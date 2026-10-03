@@ -1,20 +1,26 @@
 # Process overview
 
-<!-- TEMPLATE: replace everything in this file with your own account, this
-     comment included --- `pnpm check:evidence` fails while it's still here. -->
+> **Draft placeholder — not yet written.** This will become my own account of
+> how I got from the brief to the harness, agentic workflow and stack behind
+> this app, with commit links as evidence.
 
-How you got from the brief to the harness, agentic workflow and stack behind
-this app, told however suits the work. The
-[final project brief](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/assessments/final-project/#what-you-submit)
-says what it covers and how long it runs.
+## From the brief to the idea
 
-Markers follow the links you give them; they don't trawl the repo for evidence
-you didn't point at. A link to the record is one whose text is the commit hash,
-and it can sit anywhere in a sentence:
-[`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d) for one
-commit, or
-[`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
-for a range.
+_To write._
 
-`pnpm check:evidence` checks that this comment is gone and that every commit you
-link exists in this repo. Whether the account is any good is the marker's call.
+## The harness
+
+_To write: CLAUDE.md / AGENTS.md and why those rules._
+
+## Agentic workflow
+
+_To write: Codex producing validated binary evidence, Claude building the
+frontend, handoffs between them._
+
+## Stack
+
+_To write._
+
+## Evidence
+
+_To write: links to the commits that show the process._
