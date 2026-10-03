@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 /**
- * Headless play test of the chamber, adapted from the previous Binary Ninja
- * browser check. It drives real keyboard events through the Chrome DevTools
- * Protocol against a served build, asserts the core loop (carry a cable,
- * wire, run, stop on a wrong card, bridge only on input 7, carry the cube
- * across, analysis reveal), fails on console errors, and saves screenshots.
+ * Headless play-through of the four tutorial chambers, adapted from the
+ * previous Binary Ninja browser check. It drives real keyboard events through
+ * the Chrome DevTools Protocol against a served build — walking, hopping,
+ * carrying cubes into sockets, carrying cables between jacks — and asserts
+ * the replay contract along the way (bridge only on input 7's write, a wrong
+ * TRUE/FALSE cable stops the run, one circuit serves all three inputs). It
+ * fails on console errors and saves screenshots. Teleports are used only to
+ * skip walking between machines that have already been reached on foot.
  *
  *   pnpm build && pnpm preview &   # serves on :4173
  *   node scripts/browser-check.ts [url] [screenshot-dir]
@@ -123,18 +126,12 @@ const KEYS: Record<string, { key: string; vk: number }> = {
   KeyA: { key: "a", vk: 65 },
   KeyD: { key: "d", vk: 68 },
   KeyE: { key: "e", vk: 69 },
-  KeyH: { key: "h", vk: 72 },
   KeyI: { key: "i", vk: 73 },
   KeyF: { key: "f", vk: 70 },
   KeyR: { key: "r", vk: 82 },
   Space: { key: " ", vk: 32 },
-  Enter: { key: "Enter", vk: 13 },
-  Escape: { key: "Escape", vk: 27 },
   Tab: { key: "Tab", vk: 9 },
   F1: { key: "F1", vk: 112 },
-  Digit1: { key: "1", vk: 49 },
-  Digit2: { key: "2", vk: 50 },
-  Digit3: { key: "3", vk: 51 },
 };
 
 async function key(cdp: Cdp, type: "keyDown" | "keyUp", code: string): Promise<void> {
@@ -150,30 +147,35 @@ async function key(cdp: Cdp, type: "keyDown" | "keyUp", code: string): Promise<v
 
 async function tap(cdp: Cdp, code: string): Promise<void> {
   await key(cdp, "keyDown", code);
-  await sleep(40);
+  await sleep(50);
   await key(cdp, "keyUp", code);
-  await sleep(60);
+  await sleep(80);
 }
 
 interface Snap {
-  input: number;
-  trace: string;
+  chamber: string;
+  chamberIndex: number;
+  input: number | null;
   status: string;
-  cursor: number;
-  stop: { at: string; proposed: string | null; reason: string } | null;
-  state: { value: number; result: number; bridge_open: number };
+  stop: { at: string; port: string | null; proposed: string | null; reason: string } | null;
+  state: { value: number; result: number; bridge_open: number } | null;
+  outcomes: string[];
+  litPorts: string[];
   bridgeOpen: boolean;
   bridgeExtent: number;
-  wiring: [string, string][];
-  held: { kind: string; from?: string } | null;
-  station: string;
+  cables: [string, string][];
+  held: { kind: string; cubeId?: string; portId?: string } | null;
+  sockets: Record<string, string | null>;
+  doors: { id: string; openness: number }[];
+  finishedInputs: number[];
+  runs: number;
   player: { x: number; y: number; grounded: boolean; groundId: string | null };
-  cube: { x: number; y: number; socketed: boolean };
+  ended: boolean;
 }
 
 const snap = (cdp: Cdp): Promise<Snap> => evaluate<Snap>(cdp, "globalThis.binaryNinja.snapshot()");
 
-async function waitFor(cdp: Cdp, what: string, predicate: (s: Snap) => boolean, timeoutMs = 20000): Promise<Snap> {
+async function waitFor(cdp: Cdp, what: string, predicate: (s: Snap) => boolean, timeoutMs = 25000): Promise<Snap> {
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     const s = await snap(cdp);
@@ -183,16 +185,21 @@ async function waitFor(cdp: Cdp, what: string, predicate: (s: Snap) => boolean, 
   }
 }
 
-/** Holds a direction key until the player's x passes `x`. */
-async function walkTo(cdp: Cdp, x: number): Promise<Snap> {
+/** Holds a direction (hopping when asked) until the player's x passes `x`. */
+async function walkTo(cdp: Cdp, x: number, hop = false): Promise<Snap> {
   const s = await snap(cdp);
   const code = x > s.player.x ? "KeyD" : "KeyA";
   await key(cdp, "keyDown", code);
+  if (hop) {
+    await key(cdp, "keyDown", "Space");
+    await sleep(260);
+    await key(cdp, "keyUp", "Space");
+  }
   try {
-    return await waitFor(cdp, `walk to x=${x}`, (n) => (code === "KeyD" ? n.player.x >= x : n.player.x <= x), 8000);
+    return await waitFor(cdp, `walk to x=${x}`, (n) => (code === "KeyD" ? n.player.x >= x : n.player.x <= x), 9000);
   } finally {
     await key(cdp, "keyUp", code);
-    await sleep(250);
+    await sleep(300);
   }
 }
 
@@ -207,15 +214,47 @@ function check(label: string, ok: boolean, detail = ""): void {
   if (!ok) throw new Error(`${label} ${detail}`);
 }
 
-/** Puts the player at a point (debug teleport; movement itself is tested separately). */
 const teleport = (cdp: Cdp, x: number, y: number): Promise<unknown> =>
-  evaluate(cdp, `(() => { const p = binaryNinja.world.player; p.x = ${x}; p.y = ${y}; p.vx = 0; p.vy = 0; })()`);
+  evaluate(cdp, `(() => { const p = binaryNinja.world.player; Object.assign(p, { x: ${x}, y: ${y}, vx: 0, vy: 0 }); })()`);
 
-const wire = (cdp: Cdp, pairs: [string, string][]): Promise<unknown> =>
-  evaluate(
-    cdp,
-    `(() => { const w = binaryNinja.world; w.clearWiring(); for (const [a, b] of ${JSON.stringify(pairs)}) w.connect(a, b); })()`,
-  );
+/** Positions of things in the current chamber, read from the live world. */
+const where = (cdp: Cdp, expr: string): Promise<{ x: number; y: number }> => evaluate(cdp, expr);
+const jack = (cdp: Cdp, id: string, kind: "in" | "out"): Promise<{ x: number; y: number }> =>
+  where(cdp, `binaryNinja.world.jacks.find((j) => j.kind === "${kind}" && (j.portId === "${id}" || j.stageId === "${id}")).at`);
+const socketAt = (cdp: Cdp, id: string): Promise<{ x: number; y: number }> =>
+  where(cdp, `binaryNinja.world.socketPoint(binaryNinja.world.sockets.get("${id}").def)`);
+const cubeAt = (cdp: Cdp, id: string): Promise<{ x: number; y: number }> =>
+  where(cdp, `(() => { const c = binaryNinja.world.cubes.get("${id}"); return { x: c.x, y: c.y }; })()`);
+
+/** Teleport beside a point (standing on whatever is below) and press E. */
+async function useAt(cdp: Cdp, at: { x: number; y: number }): Promise<Snap> {
+  await teleport(cdp, at.x - 6, at.y - 20);
+  await sleep(350);
+  await tap(cdp, "KeyE");
+  await sleep(150);
+  return snap(cdp);
+}
+
+/** Step away from the socket, then put the held cube down. */
+async function dropAway(cdp: Cdp, x: number): Promise<void> {
+  await teleport(cdp, x, 983);
+  await sleep(250);
+  await tap(cdp, "KeyE");
+}
+
+async function exitRight(cdp: Cdp, from: number | null, next: number): Promise<void> {
+  if (from !== null) {
+    await teleport(cdp, from, 983);
+    await sleep(300);
+  }
+  await key(cdp, "keyDown", "KeyD");
+  try {
+    await waitFor(cdp, `exit to chamber ${next}`, (n) => n.chamberIndex === next || n.ended, 9000);
+  } finally {
+    await key(cdp, "keyUp", "KeyD");
+  }
+  await sleep(500);
+}
 
 async function main(): Promise<void> {
   mkdirSync(SHOTS, { recursive: true });
@@ -223,186 +262,165 @@ async function main(): Promise<void> {
   let cdp: Cdp | null = null;
   try {
     cdp = await connect(URL_BASE);
-    await waitFor(cdp, "game boot", (s) => typeof s.status === "string", 15000).catch(async () => {
+    await waitFor(cdp, "game boot", (s) => typeof s.chamber === "string", 15000).catch(async () => {
       await sleep(1000);
       return snap(cdp as Cdp);
     });
-    await sleep(600);
-    await shot(cdp, "01-help");
-    await tap(cdp, "KeyH");
     await sleep(500);
-    await shot(cdp, "02-start");
+    await shot(cdp, "c0-start");
 
-    // Physically carry a cable: entry OUT -> calculate_compare IN.
-    const sockets = await evaluate<Record<string, { in: { x: number } | null; out: { x: number } | null }>>(
-      cdp,
-      "Object.fromEntries([...binaryNinja.world.cards].map(([k, c]) => [k, { in: c.in, out: c.out }]))",
-    );
-    await walkTo(cdp, (sockets.entry.out?.x ?? 0) - 6);
-    await tap(cdp, "KeyE");
+    // --- 0 POWER: all on foot.
     let s = await snap(cdp);
-    check("E at an OUT socket picks up its cable", s.held?.kind === "cable" && s.held.from === "entry", JSON.stringify(s.held));
-    await walkTo(cdp, (sockets.calculate_compare.in?.x ?? 0) + 4);
-    await shot(cdp, "03-carrying-cable");
+    check("starts in chamber 0", s.chamberIndex === 0, s.chamber);
+    await walkTo(cdp, 520);
+    await walkTo(cdp, 655, true);
+    s = await snap(cdp);
+    check("hopped onto the cube ledge", s.player.groundId === "cube_ledge", String(s.player.groundId));
     await tap(cdp, "KeyE");
     s = await snap(cdp);
-    check("E at an IN socket plugs it", JSON.stringify(s.wiring) === JSON.stringify([["entry", "calculate_compare"]]), JSON.stringify(s.wiring));
-
-    // Physically jump up a ladder to the gallery.
-    await walkTo(cdp, 1770);
-    for (let i = 0; i < 6; i += 1) {
-      await key(cdp, "keyDown", "Space");
-      await sleep(380);
-      await key(cdp, "keyUp", "Space");
-      await sleep(250);
-    }
+    check("E picks up the power cube", s.held?.cubeId === "power", JSON.stringify(s.held));
+    await walkTo(cdp, 1120);
+    await walkTo(cdp, 1270, true);
+    await tap(cdp, "KeyE");
     s = await snap(cdp);
-    check("the right ladder climbs to the gallery", s.player.groundId === "gallery", `${s.player.groundId} @ ${s.player.y.toFixed(0)}`);
-    await shot(cdp, "04-gallery");
+    check("E seats the cube in the POWER socket", s.sockets.power_socket === "power", JSON.stringify(s.sockets));
+    s = await waitFor(cdp, "door opens", (n) => n.doors[0]?.openness === 1, 5000);
+    await shot(cdp, "c0-powered");
+    await exitRight(cdp, null, 1);
+    check("walking through the open door enters chamber 1", true);
+    await sleep(2200);
+    await shot(cdp, "c1-start");
 
-    // Correct wiring for input 7: watch it run, bridge opens only at its event.
-    await wire(cdp, [
-      ["entry", "calculate_compare"],
-      ["calculate_compare", "compare_high"],
-      ["compare_high", "match"],
-      ["match", "end"],
-      ["low", "end"],
-      ["high", "end"],
-    ]);
-    await teleport(cdp, 1500, 1083);
-    await tap(cdp, "Digit2");
-    await tap(cdp, "Enter");
-    await waitFor(cdp, "first comparison", (n) => n.cursor >= 1 && n.state.value === 22, 8000);
-    await sleep(500);
-    await shot(cdp, "05-run7-compare");
+    // --- 1 CONNECT: one cable, then the power cube into RUN.
+    const startOut = await jack(cdp, "entry:NEXT", "out");
+    const calcIn = await jack(cdp, "calculate_compare", "in");
+    await walkTo(cdp, startOut.x - 4);
+    await tap(cdp, "KeyE");
     s = await snap(cdp);
-    check("bridge still closed before the MATCH write", !s.bridgeOpen && s.state.bridge_open !== 1);
-    s = await waitFor(cdp, "input 7 finished", (n) => n.status === "finished", 20000);
-    check("input 7 finishes MATCH with the bridge open", s.state.result === 2 && s.bridgeOpen, JSON.stringify(s.state));
-    await sleep(1200);
-    await shot(cdp, "06-run7-finished");
+    check("E at START's OUT jack takes its cable", s.held?.portId === "entry:NEXT", JSON.stringify(s.held));
+    await walkTo(cdp, 760);
+    await walkTo(cdp, calcIn.x - 40, true);
     s = await snap(cdp);
-    check("the physical bridge extended", s.bridgeExtent === 1, String(s.bridgeExtent));
+    check("hopped onto CALCULATE's plinth still carrying the cable", s.player.groundId === "calc_plinth" && s.held?.portId === "entry:NEXT", String(s.player.groundId));
+    await shot(cdp, "c1-carrying");
+    s = await useAt(cdp, calcIn);
+    check("E at CALCULATE's IN jack connects it", JSON.stringify(s.cables) === '[["entry:NEXT","calculate_compare"]]', JSON.stringify(s.cables));
+    await walkTo(cdp, 1400);
+    await walkTo(cdp, 1460, true);
+    s = await snap(cdp);
+    check("hopped onto the RUN dais", s.player.groundId === "run_dais", String(s.player.groundId));
+    await useAt(cdp, await cubeAt(cdp, "power"));
+    s = await useAt(cdp, await socketAt(cdp, "run"));
+    check("the power cube in RUN starts input 7's run", s.status === "running" && s.input === 7, s.status);
+    await sleep(1600);
+    await shot(cdp, "c1-running");
+    s = await waitFor(cdp, "chamber 1 run finishes", (n) => n.status !== "running");
+    check("the run finishes and the real write opens the bridge", s.status === "finished" && s.bridgeOpen, s.status);
+    await waitFor(cdp, "bridge extends", (n) => n.bridgeExtent === 1, 4000);
+    await shot(cdp, "c1-bridge");
+    await exitRight(cdp, 1850, 2);
+    check("crossing the bridge enters chamber 2", true);
+    await sleep(2200);
+    await shot(cdp, "c2-start");
 
-    // Wrong card: the MATCH clone. The run stops and the bridge retracts.
-    await wire(cdp, [
-      ["entry", "calculate_compare"],
-      ["calculate_compare", "compare_high"],
-      ["compare_high", "decoy_match"],
-      ["decoy_match", "end"],
-    ]);
-    await tap(cdp, "Enter");
-    s = await waitFor(cdp, "stop on decoy", (n) => n.status === "stopped", 20000);
+    // --- 2 INPUT: power RUN, then try numbers until the bridge opens.
+    await useAt(cdp, await cubeAt(cdp, "power"));
+    s = await useAt(cdp, await socketAt(cdp, "run"));
+    check("RUN with no input refuses to start", s.sockets.run === "power" && s.status === "no_input", s.status);
+    await useAt(cdp, await cubeAt(cdp, "input_6"));
+    s = await useAt(cdp, await socketAt(cdp, "input"));
+    check("seating cube 6 while RUN is powered starts input 6", s.input === 6 && s.status === "running", `${s.input} ${s.status}`);
+    s = await waitFor(cdp, "input 6 finishes", (n) => n.status === "finished");
+    check("input 6 ends LOW, bridge shut", s.state?.result === 1 && !s.bridgeOpen);
+    await sleep(400);
+    await shot(cdp, "c2-low");
+    // Swap: carry 8 to the INPUT socket; one E seats 8 and hands back 6.
+    await useAt(cdp, await cubeAt(cdp, "input_8"));
+    s = await useAt(cdp, await socketAt(cdp, "input"));
+    check("swapping in 8 runs again on the same machine", s.input === 8 && s.status === "running" && s.held?.cubeId === "input_6", JSON.stringify(s.held));
+    await dropAway(cdp, 760);
+    s = await waitFor(cdp, "input 8 finishes", (n) => n.status === "finished");
+    check("input 8 ends HIGH, bridge shut", s.state?.result === 3 && !s.bridgeOpen);
+    await useAt(cdp, await cubeAt(cdp, "input_7"));
+    await useAt(cdp, await socketAt(cdp, "input"));
+    await dropAway(cdp, 760);
+    s = await waitFor(cdp, "input 7 finishes", (n) => n.status === "finished");
+    check("input 7 ends MATCH and its write opens the bridge", s.state?.result === 2 && s.bridgeOpen);
+    await waitFor(cdp, "bridge extends", (n) => n.bridgeExtent === 1, 4000);
+    await shot(cdp, "c2-match");
+    await exitRight(cdp, 2000, 3);
+    check("crossing the bridge enters chamber 3", true);
+    await sleep(2200);
+    await shot(cdp, "c3-start");
+
+    // --- 3 BRANCH: wire TRUE/FALSE the wrong way round first.
+    const trueJack = await jack(cdp, "cmp_000010a2:TRUE", "out");
+    const falseJack = await jack(cdp, "cmp_000010a2:FALSE", "out");
+    const lowIn = await jack(cdp, "low", "in");
+    const highCmpIn = await jack(cdp, "compare_high", "in");
+    await useAt(cdp, trueJack);
+    await useAt(cdp, highCmpIn);
+    await useAt(cdp, falseJack);
+    s = await useAt(cdp, lowIn);
+    check("both comparison outputs wired (swapped)", s.cables.length === 2, JSON.stringify(s.cables));
+    await useAt(cdp, await cubeAt(cdp, "power"));
+    await useAt(cdp, await socketAt(cdp, "run"));
+    await useAt(cdp, await cubeAt(cdp, "input_6"));
+    await useAt(cdp, await socketAt(cdp, "input"));
+    await teleport(cdp, 1300, 983);
+    s = await waitFor(cdp, "swapped wiring stops input 6", (n) => n.status !== "running");
     check(
-      "wiring the MATCH clone stops at compare_high",
-      s.stop?.at === "compare_high" && s.stop.proposed === "decoy_match" && !s.bridgeOpen && s.state.result === -999,
+      "input 6 answers TRUE, lights TRUE, and stops on the wrong TRUE cable",
+      s.status === "stopped" && s.stop?.port === "cmp_000010a2:TRUE" && s.outcomes[0] === "VALUE = 19 19 < 22 TRUE",
       JSON.stringify(s.stop),
     );
-    await sleep(900);
-    await shot(cdp, "07-run7-stopped-decoy");
-    s = await snap(cdp);
-    check("the bridge retracted for the fresh run", s.bridgeExtent === 0, String(s.bridgeExtent));
+    await sleep(300);
+    await shot(cdp, "c3-wrong");
 
-    // The expert inspector on the MATCH clone, before any reveal: real code, no answer.
-    await teleport(cdp, 1520, 1083);
+    // Re-plug both correctly; the same circuit then serves 6, 7 and 8.
+    await useAt(cdp, trueJack);
+    await useAt(cdp, lowIn);
+    await useAt(cdp, falseJack);
+    s = await useAt(cdp, highCmpIn);
+    check("rewired TRUE→LOW, FALSE→second comparison", JSON.stringify([...s.cables].sort()) === JSON.stringify([["cmp_000010a2:FALSE", "compare_high"], ["cmp_000010a2:TRUE", "low"]]), JSON.stringify(s.cables));
+    for (const [n, cube] of [[6, "input_6"], [7, "input_7"], [8, "input_8"]] as const) {
+      if (n === 6) {
+        // 6 is still seated from the failed run: re-seat it to run again.
+        await useAt(cdp, await socketAt(cdp, "input"));
+        await useAt(cdp, await socketAt(cdp, "input"));
+      } else {
+        await useAt(cdp, await cubeAt(cdp, cube));
+        await useAt(cdp, await socketAt(cdp, "input"));
+        await dropAway(cdp, 700);
+      }
+      await teleport(cdp, 1300, 983);
+      if (n === 7) {
+        await waitFor(cdp, "7's first answer", (x) => x.outcomes.length >= 1, 8000);
+        await sleep(500);
+        await shot(cdp, "c3-feedback");
+      }
+      s = await waitFor(cdp, `input ${n} finishes`, (x) => x.status !== "running");
+      check(`input ${n} finishes on the unchanged circuit`, s.status === "finished" && s.finishedInputs.includes(n), s.status);
+    }
+    check("the three runs lit different branch ports", true);
+    await waitFor(cdp, "door opens", (n) => n.doors[0]?.openness === 1, 5000);
+    await shot(cdp, "c3-done");
+
+    await teleport(cdp, 1300, 983);
     await sleep(300);
     await tap(cdp, "KeyI");
     await sleep(400);
-    const inspectorText = await evaluate<string>(cdp, "document.querySelector('.inspector')?.textContent ?? ''");
-    const leaks = ["decoy", "alteredBB", "bogus", "clone", "candidate"].filter((w) => inspectorText.toLowerCase().includes(w.toLowerCase()));
-    check("the inspector shows the clone's real code without naming it", inspectorText.includes("bb_00001407") && leaks.length === 0, leaks.join(","));
-    await shot(cdp, "07b-inspector-before-reveal");
+    await shot(cdp, "c3-inspector");
     await tap(cdp, "KeyI");
-
-    // Input 6: valid LOW run, bridge stays closed.
-    await wire(cdp, [
-      ["entry", "calculate_compare"],
-      ["calculate_compare", "low"],
-      ["low", "end"],
-    ]);
-    await tap(cdp, "Digit1");
-    s = await snap(cdp);
-    check("selecting input 6 gives a fresh, unstarted replay", s.input === 6 && s.status === "ready" && s.trace === "input_6");
-    await tap(cdp, "KeyF");
-    await tap(cdp, "Enter");
-    s = await waitFor(cdp, "input 6 finished", (n) => n.status === "finished", 20000);
-    check("input 6 finishes LOW with the bridge closed", s.state.result === 1 && !s.bridgeOpen);
-    await tap(cdp, "KeyF");
-
-    // Input 8 stopped by input 6's wiring at the first comparison.
-    await tap(cdp, "Digit3");
-    await tap(cdp, "Enter");
-    s = await waitFor(cdp, "input 8 stops", (n) => n.status === "stopped", 20000);
-    check("input 8 on input 6's wiring stops at calculate_compare", s.stop?.at === "calculate_compare");
-
-    // Re-open the bridge with input 7 and carry the cube across on foot.
-    await wire(cdp, [
-      ["entry", "calculate_compare"],
-      ["calculate_compare", "compare_high"],
-      ["compare_high", "match"],
-      ["match", "end"],
-    ]);
-    await tap(cdp, "Digit2");
-    await tap(cdp, "KeyF");
-    await tap(cdp, "Enter");
-    await waitFor(cdp, "bridge reopened", (n) => n.bridgeExtent === 1, 20000);
-    await tap(cdp, "KeyF");
-    const cube = (await snap(cdp)).cube;
-    await teleport(cdp, cube.x + 30, 1083);
-    await sleep(300);
-    await walkTo(cdp, cube.x + 6);
-    await tap(cdp, "KeyE");
-    s = await snap(cdp);
-    check("E picks up the cube", s.held?.kind === "cube");
-    await teleport(cdp, 2150, 1083);
-    await sleep(200);
-    const slot = await evaluate<{ x: number }>(cdp, "binaryNinja.room.station.slot");
-    await walkTo(cdp, slot.x - 4);
-    s = await snap(cdp);
-    check("walked across the open bridge with the cube", s.player.groundId === "floor_far" && s.held?.kind === "cube", `${s.player.groundId}`);
-    await tap(cdp, "KeyE");
-    s = await snap(cdp);
-    check("the cube powers the analysis station", s.station === "online" && s.cube.socketed);
-    await walkTo(cdp, slot.x + 150);
-    await tap(cdp, "KeyE");
-    s = await snap(cdp);
-    check("using the powered station reveals the analysis", s.station === "revealed");
-    await sleep(600);
-    await shot(cdp, "08-station-revealed");
-
-    // Overview + revealed decoys.
-    await key(cdp, "keyDown", "Tab");
-    await sleep(1500);
-    await shot(cdp, "09-overview-revealed");
-    await key(cdp, "keyUp", "Tab");
-
-    // Expert inspector on the MATCH clone, then the real MATCH card after a run.
-    await teleport(cdp, 1500, 1083);
-    await sleep(400);
-    await evaluate(cdp, "binaryNinja.director.select(7)");
-    await wire(cdp, [
-      ["entry", "calculate_compare"],
-      ["calculate_compare", "compare_high"],
-      ["compare_high", "match"],
-      ["match", "end"],
-    ]);
-    await tap(cdp, "KeyF");
-    await tap(cdp, "Enter");
-    await waitFor(cdp, "input 7 finished again", (n) => n.status === "finished", 20000);
-    await tap(cdp, "KeyF");
-    await teleport(cdp, 1660, 1083);
-    await sleep(500);
-    await tap(cdp, "KeyI");
-    await sleep(400);
-    await shot(cdp, "10-inspector");
-    await tap(cdp, "KeyI");
-
-    // Debug overlay.
     await tap(cdp, "F1");
     await sleep(400);
-    await shot(cdp, "11-debug");
+    await shot(cdp, "c3-debug");
     await tap(cdp, "F1");
 
+    await exitRight(cdp, 2550, 4);
+    s = await snap(cdp);
+    check("leaving chamber 3 ends the tutorial", s.ended);
+    await shot(cdp, "end");
     check("no console errors", cdp.errors.length === 0, cdp.errors.join(" | "));
   } finally {
     console.log(checks.join("\n"));

@@ -1,22 +1,27 @@
 /**
  * Game shell: the fixed-timestep loop (from the previous Binary Ninja game),
- * and the glue between the replay, the room and everything the player sees.
+ * the tutorial chamber sequence, and the glue between sockets, the replay and
+ * everything the player sees.
  *
- * The one rule this file enforces between layers: the physical bridge follows
- * `replay.bridgeOpen`, which only a processed `bridge_open` event sets.
+ * Rules this file enforces between layers:
+ * - a cube seated in RUN starts one fresh run (latched; no repeat firing);
+ * - seating a different number cube in INPUT selects that input's retained
+ *   execution and, if RUN is powered, starts it — wiring is never touched;
+ * - the physical bridge follows `replay.bridgeOpen`, which only a processed
+ *   `bridge_open` event sets.
  */
 
 import type { SpecimenIndex } from "./data/bundle.ts";
-import { CAMERA, FIXED_DT, MAX_FRAME_TIME } from "./engine/constants.ts";
+import { FIXED_DT, MAX_FRAME_TIME, RUN } from "./engine/constants.ts";
 import type { Box, Vec2 } from "./engine/geometry.ts";
 import type { GrappleTarget } from "./engine/physics.ts";
 import { findGrappleTarget } from "./engine/physics.ts";
-import { HINT_COLOURS } from "./level/card-faces.ts";
-import { cardName, cardTitle, relationshipPhrase, stateText } from "./level/presentation.ts";
-import type { RoomDef } from "./level/room.ts";
-import { cardPanel } from "./level/room.ts";
+import type { ChamberDef } from "./level/chamber.ts";
+import { housing } from "./level/chamber.ts";
+import { ChamberLayout } from "./level/layout.ts";
+import { machineTitle, portLabel } from "./level/presentation.ts";
 import { RunDirector } from "./replay/director.ts";
-import type { DirectorEvent } from "./replay/director.ts";
+import type { DirectorEvent, PacingView } from "./replay/director.ts";
 import { Renderer } from "./render/renderer.ts";
 import { DebugPanel } from "./ui/debug-panel.ts";
 import { Hud } from "./ui/hud.ts";
@@ -28,11 +33,14 @@ import type { Interactable, WorldEvent } from "./world/world.ts";
 export interface GameOptions {
   debug: boolean;
   grapple: boolean;
+  startChamber: number;
 }
 
 export class Game {
-  readonly world: World;
-  readonly director: RunDirector;
+  world!: World;
+  layout!: ChamberLayout;
+  director!: RunDirector;
+  chamberIndex = 0;
   private renderer: Renderer;
   private input: InputManager;
   private hud: Hud;
@@ -45,101 +53,107 @@ export class Game {
   private fps = 60;
   private focus: Interactable | null = null;
   private grappleTarget: GrappleTarget | null = null;
-  /** Seconds left to keep framing the run after it stops or finishes. */
-  private linger = 0;
-  private bridgeEverOpened = false;
-  private stageCounter = 0;
-  private seen = new Set<string>();
+  private moved = 0;
+  private log: string[] = [];
 
   constructor(
     host: HTMLElement,
     canvas: HTMLCanvasElement,
     readonly specimen: SpecimenIndex,
-    readonly room: RoomDef,
+    readonly chambers: ChamberDef[],
     private readonly options: GameOptions,
   ) {
-    if (room.specimenId !== specimen.bundle.specimen_id) {
-      throw new Error(`Room ${room.id} is authored for ${room.specimenId}, not ${specimen.bundle.specimen_id}`);
-    }
-    this.world = new World(room, specimen);
-    // Input 7 is the run that reaches the bridge; start there.
-    const first = specimen.inputs.includes(7) ? 7 : specimen.inputs[0];
-    this.director = new RunDirector(specimen, first);
     this.renderer = new Renderer(canvas);
     this.input = new InputManager(options.grapple);
     this.input.attach(canvas, host);
-
-    this.hud = new Hud(host, specimen, {
-      input: (i) => this.input.pushAction(`input:${i}` as "input:0"),
-      run: () => this.input.pushAction("run"),
-      reset: () => this.input.pushAction("reset"),
-      fast: () => this.input.pushAction("fast"),
-      help: () => this.input.pushAction("help"),
-    });
+    this.hud = new Hud(host, () => this.loadChamber(0));
     this.inspector = new Inspector(host, specimen);
-    this.debug = new DebugPanel(host, specimen, room.cards.map((c) => c.stageId), {
-      wireTrace: () => {
-        this.world.clearWiring();
-        for (const e of this.director.replay.trace.events) {
-          if (e.next_stage_id) this.world.connect(e.stage_id, e.next_stage_id);
+    this.debug = new DebugPanel(host, specimen, chambers, {
+      chamber: (i) => this.loadChamber(i),
+      input: (value) => this.debugInput(value),
+      run: () => this.startRun(),
+      reset: () => this.director.reset(),
+      wireCorrectly: () => {
+        for (const port of this.world.chamber.editablePorts) {
+          this.world.connect(port, this.specimen.port(port).expected_destination_stage_id);
         }
-        this.world.drainEvents();
       },
-      clearWiring: () => this.world.clearWiring(),
-      connect: (from, to) => {
-        if (to) this.world.connect(from, to);
-        else this.world.disconnect(from);
-        this.world.drainEvents();
+      clearCables: () => this.world.clearCables(),
+      connect: (port, to) => {
+        if (to) this.world.connect(port, to);
+        else this.world.disconnect(port);
       },
       toggleStepMode: () => {
         this.director.stepMode = !this.director.stepMode;
       },
-      step: () => this.director.stepOnce(this.lookup, this.cableLength),
-      unlockStation: () => this.world.forceStationOnline(),
-      resetCube: () => this.world.resetCube(),
+      step: () => this.director.stepOnce(this.wiring, this.pacing),
+      toggleFast: () => {
+        this.director.fast = !this.director.fast;
+      },
+      resetCubes: () => this.world.resetCubes(),
     });
     this.debug.setVisible(options.debug);
-    this.hud.setHelp(!options.debug);
-    this.hud.logReset("Ready. Choose an input and press Enter to run.");
+    this.loadChamber(Math.min(Math.max(0, options.startChamber), chambers.length - 1));
+  }
 
-    this.renderer.camera.setWorld(room.world.width, room.world.height);
+  private wiring = (portId: string): string | null => this.world.connection(portId);
+
+  private pacing: PacingView = {
+    visible: (stageId) => this.layout.stages.get(stageId)?.mode === "machine",
+    travel: (portId) => {
+      const to = this.world.connection(portId);
+      const length = to ? this.layout.pathLength(portId, to) : 0;
+      return Math.min(RUN.transferMax, RUN.transferBase + length * RUN.transferPerUnit);
+    },
+  };
+
+  loadChamber(index: number): void {
+    const chamber = this.chambers[index];
+    this.chamberIndex = index;
+    for (const s of chamber.stages) this.specimen.stage(s.stageId);
+    this.world = new World(chamber, this.specimen);
+    this.layout = new ChamberLayout(chamber, this.specimen);
+    this.director = new RunDirector(this.specimen, chamber.fixedInput);
+    this.director.drainEvents();
+    this.log = [];
+    this.moved = 0;
+    this.inspector.close();
+    this.renderer.resetChamber();
+    this.renderer.camera.setWorld(chamber.world.width, chamber.world.height, chamber.camera.viewHeight);
     const view = this.renderer.viewSize();
     this.renderer.camera.viewW = view.w;
     this.renderer.camera.viewH = view.h;
-    this.renderer.camera.snapTo(this.world.player.x, this.world.player.y + room.camera.offsetY);
+    this.renderer.camera.snapTo(this.world.player.x, this.world.player.y + chamber.camera.offsetY);
+    this.hud.enterChamber(chamber.number, chamber.title);
+    this.accumulator = 0;
   }
-
-  get revealed(): boolean {
-    return this.world.station === "revealed";
-  }
-
-  private lookup = (stageId: string): string | null => this.world.connection(stageId);
-
-  private cableLength = (from: string, to: string): number => {
-    const a = this.world.cards.get(from)?.out;
-    const b = this.world.cards.get(to)?.in;
-    return a && b ? Math.hypot(b.x - a.x, b.y - a.y) : 0;
-  };
 
   /** Read-only live state for the browser check and the console. */
   snapshot(): Record<string, unknown> {
     const r = this.director.replay;
     const p = this.world.player;
     return {
-      input: this.director.selectedInput,
-      trace: r.trace.id,
-      status: r.status,
-      cursor: r.cursor,
-      stop: r.stop ? { at: r.stop.event.stage_id, proposed: r.stop.proposed, reason: r.stop.reason } : null,
-      state: { ...r.state },
-      bridgeOpen: r.bridgeOpen,
+      chamber: this.world.chamber.id,
+      chamberIndex: this.chamberIndex,
+      input: this.director.input,
+      trace: r?.trace.id ?? null,
+      status: r?.status ?? "no_input",
+      cursor: r?.cursor ?? null,
+      stop: r?.stop ? { at: r.stop.event.stage_id, port: r.stop.portId, proposed: r.stop.proposed, reason: r.stop.reason } : null,
+      state: r ? { ...r.state } : null,
+      outcomes: r?.outcomesShown.map((o) => o.feedback.lines.join(" ")) ?? [],
+      litPorts: r ? [...r.activatedPorts] : [],
+      bridgeOpen: r?.bridgeOpen ?? false,
       bridgeExtent: this.world.bridgeExtent,
-      wiring: this.world.wiring(),
+      cables: this.world.cables(),
       held: this.world.held,
-      station: this.world.station,
+      sockets: Object.fromEntries([...this.world.sockets].map(([id, s]) => [id, s.cubeId])),
+      doors: this.world.doors.map((d) => ({ id: d.def.id, openness: d.openness })),
+      finishedInputs: [...this.world.finishedInputs],
+      runs: this.director.runs,
       player: { x: p.x, y: p.y, grounded: p.grounded, groundId: p.groundId },
-      cube: { x: this.world.cube.x, y: this.world.cube.y, socketed: this.world.cube.socketed },
-      focus: this.focus,
+      exited: this.world.exited,
+      ended: this.hud.endOpen,
       fps: this.fps,
     };
   }
@@ -161,29 +175,28 @@ export class Game {
 
     this.handleActions();
     const aim = this.resolveAim();
-    if (!this.hud.helpOpen) this.simulate(dt, aim);
+    if (!this.hud.endOpen) this.simulate(dt, aim);
     this.handleWorldEvents(this.world.drainEvents());
-
-    this.director.update(dt, this.lookup, this.cableLength);
+    this.director.update(dt, this.wiring, this.pacing);
     this.handleDirectorEvents(this.director.drainEvents());
-    this.world.bridgeTarget = this.director.replay.bridgeOpen;
-    if (this.director.replay.bridgeOpen) this.bridgeEverOpened = true;
+    this.world.bridgeTarget = this.director.replay?.bridgeOpen ?? false;
 
     this.renderer.particles.update(dt);
     this.updateCamera(dt);
     this.focus = this.world.focus();
     this.hud.setPrompt(this.promptText());
-    this.hud.update(this.hudView());
-    this.inspector.update(this.director.replay, this.revealed);
-    this.debug.update(this.director, this.world, this.fps);
+    this.hud.setHint(this.moved < 260);
+    this.inspector.update(this.director.replay, this.wiring, (p) => this.world.isEditable(p), false);
+    this.debug.update(this.director, this.world, this.fps, this.log);
 
     this.renderer.draw({
       world: this.world,
+      layout: this.layout,
       specimen: this.specimen,
       director: this.director,
-      revealed: this.revealed,
       focus: this.focus,
       time: this.time,
+      dt,
       debug: this.debug.visible,
       inspected: this.inspector.isOpen ? this.inspector.stageId : null,
       grapple: this.options.grapple ? { target: this.grappleTarget, aim } : null,
@@ -192,50 +205,39 @@ export class Game {
 
   private handleActions(): void {
     const input = this.input;
-    if (input.takeAction("help")) this.hud.setHelp(!this.hud.helpOpen);
-    if (input.takeAction("escape")) {
-      if (this.hud.helpOpen) this.hud.setHelp(false);
-      else if (this.inspector.isOpen) this.inspector.close();
-    }
+    if (input.takeAction("escape")) this.inspector.close();
     if (input.takeAction("debug")) this.debug.setVisible(!this.debug.visible);
-    for (let i = 0; i < this.specimen.inputs.length; i += 1) {
-      if (input.takeAction(`input:${i}` as "input:0")) this.director.select(this.specimen.inputs[i]);
-    }
-    if (input.takeAction("run")) {
-      this.hud.setHelp(false);
-      this.director.run();
-    }
-    if (input.takeAction("reset")) this.director.reset();
     if (input.takeAction("fast")) this.director.fast = !this.director.fast;
+    if (input.takeAction("reset")) this.world.resetCubes();
     if (input.takeAction("inspect")) this.toggleInspector();
-
     for (const click of input.clicks) {
-      const stageId = this.renderer.cardAt(this.world, click.x, click.y);
+      const stageId = this.renderer.machineAt(this.world, click.x, click.y);
       if (stageId) this.inspector.open(stageId);
     }
     input.clicks = [];
     input.clearActions();
   }
 
-  /** I: inspect the card being used, else the nearest card in view. */
+  /** I: inspect the machine being used, else the nearest visible machine. */
   private toggleInspector(): void {
     if (this.inspector.isOpen) {
       this.inspector.close();
       return;
     }
     const f = this.focus;
-    if (f && (f.kind === "in" || f.kind === "out")) {
-      this.inspector.open(f.stageId);
+    if (f?.kind === "jack") {
+      this.inspector.open(f.jack.stageId);
       return;
     }
     const p = this.world.player;
     let best: string | null = null;
-    let bestDist = 520;
-    for (const [stageId, c] of this.world.cards) {
-      const b = cardPanel(c.card);
+    let bestDist = 600;
+    for (const s of this.world.chamber.stages) {
+      if (s.mode !== "machine") continue;
+      const b = housing(s);
       const d = Math.hypot(b.x + b.w / 2 - p.x, b.y + b.h / 2 - p.y);
       if (d < bestDist) {
-        best = stageId;
+        best = s.stageId;
         bestDist = d;
       }
     }
@@ -251,6 +253,7 @@ export class Game {
   private simulate(dt: number, aim: Vec2): void {
     this.accumulator += dt;
     let steps = 0;
+    const before = this.world.player.x;
     while (this.accumulator >= FIXED_DT && steps < 8) {
       this.input.sync(aim);
       const edges = this.input.takeEdges();
@@ -263,6 +266,7 @@ export class Game {
       steps += 1;
     }
     if (steps >= 8) this.accumulator = 0;
+    this.moved += Math.abs(this.world.player.x - before);
     if (this.options.grapple) {
       const p = this.world.player;
       this.grappleTarget =
@@ -270,75 +274,77 @@ export class Game {
     }
   }
 
-  // --- events -------------------------------------------------------------
+  // --- sockets drive the machine ------------------------------------------
 
-  private once(key: string): boolean {
-    if (this.seen.has(key)) return false;
-    this.seen.add(key);
-    return true;
+  private socketKind(socketId: string): string | undefined {
+    return this.world.sockets.get(socketId)?.def.kind;
   }
 
-  private name(stageId: string): string {
-    return cardTitle(this.specimen, stageId, this.revealed);
+  private runPowered(): boolean {
+    return [...this.world.sockets.values()].some((s) => s.def.kind === "run" && s.cubeId !== null);
+  }
+
+  private startRun(): void {
+    if (this.director.run()) return;
+    this.hud.toast("NO INPUT", "", "bad");
+  }
+
+  /** Developer shortcut: seat (or clear) the input as if a cube were placed. */
+  private debugInput(value: number | null): void {
+    const socket = [...this.world.sockets.values()].find((s) => s.def.kind === "input");
+    const cube = [...this.world.cubes.values()].find((c) => c.def.kind === "input" && c.def.value === value);
+    if (socket && cube) {
+      if (socket.cubeId) this.world.resetCubes();
+      this.world.insert(cube.def.id, socket.def.id);
+    } else {
+      this.director.select(value);
+    }
   }
 
   private handleWorldEvents(events: WorldEvent[]): void {
     const fx = this.renderer.particles;
     for (const e of events) {
       switch (e.kind) {
-        case "connected": {
-          const at = this.world.cards.get(e.to)?.in;
-          if (at) fx.burst(at.x, at.y, 14, "#9fd3ff", 160);
+        case "socket_filled": {
+          const kind = this.socketKind(e.socketId);
+          const s = this.world.sockets.get(e.socketId)?.def;
+          if (s) fx.burst(s.x, s.floorY - 20, 22, kind === "input" ? "#7cc4ff" : "#c08cff", 220);
+          if (kind === "input") {
+            this.director.select(this.world.cubes.get(e.cubeId)?.def.value ?? null);
+            if (this.runPowered()) this.startRun();
+          } else if (kind === "run") {
+            this.startRun();
+          }
           break;
         }
-        case "dropped_cable":
-          this.hud.toast("Cable dropped", `${this.name(e.from)} is now unplugged`, "info");
+        case "socket_emptied":
+          if (this.socketKind(e.socketId) === "input") this.director.select(null);
           break;
-        case "took_cable":
-          if (this.once("took_cable")) {
-            this.hud.toast("Carrying a cable", "Walk to another card's IN socket and press E", "info");
-          }
+        case "connected": {
+          const at = this.layout.stages.get(e.to);
+          if (at) fx.burst(at.x + 34, at.floorY - 26, 14, "#cfe6ff", 160);
           break;
-        case "picked_cube":
-          if (this.once("picked_cube")) {
-            this.hud.toast("Power cube", "The analysis station is across the pit", "info");
-          }
+        }
+        case "door_opened": {
+          const door = this.world.doors.find((d) => d.def.id === e.doorId);
+          if (door) fx.burst(door.def.x + door.def.w / 2, door.def.y, 26, "#4ee0a1", 240);
+          this.renderer.camera.kick(0.2);
           break;
-        case "cube_socketed":
-          this.hud.toast("Analysis station powered", "Press E at the station to run the analysis", "good");
-          fx.burst(this.room.station.slot.x, this.room.station.slot.y, 40, "#c08cff", 280);
-          this.renderer.camera.kick(0.3);
-          break;
-        case "analysis_revealed":
-          this.hud.toast(
-            "Analysis complete",
-            `${this.specimen.bundle.analysis_reward.reveal_stage_ids.length} cards are proven bogus clones — inspect them (I)`,
-            "good",
-          );
-          for (const id of this.specimen.bundle.analysis_reward.reveal_stage_ids) {
-            const c = this.world.cards.get(id);
-            if (c) {
-              const b = cardPanel(c.card);
-              fx.shatter(b.x, b.y, b.w, b.h, "#ff6f88");
-            }
-          }
-          this.renderer.camera.kick(0.4);
+        }
+        case "exited":
+          if (this.chamberIndex + 1 < this.chambers.length) this.loadChamber(this.chamberIndex + 1);
+          else this.hud.setEnd(true);
+          return;
+        case "denied":
+          this.hud.toast(e.message, "", "bad");
           break;
         case "cube_respawned":
-          this.hud.toast("Cube returned", "It fell out of the room", "info");
-          break;
-        case "denied":
-          this.hud.toast("Not here", e.message, "bad");
-          break;
-        case "run_requested":
-          this.hud.setHelp(false);
-          this.director.run();
+          this.hud.toast("Cube returned", "", "info");
           break;
         case "landed":
           if (e.speed > 700) fx.burst(e.x, e.y + 17, 5, "#8fb6d6", 90);
           break;
-        case "bridge_settled":
-        case "unplugged":
+        default:
           break;
       }
     }
@@ -348,62 +354,53 @@ export class Game {
     const fx = this.renderer.particles;
     for (const ev of events) {
       if (ev.kind === "reset") {
-        this.hud.logReset(`Ready · input ${ev.input}. Press Enter to run.`);
-        this.linger = 0;
+        this.log.push(`reset · input ${ev.input ?? "none"}`);
         continue;
       }
       if (ev.kind === "started") {
-        this.stageCounter = 0;
-        this.hud.logReset(`Run · input ${ev.input} · ${ev.traceId}`);
+        this.log.push(`run · input ${ev.input} · ${ev.traceId}`);
         continue;
       }
       const step = ev.step;
       switch (step.kind) {
         case "enter":
-          this.stageCounter += 1;
-          this.hud.logLine(`<b>${this.stageCounter}.</b> ${this.name(step.event.stage_id)}`);
+          this.log.push(`enter ${step.event.id} (${step.event.stage_id})`);
           break;
-        case "semantic": {
-          const s = step.semantic;
-          const shown = s.label ? s.label : stateText(this.specimen, s.field, s.value);
-          this.hud.logChip(`${s.field} ← ${shown}`, s.kind === "bridge_open" ? "#4ee0a1" : s.label ? HINT_COLOURS[s.label] : null);
-          if (s.kind === "bridge_open") {
+        case "feedback":
+          this.log.push(`  answer ${step.outcome.feedback.lines.join(" / ")}`);
+          break;
+        case "activation":
+          this.log.push(`  port lit ${step.outcome.selected_port_id}`);
+          break;
+        case "semantic":
+          this.log.push(`  ${step.semantic.kind} ${step.semantic.field}=${step.semantic.value}`);
+          if (step.semantic.kind === "bridge_open") {
+            const br = this.world.chamber.bridge;
             this.renderer.camera.kick(0.35);
-            fx.burst(this.room.bridge.x - 30, this.room.bridge.y - 50, 30, "#4ee0a1", 240);
+            if (br) fx.burst(br.x - 30, br.y - 50, 30, "#4ee0a1", 240);
           }
           break;
-        }
-        case "comparison": {
-          const c = step.comparison;
-          this.hud.logChip(`${relationshipPhrase(c)} → ${c.hint}`, HINT_COLOURS[c.hint]);
-          break;
-        }
         case "advance":
+          this.log.push(`  via ${step.portId} → ${step.to.stage_id}`);
           break;
         case "stopped": {
-          const stop = step.stop;
-          const from = this.name(stop.event.stage_id);
-          const detail =
-            stop.reason === "no_connection"
-              ? `Nothing is plugged into ${from}'s output.`
-              : `From ${from}, execution did not go to ${stop.proposed ? cardName(this.specimen, stop.proposed, this.revealed) : "that card"}.`;
-          this.hud.logLine(`✕ Stopped. ${detail}`, "log-bad");
-          this.hud.toast("Run stopped", `${detail} Re-wire and run again.`, "bad");
-          this.renderer.camera.kick(0.3);
-          const at = this.world.cards.get(stop.event.stage_id)?.out;
-          if (at) fx.burst(at.x, at.y, 26, "#ff5f7a", 220);
-          this.linger = CAMERA.frameLinger;
+          this.log.push(`stopped: ${step.stop.reason} at ${step.stop.portId ?? "—"}`);
+          const at = step.stop.portId ? this.layout.portJack(step.stop.portId) : null;
+          if (at && this.world.isEditable(step.stop.portId ?? "")) fx.burst(at.x, at.y, 26, "#ff5f7a", 220);
+          this.renderer.camera.kick(0.25);
           break;
         }
         case "finished": {
-          const r = this.director.replay;
-          const result = stateText(this.specimen, "result", r.state.result);
-          const bridge = r.bridgeOpen ? "the bridge is open" : "the bridge stays closed";
-          this.hud.logLine(`✓ Returned ${result}; ${bridge}.`, "log-good");
-          this.hud.toast(`Program finished: ${result}`, `A complete, valid run of input ${r.input} — ${bridge}.`, "good");
-          this.linger = CAMERA.frameLinger;
+          this.log.push(`finished · result ${this.director.replay?.state.result}`);
+          const input = this.director.input;
+          const rule = this.world.doors.find((d) => d.def.rule.kind === "inputs_finished")?.def.rule;
+          if (input !== null && rule?.kind === "inputs_finished" && rule.inputs.includes(input)) {
+            this.world.finishedInputs.add(input);
+          }
           break;
         }
+        case "comparison":
+          break;
       }
     }
   }
@@ -413,106 +410,67 @@ export class Game {
   private updateCamera(dt: number): void {
     const view = this.renderer.viewSize();
     const p = this.world.player;
-    this.linger = Math.max(0, this.linger - dt);
     let frame: Box | null = null;
     if (this.input.overviewHeld) {
-      frame = { x: 0, y: 0, w: this.room.world.width, h: this.room.world.height };
-    } else if (this.director.running || this.linger > 0) {
+      frame = { x: 0, y: 0, w: this.world.chamber.world.width, h: this.world.chamber.world.height };
+    } else if (this.director.running) {
       frame = this.runFrame();
     }
-    this.renderer.camera.update(dt, { x: p.x, y: p.y }, { x: p.vx, y: p.vy }, view.w, view.h, frame, this.room.camera);
+    this.renderer.camera.update(dt, { x: p.x, y: p.y }, { x: p.vx, y: p.vy }, view.w, view.h, frame, this.world.chamber.camera);
   }
 
-  /** The player plus the card being executed (and the one a pulse is heading to). */
-  private runFrame(): Box {
+  /** During a run: the player and the visible machine executing (sealed ones don't pull the view). */
+  private runFrame(): Box | null {
+    const id = this.director.visual.pulse?.to ?? this.director.visual.activeStageId;
+    const stage = id ? this.layout.stages.get(id) : undefined;
+    if (!stage || stage.mode !== "machine") return null;
     const p = this.world.player;
-    let x0 = p.x - 40;
-    let y0 = p.y - 60;
-    let x1 = p.x + 40;
-    let y1 = p.y + 40;
-    const visual = this.director.visual;
-    const include = (id: string | null | undefined): void => {
-      const c = id ? this.world.cards.get(id) : undefined;
-      if (!c) return;
-      const b = cardPanel(c.card);
-      x0 = Math.min(x0, b.x);
-      y0 = Math.min(y0, b.y - (visual.comparison?.stage_id === id ? 180 : 50));
-      x1 = Math.max(x1, b.x + b.w);
-      y1 = Math.max(y1, b.y + b.h + 30);
-    };
-    include(visual.activeStageId);
-    include(visual.pulse?.to);
-    if (this.director.replay.bridgeEvent) {
-      x1 = Math.max(x1, this.room.bridge.x + this.room.bridge.length);
-      y1 = Math.max(y1, this.room.bridge.y + 40);
-    }
+    const b = housing(stage);
+    const x0 = Math.min(p.x - 60, b.x);
+    const x1 = Math.max(p.x + 60, b.x + b.w);
+    const y0 = Math.min(p.y - 80, b.y - 60);
+    const y1 = Math.max(p.y + 40, b.y + b.h + 20);
     return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
   }
 
   private promptText(): string | null {
     const f = this.focus;
-    const held = this.world.held;
+    const w = this.world;
+    const held = w.held;
     const sp = this.specimen;
+    const cubeName = (cubeId: string): string => {
+      const c = w.cubes.get(cubeId)?.def;
+      return c?.kind === "input" ? `cube ${c.value}` : "power cube";
+    };
     if (held?.kind === "cube") {
-      return f?.kind === "slot" ? "E · insert the power cube" : "E · put the cube down";
+      if (f?.kind === "socket") {
+        const seated = w.socketCube(f.socketId);
+        const label = w.sockets.get(f.socketId)?.def.label;
+        return seated
+          ? `E · swap ${cubeName(held.cubeId)} for ${cubeName(seated.def.id)} in ${label}`
+          : `E · place ${cubeName(held.cubeId)} in ${label}`;
+      }
+      return "E · put down";
     }
     if (held?.kind === "cable") {
-      if (f?.kind === "in") {
-        return f.stageId === held.from
-          ? "A card can't feed its own input"
-          : `E · plug ${this.name(held.from)} → ${cardName(sp, f.stageId, this.revealed)}`;
-      }
-      return `Carrying ${this.name(held.from)}'s cable · E on an IN socket to plug · E elsewhere drops it`;
+      const label = portLabel(sp, held.portId);
+      if (f?.kind === "jack" && f.jack.kind === "in") return `E · connect ${label} → ${machineTitle(sp, f.jack.stageId)}`;
+      return `E · drop the ${label} cable`;
     }
     if (!f) return null;
     switch (f.kind) {
-      case "out": {
-        const to = this.world.connection(f.stageId);
-        return to
-          ? `E · unplug ${this.name(f.stageId)} → ${this.name(to)} and carry it`
-          : `E · take the output cable of ${cardName(sp, f.stageId, this.revealed)}`;
+      case "jack": {
+        if (f.jack.kind === "in") return "E · pull a cable out";
+        const port = f.jack.portId as string;
+        const to = w.connection(port);
+        return to ? `E · unplug ${portLabel(sp, port)} (→ ${machineTitle(sp, to)})` : `E · take the ${portLabel(sp, port)} cable`;
       }
-      case "in":
-        return `E · pull a cable out of ${this.name(f.stageId)}'s input`;
       case "cube":
-        return "E · pick up the power cube";
-      case "run":
-        return `E · run the program with input ${this.director.selectedInput}`;
-      case "station":
-        return this.world.station === "locked"
-          ? "Analysis station · locked — bring the power cube"
-          : this.world.station === "online"
-            ? "E · run the bogus-clone analysis"
-            : "Analysis complete — marked cards are proven fake";
-      case "slot":
-        return null;
+        return `E · pick up ${cubeName(f.cubeId)}`;
+      case "socket": {
+        const cube = w.socketCube(f.socketId);
+        return cube ? `E · take ${cubeName(cube.def.id)} out` : null;
+      }
     }
-  }
-
-  private hudView(): Parameters<Hud["update"]>[0] {
-    const r = this.director.replay;
-    const extent = this.world.bridgeExtent;
-    const at = (id: string | undefined): string => (id ? this.name(id) : "");
-    const statusText =
-      r.status === "ready"
-        ? `Ready · input ${r.input}. Press Enter to run.`
-        : r.status === "running"
-          ? `Running input ${r.input} · at ${at(r.currentEvent?.stage_id)}`
-          : r.status === "stopped"
-            ? `Stopped at ${at(r.stop?.event.stage_id)} · re-wire and run again`
-            : `Finished · returned ${stateText(this.specimen, "result", r.state.result)}`;
-    return {
-      input: this.director.selectedInput,
-      status: r.status,
-      statusText,
-      fast: this.director.fast,
-      state: { ...r.state },
-      bridge: extent >= 1 ? "open" : extent > 0 ? "moving" : "closed",
-      objectives: {
-        bridge: this.bridgeEverOpened,
-        cube: this.world.station !== "locked",
-        analysis: this.world.station === "revealed",
-      },
-    };
   }
 }

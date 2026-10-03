@@ -3,7 +3,7 @@
  * the workspace export (see `game_data/SOURCE.md`).
  */
 
-import raw from "../../game_data/level01_compare_bcf_v1.json";
+import raw from "../../game_data/level01_compare_bcf_v2.json";
 import { parseBundle, SpecimenIndex } from "./bundle.ts";
 
 export function loadSpecimen(): SpecimenIndex {

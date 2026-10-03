@@ -163,6 +163,9 @@ function resolveX(b: Body, w: number, h: number, solids: readonly Solid[]): void
     const right = b.x + w / 2;
     if (right <= s.x || left >= s.x + s.w) continue;
     if (bottom <= s.y + EPS || top >= s.y + s.h - EPS) continue;
+    // A sliver of vertical overlap is a floor or ceiling contact for resolveY,
+    // not a wall: pushing sideways out of a long floor would fling the body.
+    if (Math.min(bottom, s.y + s.h) - Math.max(top, s.y) < 4) continue;
     const pushLeft = right - s.x;
     const pushRight = s.x + s.w - left;
     if (b.vx > 0 || (b.vx === 0 && pushLeft < pushRight)) b.x -= pushLeft;

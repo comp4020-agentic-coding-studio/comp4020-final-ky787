@@ -1,7 +1,7 @@
 /**
  * Expert inspector: the real instructions, addresses and raw-block mapping
  * behind a card, plus what the *current* run actually did there — the same
- * comparison and write objects the beginner hint and HUD were drawn from.
+ * branch outcome and write objects the machines in the room were drawn from.
  *
  * Until the analysis reward is earned it hides everything that would name the
  * answer: stage ids and kinds, IR block names (BCF names clones `…alteredBB`),
@@ -11,8 +11,8 @@
 
 import type { SpecimenIndex } from "../data/bundle.ts";
 import type { Comparison, RawBlock, SemanticEvent, StageEvent } from "../data/bundle-types.ts";
-import { cardName, cardTitle, escapeHtml, relationshipPhrase, stateText } from "../level/presentation.ts";
-import type { Replay } from "../replay/replay.ts";
+import { escapeHtml, machineTitle, stageName, stateText } from "../level/presentation.ts";
+import type { PortLookup, Replay } from "../replay/replay.ts";
 
 const h = escapeHtml;
 
@@ -68,18 +68,25 @@ export class Inspector {
     this.root.classList.remove("is-open");
   }
 
-  update(replay: Replay, revealed: boolean): void {
+  /**
+   * `wiring` is the chamber's live connection map and `editable` says which
+   * ports are player cables; `replay` is null while no input is seated.
+   */
+  update(replay: Replay | null, wiring: PortLookup, editable: (portId: string) => boolean, revealed: boolean): void {
     if (!this.isOpen || !this.stageId) return;
+    const ports = this.specimen.stagePorts(this.stageId).map((p) => `${p.id}>${wiring(p.id)}`);
     const key = [
       this.stageId,
       this.mapMode,
       revealed,
-      replay.trace.id,
-      replay.status,
-      replay.cursor,
-      replay.processedSemantic.length,
-      replay.processedComparisons.length,
-      replay.entered.length,
+      replay?.trace.id,
+      replay?.status,
+      replay?.cursor,
+      replay?.processedSemantic.length,
+      replay?.outcomesShown.length,
+      replay?.activatedPorts.length,
+      replay?.entered.length,
+      ...ports,
     ].join("|");
     if (key === this.lastKey) return;
     this.lastKey = key;
@@ -88,13 +95,19 @@ export class Inspector {
       this.body.innerHTML = this.renderMap(revealed);
       return;
     }
-    this.titleEl.textContent = cardName(this.specimen, this.stageId, revealed);
-    this.body.innerHTML = this.renderCard(this.stageId, replay, revealed);
+    this.titleEl.textContent = stageName(this.specimen, this.stageId);
+    this.body.innerHTML = this.renderCard(this.stageId, replay, wiring, editable, revealed);
   }
 
   // --- one card -------------------------------------------------------------
 
-  private renderCard(stageId: string, replay: Replay, revealed: boolean): string {
+  private renderCard(
+    stageId: string,
+    replay: Replay | null,
+    wiring: PortLookup,
+    editable: (portId: string) => boolean,
+    revealed: boolean,
+  ): string {
     const sp = this.specimen;
     const stage = sp.stage(stageId);
     const blocks = sp.stageBlocks(stageId);
@@ -109,13 +122,14 @@ export class Inspector {
     const candidate = sp.bundle.analysis_reward.candidates.find((c) => c.stage_id === stageId);
     if (revealed && candidate) parts.push(this.renderProof(candidate.id));
 
-    parts.push(this.renderRun(stageId, replay, revealed));
+    parts.push(this.renderPorts(stageId, wiring, editable, replay));
+    parts.push(this.renderRun(stageId, replay));
 
     parts.push(`<section><h3>Raw blocks <small>${blocks.length} · end addresses exclusive</small></h3>`);
     const executed = new Set(
-      replay.entered
+      (replay?.entered ?? [])
         .filter((e) => e.stage_id === stageId)
-        .flatMap((e) => e.raw_occurrence_indices.map((i) => replay.trace.raw_occurrences[i].block_id)),
+        .flatMap((e) => e.raw_occurrence_indices.map((i) => replay?.trace.raw_occurrences[i].block_id ?? "")),
     );
     for (const block of blocks) parts.push(this.renderBlock(block, executed.has(block.id), revealed));
     parts.push(`</section>`);
@@ -125,23 +139,45 @@ export class Inspector {
     return parts.join("");
   }
 
-  /** What the current run did on this card: the same objects the beginner saw. */
-  private renderRun(stageId: string, replay: Replay, revealed: boolean): string {
+  /** The stage's stable output ports and how this chamber wires them. */
+  private renderPorts(stageId: string, wiring: PortLookup, editable: (portId: string) => boolean, replay: Replay | null): string {
     const sp = this.specimen;
+    const ports = sp.stagePorts(stageId);
+    if (ports.length === 0) return `<section><h3>Output ports</h3><p class="muted">None: execution ends here.</p></section>`;
+    const site = sp.siteForStage(stageId);
+    const rows = ports
+      .map((p) => {
+        const to = wiring(p.id);
+        const lit = replay?.activatedPorts.includes(p.id) ? " · lit this run" : "";
+        const meaning = site && p.branch_site_id ? site.outputs[p.label as "TRUE" | "FALSE"].semantic_condition : "continue";
+        return `<tr><td>${h(p.id)}</td><td>${h(meaning)}</td><td>${h(to ? machineTitle(sp, to) : "unplugged")}</td><td>${editable(p.id) ? "your cable" : "fixed pipe"}${lit}</td></tr>`;
+      })
+      .join("");
+    const question = site
+      ? `<p class="muted">Question <code>${h(site.expression)}</code> (${h(site.interpretation)}). ${h(site.machine_branch_condition)}</p>`
+      : "";
+    return `<section><h3>Output ports</h3>${question}
+      <table class="tbl"><tr><th>port</th><th>means</th><th>wired to</th><th></th></tr>${rows}</table></section>`;
+  }
+
+  /** What the current run did on this machine: the same objects the room showed. */
+  private renderRun(stageId: string, replay: Replay | null): string {
+    const sp = this.specimen;
+    if (!replay) return `<section><h3>This run</h3><p class="muted">No input is seated, so there is no run.</p></section>`;
     const occurrences = replay.entered.filter((e) => e.stage_id === stageId);
     const head = `<h3>This run <small>input ${replay.input} · trace ${h(replay.trace.id)} · ${replay.status}</small></h3>`;
     if (occurrences.length === 0) {
       const note =
         replay.status === "ready"
-          ? "No run in progress. Press Enter to run the selected input."
-          : "Execution has not entered this card in this run. Other inputs take other paths, so this says nothing about whether the code is real.";
+          ? "No run yet. Power the RUN socket to start one."
+          : "Execution has not entered this machine in this run. Other inputs take other paths, so this says nothing about whether the code is real.";
       return `<section>${head}<p class="muted">${note}</p></section>`;
     }
     const parts = [`<section>${head}`];
     for (const event of occurrences) {
       parts.push(this.renderOccurrence(event, replay));
       const comparisons = replay.processedComparisons.filter((c) => c.stage_event_id === event.id);
-      for (const c of comparisons) parts.push(this.renderComparison(c, revealed));
+      for (const c of comparisons) parts.push(this.renderComparison(c, replay));
       const writes = replay.processedSemantic.filter((s) => s.stage_event_id === event.id);
       if (writes.length > 0) {
         parts.push(`<h4>Committed writes</h4><table class="tbl"><tr><th>step</th><th>address</th><th>instruction</th><th>write</th><th>kind</th></tr>`);
@@ -150,8 +186,8 @@ export class Inspector {
       }
       const stop = replay.stop;
       if (stop && stop.event.id === event.id) {
-        const proposed = stop.proposed ? cardName(sp, stop.proposed, revealed) : "nothing plugged in";
-        parts.push(`<p class="bad">Stopped here: the output was wired to ${h(proposed)}, and execution did not go there.</p>`);
+        const proposed = stop.proposed ? stageName(sp, stop.proposed) : "nothing";
+        parts.push(`<p class="bad">Stopped here: active port ${h(stop.portId ?? "—")} is wired to ${h(proposed)}, and execution did not go there.</p>`);
       }
     }
     parts.push(`</section>`);
@@ -170,8 +206,9 @@ export class Inspector {
       <table class="tbl"><tr><th>raw #</th><th>block</th><th>visit</th><th>steps</th></tr>${rows}</table>`;
   }
 
-  private renderComparison(c: Comparison, revealed: boolean): string {
+  private renderComparison(c: Comparison, replay: Replay): string {
     const sp = this.specimen;
+    const outcome = replay.outcomesShown.find((o) => o.comparison_event_id === c.id);
     const operands = c.operands
       .map((o) => `${o.kind}${o.register ? ` ${o.register}` : ""} · ${o.width}-bit · signed ${o.signed} · unsigned ${o.unsigned}`)
       .map((t) => `<li>${h(t)}</li>`)
@@ -187,10 +224,19 @@ export class Inspector {
       .filter(([k]) => k !== "eflags")
       .map(([k, v]) => `${k}=${v ? 1 : 0}`)
       .join(" ");
-    const next = c.next_trace_stage_id ? cardName(sp, c.next_trace_stage_id, revealed) : "—";
+    const next = c.next_trace_stage_id ? stageName(sp, c.next_trace_stage_id) : "—";
+    const answer = outcome
+      ? `<span class="hint hint-${outcome.outcome}">${outcome.outcome}</span> <small>${h(outcome.feedback.lines.join(" · "))}</small>`
+      : `<small>answer not reached yet</small>`;
+    const branch = outcome
+      ? `${kv("answer shown at", `step ${outcome.feedback_step_index} (materialized Boolean)`)}
+         ${kv("port lit at", `step ${outcome.port_activation_step_index} · ${outcome.selected_port_id}`)}
+         ${kv("machine branch taken", String(outcome.machine_branch_taken))}`
+      : "";
     return `<div class="cmp">
-      <h4>Comparison <span class="hint hint-${c.hint}">${c.hint}</span> <small>${h(relationshipPhrase(c))}</small></h4>
-      <p class="muted">The beginner hint is the exported <code>relationship</code> (${c.relationship}) of the measured value to the immediate; it is not an alias for the branch.</p>
+      <h4>Comparison ${answer}</h4>
+      <p class="muted">The machine shows the exported branch outcome: the measured value, the site's question and its TRUE/FALSE answer. TRUE/FALSE is not the same thing as "JNE taken".</p>
+      <dl class="kv">${branch}</dl>
       <dl class="kv">
         ${kv("id", c.id)}${kv("site", `${c.site_id} · visit ${c.visit_number}`)}
         ${kv("instruction", `${c.instruction_address}  ${c.instruction_text}`)}
@@ -230,9 +276,9 @@ export class Inspector {
     const sp = this.specimen;
     const own = new Set(blocks.map((b) => b.id));
     const where = (blockId: string): string => {
-      const sid = sp.blocksById.get(blockId)?.stage_id;
-      if (!sid) return `${blockId} (no card)`;
-      return sid === stageId ? `${blockId} (this card)` : `${blockId} (${cardName(sp, sid, revealed)})`;
+      const sid = this.shownStage(sp.blocksById.get(blockId)?.stage_id ?? null, revealed);
+      if (!sid) return `${blockId} (no machine)`;
+      return sid === stageId ? `${blockId} (this machine)` : `${blockId} (${stageName(sp, sid)})`;
     };
     const edges = sp.bundle.raw.edges.filter((e) => own.has(e.source) !== own.has(e.target));
     const rows = edges
@@ -273,13 +319,24 @@ export class Inspector {
     </dl></section>`;
   }
 
+  /**
+   * The stage a raw block may be attributed to here. Stages whose
+   * classification starts hidden (the proven clones) read as unassigned until
+   * the reveal: even their bundle labels would name them.
+   */
+  private shownStage(stageId: string | null, revealed: boolean): string | null {
+    if (!stageId) return null;
+    return revealed || !this.specimen.stage(stageId).classification_hidden_initially ? stageId : null;
+  }
+
   // --- whole function -------------------------------------------------------
 
   private renderMap(revealed: boolean): string {
     const sp = this.specimen;
     const rows = sp.bundle.raw.blocks
       .map((b) => {
-        const card = b.stage_id ? cardTitle(sp, b.stage_id, revealed) : "— (inspector only)";
+        const sid = this.shownStage(b.stage_id, revealed);
+        const card = sid ? machineTitle(sp, sid) : "— (no machine)";
         const cls = revealed ? `<td>${h(b.classification)}</td>` : "";
         return `<tr><td>${h(b.id)}</td><td>${h(b.start_rva)}–${h(b.end_rva_exclusive)}</td><td>${b.instructions.length}</td><td>${h(card)}</td>${cls}</tr>`;
       })

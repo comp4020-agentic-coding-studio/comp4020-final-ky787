@@ -88,8 +88,10 @@ export const CAMERA = {
 } as const;
 
 export const CARRY = {
-  /** How close (centre to point) the player must be to use something. */
-  reach: 58,
+  /** How close (centre to point) the player must be to use a jack or cube. Jacks sit ≥ 90 apart. */
+  reach: 66,
+  /** Sockets are bigger targets than jacks. */
+  socketReach: 70,
   /** The cube sits this far above the player's head while carried. */
   holdGap: 4,
   cubeSize: 36,
@@ -111,13 +113,17 @@ export const BRIDGE = {
  */
 export const RUN = {
   enter: 0.32,
-  write: 0.6,
-  output: 0.85,
+  write: 0.55,
+  output: 0.9,
   bridge: 1.05,
-  comparison: 1.5,
-  /** Pulse travel along a cable: base plus per world unit, capped. */
-  transferBase: 0.28,
-  transferPerUnit: 0.00035,
-  transferMax: 0.85,
+  /** Time to read a comparison's answer before its port lights. */
+  feedback: 1.3,
+  activation: 0.45,
+  /** Anything inside a sealed stage: replayed, just not dwelt on. */
+  hidden: 0.08,
+  /** Pulse travel along a cable or pipe: base plus per world unit, capped. */
+  transferBase: 0.25,
+  transferPerUnit: 0.0004,
+  transferMax: 0.9,
   fastFactor: 3.2,
 } as const;

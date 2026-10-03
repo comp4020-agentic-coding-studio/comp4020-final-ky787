@@ -1,10 +1,13 @@
 /**
- * The playable room: player, cube, bridge, cables and the analysis station.
+ * The playable chamber: player, cubes, sockets, doors, bridge and wiring.
  *
- * It knows the room geometry and which stages exist, but nothing about
- * traces: the bridge only follows `bridgeTarget`, which the game sets from the
- * replay's processed `bridge_open` event. Cables are logical connections
- * between card sockets, not physics ropes — their drawn sag is cosmetic.
+ * It knows the chamber's geometry and which ports exist, but nothing about
+ * traces. The bridge only follows `bridgeTarget`, which the game sets from
+ * the replay's processed `bridge_open` event, and `finishedInputs` (for door
+ * lamps) is likewise fed in by the game. Wiring is a map from stable output
+ * port id to destination stage id: the chamber's fixed pipes plus whatever
+ * cables the player plugs into editable jacks. Cables are logical
+ * connections, not physics ropes.
  */
 
 import type { SpecimenIndex } from "../data/bundle.ts";
@@ -13,95 +16,116 @@ import type { Vec2 } from "../engine/geometry.ts";
 import { boxesOverlap } from "../engine/geometry.ts";
 import type { InputState, LooseBody, PlayerState, Solid } from "../engine/physics.ts";
 import { createPlayer, playerBox, stepBody, stepPlayer } from "../engine/physics.ts";
-import type { RoomCard, RoomDef } from "../level/room.ts";
-import { cardSockets } from "../level/room.ts";
+import type { ChamberCube, ChamberDef, ChamberDoor, ChamberSocket, ChamberStage, SocketKind } from "../level/chamber.ts";
+import { inJack, outJack } from "../level/chamber.ts";
 
-export type Held = { kind: "cable"; from: string } | { kind: "cube" };
+export type Held = { kind: "cable"; portId: string } | { kind: "cube"; cubeId: string };
 
-export type StationState = "locked" | "online" | "revealed";
-
-export interface CardRuntime {
-  card: RoomCard;
-  /** Absent on the entry card (nothing feeds it) and the end card (it returns). */
-  in: Vec2 | null;
-  out: Vec2 | null;
+export interface CubeRuntime extends LooseBody {
+  def: ChamberCube;
+  carried: boolean;
+  socketId: string | null;
+  everCarried: boolean;
 }
 
-export interface CubeState extends LooseBody {
-  carried: boolean;
-  socketed: boolean;
+export interface SocketRuntime {
+  def: ChamberSocket;
+  cubeId: string | null;
+}
+
+export interface DoorRuntime {
+  def: ChamberDoor;
+  solid: Solid;
+  /** 0 = shut, 1 = fully open. */
+  openness: number;
+}
+
+/** A jack the player can plug into or take a cable from. */
+export interface Jack {
+  kind: "in" | "out";
+  stageId: string;
+  /** For an output jack, the port it carries. */
+  portId: string | null;
+  at: Vec2;
 }
 
 export type Interactable =
-  | { kind: "out"; stageId: string; at: Vec2 }
-  | { kind: "in"; stageId: string; at: Vec2 }
-  | { kind: "cube"; at: Vec2 }
-  | { kind: "run"; at: Vec2 }
-  | { kind: "slot"; at: Vec2 }
-  | { kind: "station"; at: Vec2 };
+  | { kind: "jack"; jack: Jack; at: Vec2 }
+  | { kind: "cube"; cubeId: string; at: Vec2 }
+  | { kind: "socket"; socketId: string; at: Vec2 };
 
 export type WorldEvent =
-  | { kind: "connected"; from: string; to: string }
-  | { kind: "unplugged"; from: string; to: string }
-  | { kind: "took_cable"; from: string }
-  | { kind: "dropped_cable"; from: string }
-  | { kind: "picked_cube" }
-  | { kind: "dropped_cube" }
-  | { kind: "cube_socketed" }
-  | { kind: "cube_respawned" }
-  | { kind: "run_requested" }
-  | { kind: "analysis_revealed" }
+  | { kind: "connected"; portId: string; to: string }
+  | { kind: "unplugged"; portId: string; to: string }
+  | { kind: "took_cable"; portId: string }
+  | { kind: "dropped_cable"; portId: string }
+  | { kind: "picked_cube"; cubeId: string }
+  | { kind: "dropped_cube"; cubeId: string }
+  | { kind: "socket_filled"; socketId: string; cubeId: string }
+  | { kind: "socket_emptied"; socketId: string; cubeId: string }
+  | { kind: "cube_respawned"; cubeId: string }
   | { kind: "denied"; message: string }
   | { kind: "landed"; speed: number; x: number; y: number }
-  | { kind: "bridge_settled"; open: boolean };
+  | { kind: "door_opened"; doorId: string }
+  | { kind: "exited" };
 
-const STATION_REACH = 150;
+const ACCEPTS: Record<SocketKind, ChamberCube["kind"]> = { power: "power", run: "power", input: "input" };
+const DOOR_RATE = 1.6;
 
 export class World {
   readonly player: PlayerState;
-  readonly cube: CubeState;
-  readonly cards = new Map<string, CardRuntime>();
+  readonly cubes = new Map<string, CubeRuntime>();
+  readonly sockets = new Map<string, SocketRuntime>();
+  readonly doors: DoorRuntime[] = [];
+  readonly stagesById = new Map<string, ChamberStage>();
+  readonly jacks: Jack[] = [];
   readonly staticSolids: Solid[];
-  readonly bridgeSolid: Solid;
+  readonly bridgeSolid: Solid | null;
   readonly solids: Solid[];
 
-  /** Set by the game from the replay; the bridge animates toward it. */
   bridgeTarget = false;
-  /** 0 = retracted, 1 = fully extended. */
   bridgeExtent = 0;
   held: Held | null = null;
-  station: StationState = "locked";
-  /** Player's wiring: stage id → the stage its output is plugged into. */
+  /** Inputs that finished a run on the current editable wiring (door lamps). */
+  readonly finishedInputs = new Set<number>();
+  exited = false;
+
+  /** Persistent wiring: port id → destination stage id. */
   private connections = new Map<string, string>();
-  /** Source stage ids in the order their cables were plugged in. */
+  /** Editable ports in the order their cables were plugged in. */
   private plugOrder: string[] = [];
+  private editable: Set<string>;
   private events: WorldEvent[] = [];
 
   constructor(
-    readonly room: RoomDef,
+    readonly chamber: ChamberDef,
     readonly specimen: SpecimenIndex,
   ) {
-    this.player = createPlayer(room.spawn.x, room.spawn.y);
-    this.cube = {
-      x: room.cube.x,
-      y: room.cube.y,
-      vx: 0,
-      vy: 0,
-      grounded: false,
-      groundId: null,
-      carried: false,
-      socketed: false,
-    };
-    for (const card of room.cards) {
-      const kind = specimen.stage(card.stageId).kind;
-      const sockets = cardSockets(card);
-      this.cards.set(card.stageId, {
-        card,
-        in: kind === "entry" ? null : sockets.in,
-        out: kind === "end" ? null : sockets.out,
+    this.player = createPlayer(chamber.spawn.x, chamber.spawn.y);
+    this.editable = new Set(chamber.editablePorts);
+    for (const [port, to] of Object.entries(chamber.prewired)) this.connections.set(port, to);
+
+    for (const s of chamber.stages) this.stagesById.set(s.stageId, s);
+    const cablesInPlay = chamber.editablePorts.length > 0;
+    for (const s of chamber.stages) {
+      if (s.mode !== "machine" || s.wallMounted) continue;
+      // Where the player has cables, any floor machine but START accepts one, right or wrong.
+      if (cablesInPlay && specimen.stage(s.stageId).kind !== "entry") {
+        this.jacks.push({ kind: "in", stageId: s.stageId, portId: null, at: inJack(s) });
+      }
+      const ports = specimen.stagePorts(s.stageId);
+      ports.forEach((port, i) => {
+        if (this.editable.has(port.id)) {
+          this.jacks.push({ kind: "out", stageId: s.stageId, portId: port.id, at: outJack(s, i, ports.length) });
+        }
       });
     }
-    this.staticSolids = room.solids.map((s) => ({
+    for (const c of chamber.cubes) {
+      this.cubes.set(c.id, { def: c, x: c.x, y: c.y, vx: 0, vy: 0, grounded: false, groundId: null, carried: false, socketId: null, everCarried: false });
+    }
+    for (const s of chamber.sockets) this.sockets.set(s.id, { def: s, cubeId: null });
+
+    this.staticSolids = chamber.solids.map((s) => ({
       id: s.id,
       x: s.x,
       y: s.y,
@@ -111,84 +135,121 @@ export class World {
       enabled: true,
       grappleable: s.kind !== "floor",
     }));
-    this.bridgeSolid = {
-      id: "bridge",
-      x: room.bridge.x,
-      y: room.bridge.y,
-      w: 0,
-      h: BRIDGE.thickness,
-      oneWay: true,
-      enabled: false,
-      grappleable: false,
-    };
-    this.solids = [...this.staticSolids, this.bridgeSolid];
+    for (const d of chamber.doors) {
+      const solid: Solid = { id: d.id, x: d.x, y: d.y, w: d.w, h: d.h, oneWay: false, enabled: true, grappleable: false };
+      this.doors.push({ def: d, solid, openness: 0 });
+    }
+    this.bridgeSolid = chamber.bridge
+      ? { id: "bridge", x: chamber.bridge.x, y: chamber.bridge.y, w: 0, h: BRIDGE.thickness, oneWay: true, enabled: false, grappleable: false }
+      : null;
+    this.solids = [...this.staticSolids, ...this.doors.map((d) => d.solid), ...(this.bridgeSolid ? [this.bridgeSolid] : [])];
   }
 
   // --- wiring -----------------------------------------------------------
 
-  connection(stageId: string): string | null {
-    return this.connections.get(stageId) ?? null;
+  connection(portId: string): string | null {
+    return this.connections.get(portId) ?? null;
   }
 
-  /** All current connections as [from, to] pairs. */
+  isEditable(portId: string): boolean {
+    return this.editable.has(portId);
+  }
+
+  /** All connections, fixed and player-made, as [port, destination] pairs. */
   wiring(): [string, string][] {
     return [...this.connections.entries()];
   }
 
-  connect(from: string, to: string): void {
-    if (!this.cards.get(from)?.out || !this.cards.get(to)?.in || from === to) return;
-    this.disconnect(from);
-    this.connections.set(from, to);
-    this.plugOrder.push(from);
-    this.events.push({ kind: "connected", from, to });
+  /** Player cables only. */
+  cables(): [string, string][] {
+    return this.wiring().filter(([port]) => this.editable.has(port));
   }
 
-  disconnect(from: string): string | null {
-    const to = this.connections.get(from);
+  connect(portId: string, to: string): boolean {
+    if (!this.editable.has(portId)) return false;
+    if (!this.jacks.some((j) => j.kind === "in" && j.stageId === to)) return false;
+    if (this.specimen.port(portId).owner_stage_id === to) return false;
+    this.disconnect(portId);
+    this.connections.set(portId, to);
+    this.plugOrder.push(portId);
+    this.wiringChanged();
+    this.events.push({ kind: "connected", portId, to });
+    return true;
+  }
+
+  disconnect(portId: string): string | null {
+    if (!this.editable.has(portId)) return null;
+    const to = this.connections.get(portId);
     if (to === undefined) return null;
-    this.connections.delete(from);
-    this.plugOrder = this.plugOrder.filter((id) => id !== from);
+    this.connections.delete(portId);
+    this.plugOrder = this.plugOrder.filter((id) => id !== portId);
+    this.wiringChanged();
     return to;
   }
 
-  clearWiring(): void {
-    this.connections.clear();
-    this.plugOrder = [];
+  clearCables(): void {
+    for (const port of [...this.editable]) this.disconnect(port);
     if (this.held?.kind === "cable") this.held = null;
+  }
+
+  /** A different circuit has not yet proved anything: door lamps go out. */
+  private wiringChanged(): void {
+    this.finishedInputs.clear();
   }
 
   // --- simulation -------------------------------------------------------
 
   step(input: InputState, interact: boolean, dt: number): void {
+    this.stepDoors(dt);
     this.stepBridge(dt);
     stepPlayer(this.player, input, this.solids, dt);
     if (this.player.justLanded) {
       this.events.push({ kind: "landed", speed: this.player.landingSpeed, x: this.player.x, y: this.player.y });
     }
-    if (this.player.y > this.room.world.height + 200) this.respawnPlayer();
+    if (this.player.y > this.chamber.world.height + 200) this.respawnPlayer();
     if (interact) this.interact();
-    this.stepCube(dt);
+    for (const cube of this.cubes.values()) this.stepCube(cube, dt);
+    if (!this.exited && boxesOverlap(playerBox(this.player), this.chamber.exit)) {
+      this.exited = true;
+      this.events.push({ kind: "exited" });
+    }
+  }
+
+  doorShouldOpen(door: DoorRuntime): boolean {
+    const rule = door.def.rule;
+    if (rule.kind === "socket") return this.sockets.get(rule.socketId)?.cubeId != null;
+    return rule.inputs.every((n) => this.finishedInputs.has(n));
+  }
+
+  private stepDoors(dt: number): void {
+    for (const door of this.doors) {
+      const open = this.doorShouldOpen(door);
+      const before = door.openness;
+      door.openness = Math.max(0, Math.min(1, door.openness + (open ? 1 : -1) * DOOR_RATE * dt));
+      if (before < 1 && door.openness === 1) this.events.push({ kind: "door_opened", doorId: door.def.id });
+      // The panel slides up into the frame; it stops blocking once mostly open.
+      door.solid.h = door.def.h * (1 - door.openness);
+      door.solid.enabled = door.openness < 0.85;
+    }
   }
 
   private stepBridge(dt: number): void {
-    const before = this.bridgeExtent;
+    const bridge = this.chamber.bridge;
+    if (!bridge || !this.bridgeSolid) return;
     const rate = dt / BRIDGE.extendTime;
-    this.bridgeExtent = this.bridgeTarget
-      ? Math.min(1, this.bridgeExtent + rate)
-      : Math.max(0, this.bridgeExtent - rate);
-    if (before !== this.bridgeExtent && (this.bridgeExtent === 0 || this.bridgeExtent === 1)) {
-      this.events.push({ kind: "bridge_settled", open: this.bridgeExtent === 1 });
-    }
-    this.bridgeSolid.w = this.room.bridge.length * this.bridgeExtent;
+    this.bridgeExtent = this.bridgeTarget ? Math.min(1, this.bridgeExtent + rate) : Math.max(0, this.bridgeExtent - rate);
+    this.bridgeSolid.w = bridge.length * this.bridgeExtent;
     this.bridgeSolid.enabled = this.bridgeSolid.w > 6;
   }
 
-  private stepCube(dt: number): void {
-    const cube = this.cube;
+  private stepCube(cube: CubeRuntime, dt: number): void {
     const size = CARRY.cubeSize;
-    if (cube.socketed) {
-      cube.x = this.room.station.slot.x;
-      cube.y = this.room.station.slot.y;
+    if (cube.socketId) {
+      const socket = this.sockets.get(cube.socketId);
+      if (socket) {
+        cube.x = socket.def.x;
+        cube.y = socket.def.floorY - size / 2;
+      }
       return;
     }
     if (cube.carried) {
@@ -201,46 +262,75 @@ export class World {
       return;
     }
     stepBody(cube, size, this.solids, CARRY.cubeGravity, CARRY.cubeMaxFall, dt);
-    if (cube.y > this.room.world.height + 200) {
-      this.placeCube(this.room.cube);
-      this.events.push({ kind: "cube_respawned" });
+    if (cube.y > this.chamber.world.height + 200) {
+      this.placeCube(cube, { x: cube.def.x, y: cube.def.y });
+      this.events.push({ kind: "cube_respawned", cubeId: cube.def.id });
     }
-    // A cube put down on the slot powers the station without a second press.
-    const slot = this.room.station.slot;
-    if (this.station === "locked" && cube.grounded && Math.hypot(cube.x - slot.x, cube.y - slot.y) < 40) {
-      this.socketCube();
+    // A cube put down on its socket seats itself without a second press.
+    if (cube.grounded) {
+      for (const socket of this.sockets.values()) {
+        if (socket.cubeId || ACCEPTS[socket.def.kind] !== cube.def.kind) continue;
+        // Only a cube landing squarely on it: one put down beside it stays put.
+        if (Math.abs(cube.x - socket.def.x) < 14 && Math.abs(cube.y + size / 2 - socket.def.floorY) < 6) {
+          this.seat(cube, socket);
+          break;
+        }
+      }
     }
   }
 
-  private placeCube(at: Vec2): void {
-    Object.assign(this.cube, { x: at.x, y: at.y, vx: 0, vy: 0, carried: false, socketed: false, grounded: false });
+  private placeCube(cube: CubeRuntime, at: Vec2): void {
+    Object.assign(cube, { x: at.x, y: at.y, vx: 0, vy: 0, carried: false, grounded: false });
   }
 
   respawnPlayer(): void {
     const p = this.player;
-    p.x = this.room.spawn.x;
-    p.y = this.room.spawn.y;
+    p.x = this.chamber.spawn.x;
+    p.y = this.chamber.spawn.y;
     p.vx = 0;
     p.vy = 0;
   }
 
-  resetCube(): void {
+  /** Every cube back where the chamber put it; sockets empty. Wiring is kept. */
+  resetCubes(): void {
     if (this.held?.kind === "cube") this.held = null;
-    this.placeCube(this.room.cube);
-    if (this.station === "online") this.station = "locked";
+    for (const socket of this.sockets.values()) {
+      if (socket.cubeId) this.unseat(socket);
+    }
+    for (const cube of this.cubes.values()) this.placeCube(cube, { x: cube.def.x, y: cube.def.y });
   }
 
-  /** Developer shortcut: power the station without delivering the cube. */
-  forceStationOnline(): void {
-    if (this.station === "locked") this.station = "online";
+  /** Seats a cube (developer shortcut and tests); false if it doesn't fit. */
+  insert(cubeId: string, socketId: string): boolean {
+    const cube = this.cubes.get(cubeId);
+    const socket = this.sockets.get(socketId);
+    if (!cube || !socket || socket.cubeId || ACCEPTS[socket.def.kind] !== cube.def.kind) return false;
+    if (cube.socketId) this.unseat(this.sockets.get(cube.socketId) as SocketRuntime);
+    if (this.held?.kind === "cube" && this.held.cubeId === cubeId) this.held = null;
+    this.seat(cube, socket);
+    return true;
   }
 
-  private socketCube(): void {
-    this.cube.carried = false;
-    this.cube.socketed = true;
-    this.held = null;
-    this.station = "online";
-    this.events.push({ kind: "cube_socketed" });
+  private seat(cube: CubeRuntime, socket: SocketRuntime): void {
+    cube.carried = false;
+    cube.socketId = socket.def.id;
+    socket.cubeId = cube.def.id;
+    this.events.push({ kind: "socket_filled", socketId: socket.def.id, cubeId: cube.def.id });
+  }
+
+  private unseat(socket: SocketRuntime): CubeRuntime | null {
+    const cube = socket.cubeId ? this.cubes.get(socket.cubeId) : undefined;
+    socket.cubeId = null;
+    if (!cube) return null;
+    cube.socketId = null;
+    this.events.push({ kind: "socket_emptied", socketId: socket.def.id, cubeId: cube.def.id });
+    return cube;
+  }
+
+  /** The cube seated in a socket, if any. */
+  socketCube(socketId: string): CubeRuntime | null {
+    const id = this.sockets.get(socketId)?.cubeId;
+    return id ? (this.cubes.get(id) ?? null) : null;
   }
 
   // --- interaction ------------------------------------------------------
@@ -250,27 +340,34 @@ export class World {
     const out: Interactable[] = [];
     const held = this.held;
     if (held?.kind === "cube") {
-      if (this.station === "locked") out.push({ kind: "slot", at: this.room.station.slot });
+      // Any matching socket: an empty one takes the cube, a full one swaps.
+      const cube = this.cubes.get(held.cubeId);
+      for (const socket of this.sockets.values()) {
+        if (cube && ACCEPTS[socket.def.kind] === cube.def.kind) {
+          out.push({ kind: "socket", socketId: socket.def.id, at: this.socketPoint(socket.def) });
+        }
+      }
       return out;
     }
     if (held?.kind === "cable") {
-      for (const [stageId, c] of this.cards) {
-        if (c.in) out.push({ kind: "in", stageId, at: c.in });
-      }
+      for (const jack of this.jacks) if (jack.kind === "in") out.push({ kind: "jack", jack, at: jack.at });
       return out;
     }
-    const fed = new Set(this.connections.values());
-    for (const [stageId, c] of this.cards) {
-      if (c.out) out.push({ kind: "out", stageId, at: c.out });
-      if (c.in && fed.has(stageId)) out.push({ kind: "in", stageId, at: c.in });
-      if (this.specimen.stage(stageId).kind === "entry") {
-        out.push({ kind: "run", at: { x: c.card.x + c.card.width / 2, y: c.card.floorY - 26 } });
-      }
+    const fed = new Set(this.cables().map(([, to]) => to));
+    for (const jack of this.jacks) {
+      if (jack.kind === "out" || fed.has(jack.stageId)) out.push({ kind: "jack", jack, at: jack.at });
     }
-    if (!this.cube.socketed) out.push({ kind: "cube", at: { x: this.cube.x, y: this.cube.y } });
-    const st = this.room.station;
-    out.push({ kind: "station", at: { x: st.x + st.width / 2, y: st.floorY - 26 } });
+    for (const cube of this.cubes.values()) {
+      if (!cube.socketId && !cube.carried) out.push({ kind: "cube", cubeId: cube.def.id, at: { x: cube.x, y: cube.y } });
+    }
+    for (const socket of this.sockets.values()) {
+      if (socket.cubeId) out.push({ kind: "socket", socketId: socket.def.id, at: this.socketPoint(socket.def) });
+    }
     return out;
+  }
+
+  socketPoint(def: ChamberSocket): Vec2 {
+    return { x: def.x, y: def.floorY - CARRY.cubeSize / 2 };
   }
 
   /** The interactable E would use now, if any. */
@@ -279,7 +376,7 @@ export class World {
     let best: Interactable | null = null;
     let bestDist = Infinity;
     for (const it of this.interactables()) {
-      const reach = it.kind === "station" ? STATION_REACH : CARRY.reach;
+      const reach = it.kind === "socket" ? CARRY.socketReach : CARRY.reach;
       const d = Math.hypot(it.at.x - p.x, it.at.y - p.y);
       if (d <= reach && d < bestDist) {
         best = it;
@@ -294,85 +391,93 @@ export class World {
     const held = this.held;
 
     if (held?.kind === "cube") {
-      if (target?.kind === "slot") this.socketCube();
-      else this.dropCube();
+      const cube = this.cubes.get(held.cubeId);
+      if (!cube) return;
+      if (target?.kind === "socket") {
+        const socket = this.sockets.get(target.socketId);
+        if (socket) {
+          // Swap: the seated cube comes out into the player's hands.
+          const old = socket.cubeId ? this.unseat(socket) : null;
+          this.held = null;
+          this.seat(cube, socket);
+          if (old) {
+            old.carried = true;
+            old.everCarried = true;
+            this.held = { kind: "cube", cubeId: old.def.id };
+            this.events.push({ kind: "picked_cube", cubeId: old.def.id });
+          }
+        }
+      } else {
+        this.dropCube(cube);
+      }
       return;
     }
 
     if (held?.kind === "cable") {
-      if (target?.kind === "in") {
-        if (target.stageId === held.from) {
-          this.events.push({ kind: "denied", message: "A card can't feed its own input here." });
+      if (target?.kind === "jack" && target.jack.kind === "in") {
+        const owner = this.specimen.port(held.portId).owner_stage_id;
+        if (target.jack.stageId === owner) {
+          this.events.push({ kind: "denied", message: "A machine can't feed itself here." });
           return;
         }
         this.held = null;
-        this.connect(held.from, target.stageId);
+        this.connect(held.portId, target.jack.stageId);
       } else {
         this.held = null;
-        this.events.push({ kind: "dropped_cable", from: held.from });
+        this.events.push({ kind: "dropped_cable", portId: held.portId });
       }
       return;
     }
 
     if (!target) return;
     switch (target.kind) {
-      case "out": {
-        const to = this.disconnect(target.stageId);
-        if (to !== null) this.events.push({ kind: "unplugged", from: target.stageId, to });
-        this.held = { kind: "cable", from: target.stageId };
-        this.events.push({ kind: "took_cable", from: target.stageId });
-        break;
-      }
-      case "in": {
-        // Pick up the most recently plugged cable feeding this socket.
-        const from = [...this.plugOrder].reverse().find((id) => this.connections.get(id) === target.stageId);
-        if (!from) return;
-        this.disconnect(from);
-        this.events.push({ kind: "unplugged", from, to: target.stageId });
-        this.held = { kind: "cable", from };
-        this.events.push({ kind: "took_cable", from });
-        break;
-      }
-      case "cube":
-        this.cube.carried = true;
-        this.held = { kind: "cube" };
-        this.events.push({ kind: "picked_cube" });
-        break;
-      case "run":
-        this.events.push({ kind: "run_requested" });
-        break;
-      case "station":
-        if (this.station === "online") {
-          this.station = "revealed";
-          this.events.push({ kind: "analysis_revealed" });
-        } else if (this.station === "locked") {
-          this.events.push({ kind: "denied", message: "Analysis station is locked: it needs the power cube." });
+      case "jack": {
+        const jack = target.jack;
+        let portId = jack.portId;
+        if (jack.kind === "in") {
+          // Pull out the most recently plugged cable feeding this machine.
+          portId = [...this.plugOrder].reverse().find((id) => this.connections.get(id) === jack.stageId) ?? null;
         }
+        if (!portId) return;
+        const to = this.disconnect(portId);
+        if (to !== null) this.events.push({ kind: "unplugged", portId, to });
+        this.held = { kind: "cable", portId };
+        this.events.push({ kind: "took_cable", portId });
         break;
-      case "slot":
+      }
+      case "cube": {
+        const cube = this.cubes.get(target.cubeId);
+        if (!cube) return;
+        cube.carried = true;
+        cube.everCarried = true;
+        this.held = { kind: "cube", cubeId: cube.def.id };
+        this.events.push({ kind: "picked_cube", cubeId: cube.def.id });
         break;
+      }
+      case "socket": {
+        const socket = this.sockets.get(target.socketId);
+        const cube = socket ? this.unseat(socket) : null;
+        if (!cube) return;
+        cube.carried = true;
+        cube.everCarried = true;
+        this.held = { kind: "cube", cubeId: cube.def.id };
+        this.events.push({ kind: "picked_cube", cubeId: cube.def.id });
+        break;
+      }
     }
   }
 
-  private dropCube(): void {
+  private dropCube(cube: CubeRuntime): void {
     const p = this.player;
     const size = CARRY.cubeSize;
     const ahead = p.x + p.facing * (PLAYER.width / 2 + size / 2 + CARRY.dropAhead / 3);
-    const box = { x: ahead - size / 2, y: p.y - size / 2, w: size, h: size };
+    // Set down resting on the player's floor, never sunk into it.
+    const y = p.y + PLAYER.height / 2 - size / 2 - 0.5;
+    const box = { x: ahead - size / 2, y: y - size / 2, w: size, h: size };
     const blocked = this.solids.some((s) => s.enabled && !s.oneWay && boxesOverlap(box, s));
-    this.cube.x = blocked ? p.x : ahead;
-    this.cube.y = p.y;
-    this.cube.vx = 0;
-    this.cube.vy = 0;
-    this.cube.carried = false;
-    this.cube.grounded = false;
+    this.placeCube(cube, { x: blocked ? p.x : ahead, y });
     this.held = null;
-    this.events.push({ kind: "dropped_cube" });
-  }
-
-  /** True once the player stands across the bridge. */
-  playerOnFarSide(): boolean {
-    return boxesOverlap(playerBox(this.player), this.room.farSide);
+    this.events.push({ kind: "dropped_cube", cubeId: cube.def.id });
   }
 
   drainEvents(): WorldEvent[] {

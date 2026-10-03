@@ -4,25 +4,16 @@
  * Adapted from the previous Binary Ninja game's InputManager: held keys are
  * sampled each physics step, and edge-triggered presses (jump, interact,
  * grapple) are latched here and consumed by exactly one fixed step, so
- * behaviour does not depend on frame rate. New here: interaction, input
- * selection and run controls; the grapple only listens when enabled.
+ * behaviour does not depend on frame rate. New here: interaction (E). Program
+ * input and running are physical (cubes and sockets), so there are no keys
+ * for them; the grapple only listens when enabled.
  */
 
 import type { Vec2 } from "../engine/geometry.ts";
 import type { InputState } from "../engine/physics.ts";
 import { emptyInput } from "../engine/physics.ts";
 
-export type ActionName =
-  | "run"
-  | "reset"
-  | "fast"
-  | "inspect"
-  | "debug"
-  | "help"
-  | "escape"
-  | "input:0"
-  | "input:1"
-  | "input:2";
+export type ActionName = "reset" | "fast" | "inspect" | "debug" | "escape";
 
 const GAME_KEYS = new Set([
   "KeyA",
@@ -37,7 +28,6 @@ const GAME_KEYS = new Set([
   "ArrowDown",
   "Tab",
   "F1",
-  "Enter",
 ]);
 
 export class InputManager {
@@ -72,16 +62,11 @@ export class InputManager {
 
       if (code === "Space" || code === "KeyW" || code === "ArrowUp") this.pendingJump = true;
       if (code === "KeyE") this.pendingInteract = true;
-      if (code === "Enter") this.actions.add("run");
       if (code === "KeyR") this.actions.add("reset");
       if (code === "KeyF") this.actions.add("fast");
       if (code === "KeyI") this.actions.add("inspect");
-      if (code === "KeyH") this.actions.add("help");
       if (code === "F1" || code === "Backquote") this.actions.add("debug");
       if (code === "Escape") this.actions.add("escape");
-      if (code === "Digit1" || code === "Numpad1") this.actions.add("input:0");
-      if (code === "Digit2" || code === "Numpad2") this.actions.add("input:1");
-      if (code === "Digit3" || code === "Numpad3") this.actions.add("input:2");
     };
 
     const keyDown = (e: KeyboardEvent): void => onKey(e, true);
@@ -199,11 +184,6 @@ export class InputManager {
     if (!this.actions.has(name)) return false;
     this.actions.delete(name);
     return true;
-  }
-
-  /** Lets on-screen buttons trigger the same actions as their keys. */
-  pushAction(name: ActionName): void {
-    this.actions.add(name);
   }
 
   clearActions(): void {

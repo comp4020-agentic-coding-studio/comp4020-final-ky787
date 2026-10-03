@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 /**
- * The expert inspector shows real code from the start, but nothing that names
- * the answer until the analysis reward is earned: no stage ids or kinds, no
- * BCF clone names, no classifications or proofs. Afterwards it shows the
- * bundle's proof for the revealed candidates.
+ * The expert inspector shows real code, ports and the run's actual branch
+ * outcome — but before an analysis reward it names nothing about bogus
+ * code: no clone names, classifications or proofs.
  */
 
 import { describe, expect, it } from "vitest";
@@ -12,43 +11,47 @@ import { Replay } from "../src/replay/replay.ts";
 import { Inspector } from "../src/ui/inspector.ts";
 
 const specimen = loadSpecimen();
-const GIVEAWAYS = ["decoy", "alteredBB", "bogus", "candidate", "clone", "proven", "analysis_candidate", "classification"];
+const CORRECT = new Map(specimen.bundle.output_ports.map((p) => [p.id, p.expected_destination_stage_id]));
+const GIVEAWAYS = ["decoy", "alteredBB", "bogus", "candidate", "clone", "proven", "classification"];
 
-function render(stageId: string, revealed: boolean, map = false): string {
+function render(stageId: string, replay: Replay | null, revealed = false, map = false): string {
   const host = document.createElement("div");
   const inspector = new Inspector(host, specimen);
   inspector.open(stageId);
   if (map) (host.querySelector('[data-act="map"]') as HTMLButtonElement).click();
-  inspector.update(new Replay(specimen, 7), revealed);
+  inspector.update(replay, (p) => CORRECT.get(p) ?? null, (p) => p.startsWith("cmp_000010a2"), revealed);
   return host.textContent ?? "";
 }
 
+function finished(input: number): Replay {
+  const replay = new Replay(specimen, input);
+  replay.start();
+  for (let i = 0; i < 500 && replay.status === "running"; i += 1) replay.step((p) => CORRECT.get(p) ?? null);
+  return replay;
+}
+
 describe("expert inspector", () => {
-  it.each(["decoy_low", "decoy_match", "match", "low"])("hides the answer on %s before the reveal", (stageId) => {
-    const text = render(stageId, false);
+  it.each(["calculate_compare", "compare_high", "low", "match"])("hides every bogus-code giveaway on %s", (stageId) => {
+    const text = render(stageId, finished(7));
     for (const word of GIVEAWAYS) expect(text.toLowerCase(), word).not.toContain(word.toLowerCase());
-    // Real instructions are still there for an expert to read.
     for (const id of specimen.stage(stageId).raw_block_ids) expect(text).toContain(id);
   });
 
-  it("hides classifications in the whole-function map before the reveal", () => {
-    const text = render("entry", false, true);
+  it("describes the same branch outcome the machine showed", () => {
+    const text = render("calculate_compare", finished(6));
+    expect(text).toContain("VALUE = 19 · 19 < 22 · TRUE");
+    expect(text).toContain("cmp_000010a2:TRUE");
+    expect(text).toContain("your cable");
+    expect(text).not.toContain("MATCH ·");
+  });
+
+  it("works with no input seated", () => {
+    expect(render("low", null)).toContain("No input is seated");
+  });
+
+  it("hides classifications in the whole-function map", () => {
+    const text = render("low", null, false, true);
     expect(text).not.toContain("proven_bogus_clone");
-    expect(text).not.toContain("proven_infeasible_trampoline");
     expect(text).toContain("bb_00001374");
-  });
-
-  it("shows the bundle's proof for a revealed candidate", () => {
-    const text = render("decoy_match", true);
-    const candidate = specimen.bundle.analysis_reward.candidates.find((c) => c.stage_id === "decoy_match");
-    expect(text).toContain(candidate?.id);
-    expect(text).toContain(candidate?.proof);
-    expect(text).toContain(specimen.bundle.analysis_reward.predicate);
-  });
-
-  it("never marks a legitimate stage as bogus after the reveal", () => {
-    const text = render("high", true);
-    expect(text).not.toContain("Analysis reward");
-    expect(text).toContain("legitimate_stage");
   });
 });

@@ -10,8 +10,8 @@
 import { createHash } from "node:crypto";
 import { copyFileSync, readFileSync } from "node:fs";
 
-const SOURCE = "Workspace/binary_binja_redesign/game_data/level01_compare_bcf_v1.json";
-const TARGET = "game_data/level01_compare_bcf_v1.json";
+const SOURCE = "Workspace/binary_binja_redesign/game_data/level01_compare_bcf_v2.json";
+const TARGET = "game_data/level01_compare_bcf_v2.json";
 
 const sha256 = (path: string): string => createHash("sha256").update(readFileSync(path)).digest("hex");
 

@@ -25,14 +25,17 @@ export class Camera {
   viewH = 720;
 
   private world = { width: 1000, height: 1000 };
+  /** World height kept in view while following; set per chamber. */
+  private viewHeight: number = CAMERA.viewHeight;
 
-  setWorld(width: number, height: number): void {
+  setWorld(width: number, height: number, viewHeight: number = CAMERA.viewHeight): void {
     this.world = { width, height };
+    this.viewHeight = viewHeight;
   }
 
   /** The zoom the camera rests at while simply following the player. */
   baseZoom(viewW = this.viewW, viewH = this.viewH): number {
-    return clamp(Math.min(viewH / CAMERA.viewHeight, viewW / CAMERA.viewWidth), CAMERA.minZoom, CAMERA.maxZoom);
+    return clamp(Math.min(viewH / this.viewHeight, viewW / CAMERA.viewWidth), CAMERA.minZoom, CAMERA.maxZoom);
   }
 
   snapTo(x: number, y: number): void {

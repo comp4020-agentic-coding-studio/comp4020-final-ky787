@@ -1,11 +1,11 @@
 /**
- * Types for the `binary-binja-specimen/v1` browser bundle. The authoritative
+ * Types for the `binary-binja-specimen/v2` browser bundle. The authoritative
  * field definitions are the evidence workspace's `game_data/README.md`; these
  * types cover the fields the game reads and are never used to add or change
  * binary facts.
  */
 
-export const SUPPORTED_SCHEMA = "binary-binja-specimen/v1";
+export const SUPPORTED_SCHEMA = "binary-binja-specimen/v2";
 
 export interface StateSnapshot {
   value: number;
@@ -73,6 +73,9 @@ export interface StageEvent {
   semantic_event_ids: string[];
   next_event_id: string | null;
   next_stage_id: string | null;
+  /** The output port this occurrence leaves through; null on the final occurrence. */
+  exit_port_id: string | null;
+  branch_outcome_event_id: string | null;
 }
 
 export interface RawOccurrence {
@@ -156,6 +159,72 @@ export interface Comparison {
   next_trace_stage_id: string | null;
   lineage_snapshot_phase: string;
   lineage: LineageStep[];
+  branch_outcome_event_id: string | null;
+}
+
+/** A comparison's semantic answer in one run, and the port it activates. */
+export interface BranchOutcome {
+  id: string;
+  comparison_event_id: string;
+  site_id: string;
+  stage_id: string;
+  stage_event_id: string;
+  visit_number: number;
+  input: number;
+  boolean_value: boolean;
+  outcome: "TRUE" | "FALSE";
+  selected_port_id: string;
+  destination_stage_id: string;
+  next_stage_event_id: string;
+  compare_step_index: number;
+  /** The SETcc that materializes the Boolean: show the answer here. */
+  feedback_step_index: number;
+  branch_step_index: number;
+  /** The branch that consumes the Boolean: illuminate the port here. */
+  port_activation_step_index: number;
+  machine_branch_taken: boolean;
+  feedback: {
+    value: number;
+    operator: string;
+    reference: number;
+    expression: string;
+    result: "TRUE" | "FALSE";
+    lines: string[];
+  };
+}
+
+export interface BranchOutput {
+  port_id: string;
+  boolean_value: boolean;
+  semantic_condition: string;
+  destination_stage_id: string;
+  machine_taken: boolean;
+  raw_block_path: string[];
+}
+
+export interface BranchSite {
+  id: string;
+  stage_id: string;
+  /** Readable question, e.g. `value < 22`. */
+  expression: string;
+  operand_width_bits: number;
+  interpretation: string;
+  predicate: { operator: string; lhs: string; rhs: number };
+  machine_branch_condition: string;
+  incoming_semantic_paths: { site_id: string; outcome: string; condition: string }[];
+  outputs: { TRUE: BranchOutput; FALSE: BranchOutput };
+}
+
+/** A stable wiring terminal: a comparison's TRUE/FALSE, or an ordinary NEXT. */
+export interface OutputPort {
+  id: string;
+  owner_stage_id: string;
+  label: string;
+  /** `semantic_branch` or `continuation`. */
+  kind: string;
+  branch_site_id: string | null;
+  boolean_value: boolean | null;
+  expected_destination_stage_id: string;
 }
 
 export interface SemanticEvent {
@@ -199,6 +268,7 @@ export interface Trace {
   timeline: TimelineEntry[];
   instruction_count: number;
   linked_helper_instruction_count: number;
+  branch_outcomes: BranchOutcome[];
 }
 
 export interface InputPreset {
@@ -242,6 +312,7 @@ export interface AnalysisReward {
 export interface Bundle {
   schema: string;
   specimen_id: string;
+  frontend_contract_id: string;
   title: string;
   binary: {
     sha256: string;
@@ -282,6 +353,10 @@ export interface Bundle {
   };
   traces: Trace[];
   analysis_reward: AnalysisReward;
+  branch_sites: BranchSite[];
+  output_ports: OutputPort[];
+  /** Every stage's output terminals; `end` and the decoys have none. */
+  stage_port_ids: Record<string, string[]>;
   validation: {
     all_native_and_emulated_results_agree: boolean;
   };
