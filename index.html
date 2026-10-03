@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Binary Ninja — Chamber 01 prototype</title>
+    <meta
+      name="description"
+      content="Prototype puzzle chamber: wire the stages of a real OLLVM-obfuscated program in the order it runs, and replay its retained executions."
+    />
+    <meta name="theme-color" content="#04060a" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Binary Ninja</h1>
+      <p class="topbar-note">Chamber prototype · <code>level01_compare_bcf_v1</code> · OLLVM BCF x86-64 · retained executions for inputs 6, 7, 8</p>
+    </header>
+    <main id="app">
+      <canvas
+        id="stage"
+        tabindex="0"
+        aria-label="Puzzle chamber. A and D move, Space jumps, E picks up and plugs cables, Enter runs the program."
+      ></canvas>
+      <noscript><p class="fatal">This prototype is a real-time game and needs JavaScript.</p></noscript>
+    </main>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

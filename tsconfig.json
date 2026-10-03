@@ -1,6 +1,5 @@
 {
-  // Covers the supplied harness (spec/, scripts/); widen `include` if your app
-  // is TypeScript and you want `pnpm typecheck` to cover it too.
+  // Covers the supplied harness (spec/, scripts/) and the game (src/, tests/).
   "compilerOptions": {
     "target": "ES2023",
     "module": "ESNext",
@@ -9,12 +8,15 @@
     // node itself wants when it runs a .ts file directly.
     "allowImportingTsExtensions": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["node"],
+    "types": ["node", "vite/client"],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
     "moduleDetection": "force",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["*.ts", "spec", "scripts"]
+  "include": ["*.ts", "spec", "scripts", "src", "tests"]
 }
