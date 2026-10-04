@@ -34,8 +34,10 @@ export class SliceGame {
         this.debug = new URL(location.href).searchParams.has('debug');
         document.addEventListener('visibilitychange', () => { if (document.hidden) {
             this.input.releaseAll();
+            this.world.cancelGrapple();
             void this.store.flush();
         } });
+        window.addEventListener('blur', () => this.world.cancelGrapple());
         window.addEventListener('pagehide', () => void this.store.flush());
     }
     async start(): Promise<void> {
@@ -55,6 +57,7 @@ export class SliceGame {
     }
     private showMenu(): void {
         this.started = false;
+        this.world.cancelGrapple();
         this.input.releaseAll();
         this.menu.hidden = false;
         const p = this.store.progress, saved = this.store.updatedAt;
@@ -65,7 +68,7 @@ export class SliceGame {
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${p.currentRoom.toUpperCase()}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       ${this.ended ? '<button id="new-run">Start a new run</button>' : ''}
-      <p class="fine">A / D move · Space jump · E interact<br>Hold left click to grapple · R checkpoint · Tab overview</p>
+      <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook / release · Hold click also hooks<br>R checkpoint · Tab overview</p>
       <p class="prototype-note">Greybox · mock controllers and string effects.<br>Crumble is a gameplay prototype, not binary evidence.</p></div>`;
         this.menu.querySelector('#continue')!.addEventListener('click', () => {
             if (this.ended) {
@@ -109,7 +112,7 @@ export class SliceGame {
     snapshot() {
         return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, inputs: this.world.inputs, outputs: this.world.frame.outputs,
             source: this.world.frame.source, platforms: this.world.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn })),
-            checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, ended: this.ended, started: this.started,
+            checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started,
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
     private frame(now: number): void {
@@ -132,6 +135,7 @@ export class SliceGame {
             while (this.accumulated >= FIXED_DT) {
                 const e = this.input.takeEdges();
                 this.input.state.jumpPressed = e.jump;
+                this.input.state.airGrapplePressed = e.airGrapple;
                 this.input.state.grapplePressed = e.grapple;
                 this.world.step(FIXED_DT, this.input.state, e.interact);
                 this.accumulated -= FIXED_DT;

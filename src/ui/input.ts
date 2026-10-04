@@ -39,6 +39,7 @@ export class InputManager {
   clicks: Vec2[] = [];
 
   private pendingJump = false;
+  private pendingAirGrapple = false;
   private pendingInteract = false;
   private pendingGrapple = false;
   private actions = new Set<ActionName>();
@@ -61,6 +62,7 @@ export class InputManager {
       if (!down) return;
 
       if (code === "Space" || code === "KeyW" || code === "ArrowUp") this.pendingJump = true;
+      if (code === "Space") this.pendingAirGrapple = true;
       if (code === "KeyE") this.pendingInteract = true;
       if (code === "KeyR") this.actions.add("reset");
       if (code === "KeyF") this.actions.add("fast");
@@ -172,9 +174,10 @@ export class InputManager {
   }
 
   /** Consumed once per physics step; edges fire on the first step only. */
-  takeEdges(): { jump: boolean; interact: boolean; grapple: boolean } {
-    const out = { jump: this.pendingJump, interact: this.pendingInteract, grapple: this.pendingGrapple };
+  takeEdges(): { jump: boolean; interact: boolean; grapple: boolean; airGrapple: boolean } {
+    const out = { jump: this.pendingJump, interact: this.pendingInteract, grapple: this.pendingGrapple, airGrapple: this.pendingAirGrapple };
     this.pendingJump = false;
+    this.pendingAirGrapple = false;
     this.pendingInteract = false;
     this.pendingGrapple = false;
     return out;
@@ -195,6 +198,7 @@ export class InputManager {
     this.touchMove = 0;
     this.state.grappleHeld = false;
     this.pendingJump = false;
+    this.pendingAirGrapple = false;
     this.pendingInteract = false;
     this.pendingGrapple = false;
   }

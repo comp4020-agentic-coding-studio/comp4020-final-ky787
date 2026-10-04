@@ -13,7 +13,7 @@ export const mockPresentation: MachinePresentation = {
         return {
             active: room === 'pressure' ? o.exitDoor : o.grappleAnchor || o.bridge,
             text: room === 'pressure' ? 'ACCESS GRANTED' : room === 'switch' ? 'ANCHOR ENABLED'
-                : o.bridge ? 'BRIDGE ENABLED' : 'ANCHOR CONTROL ONLINE',
+                : o.exitDoor ? 'ACCESS GRANTED' : o.bridge ? 'BRIDGE LOCKED · CUBE TO B' : 'ANCHOR CONTROL ONLINE',
             label: 'MACHINE / MOCK SIGNAL',
         };
     },

@@ -11,15 +11,19 @@ and its evidence/replay tests remain in the repository, outside the default game
 
 ## How to play
 
-1. **PRESSURE:** put the cube on the button to open the exit. No jumping needed.
+1. **PRESSURE:** put the cube on the button to open the exit, then hop past it.
 2. **SWITCH:** flip the lever to materialise the marked grapple platform. Hold
    left click on its ring while moving right, then release as you swing right.
-3. **RELAY:** leave the cube on Plate A, grapple across and flip Switch B. The
-   return bridge lets a future partner follow. Climb the lit code steps to the
-   exit. The unstable prototype drops you onto a safe recovery floor.
+3. **RELAY:** leave the cube on Plate A, grapple across and lock the return bridge
+   with its lever. Walk back for the cube and carry it to Plate B on the first
+   raised platform to open the exit. Jump onto the cube or over it to climb the
+   remaining code steps. The unstable prototype has a safe recovery floor.
 
-A/D or arrows move. Space/W jumps. E picks up/puts down a cube or toggles a
-nearby switch. Hold left click on a marked ring to grapple; release to detach.
+A/D or arrows move. Space/W jumps. Aim at a marked ring to preview the grapple;
+press Space again in midair to hook that highlighted target, then once more to
+release. A tap holds the rope for you. Hold left click and release still works.
+E picks up/puts down a cube or uses a nearby lever. RELAY's bridge lever locks
+ON permanently; SWITCH's lever remains an ON/OFF toggle.
 Click-hold a cube in RELAY to pull it towards you. S drops through code platforms.
 R returns to the checkpoint without clearing solved machinery. Tab shows the
 room overview. Escape opens the menu. F1 shows inputs, outputs and save state.
@@ -32,9 +36,9 @@ controls are present; touch gameplay has not been tuned or validated.
 
 An anonymous browser cookie identifies your server save. Returning to the same
 site/browser offers **CONTINUE — [ROOM]**. Completed rooms, logical checkpoint,
-switch state, cube-on-plate state, discovered mechanics and the last 40 notable
+switch state, cube-on-Plate-A/B state, discovered mechanics and the last 40 notable
 events survive reload and server restart. Loose cube positions and velocities
-are not saved. Cookies must be retained to find the same save.
+are not saved. Existing version-1 saves are migrated without losing progress. Cookies must be retained to find the same save.
 
 The footer says **Saved on server** only after acknowledgement. Failed saves
 remain pending and retry; if the initial connection fails, the menu offers a

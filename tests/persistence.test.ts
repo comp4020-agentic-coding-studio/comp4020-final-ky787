@@ -40,7 +40,7 @@ it('persists meaningful state and anonymous identity across actual process resta
     const progress = freshProgress();
     progress.currentRoom = 'relay';
     progress.completedRooms = ['pressure', 'switch'];
-    progress.rooms.relay = { switchB: true, cubeOnPlate: true, checkpoint: 'relay' };
+    progress.rooms.relay = { switchB: true, cubeOnPlate: false, cubeOnPlateB: true, checkpoint: 'relay' };
     progress.mechanics = ['carry', 'bridge'];
     progress.history = [{ room: 'relay', event: 'checkpoint', at: new Date().toISOString() }];
     const put = await fetch(app.url + '/api/progress', { method: 'PUT', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ revision: 0, progress }) });
@@ -71,5 +71,32 @@ it('persists meaningful state and anonymous identity across actual process resta
     const broken = await fetch(app.url + '/api/progress', { headers: { cookie } });
     expect(broken.status).toBe(503);
     expect(await readFile(path, 'utf8')).toBe('broken');
+    await stop(app.child);
+});
+
+it('loads an existing on-disk version-1 save and writes the migrated version without changing identity', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'bn-legacy-data-')); dirs.push(dir);
+    const app = await start(dir);
+    const response = await fetch(app.url + '/api/progress');
+    const cookie = response.headers.get('set-cookie')!.split(';')[0];
+    const record = await response.json();
+    record.revision = 7;
+    record.progress.version = 1;
+    record.progress.currentRoom = 'relay';
+    record.progress.rooms.relay.switchB = true;
+    record.progress.rooms.relay.cubeOnPlate = true;
+    record.progress.rooms.relay.checkpoint = 'relay';
+    for (const memory of Object.values(record.progress.rooms)) delete (memory as Record<string, unknown>).cubeOnPlateB;
+    const path = join(dir, `${record.id}.json`);
+    await writeFile(path, JSON.stringify(record));
+    const migrated = await (await fetch(app.url + '/api/progress', { headers: { cookie } })).json();
+    expect(migrated.id).toBe(record.id);
+    expect(migrated.revision).toBe(7);
+    expect(migrated.progress.version).toBe(2);
+    expect(migrated.progress.rooms.relay.cubeOnPlate).toBe(true);
+    expect(migrated.progress.rooms.relay.cubeOnPlateB).toBe(false);
+    const saved = await fetch(app.url + '/api/progress', { method: 'PUT', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ revision: 7, progress: migrated.progress }) });
+    expect(saved.status).toBe(200);
+    expect(JSON.parse(await readFile(path, 'utf8')).progress.version).toBe(2);
     await stop(app.child);
 });

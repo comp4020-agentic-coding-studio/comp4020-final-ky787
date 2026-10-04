@@ -1,4 +1,4 @@
-import { freshProgress, validProgress, type Progress } from './progress.ts';
+import { freshProgress, readProgress, type Progress } from './progress.ts';
 export class ProgressStore {
     progress = freshProgress();
     visitor = '';
@@ -16,9 +16,10 @@ export class ProgressStore {
             if (!res.ok)
                 throw new Error();
             const data = await res.json();
-            if (!validProgress(data.progress))
+            const progress = readProgress(data.progress);
+            if (!progress)
                 throw new Error();
-            this.progress = data.progress;
+            this.progress = progress;
             this.visitor = data.id;
             this.revision = data.revision;
             this.updatedAt = data.updatedAt;

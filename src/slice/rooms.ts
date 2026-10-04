@@ -1,3 +1,4 @@
+import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
 import type { ControllerOutputs, RoomId } from "./controller.ts";
 export interface Platform extends Box {
@@ -17,6 +18,7 @@ export interface RoomDef {
     checkpoint: Vec2;
     cube?: Vec2;
     plate?: Vec2;
+    plateB?: Vec2;
     lever?: Vec2;
     platforms: Platform[];
     hazards: Box[];
@@ -28,7 +30,7 @@ export const ROOMS: readonly RoomDef[] = [
     {
         id: "pressure", title: "PRESSURE", instruction: "PUT THE CUBE ON THE BUTTON",
         width: 1250, height: 720, spawn: { x: 140, y: 543 }, checkpoint: { x: 140, y: 543 },
-        cube: { x: 310, y: 542 }, plate: { x: 610, y: 560 }, display: { x: 760, y: 340 },
+        cube: { x: 310, y: 560 - CUBE_SIZE / 2 }, plate: { x: 610, y: 560 }, display: { x: 760, y: 340 },
         platforms: [floor("floor", 0, 560, 1250)], hazards: [],
         exit: { x: 1130, y: 420, w: 60, h: 140 },
     },
@@ -42,16 +44,16 @@ export const ROOMS: readonly RoomDef[] = [
         exit: { x: 1300, y: 420, w: 60, h: 140 },
     },
     {
-        id: "relay", title: "RELAY", instruction: "HOLD A. CROSS. SWITCH B. REUNITE.",
+        id: "relay", title: "RELAY", instruction: "HOLD A. LOCK THE BRIDGE. MOVE THE CUBE TO B.",
         width: 2000, height: 800, spawn: { x: 130, y: 543 }, checkpoint: { x: 1050, y: 543 },
-        cube: { x: 260, y: 542 }, plate: { x: 375, y: 560 }, lever: { x: 1080, y: 560 },
+        cube: { x: 260, y: 560 - CUBE_SIZE / 2 }, plate: { x: 375, y: 560 }, plateB: { x: 1270, y: 470 }, lever: { x: 1080, y: 560 },
         display: { x: 950, y: 175 },
         platforms: [floor("near", 0, 560, 480, 240), floor("far", 920, 560, 260, 240),
-            floor("recovery", 1180, 650, 820), floor("recovery-step", 1210, 550, 90, 100),
+            floor("recovery", 1180, 650, 820), floor("recovery-step", 1160, 550, 140, 100),
             floor("exit-shelf", 1660, 350, 340, 450),
             { id: "anchor", kind: "code", x: 700, y: 220, w: 160, h: 60, signal: "grappleAnchor", anchor: true, label: "RELAY A" },
             { id: "bridge", kind: "code", x: 480, y: 560, w: 440, h: 20, signal: "bridge", label: "RETURN BRIDGE" },
-            { id: "step-a", kind: "code", x: 1180, y: 470, w: 170, h: 32, signal: "codePlatformA", label: "PATH 01" },
+            { id: "step-a", kind: "code", x: 1140, y: 470, w: 210, h: 32, signal: "codePlatformA", label: "PATH 01" },
             { id: "step-b", kind: "code", x: 1430, y: 410, w: 165, h: 32, signal: "codePlatformB", label: "PATH 02" },
             { id: "inactive", kind: "code", x: 1260, y: 320, w: 130, h: 32, label: "NO SIGNAL" },
             { id: "crumble", kind: "crumble-prototype", x: 1360, y: 520, w: 140, h: 32, label: "UNSTABLE" }],

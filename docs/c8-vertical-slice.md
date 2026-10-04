@@ -1,6 +1,6 @@
 # C8 vertical slice — 2026-10-04
 
-Status: implemented and automated-playtested; awaiting human playtest. This is
+Status: revised after initial human feedback; awaiting the next human playtest. This is
 a gameplay prototype, not an accepted specification for a new binary.
 
 ## Design and room layouts
@@ -13,20 +13,22 @@ workspaces were read but not modified.
 
 | Room | Hand-authored layout | Physical solution |
 | --- | --- | --- |
-| PRESSURE | 1,250 × 720; continuous floor at y=560; cube at x=310, plate at x=610, exit at x=1,130 | E carries/drops the cube. Either a player or resting cube depresses the plate. Leave the cube there to hold the door open. |
-| SWITCH | 1,420 × 780; near bank ends x=460, far bank starts x=880; 420-unit pit; lever x=300; anchor ring (770,226) | Lever ON makes the ghost card solid and enables its marked ring. Hold click and move right, release on the rightward swing, land on the broad far bank. |
-| RELAY | 2,000 × 800; Plate A x=375; banks end/start x=480/920; 440-unit pit; anchor (780,226); Switch B x=1,080 | Cube holds A while the player crosses. B creates a return bridge, lights two ascending steps, opens the exit, and sets a far-bank checkpoint. A lower crumble detour drops onto a safe recovery floor. |
+| PRESSURE | 1,250 × 720; continuous floor at y=560; cube at x=310, plate at x=610, exit at x=1,130 | E carries/drops the cube. Either a player or resting cube depresses the plate. Leave the cube there to hold the door open, then hop past the solid cube. |
+| SWITCH | 1,420 × 780; near bank ends x=460, far bank starts x=880; 420-unit pit; lever x=300; anchor ring (770,226) | Lever ON makes the ghost card solid and enables its marked ring. Hold click and move right, or jump and tap Space again at the highlighted target. Release on the rightward swing; the far bank is broad. |
+| RELAY | 2,000 × 800; Plate A x=375; banks end/start x=480/920; 440-unit pit; anchor (780,226); bridge lever x=1,080; Plate B (1,270,470) | Cube holds A while the player crosses. The lever permanently locks the bridge and code steps ON and sets the far-bank checkpoint. Retrieve the cube across the bridge and carry it to B to hold the exit open. A lower crumble detour drops onto a safe recovery floor. |
 
 RELAY's steps are y=470 and y=410, then an exit shelf at y=350. The inactive
 card at y=320 remains non-solid; it is not classified as bogus. The amber
 crumble at y=520 arms for 0.6 s after contact, disappears for 2.4 s, and
 reappears. Falling from it lands on architecture at y=650; a y=550 step gets
-back onto the intended path. The pit is the lethal portion. Death respawns
+back onto the intended path. The recovery step and first code platform are widened
+to leave space beside the cube now occupying Plate B. The pit is the lethal portion. Death respawns
 immediately with a brief flash, preserving switches and cubes left on plates.
 
 The future cooperative reading is visible across one open gap: one player
-holds A, another crosses and flips B, then the first walks the return bridge.
-The single-player route actually tests that return crossing. No network
+holds A, another crosses and locks the bridge lever, then the first walks the
+return bridge. A cube can then replace a player on Plate B to hold the exit.
+The single-player route requires that return crossing to retrieve the cube. No network
 semantics are implemented or implied.
 
 ## Reuse and module boundaries
@@ -34,6 +36,8 @@ semantics are implemented or implied.
 - `src/engine/physics.ts`: reused fixed-step AABB movement, coyote time, buffered
   variable-height jumping, one-way collision, cube body physics and old rope
   implementation. Original grapple inspected in the previous Crit 5 source.
+- `src/render/ninja.ts`: original Crit 5 character drawing, including dark body,
+  glowing visor/outline/halo, scarf, velocity lean, afterglow and running legs.
 - `src/render/camera.ts`, `src/ui/input.ts`, `src/render/fx.ts`: reused smoothing,
   look-ahead, edge-latched input, overview framing and particle effects.
 - `src/slice/rooms.ts`: coordinates and authored object definitions only.
@@ -59,22 +63,24 @@ There are no fabricated opcodes, addresses, traces or obfuscator provenance.
 
 Inputs, all booleans:
 
-- `plateA`: momentary physical occupancy by a grounded player or loose cube.
-- `cubeOnPlate`: cube-specific occupancy, for diagnostics and logical saves.
-  In physically reachable states, this implies `plateA`.
-- `switchB`: persistent player-toggled switch state, retained on death/reload.
+- `plateA`, `plateB`: momentary physical occupancy by a grounded player or loose cube.
+- `cubeOnPlate`, `cubeOnPlateB`: cube-specific occupancy of A and B, for diagnostics
+  and logical saves. Each implies its corresponding plate input. One cube cannot
+  occupy both plates at once.
+- `switchB`: persistent lever state, retained on death/reload. It toggles in SWITCH
+  and locks ON after its first activation in RELAY.
 
 | Output | PRESSURE | SWITCH | RELAY |
 | --- | --- | --- | --- |
-| `exitDoor` | `plateA` | `switchB` | `switchB` |
+| `exitDoor` | `plateA` | `switchB` | `switchB && plateB` |
 | `grappleAnchor` | false | `switchB` | `plateA` |
 | `bridge` | false | false | `switchB` |
 | `codePlatformA` | false | false | `switchB` |
 | `codePlatformB` | false | false | `switchB` |
 
-The evaluator is combinational; the physical lever owns the persistent toggle.
-The cube flag does not independently override `plateA`. Tests enumerate all
-8 boolean combinations in all 3 rooms, including physically inconsistent
+The evaluator is combinational; the physical lever owns its toggle/latched state.
+Cube flags do not independently override plate inputs. Tests enumerate all
+32 boolean combinations in all 3 rooms, including physically inconsistent
 combinations, so the mock contract is unambiguous. Future retained exhaustive
 traces can implement the same adapter. Neither the binary nor its trace data
 should own geometry, physics, crumble guesses or animation timing.
@@ -84,6 +90,26 @@ receives the controller frame and selects authored text for the display. Its
 hex-to-readable animation is deliberately cosmetic. Replace this presentation
 adapter with genuine retained string-decoding events when available; current
 text is not Hikari, Polaris, Tigress or OLLVM evidence.
+
+## Character, cube and controls after playtest feedback
+
+The character uses the actual previous game's canvas drawing routine, not a new
+approximation. Gameplay collision remains 22 × 34. C8 cubes grew from 36 to
+44 units per side (legacy socket cubes keep their previous size).
+
+A resting loose cube is a solid collider for the player. It supports standing
+and jumping while continuing to press its plate. Carried/falling cubes do not
+act as airborne platforms. Grappling the cube under the player's feet is
+rejected so it cannot become a self-lifting elevator. Cube simulation excludes
+its own player-only collider.
+
+Space on the ground jumps. A new Space press while airborne consumes the jump
+only if the same probe used by the visible targeting hint finds an active marked
+anchor. That press latches the rope; another Space press releases it. Key release
+alone does not detach a keyboard hook. Clicking takes over with the existing
+hold/release behaviour. Landing, respawning, opening the menu, losing focus or
+losing the anchor signal clears the keyboard latch. W/up remain ordinary jump
+aliases. No automatic hook is fired merely by continuing to hold a ground jump.
 
 ## Grapple tuning and known limits
 
@@ -129,10 +155,10 @@ its `/data` mount are unchanged. This task does not deploy or push the commit.
 
 An HttpOnly, SameSite=Lax, one-year UUID cookie identifies a visitor (Secure
 behind Fly HTTPS). `/data/<visitor UUID>.json` contains an envelope with visitor
-ID, revision, update time and version-1 progress:
+ID, revision, update time and version-2 progress:
 
 - current and completed rooms;
-- per-room switch, cube-on-plate and entry/far-bank checkpoint;
+- per-room switch/bridge latch, cube-on-Plate-A/B and entry/far-bank checkpoint;
 - discovered mechanics/notable actions and the last 40 timestamped events.
 
 Writes validate schema and body size, serialize per visitor, fsync a temporary
@@ -145,8 +171,12 @@ volume, not multiple server writers.
 The client writes only logical changes/events, coalesces pending saves, retries
 network failures, and reports pending/confirmed/conflicting status. No player
 position, velocity, rope or frame snapshots are persisted. Cube-on-plate saves
-reconstruct a cube at its plate; other loose cubes return to authored spawn.
+reconstruct a cube at the correct plate, including B; other loose cubes return to authored spawn.
 A carried cube therefore need not be rescued after returning to the site.
+
+Existing version-1 saves migrate in memory to version 2 with Plate B initially
+empty; visitor identity, revisions, completion, checkpoints and Plate A placement
+are preserved. The next successful write persists the migrated schema.
 
 `DATA_DIR` overrides `/data` locally. Visitor progression and room memory are
 separate schema fields, so later shared room state can have its own identity
@@ -158,18 +188,19 @@ written to the server.
 ## Validation and playtest observations
 
 - `pnpm typecheck`: passed.
-- `pnpm test:unit`: 94 passed, 2 existing conditional tests skipped for tutorial
+- `pnpm test:unit`: 102 passed, 2 existing conditional tests skipped for tutorial
   rooms without pits; none weakened or removed.
 - `pnpm build`: passed; the default bundle excludes the previous binary tutorial.
 - `pnpm test`: both original HTTP invariants passed against the production server.
 - `pnpm check:browser`: real CDP keyboard/mouse route through all three rooms,
-  including a deliberate failed jump, cube pull, both intended grapple
-  crossings, return bridge, checkpoint reset, reload/continue, crumble recovery,
+  including a deliberate failed jump, cube pull, mouse and Space grapple
+  crossings, permanent return bridge, A-to-B transfer, standing on the cube,
+  checkpoint reset, reload/continue with B held, and crumble recovery,
   final completion save, debug state, screenshots and zero console errors.
 - Restart test: save RELAY, SIGKILL the server, launch a new process on the same
   temporary `/data`-style directory, load the same cookie, compare saved state.
   Also checks independent visitors, conflicting writes, bad payloads, bounded
-  request sizes and preservation of corrupt files. Client tests cover visible
+  request sizes and preservation of corrupt files. The HTTP suite also migrates a real on-disk version-1 save. Client tests cover visible
   unsaved startup, retry/coalescing and conflict handling.
 
 Automation confirms reachability and behaviour, not whether a person finds it
@@ -181,7 +212,9 @@ fun. Remaining points for manual playtesting:
 2. A cube is put down in front of the player, not directly underneath. Wide
    plates tolerate placement errors, but a player may initially overshoot.
 3. The crumble is recoverable, but its recovery route requires turning left and
-   jumping back up. The unstable/prototype label may make it less tempting.
+   jumping back up. The unstable/prototype label may make it less tempting. After adding the
+   solid cube to B, the first/recovery steps were widened to leave a clear route
+   back up beside it.
 4. RELAY's title scrolls out of view as the camera follows; the plate, gap,
    anchor and switch retain useful sightlines. Tab gives a full-room overview.
 5. Touch controls are inherited but unvalidated; desktop was tested at 1600×900

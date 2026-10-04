@@ -183,6 +183,8 @@ interface Snap {
     } | null;
     inputs: {
         plateA: boolean;
+        plateB: boolean;
+        cubeOnPlateB: boolean;
         cubeOnPlate: boolean;
         switchB: boolean;
     };
@@ -195,6 +197,7 @@ interface Snap {
     checkpoint: string;
     deaths: number;
     pullingCube: boolean;
+    keyboardGrapple: boolean;
     ended: boolean;
     started: boolean;
     progress: {
@@ -248,6 +251,32 @@ async function walkTo(cdp: Cdp, x: number, hop = false): Promise<Snap> {
         await sleep(180);
     }
 }
+/** Brake in the air using real keys so narrow cube landings don't rely on fixed sleeps. */
+async function jumpTo(cdp: Cdp, x: number, groundId: string): Promise<void> {
+    const start = Date.now();
+    let direction = 0, airborne = false, jumpHeld = true;
+    await key(cdp, 'keyDown', 'Space');
+    try {
+        for (;;) {
+            const s = await snap(cdp);
+            airborne ||= !s.player.grounded;
+            if (airborne && s.player.groundId === groundId) return;
+            if (Date.now() - start > 4000) throw new Error(`Jump to ${groundId} failed: ${JSON.stringify(s.player)}`);
+            if (jumpHeld && Date.now() - start > 300) { await key(cdp, 'keyUp', 'Space'); jumpHeld = false; }
+            const desired = Math.max(-380, Math.min(380, (x - s.player.x) * 6));
+            const next = desired - s.player.vx > 25 ? 1 : desired - s.player.vx < -25 ? -1 : 0;
+            if (next !== direction) {
+                if (direction) await key(cdp, 'keyUp', direction > 0 ? 'KeyD' : 'KeyA');
+                if (next) await key(cdp, 'keyDown', next > 0 ? 'KeyD' : 'KeyA');
+                direction = next;
+            }
+            await sleep(20);
+        }
+    } finally {
+        await key(cdp, 'keyUp', 'KeyA'); await key(cdp, 'keyUp', 'KeyD'); await key(cdp, 'keyUp', 'Space');
+        await sleep(150);
+    }
+}
 async function shot(cdp: Cdp, name: string): Promise<void> { const res = await cdp.send('Page.captureScreenshot', { format: 'png' }) as {
     data?: string;
 }; if (res.data)
@@ -261,16 +290,25 @@ async function mouseAt(cdp: Cdp, x: number, y: number, type = 'mousePressed') {
         x: number;
         y: number;
     }>(cdp, `(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();return {x:(${x}-c.originX())*c.zoom+r.left,y:(${y}-c.originY())*c.zoom+r.top};})()`);
-    await cdp.send('Input.dispatchMouseEvent', { type, x: at.x, y: at.y, button: 'left', buttons: type === 'mouseReleased' ? 0 : 1, clickCount: 1 });
+    await cdp.send('Input.dispatchMouseEvent', { type, x: at.x, y: at.y, button: type === 'mouseMoved' ? 'none' : 'left', buttons: type === 'mousePressed' ? 1 : 0, clickCount: 1 });
 }
-async function cross(cdp: Cdp, anchorX: number) {
+async function cross(cdp: Cdp, anchorX: number, keyboard = false) {
     const before = (await snap(cdp)).deaths;
     await key(cdp, 'keyDown', 'KeyD');
-    await mouseAt(cdp, anchorX, 226);
+    if (keyboard) {
+        await mouseAt(cdp, anchorX, 226, 'mouseMoved');
+        await tap(cdp, 'Space'); // Jump from the near bank.
+        check('ground Space jumps without firing a hook', (await snap(cdp)).player.rope.phase === 'idle');
+        await mouseAt(cdp, anchorX, 226, 'mouseMoved');
+        check('air hook uses visible target preview', await evaluate(cdp, '!!binaryNinja.world.target(binaryNinja.input.state.aim)'));
+        await tap(cdp, 'Space'); // Catch the ring; releasing the key keeps it attached.
+    } else await mouseAt(cdp, anchorX, 226);
     await waitFor(cdp, 'hook attachment', s => s.player.rope.phase === 'attached');
-    await sleep(700);
+    if (keyboard) check('tapped airborne Space latches the hook', (await snap(cdp)).keyboardGrapple);
+    await waitFor(cdp, 'rightward release point', s => s.player.x > anchorX + 90 && s.player.y < 510 && s.player.vx > 0);
     await shot(cdp, `swing-${(await snap(cdp)).room}`);
-    await mouseAt(cdp, anchorX, 226, 'mouseReleased');
+    if (keyboard) await tap(cdp, 'Space');
+    else await mouseAt(cdp, anchorX, 226, 'mouseReleased');
     await waitFor(cdp, 'far bank', s => s.player.x > 965 && s.player.grounded);
     await key(cdp, 'keyUp', 'KeyD');
     await sleep(150);
@@ -298,13 +336,13 @@ async function main() {
         await shot(cdp, 'start');
         check('new visitor starts at pressure', (await snap(cdp)).room === 'pressure');
         await click(cdp, '#continue');
-        await walkTo(cdp, 280);
+        await walkTo(cdp, 260);
         await tap(cdp, 'KeyE');
         check('cube carried', (await snap(cdp)).cube?.carried === true);
         await walkTo(cdp, 560);
         await tap(cdp, 'KeyE');
         await waitFor(cdp, 'cube on plate', s => s.inputs.cubeOnPlate);
-        await walkTo(cdp, 735);
+        await walkTo(cdp, 735, true);
         check('cube holds plate after player leaves', (await snap(cdp)).outputs.exitDoor);
         await shot(cdp, 'pressure');
         await exitRoom(cdp, 'switch');
@@ -325,7 +363,7 @@ async function main() {
         await sleep(150);
         check('pit respawns quickly without losing switch progress', (await snap(cdp)).outputs.grappleAnchor);
         await walkTo(cdp, 415);
-        await cross(cdp, 770);
+        await cross(cdp, 770, true);
         await exitRoom(cdp, 'relay');
         // Cube grapple is a physical pull, not a swing anchor.
         await mouseAt(cdp, 260, 542);
@@ -338,12 +376,14 @@ async function main() {
         await walkTo(cdp, 325);
         await tap(cdp, 'KeyE');
         await waitFor(cdp, 'relay plate', s => s.inputs.cubeOnPlate);
-        await walkTo(cdp, 430);
+        await walkTo(cdp, 430, true);
         await cross(cdp, 780);
         await walkTo(cdp, 1050);
         await tap(cdp, 'KeyE');
         s = await snap(cdp);
-        check('Switch B restores bridge and sets checkpoint', s.outputs.bridge && s.checkpoint === 'relay');
+        check('bridge locks but exit still requires Plate B', s.outputs.bridge && !s.outputs.exitDoor && s.checkpoint === 'relay');
+        await tap(cdp, 'KeyE');
+        check('relay bridge lever cannot switch back off', (await snap(cdp)).outputs.bridge);
         // Walk the bridge back: future second-player route is actually traversable.
         await walkTo(cdp, 850);
         check('return bridge supports player', (await snap(cdp)).player.groundId === 'bridge');
@@ -360,9 +400,28 @@ async function main() {
         check('reload restores checkpoint, plate and bridge', s.checkpoint === 'relay' && s.inputs.cubeOnPlate && s.outputs.bridge && s.player.x === 1050);
         await shot(cdp, 'continue-relay');
         await click(cdp, '#continue');
+        await walkTo(cdp, (await snap(cdp)).cube!.x + 48);
+        await tap(cdp, 'KeyE');
+        check('retrieve cube from A across permanent bridge', (await snap(cdp)).cube!.carried);
+        await walkTo(cdp, 650);
+        s = await snap(cdp);
+        check('removing cube disables anchor but keeps bridge and closed exit', !s.inputs.plateA && !s.outputs.grappleAnchor && s.outputs.bridge && !s.outputs.exitDoor);
         await walkTo(cdp, 1125);
         await walkTo(cdp, 1240, true);
         await waitFor(cdp, 'step a landing', s => s.player.groundId === 'step-a');
+        await walkTo(cdp, 1220);
+        await tap(cdp, 'KeyD'); // Face into the wide second plate.
+        await tap(cdp, 'KeyE');
+        await waitFor(cdp, 'cube on Plate B', s => s.inputs.cubeOnPlateB);
+        await shot(cdp, 'plate-b');
+        check('cube transferred to B opens the exit', (await snap(cdp)).outputs.exitDoor);
+        await jumpTo(cdp, (await snap(cdp)).cube!.x, 'cube-body');
+        await shot(cdp, 'ninja-on-cube');
+        check('player stands on cube while it holds Plate B', (await snap(cdp)).inputs.cubeOnPlateB);
+        await walkTo(cdp, 1200);
+        await waitFor(cdp, 'step a before crumble', s => s.player.groundId === 'step-a');
+        await jumpTo(cdp, 1320, 'step-a');
+
         // Tempting lower platform crumbles into the recovery floor, not a death pit.
         await walkTo(cdp, 1380);
         await waitFor(cdp, 'crumble armed', s => s.platforms.some(p => p.id === 'crumble' && p.fuse > 0));
@@ -372,9 +431,9 @@ async function main() {
         await walkTo(cdp, 1315);
         await walkTo(cdp, 1250, true);
         await waitFor(cdp, 'recovery step', s => s.player.groundId === 'recovery-step');
-        await tap(cdp, 'Space');
-        await waitFor(cdp, 'back on step a', s => s.player.groundId === 'step-a');
-        await walkTo(cdp, 1310);
+        await walkTo(cdp, 1195);
+        await jumpTo(cdp, 1180, 'step-a');
+        await jumpTo(cdp, 1320, 'step-a');
         await walkTo(cdp, 1490, true);
         await waitFor(cdp, 'step b landing', s => s.player.groundId === 'step-b');
         await walkTo(cdp, 1560);
@@ -389,6 +448,11 @@ async function main() {
         await waitFor(cdp, 'final save', s => s.persistence.status === 'Saved on server');
         check('three-room completion saved', (await snap(cdp)).progress.completedRooms.length === 3);
         await shot(cdp, 'end');
+        await cdp.send('Page.reload');
+        await sleep(600);
+        await waitFor(cdp, 'restore Plate B save', s => s.persistence.visitor === visitor && s.inputs.cubeOnPlateB);
+        check('reload restores cube at B with bridge and exit open', (await snap(cdp)).outputs.exitDoor && (await snap(cdp)).outputs.bridge);
+        await shot(cdp, 'continue-plate-b');
         await cdp.send('Emulation.setDeviceMetricsOverride', { width: 960, height: 640, deviceScaleFactor: 1, mobile: false });
         await sleep(300);
         await shot(cdp, 'compact-menu');

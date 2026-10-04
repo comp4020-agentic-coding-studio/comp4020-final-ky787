@@ -80,6 +80,8 @@ export interface InputState {
   down: boolean;
   jumpHeld: boolean;
   jumpPressed: boolean;
+  /** Space-only edge: the C8 world may consume it for a hinted airborne hook. */
+  airGrapplePressed?: boolean;
   grappleHeld: boolean;
   grapplePressed: boolean;
   reelIn: boolean;

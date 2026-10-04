@@ -1,3 +1,4 @@
+import { CUBE_SIZE } from './tuning.ts';
 import { CARRY, GRAPPLE, PLAYER } from '../engine/constants.ts';
 import { boxesOverlap, clamp, type Vec2 } from '../engine/geometry.ts';
 import { createPlayer, playerBox, releaseRope, stepBody, stepPlayer, findGrappleTarget, type InputState, type LooseBody, type Solid } from '../engine/physics.ts';
@@ -25,10 +26,13 @@ export class PuzzleWorld {
     platforms: PlatformState[];
     solids: Solid[];
     door: Solid;
-    inputs: ControllerInputs = { plateA: false, cubeOnPlate: false, switchB: false };
+    inputs: ControllerInputs = { plateA: false, plateB: false, cubeOnPlate: false, cubeOnPlateB: false, switchB: false };
     frame: ControllerFrame;
     checkpoint: RoomMemory['checkpoint'] = 'entry';
     plateDepth = 0;
+    plateDepthB = 0;
+    keyboardGrapple = false;
+    private cubeSolid: Solid = { id: 'cube-body', x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
     doorOpen = 0;
     displayPulse = 0;
     elapsed = 0;
@@ -42,7 +46,8 @@ export class PuzzleWorld {
         this.checkpoint = memory.checkpoint;
         this.player = createPlayer(...this.spawnPoint());
         if (room.cube) {
-            const at = memory.cubeOnPlate && room.plate ? { x: room.plate.x, y: room.plate.y - CARRY.cubeSize / 2 } : room.cube;
+            const plate = memory.cubeOnPlateB ? room.plateB : memory.cubeOnPlate ? room.plate : undefined;
+            const at = plate ? { x: plate.x, y: plate.y - CUBE_SIZE / 2 } : room.cube;
             this.cube = { ...at, vx: 0, vy: 0, carried: false, grounded: true, groundId: 'near' };
         }
         this.platforms = room.platforms.map(def => ({ def, pulse: 0, fuse: -1, respawn: 0,
@@ -64,17 +69,34 @@ export class PuzzleWorld {
         return [p.x, p.y];
     }
     private emit(kind: string, at: Vec2 = this.player): void { this.events.push({ kind, at: { x: at.x, y: at.y } }); }
-    memory(): RoomMemory { return { switchB: this.inputs.switchB, cubeOnPlate: this.inputs.cubeOnPlate, checkpoint: this.checkpoint }; }
-    private onPlate(body: Vec2, width: number, height: number): boolean {
-        const plate = this.room.plate;
+    memory(): RoomMemory { return { switchB: this.inputs.switchB, cubeOnPlate: this.inputs.cubeOnPlate, cubeOnPlateB: this.inputs.cubeOnPlateB, checkpoint: this.checkpoint }; }
+    private onPlate(body: Vec2, width: number, height: number, plate: Vec2 | undefined): boolean {
         return !!plate && Math.abs(body.x - plate.x) < 45 + width / 2 - 8 && Math.abs(body.y + height / 2 - plate.y) < 5;
     }
     private samplePlate(): void {
-        const previous = this.inputs.plateA;
-        this.inputs.cubeOnPlate = !!this.cube && !this.cube.carried && this.cube.grounded && this.onPlate(this.cube, CARRY.cubeSize, CARRY.cubeSize);
-        this.inputs.plateA = this.inputs.cubeOnPlate || (this.player.grounded && this.onPlate(this.player, PLAYER.width, PLAYER.height));
-        if (!previous && this.inputs.plateA)
-            this.emit('plate', this.room.plate);
+        const c = this.cube, p = this.player;
+        const occupied = (plate: Vec2 | undefined) => ({
+            cube: !!c && !c.carried && c.grounded && this.onPlate(c, CUBE_SIZE, CUBE_SIZE, plate),
+            player: p.grounded && this.onPlate(p, PLAYER.width, PLAYER.height, plate),
+        });
+        const a = occupied(this.room.plate), b = occupied(this.room.plateB);
+        const wasA = this.inputs.plateA, wasB = this.inputs.plateB;
+        this.inputs.cubeOnPlate = a.cube;
+        this.inputs.cubeOnPlateB = b.cube;
+        this.inputs.plateA = a.cube || a.player;
+        this.inputs.plateB = b.cube || b.player;
+        if (!wasA && this.inputs.plateA) this.emit('plate', this.room.plate);
+        if (!wasB && this.inputs.plateB) this.emit('plate', this.room.plateB);
+    }
+    private nearLever(): boolean {
+        return !!this.room.lever && Math.hypot(this.player.x - this.room.lever.x, this.player.y - (this.room.lever.y - 25)) < 72;
+    }
+    private get bridgeLocked(): boolean { return this.room.id === 'relay' && this.inputs.switchB; }
+    private updateCubeSolid(): void {
+        const c = this.cube;
+        // Only a resting cube supports the player: no midair drop/jump ladder exploit.
+        this.cubeSolid.enabled = !!c && !c.carried && c.grounded;
+        if (c) { this.cubeSolid.x = c.x - CUBE_SIZE / 2; this.cubeSolid.y = c.y - CUBE_SIZE / 2; }
     }
     private evaluate(): void {
         const old = this.frame.outputs;
@@ -99,18 +121,19 @@ export class PuzzleWorld {
     interactionHint(): string {
         if (this.cube?.carried)
             return 'E · put down cube';
-        if (this.room.lever && Math.hypot(this.player.x - this.room.lever.x, this.player.y - (this.room.lever.y - 25)) < 72)
+        if (this.nearLever() && !this.bridgeLocked)
             return `E · switch ${this.inputs.switchB ? 'OFF' : 'ON'}`;
         if (this.cube && Math.hypot(this.player.x - this.cube.x, this.player.y - this.cube.y) < CARRY.reach)
             return 'E · carry cube';
+        if (this.nearLever() && this.bridgeLocked) return 'Bridge locked · move the cube to B';
         return '';
     }
     interact(): void {
         const p = this.player, c = this.cube;
         if (c?.carried) {
-            const ahead = p.x + p.facing * 39;
-            const y = p.y + PLAYER.height / 2 - CARRY.cubeSize / 2 - 0.5;
-            const box = { x: ahead - 18, y: y - 18, w: 36, h: 36 };
+            const ahead = p.x + p.facing * (PLAYER.width / 2 + CUBE_SIZE / 2 + 10);
+            const y = p.y + PLAYER.height / 2 - CUBE_SIZE / 2 - 0.5;
+            const box = { x: ahead - CUBE_SIZE / 2, y: y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE };
             c.x = this.solids.some(s => s.enabled && !s.oneWay && boxesOverlap(box, s)) ? p.x : ahead;
             c.y = y;
             c.carried = false;
@@ -118,7 +141,7 @@ export class PuzzleWorld {
             c.vy = 0;
             c.grounded = false;
         }
-        else if (this.room.lever && Math.hypot(p.x - this.room.lever.x, p.y - (this.room.lever.y - 25)) < 72) {
+        else if (this.nearLever() && !this.bridgeLocked) {
             this.inputs.switchB = !this.inputs.switchB;
             this.emit('switch', this.room.lever);
             if (this.room.id === 'relay') {
@@ -139,7 +162,7 @@ export class PuzzleWorld {
         this.player = createPlayer(...this.spawnPoint());
         if (this.cube?.carried)
             this.returnCube();
-        this.pullingCube = false;
+        this.cancelGrapple();
         this.deaths++;
         this.deathFlash = 0.35;
         this.emit('death');
@@ -151,9 +174,38 @@ export class PuzzleWorld {
         this.pullingCube = false;
         this.emit('cube-return');
     }
+    cancelGrapple(): void {
+        this.keyboardGrapple = false;
+        this.pullingCube = false;
+        releaseRope(this.player, false);
+    }
+    private keyboardHook(input: InputState): void {
+        if (input.grapplePressed) this.keyboardGrapple = false; // Mouse takes ownership.
+        if (input.airGrapplePressed) {
+            const p = this.player;
+            if (p.rope.phase === 'attached' || p.rope.phase === 'firing') {
+                this.keyboardGrapple = false;
+                releaseRope(p);
+                input.jumpPressed = false;
+                input.grappleHeld = false;
+                p.jumpBuffer = 0;
+                return;
+            }
+            const target = !p.grounded ? this.target(input.aim) : null;
+            if (target) {
+                // Exactly the same probe as the pre-click hint, never an arbitrary surface.
+                this.keyboardGrapple = true;
+                input.aim = target.point;
+                input.grapplePressed = true;
+                input.jumpPressed = false;
+                p.jumpBuffer = 0;
+            }
+        }
+        if (this.keyboardGrapple) input.grappleHeld = true;
+    }
     private hookCube(input: InputState): void {
         const c = this.cube, p = this.player;
-        if (!c || c.carried || this.room.id === 'pressure') {
+        if (!c || c.carried || this.room.id === 'pressure' || p.groundId === this.cubeSolid.id) {
             this.pullingCube = false;
             return;
         }
@@ -167,8 +219,8 @@ export class PuzzleWorld {
             this.pullingCube = false;
         if (!this.pullingCube)
             return;
-        const dx = p.x - c.x, dy = p.y - 18 - c.y, d = Math.hypot(dx, dy);
-        if (d > 38) {
+        const dx = p.x - c.x, dy = p.y - CUBE_SIZE / 2 - c.y, d = Math.hypot(dx, dy);
+        if (d > CUBE_SIZE) {
             c.grounded = false;
             c.vx = dx / d * Math.min(330, d * 5);
             c.vy = dy / d * Math.min(330, d * 5) - 55;
@@ -190,26 +242,34 @@ export class PuzzleWorld {
             input.grappleHeld = false;
             input.grapplePressed = false;
         }
-        this.hookCube(input);
+        this.samplePlate();
+        this.evaluate();
+        this.keyboardHook(input);
+        if (this.keyboardGrapple) this.pullingCube = false;
+        else this.hookCube(input);
         if (this.pullingCube) {
             input.grappleHeld = false;
             input.grapplePressed = false;
         }
-        this.samplePlate();
-        this.evaluate();
-        const wasAttached = this.player.rope.phase === 'attached';
-        stepPlayer(this.player, input, this.solids, dt);
-        if (!wasAttached && this.player.rope.phase === 'attached')
-            this.emit('grapple');
-        if (this.cube) {
+        if (this.cube && !this.cube.carried) {
             const c = this.cube;
-            if (c.carried)
-                Object.assign(c, { x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - 18, vx: 0, vy: 0, grounded: false });
-            else
-                stepBody(c, CARRY.cubeSize, this.solids, this.pullingCube ? 300 : CARRY.cubeGravity, CARRY.cubeMaxFall, dt);
-            if (c.y > this.room.height || this.room.hazards.some(h => boxesOverlap(h, { x: c.x - 18, y: c.y - 18, w: 36, h: 36 })))
-                this.returnCube();
+            stepBody(c, CUBE_SIZE, this.solids, this.pullingCube ? 300 : CARRY.cubeGravity, CARRY.cubeMaxFall, dt);
+            if (c.y > this.room.height || this.room.hazards.some(h => boxesOverlap(h, {
+                x: c.x - CUBE_SIZE / 2, y: c.y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE,
+            }))) this.returnCube();
         }
+        this.updateCubeSolid();
+        const wasAttached = this.player.rope.phase === 'attached';
+        stepPlayer(this.player, input, this.cubeSolid.enabled ? [...this.solids, this.cubeSolid] : this.solids, dt);
+        if (!wasAttached && this.player.rope.phase === 'attached') this.emit('grapple');
+        if (this.keyboardGrapple && (this.player.grounded || ['idle', 'retracting'].includes(this.player.rope.phase))) {
+            this.keyboardGrapple = false;
+            releaseRope(this.player, false);
+        }
+        if (this.cube?.carried) Object.assign(this.cube, {
+            x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2,
+            vx: 0, vy: 0, grounded: false,
+        });
         this.samplePlate();
         this.evaluate();
         for (const platform of this.platforms) {
@@ -234,6 +294,7 @@ export class PuzzleWorld {
             }
         }
         this.plateDepth += ((this.inputs.plateA ? 1 : 0) - this.plateDepth) * Math.min(1, dt * 16);
+        this.plateDepthB += ((this.inputs.plateB ? 1 : 0) - this.plateDepthB) * Math.min(1, dt * 16);
         this.doorOpen = clamp(this.doorOpen + (this.frame.outputs.exitDoor ? dt * 3 : -dt * 3), 0, 1);
         this.displayPulse = Math.max(0, this.displayPulse - dt * 0.9);
         if (this.room.hazards.some(h => boxesOverlap(playerBox(this.player), h)) || this.player.y > this.room.height + 50)

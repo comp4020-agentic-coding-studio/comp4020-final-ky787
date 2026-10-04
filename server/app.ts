@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, open, rename, unlink } from 'node:fs/promises';
 import { resolve, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { freshProgress, validProgress, type Progress } from '../src/slice/progress.ts';
+import { freshProgress, validProgress, readProgress, type Progress } from '../src/slice/progress.ts';
 interface RecordData {
     id: string;
     revision: number;
@@ -30,9 +30,10 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
     async function load(id: string): Promise<RecordData> {
         try {
             const record = JSON.parse(await readFile(join(dataDir, `${id}.json`), 'utf8')) as RecordData;
-            if (record.id !== id || !Number.isInteger(record.revision) || record.revision < 0 || !validProgress(record.progress))
+            const progress = readProgress(record.progress);
+            if (record.id !== id || !Number.isInteger(record.revision) || record.revision < 0 || !progress)
                 throw new Error('Invalid saved data');
-            return record;
+            return { ...record, progress: progress! };
         }
         catch (e) {
             if ((e as NodeJS.ErrnoException).code !== 'ENOENT')

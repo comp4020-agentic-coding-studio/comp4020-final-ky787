@@ -1,4 +1,5 @@
-import { PLAYER } from '../engine/constants.ts';
+import { drawNinja } from '../render/ninja.ts';
+import { CUBE_SIZE } from './tuning.ts';
 import { Camera } from '../render/camera.ts';
 import { Particles } from '../render/fx.ts';
 import type { Vec2 } from '../engine/geometry.ts';
@@ -140,13 +141,27 @@ export class PuzzleRenderer {
                 c.globalAlpha = 1;
             }
         }
-        if (r.plate) {
-            const x = r.plate.x, y = r.plate.y;
+        const plates = [
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'relay' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: 'PLATE B / EXIT' },
+        ];
+        for (const plate of plates) {
+            if (!plate.at) continue;
+            const { x, y } = plate.at;
             c.fillStyle = '#101c23';
             c.fillRect(x - 51, y - 3, 102, 13);
-            c.fillStyle = w.inputs.plateA ? C.cyan : C.amber;
-            c.fillRect(x - 45, y - 9 + w.plateDepth * 6, 90, 7);
-            this.text(r.id === 'relay' ? 'PLATE A' : 'BUTTON', x - 38, y + 39, 13, w.inputs.plateA ? C.cyan : C.amber);
+            c.fillStyle = plate.active ? C.cyan : C.amber;
+            c.fillRect(x - 45, y - 9 + plate.depth * 6, 90, 7);
+            this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
+        }
+        if (r.plateB) {
+            // Plate B's exit conduit stays on the wall behind the climbing section.
+            c.setLineDash([5, 8]);
+            const colour = w.frame.outputs.exitDoor ? C.cyan : C.line;
+            this.line(r.plateB.x, r.plateB.y - 85, r.exit.x + r.exit.w / 2, r.plateB.y - 85, colour);
+            this.line(r.exit.x + r.exit.w / 2, r.plateB.y - 85, r.exit.x + r.exit.w / 2, r.exit.y - 45, colour);
+            c.setLineDash([]);
+            if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
         if (r.lever) {
             const x = r.lever.x, y = r.lever.y;
@@ -156,7 +171,7 @@ export class PuzzleRenderer {
             const dx = w.inputs.switchB ? 19 : -19;
             this.line(x, y - 33, x + dx, y - 72, w.inputs.switchB ? C.cyan : C.amber, 6);
             this.ring(x + dx, y - 72, 7, C.ink);
-            this.text(`${r.id === 'relay' ? 'SWITCH B' : 'SWITCH'} / ${w.inputs.switchB ? 'ON' : 'OFF'}`, x - 55, y + 40, 13, w.inputs.switchB ? C.cyan : C.amber);
+            this.text(`${r.id === 'relay' ? 'BRIDGE' : 'SWITCH'} / ${w.inputs.switchB ? r.id === 'relay' ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, y + 40, 13, w.inputs.switchB ? C.cyan : C.amber);
         }
         const feedback = this.presentation.describe(r.id, w.frame);
         const displayOn = feedback.active, message = feedback.text;
@@ -183,10 +198,10 @@ export class PuzzleRenderer {
         if (w.cube) {
             const cube = w.cube;
             c.fillStyle = '#393b32';
-            c.fillRect(cube.x - 18, cube.y - 18, 36, 36);
+            c.fillRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
             c.strokeStyle = C.amber;
             c.lineWidth = 3;
-            c.strokeRect(cube.x - 18, cube.y - 18, 36, 36);
+            c.strokeRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
             this.ring(cube.x, cube.y, 8, C.amber);
             if (w.pullingCube) {
                 c.setLineDash([6, 5]);
@@ -199,12 +214,7 @@ export class PuzzleRenderer {
             this.line(p.x, p.y, rope.tip.x, rope.tip.y, C.cyan, 2);
             this.ring(rope.tip.x, rope.tip.y, 4, C.ink);
         }
-        c.fillStyle = C.ink;
-        c.fillRect(p.x - 11, p.y - 17, 22, 34);
-        c.fillStyle = '#2b7883';
-        c.fillRect(p.x - 9, p.y - 12, 18, 8);
-        c.fillStyle = C.cyan;
-        c.fillRect(p.x + (p.facing > 0 ? 4 : -9), p.y - 10, 5, 4);
+        drawNinja(c, p, w.elapsed, C.cyan);
         const hint = w.interactionHint();
         if (hint)
             this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
@@ -214,9 +224,12 @@ export class PuzzleRenderer {
             c.setLineDash([3, 8]);
             this.line(p.x, p.y, target.point.x, target.point.y, '#629b99', 1);
             c.setLineDash([]);
+            if (!p.grounded && ['idle', 'retracting'].includes(rope.phase)) this.text('SPACE · GRAPPLE', p.x - 65, p.y - 48, 13, C.cyan);
         }
+        if (w.keyboardGrapple) this.text('SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
         if (r.id !== 'pressure') {
-            this.text('HOLD CLICK + D', 330, 460, 15, C.ink);
+            this.text('HOLD CLICK + D', 305, 440, 15, C.ink);
+            this.text('OR SPACE IN THE AIR', 285, 461, 13, C.cyan);
             this.text('Release as you swing right', 310, 483, 12, C.dim);
         }
         if (r.id === 'relay')
