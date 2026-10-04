@@ -1,29 +1,21 @@
 <!doctype html>
 <html lang="en-AU">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Binary Ninja — Chamber 01 prototype</title>
-    <meta
-      name="description"
-      content="Prototype puzzle chamber: wire the stages of a real OLLVM-obfuscated program in the order it runs, and replay its retained executions."
-    />
-    <meta name="theme-color" content="#04060a" />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <h1>Binary Ninja</h1>
-      <p class="topbar-note">Chamber prototype · <code>level01_compare_bcf_v1</code> · OLLVM BCF x86-64 · retained executions for inputs 6, 7, 8</p>
-    </header>
-    <main id="app">
-      <canvas
-        id="stage"
-        tabindex="0"
-        aria-label="Puzzle chamber. A and D move, Space jumps, E picks up and plugs cables, Enter runs the program."
-      ></canvas>
-      <noscript><p class="fatal">This prototype is a real-time game and needs JavaScript.</p></noscript>
-    </main>
-    <script type="module" src="./src/main.ts"></script>
-  </body>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary Ninja — Pressure / Switch / Relay</title>
+  <meta name="description" content="Three hand-authored platform puzzles. A single-player greybox for a future cooperative Binary Ninja.">
+  <meta name="theme-color" content="#0c131a"><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header><a class="brand" href="/">BN<span>BINARY NINJA</span></a><strong id="room-title">01 / PRESSURE</strong><div class="header-right"><span class="badge">C8 · MOCK CONTROLLERS</span><button id="pause">Menu</button></div></header>
+  <main id="app">
+    <canvas id="stage" tabindex="0" aria-label="Platform puzzle. A and D move. Space jumps. E carries cubes or flips switches. Hold left click on marked anchors to grapple. Release to let go. R returns to checkpoint."></canvas>
+    <section id="menu" aria-label="Start or continue"><div class="menu-card"><p>Loading saved progress…</p></div></section>
+    <aside id="debug" hidden><strong>DEVELOPER / MOCK STATE</strong><button id="return-cube">Return cube to spawn</button><pre></pre></aside>
+    <noscript>This game requires JavaScript.</noscript>
+  </main>
+  <footer><span>A D <b>move</b> / SPACE <b>jump</b> / E <b>interact</b> / CLICK + HOLD <b>grapple</b> / R <b>checkpoint</b> / TAB <b>overview</b></span><span id="save-status" role="status">Loading…</span><button id="debug-toggle">F1 · Debug</button></footer>
+  <script type="module" src="./src/main.ts"></script>
+</body>
 </html>

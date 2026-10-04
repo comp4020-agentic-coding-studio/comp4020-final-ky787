@@ -50,18 +50,22 @@ export const PLAYER = {
 } as const;
 
 export const GRAPPLE = {
-  maxRange: 620,
+  maxRange: 500,
   minRange: 58,
   hookSpeed: 3400,
   aimAssistRadius: 26,
-  reelInSpeed: 330,
+  reelInSpeed: 250,
   reelOutSpeed: 430,
-  minLength: 46,
+  minLength: 200,
   ropeStiffness: 1.0,
-  reelTransfer: 0.9,
-  swingAccel: 1500,
-  releaseBoost: 90,
-  releaseMomentum: 1.0,
+  reelTransfer: 0.35,
+  swingAccel: 1100,
+  releaseBoost: 0,
+  releaseMomentum: 0.9,
+  attachedGravity: 1.35,
+  swingDrag: 0.7,
+  maxSwingSpeed: 700,
+  maxReleaseSpeed: 560,
 } as const;
 
 export const CAMERA = {

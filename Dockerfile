@@ -10,14 +10,12 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
-# Served as the template did: busybox httpd on 0.0.0.0:$PORT (fly.toml sets
-# PORT), the game at /, and README.md verbatim at /readme/ (spec/README.md
-# says what's checked).
-FROM docker.io/library/busybox:1.38.0
-COPY --from=build /app/dist/ /site/
-COPY placeholder/readme.html README.md /src/
-# README.md goes into the page as-is, HTML-escaped, in place of @README@
-RUN mkdir -p /site/readme \
-    && sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' /src/README.md > /src/body \
-    && sed -e '/@README@/{r /src/body' -e 'd}' /src/readme.html > /site/readme/index.html
-CMD ["sh", "-c", "exec httpd -f -p 0.0.0.0:${PORT:-8080} -h /site"]
+# One small Node HTTP process serves the build and atomic progress files on /data.
+FROM docker.io/library/node:24.21.0-slim
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/dist/ ./dist/
+COPY server/ ./server/
+COPY src/slice/progress.ts src/slice/controller.ts ./src/slice/
+COPY package.json README.md ./
+CMD ["node", "server/app.ts"]

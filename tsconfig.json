@@ -18,5 +18,5 @@
     "useDefineForClassFields": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["*.ts", "spec", "scripts", "src", "tests"]
+  "include": ["*.ts", "spec", "scripts", "server", "src", "tests"]
 }

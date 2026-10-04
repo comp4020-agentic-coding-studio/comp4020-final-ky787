@@ -1,40 +1,75 @@
-# Binary Ninja: Tutorial Chambers
+# Binary Ninja: Pressure / Switch / Relay
 
-A puzzle-platformer prototype built on a real, obfuscated x86-64 program. Each
-machine in a room is one stage of that program's code. Connect them, choose an
-input, and watch the recorded execution follow your cables. It stops at the
-first wrong one.
+A single-player, three-room greybox for a future cooperative platform-puzzle
+game. Gameplay comes first: carry a cube, hold a plate, wake a grapple anchor,
+and make a way across. Rooms are hand-authored.
 
-This is an early prototype: four short tutorial chambers, made to test whether
-the core mechanic is fun and understandable.
+**C8 uses explicit mock controllers.** Code displays, string reveals and the
+crumble example are gameplay prototypes, not validated obfuscator evidence.
+No new binary or multiplayer is included. The earlier binary-backed tutorial
+and its evidence/replay tests remain in the repository, outside the default game.
 
 ## How to play
 
-The signs in each room tell you what to do next.
+1. **PRESSURE:** put the cube on the button to open the exit. No jumping needed.
+2. **SWITCH:** flip the lever to materialise the marked grapple platform. Hold
+   left click on its ring while moving right, then release as you swing right.
+3. **RELAY:** leave the cube on Plate A, grapple across and flip Switch B. The
+   return bridge lets a future partner follow. Climb the lit code steps to the
+   exit. The unstable prototype drops you onto a safe recovery floor.
 
-1. **Power:** carry the cube to its socket to open the exit.
-2. **Connect:** take START's cable to CALCULATE, then put the power cube in
-   **RUN**.
-3. **Input:** put a numbered cube (6, 7 or 8) in **INPUT** and power **RUN**.
-   Only one input opens the bridge.
-4. **Branch:** wire the comparison's **TRUE** and **FALSE** outputs once, then
-   run 6, 7 and 8 without rewiring to open the door.
+A/D or arrows move. Space/W jumps. E picks up/puts down a cube or toggles a
+nearby switch. Hold left click on a marked ring to grapple; release to detach.
+Click-hold a cube in RELAY to pull it towards you. S drops through code platforms.
+R returns to the checkpoint without clearing solved machinery. Tab shows the
+room overview. Escape opens the menu. F1 shows inputs, outputs and save state.
+The debug panel can return a lost cube to its spawn.
 
-Controls: A/D move, Space or W jump, S drop through a platform, E pick up or
-use, R reset the cubes, F fast-forward a run, I inspect the real code, hold Tab
-for an overview.
+This pass is tuned and tested for desktop keyboard and mouse. Inherited touch
+controls are present; touch gameplay has not been tuned or validated.
 
-## Where the data comes from
+## Saved progress
 
-The program is a small controller compiled with OLLVM's bogus-control-flow
-obfuscation. The game never runs the binary: it replays executions recorded
-from the real compiled program for each of the three inputs. Stages the
-tutorial hides still run in full, just out of sight.
+An anonymous browser cookie identifies your server save. Returning to the same
+site/browser offers **CONTINUE — [ROOM]**. Completed rooms, logical checkpoint,
+switch state, cube-on-plate state, discovered mechanics and the last 40 notable
+events survive reload and server restart. Loose cube positions and velocities
+are not saved. Cookies must be retained to find the same save.
+
+The footer says **Saved on server** only after acknowledgement. Failed saves
+remain pending and retry; if the initial connection fails, the menu offers a
+retry or explicitly unsaved play. Another tab changing the save produces a
+reload notice rather than silently overwriting it.
 
 ## Development
 
+Node 24.21+ and pnpm 11. No runtime server dependencies.
+
 ```sh
 pnpm install
-pnpm dev          # play locally (?chamber=0..3 to jump, ?debug for tools)
-pnpm check        # type-check, unit tests, and the deployed-app checks
+pnpm build
+DATA_DIR=.local-data pnpm start  # http://localhost:8080 (game + save API + /readme/)
 ```
+
+For frontend development, leave that server running and run `pnpm dev` in
+another terminal. Vite proxies `/api` and `/readme` to port 8080. `pnpm preview`
+alone is static and does not provide persistence.
+
+```sh
+pnpm typecheck
+pnpm test:unit
+pnpm build
+pnpm test            # running app at APP_URL, default http://localhost:8080
+pnpm check:browser  # same default; optional URL and screenshot directory arguments
+```
+
+The Docker image uses one Node HTTP process, with Fly's existing volume at
+`/data`. Local `DATA_DIR` overrides keep test saves separate. The persistence
+suite kills and restarts a real server with the same temporary data directory.
+The course HTTP invariants remain unchanged; Docker is not required locally.
+
+## Design and playtest notes
+
+See [the C8 architecture, controller contract and playtest record](docs/c8-vertical-slice.md).
+Stop here for manual playtesting before designing a real binary around the
+state machine. The old game and research workspaces remain read-only.

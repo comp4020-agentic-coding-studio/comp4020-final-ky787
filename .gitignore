@@ -24,3 +24,5 @@ mise.local.toml
 # The mounted research share (old game, old research, evidence workspace).
 # Large and machine-local; the game ships its own copy of the bundle.
 Workspace/
+
+.local-data/

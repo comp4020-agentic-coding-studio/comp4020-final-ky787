@@ -1,10 +1,11 @@
 /**
- * Player movement, collision and the (disabled) rope.
+ * Player movement, collision and the controlled puzzle rope.
  *
  * Adapted from the previous Binary Ninja game (crit 5, `src/engine/physics.ts`).
  * Kept as they were: the acceleration/friction model, variable-height jump,
  * coyote time, jump buffering, one-way landing and drop-through, the speed
- * caps and the whole grapple/rope implementation. Added: full solid boxes
+ * caps and grapple/rope structure. C8 bounds reel/swing energy and marks targets.
+ * Added: full solid boxes
  * (walls, floors, ceilings) resolved one axis at a time, because a
  * hand-authored room has walls where the old floating code blocks did not,
  * and a small `stepBody` for carried objects.
@@ -27,6 +28,8 @@ export interface Solid extends Box {
   grappleable: boolean;
   /** Centred grapple target width when it differs from the collision box. */
   grappleWidth?: number;
+  /** Explicit marked point, when this object exposes a puzzle anchor. */
+  grapplePoint?: Vec2;
 }
 
 export type RopePhase = "idle" | "firing" | "attached" | "retracting";
@@ -277,7 +280,7 @@ export function stepBody(
   b.grounded = b.groundId !== null;
 }
 
-// --- grapple (kept from the previous game; off unless FEATURES.grapple) -----
+// --- grapple (adapted from the previous game; marked targets in C8) --------
 
 export interface GrappleTarget {
   solid: Solid;
@@ -287,6 +290,7 @@ export interface GrappleTarget {
 
 /** The actual box a grapple ray can catch, centred on the collision box. */
 export function grappleBox(solid: Solid): Box {
+  if (solid.grapplePoint) return { x: solid.grapplePoint.x - 10, y: solid.grapplePoint.y - 10, w: 20, h: 20 };
   const w = solid.grappleWidth ?? solid.w;
   return {
     x: solid.x + (solid.w - w) / 2,
@@ -321,9 +325,10 @@ export function probeRope(
   );
   if (!hit) return null;
   const solid = solids[hit.index];
-  const reach = Math.hypot(hit.point.x - origin.x, hit.point.y - origin.y);
+  const point = solid.grapplePoint ?? hit.point;
+  const reach = Math.hypot(point.x - origin.x, point.y - origin.y);
   if (reach < GRAPPLE.minRange || reach > GRAPPLE.maxRange) return null;
-  return { solid, point: hit.point, distance: reach };
+  return { solid, point, distance: reach };
 }
 
 /** Unit vector from `origin` to `aim`, or null if they coincide. */
@@ -353,6 +358,11 @@ export function releaseRope(p: PlayerState, boost = true): void {
     p.vy -= GRAPPLE.releaseBoost;
     p.vx *= GRAPPLE.releaseMomentum;
     p.vy *= GRAPPLE.releaseMomentum;
+    const speed = Math.hypot(p.vx, p.vy);
+    if (speed > GRAPPLE.maxReleaseSpeed) {
+      p.vx *= GRAPPLE.maxReleaseSpeed / speed;
+      p.vy *= GRAPPLE.maxReleaseSpeed / speed;
+    }
   }
   p.rope.phase = "retracting";
   p.rope.anchorId = null;
@@ -475,8 +485,12 @@ function applyRopeConstraint(p: PlayerState, dt: number): void {
   }
   if (rope.shrink > 0 && dt > 0) {
     const pull = (rope.shrink / dt) * GRAPPLE.reelTransfer;
-    p.vx -= nx * pull;
-    p.vy -= ny * pull;
+    // Approach a bounded inward speed; the old per-step addition built energy indefinitely.
+    const inward = p.vx * nx + p.vy * ny;
+    if (inward > -pull) {
+      p.vx -= nx * (inward + pull);
+      p.vy -= ny * (inward + pull);
+    }
   }
 }
 
@@ -507,6 +521,9 @@ export function stepPlayer(
   // run cap, so rope momentum survives but running still tops out.
   if (attached) {
     p.vx += dir * GRAPPLE.swingAccel * dt;
+    const drag = Math.exp(-GRAPPLE.swingDrag * dt);
+    p.vx *= drag;
+    p.vy *= drag;
   } else if (dir !== 0) {
     const accel = p.grounded ? PLAYER.accel : PLAYER.airAccel;
     const over = Math.abs(p.vx) >= PLAYER.maxRunSpeed && Math.sign(p.vx) === dir;
@@ -524,11 +541,11 @@ export function stepPlayer(
     p.vx = Math.abs(p.vx) <= drop ? 0 : p.vx - Math.sign(p.vx) * drop;
   }
 
-  // Jump. While attached, a jump doubles as "let go and kick".
+  // Jump. While attached, jump releases without injecting another kick.
   if (p.jumpBuffer > 0 && (p.grounded || p.coyote > 0 || attached)) {
     if (attached) {
       releaseRope(p);
-      p.vy = Math.min(p.vy, 0) - PLAYER.jumpVelocity * 0.72;
+      // Detach only: repeated hooks + jump must not manufacture upward kicks.
     } else {
       p.vy = -PLAYER.jumpVelocity;
     }
@@ -549,7 +566,8 @@ export function stepPlayer(
   }
 
   let gravity = PLAYER.gravity;
-  if (p.vy < 0 && input.jumpHeld && !attached) gravity *= PLAYER.jumpHoldGravity;
+  if (attached) gravity *= GRAPPLE.attachedGravity;
+  else if (p.vy < 0 && input.jumpHeld) gravity *= PLAYER.jumpHoldGravity;
   else if (p.vy > 0) gravity *= PLAYER.fallGravity;
   p.vy += gravity * dt;
   if (p.vy > PLAYER.maxFallSpeed) p.vy = PLAYER.maxFallSpeed;
@@ -574,6 +592,14 @@ export function stepPlayer(
   applyRopeConstraint(p, dt);
   if (p.rope.phase === "attached") pushOutOfSolids(p, w, h, solids);
 
+  // Constraint/reel corrections also obey the swing cap.
+  if (p.rope.phase === "attached") {
+    const speed = Math.hypot(p.vx, p.vy);
+    if (speed > GRAPPLE.maxSwingSpeed) {
+      p.vx *= GRAPPLE.maxSwingSpeed / speed;
+      p.vy *= GRAPPLE.maxSwingSpeed / speed;
+    }
+  }
   const landed = resolveY(p, w, h, prevBottom, prevTop, solids, p.dropThrough > 0 ? p.dropIgnore : null);
   p.grounded = landed !== null;
   p.groundId = landed;

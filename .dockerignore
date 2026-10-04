@@ -14,3 +14,5 @@ mise.local.toml
 # The mounted research share: large, slow, and not needed (the game ships its
 # own copy of the bundle in game_data/)
 Workspace
+
+.local-data/

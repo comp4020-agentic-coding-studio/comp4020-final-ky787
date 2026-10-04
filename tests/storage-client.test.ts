@@ -1,0 +1,42 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { ProgressStore } from '../src/slice/storage.ts';
+import { freshProgress } from '../src/slice/progress.ts';
+afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
+it('failed startup is visibly unsaved, without creating an accidental reset write', async () => {
+    const fetch = vi.fn().mockRejectedValue(new Error('offline'));
+    vi.stubGlobal('fetch', fetch);
+    const store = new ProgressStore();
+    expect(await store.load()).toBe(false);
+    store.save(freshProgress());
+    expect(store.ready).toBe(false);
+    expect(store.status).toContain('unavailable');
+    expect(fetch).toHaveBeenCalledTimes(1);
+});
+it('retries the newest logical state after a network failure', async () => {
+    vi.useFakeTimers();
+    const fetch = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue({ ok: true, status: 200, json: async () => ({ revision: 1, updatedAt: '2026-10-04T12:00:00Z' }) });
+    vi.stubGlobal('fetch', fetch);
+    const store = new ProgressStore();
+    store.ready = true;
+    store.save(freshProgress());
+    await vi.waitFor(() => expect(store.status).toContain('pending'));
+    const newer = freshProgress();
+    newer.currentRoom = 'relay';
+    store.save(newer);
+    await vi.waitFor(() => expect(store.status).toBe('Saved on server'));
+    expect(JSON.parse(fetch.mock.calls[1][1].body).progress.currentRoom).toBe('relay');
+    expect(store.revision).toBe(1);
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(fetch).toHaveBeenCalledTimes(2);
+});
+it('a conflicting tab blocks subsequent writes and asks for reload', async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: false, status: 409 });
+    vi.stubGlobal('fetch', fetch);
+    const store = new ProgressStore();
+    store.ready = true;
+    store.save(freshProgress());
+    await vi.waitFor(() => expect(store.conflict).toBe(true));
+    store.save(freshProgress());
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(store.status).toContain('another tab');
+});

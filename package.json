@@ -13,7 +13,9 @@
     "check:browser": "node scripts/browser-check.ts",
     "sync:bundle": "node scripts/sync-bundle.ts",
     "test": "vitest run",
-    "test:unit": "vitest run --config vitest.unit.config.ts"
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "start": "node server/app.ts",
+    "dev:server": "DATA_DIR=.local-data node server/app.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

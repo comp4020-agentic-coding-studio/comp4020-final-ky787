@@ -10,6 +10,7 @@ export default defineConfig({
   // Relative asset URLs, so the build works from any path.
   base: "./",
   server: {
+    proxy: { "/api": "http://localhost:8080", "/readme": "http://localhost:8080" },
     watch: { ignored: [WORKSPACE] },
   },
   optimizeDeps: {
