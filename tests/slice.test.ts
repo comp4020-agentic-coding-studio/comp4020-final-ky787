@@ -41,13 +41,17 @@ function hookAcross(w: PuzzleWorld) {
 describe('C8 physical vocabulary', () => {
     it('exhaustively maps all mock boolean inputs without geometry or binary claims', () => {
         for (const room of ROOM_IDS)
-            for (let bits = 0; bits < 32; bits++) {
-                const inputs = { plateA: !!(bits & 1), cubeOnPlate: !!(bits & 2), switchB: !!(bits & 4), plateB: !!(bits & 8), cubeOnPlateB: !!(bits & 16) };
+            for (let bits = 0; bits < 256; bits++) {
+                const inputs = { plateA: !!(bits & 1), cubeOnPlate: !!(bits & 2), switchB: !!(bits & 4), plateB: !!(bits & 8), cubeOnPlateB: !!(bits & 16), switchC: !!(bits & 32), plateC: !!(bits & 64), cubeOnPlateC: !!(bits & 128) };
                 const f = mockController.evaluate(room, inputs);
                 expect(f.source).toBe('mock-greybox');
-                expect(f.outputs.exitDoor).toBe(room === 'pressure' ? inputs.plateA : room === 'relay' ? inputs.switchB && inputs.plateB : inputs.switchB);
+                expect(f.outputs.exitDoor).toBe(room === 'uplink' ? inputs.switchC && inputs.cubeOnPlateC : room === 'pressure' ? inputs.plateA : room === 'relay' ? inputs.switchB && inputs.plateB : inputs.switchB);
                 expect(f.outputs.grappleAnchor).toBe(room === 'pressure' ? false : room === 'switch' ? inputs.switchB : inputs.plateA);
                 expect(f.outputs.bridge).toBe(room === 'relay' && inputs.switchB);
+                expect(f.outputs.relayGates).toBe(room === 'uplink' && inputs.switchB);
+                expect(f.outputs.liftField).toBe(room === 'uplink' && (inputs.plateB || inputs.switchC));
+                expect(f.outputs.codePlatformA).toBe(room === 'uplink' ? inputs.switchC : room === 'relay' && inputs.switchB);
+                expect(f.outputs.codePlatformB).toBe(room === 'uplink' ? inputs.switchC && inputs.cubeOnPlateC : room === 'relay' && inputs.switchB);
             }
     });
     it('plate accepts player or resting cube, releases, and carried cubes do not activate it', () => {

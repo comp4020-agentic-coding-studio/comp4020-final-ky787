@@ -1,8 +1,8 @@
-# Binary Ninja: Pressure / Switch / Relay
+# Binary Ninja: Pressure / Switch / Relay / Uplink
 
-A single-player, three-room greybox for a future cooperative platform-puzzle
+A single-player, four-room greybox for a future cooperative platform-puzzle
 game. Gameplay comes first: carry a cube, hold a plate, wake a grapple anchor,
-and make a way across. Rooms are hand-authored.
+enable lifts and fixed relay gates, and route a payload upstairs. Rooms are hand-authored.
 
 **C8 uses explicit mock controllers.** Code displays, string reveals and the
 crumble example are gameplay prototypes, not validated obfuscator evidence.
@@ -18,13 +18,18 @@ and its evidence/replay tests remain in the repository, outside the default game
    with its lever. Walk back for the cube and carry it to Plate B on the first
    raised platform to open the exit. Jump onto the cube or over it to climb the
    remaining code steps. The unstable prototype has a safe recovery floor.
+4. **UPLINK:** get the payload to the upper node. Observe which controls power the
+   relay, lift and upper route; some machinery lets you return for the cube.
 
 A/D or arrows move. Space/W jumps. Aim at a marked ring to preview the grapple;
 press Space again in midair to hook that highlighted target, then once more to
 release. A tap holds the rope for you. Hold left click and release still works.
 E picks up/puts down a cube or uses a nearby lever. RELAY's bridge lever locks
-ON permanently; SWITCH's lever remains an ON/OFF toggle.
-Click-hold a cube in RELAY to pull it towards you. S drops through code platforms.
+ON permanently; SWITCH's lever and UPLINK's relay power remain ON/OFF toggles.
+UPLINK's upper lift latch locks ON. Walk into powered relay doorways to travel
+in either direction; a carried cube comes with you. Steer within the Lift Field
+to rise, then step sideways onto the upper deck.
+Click-hold a cube in RELAY or UPLINK to pull it towards you. S drops through code platforms.
 R returns to the checkpoint without clearing solved machinery. Tab shows the
 room overview. Escape opens the menu. F1 shows inputs, outputs and save state.
 The debug panel can return a lost cube to its spawn.
@@ -38,7 +43,9 @@ An anonymous browser cookie identifies your server save. Returning to the same
 site/browser offers **CONTINUE — [ROOM]**. Completed rooms, logical checkpoint,
 switch state, cube-on-Plate-A/B state, discovered mechanics and the last 40 notable
 events survive reload and server restart. Loose cube positions and velocities
-are not saved. Existing version-1 saves are migrated without losing progress. Cookies must be retained to find the same save.
+are not saved. Existing version-1/2 saves migrate to version 3 without losing progress; visitors
+who completed the three tutorials continue directly into UPLINK. UPLINK saves
+its upper latch, cargo checkpoint and final payload placement. Cookies must be retained to find the same save.
 
 The footer says **Saved on server** only after acknowledgement. Failed saves
 remain pending and retry; if the initial connection fails, the menu offers a

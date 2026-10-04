@@ -263,6 +263,22 @@ export interface LooseBody extends Body {
   groundId: string | null;
 }
 
+/** Optional bounded external vertical transport; independent of controller/room data. */
+export interface VerticalMotion {
+  targetY: number;
+  acceleration: number;
+  maxRise: number;
+  maxHorizontal: number;
+  horizontalDrag: number;
+}
+function applyVerticalMotion(b: Body, field: VerticalMotion, dt: number, steering = false): void {
+  const change = field.targetY - b.vy;
+  b.vy += Math.sign(change) * Math.min(Math.abs(change), field.acceleration * dt);
+  b.vy = Math.max(-field.maxRise, b.vy);
+  b.vx = Math.max(-field.maxHorizontal, Math.min(field.maxHorizontal, b.vx));
+  if (!steering) b.vx = Math.sign(b.vx) * Math.max(0, Math.abs(b.vx) - field.horizontalDrag * dt);
+}
+
 export function stepBody(
   b: LooseBody,
   size: number,
@@ -270,9 +286,11 @@ export function stepBody(
   gravity: number,
   maxFall: number,
   dt: number,
+  field?: VerticalMotion,
 ): void {
-  b.vy = Math.min(maxFall, b.vy + gravity * dt);
+  b.vy = Math.min(maxFall, b.vy + (field ? 0 : gravity) * dt);
   if (b.grounded) b.vx = 0;
+  if (field) applyVerticalMotion(b, field, dt);
   const prevBottom = b.y + size / 2;
   const prevTop = b.y - size / 2;
   b.x += b.vx * dt;
@@ -503,6 +521,7 @@ export function stepPlayer(
   input: InputState,
   solids: readonly Solid[],
   dt: number,
+  field?: VerticalMotion,
 ): void {
   p.justLanded = false;
   p.coyote = Math.max(0, p.coyote - dt);
@@ -569,7 +588,8 @@ export function stepPlayer(
   if (attached) gravity *= GRAPPLE.attachedGravity;
   else if (p.vy < 0 && input.jumpHeld) gravity *= PLAYER.jumpHoldGravity;
   else if (p.vy > 0) gravity *= PLAYER.fallGravity;
-  p.vy += gravity * dt;
+  p.vy += (field ? 0 : gravity) * dt;
+  if (field) applyVerticalMotion(p, field, dt, dir !== 0);
   if (p.vy > PLAYER.maxFallSpeed) p.vy = PLAYER.maxFallSpeed;
   if (p.rope.phase === "attached") p.vy = Math.max(p.vy, -GRAPPLE.maxSwingRiseSpeed);
 

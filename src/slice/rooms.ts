@@ -1,6 +1,7 @@
 import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
 import type { ControllerOutputs, RoomId } from "./controller.ts";
+import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 export interface Platform extends Box {
     id: string;
     kind: "static" | "code" | "crumble-prototype";
@@ -19,7 +20,13 @@ export interface RoomDef {
     cube?: Vec2;
     plate?: Vec2;
     plateB?: Vec2;
+    plateC?: Vec2;
     lever?: Vec2;
+    upperLever?: Vec2;
+    upperCheckpoint?: Vec2;
+    cargoRecovery?: Vec2;
+    lifts?: LiftFieldDef[];
+    gates?: RelayGatePairDef[];
     platforms: Platform[];
     hazards: Box[];
     exit: Box;
@@ -59,6 +66,26 @@ export const ROOMS: readonly RoomDef[] = [
             { id: "crumble", kind: "crumble-prototype", x: 1360, y: 520, w: 140, h: 32, label: "UNSTABLE" }],
         hazards: [{ x: 480, y: 710, w: 440, h: 100 }],
         exit: { x: 1870, y: 210, w: 60, h: 140 },
+    },
+    {
+        id: 'uplink', title: 'UPLINK', instruction: 'GET THE PAYLOAD TO THE UPPER NODE',
+        width: 2440, height: 1100,
+        spawn: { x: 245, y: 843 }, checkpoint: { x: 1130, y: 843 }, upperCheckpoint: { x: 1980, y: 243 },
+        cube: { x: 380, y: 838 }, cargoRecovery: { x: 1400, y: 838 },
+        plate: { x: 320, y: 860 }, plateB: { x: 1510, y: 860 }, plateC: { x: 2320, y: 260 },
+        lever: { x: 1140, y: 860 }, upperLever: { x: 1970, y: 260 }, display: { x: 1110, y: 545 },
+        platforms: [floor('near', 0, 860, 480, 240), floor('far', 960, 860, 1480, 240),
+            floor('upper-deck', 1870, 260, 260, 32), floor('node-deck', 2230, 260, 210, 32), floor('uplink-deck', 1040, 260, 300, 32),
+            { id: 'anchor', kind: 'code', x: 700, y: 520, w: 160, h: 60, signal: 'grappleAnchor', anchor: true, label: 'PLATE A / ANCHOR' },
+            { id: 'service', kind: 'code', x: 1430, y: 460, w: 150, h: 28, signal: 'codePlatformA', label: 'SERVICE LANDING' },
+            { id: 'upper-route', kind: 'code', x: 1340, y: 260, w: 530, h: 28, signal: 'codePlatformB', label: 'PAYLOAD ROUTE' }],
+        lifts: [{ id: 'lift', x: 1630, y: 150, w: 240, h: 710, signal: 'liftField' }],
+        gates: [{ id: 'R1', signal: 'relayGates', gates: [
+            { id: 'A', x: 120, y: 750, w: 56, h: 110, exitSide: 1 },
+            { id: 'B', x: 1300, y: 750, w: 56, h: 110, exitSide: 1 },
+        ] }],
+        hazards: [{ x: 480, y: 1010, w: 480, h: 90 }],
+        exit: { x: 1110, y: 120, w: 60, h: 140 },
     },
 ];
 export function roomById(id: RoomId): RoomDef { return ROOMS.find(r => r.id === id)!; }

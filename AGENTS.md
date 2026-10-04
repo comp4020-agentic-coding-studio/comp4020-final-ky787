@@ -1,7 +1,7 @@
 # Binary Ninja — COMP8020 / COMP4020
 
 - Gameplay comes first: hand-authored cooperative platform puzzles, never
-  physical layouts generated from CFGs. C8 is three rooms for one player;
+  physical layouts generated from CFGs. C8 is four rooms (three tutorials plus UPLINK) for one player;
   no networking, accounts or new binaries.
 - Keep `Workspace/binary_ninja/comp4020-crit5-Ky787` and
   `Workspace/seeing_through_obfuscation` read-only. Preserve research artifacts

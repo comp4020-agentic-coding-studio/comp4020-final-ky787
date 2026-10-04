@@ -74,29 +74,52 @@ it('persists meaningful state and anonymous identity across actual process resta
     await stop(app.child);
 });
 
-it('loads an existing on-disk version-1 save and writes the migrated version without changing identity', async () => {
+it.each([1, 2])('loads an existing on-disk version-%s save and writes the migrated version without changing identity', async (version) => {
     const dir = await mkdtemp(join(tmpdir(), 'bn-legacy-data-')); dirs.push(dir);
     const app = await start(dir);
     const response = await fetch(app.url + '/api/progress');
     const cookie = response.headers.get('set-cookie')!.split(';')[0];
     const record = await response.json();
     record.revision = 7;
-    record.progress.version = 1;
+    record.progress.version = version;
+    delete record.progress.rooms.uplink;
     record.progress.currentRoom = 'relay';
     record.progress.rooms.relay.switchB = true;
     record.progress.rooms.relay.cubeOnPlate = true;
     record.progress.rooms.relay.checkpoint = 'relay';
-    for (const memory of Object.values(record.progress.rooms)) delete (memory as Record<string, unknown>).cubeOnPlateB;
+    if (version === 1) for (const memory of Object.values(record.progress.rooms)) delete (memory as Record<string, unknown>).cubeOnPlateB;
     const path = join(dir, `${record.id}.json`);
     await writeFile(path, JSON.stringify(record));
     const migrated = await (await fetch(app.url + '/api/progress', { headers: { cookie } })).json();
     expect(migrated.id).toBe(record.id);
     expect(migrated.revision).toBe(7);
-    expect(migrated.progress.version).toBe(2);
+    expect(migrated.progress.version).toBe(3);
     expect(migrated.progress.rooms.relay.cubeOnPlate).toBe(true);
     expect(migrated.progress.rooms.relay.cubeOnPlateB).toBe(false);
     const saved = await fetch(app.url + '/api/progress', { method: 'PUT', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ revision: 7, progress: migrated.progress }) });
     expect(saved.status).toBe(200);
-    expect(JSON.parse(await readFile(path, 'utf8')).progress.version).toBe(2);
+    expect(JSON.parse(await readFile(path, 'utf8')).progress.version).toBe(3);
+    await stop(app.child);
+});
+
+it('preserves UPLINK relay and upper payload checkpoints across separate server restarts', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'bn-uplink-data-')); dirs.push(dir);
+    let app = await start(dir);
+    const response = await fetch(app.url + '/api/progress');
+    const cookie = response.headers.get('set-cookie')!.split(';')[0];
+    const initial = await response.json();
+    const progress = freshProgress(); progress.currentRoom = 'uplink';
+    progress.completedRooms = ['pressure', 'switch', 'relay'];
+    progress.mechanics = ['relay-power', 'teleport', 'relay-cargo', 'lift'];
+    progress.rooms.uplink = { switchB: true, switchC: false, checkpoint: 'relay', cubeOnPlate: false, cubeOnPlateB: true, cubeOnPlateC: false, cubeTransferred: true };
+    for (let revision = 0; revision < 2; revision++) {
+        if (revision === 1) Object.assign(progress.rooms.uplink, { switchC: true, checkpoint: 'upper', cubeOnPlateB: false, cubeOnPlateC: true });
+        const saved = await fetch(app.url + '/api/progress', { method: 'PUT', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ revision, progress }) });
+        expect(saved.status).toBe(200);
+        await stop(app.child, 'SIGKILL'); app = await start(dir);
+        const loaded = await (await fetch(app.url + '/api/progress', { headers: { cookie } })).json();
+        expect(loaded.id).toBe(initial.id); expect(loaded.progress).toEqual(progress);
+        expect(loaded.revision).toBe(revision + 1);
+    }
     await stop(app.child);
 });

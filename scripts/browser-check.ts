@@ -184,6 +184,9 @@ interface Snap {
     inputs: {
         plateA: boolean;
         plateB: boolean;
+        plateC: boolean;
+        cubeOnPlateC: boolean;
+        switchC: boolean;
         cubeOnPlateB: boolean;
         cubeOnPlate: boolean;
         switchB: boolean;
@@ -191,6 +194,10 @@ interface Snap {
     outputs: {
         exitDoor: boolean;
         grappleAnchor: boolean;
+        relayGates: boolean;
+        liftField: boolean;
+        codePlatformA: boolean;
+        codePlatformB: boolean;
         bridge: boolean;
     };
     source: string;
@@ -292,23 +299,23 @@ async function mouseAt(cdp: Cdp, x: number, y: number, type = 'mousePressed') {
     }>(cdp, `(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();return {x:(${x}-c.originX())*c.zoom+r.left,y:(${y}-c.originY())*c.zoom+r.top};})()`);
     await cdp.send('Input.dispatchMouseEvent', { type, x: at.x, y: at.y, button: type === 'mouseMoved' ? 'none' : 'left', buttons: type === 'mousePressed' ? 1 : 0, clickCount: 1 });
 }
-async function cross(cdp: Cdp, anchorX: number, keyboard = false) {
+async function cross(cdp: Cdp, anchorX: number, keyboard = false, anchorY = 226) {
     const before = (await snap(cdp)).deaths;
     await key(cdp, 'keyDown', 'KeyD');
     if (keyboard) {
-        await mouseAt(cdp, anchorX, 226, 'mouseMoved');
+        await mouseAt(cdp, anchorX, anchorY, 'mouseMoved');
         await tap(cdp, 'Space'); // Jump from the near bank.
         check('ground Space jumps without firing a hook', (await snap(cdp)).player.rope.phase === 'idle');
-        await mouseAt(cdp, anchorX, 226, 'mouseMoved');
+        await mouseAt(cdp, anchorX, anchorY, 'mouseMoved');
         check('air hook uses visible target preview', await evaluate(cdp, '!!binaryNinja.world.target(binaryNinja.input.state.aim)'));
         await tap(cdp, 'Space'); // Catch the ring; releasing the key keeps it attached.
-    } else await mouseAt(cdp, anchorX, 226);
+    } else await mouseAt(cdp, anchorX, anchorY);
     await waitFor(cdp, 'hook attachment', s => s.player.rope.phase === 'attached');
     if (keyboard) check('tapped airborne Space latches the hook', (await snap(cdp)).keyboardGrapple);
-    await waitFor(cdp, 'rightward release point', s => s.player.x > anchorX + 90 && s.player.y < 510 && s.player.vx > 0);
+    await waitFor(cdp, 'rightward release point', s => s.player.x > anchorX + 90 && s.player.y < anchorY + 284 && s.player.vx > 0);
     await shot(cdp, `swing-${(await snap(cdp)).room}`);
     if (keyboard) await tap(cdp, 'Space');
-    else await mouseAt(cdp, anchorX, 226, 'mouseReleased');
+    else await mouseAt(cdp, anchorX, anchorY, 'mouseReleased');
     await waitFor(cdp, 'far bank', s => s.player.x > 965 && s.player.grounded);
     await key(cdp, 'keyUp', 'KeyD');
     await sleep(150);
@@ -324,6 +331,87 @@ async function exitRoom(cdp: Cdp, next: string | undefined) {
         await key(cdp, 'keyUp', 'KeyD');
         await sleep(150);
     }
+}
+async function alignTo(cdp: Cdp, x: number, ground?: string) {
+    let direction = 0;
+    const start = Date.now();
+    try {
+        for (;;) {
+            const s = await snap(cdp);
+            if (Math.abs(s.player.x - x) < 9 && Math.abs(s.player.vx) < 35 && (!ground || s.player.groundId === ground)) return;
+            if (Date.now() - start > 12000) throw new Error(`align ${x}: ${JSON.stringify(s.player)}`);
+            const desired = Math.max(-380, Math.min(380, (x - s.player.x) * 6));
+            const next = desired - s.player.vx > 20 ? 1 : desired - s.player.vx < -20 ? -1 : 0;
+            if (direction !== next) {
+                if (direction) await key(cdp, 'keyUp', direction > 0 ? 'KeyD' : 'KeyA');
+                if (next) await key(cdp, 'keyDown', next > 0 ? 'KeyD' : 'KeyA');
+                direction = next;
+            }
+            await sleep(20);
+        }
+    } finally { await key(cdp, 'keyUp', 'KeyA'); await key(cdp, 'keyUp', 'KeyD'); }
+}
+async function gateTrip(cdp: Cdp, toFar: boolean) {
+    const direction = toFar ? 'KeyA' : 'KeyD';
+    await key(cdp, 'keyDown', direction);
+    try { await waitFor(cdp, 'relay transit', s => toFar ? s.player.x > 1300 : s.player.x < 480); }
+    finally { await key(cdp, 'keyUp', direction); await sleep(160); }
+}
+async function liftRide(cdp: Cdp) {
+    // Walk into the shaft and release the movement key; no continual counter-steering.
+    await walkTo(cdp, 1740);
+    await waitFor(cdp, 'lift upper landing height', s => s.player.y < 190);
+    await shot(cdp, 'uplink-lift-rider');
+    await alignTo(cdp, 1980, 'upper-deck');
+}
+async function uplinkRoute(cdp: Cdp) {
+    await shot(cdp, 'uplink-arrival');
+    await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'uplink-overview'); await key(cdp, 'keyUp', 'Tab'); await sleep(700);
+    await alignTo(cdp, 345); await tap(cdp, 'KeyE');
+    await alignTo(cdp, 363); await tap(cdp, 'KeyA'); await tap(cdp, 'KeyE');
+    await waitFor(cdp, 'uplink cube A', s => s.inputs.cubeOnPlate);
+    await walkTo(cdp, 430); await cross(cdp, 780, false, 526);
+    await alignTo(cdp, 1120); await tap(cdp, 'KeyE');
+    check('UPLINK relay power sets far checkpoint', (await snap(cdp)).outputs.relayGates && (await snap(cdp)).checkpoint === 'relay');
+    await tap(cdp, 'KeyE'); check('UPLINK relay power can toggle OFF', !(await snap(cdp)).outputs.relayGates);
+    await tap(cdp, 'KeyE');
+    await waitFor(cdp, 'uplink relay save', s => s.persistence.status === 'Saved on server');
+    await cdp.send('Page.reload'); await sleep(600);
+    await waitFor(cdp, 'uplink far restore', s => s.room === 'uplink' && s.checkpoint === 'relay');
+    check('UPLINK reload preserves initial cube and powered gate', (await snap(cdp)).inputs.cubeOnPlate && (await snap(cdp)).outputs.relayGates);
+    await shot(cdp, 'uplink-continue-relay'); await click(cdp, '#continue');
+    await gateTrip(cdp, false);
+    check('UPLINK player gate B to A', (await snap(cdp)).player.x < 480);
+    await alignTo(cdp, 275); await tap(cdp, 'KeyE');
+    check('UPLINK retrieve initial payload', (await snap(cdp)).cube!.carried);
+    await gateTrip(cdp, true);
+    check('UPLINK carried payload reaches far gate', (await snap(cdp)).cube!.carried && (await snap(cdp)).cube!.x > 1300);
+    await shot(cdp, 'uplink-relay-cargo');
+    await alignTo(cdp, 1467); await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
+    await waitFor(cdp, 'uplink cube B', s => s.inputs.cubeOnPlateB);
+    check('UPLINK cube B powers lift and anchor turns off', (await snap(cdp)).outputs.liftField && !(await snap(cdp)).outputs.grappleAnchor);
+    await jumpTo(cdp, 1580, 'far'); await liftRide(cdp); await tap(cdp, 'KeyE');
+    check('UPLINK upper switch latches lift but needs payload', (await snap(cdp)).inputs.switchC && (await snap(cdp)).outputs.codePlatformA && !(await snap(cdp)).outputs.exitDoor);
+    await tap(cdp, 'KeyE'); check('UPLINK upper latch cannot be undone', (await snap(cdp)).inputs.switchC);
+    await waitFor(cdp, 'upper checkpoint save', s => s.persistence.status === 'Saved on server');
+    await shot(cdp, 'uplink-latched'); await cdp.send('Page.reload'); await sleep(600);
+    await waitFor(cdp, 'upper checkpoint restore', s => s.checkpoint === 'upper' && s.inputs.switchC);
+    check('UPLINK upper checkpoint restores cube holding B', (await snap(cdp)).inputs.cubeOnPlateB && (await snap(cdp)).player.x === 1980);
+    await click(cdp, '#continue');
+    await alignTo(cdp, 2180); await waitFor(cdp, 'safe drop from upper deck', s => s.player.groundId === 'far');
+    await alignTo(cdp, 1555, 'far'); await tap(cdp, 'KeyE');
+    await alignTo(cdp, 1580);
+    check('UPLINK retrieve B after latching the lift', (await snap(cdp)).cube!.carried && !(await snap(cdp)).inputs.plateB && (await snap(cdp)).outputs.liftField);
+    await liftRide(cdp); await alignTo(cdp, 2070); await jumpTo(cdp, 2275, 'node-deck');
+    await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
+    await waitFor(cdp, 'upper payload delivered', s => s.inputs.cubeOnPlateC);
+    check('UPLINK payload activates route without remote completion', (await snap(cdp)).outputs.codePlatformB && !(await snap(cdp)).ended);
+    await shot(cdp, 'uplink-payload');
+    await alignTo(cdp, 2250); await jumpTo(cdp, 2080, 'upper-deck');
+    await key(cdp, 'keyDown', 'KeyA');
+    try { await waitFor(cdp, 'UPLINK exit', s => s.ended); }
+    finally { await key(cdp, 'keyUp', 'KeyA'); }
+    check('UPLINK full retrieval route has no deaths', (await snap(cdp)).deaths === 0);
 }
 async function main() {
     mkdirSync(SHOTS, { recursive: true });
@@ -376,7 +464,8 @@ async function main() {
         await walkTo(cdp, 325);
         await tap(cdp, 'KeyE');
         await waitFor(cdp, 'relay plate', s => s.inputs.cubeOnPlate);
-        await walkTo(cdp, 430, true);
+        // Land and aim on the near bank; a timed coast after jumping the cube can pass the lip.
+        await jumpTo(cdp, 440, 'near');
         await cross(cdp, 780);
         await walkTo(cdp, 1050);
         await tap(cdp, 'KeyE');
@@ -415,6 +504,13 @@ async function main() {
         await waitFor(cdp, 'cube on Plate B', s => s.inputs.cubeOnPlateB);
         await shot(cdp, 'plate-b');
         check('cube transferred to B opens the exit', (await snap(cdp)).outputs.exitDoor);
+        await waitFor(cdp, 'Plate B saved', s => s.persistence.status === 'Saved on server');
+        await cdp.send('Page.reload'); await sleep(600);
+        await waitFor(cdp, 'restore Plate B save', s => s.persistence.visitor === visitor && s.inputs.cubeOnPlateB);
+        check('reload restores cube at B with bridge and exit open', (await snap(cdp)).outputs.exitDoor && (await snap(cdp)).outputs.bridge);
+        await shot(cdp, 'continue-plate-b'); await click(cdp, '#continue');
+        await walkTo(cdp, 1125); await walkTo(cdp, 1220, true);
+        await waitFor(cdp, 'restored step a', s => s.player.groundId === 'step-a');
         await jumpTo(cdp, (await snap(cdp)).cube!.x, 'cube-body');
         await shot(cdp, 'ninja-on-cube');
         check('player stands on cube while it holds Plate B', (await snap(cdp)).inputs.cubeOnPlateB);
@@ -444,15 +540,16 @@ async function main() {
         check('debug exposes mock inputs and persistence', await evaluate(cdp, "!document.querySelector('#debug').hidden && document.querySelector('#debug pre').textContent.includes('mock-greybox')"));
         await shot(cdp, 'debug');
         await tap(cdp, 'F1');
-        await exitRoom(cdp, undefined);
+        await exitRoom(cdp, 'uplink');
+        check('three tutorial rooms complete', (await snap(cdp)).progress.completedRooms.length === 3);
+        await uplinkRoute(cdp);
         await waitFor(cdp, 'final save', s => s.persistence.status === 'Saved on server');
-        check('three-room completion saved', (await snap(cdp)).progress.completedRooms.length === 3);
+        check('four-room completion saved', (await snap(cdp)).progress.completedRooms.length === 4);
         await shot(cdp, 'end');
-        await cdp.send('Page.reload');
-        await sleep(600);
-        await waitFor(cdp, 'restore Plate B save', s => s.persistence.visitor === visitor && s.inputs.cubeOnPlateB);
-        check('reload restores cube at B with bridge and exit open', (await snap(cdp)).outputs.exitDoor && (await snap(cdp)).outputs.bridge);
-        await shot(cdp, 'continue-plate-b');
+        await cdp.send('Page.reload'); await sleep(600);
+        await waitFor(cdp, 'restore upper payload', s => s.persistence.visitor === visitor && s.inputs.cubeOnPlateC);
+        check('reload restores UPLINK latch, payload and final route', (await snap(cdp)).outputs.exitDoor && (await snap(cdp)).outputs.codePlatformB && (await snap(cdp)).checkpoint === 'upper');
+        await shot(cdp, 'continue-uplink');
         await cdp.send('Emulation.setDeviceMetricsOverride', { width: 960, height: 640, deviceScaleFactor: 1, mobile: false });
         await sleep(300);
         await shot(cdp, 'compact-menu');

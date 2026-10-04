@@ -1,6 +1,6 @@
-# C8 vertical slice — 2026-10-04
+# C8 vertical slice — updated 2026-10-05
 
-Status: revised after initial human feedback; awaiting the next human playtest. This is
+Status: three tutorials plus UPLINK; awaiting human puzzle/feel testing. This is
 a gameplay prototype, not an accepted specification for a new binary.
 
 ## Design and room layouts
@@ -30,6 +30,89 @@ holds A, another crosses and locks the bridge lever, then the first walks the
 return bridge. A cube can then replace a player on Plate B to hold the exit.
 The single-player route requires that return crossing to retrieve the cube. No network
 semantics are implemented or implied.
+
+## UPLINK: the first retrieval puzzle
+
+All new machinery, strings and controller signals are **mock-greybox**. No new
+binary was generated and no obfuscator evidence is asserted. This room is a
+candidate physical state machine for human playtesting, not yet a specification
+for a real obfuscated controller.
+
+UPLINK is 2,440 × 1,100. The lower floor is y=860, the upper decks y=260: a
+600-unit ascent. Near architecture ends at x=480 and resumes at x=960, leaving
+a 480-unit death gap. Plate A is at (320,860); the ring is at (780,526).
+The cube cannot be pulled from A by someone standing on the far bank. The
+initial marked anchor is the only grapple target, well below the upper decks.
+
+The relay switch at (1140,860) powers the fixed R1 pair, whose two doorways are
+at x=120 and x=1300. Both face right into clear floor space. Plate B (1510,860)
+powers the 240-unit-wide lift shaft at x=1630–1870; the field extends from y=860
+to y=150. Its top gently holds riders above the upper landing instead of ejecting
+them. The upper latch is at (1970,260). A 100-unit safe drop between the control
+deck (1870–2130) and payload deck (2230–2440) provides a return route to the
+machinery floor and a forgiving jump to the node. Node C is at (2320,260).
+The final exit is back to the left, at (1110,120), on a separate upper shelf.
+
+Intended solution:
+
+1. Put the cube on A; grapple across the gap. Power the relay with the far lever.
+   This sets the far checkpoint. The relay switch remains a genuine ON/OFF toggle.
+2. Enter gate B to return to the near side. Retrieve the cube, carry it through
+   A → B, and leave it on Plate B. The grapple turns off; the lift powers up.
+3. Ride the lift, steer right onto the broad control deck, and operate the upper
+   latch. It permanently holds lift power, lights the service landing, and sets
+   the upper checkpoint. The final route remains ghosted and the exit closed.
+4. Drop through the safe gap to the floor, return for the cube on B, and ride
+   the now-latched lift carrying it. Jump the short deck gap and put it on C.
+5. C requires a **cube payload**: player occupancy alone does not qualify. It
+   materialises the upper return route across the lift and opens the exit.
+   Leave the cube on C, jump back onto the control deck and follow the new route
+   left to the exit. Being on the payload deck does not remotely finish the room.
+
+The environment states the goal, “GET THE PAYLOAD TO THE UPPER NODE”, and labels
+mechanisms. It does not print this solution. The relay and upper latch each
+create a reason to go back for a cube that had to be left behind. The lower
+floor is safe except for the initial grapple pit. Falling from the upper area
+costs travel, not a full puzzle reset. R returns to the latest checkpoint.
+
+Future co-op interpretation: one player can hold A while another crosses and
+powers the relay; either can then return through the pair. A player can hold B
+while a partner rides and latches the lift, freeing the first player to move.
+The final cargo condition currently requires the cube. These are physical roles,
+not implemented multiplayer or synchronization semantics.
+
+## Reusable LiftField and RelayGatePair contracts
+
+`src/slice/machinery.ts` owns transient powered devices. Room definitions supply
+geometry and named output signals; the world binds controller outputs to their
+power. The controller never sees coordinates, particles, bodies or timers.
+`machinery-render.ts` draws the industrial emitter, ascending scan/code fragments,
+and paired upright relay frames. Both devices have dark/off and illuminated/on
+states and activation pulses. `MachinePresentation.describe` accepts an optional
+output name for per-machine string feedback (RELAY LINK ESTABLISHED, LIFT FIELD
+ONLINE, ROUTE UNLOCKED, UPLINK READY). These remain replaceable cosmetic effects.
+
+**LiftField:** player and loose cube simulation accept the same optional
+`VerticalMotion` influence. Within a powered volume it replaces gravity with
+acceleration toward a bounded vertical target (1,800 units/s², maximum ascent
+240 units/s); the target slows toward a hover at the top. Horizontal speed is
+capped at 240 inside the field, with 1,000 units/s² of extra braking when no
+horizontal input is held. This lets riders settle in the shaft without continual
+counter-steering. The field provides useful steering but no swing-energy
+launch. Exiting or switching off immediately restores ordinary gravity and
+collision, preserving position and current bounded velocity. Entering a lift
+cancels an attached grapple. Carried cubes follow the rider once and receive no
+independent field force. No lift timers or velocities are saved.
+
+**RelayGatePair:** two fixed authored upright gates share one pair ID and one
+output. Player and loose cubes use the same bidirectional overlap transport.
+Each entity has a 0.65 s cooldown. Arrivals are placed 18 units beyond the frame
+plus the entity half-width, at the destination floor, facing outward in velocity.
+Horizontal velocity is preserved up to 240; vertical velocity resets to zero.
+The player rope, jump buffer and coyote timer are cleared. A carried cube moves
+with its rider, and the entire payload clearance is checked at the destination.
+Blocked or out-of-room destinations reject transport. Stationary arrivals do not
+bounce back. There is no arbitrary portal placement or high-speed portal fling.
 
 ## Reuse and module boundaries
 
@@ -68,19 +151,25 @@ Inputs, all booleans:
   and logical saves. Each implies its corresponding plate input. One cube cannot
   occupy both plates at once.
 - `switchB`: persistent lever state, retained on death/reload. It toggles in SWITCH
-  and locks ON after its first activation in RELAY.
+  and UPLINK (relay power), and locks ON after its first activation in RELAY.
+- `switchC`: UPLINK's upper lift latch, owned by physical room state and never
+  cleared by another interaction. It also records the upper checkpoint.
+- `plateC`, `cubeOnPlateC`: upper node occupancy and cube-specific occupancy.
+  The final UPLINK payload condition explicitly requires the cube.
 
-| Output | PRESSURE | SWITCH | RELAY |
-| --- | --- | --- | --- |
-| `exitDoor` | `plateA` | `switchB` | `switchB && plateB` |
-| `grappleAnchor` | false | `switchB` | `plateA` |
-| `bridge` | false | false | `switchB` |
-| `codePlatformA` | false | false | `switchB` |
-| `codePlatformB` | false | false | `switchB` |
+| Output | PRESSURE | SWITCH | RELAY | UPLINK |
+| --- | --- | --- | --- | --- |
+| `exitDoor` | `plateA` | `switchB` | `switchB && plateB` | `switchC && cubeOnPlateC` |
+| `grappleAnchor` | false | `switchB` | `plateA` | `plateA` |
+| `bridge` | false | false | `switchB` | false |
+| `codePlatformA` | false | false | `switchB` | `switchC` (service landing) |
+| `codePlatformB` | false | false | `switchB` | `switchC && cubeOnPlateC` (upper return route) |
+| `relayGates` | false | false | false | `switchB` |
+| `liftField` | false | false | false | `plateB || switchC` |
 
 The evaluator is combinational; the physical lever owns its toggle/latched state.
-Cube flags do not independently override plate inputs. Tests enumerate all
-32 boolean combinations in all 3 rooms, including physically inconsistent
+A/B cube flags do not independently override plate inputs; C is the explicit
+cargo sensor. Tests enumerate all 256 boolean combinations in all 4 rooms, including physically inconsistent
 combinations, so the mock contract is unambiguous. Future retained exhaustive
 traces can implement the same adapter. Neither the binary nor its trace data
 should own geometry, physics, crumble guesses or animation timing.
@@ -164,7 +253,7 @@ its `/data` mount are unchanged. This task does not deploy or push the commit.
 
 An HttpOnly, SameSite=Lax, one-year UUID cookie identifies a visitor (Secure
 behind Fly HTTPS). `/data/<visitor UUID>.json` contains an envelope with visitor
-ID, revision, update time and version-2 progress:
+ID, revision, update time and version-3 progress:
 
 - current and completed rooms;
 - per-room switch/bridge latch, cube-on-Plate-A/B and entry/far-bank checkpoint;
@@ -183,9 +272,20 @@ position, velocity, rope or frame snapshots are persisted. Cube-on-plate saves
 reconstruct a cube at the correct plate, including B; other loose cubes return to authored spawn.
 A carried cube therefore need not be rescued after returning to the site.
 
-Existing version-1 saves migrate in memory to version 2 with Plate B initially
-empty; visitor identity, revisions, completion, checkpoints and Plate A placement
-are preserved. The next successful write persists the migrated schema.
+Existing version-1/2 saves migrate in memory to version 3. Version 1 gains an
+empty Plate B as before. All old rooms, visitor identity, revisions, mechanics,
+completion and history are preserved. A visitor who finished the three tutorials
+continues into UPLINK; other visitors keep their current room. The next successful
+write persists the new schema.
+
+UPLINK adds three room-memory booleans: `switchC`, `cubeOnPlateC`, and
+`cubeTransferred`, plus an `upper` checkpoint value. The transferred flag records
+that the payload reached the relay side; it is recovery information, not a
+controller input. An unplaced/in-transit cube restores to the safe cargo dock at
+(1400,838) after transfer, or its original spawn beforehand. Important A/B/C plate
+placements restore exactly. Upper checkpoint spawn is on static architecture;
+restoring never depends on an inactive code platform. The two new latches/room
+checkpoints and final payload are covered by real process-restart tests.
 
 `DATA_DIR` overrides `/data` locally. Visitor progression and room memory are
 separate schema fields, so later shared room state can have its own identity
@@ -194,22 +294,64 @@ cookies loses the browser's reference to its anonymous save. Initial API
 failure offers explicitly unsaved play; it does not pretend local state was
 written to the server.
 
+## UPLINK playtest review and remaining questions
+
+Automated playback completed UPLINK without a death, using ordinary input events
+and no world/controller overrides. Both gate directions, two lift rides, safe
+return drop, upper deck jump and final return route worked. The browser pauses
+and reloads at each new checkpoint. The lift ride now releases the movement key
+and waits for the top; it does not rely on a frame-perfect release or continual
+scripted counter-steering. Screenshots show the overview, gate cargo, lift ride,
+upper payload and restored save.
+
+The first lift pass inherited too much unsteered air drift. That was awkward in
+control review: releasing D near the shaft centre could carry the rider out
+before reaching the top. Field-only braking fixes that, without changing the
+grapple's horizontal momentum. An additional RELAY reload test initially tried
+to walk through its restored solid cube; the test now approaches beside the cube
+before jumping onto it. The older RELAY approach also used a timed coast after
+jumping the cube; on one run that put the hook start beyond the bank and left the player hanging short
+of the release point. The browser now lands on the bank before aiming, using
+normal directional braking. No tutorial geometry was changed to accommodate tests.
+
+Manual playtesting still needs to answer:
+
+- Are the matching R1 gate labels and illuminated frames enough to suggest a
+  return trip, without a step-by-step instruction? Gate activation is by walking
+  into the frame; accidental entry near a powered gate may initially surprise.
+- Does LIFT LATCH / LOCKED make it clear that B's cube is now free to move? Its
+  lamp, persistent lift, and newly active service platform provide feedback.
+- Does the safe upper drop read as a useful return route? It is deliberately
+  not a death pit, but a player may initially avoid dropping back to the floor.
+- The final code route crosses an active lift. Walking through it gives a brief,
+  bounded rise before landing back on the route. This is traversable; whether
+  that feels useful or unnecessary remains a human feel question.
+
+No brute-force exploit proof is claimed. Tests cover gap jumps, near-cube pull
+range, initial grapple/re-hook ascent, cube-assisted jumps, taking B's cube before
+latching, final cube-only occupancy, and blocked/out-of-room gate exits. Known
+through-wall hook targeting remains a limitation of the inherited grapple;
+UPLINK keeps the only anchor below and out of range of its upper machinery.
+
 ## Validation and playtest observations
 
 - `pnpm typecheck`: passed.
-- `pnpm test:unit`: 103 passed, 2 existing conditional tests skipped for tutorial
-  rooms without pits; none weakened or removed.
+- `pnpm test:unit`: 120 passed, 2 existing conditional tests skipped for tutorial
+  rooms without pits; existing gameplay assertions retained.
 - `pnpm build`: passed; the default bundle excludes the previous binary tutorial.
 - `pnpm test`: both original HTTP invariants passed against the production server.
-- `pnpm check:browser`: real CDP keyboard/mouse route through all three rooms,
+- `pnpm check:browser`: real CDP keyboard/mouse route through all four rooms,
   including a deliberate failed jump, cube pull, mouse and Space grapple
   crossings, permanent return bridge, A-to-B transfer, standing on the cube,
   checkpoint reset, reload/continue with B held, and crumble recovery,
-  final completion save, debug state, screenshots and zero console errors.
+  final completion save, debug state, screenshots and zero console errors. UPLINK
+  adds both gate directions, carrying through a gate, both lift rides, cube retrieval,
+  upper payload, and reloads at both new checkpoints.
 - Restart test: save RELAY, SIGKILL the server, launch a new process on the same
   temporary `/data`-style directory, load the same cookie, compare saved state.
   Also checks independent visitors, conflicting writes, bad payloads, bounded
-  request sizes and preservation of corrupt files. The HTTP suite also migrates a real on-disk version-1 save. Client tests cover visible
+  request sizes and preservation of corrupt files. The HTTP suite also migrates
+  real on-disk version-1 and version-2 saves. Client tests cover visible
   unsaved startup, retry/coalescing and conflict handling.
 
 Automation confirms reachability and behaviour, not whether a person finds it
@@ -231,4 +373,4 @@ fun. Remaining points for manual playtesting:
 
 Screenshots retained in `docs/playtest/` show the implemented rooms and restored
 continue screen. The next step is a human playtest of this slice, not a new
-obfuscated controller.
+obfuscated controller. UPLINK-specific screenshots use the `uplink-` prefix.

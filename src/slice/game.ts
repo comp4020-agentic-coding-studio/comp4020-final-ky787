@@ -62,9 +62,9 @@ export class SliceGame {
         this.menu.hidden = false;
         const p = this.store.progress, saved = this.store.updatedAt;
         this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA / C8 PLAYTEST</span>
-      <h2>${this.ended ? 'Relay complete.' : 'Small inputs.<br>Big changes.'}</h2>
-      <p>${this.ended ? 'Three rooms explored. Ready for a human playtest.' : 'A cube. A switch. A way across.<br>Three physical puzzles for one player.'}</p>
-      <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${p.currentRoom.toUpperCase()} · ${p.completedRooms.length} / 3 rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
+      <h2>${this.ended ? 'Uplink complete.' : 'Small inputs.<br>Big changes.'}</h2>
+      <p>${this.ended ? 'Four rooms explored. Ready for a human playtest.' : 'Three tutorials. One bigger puzzle.<br>Route the payload to the Uplink.'}</p>
+      <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${p.currentRoom.toUpperCase()} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${p.currentRoom.toUpperCase()}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       ${this.ended ? '<button id="new-run">Start a new run</button>' : ''}
@@ -112,6 +112,9 @@ export class SliceGame {
     snapshot() {
         return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, inputs: this.world.inputs, outputs: this.world.frame.outputs,
             source: this.world.frame.source, platforms: this.world.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn })),
+            lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
+            gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
+            cubeTransferred: this.world.cubeTransferred,
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started,
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }

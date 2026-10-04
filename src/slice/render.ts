@@ -5,6 +5,8 @@ import { Particles } from '../render/fx.ts';
 import type { Vec2 } from '../engine/geometry.ts';
 import { mockPresentation, type MachinePresentation } from './presentation.ts';
 import type { PuzzleWorld } from './world.ts';
+import { ROOM_IDS } from './controller.ts';
+import { drawMachinery } from './machinery-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     camera = new Camera();
@@ -51,7 +53,7 @@ export class PuzzleRenderer {
     draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean): void {
         this.resize();
         const c = this.ctx, cam = this.camera, r = w.room;
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : null, { offsetY: -140, minY: 340, maxY: 390 });
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;
@@ -62,17 +64,18 @@ export class PuzzleRenderer {
             this.line(x, 0, x, r.height, C.grid, 0.6);
         for (let y = 0; y < r.height; y += 50)
             this.line(0, y, r.width, y, C.grid, 0.6);
-        this.text(`0${['pressure', 'switch', 'relay'].indexOf(r.id) + 1} / ${r.title}`, 80, 90, 18, C.cyan);
-        this.text(r.instruction, 80, 132, 27, C.ink);
+        this.text(`0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 575 : 90, 18, C.cyan);
+        this.text(r.instruction, 80, r.id === 'uplink' ? 617 : 132, 27, C.ink);
         // Authored conduits communicate input/output relationships, not machine CFG edges.
         const source = r.plate ?? r.lever;
         if (source) {
-            const dest = r.id === 'pressure' ? { x: r.exit.x, y: r.exit.y } : { x: r.id === 'switch' ? 770 : 780, y: 220 };
+            const anchor = r.platforms.find(p => p.anchor);
+            const dest = anchor ? { x: anchor.x + anchor.w / 2, y: anchor.y } : r.exit;
             const on = r.id === 'pressure' ? w.frame.outputs.exitDoor : w.frame.outputs.grappleAnchor;
             c.setLineDash([5, 8]);
-            this.line(source.x, source.y + 35, source.x, 605, on ? C.cyan : C.line);
-            this.line(source.x, 605, dest.x, 605, on ? C.cyan : C.line);
-            this.line(dest.x, 605, dest.x, dest.y, on ? C.cyan : C.line);
+            this.line(source.x, source.y + 35, source.x, source.y + 45, on ? C.cyan : C.line);
+            this.line(source.x, source.y + 45, dest.x, source.y + 45, on ? C.cyan : C.line);
+            this.line(dest.x, source.y + 45, dest.x, dest.y, on ? C.cyan : C.line);
             c.setLineDash([]);
         }
         for (const h of r.hazards) {
@@ -141,9 +144,11 @@ export class PuzzleRenderer {
                 c.globalAlpha = 1;
             }
         }
+        drawMachinery(c, w, this.presentation);
         const plates = [
-            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'relay' ? 'PLATE A / ANCHOR' : 'BUTTON' },
-            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: 'PLATE B / EXIT' },
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
+            { at: r.plateC, active: w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: 'NODE C / CUBE PAYLOAD' },
         ];
         for (const plate of plates) {
             if (!plate.at) continue;
@@ -154,7 +159,7 @@ export class PuzzleRenderer {
             c.fillRect(x - 45, y - 9 + plate.depth * 6, 90, 7);
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
         }
-        if (r.plateB) {
+        if (r.plateB && r.id !== 'uplink') {
             // Plate B's exit conduit stays on the wall behind the climbing section.
             c.setLineDash([5, 8]);
             const colour = w.frame.outputs.exitDoor ? C.cyan : C.line;
@@ -163,15 +168,28 @@ export class PuzzleRenderer {
             c.setLineDash([]);
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
-        if (r.lever) {
-            const x = r.lever.x, y = r.lever.y;
+        if (r.id === 'uplink') {
+            c.setLineDash([5, 8]);
+            this.line(1510, 920, 1740, 920, w.frame.outputs.liftField ? C.cyan : C.line);
+            this.line(1510, 895, 1510, 920, w.frame.outputs.liftField ? C.cyan : C.line);
+            this.line(1740, 920, 1740, 865, w.frame.outputs.liftField ? C.cyan : C.line);
+            this.line(2320, 320, 1190, 320, w.frame.outputs.exitDoor ? C.cyan : C.line);
+            c.setLineDash([]);
+            this.text('PAYLOAD LINK', 2200, 354, 13, w.frame.outputs.exitDoor ? C.cyan : C.dim);
+        }
+        for (const lever of [
+            { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' },
+            { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
+        ]) {
+            if (!lever.at) continue;
+            const { x, y } = lever.at;
             c.fillStyle = C.wall;
             c.fillRect(x - 24, y - 36, 48, 36);
             this.ring(x, y - 33, 8, C.line);
-            const dx = w.inputs.switchB ? 19 : -19;
-            this.line(x, y - 33, x + dx, y - 72, w.inputs.switchB ? C.cyan : C.amber, 6);
+            const dx = lever.active ? 19 : -19;
+            this.line(x, y - 33, x + dx, y - 72, lever.active ? C.cyan : C.amber, 6);
             this.ring(x + dx, y - 72, 7, C.ink);
-            this.text(`${r.id === 'relay' ? 'BRIDGE' : 'SWITCH'} / ${w.inputs.switchB ? r.id === 'relay' ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, y + 40, 13, w.inputs.switchB ? C.cyan : C.amber);
+            this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, y + 40, 13, lever.active ? C.cyan : C.amber);
         }
         const feedback = this.presentation.describe(r.id, w.frame);
         const displayOn = feedback.active, message = feedback.text;
@@ -190,8 +208,8 @@ export class PuzzleRenderer {
         c.strokeRect(e.x, e.y, e.w, e.h);
         c.fillStyle = '#52616a';
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
-        this.text('EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
-        const checkpoint = w.checkpoint === 'relay' ? r.checkpoint : r.spawn;
+        this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
+        const checkpoint = w.checkpointPosition();
         this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
         c.fillStyle = C.cyan;
         c.fillRect(checkpoint.x, checkpoint.y - 47, 20, 10);
@@ -227,7 +245,7 @@ export class PuzzleRenderer {
             if (!p.grounded && ['idle', 'retracting'].includes(rope.phase)) this.text('SPACE · GRAPPLE', p.x - 65, p.y - 48, 13, C.cyan);
         }
         if (w.keyboardGrapple) this.text('SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
-        if (r.id !== 'pressure') {
+        if (r.id === 'switch' || r.id === 'relay') {
             this.text('HOLD CLICK + D', 305, 440, 15, C.ink);
             this.text('OR SPACE IN THE AIR', 285, 461, 13, C.cyan);
             this.text('Release as you swing right', 310, 483, 12, C.dim);
