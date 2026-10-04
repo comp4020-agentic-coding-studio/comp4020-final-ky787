@@ -185,11 +185,42 @@ describe('C8 physical vocabulary', () => {
             if (w.player.rope.phase === 'attached') {
                 attached++;
                 expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThanOrEqual(GRAPPLE.maxSwingSpeed + .001);
+                expect(w.player.vy).toBeGreaterThanOrEqual(-GRAPPLE.maxSwingRiseSpeed);
             }
         }
         expect(attached).toBeGreaterThan(1000);
         w.step(FIXED_DT, { ...emptyInput(), jumpPressed: true });
-        expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThan(600);
+        expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThanOrEqual(GRAPPLE.maxReleaseSpeed + PLAYER.gravity * PLAYER.fallGravity * FIXED_DT);
+        expect(w.player.vy).toBeGreaterThanOrEqual(-GRAPPLE.maxReleaseRiseSpeed);
+    });
+    it('carries a rightward swing onto the far bank with a low release arc', () => {
+        const w = world(1);
+        w.inputs.switchB = true;
+        Object.assign(w.player, { x: 430, y: 543 });
+        step(w, FIXED_DT);
+        const i = { ...emptyInput(), right: true, grapplePressed: true, grappleHeld: true, aim: { x: 770, y: 226 } };
+        for (let n = 0; n < 180; n++) {
+            w.step(FIXED_DT, i);
+            i.grapplePressed = false;
+            if (w.player.x > 860 && w.player.y < 510 && w.player.vx > 0) break;
+        }
+        expect(w.player.rope.phase).toBe('attached');
+        const { vx, vy, y } = w.player;
+        expect(vx).toBeGreaterThan(600);
+        expect(vy).toBeLessThan(-100);
+        // Let go of both the hook and movement: the swing itself supplies carry.
+        step(w, FIXED_DT);
+        expect(w.player.vx).toBeGreaterThan(vx * .95);
+        expect(-w.player.vy).toBeLessThan(-vy * .6);
+        let highest = w.player.y;
+        for (let n = 0; n < 120 && !w.player.grounded; n++) {
+            step(w, FIXED_DT);
+            highest = Math.min(highest, w.player.y);
+        }
+        expect(y - highest).toBeLessThan(16);
+        expect(w.player.grounded).toBe(true);
+        expect(w.player.x).toBeGreaterThan(990);
+        expect(w.deaths).toBe(0);
     });
 });
 

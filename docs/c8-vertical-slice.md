@@ -118,10 +118,11 @@ aliases. No automatic hook is fired merely by continuing to hold a ground jump.
 | Maximum range | 500 world units |
 | Aim assist | 26 units around a 20 × 20 marked target; hook snaps to the ring |
 | Automatic reel speed / minimum rope | 250 units/s / 200 units |
-| Attached gravity | 1.35 × normal gravity, plus existing falling multiplier |
-| Swing acceleration / damping | 1,100 units/s² / exponential 0.7 per second |
-| Attached velocity cap | 700 units/s, including after rope correction |
-| Release cap / retained momentum | 560 units/s / 90% |
+| Attached gravity | 1.35 × normal gravity |
+| Swing acceleration | 1,350 units/s² |
+| Swing damping | exponential 0.25 horizontal / 0.9 vertical per second |
+| Attached velocity cap | 800 units/s overall; upward speed limited to 360, including after rope correction |
+| Release cap / retained momentum | 740 units/s overall / 100% horizontal, 55% vertical; upward speed limited to 240 |
 | Release boost / attached jump kick | zero / none |
 | Cube pull | up to 330 units/s, with low gravity and normal body collision |
 
@@ -137,6 +138,14 @@ release too narrow. Testing led to higher rings, shorter (still unjumpable)
 gaps and the current reel speed. Successful browser crossings start near the
 lip, hold click + D, and release on the first rightward swing. The intended
 route needs neither jump-launching nor manual reeling.
+
+The 2026-10-05 tuning restores more sideways carry without the old upward
+release kick. Horizontal drag is lower; vertical drag and upward-only caps
+keep the arc shallow while preserving gravity on the downward swing. In the
+same simulated SWITCH crossing, the release begins at about 696 horizontal
+units/s versus 607 previously; removing the old release loss retains almost
+all of that speed. With movement released too, the player rises less than 16
+units after detaching and lands safely beyond x=990. Ordinary jumps are unchanged.
 
 No runaway speed was observed in the stress or browser tests. This is not an
 exhaustive exploit proof: targeting does not currently reject a marked anchor
@@ -188,7 +197,7 @@ written to the server.
 ## Validation and playtest observations
 
 - `pnpm typecheck`: passed.
-- `pnpm test:unit`: 102 passed, 2 existing conditional tests skipped for tutorial
+- `pnpm test:unit`: 103 passed, 2 existing conditional tests skipped for tutorial
   rooms without pits; none weakened or removed.
 - `pnpm build`: passed; the default bundle excludes the previous binary tutorial.
 - `pnpm test`: both original HTTP invariants passed against the production server.

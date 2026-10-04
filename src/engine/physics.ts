@@ -357,9 +357,8 @@ export function findGrappleTarget(
 export function releaseRope(p: PlayerState, boost = true): void {
   if (p.rope.phase === "idle") return;
   if (p.rope.phase === "attached" && boost) {
-    p.vy -= GRAPPLE.releaseBoost;
     p.vx *= GRAPPLE.releaseMomentum;
-    p.vy *= GRAPPLE.releaseMomentum;
+    p.vy = Math.max(-GRAPPLE.maxReleaseRiseSpeed, p.vy * GRAPPLE.releaseVerticalMomentum);
     const speed = Math.hypot(p.vx, p.vy);
     if (speed > GRAPPLE.maxReleaseSpeed) {
       p.vx *= GRAPPLE.maxReleaseSpeed / speed;
@@ -523,9 +522,8 @@ export function stepPlayer(
   // run cap, so rope momentum survives but running still tops out.
   if (attached) {
     p.vx += dir * GRAPPLE.swingAccel * dt;
-    const drag = Math.exp(-GRAPPLE.swingDrag * dt);
-    p.vx *= drag;
-    p.vy *= drag;
+    p.vx *= Math.exp(-GRAPPLE.swingDrag * dt);
+    p.vy *= Math.exp(-GRAPPLE.swingVerticalDrag * dt);
   } else if (dir !== 0) {
     const accel = p.grounded ? PLAYER.accel : PLAYER.airAccel;
     const over = Math.abs(p.vx) >= PLAYER.maxRunSpeed && Math.sign(p.vx) === dir;
@@ -573,6 +571,7 @@ export function stepPlayer(
   else if (p.vy > 0) gravity *= PLAYER.fallGravity;
   p.vy += gravity * dt;
   if (p.vy > PLAYER.maxFallSpeed) p.vy = PLAYER.maxFallSpeed;
+  if (p.rope.phase === "attached") p.vy = Math.max(p.vy, -GRAPPLE.maxSwingRiseSpeed);
 
   const speed = Math.hypot(p.vx, p.vy);
   if (speed > PLAYER.maxSpeed) {
@@ -596,6 +595,8 @@ export function stepPlayer(
 
   // Constraint/reel corrections also obey the swing cap.
   if (p.rope.phase === "attached") {
+    // Trim lift separately so extra horizontal momentum cannot become a launch.
+    p.vy = Math.max(p.vy, -GRAPPLE.maxSwingRiseSpeed);
     const speed = Math.hypot(p.vx, p.vy);
     if (speed > GRAPPLE.maxSwingSpeed) {
       p.vx *= GRAPPLE.maxSwingSpeed / speed;

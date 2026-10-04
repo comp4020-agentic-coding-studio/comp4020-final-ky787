@@ -59,13 +59,18 @@ export const GRAPPLE = {
   minLength: 200,
   ropeStiffness: 1.0,
   reelTransfer: 0.35,
-  swingAccel: 1100,
-  releaseBoost: 0,
-  releaseMomentum: 0.9,
+  swingAccel: 1350,
+  /** Keep sideways carry on release; soften lift instead of adding a kick. */
+  releaseMomentum: 1.0,
+  releaseVerticalMomentum: 0.55,
   attachedGravity: 1.35,
-  swingDrag: 0.7,
-  maxSwingSpeed: 700,
-  maxReleaseSpeed: 560,
+  swingDrag: 0.25,
+  swingVerticalDrag: 0.9,
+  maxSwingSpeed: 800,
+  /** Upward-only limits leave gravity free to bring the player back down. */
+  maxSwingRiseSpeed: 360,
+  maxReleaseRiseSpeed: 240,
+  maxReleaseSpeed: 740,
 } as const;
 
 export const CAMERA = {
