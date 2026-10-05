@@ -4,7 +4,8 @@ import type { ControllerOutputs, RoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 export interface Platform extends Box {
     id: string;
-    kind: "static" | "code" | "crumble-prototype";
+    kind: "static" | "code" | "crumble-prototype" | "crumble-proven";
+    evidenceId?: string;
     signal?: keyof ControllerOutputs;
     anchor?: boolean;
     label?: string;
@@ -78,7 +79,9 @@ export const ROOMS: readonly RoomDef[] = [
             floor('upper-deck', 1870, 260, 260, 32), floor('node-deck', 2230, 260, 210, 32), floor('uplink-deck', 1040, 260, 300, 32),
             { id: 'anchor', kind: 'code', x: 700, y: 520, w: 160, h: 60, signal: 'grappleAnchor', anchor: true, label: 'PLATE A / ANCHOR' },
             { id: 'service', kind: 'code', x: 1430, y: 460, w: 150, h: 28, signal: 'codePlatformA', label: 'SERVICE LANDING' },
-            { id: 'upper-route', kind: 'code', x: 1340, y: 260, w: 530, h: 28, signal: 'codePlatformB', label: 'PAYLOAD ROUTE' }],
+            { id: 'upper-route', kind: 'code', x: 1340, y: 260, w: 530, h: 28, signal: 'codePlatformB', label: 'PAYLOAD ROUTE' },
+            // Optional evidence metaphor over safe ground; outside the accepted solution.
+            { id: 'proven-clone', kind: 'crumble-proven', evidenceId: 'bcf_clone_originalBB71alteredBB', x: 2220, y: 740, w: 200, h: 28, label: 'UNSTABLE' }],
         lifts: [{ id: 'lift', x: 1630, y: 150, w: 240, h: 710, signal: 'liftField' }],
         gates: [{ id: 'R1', signal: 'relayGates', gates: [
             { id: 'A', x: 120, y: 750, w: 56, h: 110, exitSide: 1 },

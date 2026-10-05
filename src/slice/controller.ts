@@ -1,4 +1,4 @@
-/** Coordinate-free C8 mock contract. No instructions, traces or binary claims. */
+/** Coordinate-free physical controller contract. Evidence belongs to the selected adapter. */
 export const ROOM_IDS = ["pressure", "switch", "relay", "uplink"] as const;
 export type RoomId = typeof ROOM_IDS[number];
 export interface ControllerInputs {
@@ -23,6 +23,7 @@ export interface ControllerOutputs {
 export interface ControllerFrame {
     source: "mock-greybox" | "validated-trace";
     outputs: ControllerOutputs;
+    evidence?: { stateId: number; traceId: string; specimenId: string; binarySha256: string };
 }
 export interface RoomController {
     evaluate(room: RoomId, inputs: Readonly<ControllerInputs>): ControllerFrame;

@@ -2,3 +2,6 @@
 # (core.autocrlf=true), but sh can't run a script whose lines end in \r.
 # Force LF for the hooks so the pre-commit guard works on Windows too.
 .githooks/* text eol=lf
+
+# Hash-pinned Windows export: preserve original CRLF bytes on every checkout.
+game_data/uplink_controller_ollvm_bcf_v1.json -text whitespace=cr-at-eol

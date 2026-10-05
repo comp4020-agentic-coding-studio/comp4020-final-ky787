@@ -16,7 +16,7 @@ export const mockPresentation: MachinePresentation = {
                 relayGates: 'RELAY LINK ESTABLISHED', liftField: 'LIFT FIELD ONLINE',
                 codePlatformA: 'ROUTE UNLOCKED', exitDoor: 'UPLINK READY',
             };
-            return { active: o[key], text: messages[key] ?? 'SIGNAL ONLINE', label: 'MACHINE / MOCK SIGNAL' };
+            return { active: o[key], text: messages[key] ?? 'SIGNAL ONLINE', label: 'AUTHORED TEXT / NOT A DECODE TRACE' };
         }
         return {
             active: room === 'pressure' ? o.exitDoor : o.grappleAnchor || o.bridge,

@@ -4,10 +4,11 @@ A single-player, four-room greybox for a future cooperative platform-puzzle
 game. Gameplay comes first: carry a cube, hold a plate, wake a grapple anchor,
 enable lifts and fixed relay gates, and route a payload upstairs. Rooms are hand-authored.
 
-**C8 uses explicit mock controllers.** Code displays, string reveals and the
-crumble example are gameplay prototypes, not validated obfuscator evidence.
-No new binary or multiplayer is included. The earlier binary-backed tutorial
-and its evidence/replay tests remain in the repository, outside the default game.
+**UPLINK uses a validated OLLVM-16 BCF controller**, with retained real assembly
+and an optional proof-backed bogus-code platform. The first three rooms still
+use mock controllers. Room geometry, physics, crumble timing and all string
+reveals remain authored game abstractions. No multiplayer is included. The
+earlier binary-backed tutorial and its tests remain outside the default game.
 
 ## How to play
 
@@ -32,7 +33,9 @@ to rise, then step sideways onto the upper deck.
 Click-hold a cube in RELAY or UPLINK to pull it towards you. S drops through code platforms.
 R returns to the checkpoint without clearing solved machinery. Tab shows the
 room overview. Escape opens the menu. F1 shows inputs, outputs and save state.
-The debug panel can return a lost cube to its spawn.
+The debug panel can return a lost cube to its spawn. In UPLINK, **Evidence** pauses
+play for full assembly, retained trace occurrences and clone provenance. Assembly
+playback explains machinery that has already responded; it never delays controls.
 
 This pass is tuned and tested for desktop keyboard and mouse. Inherited touch
 controls are present; touch gameplay has not been tuned or validated.
@@ -58,7 +61,7 @@ Node 24.21+ and pnpm 11. No runtime server dependencies.
 
 ```sh
 pnpm install
-pnpm build
+pnpm build                    # includes pinned UPLINK bundle validation
 DATA_DIR=.local-data pnpm start  # http://localhost:8080 (game + save API + /readme/)
 ```
 
@@ -69,7 +72,7 @@ alone is static and does not provide persistence.
 ```sh
 pnpm typecheck
 pnpm test:unit
-pnpm build
+pnpm build                    # includes pinned UPLINK bundle validation
 pnpm test            # running app at APP_URL, default http://localhost:8080
 pnpm check:browser  # same default; optional URL and screenshot directory arguments
 ```
@@ -82,5 +85,5 @@ The course HTTP invariants remain unchanged; Docker is not required locally.
 ## Design and playtest notes
 
 See [the C8 architecture, controller contract and playtest record](docs/c8-vertical-slice.md).
-Stop here for manual playtesting before designing a real binary around the
-state machine. The old game and research workspaces remain read-only.
+Stop here for manual playtesting of the validated UPLINK integration before
+extending the binary or mechanics. The old game and research workspaces remain read-only.

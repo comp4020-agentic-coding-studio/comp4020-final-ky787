@@ -1,0 +1,96 @@
+{
+  "schema": "uplink-portable-verification/v1",
+  "status": "PASS",
+  "read_only": true,
+  "frontend_design_commit": "ec1e4ae206f8a90db2da4128b2cbd0938deacfbf",
+  "bundle_sha256": "87dec9e470119a951eb1486e25d62226c72b34367e754b0a14b4e5a818c4c082",
+  "verifier_sha256": "9e82096c7aaf26bfc18487bf4d86c4054854bfe3e9e5d767f9603251525462b5",
+  "proof_checker_sha256": "67a5230e33bacb9402c16c8172a81a62834b915bff45bd4072a71fe13f25def9",
+  "binary_sha256": {
+    "clean": "e81b410c5389c6ac8683b0105a1663ff6177fa5f5d1b0f14ff3c78e088147945",
+    "bcf": "1e6e39f015613d03560e1dc49a93a8de43e16ea2f0006ee8809632cc3972aa61"
+  },
+  "coverage": {
+    "logical_inputs": 5,
+    "logical_states": 32,
+    "frontend_boolean_combinations": 256,
+    "native_runs": 64,
+    "bcf_traces": 32,
+    "semantic_output_commits": 224,
+    "real_regions": 6,
+    "proof_guards": 34,
+    "proven_clones": 17,
+    "selected_bogus_candidates": 2
+  },
+  "checks": [
+    "Independent UPLINK Boolean equations and captured actual frontend frames",
+    "Retained source, compiler, clean and BCF build identities",
+    "Exact named PE export/pdata extents and complete instruction byte partition",
+    "Encoded CFG branches and linked relocation targets",
+    "Register, flag, memory, helper-call and return chronology",
+    "Raw block occurrences and exact next occurrence links",
+    "Every actual output store decoded from PE and sampled after commit, including false values",
+    "Universal parity argument, exact native opaque guards, clone origins and all incoming CFG transfers",
+    "Exact browser evidence projections, real ranges, machine bindings and bogus candidates",
+    "Authored presentation strings remain mock; no exported world coordinates"
+  ],
+  "negative_checks": [
+    {
+      "mutation": "missing_state",
+      "rejected": true,
+      "reason": "Browser must contain all 32 unique states and traces"
+    },
+    {
+      "mutation": "duplicate_state",
+      "rejected": true,
+      "reason": "Browser must contain all 32 unique states and traces"
+    },
+    {
+      "mutation": "wrong_state",
+      "rejected": true,
+      "reason": "Browser output states are not correct booleans"
+    },
+    {
+      "mutation": "wrong_event",
+      "rejected": true,
+      "reason": "Browser semantic_events differs from actual retained trace"
+    },
+    {
+      "mutation": "wrong_next",
+      "rejected": true,
+      "reason": "Browser raw_occurrences differs from actual retained trace"
+    },
+    {
+      "mutation": "invented_range",
+      "rejected": true,
+      "reason": "Presentation range differs from actual machine block"
+    },
+    {
+      "mutation": "nonraw_region",
+      "rejected": true,
+      "reason": "Presentation region names a nonraw block"
+    },
+    {
+      "mutation": "wrong_clone",
+      "rejected": true,
+      "reason": "Selected candidate differs from its exact proven machine region"
+    },
+    {
+      "mutation": "missing_clone_proof",
+      "rejected": true,
+      "reason": "Selected clone provenance mismatch"
+    },
+    {
+      "mutation": "fake_decoding",
+      "rejected": true,
+      "reason": "Authored presentation falsely claims binary string decoding"
+    }
+  ],
+  "limits": [
+    "Rechecks retained native/emulator observations without executing PE files or re-running an emulator.",
+    "Recorded object byte/relocation equivalence is hash-bound; ignored object files are not required.",
+    "Does not invoke Z3: exact guarded instruction forms plus independent parity reasoning establish these clone edges under retained proof assumptions.",
+    "Does not establish behavior for noncanonical inputs, invalid pointers, external interior jumps, corruption, or arbitrary runtime environments.",
+    "Frontend capture is tied to the retained source snapshot; the frontend checkout is not required or modified."
+  ]
+}

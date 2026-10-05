@@ -1,12 +1,14 @@
 # C8 vertical slice — updated 2026-10-05
 
-Status: three tutorials plus UPLINK; awaiting human puzzle/feel testing. This is
-a gameplay prototype, not an accepted specification for a new binary.
+Status: three mock tutorial rooms plus **validated-trace UPLINK**. The accepted
+physical puzzle is now driven by the retained Windows OLLVM-16 BCF controller.
+Human playtesting remains the next step; this integration does not redesign the puzzle.
 
 ## Design and room layouts
 
-The default experience supersedes the four wiring/input tutorials. No new
-binary, trace, account, multiplayer service or generated CFG layout was added.
+The default experience supersedes the four wiring/input tutorials. Linux consumes
+the validated Windows export; no binary was rebuilt or executed here. There are
+no accounts, multiplayer service or generated CFG layouts.
 The old data, replay, sockets and their tests are retained; the new entry point
 imports only the C8 slice. The previous Binary Ninja and obfuscation research
 workspaces were read but not modified.
@@ -33,10 +35,10 @@ semantics are implemented or implied.
 
 ## UPLINK: the first retrieval puzzle
 
-All new machinery, strings and controller signals are **mock-greybox**. No new
-binary was generated and no obfuscator evidence is asserted. This room is a
-candidate physical state machine for human playtesting, not yet a specification
-for a real obfuscated controller.
+UPLINK controller signals and assembly use **validated-trace** evidence from
+`uplink_controller_ollvm_bcf_v1`. Machinery geometry/physics and string reveals
+remain authored game abstractions. PRESSURE, SWITCH and RELAY still use
+**mock-greybox** controllers; RELAY retains its explicitly unproven crumble prototype.
 
 UPLINK is 2,440 × 1,100. The lower floor is y=860, the upper decks y=260: a
 600-unit ascent. Near architecture ends at x=480 and resumes at x=960, leaving
@@ -127,6 +129,10 @@ bounce back. There is no arbitrary portal placement or high-speed portal fling.
 - `src/slice/world.ts`: pressure sensors, toggle/carry interactions, bodies,
   hazards, crumble timers, signal-to-object bindings and logical checkpoints.
 - `src/slice/controller.ts`: pure, coordinate-free controller interface.
+- `src/slice/validated-controller.ts`: synchronous retained-state adapter;
+  `src/data/uplink-bundle.ts`: identity/coverage/reference validation.
+- `evidence-presentation.ts`, `evidence-render.ts`, `evidence-inspector.ts`: real
+  assembly excerpts, chronological visual replay and optional detailed inspection.
 - `src/slice/presentation.ts`: replaceable machine/string presentation adapter.
 - `src/slice/game.ts`, `storage.ts`, `progress.ts`: lifecycle, persistence client
   and versioned shared schema, separate from simulation.
@@ -135,14 +141,16 @@ Static architecture is always solid and unhookable. Code cards follow named
 output signals for collision/illumination. Only cards explicitly marked as
 anchors expose a grapple point. The authored crumble type is named
 `crumble-prototype`; it must never acquire an evidence-backed bogus label
-without retained experimental proof. The interface/header/debug view labels
-all current controllers and displayed string effects as mock.
+without retained experimental proof. UPLINK also has a separate `crumble-proven` object linked to retained BCF proof.
+The header/debug view identifies the active controller source; string effects
+remain authored regardless of controller source.
 
-## Mock controller contract for a later trace adapter
+## Controller contract and validated UPLINK adapter
 
 `RoomController.evaluate(roomId, inputs)` returns a `ControllerFrame` containing
-`source` and `outputs`. The shipping adapter always uses `source: mock-greybox`.
-There are no fabricated opcodes, addresses, traces or obfuscator provenance.
+`source`, `outputs` and optional retained-state evidence identity.
+`roomController` selects `validatedTraceController` for UPLINK and `mockController`
+for the three tutorials. Malformed UPLINK data throws; there is no mock fallback.
 
 Inputs, all booleans:
 
@@ -169,16 +177,127 @@ Inputs, all booleans:
 
 The evaluator is combinational; the physical lever owns its toggle/latched state.
 A/B cube flags do not independently override plate inputs; C is the explicit
-cargo sensor. Tests enumerate all 256 boolean combinations in all 4 rooms, including physically inconsistent
-combinations, so the mock contract is unambiguous. Future retained exhaustive
-traces can implement the same adapter. Neither the binary nor its trace data
-should own geometry, physics, crumble guesses or animation timing.
+cargo sensor. The table above describes the accepted semantics; the shipping
+UPLINK adapter does **not** evaluate those equations. It encodes the five inputs
+using the exported bit mapping, selects the retained state, and returns its BCF
+native outputs (cross-checked against clean outputs and trace finals). Tests
+enumerate all 256 frontend combinations, including inconsistent occupancy flags.
+The old mock UPLINK equation remains a regression oracle, never a runtime fallback.
+Neither the binary nor its traces own geometry, physics or animation timing.
 
 World output transitions pulse the bound platforms. `MachinePresentation`
 receives the controller frame and selects authored text for the display. Its
 hex-to-readable animation is deliberately cosmetic. Replace this presentation
 adapter with genuine retained string-decoding events when available; current
 text is not Hikari, Polaris, Tigress or OLLVM evidence.
+
+## Windows evidence consumed on 2026-10-05
+
+Before integration, frontend HEAD was
+`ec1e4ae206f8a90db2da4128b2cbd0938deacfbf`, matching the experiment's accepted design.
+The authoritative read-only experiment is
+`Workspace/binary_binja_redesign/experiments/uplink_controller_ollvm_bcf_v1`.
+Its `python3 -I -B verify_bundle.py` passed directly from the shared filesystem,
+without rebuilding/executing a PE or rerunning an emulator. Its limits and full
+report are retained in `game_data/uplink-verification.json`.
+
+- Specimen: `uplink_controller_ollvm_bcf_v1`; schema `room-controller/v1`, version 1.
+- Browser bundle SHA-256: `87dec9e470119a951eb1486e25d62226c72b34367e754b0a14b4e5a818c4c082`.
+- OLLVM BCF PE SHA-256: `1e6e39f015613d03560e1dc49a93a8de43e16ea2f0006ee8809632cc3972aa61`.
+- Clean PE SHA-256: `e81b410c5389c6ac8683b0105a1663ff6177fa5f5d1b0f14ff3c78e088147945`.
+- 32 logical states / 256 frontend projections, 64 retained clean/BCF native
+  observations, 32 retained BCF traces, 224 actual output stores, six curated
+  regions, 34 guards and 17 proven clones. Ten portable negative fixtures rejected.
+
+The runtime bundle is a **byte-identical** copy in tracked `game_data/`, with a
+small source record. `pnpm check:uplink` pins its SHA-256 and validates its
+structure before every build. Runtime validation checks supported schema,
+specimen/PE, input bits, all state keys, canonical outputs, native/trace agreement,
+raw addresses/bytes/ranges, occurrence identities, semantic store ordering,
+curated region bindings and clone proof links. Import failures produce a visible
+error screen instead of invented outputs. These checks protect the integration;
+they do not replace the experiment's PE/proof verifier.
+
+`Workspace/` is excluded from the Docker image. Neither the deployed Node process
+nor browser reads that share. No PE, PDB, virtual environment or build corpus was
+copied. Older v1/v2 tutorial data and their tests are retained.
+
+The exact input key is `plateA + 2*switchB + 4*plateB + 8*switchC + 16*cubeOnPlateC`.
+`cubeOnPlate`, `cubeOnPlateB` and `plateC` remain physical diagnostics/save state,
+not extra binary inputs. All seven outputs are retained: `grappleAnchor`,
+`relayGates`, `liftField`, `codePlatformA`, `codePlatformB`, `exitDoor`, `bridge`.
+Bridge remains false in this contract. Switch history remains physical room state.
+
+### Real assembly and explanatory replay
+
+The six exported machinery mappings drive assembly displays at the anchor, R1
+relay, lift, service landing, upper return route and exit. Each shows 3–5 actual
+instructions surrounding its selected retained store, with a native address range
+(end exclusive) and RVA gutter. Excerpts are contiguous within a retained raw
+block. The original Binary Ninja address gutter, mnemonic/operand colours and
+lit/ghosted block treatment are adapted without changing collision bounds.
+Labels such as SERVICE are explicitly semantic presentation labels, not symbols
+invented for the executable. Thin machine/display tethers are authored, not CFG edges.
+Service and payload regions overlap; the inspector preserves that awkwardness.
+
+Physical outputs update synchronously on input sampling. Independently, the
+renderer replays the selected trace's actual chronological instruction addresses,
+including helper-call timing. A base 180 retained steps/s and at least 160 ms
+between output commits make the seven stores readable, including false writes.
+This is presentation time, not simulated CPU speed. Instruction highlights,
+commit pulses and the ordered HUD commit list refer to retained addresses/events.
+Occurrence IDs and visit numbers are preserved (this specimen happens to have no
+repeated raw-block visits). A new state restarts its own trace; no artificial edge
+joins two evaluations. Brief intermediate states can be superseded visually;
+world outputs are never queued behind animation.
+
+The **Evidence** button pauses play and opens full retained regions, raw IDs,
+addresses/bytes, all occurrences, chronological commits, PE identity and proof
+assumptions. It can reveal the optional clone's classification on the canvas.
+The debug panel includes controller state/trace identity, replay cursor and save
+state. Inspector/reveal state and trace timing are not saved.
+
+### Proven clone as an optional physical metaphor
+
+Recommended candidate `bcf_clone_originalBB71alteredBB`, raw block `bb_000018AA`,
+native range `0x1400018AA–0x1400018C7` (exclusive), is represented by a new optional
+200×28 platform at **(2220,740)** above the existing safe floor y=860. This is the
+only geometry addition. It is clear of the accepted x=2180 return drop, introduces
+no anchor, and cannot reach the upper node. The full solution works without it.
+Contact uses the existing 0.6 s crumble / 2.4 s respawn behaviour; falling loses no
+puzzle state. The code plaque shows all six real instructions unchanged.
+
+Ordinary play labels the region UNANALYSED / UNSTABLE. The inspector exposes its
+proof immediately; its reveal checkbox can show **PROVEN BOGUS** without removing
+or simplifying any instruction. The clone resembles codePlatformB/exit writes,
+but those unreachable instructions are **not** replayed as successful output events.
+
+Proof is linked to `opaque_guard_25` and `opaque_guard_26`, frozen IR clone origin,
+actual compiler/native mapping and the retained universal 32-bit parity argument.
+Retained proof SHA-256:
+`4b84a695dd09f6097a9bae5c2cef2b6eb86e7293cef57a6e520024fefe530eec`.
+The portable verifier checks the exact guard forms and incoming control flow
+under normal-entry, intact-code/register-flow and successful-load assumptions;
+it does not rerun Z3 or claim arbitrary corruption/interior-entry safety.
+Nonexecution in the 32 traces alone is **not** the proof. Physical crumbling is a
+gameplay metaphor, not a claim that the CPU executes this clone then collapses it.
+
+### Evidence boundary and persistence
+
+**Real:** retained source/controller identity, OLLVM BCF PE identity, exhaustive
+canonical-state correctness, chronological traces/output commits, actual assembly,
+and linked bogus-clone provenance/proof under the documented assumptions.
+
+**Authored:** all room placements, platform collision, grapple/relay/lift physics,
+checkpoint policy, crumble timing, semantic labels, playback speed, and every
+encoded-looking → readable flavour string. RELAY LINK ESTABLISHED, LIFT FIELD
+ONLINE, ROUTE UNLOCKED and UPLINK READY remain `MachinePresentation` effects.
+No string encryption/decoding evidence is claimed by this integration.
+
+Save schema stays version 3. Reload reconstructs switches, latches, checkpoint and
+important cube placement, then selects a fresh validated frame. Far checkpoint,
+upper checkpoint with B held, and final Node C state are covered by reconstruction
+and real server process-restart tests. Animation state is never persisted.
 
 ## Character, cube and controls after playtest feedback
 
@@ -314,6 +433,15 @@ jumping the cube; on one run that put the hook start beyond the bank and left th
 of the release point. The browser now lands on the bank before aiming, using
 normal directional braking. No tutorial geometry was changed to accommodate tests.
 
+Binary-integration review: the first assembly placement crowded the relay lever;
+the excerpt is now capped at five instructions and moved clear of the control.
+The optional clone retains all six instructions. Normal camera view supports
+reading nearby excerpts; overview text is small, so Evidence provides the full
+listing at UI scale. Provenance is intentionally detailed and needs scrolling.
+Fast plate transitions can interrupt an explanatory replay, while the immediately
+applied physical state stays correct. None of these required a physics change.
+The existing brief lift rise on the final return route remains unchanged.
+
 Manual playtesting still needs to answer:
 
 - Are the matching R1 gate labels and illuminated frames enough to suggest a
@@ -336,9 +464,11 @@ UPLINK keeps the only anchor below and out of range of its upper machinery.
 ## Validation and playtest observations
 
 - `pnpm typecheck`: passed.
-- `pnpm test:unit`: 120 passed, 2 existing conditional tests skipped for tutorial
+- `pnpm test:unit`: 145 passed, 2 existing conditional tests skipped for tutorial
   rooms without pits; existing gameplay assertions retained.
-- `pnpm build`: passed; the default bundle excludes the previous binary tutorial.
+- `pnpm build`: passed, including pinned UPLINK validation; the previous binary
+  tutorial remains outside the default runtime. Full retained UPLINK data makes
+  the game chunk about 930 KB / 101 KB gzip; Vite emits its advisory size warning.
 - `pnpm test`: both original HTTP invariants passed against the production server.
 - `pnpm check:browser`: real CDP keyboard/mouse route through all four rooms,
   including a deliberate failed jump, cube pull, mouse and Space grapple
@@ -346,7 +476,9 @@ UPLINK keeps the only anchor below and out of range of its upper machinery.
   checkpoint reset, reload/continue with B held, and crumble recovery,
   final completion save, debug state, screenshots and zero console errors. UPLINK
   adds both gate directions, carrying through a gate, both lift rides, cube retrieval,
-  upper payload, and reloads at both new checkpoints.
+  upper payload, evidence inspection, source/state identity, optional proven-clone
+  contact/recovery after completing the main route, and validated frame
+  reconstruction at the far, upper and Node C reloads.
 - Restart test: save RELAY, SIGKILL the server, launch a new process on the same
   temporary `/data`-style directory, load the same cookie, compare saved state.
   Also checks independent visitors, conflicting writes, bad payloads, bounded
@@ -372,5 +504,6 @@ fun. Remaining points for manual playtesting:
    and the menu inspected at 960×640. No Docker/Fly deployment test was run.
 
 Screenshots retained in `docs/playtest/` show the implemented rooms and restored
-continue screen. The next step is a human playtest of this slice, not a new
-obfuscated controller. UPLINK-specific screenshots use the `uplink-` prefix.
+continue screen. The next step is a human playtest of this integrated slice.
+New evidence screenshots use the `uplink-binary-` prefix; earlier greybox
+screenshots remain as historical review material.

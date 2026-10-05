@@ -1,8 +1,9 @@
+import { roomController } from './validated-controller.ts';
 import { CUBE_SIZE } from './tuning.ts';
 import { CARRY, GRAPPLE, PLAYER } from '../engine/constants.ts';
 import { boxesOverlap, clamp, type Vec2 } from '../engine/geometry.ts';
 import { createPlayer, playerBox, releaseRope, stepBody, stepPlayer, findGrappleTarget, type InputState, type LooseBody, type Solid } from '../engine/physics.ts';
-import { mockController, type ControllerInputs, type ControllerFrame, type RoomController } from './controller.ts';
+import { type ControllerInputs, type ControllerFrame, type RoomController } from './controller.ts';
 import type { RoomMemory } from './progress.ts';
 import type { Platform, RoomDef } from './rooms.ts';
 import { LiftField, RelayGatePair } from './machinery.ts';
@@ -46,7 +47,7 @@ export class PuzzleWorld {
     exited = false;
     pullingCube = false;
     events: MachineEvent[] = [];
-    constructor(readonly room: RoomDef, memory: RoomMemory, private controller: RoomController = mockController) {
+    constructor(readonly room: RoomDef, memory: RoomMemory, private controller: RoomController = roomController) {
         this.inputs.switchB = memory.switchB;
         this.inputs.switchC = memory.switchC ?? false;
         this.cubeTransferred = memory.cubeTransferred ?? false;
@@ -328,7 +329,7 @@ export class PuzzleWorld {
         this.evaluate();
         for (const platform of this.platforms) {
             platform.pulse = Math.max(0, platform.pulse - dt * 1.8);
-            if (platform.def.kind !== 'crumble-prototype')
+            if (platform.def.kind !== 'crumble-prototype' && platform.def.kind !== 'crumble-proven')
                 continue;
             if (platform.fuse < 0 && platform.respawn === 0 && this.player.groundId === platform.def.id)
                 platform.fuse = 0.6;

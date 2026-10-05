@@ -1,3 +1,5 @@
+import { TracePlayback } from './evidence-presentation.ts';
+import { drawEvidence } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
 import { CUBE_SIZE } from './tuning.ts';
 import { Camera } from '../render/camera.ts';
@@ -9,6 +11,8 @@ import { ROOM_IDS } from './controller.ts';
 import { drawMachinery } from './machinery-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
+    replay = new TracePlayback();
+    revealBogus = false;
     camera = new Camera();
     particles = new Particles();
     private ctx: CanvasRenderingContext2D;
@@ -27,6 +31,8 @@ export class PuzzleRenderer {
         this.camera.setWorld(world.room.width, world.room.height, 740);
         this.camera.snapTo(world.player.x, world.player.y - 100);
         this.particles.clear();
+        this.replay = new TracePlayback();
+        this.replay.update(world.frame, 0);
     }
     private text(text: string, x: number, y: number, size = 14, colour = C.dim): void {
         this.ctx.fillStyle = colour;
@@ -52,6 +58,7 @@ export class PuzzleRenderer {
     }
     draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean): void {
         this.resize();
+        this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
         cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -101,7 +108,7 @@ export class PuzzleRenderer {
                     this.line(x, b.y + 14, x + 20, b.y + 14, '#31444d', 2);
                 continue;
             }
-            const crumble = b.kind === 'crumble-prototype';
+            const crumble = b.kind === 'crumble-prototype' || b.kind === 'crumble-proven';
             const active = p.solid.enabled;
             const colour = crumble ? C.amber : active ? C.cyan : C.dim;
             c.globalAlpha = active ? 1 : 0.4;
@@ -116,7 +123,7 @@ export class PuzzleRenderer {
             if (b.h > 40)
                 this.text(active ? 'signal → ON' : 'signal → OFF', b.x + 10, b.y + 43, 11, colour);
             if (crumble) {
-                this.text('prototype', b.x + 12, b.y + 49, 11, C.amber);
+                this.text(b.kind === 'crumble-prototype' ? 'prototype' : 'UNSTABLE', b.x + 12, b.y + 49, 11, C.amber);
                 if (p.fuse >= 0) {
                     c.fillStyle = C.amber;
                     c.fillRect(b.x, b.y - 5, b.w * p.fuse / 0.6, 3);
@@ -209,6 +216,7 @@ export class PuzzleRenderer {
         c.fillStyle = '#52616a';
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
         this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
+        drawEvidence(c, w, this.replay, this.revealBogus);
         const checkpoint = w.checkpointPosition();
         this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
         c.fillStyle = C.cyan;

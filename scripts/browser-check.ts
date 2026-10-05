@@ -137,6 +137,8 @@ const KEYS: Record<string, {
     key: string;
     vk: number;
 }> = {
+    End: { key: 'End', vk: 35 },
+    Enter: { key: 'Enter', vk: 13 },
     KeyA: { key: "a", vk: 65 },
     KeyD: { key: "d", vk: 68 },
     KeyE: { key: "e", vk: 69 },
@@ -201,6 +203,8 @@ interface Snap {
         bridge: boolean;
     };
     source: string;
+    evidence?: { stateId: number; traceId: string; binarySha256: string };
+    trace?: { stateId: number; outputEvents: { output: string; value: boolean }[] };
     checkpoint: string;
     deaths: number;
     pullingCube: boolean;
@@ -291,7 +295,12 @@ async function shot(cdp: Cdp, name: string): Promise<void> { const res = await c
 const checks: string[] = [];
 function check(label: string, ok: boolean, detail = ''): void { checks.push(`${ok ? 'PASS' : 'FAIL'} ${label}${detail ? ' — ' + detail : ''}`); if (!ok)
     throw new Error(label + ' ' + detail); }
-async function click(cdp: Cdp, selector: string) { await evaluate(cdp, `document.querySelector(${JSON.stringify(selector)}).click()`); await sleep(150); }
+async function click(cdp: Cdp, selector: string) {
+    const at = await evaluate<{ x: number; y: number }>(cdp, `(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+    await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...at, button: 'left', buttons: 1, clickCount: 1 });
+    await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at, button: 'left', buttons: 0, clickCount: 1 });
+    await sleep(150);
+}
 async function mouseAt(cdp: Cdp, x: number, y: number, type = 'mousePressed') {
     const at = await evaluate<{
         x: number;
@@ -364,12 +373,28 @@ async function liftRide(cdp: Cdp) {
     await shot(cdp, 'uplink-lift-rider');
     await alignTo(cdp, 1980, 'upper-deck');
 }
+async function checkValidatedFrame(cdp: Cdp, where: string) {
+    const s = await snap(cdp);
+    const key = Number(s.inputs.plateA) + 2 * Number(s.inputs.switchB) + 4 * Number(s.inputs.plateB) + 8 * Number(s.inputs.switchC) + 16 * Number(s.inputs.cubeOnPlateC);
+    check(`UPLINK ${where}: validated state ${key}`, s.source === 'validated-trace' && s.evidence?.stateId === key && s.evidence?.traceId === `bcf_state_${String(key).padStart(2, '0')}` && s.evidence?.binarySha256 === '1e6e39f015613d03560e1dc49a93a8de43e16ea2f0006ee8809632cc3972aa61');
+}
 async function uplinkRoute(cdp: Cdp) {
+    await checkValidatedFrame(cdp, 'entry');
+    await click(cdp, '#evidence-toggle');
+    check('real assembly inspector pauses play and shows PE provenance', !(await snap(cdp)).started && await evaluate(cdp, "document.querySelector('#evidence pre').textContent.includes('0x140001') && document.querySelector('#evidence pre').textContent.includes('BCF PE SHA-256')"));
+    await shot(cdp, 'uplink-assembly-inspector');
+    await click(cdp, '#evidence select'); await tap(cdp, 'End'); await tap(cdp, 'Enter');
+    check('optional bogus inspector retains proof assumptions and real clone assembly', await evaluate(cdp, "document.querySelector('#evidence pre').textContent.includes('bcf_clone_originalBB71alteredBB') && document.querySelector('#evidence pre').textContent.includes('mov dword ptr [rcx + 0x10], 1') && document.querySelector('#evidence pre').textContent.includes('assumptions')"));
+    await shot(cdp, 'uplink-bogus-inspector');
+    await click(cdp, '#evidence button');
+
     await shot(cdp, 'uplink-arrival');
     await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'uplink-overview'); await key(cdp, 'keyUp', 'Tab'); await sleep(700);
     await alignTo(cdp, 345); await tap(cdp, 'KeyE');
     await alignTo(cdp, 363); await tap(cdp, 'KeyA'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'uplink cube A', s => s.inputs.cubeOnPlate);
+    await checkValidatedFrame(cdp, 'anchor active');
+    check('anchor uses immediate retained output', (await snap(cdp)).outputs.grappleAnchor);
     await walkTo(cdp, 430); await cross(cdp, 780, false, 526);
     await alignTo(cdp, 1120); await tap(cdp, 'KeyE');
     check('UPLINK relay power sets far checkpoint', (await snap(cdp)).outputs.relayGates && (await snap(cdp)).checkpoint === 'relay');
@@ -379,6 +404,7 @@ async function uplinkRoute(cdp: Cdp) {
     await cdp.send('Page.reload'); await sleep(600);
     await waitFor(cdp, 'uplink far restore', s => s.room === 'uplink' && s.checkpoint === 'relay');
     check('UPLINK reload preserves initial cube and powered gate', (await snap(cdp)).inputs.cubeOnPlate && (await snap(cdp)).outputs.relayGates);
+    await checkValidatedFrame(cdp, 'far reload');
     await shot(cdp, 'uplink-continue-relay'); await click(cdp, '#continue');
     await gateTrip(cdp, false);
     check('UPLINK player gate B to A', (await snap(cdp)).player.x < 480);
@@ -397,6 +423,7 @@ async function uplinkRoute(cdp: Cdp) {
     await shot(cdp, 'uplink-latched'); await cdp.send('Page.reload'); await sleep(600);
     await waitFor(cdp, 'upper checkpoint restore', s => s.checkpoint === 'upper' && s.inputs.switchC);
     check('UPLINK upper checkpoint restores cube holding B', (await snap(cdp)).inputs.cubeOnPlateB && (await snap(cdp)).player.x === 1980);
+    await checkValidatedFrame(cdp, 'upper reload');
     await click(cdp, '#continue');
     await alignTo(cdp, 2180); await waitFor(cdp, 'safe drop from upper deck', s => s.player.groundId === 'far');
     await alignTo(cdp, 1555, 'far'); await tap(cdp, 'KeyE');
@@ -406,6 +433,7 @@ async function uplinkRoute(cdp: Cdp) {
     await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'upper payload delivered', s => s.inputs.cubeOnPlateC);
     check('UPLINK payload activates route without remote completion', (await snap(cdp)).outputs.codePlatformB && !(await snap(cdp)).ended);
+    await checkValidatedFrame(cdp, 'payload delivered');
     await shot(cdp, 'uplink-payload');
     await alignTo(cdp, 2250); await jumpTo(cdp, 2080, 'upper-deck');
     await key(cdp, 'keyDown', 'KeyA');
@@ -549,7 +577,19 @@ async function main() {
         await cdp.send('Page.reload'); await sleep(600);
         await waitFor(cdp, 'restore upper payload', s => s.persistence.visitor === visitor && s.inputs.cubeOnPlateC);
         check('reload restores UPLINK latch, payload and final route', (await snap(cdp)).outputs.exitDoor && (await snap(cdp)).outputs.codePlatformB && (await snap(cdp)).checkpoint === 'upper');
+        await checkValidatedFrame(cdp, 'Node C reload');
         await shot(cdp, 'continue-uplink');
+        // Optional evidence object is explored only AFTER the accepted route completed.
+        await click(cdp, '#continue');
+        await alignTo(cdp, 2180); await waitFor(cdp, 'optional region safe floor', s => s.player.groundId === 'far');
+        await jumpTo(cdp, 2310, 'proven-clone');
+        check('optional proven clone arms on physical contact', (await snap(cdp)).platforms.some(p => p.id === 'proven-clone' && p.fuse > 0));
+        await shot(cdp, 'uplink-bogus-contact');
+        await waitFor(cdp, 'proven clone safe recovery', s => s.player.groundId === 'far');
+        check('optional proven clone crumbles without death or losing payload', (await snap(cdp)).deaths === 0 && (await snap(cdp)).inputs.cubeOnPlateC && (await snap(cdp)).platforms.some(p => p.id === 'proven-clone' && !p.enabled));
+        await waitFor(cdp, 'proven clone reappears', s => s.platforms.some(p => p.id === 'proven-clone' && p.enabled));
+        await shot(cdp, 'uplink-bogus-recovered');
+        await tap(cdp, 'KeyR'); await click(cdp, '#pause');
         await cdp.send('Emulation.setDeviceMetricsOverride', { width: 960, height: 640, deviceScaleFactor: 1, mobile: false });
         await sleep(300);
         await shot(cdp, 'compact-menu');

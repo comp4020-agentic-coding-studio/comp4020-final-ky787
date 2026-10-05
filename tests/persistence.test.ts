@@ -3,6 +3,9 @@ import { mkdtemp, rm, readdir, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, expect, it } from 'vitest';
+import { PuzzleWorld } from '../src/slice/world.ts';
+import { roomById } from '../src/slice/rooms.ts';
+import { uplinkEvidence, uplinkStateKey } from '../src/slice/validated-controller.ts';
 import { freshProgress } from '../src/slice/progress.ts';
 const children: ChildProcess[] = [];
 const dirs: string[] = [];
@@ -112,14 +115,18 @@ it('preserves UPLINK relay and upper payload checkpoints across separate server 
     progress.completedRooms = ['pressure', 'switch', 'relay'];
     progress.mechanics = ['relay-power', 'teleport', 'relay-cargo', 'lift'];
     progress.rooms.uplink = { switchB: true, switchC: false, checkpoint: 'relay', cubeOnPlate: false, cubeOnPlateB: true, cubeOnPlateC: false, cubeTransferred: true };
-    for (let revision = 0; revision < 2; revision++) {
-        if (revision === 1) Object.assign(progress.rooms.uplink, { switchC: true, checkpoint: 'upper', cubeOnPlateB: false, cubeOnPlateC: true });
+    for (let revision = 0; revision < 3; revision++) {
+        if (revision === 1) Object.assign(progress.rooms.uplink, { switchC: true, checkpoint: 'upper' });
+        if (revision === 2) Object.assign(progress.rooms.uplink, { cubeOnPlateB: false, cubeOnPlateC: true });
         const saved = await fetch(app.url + '/api/progress', { method: 'PUT', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ revision, progress }) });
         expect(saved.status).toBe(200);
         await stop(app.child, 'SIGKILL'); app = await start(dir);
         const loaded = await (await fetch(app.url + '/api/progress', { headers: { cookie } })).json();
         expect(loaded.id).toBe(initial.id); expect(loaded.progress).toEqual(progress);
         expect(loaded.revision).toBe(revision + 1);
+        const world = new PuzzleWorld(roomById('uplink'), loaded.progress.rooms.uplink);
+        expect(world.frame.source).toBe('validated-trace');
+        expect(world.frame.outputs).toEqual(uplinkEvidence.state_table[uplinkStateKey(world.inputs)].expected_outputs);
     }
     await stop(app.child);
 });

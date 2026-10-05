@@ -265,3 +265,22 @@ p {
     margin:15px 0;
   }
 }
+
+#trace-status {
+  position:absolute; top:8px; left:12px; max-width:calc(100% - 24px);
+  padding:6px 9px; background:#0b1720df; border-left:2px solid #64e6d5;
+  font:10px/1.5 ui-monospace,monospace; color:#9fb8c5; pointer-events:none;
+}
+#evidence {
+  position:absolute; inset:16px; z-index:3; overflow:auto;
+  padding:22px; background:#0c1727fa; border:1px solid #698491;
+  font:12px/1.6 ui-monospace,monospace;
+}
+.evidence-toolbar { display:flex; justify-content:space-between; gap:16px; align-items:center; }
+#evidence label { display:inline-block; margin:0 18px 12px 0; }
+#evidence select { color:#e2edf1; background:#172831; padding:8px; max-width:100%; }
+#evidence pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+
+.trace-commits { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.trace-commits span { border:1px solid #304551; padding:2px 5px; color:#657e8e; }
+.trace-commits .committed { color:#a1eee0; border-color:#39746b; }

@@ -1,3 +1,4 @@
+import { EvidenceInspector } from './evidence-inspector.ts';
 import { FIXED_DT, MAX_FRAME_TIME } from '../engine/constants.ts';
 import { InputManager } from '../ui/input.ts';
 import { PuzzleRenderer } from './render.ts';
@@ -13,6 +14,14 @@ export class SliceGame {
     started = false;
     ended = false;
     debug = false;
+    private inspector: EvidenceInspector;
+    private resumeAfterInspector = false;
+    private sourceBadge = document.querySelector<HTMLElement>('#controller-source')!;
+    private traceView = document.querySelector<HTMLElement>('#trace-status')!;
+    private traceLabel = document.createElement('div');
+    private traceCommits = document.createElement('div');
+    private traceId = '';
+    private evidenceButton = document.querySelector<HTMLButtonElement>('#evidence-toggle')!;
     private last = 0;
     private accumulated = 0;
     private menu: HTMLElement;
@@ -21,7 +30,16 @@ export class SliceGame {
     private roomTitle: HTMLElement;
     private memory = '';
     constructor(readonly host: HTMLElement, readonly canvas: HTMLCanvasElement) {
+        this.traceView.append(this.traceLabel, this.traceCommits);
+        this.traceCommits.className = 'trace-commits';
         this.renderer = new PuzzleRenderer(canvas);
+        this.inspector = new EvidenceInspector(() => this.closeInspector(), show => { this.renderer.revealBogus = show; });
+        this.evidenceButton.addEventListener('click', () => {
+            if (!this.inspector.element.hidden) { this.closeInspector(); return; }
+            this.resumeAfterInspector = this.started; this.started = false;
+            this.world.cancelGrapple(); this.input.releaseAll();
+            this.inspector.element.hidden = false;
+        });
         this.renderer.room(this.world);
         this.input.attach(canvas, host);
         this.menu = document.querySelector('#menu')!;
@@ -46,10 +64,17 @@ export class SliceGame {
         this.loadRoom();
         this.showMenu();
     }
+    private closeInspector(): void {
+        this.inspector.element.hidden = true; this.started = this.resumeAfterInspector;
+        this.input.releaseAll(); this.canvas.focus();
+    }
     private loadRoom(): void {
         const id = this.store.progress.currentRoom;
         this.world = new PuzzleWorld(roomById(id), this.store.progress.rooms[id]);
         this.renderer.room(this.world);
+        this.sourceBadge.textContent = this.world.frame.source;
+        this.evidenceButton.hidden = id !== 'uplink';
+        this.traceView.hidden = id !== 'uplink';
         this.memory = JSON.stringify(this.world.memory());
         this.input.releaseAll();
         this.accumulated = 0;
@@ -57,6 +82,7 @@ export class SliceGame {
     }
     private showMenu(): void {
         this.started = false;
+        this.inspector.element.hidden = true;
         this.world.cancelGrapple();
         this.input.releaseAll();
         this.menu.hidden = false;
@@ -69,7 +95,7 @@ export class SliceGame {
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       ${this.ended ? '<button id="new-run">Start a new run</button>' : ''}
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook / release · Hold click also hooks<br>R checkpoint · Tab overview</p>
-      <p class="prototype-note">Greybox · mock controllers and string effects.<br>Crumble is a gameplay prototype, not binary evidence.</p></div>`;
+      <p class="prototype-note">UPLINK: validated OLLVM controller + real assembly.<br>Tutorial controllers and all string effects remain authored.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector('#continue')!.addEventListener('click', () => {
             if (this.ended) {
                 this.loadRoom();
@@ -111,7 +137,7 @@ export class SliceGame {
     }
     snapshot() {
         return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, inputs: this.world.inputs, outputs: this.world.frame.outputs,
-            source: this.world.frame.source, platforms: this.world.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn })),
+            source: this.world.frame.source, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: 'authored / not binary decoding', platforms: this.world.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,
@@ -124,7 +150,8 @@ export class SliceGame {
         if (this.input.takeAction('debug'))
             this.debug = !this.debug;
         if (this.input.takeAction('escape')) {
-            if (this.started)
+            if (!this.inspector.element.hidden) this.closeInspector();
+            else if (this.started)
                 this.showMenu();
             else
                 (this.menu.querySelector('#continue') as HTMLButtonElement | null)?.click();
@@ -163,6 +190,21 @@ export class SliceGame {
         else
             this.accumulated = 0;
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld);
+        this.inspector.update(this.renderer.replay);
+        const replay = this.renderer.replay;
+        if (replay.trace) {
+            if (this.traceId !== replay.trace.id) {
+                this.traceId = replay.trace.id;
+                this.traceCommits.replaceChildren(...replay.trace.semantic_events.map(e => {
+                    const node = document.createElement('span');
+                    node.textContent = `${e.output} ← ${e.value}`;
+                    node.title = `${e.id} · step ${e.step_index} · ${e.raw_occurrence_id}`;
+                    return node;
+                }));
+            }
+            this.traceLabel.textContent = `RETAINED ${replay.trace.id} · ${replay.step + 1}/${replay.trace.instruction_count} · ${replay.occurrence ? `${replay.occurrence.block_id} visit ${replay.occurrence.visit_number}` : 'linked helper'} | outputs immediate · strings authored`;
+            [...this.traceCommits.children].forEach((node, index) => node.classList.toggle('committed', replay.trace!.semantic_events[index].step_index <= replay.step));
+        }
         this.status.textContent = this.store.status;
         this.debugView.hidden = !this.debug;
         if (this.debug)

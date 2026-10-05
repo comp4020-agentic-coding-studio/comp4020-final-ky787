@@ -5,10 +5,11 @@
   "scripts": {
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "dev": "vite",
-    "build": "vite build",
+    "build": "pnpm check:uplink && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm test:unit && pnpm test",
+    "check:uplink": "node scripts/check-uplink-bundle.ts",
     "check:evidence": "node scripts/check-evidence.ts",
     "check:browser": "node scripts/browser-check.ts",
     "sync:bundle": "node scripts/sync-bundle.ts",

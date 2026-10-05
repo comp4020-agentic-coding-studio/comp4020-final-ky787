@@ -1,0 +1,13 @@
+{
+  "frontend_head": "ec1e4ae206f8a90db2da4128b2cbd0938deacfbf",
+  "experiment_id": "uplink_controller_ollvm_bcf_v1",
+  "bundle_sha256": "87dec9e470119a951eb1486e25d62226c72b34367e754b0a14b4e5a818c4c082",
+  "ollvm_pe_sha256": "1e6e39f015613d03560e1dc49a93a8de43e16ea2f0006ee8809632cc3972aa61",
+  "schema": "room-controller/v1",
+  "schema_version": 1,
+  "source_bundle": "Workspace/binary_binja_redesign/game_data/uplink_controller_ollvm_bcf_v1.json",
+  "source_experiment": "Workspace/binary_binja_redesign/experiments/uplink_controller_ollvm_bcf_v1",
+  "portable_verifier": "python3 -I -B verify_bundle.py",
+  "verified_read_only": true,
+  "specimen_id": "uplink_controller_ollvm_bcf_v1"
+}
