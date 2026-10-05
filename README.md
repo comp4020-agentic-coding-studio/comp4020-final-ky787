@@ -1,108 +1,68 @@
-# Binary Ninja: Pressure / Switch / Relay / Control Spine
+# Binary Ninja
 
-A single-player, four-room greybox for a future cooperative platform-puzzle
-game. Gameplay comes first: carry a cube, hold a plate, wake a grapple anchor,
-enable lifts and fixed relay gates, and route a payload upstairs. Rooms are hand-authored.
+**Binary Ninja is a cooperative puzzle-platformer where real obfuscated programs control the level around you.**
 
-**CONTROL SPINE (UPLINK) uses a validated OLLVM-16 BCF controller**, with retained real assembly
-and a proof-backed unstable anchor in the final rope chain. The first three rooms still
-use mock controllers. Room geometry, physics, crumble timing and all string
-reveals remain authored game abstractions. No multiplayer is included. The
-earlier binary-backed tutorial and its tests remain outside the default game.
+My definition of a good version of this project is first and foremost a **fun two-player puzzle game**. Movement should feel satisfying, rooms should be deliberately designed rather than procedurally generated, and cooperation should be necessary to progress. Players should be carrying cubes, holding pressure plates for each other, flipping switches, grappling across gaps, powering lifts, activating portals and changing the structure of the room together.
 
-## How to play
+Reverse engineering is the flavour and underlying machinery!
 
-1. **PRESSURE:** put the cube on the button to open the exit, then hop past it.
-2. **SWITCH:** flip the lever to materialise the marked grapple platform. Hold
-   left click on its code slab while moving right, then release as you swing right.
-3. **RELAY:** leave the cube on Plate A, grapple across and lock the return bridge
-   with its lever. Walk back for the cube and carry it to Plate B on the first
-   raised platform to open the exit. Jump onto the cube or over it to climb the
-   remaining code steps. The unstable prototype has a safe recovery floor.
-4. **CONTROL SPINE:** route the payload to the core node in a large machine hall. Observe which controls power the
-   relay, lift and upper route; some machinery lets you return for the cube.
-   Its opening overview waits for **Space** (or the on-screen button). The final
-   return uses successive rope swings; unstable anchors warn before breaking.
+## What I am trying to build
 
-A/D or arrows move. Space/W jumps. Aim at an enabled code slab to preview the grapple;
-press Space again in midair to hook that highlighted target, then once more to
-**jump off** with sideways momentum. A tap holds the rope for you. W/Up also
-jump off an attached rope. Each anchor supplies one short hop until you land;
-moving to the next anchor supplies another. Hold left click to hook and let go
-for the original low release arc, or press Space while holding it to jump off.
-E picks up/puts down a cube or uses a nearby lever. RELAY's bridge lever locks
-ON permanently; SWITCH's lever and CONTROL SPINE's relay power remain ON/OFF toggles.
-CONTROL SPINE's upper lift latch locks ON. Walk into powered relay doorways to travel
-in either direction; a carried cube comes with you. Steer within the Lift Field
-to rise, then step sideways onto the upper deck.
-Click-hold a cube in RELAY or CONTROL SPINE to pull it towards you. S drops through code platforms.
-R returns to the checkpoint without clearing solved machinery. Tab shows the
-room overview. Escape opens the menu. F1 shows inputs, outputs, trace activity and save state.
-The start/pause menu lets you choose any of the four rooms. Each room keeps its
-saved checkpoint and puzzle progress; selecting a room does not mark it complete.
-The debug panel can return a lost cube to its spawn. In CONTROL SPINE, **Evidence** pauses
-play for full assembly, retained trace occurrences and clone provenance. Code
-platforms show their real addresses with assembly and authored strings below;
-all enabled code slabs accept the hook. Static floors remain unhookable. Assembly
-playback explains machinery that has already responded; it never delays controls.
-Selected machine messages use authored single-byte XOR (0x5A), separate from the
-retained OLLVM assembly. Powered lines animate from physical controls to their
-machinery; these are authored wiring diagrams, not native control-flow edges.
-Node C reveals the upper rope route and a catch deck for safe recovery.
+The final game is intended to be two-player only game inspired by portal (apart from tutorial and test chambers). A typical room might require one player to hold a pressure plate while the other uses an activated grapple block to cross a gap. The second player can then enable a bridge or relay so the first can follow. Cubes act as movable substitutes for players and can be carried, pulled with the grapple, placed on switches or routed through machinery.
 
-This pass is tuned and tested for desktop keyboard and mouse. Inherited touch
-controls are present; touch gameplay has not been tuned or validated.
+Different program-controlled objects provide different movement and puzzle possibilities:
 
-## Saved progress
+- grapple blocks provide horizontal traversal;
+- lift fields provide vertical traversal;
+- relay gates teleport players and payloads between fixed locations;
+- code platforms can become solid or disappear depending on program state;
+- proven bogus-code blocks can appear stable before collapsing;
+- switches, pressure plates and cubes act as inputs to the room controller.
 
-An anonymous browser cookie identifies your server save. Returning to the same
-site/browser offers **CONTINUE — [ROOM]**. Older UPLINK saves resume as CONTROL SPINE,
-with their checkpoints and payload placement retained. Completed rooms, logical checkpoint,
-switch state, cube-on-Plate-A/B state, discovered mechanics and the last 40 notable
-events survive reload and server restart. Loose cube positions and velocities
-are not saved. Existing version-1/2 saves migrate to version 3 without losing progress; visitors
-who completed the three tutorials continue directly into UPLINK. UPLINK saves
-its upper latch, cargo checkpoint and final payload placement. Cookies must be retained to find the same save.
+A good level should be understandable through its physical design without needing an assembly lesson. The reverse-engineering layer should reward players who look deeper.
 
-Use **Menu → Reset all progress…** to start over at PRESSURE. Confirming clears
-all rooms, checkpoints, discoveries and activity while keeping your anonymous
-visitor ID. Cancel or Escape leaves progress untouched. Wait for **Saved on server**
-before closing the page.
+## Gameplay first, binaries second
 
-The footer says **Saved on server** only after acknowledgement. Failed saves
-remain pending and retry; if the initial connection fails, the menu offers a
-retry or explicitly unsaved play. Another tab changing the save produces a
-reload notice rather than silently overwriting it.
+An important change in my process has been to **design the puzzle before designing the binary**.
 
-## Development
+The level is first greyboxed as a normal game. Once its mechanics and state transitions work, the room is annotated with logical inputs and outputs. For example:
 
-Node 24.21+ and pnpm 11. No runtime server dependencies.
+`Plate A → Grapple Anchor`
 
-```sh
-pnpm install
-pnpm build                    # includes pinned UPLINK bundle validation
-DATA_DIR=.local-data pnpm start  # http://localhost:8080 (game + save API + /readme/)
-```
+`Relay Switch → Relay Gates`
 
-For frontend development, leave that server running and run `pnpm dev` in
-another terminal. Vite proxies `/api` and `/readme` to port 8080. `pnpm preview`
-alone is static and does not provide persistence.
+`Payload on Node C → Final Route + Exit`
 
-```sh
-pnpm typecheck
-pnpm test:unit
-pnpm build                    # includes pinned UPLINK bundle validation
-pnpm test            # running app at APP_URL, default http://localhost:8080
-pnpm check:browser  # same default; optional URL and screenshot directory arguments
-```
+A separate agent then builds a small C program implementing that accepted state machine, compiles and obfuscates it, and exhaustively tests its supported input states.
 
-The Docker image uses one Node HTTP process, with Fly's existing volume at
-`/data`. Local `DATA_DIR` overrides keep test saves separate. The persistence
-suite kills and restarts a real server with the same temporary data directory.
-The course HTTP invariants remain unchanged; Docker is not required locally.
+The resulting binary is disassembled and traced. Its real assembly, addresses, execution order and validated outputs are then brought back into the playable room.
 
-## Design and playtest notes
+This means the stage is not shaped around whatever CFG a compiler happened to produce. Instead, a carefully designed game level gains an authentic binary underneath it.
 
-See [the C8 architecture, controller contract and playtest record](docs/c8-vertical-slice.md).
-Stop here for manual playtesting of the CONTROL SPINE showcase before
-extending the binary or mechanics. The old game and research workspaces remain read-only.
+## Current Crit 8 build
+
+The current build contains introductory rooms for pressure plates, switches, grappling and payload routing, followed by a larger UPLINK puzzle combining these mechanics.
+
+UPLINK is already driven by a validated OLLVM-16 bogus-control-flow controller. Its real machine instructions appear on the floating code machinery, and the displayed execution follows retained traces from the actual obfuscated binary.
+
+One optional unstable platform uses assembly from a real OLLVM BCF clone whose incoming bogus paths were independently proved infeasible. The crumble behaviour is a game metaphor; the underlying bogus-code classification is real.
+
+Other visual effects, including decoded machine messages, remain authored presentation and are labelled accordingly.
+
+## What good means
+
+For the final project, I want:
+
+- genuinely enjoyable two-player cooperation;
+- responsive movement and a restrained but satisfying grapple;
+- strong sound, visual feedback and environmental presentation;
+- hand-crafted levels with clear sightlines and deliberate puzzle progression;
+- persistence so players can leave and continue later;
+- real obfuscated binaries underneath important room machinery;
+- optional inspection depth for experienced reverse engineers without excluding beginners.
+
+Previous experiments with OLLVM, Hikari, Polaris, Tigress and several deobfuscation techniques provide a pool of real evidence that can be used to give later rooms different obfuscation flavours.
+
+The goal is not to disguise an obfuscation study as a game.
+
+The goal is to make a good cooperative game whose strange machinery genuinely comes from the reverse-engineering work behind it.
