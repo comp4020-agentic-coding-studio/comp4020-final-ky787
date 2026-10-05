@@ -58,9 +58,11 @@ export function drawPlatformListings(c: CanvasRenderingContext2D, w: PuzzleWorld
 export function drawMachineListings(c: CanvasRenderingContext2D, w: PuzzleWorld, replay: TracePlayback, presentation: MachinePresentation): void {
     const trace = replay.trace;
     if (w.room.id !== 'uplink' || !trace) return;
-    const gate = w.room.gates![0].gates[1], lift = w.room.lifts![0], exit = w.room.exit;
+    const relaySwitch = w.room.lever!, lift = w.room.lifts![0], exit = w.room.exit;
     const devices = [
-        { id: 'relay-control-display', type: 'RELAY', signal: 'relayGates' as const, box: { x: gate.x - 155, y: gate.y - 155, w: 265, h: 24 }, pulse: w.gates[0].pulse },
+        // Mount the retained relay-output listing under its power control, clear of the gate.
+        // This is frontend presentation placement; the exported binary binding stays unchanged.
+        { id: 'relay-control-display', type: 'SWITCH', signal: 'relayGates' as const, box: { x: relaySwitch.x - 132, y: relaySwitch.y + 56, w: 265, h: 24 }, pulse: w.gates[0].pulse },
         { id: 'lift-control-display', type: 'LIFT', signal: 'liftField' as const, box: { x: lift.x, y: lift.y + lift.h + 5, w: lift.w, h: 24 }, pulse: w.lifts[0].pulse },
         { id: 'exit-display', type: 'EXIT', signal: 'exitDoor' as const, box: { x: exit.x - 65, y: exit.y + exit.h + 32, w: 260, h: 24 }, pulse: w.displayPulse },
     ];

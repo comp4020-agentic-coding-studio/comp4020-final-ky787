@@ -526,7 +526,11 @@ Removed the detached assembly cards/tethers, permanent ring labels, repeated
 “REAL x64 / full region in EVIDENCE” footers, the duplicate UPLINK wall string
 panel, and decorative UPLINK wiring lines. Trace telemetry is now debug-only;
 real execution still highlights instructions and pulses machinery during play.
-Equipment listings sit against the relay, lift emitter and exit architecture.
+Equipment listings sit beneath the relay power switch, lift emitter and exit
+architecture. Relay gates themselves have no code listing. The switch listing
+shows the same retained relay-output region; its location is authored presentation,
+not a change to the exported machine binding. This also demonstrates the
+under-button display treatment without duplicating another floating panel.
 Strings remain authored effects, identified in the menu and evidence inspector.
 
 Regular platforms here means floating code slabs. All enabled code slabs and
