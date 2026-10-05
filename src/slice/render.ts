@@ -5,7 +5,7 @@ import { CUBE_SIZE, CODE_SLAB_HEIGHT } from './tuning.ts';
 import { Camera } from '../render/camera.ts';
 import { Particles } from '../render/fx.ts';
 import type { Vec2 } from '../engine/geometry.ts';
-import { mockPresentation, type MachinePresentation } from './presentation.ts';
+import { revealMessage, authoredPresentation, type MachinePresentation } from './presentation.ts';
 import type { PuzzleWorld } from './world.ts';
 import { ROOM_IDS } from './controller.ts';
 import { drawMachinery } from './machinery-render.ts';
@@ -13,10 +13,12 @@ const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', in
 export class PuzzleRenderer {
     replay = new TracePlayback();
     revealBogus = false;
+    private returnReveal = 0;
+    private exitWasOpen = false;
     camera = new Camera();
     particles = new Particles();
     private ctx: CanvasRenderingContext2D;
-    constructor(readonly canvas: HTMLCanvasElement, private presentation: MachinePresentation = mockPresentation) { this.ctx = canvas.getContext('2d')!; }
+    constructor(readonly canvas: HTMLCanvasElement, private presentation: MachinePresentation = authoredPresentation) { this.ctx = canvas.getContext('2d')!; }
     resize(): void {
         const rect = this.canvas.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
         if (this.canvas.width !== Math.round(rect.width * dpr) || this.canvas.height !== Math.round(rect.height * dpr)) {
@@ -31,6 +33,8 @@ export class PuzzleRenderer {
         this.camera.setWorld(world.room.width, world.room.height, 740);
         this.camera.snapTo(world.player.x, world.player.y - 100);
         this.particles.clear();
+        this.returnReveal = 0;
+        this.exitWasOpen = world.frame.outputs.exitDoor;
         this.replay = new TracePlayback();
         this.replay.update(world.frame, 0);
     }
@@ -60,7 +64,11 @@ export class PuzzleRenderer {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        // Authored reveal of the final physical route; outputs and controls never wait for it.
+        if (r.id === 'uplink' && w.frame.outputs.exitDoor && !this.exitWasOpen) this.returnReveal = 2.2;
+        this.exitWasOpen = w.frame.outputs.exitDoor;
+        this.returnReveal = Math.max(0, this.returnReveal - dt);
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, (overview || (r.id === 'uplink' && w.checkpoint === 'entry' && w.elapsed < 2.2)) ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 540 } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;
@@ -72,7 +80,7 @@ export class PuzzleRenderer {
         for (let y = 0; y < r.height; y += 50)
             this.line(0, y, r.width, y, C.grid, 0.6);
         this.text(`0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 575 : 90, 18, C.cyan);
-        this.text(r.instruction, 80, r.id === 'uplink' ? 617 : 132, 27, C.ink);
+        this.text(r.instruction, 80, r.id === 'uplink' ? 685 : 132, 27, C.ink);
         // Authored conduits communicate input/output relationships, not machine CFG edges.
         const source = r.plate ?? r.lever;
         if (source && r.id !== 'uplink') {
@@ -124,8 +132,8 @@ export class PuzzleRenderer {
             const address = r.id === 'uplink' ? platformAddress(p, this.replay) : null;
             this.text(address ?? b.label ?? b.id, b.x + 8, b.y + Math.min(19, b.h - 7), address ? 11 : 12, colour);
             if (address) {
-                const type = crumble && this.revealBogus ? 'BOGUS' : active ? 'CODE' : 'GHOST';
-                this.text(type, b.x + b.w - 36, b.y + Math.min(18, b.h - 8), 9, colour);
+                const type = crumble ? this.revealBogus ? 'PROVEN BOGUS' : 'UNSTABLE' : active ? 'CODE' : 'GHOST';
+                this.text(type, b.x + b.w - type.length * 5.5 - 6, b.y + Math.min(18, b.h - 8), 9, colour);
             }
             if (crumble) {
                 if (!address) this.text('prototype', b.x + 12, b.y + 49, 11, C.amber);
@@ -143,6 +151,21 @@ export class PuzzleRenderer {
                 c.lineWidth = 3;
                 c.strokeRect(b.x - 8 * (1 - p.pulse), b.y - 8 * (1 - p.pulse), b.w + 16 * (1 - p.pulse), b.h + 16 * (1 - p.pulse));
                 c.globalAlpha = 1;
+            }
+        }
+        if (r.id === 'uplink') {
+            this.text('CONTROL WING', 1030, 740, 19, C.dim);
+            this.text('LIFT / VERTICAL TRANSPORT', 1625, 775, 13, C.dim);
+            this.text('SERVICE BAY', 2360, 455, 16, C.dim);
+            this.text('CORE NODE', 3080, 90, 22, C.cyan);
+            this.text('← LOWER WING', 2140, 455, 12, C.dim);
+            this.text('RECOVERY DECK', 2900, 535, 14, C.dim);
+            this.text('↑ SERVICE ACCESS', 2280, 545, 12, C.dim);
+            for (const p of w.platforms.filter(p => p.def.signal === 'codePlatformB'))
+                this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
+            if (w.inputs.switchC) {
+                const feedback = this.presentation.describe(r.id, w.frame, 'liftField');
+                this.text(revealMessage(feedback, 1 - w.displayPulse), r.upperLever!.x - 105, r.upperLever!.y + 65, 12, C.cyan);
             }
         }
         drawMachinery(c, w, this.presentation);

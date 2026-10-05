@@ -78,7 +78,7 @@ export class SliceGame {
         this.memory = JSON.stringify(this.world.memory());
         this.input.releaseAll();
         this.accumulated = 0;
-        this.roomTitle.textContent = `0${ROOMS.findIndex(r => r.id === id) + 1} / ${id.toUpperCase()}`;
+        this.roomTitle.textContent = `0${ROOMS.findIndex(r => r.id === id) + 1} / ${roomById(id).title}`;
     }
     private showMenu(): void {
         this.started = false;
@@ -88,10 +88,10 @@ export class SliceGame {
         this.menu.hidden = false;
         const p = this.store.progress, saved = this.store.updatedAt;
         this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA / C8 PLAYTEST</span>
-      <h2>${this.ended ? 'Uplink complete.' : 'Small inputs.<br>Big changes.'}</h2>
-      <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Three tutorials. One bigger puzzle.<br>Route the payload to the Uplink.'}</p>
-      <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${p.currentRoom.toUpperCase()} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
-      <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${p.currentRoom.toUpperCase()}</button>
+      <h2>${this.ended ? 'Control Spine complete.' : 'Small inputs.<br>Big changes.'}</h2>
+      <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Three tutorials. One bigger puzzle.<br>Route the payload to the core node.'}</p>
+      <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${roomById(p.currentRoom).title} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
+      <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${roomById(p.currentRoom).title}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       ${this.ended ? '<button id="new-run">Start a new run</button>' : ''}
       <nav class="level-select" aria-label="Level select">
@@ -100,7 +100,7 @@ export class SliceGame {
         <small>All rooms available · keeps each room’s saved progress</small>
       </nav>
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook / release · Hold click also hooks<br>R checkpoint · Tab overview</p>
-      <p class="prototype-note">UPLINK: validated OLLVM controller + real assembly.<br>Tutorial controllers and all string effects remain authored.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
+      <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
         for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-room]')) {
@@ -159,7 +159,7 @@ export class SliceGame {
     }
     snapshot() {
         return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, inputs: this.world.inputs, outputs: this.world.frame.outputs,
-            source: this.world.frame.source, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: 'authored / not binary decoding', platforms: this.world.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
+            source: this.world.frame.source, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,

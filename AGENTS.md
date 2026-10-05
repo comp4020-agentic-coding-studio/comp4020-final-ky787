@@ -11,6 +11,9 @@
 - Separate binary evidence, coordinate-free controller signals, hand-authored
   geometry and presentation/physics. Physical inputs drive a replaceable
   controller adapter; its outputs drive machinery.
+- CONTROL SPINE is the fourth room, still ID `uplink`: preserve its validated
+  five-input/seven-output contract. Several physical objects may share one
+  retained output/region; never present them as separate native blocks.
 - Tutorial controllers and all string effects remain authored/mock; UPLINK uses
   retained validated OLLVM evidence. Prototype crumble is not obfuscator evidence. Never invent binary facts or infer bogusness from
   non-execution. Final binary-backed crumble requires retained proof.

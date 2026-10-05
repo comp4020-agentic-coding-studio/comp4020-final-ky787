@@ -2,16 +2,17 @@ import { CODE_SLAB_HEIGHT } from './tuning.ts';
 import { bogusInstructions, hex, instructionText, machineExcerpt, type TracePlayback } from './evidence-presentation.ts';
 import { uplinkEvidence } from './validated-controller.ts';
 import type { PuzzleWorld, PlatformState } from './world.ts';
-import type { MachinePresentation } from './presentation.ts';
+import { revealMessage, type MachinePresentation } from './presentation.ts';
 import type { NativeInstruction } from '../data/uplink-bundle.ts';
 import type { Box } from '../engine/geometry.ts';
 
 /** A real excerpt belongs to the physical slab, rather than a separate tethered card. */
 export function platformListing(platform: PlatformState, replay: TracePlayback): NativeInstruction[] | null {
-    if (!replay.trace) return null;
+    if (!replay.trace || platform.def.kind === 'static') return null;
     if (platform.def.kind === 'crumble-proven') return bogusInstructions();
-    const binding = uplinkEvidence.machine_bindings.find(b => b.frontend_object.collection === 'platforms' && b.frontend_object.id === platform.def.id);
-    return binding ? machineExcerpt(binding.id, replay.trace) : null;
+    const binding = uplinkEvidence.machine_bindings.find(b => platform.def.assemblyBinding ? b.id === platform.def.assemblyBinding : b.frontend_object.collection === 'platforms' && b.frontend_object.id === platform.def.id);
+    if (!binding || binding.signal !== platform.def.signal) throw new Error(`Missing or mismatched retained assembly binding for ${platform.def.id}`);
+    return machineExcerpt(binding.id, replay.trace, platform.def.signal === 'codePlatformB' ? 3 : 5);
 }
 export function platformAddress(platform: PlatformState, replay: TracePlayback): string | null {
     const listing = platformListing(platform, replay);
@@ -23,7 +24,7 @@ function text(c: CanvasRenderingContext2D, value: string, x: number, y: number, 
 /** The top edge/header is the collider. This hanging listing is decoration, like Crit 5. */
 function listing(c: CanvasRenderingContext2D, lines: NativeInstruction[], slab: Box, active: boolean, pulse: number, stepAddress: number | undefined, message?: string) {
     c.save(); c.font = '11px ui-monospace, monospace';
-    const width = Math.max(slab.w, 220, ...lines.map(i => c.measureText(instructionText(i)).width + 24));
+    const width = Math.max(340, ...lines.map(i => c.measureText(instructionText(i)).width + 24));
     const x = slab.x + (slab.w - width) / 2, y = slab.y + slab.h;
     const height = 12 + lines.length * 14 + (message ? 24 : 0);
     c.globalAlpha = active ? 0.92 : 0.35;
@@ -40,8 +41,7 @@ function listing(c: CanvasRenderingContext2D, lines: NativeInstruction[], slab: 
 }
 function displayString(w: PuzzleWorld, presentation: MachinePresentation, signal: Parameters<MachinePresentation['describe']>[2], pulse: number): string {
     const feedback = presentation.describe(w.room.id, w.frame, signal);
-    const count = feedback.active ? Math.floor(feedback.text.length * (1 - pulse)) : 0;
-    return feedback.text.split('').map((ch, i) => i < count ? ch : ((i * 17 + Math.floor(w.elapsed * 8)) % 16).toString(16).toUpperCase()).join('');
+    return revealMessage(feedback, 1 - pulse);
 }
 /** Draw below all solid geometry so a nearby listing never conceals another ledge. */
 export function drawPlatformListings(c: CanvasRenderingContext2D, w: PuzzleWorld, replay: TracePlayback, presentation: MachinePresentation): void {
@@ -49,7 +49,7 @@ export function drawPlatformListings(c: CanvasRenderingContext2D, w: PuzzleWorld
     for (const p of w.platforms) {
         const lines = platformListing(p, replay);
         if (!lines || p.respawn > 0) continue;
-        listing(c, lines, { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) }, p.solid.enabled, p.def.signal ? replay.pulse(p.def.signal) : 0,
+        listing(c, lines, { ...p.def, x: p.def.x + (p.def.listingOffsetX ?? 0), h: Math.min(CODE_SLAB_HEIGHT, p.def.h) }, p.solid.enabled, p.def.signal ? replay.pulse(p.def.signal) : 0,
             p.def.kind === 'crumble-proven' ? undefined : replay.trace.step_instruction_addresses[replay.step],
             p.def.signal ? displayString(w, presentation, p.def.signal, p.pulse) : undefined);
     }

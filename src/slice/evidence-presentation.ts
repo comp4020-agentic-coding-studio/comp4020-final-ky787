@@ -11,7 +11,7 @@ export function retainedTrace(frame: ControllerFrame): RetainedTrace | null {
     if (!trace) throw new Error(`Unresolved retained trace ${frame.evidence.traceId}`);
     return trace;
 }
-export function machineExcerpt(bindingId: string, trace: RetainedTrace): NativeInstruction[] {
+export function machineExcerpt(bindingId: string, trace: RetainedTrace, count: 3 | 5 = 5): NativeInstruction[] {
     const binding = bundle.machine_bindings.find(b => b.id === bindingId);
     if (!binding) throw new Error(`Unknown assembly binding ${bindingId}`);
     const event = trace.semantic_events.find(e => e.output === binding.signal)!;
@@ -19,8 +19,8 @@ export function machineExcerpt(bindingId: string, trace: RetainedTrace): NativeI
     if (!regions.some(r => r.output_commit_sites.some(s => s.instruction_address === event.instruction_address && s.output === event.output))) throw new Error(`Unmapped retained commit ${event.id}`);
     const block = bundle.raw.blocks.find(b => b.id === event.raw_block_id)!;
     const index = block.instruction_addresses.indexOf(event.instruction_address);
-    const start = Math.max(0, Math.min(index - 3, block.instruction_addresses.length - 5));
-    return block.instruction_addresses.slice(start, start + 5).map(a => instructions.get(a)!);
+    const start = Math.max(0, Math.min(index - (count === 3 ? 2 : 3), block.instruction_addresses.length - count));
+    return block.instruction_addresses.slice(start, start + count).map(a => instructions.get(a)!);
 }
 export function bogusInstructions(): NativeInstruction[] {
     return provenCrumble.raw_block_ids.flatMap(id => bundle.raw.blocks.find(b => b.id === id)!.instruction_addresses.map(a => instructions.get(a)!));
@@ -73,8 +73,8 @@ export function evidenceDetails(bindingId: string, trace: RetainedTrace): string
         'VALIDATED OLLVM BCF / retained evidence', `Specimen: ${bundle.specimen_id}`,
         `BCF PE SHA-256: ${bundle.identity.bcf_pe_sha256}`, `Trace: ${trace.id} · state ${trace.state_id}`,
         'Semantic labels and physical placement are authored presentation metadata.',
-        'String decode effects are authored; this experiment does not validate string decoding.',
-        'Regions may overlap. This list is not a new CFG or a separate machine function.', '',
+        'Strings use authored single-byte XOR (key 0x5A); this experiment does not validate string decoding.',
+        'Multiple world objects may share one output/region; they are not separate native blocks. Regions may overlap. This list is not a new CFG or a separate machine function.', '',
     ];
     if (bogus) lines.push('PROVEN BOGUS — gameplay crumble metaphor, not successful CPU execution',
         `Proof: ${provenCrumble.proof_id} · guards: ${provenCrumble.guard_ids.join(', ')}`,

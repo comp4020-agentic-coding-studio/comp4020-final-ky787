@@ -370,7 +370,7 @@ async function liftRide(cdp: Cdp) {
     // Walk into the shaft and release the movement key; no continual counter-steering.
     await walkTo(cdp, 1740);
     await waitFor(cdp, 'lift upper landing height', s => s.player.y < 190);
-    await shot(cdp, 'uplink-lift-rider');
+    await shot(cdp, 'control-spine-lift-rider');
     await alignTo(cdp, 1980, 'upper-deck');
 }
 async function checkValidatedFrame(cdp: Cdp, where: string) {
@@ -382,37 +382,39 @@ async function uplinkRoute(cdp: Cdp) {
     await checkValidatedFrame(cdp, 'entry');
     await click(cdp, '#evidence-toggle');
     check('real assembly inspector pauses play and shows PE provenance', !(await snap(cdp)).started && await evaluate(cdp, "document.querySelector('#evidence pre').textContent.includes('0x140001') && document.querySelector('#evidence pre').textContent.includes('BCF PE SHA-256')"));
-    await shot(cdp, 'uplink-assembly-inspector');
+    await shot(cdp, 'control-spine-assembly-inspector');
     await click(cdp, '#evidence select'); await tap(cdp, 'End'); await tap(cdp, 'Enter');
     check('optional bogus inspector retains proof assumptions and real clone assembly', await evaluate(cdp, "document.querySelector('#evidence pre').textContent.includes('bcf_clone_originalBB71alteredBB') && document.querySelector('#evidence pre').textContent.includes('mov dword ptr [rcx + 0x10], 1') && document.querySelector('#evidence pre').textContent.includes('assumptions')"));
-    await shot(cdp, 'uplink-bogus-inspector');
+    await shot(cdp, 'control-spine-bogus-inspector');
     await click(cdp, '#evidence button');
 
-    await shot(cdp, 'uplink-arrival');
-    await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'uplink-overview'); await key(cdp, 'keyUp', 'Tab'); await sleep(700);
+    await shot(cdp, 'control-spine-arrival');
+    await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'control-spine-overview'); await key(cdp, 'keyUp', 'Tab'); await sleep(700);
     await alignTo(cdp, 345); await tap(cdp, 'KeyE');
     await alignTo(cdp, 363); await tap(cdp, 'KeyA'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'uplink cube A', s => s.inputs.cubeOnPlate);
     await checkValidatedFrame(cdp, 'anchor active');
     check('anchor uses immediate retained output', (await snap(cdp)).outputs.grappleAnchor);
+    await shot(cdp, 'control-spine-anchor');
     await walkTo(cdp, 430); await cross(cdp, 780, false, 526);
     await alignTo(cdp, 1120); await tap(cdp, 'KeyE');
     check('UPLINK relay power sets far checkpoint', (await snap(cdp)).outputs.relayGates && (await snap(cdp)).checkpoint === 'relay');
     await tap(cdp, 'KeyE'); check('UPLINK relay power can toggle OFF', !(await snap(cdp)).outputs.relayGates);
     await tap(cdp, 'KeyE');
+    await shot(cdp, 'control-spine-relay-enabled');
     await waitFor(cdp, 'uplink relay save', s => s.persistence.status === 'Saved on server');
     await cdp.send('Page.reload'); await sleep(600);
     await waitFor(cdp, 'uplink far restore', s => s.room === 'uplink' && s.checkpoint === 'relay');
     check('UPLINK reload preserves initial cube and powered gate', (await snap(cdp)).inputs.cubeOnPlate && (await snap(cdp)).outputs.relayGates);
     await checkValidatedFrame(cdp, 'far reload');
-    await shot(cdp, 'uplink-continue-relay'); await click(cdp, '#continue');
+    await shot(cdp, 'control-spine-continue-relay'); await click(cdp, '#continue');
     await gateTrip(cdp, false);
     check('UPLINK player gate B to A', (await snap(cdp)).player.x < 480);
     await alignTo(cdp, 275); await tap(cdp, 'KeyE');
     check('UPLINK retrieve initial payload', (await snap(cdp)).cube!.carried);
     await gateTrip(cdp, true);
     check('UPLINK carried payload reaches far gate', (await snap(cdp)).cube!.carried && (await snap(cdp)).cube!.x > 1300);
-    await shot(cdp, 'uplink-relay-cargo');
+    await shot(cdp, 'control-spine-relay-cargo');
     await alignTo(cdp, 1467); await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'uplink cube B', s => s.inputs.cubeOnPlateB);
     check('UPLINK cube B powers lift and anchor turns off', (await snap(cdp)).outputs.liftField && !(await snap(cdp)).outputs.grappleAnchor);
@@ -420,22 +422,37 @@ async function uplinkRoute(cdp: Cdp) {
     check('UPLINK upper switch latches lift but needs payload', (await snap(cdp)).inputs.switchC && (await snap(cdp)).outputs.codePlatformA && !(await snap(cdp)).outputs.exitDoor);
     await tap(cdp, 'KeyE'); check('UPLINK upper latch cannot be undone', (await snap(cdp)).inputs.switchC);
     await waitFor(cdp, 'upper checkpoint save', s => s.persistence.status === 'Saved on server');
-    await shot(cdp, 'uplink-latched'); await cdp.send('Page.reload'); await sleep(600);
+    await shot(cdp, 'control-spine-latched'); await cdp.send('Page.reload'); await sleep(600);
     await waitFor(cdp, 'upper checkpoint restore', s => s.checkpoint === 'upper' && s.inputs.switchC);
     check('UPLINK upper checkpoint restores cube holding B', (await snap(cdp)).inputs.cubeOnPlateB && (await snap(cdp)).player.x === 1980);
     await checkValidatedFrame(cdp, 'upper reload');
     await click(cdp, '#continue');
-    await alignTo(cdp, 2180); await waitFor(cdp, 'safe drop from upper deck', s => s.player.groundId === 'far');
+    await alignTo(cdp, 2180, 'recovery-step'); await alignTo(cdp, 2080);
+    await waitFor(cdp, 'safe drop from upper deck', s => s.player.groundId === 'far');
     await alignTo(cdp, 1555, 'far'); await tap(cdp, 'KeyE');
     await alignTo(cdp, 1580);
     check('UPLINK retrieve B after latching the lift', (await snap(cdp)).cube!.carried && !(await snap(cdp)).inputs.plateB && (await snap(cdp)).outputs.liftField);
-    await liftRide(cdp); await alignTo(cdp, 2070); await jumpTo(cdp, 2275, 'node-deck');
+    await liftRide(cdp);
+    check('CONTROL SPINE second lift ride carries the payload', (await snap(cdp)).cube!.carried && (await snap(cdp)).player.groundId === 'upper-deck');
+    await alignTo(cdp, 2090); await jumpTo(cdp, 2370, 'service');
+    await shot(cdp, 'control-spine-service-assembly');
+    await alignTo(cdp, 2660); await jumpTo(cdp, 2870, 'node-deck');
+    await alignTo(cdp, 3310);
+    check('CONTROL SPINE player alone on C cannot unlock the return', (await snap(cdp)).inputs.plateC && !(await snap(cdp)).inputs.cubeOnPlateC && !(await snap(cdp)).outputs.exitDoor);
+    await alignTo(cdp, 3267);
     await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'upper payload delivered', s => s.inputs.cubeOnPlateC);
     check('UPLINK payload activates route without remote completion', (await snap(cdp)).outputs.codePlatformB && !(await snap(cdp)).ended);
     await checkValidatedFrame(cdp, 'payload delivered');
-    await shot(cdp, 'uplink-payload');
-    await alignTo(cdp, 2250); await jumpTo(cdp, 2080, 'upper-deck');
+    await shot(cdp, 'control-spine-payload');
+    await sleep(1200); await shot(cdp, 'control-spine-automatic-return-reveal');
+    await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'control-spine-final-overview'); await key(cdp, 'keyUp', 'Tab'); await sleep(700);
+    check('one retained signal materialises all three return sections', (await snap(cdp)).platforms.filter(p => ['upper-route', 'return-mid', 'return-near'].includes(p.id)).every(p => p.enabled));
+    await alignTo(cdp, 2835); await jumpTo(cdp, 2740, 'upper-route');
+    await shot(cdp, 'control-spine-return-route');
+    await alignTo(cdp, 2010); await jumpTo(cdp, 1790, 'return-mid');
+    await alignTo(cdp, 1220); await jumpTo(cdp, 1000, 'return-near');
+    await alignTo(cdp, 490); await jumpTo(cdp, 300, 'uplink-deck');
     await key(cdp, 'keyDown', 'KeyA');
     try { await waitFor(cdp, 'UPLINK exit', s => s.ended); }
     finally { await key(cdp, 'keyUp', 'KeyA'); }
@@ -462,7 +479,7 @@ async function main() {
         await waitFor(cdp, 'selected room saved', s => s.persistence.status === 'Saved on server');
         await cdp.send('Page.reload'); await sleep(600);
         await waitFor(cdp, 'selected room restored', s => s.persistence.visitor !== '' && s.room === 'uplink');
-        check('reload continues the selected room', await evaluate(cdp, "document.querySelector('#continue').textContent.includes('CONTINUE — UPLINK')"));
+        check('reload continues the selected room', await evaluate(cdp, "document.querySelector('#continue').textContent.includes('CONTINUE — CONTROL SPINE')"));
         await click(cdp, '[data-room="pressure"]');
         check('level select returns to an unfinished tutorial', (await snap(cdp)).room === 'pressure' && (await snap(cdp)).progress.completedRooms.length === 0);
         await walkTo(cdp, 260);
@@ -594,14 +611,19 @@ async function main() {
         await shot(cdp, 'continue-uplink');
         // Optional evidence object is explored only AFTER the accepted route completed.
         await click(cdp, '#continue');
-        await alignTo(cdp, 2180); await waitFor(cdp, 'optional region safe floor', s => s.player.groundId === 'far');
-        await jumpTo(cdp, 2310, 'proven-clone');
+        await alignTo(cdp, 2180, 'recovery-step');
+        await jumpTo(cdp, 2360, 'service'); await alignTo(cdp, 2600);
+        await walkTo(cdp, 2740);
+        await waitFor(cdp, 'optional shortcut contact', s => s.player.groundId === 'proven-clone');
         check('optional proven clone arms on physical contact', (await snap(cdp)).platforms.some(p => p.id === 'proven-clone' && p.fuse > 0));
-        await shot(cdp, 'uplink-bogus-contact');
-        await waitFor(cdp, 'proven clone safe recovery', s => s.player.groundId === 'far');
+        await shot(cdp, 'control-spine-bogus-contact');
+        await waitFor(cdp, 'proven clone safe recovery', s => s.player.groundId === 'payload-recovery');
         check('optional proven clone crumbles without death or losing payload', (await snap(cdp)).deaths === 0 && (await snap(cdp)).inputs.cubeOnPlateC && (await snap(cdp)).platforms.some(p => p.id === 'proven-clone' && !p.enabled));
         await waitFor(cdp, 'proven clone reappears', s => s.platforms.some(p => p.id === 'proven-clone' && p.enabled));
-        await shot(cdp, 'uplink-bogus-recovered');
+        await shot(cdp, 'control-spine-bogus-recovered');
+        await alignTo(cdp, 2350); await jumpTo(cdp, 2250, 'recovery-step');
+        await jumpTo(cdp, 2360, 'service');
+        check('bogus recovery returns to service without death or checkpoint reset', (await snap(cdp)).deaths === 0 && (await snap(cdp)).player.groundId === 'service');
         await tap(cdp, 'KeyR'); await click(cdp, '#pause');
         await shot(cdp, 'level-select');
         await click(cdp, '[data-room="relay"]');
@@ -620,8 +642,11 @@ async function main() {
     }
     finally {
         console.log(checks.join('\n'));
-        if (cdp)
+        writeFileSync(join(SHOTS, 'browser-check.txt'), checks.join('\n') + '\n');
+        if (cdp) {
             await shot(cdp, 'last-state');
+            writeFileSync(join(SHOTS, 'last-snapshot.json'), JSON.stringify(await snap(cdp), null, 2));
+        }
         console.log(`screenshots: ${SHOTS}`);
         cdp?.close();
         browser.kill();

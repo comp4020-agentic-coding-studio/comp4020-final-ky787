@@ -1,8 +1,9 @@
 # C8 vertical slice — updated 2026-10-05
 
-Status: three mock tutorial rooms plus **validated-trace UPLINK**. The accepted
-physical puzzle is now driven by the retained Windows OLLVM-16 BCF controller.
-Human playtesting remains the next step; this integration does not redesign the puzzle.
+Status: three mock tutorial rooms plus **CONTROL SPINE**, the enlarged
+**validated-trace UPLINK** showcase. The existing Windows OLLVM-16 BCF controller
+is unchanged; this pass redesigns its physical chamber and adds authored XOR
+presentation. Human playtesting is the next acceptance step.
 
 ## Design and room layouts
 
@@ -33,57 +34,212 @@ return bridge. A cube can then replace a player on Plate B to hold the exit.
 The single-player route requires that return crossing to retrieve the cube. No network
 semantics are implemented or implied.
 
-## UPLINK: the first retrieval puzzle
+## CONTROL SPINE — showcase redesign, 2026-10-05
 
-UPLINK controller signals and assembly use **validated-trace** evidence from
-`uplink_controller_ollvm_bcf_v1`. Machinery geometry/physics and string reveals
-remain authored game abstractions. PRESSURE, SWITCH and RELAY still use
-**mock-greybox** controllers; RELAY retains its explicitly unproven crumble prototype.
+The fourth room is now **CONTROL SPINE**, retaining room ID `uplink`, save schema
+3 and the exact `uplink_controller_ollvm_bcf_v1` adapter. This is a physical
+redesign of UPLINK, not a fifth room or a new controller. The player-facing goal
+is **ROUTE THE PAYLOAD TO THE CORE NODE**. The three tutorials are unchanged.
 
-UPLINK is 2,440 × 1,100. The lower floor is y=860, the upper decks y=260: a
-600-unit ascent. Near architecture ends at x=480 and resumes at x=960, leaving
-a 480-unit death gap. Plate A is at (320,860); the ring is at (780,526).
-The cube cannot be pulled from A by someone standing on the far bank. The
-initial crossing slab is well below the upper decks. Other code slabs accept
-hooks once enabled; the service/upper route remain off until their controller
-conditions hold. The optional crumble is far outside the initial crossing range.
+The machine hall is **3,540 × 1,100**, enlarged from 2,440 units wide. Its lower
+entry and control wings remain at y=860, with the existing 480-unit death gap
+between x=480 and x=960. The far wing ends at x=2260. The upper control deck is
+at (1870,260), the service slab at (2260,280), and the broad core deck begins at
+(2790,260). Node C moved to (3310,260). A raised recovery plinth at y=490 supports
+the upper payload bay; its 370-unit wall prevents lower-wing jump/cube shortcuts.
+An intermediate static step at (2120,385) serves both descent and recovery.
+A brief entry overview establishes the distant exit and major wings without Tab;
+normal follow view resumes after the first 2.2 seconds of play.
 
-The relay switch at (1140,860) powers the fixed R1 pair, whose two doorways are
-at x=120 and x=1300. Both face right into clear floor space. Plate B (1510,860)
-powers the 240-unit-wide lift shaft at x=1630–1870; the field extends from y=860
-to y=150. Its top gently holds riders above the upper landing instead of ejecting
-them. The upper latch is at (1970,260). A 100-unit safe drop between the control
-deck (1870–2130) and payload deck (2230–2440) provides a return route to the
-machinery floor and a forgiving jump to the node. Node C is at (2320,260).
-The final exit is back to the left, at (1110,120), on a separate upper shelf.
+The exit is back above the entry, at (210,30), on a static shelf at y=170. Three
+initially ghosted upper return sections span x=470–1090, 1200–1880 and 1990–2820,
+also at y=170. The final route crosses the entire hall without retracing the lower
+relay/cargo journey. Its gaps are 110 units; the upper cargo gaps are 130 and 110.
+Broad landings and the existing held jump are sufficient. No movement tuning changed.
 
-Intended solution:
+### Intended flow (design notes, not printed in game)
 
-1. Put the cube on A; grapple across the gap. Power the relay with the far lever.
-   This sets the far checkpoint. The relay switch remains a genuine ON/OFF toggle.
-2. Enter gate B to return to the near side. Retrieve the cube, carry it through
-   A → B, and leave it on Plate B. The crossing slab turns off; the lift powers up.
-3. Ride the lift, steer right onto the broad control deck, and operate the upper
-   latch. It permanently holds lift power, lights the service landing, and sets
-   the upper checkpoint. The final route remains ghosted and the exit closed.
-4. Drop through the safe gap to the floor, return for the cube on B, and ride
-   the now-latched lift carrying it. Jump the short deck gap and put it on C.
-5. C requires a **cube payload**: player occupancy alone does not qualify. It
-   materialises the upper return route across the lift and opens the exit.
-   Leave the cube on C, jump back onto the control deck and follow the new route
-   left to the exit. Being on the payload deck does not remotely finish the room.
+1. Leave the cube on **A (320,860)**. Its real anchor at (780,526) lights immediately.
+   Grapple the first gap, leaving the payload behind. The gap cannot be jumped.
+2. Toggle **relay power (1140,860)**. R1's two fixed gates at x=120 and x=1300 power
+   up and the far checkpoint is saved. Return through B → A, retrieve the cube,
+   and carry it through A → B. This is the first retrieval loop.
+3. Leave the cube on **B (1510,860)** to power the existing lift at x=1630–1870.
+   Ride alone to the upper control deck. Removing B's cube now still cuts power.
+4. Set the physical **lift latch (1970,260)**. It stays set, saves the upper
+   checkpoint, holds the lift on and illuminates the service slab. The upper
+   status says LIFT FIELD LATCHED; the service listing says PAYLOAD STILL REQUIRED.
+5. Walk off the right of the control deck onto the intermediate static step,
+   then take its left drop to the lower control wing. Retrieve B's cube and ride
+   the latched lift again, carrying it. This is the second retrieval loop; no
+   death reset is part of the solution.
+6. Cross the upper bay with two ordinary jumps via the activated service slab.
+   A lower, plausible code shortcut under the second gap is the optional proven
+   clone. Missing either jump or trying the shortcut lands on the recovery
+   plinth. Walk left, jump to the intermediate step and jump back to service.
+7. Put the cube on **Node C**. Player occupancy alone, including a player carrying
+   the cube, does not satisfy the cargo input. The three return sections appear
+   together and the exit unlocks. A 2.2-second authored camera reveal frames the
+   new route and distant exit; controls and binary outputs remain immediate.
+8. Leave the cube on C. Hop onto the higher return route, cross its broad sections
+   and enter the exit above the entry wing. The clone is never required.
 
-The environment states the goal, “GET THE PAYLOAD TO THE UPPER NODE”, and labels
-mechanisms. It does not print this solution. The relay and upper latch each
-create a reason to go back for a cube that had to be left behind. The lower
-floor is safe except for the initial grapple pit. Falling from the upper area
-costs travel, not a full puzzle reset. R returns to the latest checkpoint.
+The puzzle asks the player to free a payload from a previously necessary job
+**twice**. Controls are distributed around a lower loop, vertical shaft, upper
+cargo bay and separate return loop. Mechanism names and visible power changes
+suggest dependencies; no solution checklist or assembly knowledge is required.
 
-Future co-op interpretation: one player can hold A while another crosses and
-powers the relay; either can then return through the pair. A player can hold B
-while a partner rides and latches the lift, freeing the first player to move.
-The final cargo condition currently requires the cube. These are physical roles,
-not implemented multiplayer or synchronization semantics.
+### One validated output, several physical objects
+
+| Retained output | Authored physical manifestation | Actual retained presentation binding |
+| --- | --- | --- |
+| `grappleAnchor` | Initial crossing slab (`anchor`) | `grapple-anchor-display` |
+| `relayGates` | Fixed R1 gate pair; assembly beneath its power switch, none on the gates | `relay-control-display` |
+| `liftField` | Existing bounded lift volume/emitter; assembly below it | `lift-control-display` |
+| `codePlatformA` | Payload-bay `service` slab | `service-landing-display` |
+| `codePlatformB` | `upper-route`, `return-mid`, `return-near` together | All three share `payload-route-display` |
+| `exitDoor` | Exit above the original entry; assembly below its architecture | `exit-display` |
+| `bridge` | No physical manifestation; retained value remains false | No invented region |
+
+`assemblyBinding` is frontend presentation metadata for additional manifestations.
+The original exported object IDs still resolve. Debug exposes each object's
+signal, authored label and explicit binding alias. Evidence explains that repeated
+listings are the **same output/region**, not extra native basic blocks. The final
+route shows three real instructions per listing, including the actual output
+store; other controlled machinery retains up to five. The clone keeps all six.
+The return listing is offset beneath its slab to clear the service listing.
+
+The five inputs remain exactly `plateA`, `switchB`, `plateB`, `switchC`,
+`cubeOnPlateC`. `validatedTraceController` and the bundle are unchanged. Physical
+state selects the same retained row/trace; there are no supplemental mock UPLINK
+outputs or coordinate-dependent controller conditions. Switch C's memory remains
+in the physical latch. All existing trace occurrences, ordering, semantic writes,
+real addresses, raw bytes and inspector provenance remain authoritative.
+
+### Authored single-byte XOR presentation
+
+`src/slice/xor-presentation.ts` stores selected messages as encoded byte arrays
+with fixed key **0x5A**. `byte XOR 0x5A` produces each character. Activation reveals
+characters from left to right, showing the still-encoded bytes as hexadecimal;
+there is no random ciphertext, PE execution or cryptographic-security claim.
+Messages include RELAY LINK ESTABLISHED, LIFT FIELD ONLINE, LIFT FIELD LATCHED,
+PAYLOAD STILL REQUIRED, RETURN PATH UNLOCKED and UPLINK READY.
+
+`MachinePresentation` remains the replaceable adapter. It selects this authored
+byte sequence from an already-applied controller frame; presentation never drives
+physics. Tests check exact decoded text, inactive masking, partial reveals,
+clamped progress and the authored label. Menu, debug and Evidence identify this
+as **authored single-byte XOR presentation**, independent of the OLLVM evidence.
+This is not an OLLVM/Hikari/Polaris/Tigress string-decoding experiment.
+
+**Real evidence:** unchanged OLLVM PE/controller identity, 32 canonical retained
+states, clean/BCF agreement, chronological traces, semantic output writes, curated
+assembly regions and linked BCF clone proof. The portable read-only verifier still
+passes from the shared experiment. Nothing in that workspace was rebuilt or altered.
+
+**Authored abstraction:** all floor/slab positions, repeated physical manifestations,
+collision, grapple, relay and lift physics, crate handling, checkpoint policy,
+crumble timers, camera reveal, semantic labels and XOR messages/animation.
+
+### Optional clone and recovery
+
+`bcf_clone_originalBB71alteredBB` is the one `crumble-proven` slab at **(2670,330)**,
+200 × 28, under the last cargo jump. It looks like a lower route onto the core
+deck. Ordinary play shows its real address and **UNSTABLE**; Evidence's analysis
+checkbox can reveal **PROVEN BOGUS** without removing any of its six instructions.
+It keeps the same raw block, native range and retained proof described below.
+
+Contact starts the existing 0.6-second fuse; it returns after 2.4 seconds. Falling
+lands on `payload-recovery` at y=490. An ordinary walking/jumping route returns
+through `recovery-step` to `service`, with the payload and latch intact. Both unit
+and browser checks traverse that recovery. The accepted solution completes before
+the browser tries the clone. Its physical collapse is a metaphor: the successful
+controller trace does not execute these unreachable instructions. Nonexecution
+alone is never treated as proof.
+
+### Persistence and future co-op
+
+The existing entry/far/upper logical checkpoints still fit their original static
+platforms. A/B/C placements reconstruct from the current authored coordinates;
+old UPLINK saves therefore place a saved C payload at the new core, without a
+schema migration. Transferred loose cargo still restores at the safe lower dock
+(1400,838). No animation, grapple, cooldown, velocity or camera reveal is saved.
+Tests reload at relay power, at the upper latch with B occupied, and with the
+cube on C; actual server restart tests reconstruct the validated outputs too.
+
+Future roles remain physical and legible: one partner holds A while another
+crosses/powers the relay; one holds B while the other sets the upper latch; the
+freed partner retrieves the cube. C eventually needs the payload itself. No fake
+players, networking, new schema, or multiplayer authority are implemented.
+
+### Playtest review and remaining human questions
+
+The real-control browser route completes both retrieval loops, two lift rides,
+service jumps and the final return with **zero deaths**. It also returns from the
+optional crumble safely without R, preserves all checkpoint reloads, and checks
+that a carried cube does not satisfy C. Geometry tests cover initial run-jumps,
+cube-assisted lower-wing jumps, attempted hooks to the clone from below, initial
+re-hook ascent, B losing power, and full recovery while the final route is off.
+
+A repeat browser run exposed a marginal uphill jump from service to the core.
+Widening the service slab shortened that gap from 150 to 110 units; the tests
+still require the complete route and safe recovery.
+
+The first screenshot review found a crowded upper bay: the final-route listing
+and service label overlapped. Its three-instruction excerpt and offset listing
+now leave the service assembly readable. The descent step is labelled toward the
+lower wing. The initial jump/grapple, lift response and relay exit tolerances are
+unchanged. This is reachability/behaviour evidence, not a claim that human fun is
+proven by automation.
+
+Manual playtest questions:
+
+- Does the relay activation suggest the first retrieval without additional hints?
+- Does LIFT FIELD LATCHED make the second retrieval obvious enough, while still
+  leaving the player to plan the trip?
+- Does the intermediate step read as a safe descent and recovery route? It needs
+  a short turn left to get all the way down; walking right enters the cargo bay.
+- Are the two cargo jumps comfortable with normal held Space, including carrying?
+  The safe recovery costs a short climb; it does not reset solved machinery.
+- Does the 2.2-second route reveal help orientation without feeling disruptive?
+  Distant assembly is small during the reveal; normal view/Evidence retain detail.
+- Is the single unstable shortcut tempting enough before its analysis is revealed?
+- Is the final return satisfying or too long? Its broad platforms need only three
+  gap jumps after the first hop up from the core.
+
+Known inherited limit: grapple rays do not occlude behind architecture. The raised
+plinth/range checks prevent the obvious lower-wing clone shortcut in this layout;
+no exhaustive proof over every possible input sequence is claimed. Human review
+of re-hooking and the new upper bay remains useful before accepting the chamber.
+
+### CONTROL SPINE validation record
+
+- `pnpm typecheck`, `pnpm build`, pinned bundle/hash validation: passed.
+- `pnpm test:unit`: **158 passed**, two existing conditional skips. Includes real
+  process-kill/restart persistence at the far, upper-latch and final C states.
+- `pnpm test`: both HTTP invariants passed against the Node production server.
+- `pnpm check:evidence`: passed (course process/reflection evidence).
+- Shared experiment `python3 -I -B verify_bundle.py`: PASS, read-only; 32 states,
+  32 traces, 224 semantic commits, six curated regions, retained BCF proof checks.
+- Full real-control browser route: **70 assertions passed**, zero CONTROL SPINE
+  deaths, zero console errors. No world/controller overrides or external teleports.
+  Screenshots and the exact assertion log are retained in `docs/playtest/`.
+
+Useful captures: [overview](playtest/control-spine-overview.png),
+[anchor](playtest/control-spine-anchor.png),
+[relay](playtest/control-spine-relay-enabled.png),
+[lift](playtest/control-spine-lift-rider.png),
+[latch](playtest/control-spine-latched.png),
+[assembly](playtest/control-spine-service-assembly.png),
+[crumble contact](playtest/control-spine-bogus-contact.png),
+[safe recovery](playtest/control-spine-bogus-recovered.png),
+[Node C](playtest/control-spine-payload.png),
+[automatic return reveal](playtest/control-spine-automatic-return-reveal.png),
+[return route](playtest/control-spine-return-route.png),
+[assertion log](playtest/control-spine-browser.txt).
+
+The existing Vite advisory remains: the retained-evidence game chunk is about
+934 KB / 103 KB gzip. No deployment, multiplayer or new binary was attempted.
 
 ## Reusable LiftField and RelayGatePair contracts
 
@@ -189,7 +345,7 @@ Neither the binary nor its traces own geometry, physics or animation timing.
 
 World output transitions pulse the bound platforms. `MachinePresentation`
 receives the controller frame and selects authored text for the display. Its
-hex-to-readable animation is deliberately cosmetic. Replace this presentation
+byte-to-readable XOR animation is deliberately authored presentation. Replace this presentation
 adapter with genuine retained string-decoding events when available; current
 text is not Hikari, Polaris, Tigress or OLLVM evidence.
 
@@ -265,17 +421,12 @@ state. Inspector/reveal state and trace timing are not saved.
 ### Proven clone as an optional physical metaphor
 
 Recommended candidate `bcf_clone_originalBB71alteredBB`, raw block `bb_000018AA`,
-native range `0x1400018AA–0x1400018C7` (exclusive), is represented by a new optional
-200×28 platform at **(2220,740)** above the existing safe floor y=860. This is the
-only geometry addition. It is clear of the accepted x=2180 return drop, introduces
-no anchor, and cannot reach the upper node. The full solution works without it.
-Contact uses the existing 0.6 s crumble / 2.4 s respawn behaviour; falling loses no
-puzzle state. The code plaque shows all six real instructions unchanged.
-
-Ordinary play labels the slab with its real native address and a CODE type tag. The inspector exposes its
-proof immediately; its reveal checkbox can show its **BOGUS** type without removing
-or simplifying any instruction. The clone resembles codePlatformB/exit writes,
-but those unreachable instructions are **not** replayed as successful output events.
+native range `0x1400018AA–0x1400018C7` (exclusive), is now the optional lower
+shortcut in CONTROL SPINE's upper cargo bay. See the current placement/recovery
+contract above. Contact retains 0.6 s crumble / 2.4 s respawn. The address and all
+six native instructions remain unchanged. Normal play says UNSTABLE; the inspector
+reveals PROVEN BOGUS and the retained proof. None of those unreachable instructions
+are replayed as successful output events.
 
 Proof is linked to `opaque_guard_25` and `opaque_guard_26`, frozen IR clone origin,
 actual compiler/native mapping and the retained universal 32-bit parity argument.
@@ -295,9 +446,9 @@ and linked bogus-clone provenance/proof under the documented assumptions.
 
 **Authored:** all room placements, platform collision, grapple/relay/lift physics,
 checkpoint policy, crumble timing, semantic labels, playback speed, and every
-encoded-looking → readable flavour string. RELAY LINK ESTABLISHED, LIFT FIELD
+XOR-encoded → readable flavour string. RELAY LINK ESTABLISHED, LIFT FIELD
 ONLINE, ROUTE UNLOCKED and UPLINK READY remain `MachinePresentation` effects.
-No string encryption/decoding evidence is claimed by this integration.
+The XOR is authored frontend presentation; no PE string-decoding evidence is claimed.
 
 Save schema stays version 3. Reload reconstructs switches, latches, checkpoint and
 important cube placement, then selects a fresh validated frame. Far checkpoint,
@@ -428,7 +579,7 @@ cookies loses the browser's reference to its anonymous save. Initial API
 failure offers explicitly unsaved play; it does not pretend local state was
 written to the server.
 
-## UPLINK playtest review and remaining questions
+## Prior UPLINK playtest review (before CONTROL SPINE)
 
 Automated playback completed UPLINK without a death, using ordinary input events
 and no world/controller overrides. Both gate directions, two lift rides, safe
@@ -476,7 +627,7 @@ latching, final cube-only occupancy, and blocked/out-of-room gate exits. Known
 through-wall hook targeting remains a limitation of the inherited grapple;
 UPLINK keeps the only anchor below and out of range of its upper machinery.
 
-## Validation and playtest observations
+## Earlier vertical-slice validation and playtest observations
 
 - `pnpm typecheck`: passed.
 - `pnpm test:unit`: 145 passed, 2 existing conditional tests skipped for tutorial

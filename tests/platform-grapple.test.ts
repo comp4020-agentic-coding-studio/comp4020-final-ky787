@@ -15,16 +15,16 @@ describe('address slabs as grapple surfaces', () => {
             expect(p.solid.grappleable).toBe(p.def.kind !== 'static' && p.solid.enabled);
             if (p.def.kind === 'code') expect(grappleBox(p.solid)).toEqual({ x: p.def.x, y: p.def.y, w: p.def.w, h: 24 });
         }
-        Object.assign(w.player, { x: 1505, y: 620 });
-        expect(w.target({ x: 1505, y: 470 })?.solid.id).toBe('service');
-        for (let i = 0; i < 30; i++) w.step(FIXED_DT, { ...emptyInput(), grapplePressed: i === 0, grappleHeld: true, aim: { x: 1505, y: 470 } });
+        Object.assign(w.player, { x: 2400, y: 440 });
+        expect(w.target({ x: 2400, y: 290 })?.solid.id).toBe('service');
+        for (let i = 0; i < 30; i++) w.step(FIXED_DT, { ...emptyInput(), grapplePressed: i === 0, grappleHeld: true, aim: { x: 2400, y: 290 } });
         expect(w.player.rope.phase).toBe('attached'); expect(w.player.rope.anchorId).toBe('service');
         w.cancelGrapple();
-        Object.assign(w.player, { x: 1505, y: 420 });
-        expect(w.target({ x: 1505, y: 270 })?.solid.id).toBe('upper-route');
+        Object.assign(w.player, { x: 2750, y: 270 });
+        expect(w.target({ x: 2750, y: 180 })?.solid.id).toBe('upper-route');
         // Aim at the decorative listing alone: it never catches the rope.
-        Object.assign(w.player, { x: 1900, y: 540 });
-        expect(w.target({ x: 1505, y: 540 })).toBeNull();
+        Object.assign(w.player, { x: 2750, y: 430 });
+        expect(w.target({ x: 2400, y: 430 })).toBeNull();
     });
     it('catches the full crossing bar while keeping its tuned attachment centre', () => {
         const w = new PuzzleWorld(roomById('switch'), { ...freshProgress().rooms.switch, switchB: true });
@@ -35,13 +35,13 @@ describe('address slabs as grapple surfaces', () => {
         expect(w.target({ x: 845, y: 226 })?.point).toEqual({ x: 770, y: 226 });
     });
     it('plausible crumble slabs accept hooks only while present', () => {
-        const w = world(), p = w.platforms.find(p => p.def.id === 'proven-clone')!;
-        Object.assign(w.player, { x: 2080, y: 800 });
-        expect(w.target({ x: 2300, y: 745 })?.solid.id).toBe(p.def.id);
-        Object.assign(w.player, { x: 2300, y: 710, vy: 20 });
+        const w = new PuzzleWorld(roomById('uplink'), { ...freshProgress().rooms.uplink, switchC: true, cubeOnPlateB: true }), p = w.platforms.find(p => p.def.id === 'proven-clone')!;
+        Object.assign(w.player, { x: 2450, y: 470 });
+        expect(w.target({ x: 2740, y: 336 })?.solid.id).toBe(p.def.id);
+        Object.assign(w.player, { x: 2740, y: 300, vy: 20 });
         for (let i = 0; i < 170; i++) w.step(FIXED_DT, emptyInput());
         expect(p.solid.enabled).toBe(false); expect(p.solid.grappleable).toBe(false);
-        expect(w.target({ x: 2300, y: 745 })).toBeNull();
+        expect(w.target({ x: 2740, y: 336 })).toBeNull();
         for (let i = 0; i < 300; i++) w.step(FIXED_DT, emptyInput());
         expect(p.solid.grappleable).toBe(true);
     });

@@ -8,6 +8,7 @@ import { TracePlayback, bogusInstructions, evidenceDetails, machineExcerpt, prov
 import { PuzzleWorld } from '../src/slice/world.ts';
 import { roomById } from '../src/slice/rooms.ts';
 import { freshProgress } from '../src/slice/progress.ts';
+import { platformListing } from '../src/slice/evidence-render.ts';
 import { emptyInput } from '../src/engine/physics.ts';
 import { FIXED_DT } from '../src/engine/constants.ts';
 const inputNames = ['plateA', 'switchB', 'plateB', 'switchC', 'cubeOnPlateC', 'cubeOnPlate', 'cubeOnPlateB', 'plateC'] as const;
@@ -107,10 +108,10 @@ describe('retained UPLINK controller evidence', () => {
         expect(bogusInstructions().map(i => `${i.mnemonic} ${i.op_str}`.trim())).toEqual(provenCrumble.instructions.map(i => i.text));
         expect(evidenceDetails(provenCrumble.id, bundle.traces[0])).toContain('PROVEN BOGUS');
         const w = new PuzzleWorld(room, freshProgress().rooms.uplink);
-        Object.assign(w.player, { x: 2320, y: 710, vy: 20 });
+        Object.assign(w.player, { x: p.x + p.w / 2, y: p.y - 30, vy: 20 });
         const tick = (n: number) => { for (let i = 0; i < n; i++) w.step(FIXED_DT, emptyInput()); };
         tick(20); expect(w.player.groundId).toBe(p.id);
-        tick(140); expect(w.player.groundId).toBe('far'); expect(w.deaths).toBe(0);
+        tick(140); expect(w.player.groundId).toBe('payload-recovery'); expect(w.deaths).toBe(0);
         expect(w.platforms.find(s => s.def.id === p.id)!.solid.enabled).toBe(false);
         tick(300); expect(w.platforms.find(s => s.def.id === p.id)!.solid.enabled).toBe(true);
         expect(w.frame.outputs.exitDoor).toBe(false);
@@ -126,4 +127,22 @@ describe('retained UPLINK controller evidence', () => {
         expect(restored.frame.outputs).toEqual(bundle.state_table[uplinkStateKey(restored.inputs)].expected_outputs);
         expect(JSON.stringify(w.memory())).not.toMatch(/trace|velocity|animation|seconds/);
     });
+    it('multiple physical return sections share one retained output and instruction region in every state', () => {
+        const w = new PuzzleWorld(roomById('uplink'), freshProgress().rooms.uplink);
+        const sections = w.platforms.filter(p => p.def.signal === 'codePlatformB');
+        expect(sections).toHaveLength(3);
+        for (let key = 0; key < 32; key++) {
+            const frame = validatedTraceController.evaluate('uplink', inputs(key));
+            const replay = new TracePlayback(); replay.update(frame, 0);
+            const expected = machineExcerpt('payload-route-display', replay.trace!, 3);
+            expect(expected).toHaveLength(3);
+            expect(expected.some(i => i.address === replay.trace!.semantic_events.find(e => e.output === 'codePlatformB')!.instruction_address)).toBe(true);
+            for (const section of sections) expect(platformListing(section, replay)).toEqual(expected);
+        }
+        const extra = sections.find(p => p.def.id === 'return-mid')!;
+        extra.def = { ...extra.def, assemblyBinding: 'invented-native-region' };
+        const replay = new TracePlayback(); replay.update(w.frame, 0);
+        expect(() => platformListing(extra, replay)).toThrow('Missing or mismatched');
+    });
+
 });

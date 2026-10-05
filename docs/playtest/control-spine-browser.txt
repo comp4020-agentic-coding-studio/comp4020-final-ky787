@@ -1,0 +1,70 @@
+PASS new visitor starts at pressure
+PASS all four rooms available from the menu
+PASS level select supports keyboard navigation
+PASS selecting UPLINK does not complete skipped rooms
+PASS UPLINK direct room selection: validated state 0
+PASS reload continues the selected room
+PASS level select returns to an unfinished tutorial
+PASS cube carried
+PASS cube holds plate after player leaves
+PASS inactive anchor has no collision or hook
+PASS switch enables anchor immediately
+PASS switch can be turned off
+PASS pit respawns quickly without losing switch progress
+PASS ground Space jumps without firing a hook
+PASS air hook uses visible target preview
+PASS tapped airborne Space latches the hook
+PASS switch physical grapple crossing — x=1065
+PASS cube pulls toward player without attaching player
+PASS pulled cube can be carried
+PASS relay physical grapple crossing — x=1094
+PASS bridge locks but exit still requires Plate B
+PASS relay bridge lever cannot switch back off
+PASS return bridge supports player
+PASS checkpoint reset keeps solved machinery
+PASS reload offers CONTINUE — RELAY
+PASS reload restores checkpoint, plate and bridge
+PASS retrieve cube from A across permanent bridge
+PASS removing cube disables anchor but keeps bridge and closed exit
+PASS cube transferred to B opens the exit
+PASS reload restores cube at B with bridge and exit open
+PASS player stands on cube while it holds Plate B
+PASS crumble does not kill player
+PASS debug exposes mock inputs and persistence
+PASS three tutorial rooms complete
+PASS UPLINK entry: validated state 0
+PASS real assembly inspector pauses play and shows PE provenance
+PASS optional bogus inspector retains proof assumptions and real clone assembly
+PASS UPLINK anchor active: validated state 1
+PASS anchor uses immediate retained output
+PASS uplink physical grapple crossing — x=1079
+PASS UPLINK relay power sets far checkpoint
+PASS UPLINK relay power can toggle OFF
+PASS UPLINK reload preserves initial cube and powered gate
+PASS UPLINK far reload: validated state 3
+PASS UPLINK player gate B to A
+PASS UPLINK retrieve initial payload
+PASS UPLINK carried payload reaches far gate
+PASS UPLINK cube B powers lift and anchor turns off
+PASS UPLINK upper switch latches lift but needs payload
+PASS UPLINK upper latch cannot be undone
+PASS UPLINK upper checkpoint restores cube holding B
+PASS UPLINK upper reload: validated state 14
+PASS UPLINK retrieve B after latching the lift
+PASS CONTROL SPINE second lift ride carries the payload
+PASS CONTROL SPINE player alone on C cannot unlock the return
+PASS UPLINK payload activates route without remote completion
+PASS UPLINK payload delivered: validated state 26
+PASS one retained signal materialises all three return sections
+PASS UPLINK full retrieval route has no deaths
+PASS four-room completion saved
+PASS reload restores UPLINK latch, payload and final route
+PASS UPLINK Node C reload: validated state 26
+PASS optional proven clone arms on physical contact
+PASS optional proven clone crumbles without death or losing payload
+PASS bogus recovery returns to service without death or checkpoint reset
+PASS selecting a completed room restores its checkpoint and cube
+PASS returning to UPLINK keeps upper latch and final payload
+PASS UPLINK return through level select: validated state 26
+PASS compact menu selects rooms with saved switch state
+PASS no console errors
