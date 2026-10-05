@@ -1,0 +1,152 @@
+{
+  "retrieved": "2026-10-05",
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "assets": [
+    {
+      "file": "grapple-fire.ogg",
+      "original": "laserSmall_002.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously loudness-normalised and encoded as Vorbis.",
+      "sha256": "efa465fa2f8a98159a7b13e8552dcc40df78919b633ec89facdc0517c8c7ba59",
+      "bytes": 10826
+    },
+    {
+      "file": "grapple-attach.ogg",
+      "original": "laserSmall_003.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously loudness-normalised and encoded as Vorbis.",
+      "sha256": "6d8f48c38fe522b26937d5f9626dc80ccd6804f0adbc311a7e49011b90eeab34",
+      "bytes": 9553
+    },
+    {
+      "file": "grapple-reel.ogg",
+      "original": "computerNoise_002.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously high-pass filtered and re-encoded for a quiet reel loop.",
+      "sha256": "1102f8d58b122f83ab1282c492d2cb8c146044fb4c930648b6c48db407d08c94",
+      "bytes": 56045
+    },
+    {
+      "file": "landing.ogg",
+      "original": "landing.ogg",
+      "author": "yd",
+      "source": "https://opengameart.org/content/platformer-sounds-terminal-interaction-door-shots-bang-and-footsteps",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously repaired Vorbis metadata, capped at 1 second.",
+      "sha256": "d22c2f675cf8fa8454c0d420d17ccb04c211efce2426fcc106e36c4537855f16",
+      "bytes": 7340
+    },
+    {
+      "file": "crumble-start.ogg",
+      "original": "computerNoise_003.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously trimmed to .78s, high-pass filtered, tremolo, faded and loudness-normalised.",
+      "sha256": "88d2c5b2f1fede9f10dfa44850950516f2c701631a138efe8663c019a149d972",
+      "bytes": 16721
+    },
+    {
+      "file": "crumble-break.ogg",
+      "original": "explosionCrunch_000.ogg + forceField_004.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously mixed and loudness-normalised.",
+      "sha256": "d69a1b25ba2058757da2a9b6a4e345d85d26accf80d8f03a6231dfda43ae71e0",
+      "bytes": 16092
+    },
+    {
+      "file": "firewall-open.ogg",
+      "original": "forceField_001.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously loudness-normalised and re-encoded.",
+      "sha256": "64ed15deca96cf688a7091cbb3866ac109f5561b97dc0eec6931cc16e6283c88",
+      "bytes": 14799
+    },
+    {
+      "file": "confirm.ogg",
+      "original": "beep_message.ogg",
+      "author": "yd",
+      "source": "https://opengameart.org/content/platformer-sounds-terminal-interaction-door-shots-bang-and-footsteps",
+      "license": "CC0-1.0",
+      "processing": "Copied byte-for-byte from Crit 5. Previously trimmed to .85s, faded and loudness-normalised.",
+      "sha256": "6ff6f4eb094a54d9757c2f9d7a54e96a8e9934b79951d6388835c071ae13ad07",
+      "bytes": 23465
+    },
+    {
+      "file": "teleport.ogg",
+      "original": "teleport_02.ogg",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/50-cc0-sci-fi-sfx",
+      "license": "CC0-1.0",
+      "processing": "aformat=channel_layouts=mono, afade=t=in:d=0.01, afade=t=out:st=1.673946:d=0.07, volume=-0.800dB; 44.1kHz mono Vorbis q4.",
+      "sourceSha256": "1776e7df75bad4b5eacae95b9f7075a0a789fbd08f1954e7651c90ac17203e4b",
+      "sha256": "f58f0faaafe6f0fae582b95982b442bdeff606c43f9ec22004c03b55c95ab3b2",
+      "bytes": 17771
+    },
+    {
+      "file": "lift-on.ogg",
+      "original": "forceField_000.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "aformat=channel_layouts=mono, afade=t=in:d=0.01, afade=t=out:st=0.8840140000000001:d=0.07, volume=-5.100dB; 44.1kHz mono Vorbis q4.",
+      "sourceSha256": "c2916f2a062c8ddd1aca2826d134fe90847037db31342726ffb0f9097afe339c",
+      "sha256": "1c219fbfd05a1506f43a00a906e7f06ffd4c759a32005fbc7247bf893848ea88",
+      "bytes": 11012
+    },
+    {
+      "file": "lift-hum.ogg",
+      "original": "spaceEngineLow_003.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "aformat=channel_layouts=mono, lowpass=f=1800, afade=t=in:d=0.01, afade=t=out:st=4.93:d=0.07, volume=-5.000dB; 44.1kHz mono Vorbis q4.",
+      "sourceSha256": "e8f7ce4dbc20b5aeead35b94f1c8927b0baa416edaa5b39f1699703031111488",
+      "sha256": "16c184aaf81022c08d6028500438f8e3b1221658573540175243672ab4ddb18b",
+      "bytes": 23197
+    },
+    {
+      "file": "relay-on.ogg",
+      "original": "forceField_003.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "aformat=channel_layouts=mono, afade=t=in:d=0.01, afade=t=out:st=0.8859410000000001:d=0.07, volume=-5.100dB; 44.1kHz mono Vorbis q4.",
+      "sourceSha256": "15e3fe971ffd3415e5ab641d3a4d043fb31f6712b0956315b524ba29c3889cda",
+      "sha256": "6386ed2efde78513bdb365dbb03606bde4910d9f7904bb8f424e5c5f2cf16e04",
+      "bytes": 10957
+    },
+    {
+      "file": "door-open.ogg",
+      "original": "doorOpen_000.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "aformat=channel_layouts=mono, afade=t=in:d=0.01, afade=t=out:st=0.46161:d=0.07, volume=-3.700dB; 44.1kHz mono Vorbis q4.",
+      "sourceSha256": "5b7e07eccd4413ad9ef3720c2d14f9cc699f4c50111e9b2f48bd60e6f1a164c3",
+      "sha256": "7d3af28ddd81187c3788b79129d053fd7064e181a7f45018c8018b5f1cb3536a",
+      "bytes": 9319
+    },
+    {
+      "file": "metal-touch.ogg",
+      "original": "impactMetal_002.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "processing": "aformat=channel_layouts=mono, afade=t=in:d=0.01, afade=t=out:st=0.401111:d=0.07, volume=2.100dB; 44.1kHz mono Vorbis q4.",
+      "sourceSha256": "0c1bb4db8a4d48b2b8c2e65a175d9056b845f1063837599995d81be1c5957d2c",
+      "sha256": "4b88bbe677fa972dba77922a913cab39cfebff8fe8d683957db5c94477679806",
+      "bytes": 6267
+    }
+  ]
+}

@@ -139,6 +139,8 @@ const KEYS: Record<string, {
     vk: number;
 }> = {
     End: { key: 'End', vk: 35 },
+    Home: { key: 'Home', vk: 36 },
+    PageUp: { key: 'PageUp', vk: 33 },
     Enter: { key: 'Enter', vk: 13 },
     Escape: { key: 'Escape', vk: 27 },
     KeyA: { key: "a", vk: 65 },
@@ -218,6 +220,8 @@ interface Snap {
     overviewVisible: boolean;
     connections: { id: string; powered: boolean }[];
     progress: Progress;
+    audio: { state: string; active: boolean; loaded: number; failed: string[]; voices: number; loops: string[];
+        played: Record<string, number>; peak: number; preferences: { volume: number; muted: boolean } };
     platforms: {
         id: string;
         enabled: boolean;
@@ -368,10 +372,27 @@ async function gateTrip(cdp: Cdp, toFar: boolean) {
     try { await waitFor(cdp, 'relay transit', s => toFar ? s.player.x > 1300 : s.player.x < 480); }
     finally { await key(cdp, 'keyUp', direction); await sleep(160); }
 }
+let checkedLiftAudio = false;
 async function liftRide(cdp: Cdp) {
     // Walk into the shaft and release the movement key; no continual counter-steering.
+    await shot(cdp, 'audio-lift-label-lower');
     await walkTo(cdp, 1740);
     await waitFor(cdp, 'lift upper landing height', s => s.player.y < 602);
+    if (!checkedLiftAudio) {
+        check('powered lift has one audible local hum', (await snap(cdp)).audio.loops.includes('liftHum') && (await snap(cdp)).audio.peak > 0);
+        await click(cdp, '#pause');
+        check('menu pauses machinery audio', !(await snap(cdp)).audio.active && (await snap(cdp)).audio.voices === 0);
+        await click(cdp, '#continue');
+        await waitFor(cdp, 'lift hum resumes', s => s.audio.loops.includes('liftHum'));
+        const original = await cdp.send('Target.getTargetInfo') as { targetInfo: { targetId: string } };
+        const other = await cdp.send('Target.createTarget', { url: 'about:blank' }) as { targetId: string };
+        await cdp.send('Target.activateTarget', { targetId: other.targetId }); await sleep(200);
+        check('background tab silences lift and reel', !(await snap(cdp)).audio.active && (await snap(cdp)).audio.voices === 0);
+        await cdp.send('Target.activateTarget', { targetId: original.targetInfo.targetId });
+        await cdp.send('Target.closeTarget', { targetId: other.targetId });
+        await waitFor(cdp, 'lift sound after returning to tab', s => s.audio.loops.includes('liftHum'));
+        checkedLiftAudio = true;
+    }
     await shot(cdp, 'control-spine-lift-rider');
     await alignTo(cdp, 1980, 'upper-deck');
 }
@@ -410,6 +431,7 @@ async function uplinkRoute(cdp: Cdp) {
     await walkTo(cdp, 430); await cross(cdp, 780, false, 886);
     await alignTo(cdp, 1120); await tap(cdp, 'KeyE');
     check('UPLINK relay power sets far checkpoint', (await snap(cdp)).outputs.relayGates && (await snap(cdp)).checkpoint === 'relay');
+    check('relay power uses its sci-fi activation cue', (await snap(cdp)).audio.played.relayPower > 0);
     await tap(cdp, 'KeyE'); check('UPLINK relay power can toggle OFF', !(await snap(cdp)).outputs.relayGates);
     await tap(cdp, 'KeyE');
     await shot(cdp, 'control-spine-relay-enabled');
@@ -425,12 +447,14 @@ async function uplinkRoute(cdp: Cdp) {
     check('UPLINK retrieve initial payload', (await snap(cdp)).cube!.carried);
     await gateTrip(cdp, true);
     check('UPLINK carried payload reaches far gate', (await snap(cdp)).cube!.carried && (await snap(cdp)).cube!.x > 1300);
+    check('both relay trips play a teleport cue', (await snap(cdp)).audio.played.teleport >= 2);
     await shot(cdp, 'control-spine-relay-cargo');
     await alignTo(cdp, 1467); await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'uplink cube B', s => s.inputs.cubeOnPlateB);
     check('UPLINK cube B powers lift and anchor turns off', (await snap(cdp)).outputs.liftField && !(await snap(cdp)).outputs.grappleAnchor);
     await jumpTo(cdp, 1580, 'far'); await liftRide(cdp); await tap(cdp, 'KeyE');
     check('UPLINK upper switch latches lift but needs payload', (await snap(cdp)).inputs.switchC && (await snap(cdp)).outputs.codePlatformA && !(await snap(cdp)).outputs.exitDoor);
+    check('lift power and its latch have distinct cues', (await snap(cdp)).audio.played.liftPower > 0 && (await snap(cdp)).audio.played.latch > 0);
     await tap(cdp, 'KeyE'); check('UPLINK upper latch cannot be undone', (await snap(cdp)).inputs.switchC);
     await waitFor(cdp, 'upper checkpoint save', s => s.persistence.status === 'Saved on server');
     await shot(cdp, 'control-spine-latched'); await cdp.send('Page.reload'); await sleep(600);
@@ -462,6 +486,8 @@ async function uplinkRoute(cdp: Cdp) {
     check('one retained signal powers four return anchors and the catch deck', (await snap(cdp)).platforms.filter(p => ['upper-route', 'return-mid', 'return-high', 'return-near', 'return-catch'].includes(p.id)).every(p => p.enabled));
     await alignTo(cdp, 2860); await ropeReturn(cdp);
     check('UPLINK full retrieval route has no deaths', (await snap(cdp)).deaths === 0);
+    const sound = (await snap(cdp)).audio;
+    check('rope jumps and the final transformation play decoded audio', sound.played.ropeJump >= 5 && sound.played.codePower > 0 && sound.played.door > 0 && sound.peak > 0);
 }
 async function ropeReturn(cdp: Cdp, testRecovery = false) {
     await key(cdp, 'keyDown', 'KeyA'); await tap(cdp, 'Space');
@@ -525,10 +551,13 @@ async function main() {
         await waitFor(cdp, 'save API', s => s.persistence.visitor !== '');
         await shot(cdp, 'start');
         check('new visitor starts at pressure', (await snap(cdp)).room === 'pressure');
+        check('audio waits for the first real gesture', (await snap(cdp)).audio.state === 'locked' && (await snap(cdp)).audio.voices === 0);
         check('all four rooms available from the menu', await evaluate(cdp, 'document.querySelectorAll(".level-select button").length === 4'));
         // Native keyboard navigation reaches the last room without completing tutorials.
         for (let i = 0; i < 4; i++) await tap(cdp, 'Tab');
         check('level select supports keyboard navigation', await evaluate(cdp, 'document.activeElement.dataset.room === "uplink"'));
+        await waitFor(cdp, 'sound assets decode after a gesture', s => s.audio.loaded === 14);
+        check('all audio assets decode without errors', (await snap(cdp)).audio.state === 'running' && (await snap(cdp)).audio.failed.length === 0);
         await tap(cdp, 'Space');
         await waitFor(cdp, 'selected UPLINK', s => s.room === 'uplink');
         check('selecting UPLINK does not complete skipped rooms', (await snap(cdp)).progress.completedRooms.length === 0);
@@ -547,6 +576,7 @@ async function main() {
         await waitFor(cdp, 'cube on plate', s => s.inputs.cubeOnPlate);
         await walkTo(cdp, 735, true);
         check('cube holds plate after player leaves', (await snap(cdp)).outputs.exitDoor);
+        check('cube and plate interactions play sounds', (await snap(cdp)).audio.played.pickup > 0 && (await snap(cdp)).audio.played.drop > 0 && (await snap(cdp)).audio.played.plate > 0);
         await shot(cdp, 'pressure');
         await exitRoom(cdp, 'switch');
         check('inactive anchor has no collision or hook', (await snap(cdp)).platforms.some(p => p.id === 'anchor' && !p.enabled && !p.grappleable));
@@ -672,6 +702,7 @@ async function main() {
         await alignTo(cdp, 2660); await jumpTo(cdp, 2860, 'node-deck');
         await ropeReturn(cdp, true);
         check('unstable recovery completes the rope route without a death reset', (await snap(cdp)).deaths === 0 && (await snap(cdp)).ended);
+        check('unstable anchor plays warning and break cues', (await snap(cdp)).audio.played.crumbleWarn > 0 && (await snap(cdp)).audio.played.crumbleBreak > 0);
         await click(cdp, '#pause');
         await shot(cdp, 'level-select');
         await click(cdp, '[data-room="relay"]');
@@ -709,6 +740,19 @@ async function main() {
         await click(cdp, '[data-room="uplink"]');
         check('reset clears CONTROL SPINE latch, cargo and validated output frame', (await snap(cdp)).checkpoint === 'entry' && (await snap(cdp)).evidence?.stateId === 0 && Object.values((await snap(cdp)).outputs).every(value => !value));
         await checkValidatedFrame(cdp, 'reset CONTROL SPINE');
+        await click(cdp, '#pause');
+        await click(cdp, '#audio-mute');
+        check('mute is accessible and stops all sound', (await snap(cdp)).audio.preferences.muted && (await snap(cdp)).audio.voices === 0 && await evaluate(cdp, 'document.querySelector("#audio-mute").getAttribute("aria-pressed") === "true"'));
+        await click(cdp, '#audio-volume'); await tap(cdp, 'Home');
+        for (let n = 0; n < 3; n++) await tap(cdp, 'PageUp');
+        const volume = (await snap(cdp)).audio.preferences.volume;
+        check('volume slider works with keyboard controls', volume > 0 && volume < 1);
+        await shot(cdp, 'audio-settings');
+        await cdp.send('Page.reload'); await sleep(600);
+        await waitFor(cdp, 'audio preference reload', s => s.persistence.visitor === visitor);
+        check('reload retains mute and volume separately from game progress', (await snap(cdp)).audio.preferences.muted && (await snap(cdp)).audio.preferences.volume === volume);
+        await click(cdp, '#audio-mute');
+        check('sound can be enabled again', !(await snap(cdp)).audio.preferences.muted);
         check('no console errors', cdp.errors.length === 0, cdp.errors.join(' | '));
     }
     finally {

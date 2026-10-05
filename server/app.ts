@@ -65,7 +65,7 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
             await unlink(temp).catch(() => { });
         }
     }
-    const mime: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json' };
+    const mime: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.ogg': 'audio/ogg', '.txt': 'text/plain' };
     return createServer(async (req, res) => {
         const json = (code: number, value: unknown) => { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); };
         try {

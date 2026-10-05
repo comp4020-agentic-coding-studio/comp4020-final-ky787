@@ -256,6 +256,52 @@ The main airborne route uses the clone; the forgiving catch deck can also be
 used deliberately as a slower recovery detour. There is no hidden "touched fake
 block" completion flag or extra controller input.
 
+### Sound and lift-label revision — 2026-10-05
+
+`src/audio/game-audio.ts` adapts Crit 5's named cues, cooldowns, bounded voices
+and quiet loop mixing to Web Audio buffers. `src/slice/audio-presentation.ts`
+observes physical transitions and already-applied controller outputs. No sound
+waits on assembly playback or changes the controller, physics, persistence or
+binary evidence. Loading a saved room establishes a silent baseline; it does
+not replay all prior machinery activations. Player + carried-cube relay events
+produce one transit sound; loose cube transits also receive sound.
+
+Eight effects are reused byte-for-byte from the original project. Six selected
+CC0 effects from Kenney and rubberduck add relay travel/power, lift power/hum,
+doors and metal interactions. These 14 Ogg assets total about 228 KiB and ship
+inside the Vite output, with source/processing/hash records in
+`public/audio/credits.json` and human-readable `AUDIO_CREDITS.md`. No external
+audio service, music campaign or research-share dependency was added.
+
+The first real key/pointer gesture unlocks audio. One-shots are discarded if
+locked, unavailable or paused; they are never queued to surprise the player
+later. The manager limits simultaneous voices and repeated cues; lift/reel loops
+fade. Lift hum falls away over 420 units from the powered shaft. Menu, Evidence,
+hidden tabs and blur stop gameplay sounds. A short completion cue may ring on
+the resulting completion menu. Unsupported audio/files leave gameplay usable
+and report failures in the debug snapshot. **Menu → Sound** provides mute/volume
+as local browser preferences, not room-progress fields; reset progress leaves
+these preferences intact.
+
+The two shaft labels now draw after the field, with 18-unit inside padding for
+LIFT / VERTICAL TRANSPORT and 20-unit outside padding for LIFT FIELD LATCHED.
+This removes the field/boundary overlap on their leading Ls.
+
+Human listening questions: are the new relay sweep and lift hum balanced against
+the familiar rope effects? Is the unstable-anchor warning audible without being
+overbearing? Automated playback verifies decoding/routing and nonzero output,
+not subjective listening quality.
+
+Validation: typecheck, production build and pinned binary bundle check pass;
+**186 unit tests pass** (two existing conditional skips), including audio asset
+hash/MIME checks and server restart persistence. Both running-server HTTP
+invariants pass. The full real-control browser route passes **115 assertions**,
+including all 14 Ogg decodes, nonzero output, relay/lift/rope/crumble cues,
+menu and background-tab silence/resume, keyboard volume and preference reload.
+Both CONTROL SPINE runs finish without deaths; no console errors.
+Captures: `docs/playtest/audio-settings.png`, `audio-lift-label-lower.png`,
+`audio-lift-label-latched.png`; full assertion log: `audio-browser.txt`.
+
 ### Rope jump / final clone revision validation — 2026-10-05
 
 - Typecheck, production build and the unchanged pinned 32-state bundle/hash pass.

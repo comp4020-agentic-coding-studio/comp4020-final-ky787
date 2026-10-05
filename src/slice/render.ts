@@ -149,19 +149,23 @@ export class PuzzleRenderer {
         }
         if (r.id === 'uplink') {
             this.text('CONTROL WING', 1030, 1100, 19, C.dim);
-            this.text('LIFT / VERTICAL TRANSPORT', 1625, 1135, 13, C.dim);
             this.text('SERVICE BAY', 2360, 815, 16, C.dim);
             this.text('CORE NODE', 3080, 450, 22, C.cyan);
             this.text('RECOVERY DECK', 2900, 895, 14, C.dim);
             this.text('← RETURN TO LIFT', 2280, 915, 12, C.dim);
             for (const p of w.platforms.filter(p => p.def.signal === 'codePlatformB'))
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
-            if (w.inputs.switchC) {
-                const feedback = this.presentation.describe(r.id, w.frame, 'liftField');
-                this.text(revealMessage(feedback, 1 - w.displayPulse), r.upperLever!.x - 105, r.upperLever!.y + 65, 12, C.cyan);
-            }
         }
         drawMachinery(c, w, this.presentation);
+        if (r.id === 'uplink') {
+            // Labels sit clear of the shaft edges and are drawn AFTER the field.
+            const lift = w.lifts[0].def;
+            this.text('LIFT / VERTICAL TRANSPORT', lift.x + 18, lift.y + lift.h - 85, 13, C.dim);
+            if (w.inputs.switchC) {
+                const feedback = this.presentation.describe(r.id, w.frame, 'liftField');
+                this.text(revealMessage(feedback, 1 - w.displayPulse), lift.x + lift.w + 20, r.upperLever!.y + 65, 12, C.cyan);
+            }
+        }
         const plates = [
             { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
             { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },

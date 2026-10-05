@@ -7,11 +7,15 @@ import { ROOMS, roomById } from './rooms.ts';
 import { freshProgress } from './progress.ts';
 import { ProgressStore } from './storage.ts';
 import { connectionPowered } from './connections.ts';
+import { GameAudio } from '../audio/game-audio.ts';
+import { AudioPresentation } from './audio-presentation.ts';
 export class SliceGame {
     store = new ProgressStore();
     world = new PuzzleWorld(ROOMS[0], freshProgress().rooms.pressure);
     renderer: PuzzleRenderer;
     input = new InputManager(true);
+    audio = new GameAudio();
+    private sound = new AudioPresentation(this.audio);
     started = false;
     overviewVisible = false;
     private overviewPending = false;
@@ -34,6 +38,12 @@ export class SliceGame {
     private roomTitle: HTMLElement;
     private memory = '';
     constructor(readonly host: HTMLElement, readonly canvas: HTMLCanvasElement) {
+        const unlock = () => { void this.audio.unlock(); };
+        // Also stop a completion chime that is allowed on the already-paused menu.
+        const silence = () => { this.audio.setActive(false); this.audio.stopAll(); };
+        document.addEventListener('pointerdown', unlock, { capture: true, passive: true });
+        document.addEventListener('keydown', unlock, { capture: true });
+        this.sound.reset(this.world);
         this.traceView.append(this.traceLabel, this.traceCommits);
         this.traceCommits.className = 'trace-commits';
         this.renderer = new PuzzleRenderer(canvas);
@@ -41,6 +51,7 @@ export class SliceGame {
         this.evidenceButton.addEventListener('click', () => {
             if (!this.inspector.element.hidden) { this.closeInspector(); return; }
             this.resumeAfterInspector = this.started; this.started = false;
+            this.audio.setActive(false);
             this.world.cancelGrapple(); this.input.releaseAll();
             this.inspector.element.hidden = false;
         });
@@ -64,12 +75,13 @@ export class SliceGame {
         document.querySelector('#return-cube')!.addEventListener('click', () => { this.world.returnCube(); this.canvas.focus(); });
         this.debug = new URL(location.href).searchParams.has('debug');
         document.addEventListener('visibilitychange', () => { if (document.hidden) {
+            silence();
             this.input.releaseAll();
             this.world.cancelGrapple();
             void this.store.flush();
         } });
-        window.addEventListener('blur', () => this.world.cancelGrapple());
-        window.addEventListener('pagehide', () => void this.store.flush());
+        window.addEventListener('blur', () => { this.world.cancelGrapple(); silence(); });
+        window.addEventListener('pagehide', () => { silence(); void this.store.flush(); });
     }
     async start(): Promise<void> {
         requestAnimationFrame(t => this.frame(t));
@@ -86,6 +98,7 @@ export class SliceGame {
     private loadRoom(): void {
         const id = this.store.progress.currentRoom;
         this.world = new PuzzleWorld(roomById(id), this.store.progress.rooms[id]);
+        this.sound.reset(this.world);
         this.overviewPending = id === 'uplink' && this.world.checkpoint === 'entry';
         this.overviewVisible = false;
         this.startButton.hidden = true;
@@ -100,6 +113,7 @@ export class SliceGame {
     }
     private showMenu(): void {
         this.started = false;
+        this.audio.setActive(false);
         this.overviewVisible = false;
         this.startButton.hidden = true;
         this.inspector.element.hidden = true;
@@ -127,9 +141,25 @@ export class SliceGame {
           <div class="reset-actions"><button id="cancel-reset">Cancel</button><button id="confirm-reset" class="danger">Reset all progress</button></div>
         </div>
       </div>
+      <fieldset class="audio-settings"><legend>SOUND</legend>
+        <button id="audio-mute" type="button" aria-pressed="${this.audio.getPreferences().muted}">${this.audio.getPreferences().muted ? 'Sound off' : 'Sound on'}</button>
+        <label for="audio-volume">Volume <output id="audio-volume-value">${Math.round(this.audio.getPreferences().volume * 100)}%</output></label>
+        <input id="audio-volume" type="range" min="0" max="100" value="${Math.round(this.audio.getPreferences().volume * 100)}">
+      </fieldset>
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
+        this.menu.querySelector<HTMLButtonElement>('#audio-mute')!.addEventListener('click', e => {
+            this.audio.setPreferences({ muted: !this.audio.getPreferences().muted });
+            const button = e.currentTarget as HTMLButtonElement;
+            button.textContent = this.audio.getPreferences().muted ? 'Sound off' : 'Sound on';
+            button.setAttribute('aria-pressed', String(this.audio.getPreferences().muted));
+        });
+        this.menu.querySelector<HTMLInputElement>('#audio-volume')!.addEventListener('input', e => {
+            const value = (e.currentTarget as HTMLInputElement).valueAsNumber;
+            this.audio.setPreferences({ volume: value / 100 });
+            this.menu.querySelector('#audio-volume-value')!.textContent = `${value}%`;
+        });
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
         for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-room]')) {
             button.addEventListener('click', () => {
@@ -218,6 +248,7 @@ export class SliceGame {
             cubeTransferred: this.world.cubeTransferred,
             connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
+            audio: this.audio.snapshot(),
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
     private frame(now: number): void {
@@ -242,6 +273,8 @@ export class SliceGame {
             const edges = this.input.takeEdges();
             if (edges.airGrapple || edges.jump) this.startButton.click();
         }
+        const audible = this.started && !document.hidden && document.hasFocus();
+        this.audio.setActive(audible);
         if (this.started) {
             this.accumulated += dt;
             while (this.accumulated >= FIXED_DT) {
@@ -252,6 +285,7 @@ export class SliceGame {
                 this.world.step(FIXED_DT, this.input.state, e.interact);
                 this.accumulated -= FIXED_DT;
                 const events = this.world.events.splice(0);
+                this.sound.observe(this.world, events);
                 for (const event of events) {
                     if (event.kind === 'crumble')
                         this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
@@ -265,12 +299,15 @@ export class SliceGame {
                 }
                 if (this.world.exited) {
                     this.advance();
+                    if (audible) this.audio.play('complete');
                     break;
                 }
             }
         }
         else
             this.accumulated = 0;
+        this.sound.ambience(this.world, this.started && !document.hidden && document.hasFocus());
+        this.audio.meter();
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible);
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
