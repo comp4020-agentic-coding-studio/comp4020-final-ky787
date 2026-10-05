@@ -93,12 +93,20 @@ export class SliceGame {
       <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${roomById(p.currentRoom).title} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${roomById(p.currentRoom).title}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
-      ${this.ended ? '<button id="new-run">Start a new run</button>' : ''}
       <nav class="level-select" aria-label="Level select">
         <span class="eyebrow">CHOOSE A ROOM</span>
         <div class="level-grid">${ROOMS.map((room, index) => `<button data-room="${room.id}" ${room.id === p.currentRoom ? 'aria-current="true"' : ''}><strong>0${index + 1} / ${room.title}</strong><small>${room.id === p.currentRoom ? 'CURRENT' : p.completedRooms.includes(room.id) ? 'COMPLETE' : 'PLAY'}</small></button>`).join('')}</div>
         <small>All rooms available · keeps each room’s saved progress</small>
       </nav>
+      <div class="progress-reset">
+        <button id="reset-progress" ${!this.store.ready || this.store.conflict ? 'disabled' : ''}>Reset all progress…</button>
+        ${!this.store.ready ? '<small>Connect to the save server to reset saved progress.</small>' : this.store.conflict ? '<small>Reload the latest save before resetting progress.</small>' : ''}
+        <div id="reset-confirmation" role="group" aria-labelledby="reset-question" hidden>
+          <p id="reset-question">Reset every room and return to PRESSURE?</p>
+          <p class="fine">This clears all checkpoints, completed rooms, discovered mechanics and activity. This cannot be undone.</p>
+          <div class="reset-actions"><button id="cancel-reset">Cancel</button><button id="confirm-reset" class="danger">Reset all progress</button></div>
+        </div>
+      </div>
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook / release · Hold click also hooks<br>R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
@@ -119,7 +127,28 @@ export class SliceGame {
             });
         }
         this.menu.querySelector('#retry-save')?.addEventListener('click', async () => { await this.store.load(); this.loadRoom(); this.showMenu(); });
-        this.menu.querySelector('#new-run')?.addEventListener('click', () => { this.store.progress = freshProgress(); this.store.save(this.store.progress); this.ended = false; this.loadRoom(); this.showMenu(); });
+        const reset = this.menu.querySelector<HTMLButtonElement>('#reset-progress')!;
+        const confirmation = this.menu.querySelector<HTMLElement>('#reset-confirmation')!;
+        const cancel = this.menu.querySelector<HTMLButtonElement>('#cancel-reset')!;
+        reset.addEventListener('click', () => {
+            reset.hidden = true;
+            confirmation.hidden = false;
+            cancel.focus();
+        });
+        cancel.addEventListener('click', () => {
+            confirmation.hidden = true;
+            reset.hidden = false;
+            reset.focus();
+        });
+        this.menu.querySelector('#confirm-reset')!.addEventListener('click', () => {
+            // Use the normal revision-aware save queue, preserving visitor identity.
+            if (!this.store.ready || this.store.conflict) { this.showMenu(); return; }
+            this.store.save(freshProgress());
+            this.ended = false;
+            this.input.clearActions();
+            this.loadRoom();
+            this.showMenu();
+        });
     }
     private resumeRoom(): void {
         if (this.ended) {
@@ -173,6 +202,8 @@ export class SliceGame {
             this.debug = !this.debug;
         if (this.input.takeAction('escape')) {
             if (!this.inspector.element.hidden) this.closeInspector();
+            else if (!this.menu.hidden && this.menu.querySelector('#reset-confirmation:not([hidden])'))
+                this.menu.querySelector<HTMLButtonElement>('#cancel-reset')!.click();
             else if (this.started)
                 this.showMenu();
             else

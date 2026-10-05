@@ -8,6 +8,7 @@ import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { freshProgress, type Progress } from '../src/slice/progress.ts';
 const URL_BASE = process.argv[2] ?? "http://localhost:8080/";
 const SHOTS = process.argv[3] ?? join(tmpdir(), "binary-ninja-shots");
 const BROWSERS = ["chromium-browser", "chromium", "google-chrome", "google-chrome-stable"];
@@ -139,6 +140,7 @@ const KEYS: Record<string, {
 }> = {
     End: { key: 'End', vk: 35 },
     Enter: { key: 'Enter', vk: 13 },
+    Escape: { key: 'Escape', vk: 27 },
     KeyA: { key: "a", vk: 65 },
     KeyD: { key: "d", vk: 68 },
     KeyE: { key: "e", vk: 69 },
@@ -211,11 +213,7 @@ interface Snap {
     keyboardGrapple: boolean;
     ended: boolean;
     started: boolean;
-    progress: {
-        completedRooms: string[];
-        currentRoom: string;
-        mechanics: string[];
-    };
+    progress: Progress;
     platforms: {
         id: string;
         enabled: boolean;
@@ -638,6 +636,29 @@ async function main() {
         await shot(cdp, 'compact-menu');
         await click(cdp, '[data-room="switch"]');
         check('compact menu selects rooms with saved switch state', (await snap(cdp)).room === 'switch' && (await snap(cdp)).outputs.grappleAnchor);
+        await click(cdp, '#pause');
+        await waitFor(cdp, 'save before reset', s => s.persistence.status === 'Saved on server');
+        const beforeReset = JSON.stringify((await snap(cdp)).progress);
+        const resetRevision = (await snap(cdp)).persistence.revision;
+        await click(cdp, '#reset-progress');
+        check('reset asks for confirmation and focuses Cancel', await evaluate(cdp, "!document.querySelector('#reset-confirmation').hidden && document.activeElement.id === 'cancel-reset'"));
+        await shot(cdp, 'reset-confirmation');
+        await click(cdp, '#cancel-reset');
+        check('cancel reset preserves all progress without a save write', JSON.stringify((await snap(cdp)).progress) === beforeReset && (await snap(cdp)).persistence.revision === resetRevision);
+        await click(cdp, '#reset-progress');
+        await tap(cdp, 'Escape');
+        check('Escape cancels reset and keeps the menu paused', !(await snap(cdp)).started && await evaluate<boolean>(cdp, "document.querySelector('#reset-confirmation').hidden") && JSON.stringify((await snap(cdp)).progress) === beforeReset);
+        await click(cdp, '#reset-progress');
+        await click(cdp, '#confirm-reset');
+        await waitFor(cdp, 'reset saved', s => s.room === 'pressure' && s.persistence.status === 'Saved on server' && s.persistence.revision > resetRevision);
+        check('confirmed reset clears every room, checkpoint, mechanic and event', JSON.stringify((await snap(cdp)).progress) === JSON.stringify(freshProgress()) && !(await snap(cdp)).started);
+        await cdp.send('Page.reload'); await sleep(600);
+        await waitFor(cdp, 'reset reload', s => s.persistence.visitor === visitor);
+        check('reload retains reset and anonymous visitor identity', JSON.stringify((await snap(cdp)).progress) === JSON.stringify(freshProgress()) && (await snap(cdp)).persistence.visitor === visitor);
+        await shot(cdp, 'reset-progress');
+        await click(cdp, '[data-room="uplink"]');
+        check('reset clears CONTROL SPINE latch, cargo and validated output frame', (await snap(cdp)).checkpoint === 'entry' && (await snap(cdp)).evidence?.stateId === 0 && Object.values((await snap(cdp)).outputs).every(value => !value));
+        await checkValidatedFrame(cdp, 'reset CONTROL SPINE');
         check('no console errors', cdp.errors.length === 0, cdp.errors.join(' | '));
     }
     finally {

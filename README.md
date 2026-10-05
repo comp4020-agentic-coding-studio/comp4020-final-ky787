@@ -57,6 +57,11 @@ are not saved. Existing version-1/2 saves migrate to version 3 without losing pr
 who completed the three tutorials continue directly into UPLINK. UPLINK saves
 its upper latch, cargo checkpoint and final payload placement. Cookies must be retained to find the same save.
 
+Use **Menu → Reset all progress…** to start over at PRESSURE. Confirming clears
+all rooms, checkpoints, discoveries and activity while keeping your anonymous
+visitor ID. Cancel or Escape leaves progress untouched. Wait for **Saved on server**
+before closing the page.
+
 The footer says **Saved on server** only after acknowledgement. Failed saves
 remain pending and retry; if the initial connection fails, the menu offers a
 retry or explicitly unsaved play. Another tab changing the save produces a

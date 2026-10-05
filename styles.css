@@ -294,3 +294,12 @@ p {
 .level-grid small { display:block; font:9px ui-monospace,monospace; margin-top:6px; color:#91a9b5; }
 .level-grid [aria-current] { border-color:#64e6d5; }
 .level-select>small { font:10px/1.5 ui-monospace,monospace; color:#91a9b5; }
+.progress-reset { margin-top:18px; padding-top:16px; border-top:1px solid #314750; }
+.progress-reset>button { width:100%; }
+.progress-reset>small { display:block; margin-top:8px; color:#91a9b5; }
+.progress-reset button:disabled { opacity:.5; cursor:not-allowed; }
+.progress-reset p { margin:0 0 12px; }
+.reset-actions { display:flex; gap:10px; }
+.reset-actions button { flex:1; }
+.reset-actions .danger { border-color:#d4786a; color:#ffd4ca; }
+.reset-actions .danger:hover { background:#4b2928; }

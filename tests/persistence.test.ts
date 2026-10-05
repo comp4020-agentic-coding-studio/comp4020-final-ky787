@@ -105,7 +105,7 @@ it.each([1, 2])('loads an existing on-disk version-%s save and writes the migrat
     await stop(app.child);
 });
 
-it('preserves UPLINK relay and upper payload checkpoints across separate server restarts', async () => {
+it('preserves UPLINK checkpoints and a subsequent full reset across separate server restarts', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'bn-uplink-data-')); dirs.push(dir);
     let app = await start(dir);
     const response = await fetch(app.url + '/api/progress');
@@ -128,5 +128,12 @@ it('preserves UPLINK relay and upper payload checkpoints across separate server 
         expect(world.frame.source).toBe('validated-trace');
         expect(world.frame.outputs).toEqual(uplinkEvidence.state_table[uplinkStateKey(world.inputs)].expected_outputs);
     }
+    const reset = await fetch(app.url + '/api/progress', { method: 'PUT', headers: { cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ revision: 3, progress: freshProgress() }) });
+    expect(reset.status).toBe(200);
+    await stop(app.child, 'SIGKILL'); app = await start(dir);
+    const cleared = await (await fetch(app.url + '/api/progress', { headers: { cookie } })).json();
+    expect(cleared.id).toBe(initial.id);
+    expect(cleared.revision).toBe(4);
+    expect(cleared.progress).toEqual(freshProgress());
     await stop(app.child);
 });

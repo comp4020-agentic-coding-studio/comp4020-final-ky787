@@ -40,3 +40,26 @@ it('a conflicting tab blocks subsequent writes and asks for reload', async () =>
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(store.status).toContain('another tab');
 });
+it('queues a full reset after an in-flight save with the acknowledged revision', async () => {
+    let acknowledge!: (response: unknown) => void;
+    const fetch = vi.fn().mockImplementationOnce(() => new Promise(resolve => { acknowledge = resolve; }))
+        .mockResolvedValue({ ok: true, status: 200, json: async () => ({ revision: 9, updatedAt: '2026-10-05T12:00:00Z' }) });
+    vi.stubGlobal('fetch', fetch);
+    const store = new ProgressStore();
+    store.ready = true; store.visitor = 'same-visitor'; store.revision = 7;
+    const previous = freshProgress();
+    previous.currentRoom = 'relay'; previous.completedRooms = ['pressure', 'switch'];
+    previous.rooms.relay.switchB = true; previous.rooms.relay.checkpoint = 'relay';
+    previous.mechanics = ['bridge'];
+    previous.history = [{ room: 'relay', event: 'bridge', at: '2026-10-05T11:00:00Z' }];
+    store.save(previous);
+    store.save(freshProgress());
+    expect(fetch).toHaveBeenCalledTimes(1);
+    acknowledge({ ok: true, status: 200, json: async () => ({ revision: 8, updatedAt: '2026-10-05T11:00:00Z' }) });
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual({ revision: 8, progress: freshProgress() });
+    expect(store.progress).toEqual(freshProgress());
+    expect(store.visitor).toBe('same-visitor');
+    expect(store.revision).toBe(9);
+    expect(store.status).toBe('Saved on server');
+});

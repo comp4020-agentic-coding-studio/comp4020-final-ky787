@@ -557,6 +557,17 @@ The browser route checks direct UPLINK selection, reload, revisiting completed
 rooms and retained cube/latch state. Menu captures are in
 `docs/playtest/level-select-menu.png` and `level-select-compact.png` (960×640).
 
+**Reset all progress…** is available from the same menu, including before
+completion. Its inline confirmation defaults focus to Cancel; Escape cancels
+without resuming play. Confirmation replaces all room memories, completed rooms,
+discoveries and activity with fresh PRESSURE progress through the existing
+revision-aware save queue. Visitor identity and schema remain unchanged. Reset
+is disabled until the server save loads, or if another tab caused a conflict.
+Network failures use the normal pending/retry indicator. Browser checks cover
+cancel, Escape, confirmation, reload and the cleared validated CONTROL SPINE
+frame; server tests verify reset survives process restart, and a client test
+checks that an older in-flight save cannot overwrite the reset.
+
 Existing version-1/2 saves migrate in memory to version 3. Version 1 gains an
 empty Plate B as before. All old rooms, visitor identity, revisions, mechanics,
 completion and history are preserved. A visitor who finished the three tutorials
