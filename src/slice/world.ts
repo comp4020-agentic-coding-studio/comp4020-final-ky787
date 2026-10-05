@@ -215,7 +215,14 @@ export class PuzzleWorld {
         if (input.grapplePressed) this.keyboardGrapple = false; // Mouse takes ownership.
         if (input.airGrapplePressed) {
             const p = this.player;
-            if (p.rope.phase === 'attached' || p.rope.phase === 'firing') {
+            if (p.rope.phase === 'attached') {
+                // Route keyboard and mouse-held ropes through the same jump physics.
+                this.keyboardGrapple = false;
+                input.jumpPressed = true;
+                input.grappleHeld = true;
+                return;
+            }
+            if (p.rope.phase === 'firing') {
                 this.keyboardGrapple = false;
                 releaseRope(p);
                 input.jumpPressed = false;

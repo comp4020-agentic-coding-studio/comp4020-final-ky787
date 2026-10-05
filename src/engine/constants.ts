@@ -71,6 +71,9 @@ export const GRAPPLE = {
   maxSwingRiseSpeed: 360,
   maxReleaseRiseSpeed: 240,
   maxReleaseSpeed: 740,
+  /** Intentional rope jump: fixed upward speed, once per anchor until landing. */
+  jumpVelocity: 520,
+  maxJumpSpeed: 900,
 } as const;
 
 export const CAMERA = {

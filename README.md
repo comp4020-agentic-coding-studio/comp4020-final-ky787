@@ -26,7 +26,10 @@ earlier binary-backed tutorial and its tests remain outside the default game.
 
 A/D or arrows move. Space/W jumps. Aim at an enabled code slab to preview the grapple;
 press Space again in midair to hook that highlighted target, then once more to
-release. A tap holds the rope for you. Hold left click and release still works.
+**jump off** with sideways momentum. A tap holds the rope for you. W/Up also
+jump off an attached rope. Each anchor supplies one short hop until you land;
+moving to the next anchor supplies another. Hold left click to hook and let go
+for the original low release arc, or press Space while holding it to jump off.
 E picks up/puts down a cube or uses a nearby lever. RELAY's bridge lever locks
 ON permanently; SWITCH's lever and CONTROL SPINE's relay power remain ON/OFF toggles.
 CONTROL SPINE's upper lift latch locks ON. Walk into powered relay doorways to travel

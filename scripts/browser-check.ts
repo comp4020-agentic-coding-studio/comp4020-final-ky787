@@ -180,6 +180,7 @@ interface Snap {
         };
         vx: number;
         vy: number;
+        ropeJumpAnchors: string[];
     };
     cube: {
         x: number;
@@ -466,8 +467,8 @@ async function ropeReturn(cdp: Cdp, testRecovery = false) {
     await key(cdp, 'keyDown', 'KeyA'); await tap(cdp, 'Space');
     const anchors = [
         { id: 'upper-route', x: 2720, y: 166 }, { id: 'return-mid', x: 2240, y: 116 },
-        { id: 'return-high', x: 1760, y: 116 }, { id: 'proven-clone', x: 1280, y: 116 },
-        { id: 'return-near', x: 800, y: 116 },
+        { id: 'return-high', x: 1760, y: 116 }, { id: 'return-near', x: 1280, y: 116 },
+        { id: 'proven-clone', x: 800, y: 116 },
     ];
     for (const a of anchors) {
         await mouseAt(cdp, a.x, a.y);
@@ -482,7 +483,7 @@ async function ropeReturn(cdp: Cdp, testRecovery = false) {
                 await waitFor(cdp, 'catch deck landing', s => s.player.groundId === 'return-catch');
                 await mouseAt(cdp, a.x, a.y, 'mouseReleased');
                 check('unstable hook failure preserves C and lands safely', (await snap(cdp)).deaths === 0 && (await snap(cdp)).inputs.cubeOnPlateC && (await snap(cdp)).player.rope.anchorId === null);
-                await alignTo(cdp, 1280, 'return-catch');
+                await alignTo(cdp, 800, 'return-catch');
                 await shot(cdp, 'control-spine-rope-recovery');
                 await waitFor(cdp, 'unstable anchor reappears', s => s.platforms.some(p => p.id === a.id && p.enabled));
                 await tap(cdp, 'Space'); await mouseAt(cdp, a.x, a.y);
@@ -493,9 +494,23 @@ async function ropeReturn(cdp: Cdp, testRecovery = false) {
         await waitFor(cdp, `left swing past ${a.id}`, s => s.player.x < a.x - 125 && s.player.y < a.y + 290 && s.player.vx < 0);
         if (a.id === 'return-high') check('upper rope clears the lift volume', (await snap(cdp)).player.y + 17 < 580);
         await shot(cdp, `control-spine-rope-${a.id}`);
+        if (!testRecovery) {
+            await tap(cdp, 'Space');
+            const jumped = await snap(cdp);
+            check(`Space jumps off ${a.id} with sideways carry`, jumped.player.rope.phase !== 'attached' && jumped.player.ropeJumpAnchors.includes(a.id) && jumped.player.vy < 0 && jumped.player.vx < 0);
+            if (a.id === 'return-high') await shot(cdp, 'control-spine-rope-jump');
+        }
         await mouseAt(cdp, a.x, a.y, 'mouseReleased'); await sleep(70);
     }
-    await waitFor(cdp, 'return exit landing', s => s.player.groundId === 'uplink-deck' || s.ended);
+    const landing = await waitFor(cdp, 'return exit landing', s => s.player.groundId === 'uplink-deck' || s.ended || (testRecovery && s.player.groundId === 'return-catch'));
+    if (landing.player.groundId === 'return-catch') {
+        // A low mouse release after restarting from rest can meet the exit's
+        // 50-unit lip. Use the same ordinary ground jump a player would use.
+        await key(cdp, 'keyUp', 'KeyA');
+        await alignTo(cdp, 625, 'return-catch');
+        await jumpTo(cdp, 485, 'uplink-deck');
+        check('catch deck offers a normal jump onto the exit shelf', (await snap(cdp)).player.groundId === 'uplink-deck');
+    }
     await key(cdp, 'keyDown', 'KeyA');
     try { await waitFor(cdp, 'UPLINK exit', s => s.ended); }
     finally { await key(cdp, 'keyUp', 'KeyA'); }

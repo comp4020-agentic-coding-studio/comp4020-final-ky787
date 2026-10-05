@@ -101,20 +101,20 @@ describe('retained UPLINK controller evidence', () => {
         for (const t of bundle.traces) expect(new Set(t.raw_occurrences.map(o => o.id)).size).toBe(t.raw_occurrences.length);
         // This specimen has no repeated raw visits; preserve the exported visit identity anyway.
     });
-    it('links the unstable crumble to actual clone proof, keeps all instructions, and recovers even before C is powered', () => {
+    it('links the final unstable anchor to actual clone proof, keeps all instructions, and recovers with C intact', () => {
         const room = roomById('uplink'), p = room.platforms.find(p => p.id === 'proven-clone')!;
         expect(p.evidenceId).toBe(provenCrumble.proof_id);
         expect(bundle.proof_evidence.clones.some(c => c.id === p.evidenceId)).toBe(true);
         expect(bogusInstructions().map(i => `${i.mnemonic} ${i.op_str}`.trim())).toEqual(provenCrumble.instructions.map(i => i.text));
         expect(evidenceDetails(provenCrumble.id, bundle.traces[0])).toContain('PROVEN BOGUS');
-        const w = new PuzzleWorld(room, freshProgress().rooms.uplink);
+        const w = new PuzzleWorld(room, { ...freshProgress().rooms.uplink, switchC: true, cubeOnPlateC: true, cubeTransferred: true });
         Object.assign(w.player, { x: p.x + p.w / 2, y: p.y - 30, vy: 20 });
         const tick = (n: number) => { for (let i = 0; i < n; i++) w.step(FIXED_DT, emptyInput()); };
         tick(20); expect(w.player.groundId).toBe(p.id);
-        tick(230); expect(w.player.groundId).toBe('far'); expect(w.deaths).toBe(0);
+        tick(230); expect(w.player.groundId).toBe('return-catch'); expect(w.deaths).toBe(0);
         expect(w.platforms.find(s => s.def.id === p.id)!.solid.enabled).toBe(false);
         tick(300); expect(w.platforms.find(s => s.def.id === p.id)!.solid.enabled).toBe(true);
-        expect(w.frame.outputs.exitDoor).toBe(false);
+        expect(w.inputs.cubeOnPlateC).toBe(true); expect(w.frame.outputs.exitDoor).toBe(true);
     });
     it.each([
         { checkpoint: 'relay' as const, switchB: true, cubeOnPlate: true },

@@ -91,10 +91,10 @@ export const ROOMS: readonly RoomDef[] = [
             { id: 'upper-route', kind: 'code', x: 2620, y: 160, w: 200, h: 28, signal: 'codePlatformB', anchor: true, label: 'RETURN / B · 01' },
             { id: 'return-mid', kind: 'code', x: 2140, y: 110, w: 200, h: 28, signal: 'codePlatformB', anchor: true, assemblyBinding: 'payload-route-display', label: 'RETURN / B · 02' },
             { id: 'return-high', kind: 'code', x: 1660, y: 110, w: 200, h: 28, signal: 'codePlatformB', anchor: true, assemblyBinding: 'payload-route-display', label: 'RETURN / B · 03' },
-            { id: 'return-near', kind: 'code', x: 700, y: 110, w: 200, h: 28, signal: 'codePlatformB', anchor: true, assemblyBinding: 'payload-route-display', label: 'RETURN / B · 04' },
-            { id: 'return-catch', kind: 'code', x: 1010, y: 510, w: 550, h: 28, signal: 'codePlatformB', assemblyBinding: 'payload-route-display', label: 'RETURN / B · RECOVERY' },
+            { id: 'return-near', kind: 'code', x: 1180, y: 110, w: 200, h: 28, signal: 'codePlatformB', anchor: true, assemblyBinding: 'payload-route-display', label: 'RETURN / B · 04' },
+            { id: 'return-catch', kind: 'code', x: 530, y: 510, w: 550, h: 28, signal: 'codePlatformB', assemblyBinding: 'payload-route-display', label: 'RETURN / B · RECOVERY' },
             // A temporary rope support in the main chain. Crumble is an authored metaphor.
-            { id: 'proven-clone', kind: 'crumble-proven', evidenceId: 'bcf_clone_originalBB71alteredBB', x: 1180, y: 110, w: 200, h: 28, anchor: true, hookCrumbleDelay: 1.65, label: 'UNSTABLE' }],
+            { id: 'proven-clone', kind: 'crumble-proven', evidenceId: 'bcf_clone_originalBB71alteredBB', x: 700, y: 110, w: 200, h: 28, anchor: true, hookCrumbleDelay: 1.65, label: 'UNSTABLE' }],
         lifts: [{ id: 'lift', x: 1630, y: 580, w: 240, h: 640, signal: 'liftField' }],
         gates: [{ id: 'R1', signal: 'relayGates', gates: [
             { id: 'A', x: 120, y: 1110, w: 56, h: 110, exitSide: 1 },

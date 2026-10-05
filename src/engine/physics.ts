@@ -74,6 +74,8 @@ export interface PlayerState {
   /** Downward speed at the last landing, for landing effects. */
   landingSpeed: number;
   airTime: number;
+  /** Transient jump budget. Re-hooking a used anchor cannot manufacture lift. */
+  ropeJumpAnchors: string[];
 }
 
 export interface InputState {
@@ -123,6 +125,7 @@ export function createPlayer(x: number, y: number): PlayerState {
     justLanded: false,
     landingSpeed: 0,
     airTime: 0,
+    ropeJumpAnchors: [],
     rope: {
       phase: "idle",
       anchorId: null,
@@ -391,6 +394,24 @@ export function releaseRope(p: PlayerState, boost = true): void {
   p.airTime = 0;
 }
 
+export function canJumpFromRope(p: PlayerState): boolean {
+  return p.rope.phase === 'attached' && p.rope.anchorId !== null && !p.ropeJumpAnchors.includes(p.rope.anchorId);
+}
+
+/** Separate from letting go: retain sideways carry and set a bounded jump speed. */
+export function jumpFromRope(p: PlayerState): void {
+  const anchor = canJumpFromRope(p) ? p.rope.anchorId : null;
+  releaseRope(p);
+  if (anchor === null) return;
+  p.ropeJumpAnchors.push(anchor);
+  p.vy = -GRAPPLE.jumpVelocity; // Never add impulses to the current velocity.
+  const speed = Math.hypot(p.vx, p.vy);
+  if (speed > GRAPPLE.maxJumpSpeed) {
+    p.vx *= GRAPPLE.maxJumpSpeed / speed;
+    p.vy *= GRAPPLE.maxJumpSpeed / speed;
+  }
+}
+
 function fireRope(p: PlayerState, dir: Vec2): void {
   const rope = p.rope;
   rope.phase = "firing";
@@ -532,8 +553,11 @@ export function stepPlayer(
   if (p.dropThrough === 0) p.dropIgnore = null;
   if (input.jumpPressed) p.jumpBuffer = PLAYER.jumpBuffer;
 
-  stepRope(p, input, solids, dt);
-  const attached = p.rope.phase === "attached";
+  // A jump and mouse release may arrive in the same frame. Validate the anchor
+  // before consuming the deliberate jump, rather than detaching it first.
+  const ropeJump = input.jumpPressed && p.rope.phase === 'attached';
+  stepRope(p, ropeJump ? { ...input, grappleHeld: true, grapplePressed: false } : input, solids, dt);
+  let attached = p.rope.phase === "attached";
   if (attached) p.airTime += dt;
 
   const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
@@ -562,12 +586,13 @@ export function stepPlayer(
     p.vx = Math.abs(p.vx) <= drop ? 0 : p.vx - Math.sign(p.vx) * drop;
   }
 
-  // Jump. While attached, jump releases without injecting another kick.
+  // Ground jumps keep their usual height; rope jumps are shorter transfer hops.
   if (p.jumpBuffer > 0 && (p.grounded || p.coyote > 0 || attached)) {
-    if (attached) {
-      releaseRope(p);
-      // Detach only: repeated hooks + jump must not manufacture upward kicks.
+    if (attached && !p.grounded) {
+      jumpFromRope(p);
+      attached = false;
     } else {
+      if (attached) { releaseRope(p); attached = false; }
       p.vy = -PLAYER.jumpVelocity;
     }
     p.jumpBuffer = 0;
@@ -636,5 +661,6 @@ export function stepPlayer(
   if (p.grounded) {
     p.coyote = PLAYER.coyoteTime;
     p.airTime = 0;
+    p.ropeJumpAnchors.length = 0;
   }
 }

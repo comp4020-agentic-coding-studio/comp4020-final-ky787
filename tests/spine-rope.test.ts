@@ -11,14 +11,20 @@ it.each([[2840, 6, 100], [2860, 8, 120], [2880, 24, 140]])('chains every anchor 
     Object.assign(w.player, { x, y: 603 }); tick(w, {}, 5);
     swingReturn(w, delay, offset);
 });
+it.each([18, 30, 42])('rope jumps allow a %s-frame transfer pause through the chain and its final fake block', delay => {
+    const w = complete();
+    Object.assign(w.player, { x: 2860, y: 603 }); tick(w, {}, 5);
+    swingReturn(w, delay, 120, true);
+});
 it('hook load warns, breaks the unstable anchor, cancels its rope, and recovers without losing C', () => {
     const w = complete(), b = w.platforms.find(p => p.def.id === 'proven-clone')!;
-    Object.assign(w.player, { x: 1280, y: 470 });
-    tick(w, { grapplePressed: true, grappleHeld: true, aim: { x: 1280, y: 176 } }, 25);
+    const x = b.def.x + b.def.w / 2, aim = { x, y: b.def.y + 6 };
+    Object.assign(w.player, { x, y: 470 });
+    tick(w, { grapplePressed: true, grappleHeld: true, aim }, 25);
     expect(w.player.rope.anchorId).toBe(b.def.id); expect(b.fuse).toBeGreaterThan(1);
     const left = b.fuse;
     // Re-hooking does not reset the load warning timer.
-    tick(w, {}, 8); tick(w, { grapplePressed: true, grappleHeld: true, aim: { x: 1280, y: 176 } }, 25);
+    tick(w, {}, 8); tick(w, { grapplePressed: true, grappleHeld: true, aim }, 25);
     expect(b.fuse).toBeLessThan(left);
     tick(w, { grappleHeld: true }, 170);
     expect(b.solid.enabled).toBe(false); expect(b.solid.grappleable).toBe(false);
@@ -28,11 +34,20 @@ it('hook load warns, breaks the unstable anchor, cancels its rope, and recovers 
     expect(w.inputs.cubeOnPlateC).toBe(true); expect(w.frame.outputs.exitDoor).toBe(true);
     tick(w, {}, 200); expect(b.solid.enabled).toBe(true);
     tick(w, { jumpHeld: true, jumpPressed: true }, 25);
-    expect(w.target({ x: 1280, y: 176 })?.solid.id).toBe('proven-clone');
+    expect(w.target(aim)?.solid.id).toBe('proven-clone');
+    // The relocated catch is also a forgiving fallback to the exit's 50-unit lip.
+    for (let n = 0; n < 240 && w.player.x > 625; n++) tick(w, { left: true });
+    tick(w, {}, 120);
+    expect(w.player.groundId).toBe('return-catch');
+    tick(w, { left: true, jumpHeld: true, jumpPressed: true });
+    for (let n = 0; n < 240 && !w.exited; n++) tick(w, { left: true, jumpHeld: true });
+    expect(w.exited).toBe(true); expect(w.deaths).toBe(0); expect(w.inputs.cubeOnPlateC).toBe(true);
 });
 it('final route stays above the lift, and its gaps cannot be replaced by ordinary jumps', () => {
     const w = complete(), lift = w.room.lifts![0];
-    const ids = ['upper-route', 'return-mid', 'return-high', 'proven-clone', 'return-near'];
+    const ids = ['upper-route', 'return-mid', 'return-high', 'return-near', 'proven-clone'];
+    expect(w.room.platforms.find(p => p.id === 'return-near')!.x).toBe(1180);
+    expect(w.room.platforms.find(p => p.id === 'proven-clone')!.x).toBe(700);
     for (const id of ids) {
         const b = w.platforms.find(p => p.def.id === id)!.def;
         expect(b.y + 140).toBeLessThan(lift.y); // Address, retained listing and string all clear.

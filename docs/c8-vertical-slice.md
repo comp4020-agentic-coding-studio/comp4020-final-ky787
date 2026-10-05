@@ -60,13 +60,17 @@ below the normal follow minimum to fit the entire room on smaller screens.
 
 The exit is above the entry at (210,320), on a broad static shelf at y=460.
 Four real return anchors have centres (2720,166), (2240,116), (1760,116),
-and (800,116). The proven clone fills the intervening position (1280,116).
+and (1280,116). The proven clone is the **last anchor**, at (800,116), swapped
+with the former final real block.
 Each address slab is 200 units wide; the 280-unit gaps are beyond an ordinary
 held run-jump. Swing **under** the slabs and transfer to the next target while
-moving left. The real output also powers a catch deck at (1010,510), 550 units
+moving left. Space jumps off an attached rope for an easier transfer; letting go
+of the mouse retains the previous low release arc. The real output also powers
+a catch deck at (530,510), 550 units
 wide, below the unstable anchor. The lift ends at y=580, clear of the upper code,
 listings and a normal swing. Upper cargo jumps remain 130 and 110 units wide.
-Rope acceleration, range, reeling, speed caps and vertical limits are unchanged.
+Attached rope acceleration, range, reeling and swing caps are unchanged. The
+deliberate rope jump has its own bounded impulse, documented under grapple tuning.
 
 ### Intended flow (design notes, not printed in game)
 
@@ -92,8 +96,8 @@ Rope acceleration, range, reeling, speed caps and vertical limits are unchanged.
    together and the exit unlocks. A 2.2-second authored camera reveal frames the
    new route and distant exit; controls and binary outputs remain immediate.
 8. Leave the cube on C. Jump from the left end of the core deck and hook the first
-   overhead slab. Transfer along the five-anchor chain, including the unstable
-   clone, and release onto the exit shelf. An overloaded clone drops the player
+   overhead slab. Transfer along four real anchors, then the final unstable
+   clone, and jump off or release onto the exit shelf. An overloaded clone drops the player
    onto the catch deck; re-hook after it returns. This replaces the earlier
    optional-shortcut design at the player's request.
 
@@ -171,7 +175,7 @@ crumble timers, camera reveal, semantic labels and XOR messages/animation.
 
 ### Unstable rope anchor and recovery
 
-`bcf_clone_originalBB71alteredBB` is the one `crumble-proven` slab at **(1180,110)**,
+`bcf_clone_originalBB71alteredBB` is the one `crumble-proven` slab at **(700,110)**,
 200 × 28, in the final rope chain. Ordinary play shows its real address and
 **UNSTABLE**; Evidence's analysis
 checkbox can reveal **PROVEN BOGUS** without removing any of its six instructions.
@@ -182,8 +186,11 @@ with the rope starts a **1.65-second** fuse, with a shrinking bar and ANCHOR FAI
 warning. Re-hooking cannot restart it. Collapse releases its rope immediately;
 it returns after 2.4 seconds. The powered `return-catch` deck supports a deliberate
 failure below, with Node C and all latches intact. It is high enough to see and
-re-hook the returned anchor. Before C, falling here still lands on the lower
-control floor without death, but the intended rope chain is unavailable.
+re-hook the returned anchor. This final anchor sits above the first death gap;
+its safe catch deck and the intended approach are powered by Node C.
+The catch deck is 50 units below the exit shelf: a low release after recovery
+may land beside that lip. A normal ground jump clears it; another full room loop
+or death reset is unnecessary.
 
 The final route now uses the clone as a temporary support, rather than relegating
 it to an optional cargo shortcut. Its physical collapse is a metaphor: the successful
@@ -218,7 +225,7 @@ Browser testing exposed a real recovery problem: the initial catch deck was too
 low to see/re-hook the returned clone comfortably. Raising it to y=510 makes the
 next target visible and reachable from the recovery area. Late-transfer testing
 also justified ending the lift just below the upper deck at y=580. These are
-geometry adjustments; the controlled rope and lift physics retain their tuning.
+geometry adjustments; the attached rope and lift physics retain their tuning.
 The removed descent step is replaced by a direct safe drop. Missing a cargo jump
 now costs another lift ride, which should be judged in human playtesting.
 
@@ -249,7 +256,28 @@ The main airborne route uses the clone; the forgiving catch deck can also be
 used deliberately as a slower recovery detour. There is no hidden "touched fake
 block" completion flag or extra controller input.
 
-### Rope/wiring revision validation — 2026-10-05
+### Rope jump / final clone revision validation — 2026-10-05
+
+- Typecheck, production build and the unchanged pinned 32-state bundle/hash pass.
+- **178 unit tests pass**, two existing conditional skips. Coverage includes
+  mouse/keyboard detach, small held/tapped hop heights, per-anchor jump budget,
+  inactive-anchor cancellation, initial-anchor ascent attempts, three slower
+  transfer delays (150/250/350 ms), and actual process restart persistence.
+- Both running-server HTTP invariants pass. The real keyboard/mouse browser
+  route passes **100 assertions**, including a Space jump from every final anchor,
+  then a separate mouse-release route with deliberate crumble/recovery and a
+  normal ground jump past the exit lip. Both CONTROL SPINE routes finish with
+  zero deaths; no console errors. Tutorials, reload, level select and reset pass.
+- Captures: [jump transfer](playtest/control-spine-jump-transfer.png),
+  [swapped final route](playtest/control-spine-jump-final-overview.png),
+  [final clone collapse](playtest/control-spine-jump-final-collapse.png), and
+  [catch deck](playtest/control-spine-jump-final-recovery.png).
+  Exact assertions: `docs/playtest/control-spine-jump-browser.txt`.
+- Human check: does the short hop make choosing the next target comfortable?
+  A used anchor shows RELEASE instead of JUMP OFF until landing. The normal
+  chain gives one hop at every new block, without same-anchor pumping.
+
+### Earlier rope/wiring revision validation — 2026-10-05
 
 - Typecheck, production build and the pinned 32-state bundle/hash check pass.
 - Unit tests: **169 passed**, two existing conditional skips; includes actual
@@ -520,11 +548,13 @@ its own player-only collider.
 
 Space on the ground jumps. A new Space press while airborne consumes the jump
 only if the same probe used by the visible targeting hint finds an active marked
-anchor. That press latches the rope; another Space press releases it. Key release
+anchor. That press latches the rope; another Space press jumps off it. Key release
 alone does not detach a keyboard hook. Clicking takes over with the existing
 hold/release behaviour. Landing, respawning, opening the menu, losing focus or
 losing the anchor signal clears the keyboard latch. W/up remain ordinary jump
-aliases. No automatic hook is fired merely by continuing to hold a ground jump.
+aliases, including the attached-rope hop. Space cancels a hook still in flight
+without adding upward velocity. No automatic hook is fired merely by continuing
+to hold a ground jump.
 
 ## Grapple tuning and known limits
 
@@ -538,13 +568,19 @@ aliases. No automatic hook is fired merely by continuing to hold a ground jump.
 | Swing damping | exponential 0.25 horizontal / 0.9 vertical per second |
 | Attached velocity cap | 800 units/s overall; upward speed limited to 360, including after rope correction |
 | Release cap / retained momentum | 740 units/s overall / 100% horizontal, 55% vertical; upward speed limited to 240 |
-| Release boost / attached jump kick | zero / none |
+| Mouse release boost | zero |
+| Intentional attached-rope jump | sets upward speed to 520 units/s; total speed capped at 900; retains bounded sideways carry |
+| Rope jump budget | once per distinct anchor until landing; no extra hop from repeated hooks to the same anchor |
 | Cube pull | up to 330 units/s, with low gravity and normal body collision |
 
 The old reel added inward momentum every simulation step. C8 approaches a
 bounded inward speed instead. Alternating left/right input for 30 simulated
-seconds remained under the cap. Releasing/re-hooking cannot stack the old
-jump kick; inactive anchors release attached ropes immediately. Cubes never
+seconds remained under the cap. The new Space/W/Up rope jump is a fixed upward
+speed, never an additive kick: roughly 38 units of rise tapped or 53 held. Each
+distinct anchor can supply it once before landing. Releasing/re-hooking the same
+anchor cannot refresh that budget, even after visiting another used anchor.
+Landing resets the transient budget; it is not saved. Inactive anchors release
+attached ropes immediately without a jump impulse. Cubes never
 enter the swing-anchor list. Cube pulling is disabled in PRESSURE with all
 other grapple input.
 
@@ -554,13 +590,15 @@ gaps and the current reel speed. Successful browser crossings start near the
 lip, hold click + D, and release on the first rightward swing. The intended
 route needs neither jump-launching nor manual reeling.
 
-The 2026-10-05 tuning restores more sideways carry without the old upward
-release kick. Horizontal drag is lower; vertical drag and upward-only caps
+The earlier 2026-10-05 tuning restored more sideways carry without an automatic
+upward release kick. Horizontal drag is lower; vertical drag and upward-only caps
 keep the arc shallow while preserving gravity on the downward swing. In the
 same simulated SWITCH crossing, the release begins at about 696 horizontal
 units/s versus 607 previously; removing the old release loss retains almost
 all of that speed. With movement released too, the player rises less than 16
-units after detaching and lands safely beyond x=990. Ordinary jumps are unchanged.
+units after detaching and lands safely beyond x=990. These measurements describe
+ordinary mouse release; the intentional rope jump now provides an alternative
+for easier chaining. Ordinary ground jumps are unchanged.
 
 No runaway speed was observed in the stress or browser tests. This is not an
 exhaustive exploit proof: targeting does not currently reject a marked anchor

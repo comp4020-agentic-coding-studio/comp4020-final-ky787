@@ -8,6 +8,7 @@ import type { Vec2 } from '../engine/geometry.ts';
 import { revealMessage, authoredPresentation, type MachinePresentation } from './presentation.ts';
 import type { PuzzleWorld } from './world.ts';
 import { ROOM_IDS } from './controller.ts';
+import { canJumpFromRope } from '../engine/physics.ts';
 import { drawMachinery } from './machinery-render.ts';
 import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
@@ -248,7 +249,8 @@ export class PuzzleRenderer {
             c.setLineDash([]);
             if (!p.grounded && ['idle', 'retracting'].includes(rope.phase)) this.text('SPACE · GRAPPLE', p.x - 65, p.y - 48, 13, C.cyan);
         }
-        if (w.keyboardGrapple) this.text('SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
+        if (rope.phase === 'attached') this.text(canJumpFromRope(p) ? 'SPACE · JUMP OFF' : 'SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
+        else if (w.keyboardGrapple) this.text('SPACE · CANCEL HOOK', p.x - 65, p.y - 48, 13, C.cyan);
         if (r.id === 'switch' || r.id === 'relay') {
             this.text('HOLD CLICK + D', 305, 440, 15, C.ink);
             this.text('OR SPACE IN THE AIR', 285, 461, 13, C.cyan);

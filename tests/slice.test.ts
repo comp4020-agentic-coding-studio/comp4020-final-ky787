@@ -175,7 +175,7 @@ describe('C8 physical vocabulary', () => {
         step(w, 2.1);
         expect(crumble.solid.enabled).toBe(true);
     });
-    it('long alternating swing input stays capped and release adds no jump kick', () => {
+    it('long alternating swing input stays capped and mouse release adds no jump kick', () => {
         const w = world(1);
         w.inputs.switchB = true;
         Object.assign(w.player, { x: 430, y: 500 });
@@ -193,7 +193,7 @@ describe('C8 physical vocabulary', () => {
             }
         }
         expect(attached).toBeGreaterThan(1000);
-        w.step(FIXED_DT, { ...emptyInput(), jumpPressed: true });
+        w.step(FIXED_DT, emptyInput());
         expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThanOrEqual(GRAPPLE.maxReleaseSpeed + PLAYER.gravity * PLAYER.fallGravity * FIXED_DT);
         expect(w.player.vy).toBeGreaterThanOrEqual(-GRAPPLE.maxReleaseRiseSpeed);
     });
@@ -229,7 +229,7 @@ describe('C8 physical vocabulary', () => {
 });
 
 describe('C8 playtest revisions', () => {
-    it('ground Space jumps, airborne Space catches the hinted ring, another press releases', () => {
+    it('ground Space jumps, airborne Space catches the hinted ring, another press jumps off', () => {
         const w = world(1);
         w.inputs.switchB = true;
         Object.assign(w.player, { x: 430, y: 543 });
@@ -248,7 +248,19 @@ describe('C8 playtest revisions', () => {
         step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, aim });
         expect(w.player.rope.phase).not.toBe('attached');
         expect(w.keyboardGrapple).toBe(false);
-        expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThanOrEqual(GRAPPLE.maxReleaseSpeed + PLAYER.gravity * PLAYER.fallGravity * FIXED_DT);
+        expect(w.player.vy).toBeLessThan(-400);
+        expect(w.player.ropeJumpAnchors).toEqual(['anchor']);
+        expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThanOrEqual(GRAPPLE.maxJumpSpeed);
+    });
+    it('Space cancels a firing hook without providing an airborne jump', () => {
+        const w = world(1); w.inputs.switchB = true;
+        Object.assign(w.player, { x: 430, y: 440, vy: 100 });
+        const aim = { x: 770, y: 226 };
+        step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, aim });
+        expect(w.player.rope.phase).toBe('firing');
+        step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, aim });
+        expect(w.player.rope.phase).not.toBe('attached'); expect(w.keyboardGrapple).toBe(false);
+        expect(w.player.vy).toBeGreaterThan(0); expect(w.player.ropeJumpAnchors).toEqual([]);
     });
     it('airborne Space cannot hook inactive cards or unmarked architecture', () => {
         for (const aim of [{ x: 770, y: 226 }, { x: 100, y: 560 }]) {

@@ -127,7 +127,7 @@ export class SliceGame {
           <div class="reset-actions"><button id="cancel-reset">Cancel</button><button id="confirm-reset" class="danger">Reset all progress</button></div>
         </div>
       </div>
-      <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook / release · Hold click also hooks<br>R checkpoint · Tab overview</p>
+      <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());

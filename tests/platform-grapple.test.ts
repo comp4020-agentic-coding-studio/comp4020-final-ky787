@@ -36,12 +36,13 @@ describe('address slabs as grapple surfaces', () => {
     });
     it('plausible crumble slabs accept hooks only while present', () => {
         const w = new PuzzleWorld(roomById('uplink'), { ...freshProgress().rooms.uplink, switchC: true, cubeOnPlateB: true }), p = w.platforms.find(p => p.def.id === 'proven-clone')!;
-        Object.assign(w.player, { x: 1280, y: 470 });
-        expect(w.target({ x: 1280, y: 176 })?.solid.id).toBe(p.def.id);
-        Object.assign(w.player, { x: 1280, y: p.def.y - 30, vy: 20 });
+        const x = p.def.x + p.def.w / 2, aim = { x, y: p.def.y + 6 };
+        Object.assign(w.player, { x, y: 470 });
+        expect(w.target(aim)?.solid.id).toBe(p.def.id);
+        Object.assign(w.player, { x, y: p.def.y - 30, vy: 20 });
         for (let i = 0; i < 170; i++) w.step(FIXED_DT, emptyInput());
         expect(p.solid.enabled).toBe(false); expect(p.solid.grappleable).toBe(false);
-        expect(w.target({ x: 1280, y: 176 })).toBeNull();
+        expect(w.target(aim)).toBeNull();
         for (let i = 0; i < 300; i++) w.step(FIXED_DT, emptyInput());
         expect(p.solid.grappleable).toBe(true);
     });

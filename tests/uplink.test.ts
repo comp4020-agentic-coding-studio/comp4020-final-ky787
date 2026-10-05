@@ -105,14 +105,17 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
         expect(w.frame.outputs.exitDoor).toBe(false); expect(w.frame.outputs.codePlatformB).toBe(false);
     });
     it('the initial grapple cannot reach the upper control through swinging or repeated re-hooks', () => {
-        for (const rehook of [false, true]) {
+        for (const mode of ['hold', 'rehook', 'rope-jump']) {
+            const rehook = mode !== 'hold';
             const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, cubeOnPlate: true });
             Object.assign(w.player, { x: 440, y: 1203 }); tick(w, 3);
             let highest = w.player.y, attached = 0;
             for (let n = 0; n < 1800; n++) {
                 const fire = n === 0 || (rehook && n % 60 === 0);
                 tick(w, 1, { right: Math.floor(n / 90) % 2 === 0, left: Math.floor(n / 90) % 2 === 1,
-                    grapplePressed: fire, grappleHeld: !rehook || n % 60 < 50, reelIn: true, aim: { x: 780, y: 886 } });
+                    grapplePressed: fire, grappleHeld: !rehook || n % 60 < 50,
+                    jumpPressed: mode === 'rope-jump' && n % 60 === 49, jumpHeld: mode === 'rope-jump',
+                    reelIn: true, aim: { x: 780, y: 886 } });
                 highest = Math.min(highest, w.player.y);
                 if (w.player.rope.phase === 'attached') attached++;
             }
@@ -149,10 +152,12 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
             expect(w.player.groundId).toBe('cube-body');
             tick(w, 1, { right: true, jumpPressed: true, jumpHeld: true });
             let hooked = false, highest = w.player.y;
+            const clone = w.room.platforms.find(p => p.id === 'proven-clone')!;
+            const aim = { x: clone.x + clone.w / 2, y: clone.y + 6 };
             for (let n = 0; n < 240; n++) {
-                const target = w.target({ x: 1280, y: 176 });
+                const target = w.target(aim);
                 hooked ||= !!target;
-                tick(w, 1, { right: true, jumpHeld: true, grappleHeld: true, grapplePressed: !!target, aim: { x: 1280, y: 176 } });
+                tick(w, 1, { right: true, jumpHeld: true, grappleHeld: true, grapplePressed: !!target, aim });
                 highest = Math.min(highest, w.player.y);
             }
             expect(hooked).toBe(false);
