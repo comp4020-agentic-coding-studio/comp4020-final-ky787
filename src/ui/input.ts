@@ -55,6 +55,8 @@ export class InputManager {
       const target = e.target as HTMLElement | null;
       if (target && ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName)) return;
       const code = e.code;
+      // Menu buttons keep native keyboard navigation and activation.
+      if (target?.closest("button") && (code === "Tab" || code === "Space" || code === "Enter")) return;
       if (GAME_KEYS.has(code)) e.preventDefault();
       if (down && e.repeat) return;
       if (down) this.held.add(code);

@@ -296,7 +296,7 @@ const checks: string[] = [];
 function check(label: string, ok: boolean, detail = ''): void { checks.push(`${ok ? 'PASS' : 'FAIL'} ${label}${detail ? ' — ' + detail : ''}`); if (!ok)
     throw new Error(label + ' ' + detail); }
 async function click(cdp: Cdp, selector: string) {
-    const at = await evaluate<{ x: number; y: number }>(cdp, `(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+    const at = await evaluate<{ x: number; y: number }>(cdp, `(()=>{const el=document.querySelector(${JSON.stringify(selector)});el.scrollIntoView({block:'nearest'});const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
     await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...at, button: 'left', buttons: 1, clickCount: 1 });
     await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at, button: 'left', buttons: 0, clickCount: 1 });
     await sleep(150);
@@ -451,7 +451,20 @@ async function main() {
         await waitFor(cdp, 'save API', s => s.persistence.visitor !== '');
         await shot(cdp, 'start');
         check('new visitor starts at pressure', (await snap(cdp)).room === 'pressure');
-        await click(cdp, '#continue');
+        check('all four rooms available from the menu', await evaluate(cdp, 'document.querySelectorAll(".level-select button").length === 4'));
+        // Native keyboard navigation reaches the last room without completing tutorials.
+        for (let i = 0; i < 4; i++) await tap(cdp, 'Tab');
+        check('level select supports keyboard navigation', await evaluate(cdp, 'document.activeElement.dataset.room === "uplink"'));
+        await tap(cdp, 'Space');
+        await waitFor(cdp, 'selected UPLINK', s => s.room === 'uplink');
+        check('selecting UPLINK does not complete skipped rooms', (await snap(cdp)).progress.completedRooms.length === 0);
+        await checkValidatedFrame(cdp, 'direct room selection');
+        await waitFor(cdp, 'selected room saved', s => s.persistence.status === 'Saved on server');
+        await cdp.send('Page.reload'); await sleep(600);
+        await waitFor(cdp, 'selected room restored', s => s.persistence.visitor !== '' && s.room === 'uplink');
+        check('reload continues the selected room', await evaluate(cdp, "document.querySelector('#continue').textContent.includes('CONTINUE — UPLINK')"));
+        await click(cdp, '[data-room="pressure"]');
+        check('level select returns to an unfinished tutorial', (await snap(cdp)).room === 'pressure' && (await snap(cdp)).progress.completedRooms.length === 0);
         await walkTo(cdp, 260);
         await tap(cdp, 'KeyE');
         check('cube carried', (await snap(cdp)).cube?.carried === true);
@@ -590,9 +603,19 @@ async function main() {
         await waitFor(cdp, 'proven clone reappears', s => s.platforms.some(p => p.id === 'proven-clone' && p.enabled));
         await shot(cdp, 'uplink-bogus-recovered');
         await tap(cdp, 'KeyR'); await click(cdp, '#pause');
+        await shot(cdp, 'level-select');
+        await click(cdp, '[data-room="relay"]');
+        check('selecting a completed room restores its checkpoint and cube', (await snap(cdp)).room === 'relay' && (await snap(cdp)).checkpoint === 'relay' && (await snap(cdp)).inputs.cubeOnPlateB && (await snap(cdp)).outputs.bridge);
+        await click(cdp, '#pause');
+        await click(cdp, '[data-room="uplink"]');
+        check('returning to UPLINK keeps upper latch and final payload', (await snap(cdp)).checkpoint === 'upper' && (await snap(cdp)).inputs.cubeOnPlateC && (await snap(cdp)).outputs.exitDoor && (await snap(cdp)).progress.completedRooms.length === 4);
+        await checkValidatedFrame(cdp, 'return through level select');
+        await click(cdp, '#pause');
         await cdp.send('Emulation.setDeviceMetricsOverride', { width: 960, height: 640, deviceScaleFactor: 1, mobile: false });
         await sleep(300);
         await shot(cdp, 'compact-menu');
+        await click(cdp, '[data-room="switch"]');
+        check('compact menu selects rooms with saved switch state', (await snap(cdp)).room === 'switch' && (await snap(cdp)).outputs.grappleAnchor);
         check('no console errors', cdp.errors.length === 0, cdp.errors.join(' | '));
     }
     finally {

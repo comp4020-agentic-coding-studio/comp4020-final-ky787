@@ -123,6 +123,8 @@ footer button {
 }
 .menu-card {
   width:min(540px,90%);
+  max-height:calc(100% - 24px);
+  overflow-y:auto;
   padding:35px 42px;
   border:1px solid #38515c;
   background:#101e27;
@@ -284,3 +286,11 @@ p {
 .trace-commits { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
 .trace-commits span { border:1px solid #304551; padding:2px 5px; color:#657e8e; }
 .trace-commits .committed { color:#a1eee0; border-color:#39746b; }
+
+.level-select { margin-top:22px; padding-top:18px; border-top:1px solid #314750; }
+.level-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:12px 0 9px; }
+.level-grid button { text-align:left; padding:11px 12px; }
+.level-grid strong { display:block; font:12px ui-monospace,monospace; }
+.level-grid small { display:block; font:9px ui-monospace,monospace; margin-top:6px; color:#91a9b5; }
+.level-grid [aria-current] { border-color:#64e6d5; }
+.level-select>small { font:10px/1.5 ui-monospace,monospace; color:#91a9b5; }

@@ -396,6 +396,16 @@ position, velocity, rope or frame snapshots are persisted. Cube-on-plate saves
 reconstruct a cube at the correct plate, including B; other loose cubes return to authored spawn.
 A carried cube therefore need not be rescued after returning to the site.
 
+The start/pause menu offers all four rooms from the beginning, with current and
+completed status. Selecting a different room saves the outgoing logical state
+and restores the selected room at its saved checkpoint. Selecting the current
+room resumes play. Visiting a room never marks it complete; reload continues
+the selected room. This uses the existing per-room version-3 save without a
+schema change. The selector supports mouse and Tab/Space/Enter navigation.
+The browser route checks direct UPLINK selection, reload, revisiting completed
+rooms and retained cube/latch state. Menu captures are in
+`docs/playtest/level-select-menu.png` and `level-select-compact.png` (960×640).
+
 Existing version-1/2 saves migrate in memory to version 3. Version 1 gains an
 empty Plate B as before. All old rooms, visitor identity, revisions, mechanics,
 completion and history are preserved. A visitor who finished the three tutorials

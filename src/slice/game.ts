@@ -89,25 +89,47 @@ export class SliceGame {
         const p = this.store.progress, saved = this.store.updatedAt;
         this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA / C8 PLAYTEST</span>
       <h2>${this.ended ? 'Uplink complete.' : 'Small inputs.<br>Big changes.'}</h2>
-      <p>${this.ended ? 'Four rooms explored. Ready for a human playtest.' : 'Three tutorials. One bigger puzzle.<br>Route the payload to the Uplink.'}</p>
+      <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Three tutorials. One bigger puzzle.<br>Route the payload to the Uplink.'}</p>
       <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${p.currentRoom.toUpperCase()} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${p.currentRoom.toUpperCase()}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       ${this.ended ? '<button id="new-run">Start a new run</button>' : ''}
+      <nav class="level-select" aria-label="Level select">
+        <span class="eyebrow">CHOOSE A ROOM</span>
+        <div class="level-grid">${ROOMS.map((room, index) => `<button data-room="${room.id}" ${room.id === p.currentRoom ? 'aria-current="true"' : ''}><strong>0${index + 1} / ${room.title}</strong><small>${room.id === p.currentRoom ? 'CURRENT' : p.completedRooms.includes(room.id) ? 'COMPLETE' : 'PLAY'}</small></button>`).join('')}</div>
+        <small>All rooms available · keeps each room’s saved progress</small>
+      </nav>
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook / release · Hold click also hooks<br>R checkpoint · Tab overview</p>
       <p class="prototype-note">UPLINK: validated OLLVM controller + real assembly.<br>Tutorial controllers and all string effects remain authored.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
-        this.menu.querySelector('#continue')!.addEventListener('click', () => {
-            if (this.ended) {
-                this.loadRoom();
-                this.ended = false;
-            }
-            this.started = true;
-            this.menu.hidden = true;
-            this.input.releaseAll();
-            this.canvas.focus();
-        });
+        this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
+        this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
+        for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-room]')) {
+            button.addEventListener('click', () => {
+                const room = ROOMS.find(r => r.id === button.dataset.room);
+                if (!room) return;
+                if (room.id !== this.world.room.id) {
+                    // Save logical state before switching. Merely visiting never completes a room.
+                    p.rooms[this.world.room.id] = this.world.memory();
+                    p.currentRoom = room.id;
+                    this.store.save(p);
+                    this.ended = false;
+                    this.loadRoom();
+                }
+                this.resumeRoom();
+            });
+        }
         this.menu.querySelector('#retry-save')?.addEventListener('click', async () => { await this.store.load(); this.loadRoom(); this.showMenu(); });
         this.menu.querySelector('#new-run')?.addEventListener('click', () => { this.store.progress = freshProgress(); this.store.save(this.store.progress); this.ended = false; this.loadRoom(); this.showMenu(); });
+    }
+    private resumeRoom(): void {
+        if (this.ended) {
+            this.loadRoom();
+            this.ended = false;
+        }
+        this.started = true;
+        this.menu.hidden = true;
+        this.input.releaseAll();
+        this.canvas.focus();
     }
     private save(events: string[]): void {
         const p = this.store.progress, id = this.world.room.id;

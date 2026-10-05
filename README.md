@@ -33,6 +33,8 @@ to rise, then step sideways onto the upper deck.
 Click-hold a cube in RELAY or UPLINK to pull it towards you. S drops through code platforms.
 R returns to the checkpoint without clearing solved machinery. Tab shows the
 room overview. Escape opens the menu. F1 shows inputs, outputs, trace activity and save state.
+The start/pause menu lets you choose any of the four rooms. Each room keeps its
+saved checkpoint and puzzle progress; selecting a room does not mark it complete.
 The debug panel can return a lost cube to its spawn. In UPLINK, **Evidence** pauses
 play for full assembly, retained trace occurrences and clone provenance. Code
 platforms show their real addresses with assembly and authored strings below;
