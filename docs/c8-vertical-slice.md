@@ -44,7 +44,9 @@ UPLINK is 2,440 × 1,100. The lower floor is y=860, the upper decks y=260: a
 600-unit ascent. Near architecture ends at x=480 and resumes at x=960, leaving
 a 480-unit death gap. Plate A is at (320,860); the ring is at (780,526).
 The cube cannot be pulled from A by someone standing on the far bank. The
-initial marked anchor is the only grapple target, well below the upper decks.
+initial crossing slab is well below the upper decks. Other code slabs accept
+hooks once enabled; the service/upper route remain off until their controller
+conditions hold. The optional crumble is far outside the initial crossing range.
 
 The relay switch at (1140,860) powers the fixed R1 pair, whose two doorways are
 at x=120 and x=1300. Both face right into clear floor space. Plate B (1510,860)
@@ -60,7 +62,7 @@ Intended solution:
 1. Put the cube on A; grapple across the gap. Power the relay with the far lever.
    This sets the far checkpoint. The relay switch remains a genuine ON/OFF toggle.
 2. Enter gate B to return to the near side. Retrieve the cube, carry it through
-   A → B, and leave it on Plate B. The grapple turns off; the lift powers up.
+   A → B, and leave it on Plate B. The crossing slab turns off; the lift powers up.
 3. Ride the lift, steer right onto the broad control deck, and operate the upper
    latch. It permanently holds lift power, lights the service landing, and sets
    the upper checkpoint. The final route remains ghosted and the exit closed.
@@ -138,8 +140,8 @@ bounce back. There is no arbitrary portal placement or high-speed portal fling.
   and versioned shared schema, separate from simulation.
 
 Static architecture is always solid and unhookable. Code cards follow named
-output signals for collision/illumination. Only cards explicitly marked as
-anchors expose a grapple point. The authored crumble type is named
+output signals for collision/illumination. All enabled floating code/crumble slabs accept a grapple across their header;
+inactive/absent slabs do not. Static architecture remains unhookable. The authored crumble type is named
 `crumble-prototype`; it must never acquire an evidence-backed bogus label
 without retained experimental proof. UPLINK also has a separate `crumble-proven` object linked to retained BCF proof.
 The header/debug view identifies the active controller source; string effects
@@ -232,12 +234,14 @@ Bridge remains false in this contract. Switch history remains physical room stat
 
 The six exported machinery mappings drive assembly displays at the anchor, R1
 relay, lift, service landing, upper return route and exit. Each shows 3–5 actual
-instructions surrounding its selected retained store, with a native address range
-(end exclusive) and RVA gutter. Excerpts are contiguous within a retained raw
+instructions surrounding its selected retained store. A real excerpt address is
+printed on the physical slab, with disassembly and authored string feedback
+directly underneath. The inspector retains full address ranges and raw IDs. Excerpts are contiguous within a retained raw
 block. The original Binary Ninja address gutter, mnemonic/operand colours and
 lit/ghosted block treatment are adapted without changing collision bounds.
-Labels such as SERVICE are explicitly semantic presentation labels, not symbols
-invented for the executable. Thin machine/display tethers are authored, not CFG edges.
+Physical code slabs use real native addresses instead of labels such as SERVICE.
+Small CODE/GHOST type tags describe game state, not original executable symbols.
+Display-to-machine tethers and permanent grapple rings have been removed.
 Service and payload regions overlap; the inspector preserves that awkwardness.
 
 Physical outputs update synchronously on input sampling. Independently, the
@@ -245,7 +249,7 @@ renderer replays the selected trace's actual chronological instruction addresses
 including helper-call timing. A base 180 retained steps/s and at least 160 ms
 between output commits make the seven stores readable, including false writes.
 This is presentation time, not simulated CPU speed. Instruction highlights,
-commit pulses and the ordered HUD commit list refer to retained addresses/events.
+commit pulses and the ordered debug HUD commit list refer to retained addresses/events.
 Occurrence IDs and visit numbers are preserved (this specimen happens to have no
 repeated raw-block visits). A new state restarts its own trace; no artificial edge
 joins two evaluations. Brief intermediate states can be superseded visually;
@@ -254,6 +258,7 @@ world outputs are never queued behind animation.
 The **Evidence** button pauses play and opens full retained regions, raw IDs,
 addresses/bytes, all occurrences, chronological commits, PE identity and proof
 assumptions. It can reveal the optional clone's classification on the canvas.
+The ordered trace HUD appears only with Debug to reduce ordinary play clutter.
 The debug panel includes controller state/trace identity, replay cursor and save
 state. Inspector/reveal state and trace timing are not saved.
 
@@ -267,8 +272,8 @@ no anchor, and cannot reach the upper node. The full solution works without it.
 Contact uses the existing 0.6 s crumble / 2.4 s respawn behaviour; falling loses no
 puzzle state. The code plaque shows all six real instructions unchanged.
 
-Ordinary play labels the region UNANALYSED / UNSTABLE. The inspector exposes its
-proof immediately; its reveal checkbox can show **PROVEN BOGUS** without removing
+Ordinary play labels the slab with its real native address and a CODE type tag. The inspector exposes its
+proof immediately; its reveal checkbox can show its **BOGUS** type without removing
 or simplifying any instruction. The clone resembles codePlatformB/exit writes,
 but those unreachable instructions are **not** replayed as successful output events.
 
@@ -324,7 +329,7 @@ aliases. No automatic hook is fired merely by continuing to hold a ground jump.
 | Setting | C8 value |
 | --- | --- |
 | Maximum range | 500 world units |
-| Aim assist | 26 units around a 20 × 20 marked target; hook snaps to the ring |
+| Aim assist | 26 units around the slab address bar (full width, up to 24 high); the main crossing slabs retain their tuned centre snap |
 | Automatic reel speed / minimum rope | 250 units/s / 200 units |
 | Attached gravity | 1.35 × normal gravity |
 | Swing acceleration | 1,350 units/s² |
@@ -507,3 +512,40 @@ Screenshots retained in `docs/playtest/` show the implemented rooms and restored
 continue screen. The next step is a human playtest of this integrated slice.
 New evidence screenshots use the `uplink-binary-` prefix; earlier greybox
 screenshots remain as historical review material.
+
+## Address-slab presentation revision — 2026-10-05
+
+Following playtest feedback, a code object now has one physical address bar,
+with actual disassembly and its authored string directly beneath. The renderer
+uses the original Crit 5 layering: listings first, collision slabs and controls
+above them. Headers read real retained addresses for both live and proven-clone
+blocks; semantic machinery names remain available in Evidence. Header addresses
+can change with the selected retained branch, just as the instruction excerpt does.
+
+Removed the detached assembly cards/tethers, permanent ring labels, repeated
+“REAL x64 / full region in EVIDENCE” footers, the duplicate UPLINK wall string
+panel, and decorative UPLINK wiring lines. Trace telemetry is now debug-only;
+real execution still highlights instructions and pulses machinery during play.
+Equipment listings sit against the relay, lift emitter and exit architecture.
+Strings remain authored effects, identified in the menu and evidence inspector.
+
+Regular platforms here means floating code slabs. All enabled code slabs and
+present crumble slabs accept hooks across the address bar; ghosted/collapsed
+blocks and decorative listings do not. Static floors/ledges remain unhookable.
+PRESSURE still disables the grapple. The original crossing attachment centres,
+range and swing limits remain unchanged. New code surfaces reuse the existing
+ray/preview/Space input path. A centred crossing attachment with a wider catch
+surface preserved the accepted low horizontal swing; snapping to a different
+bar edge initially reduced momentum and was rejected by the existing tests.
+
+Type labels are small: STATIC on architecture, CODE/GHOST on retained slabs,
+and BOGUS only after the inspector reveal. No addresses were invented for the
+mock tutorial blocks. The optional clone retains all six real instructions;
+its tighter line spacing keeps the last instruction above the recovery floor.
+
+Validation: 149 unit tests pass (two existing conditional skips), typecheck,
+pinned-bundle production build and both running-server HTTP invariants pass.
+All 56 real-control browser assertions pass, with zero UPLINK deaths, no console
+errors, and successful far/upper/Node C reloads. Fresh screenshots and the browser
+log use `docs/playtest/uplink-slabs-*`. Existing saved state and retained evidence
+bytes are unchanged.

@@ -29,8 +29,10 @@ export function drawMachinery(c: CanvasRenderingContext2D, w: PuzzleWorld, prese
         c.fillStyle = '#243b43'; c.fillRect(b.x, b.y + b.h - 10, b.w, 10);
         c.fillStyle = colour;
         for (let x = b.x + 8; x < b.x + b.w - 8; x += 18) c.fillRect(x, b.y + b.h - 8, 9, 5);
-        text('LIFT / VERTICAL TRANSPORT', b.x + 5, b.y + b.h + 35, colour);
-        text(message('liftField', lift.pulse), b.x + 6, b.y + 50, colour, 12);
+        if (w.room.id !== 'uplink') {
+            text('LIFT / VERTICAL TRANSPORT', b.x + 5, b.y + b.h + 35, colour);
+            text(message('liftField', lift.pulse), b.x + 6, b.y + 50, colour, 12);
+        }
         if (lift.pulse > 0) {
             c.globalAlpha = lift.pulse; c.strokeStyle = '#c6fff5'; c.lineWidth = 4;
             c.strokeRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8); c.globalAlpha = 1;

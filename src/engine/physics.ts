@@ -28,6 +28,8 @@ export interface Solid extends Box {
   grappleable: boolean;
   /** Centred grapple target width when it differs from the collision box. */
   grappleWidth?: number;
+  /** Optional visible slab height, independent of decorative listings. */
+  grappleHeight?: number;
   /** Explicit marked point, when this object exposes a puzzle anchor. */
   grapplePoint?: Vec2;
 }
@@ -310,13 +312,13 @@ export interface GrappleTarget {
 
 /** The actual box a grapple ray can catch, centred on the collision box. */
 export function grappleBox(solid: Solid): Box {
-  if (solid.grapplePoint) return { x: solid.grapplePoint.x - 10, y: solid.grapplePoint.y - 10, w: 20, h: 20 };
+  if (solid.grapplePoint && solid.grappleHeight === undefined) return { x: solid.grapplePoint.x - 10, y: solid.grapplePoint.y - 10, w: 20, h: 20 };
   const w = solid.grappleWidth ?? solid.w;
   return {
     x: solid.x + (solid.w - w) / 2,
     y: solid.y,
     w,
-    h: solid.h,
+    h: solid.grappleHeight ?? solid.h,
   };
 }
 

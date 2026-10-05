@@ -1,5 +1,5 @@
 import { roomController } from './validated-controller.ts';
-import { CUBE_SIZE } from './tuning.ts';
+import { CUBE_SIZE, CODE_SLAB_HEIGHT } from './tuning.ts';
 import { CARRY, GRAPPLE, PLAYER } from '../engine/constants.ts';
 import { boxesOverlap, clamp, type Vec2 } from '../engine/geometry.ts';
 import { createPlayer, playerBox, releaseRope, stepBody, stepPlayer, findGrappleTarget, type InputState, type LooseBody, type Solid } from '../engine/physics.ts';
@@ -61,7 +61,7 @@ export class PuzzleWorld {
             this.cube = { ...at, vx: 0, vy: 0, carried: false, grounded: true, groundId: 'near' };
         }
         this.platforms = room.platforms.map(def => ({ def, pulse: 0, fuse: -1, respawn: 0,
-            solid: { ...def, oneWay: def.kind !== 'static', enabled: def.kind !== 'code', grappleable: false, grappleWidth: 26, grapplePoint: def.anchor ? { x: def.x + def.w / 2, y: def.y + 6 } : undefined } }));
+            solid: { ...def, oneWay: def.kind !== 'static', enabled: def.kind !== 'code', grappleable: def.kind !== 'static' && def.kind !== 'code', grappleHeight: Math.min(CODE_SLAB_HEIGHT, def.h), grapplePoint: def.anchor ? { x: def.x + def.w / 2, y: def.y + 6 } : undefined } }));
         this.door = { ...room.exit, id: 'exit-door', oneWay: false, enabled: true, grappleable: false };
         this.solids = [...this.platforms.map(p => p.solid), this.door,
             { id: 'left-wall', x: -40, y: -800, w: 40, h: 2000, enabled: true, oneWay: false, grappleable: false },
@@ -133,7 +133,7 @@ export class PuzzleWorld {
                 this.displayPulse = 1;
             }
             p.solid.enabled = active;
-            p.solid.grappleable = active && !!p.def.anchor;
+            p.solid.grappleable = active;
         }
         if (Object.keys(old).some(k => old[k as keyof typeof old] !== this.frame.outputs[k as keyof typeof old]))
             this.displayPulse = 1;
@@ -347,6 +347,7 @@ export class PuzzleWorld {
                 if (platform.respawn === 0)
                     platform.solid.enabled = true;
             }
+            platform.solid.grappleable = platform.solid.enabled;
         }
         this.plateDepth += ((this.inputs.plateA ? 1 : 0) - this.plateDepth) * Math.min(1, dt * 16);
         this.plateDepthB += ((this.inputs.plateB ? 1 : 0) - this.plateDepthB) * Math.min(1, dt * 16);

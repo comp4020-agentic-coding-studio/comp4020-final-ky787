@@ -14,7 +14,7 @@ earlier binary-backed tutorial and its tests remain outside the default game.
 
 1. **PRESSURE:** put the cube on the button to open the exit, then hop past it.
 2. **SWITCH:** flip the lever to materialise the marked grapple platform. Hold
-   left click on its ring while moving right, then release as you swing right.
+   left click on its code slab while moving right, then release as you swing right.
 3. **RELAY:** leave the cube on Plate A, grapple across and lock the return bridge
    with its lever. Walk back for the cube and carry it to Plate B on the first
    raised platform to open the exit. Jump onto the cube or over it to climb the
@@ -22,7 +22,7 @@ earlier binary-backed tutorial and its tests remain outside the default game.
 4. **UPLINK:** get the payload to the upper node. Observe which controls power the
    relay, lift and upper route; some machinery lets you return for the cube.
 
-A/D or arrows move. Space/W jumps. Aim at a marked ring to preview the grapple;
+A/D or arrows move. Space/W jumps. Aim at an enabled code slab to preview the grapple;
 press Space again in midair to hook that highlighted target, then once more to
 release. A tap holds the rope for you. Hold left click and release still works.
 E picks up/puts down a cube or uses a nearby lever. RELAY's bridge lever locks
@@ -32,9 +32,11 @@ in either direction; a carried cube comes with you. Steer within the Lift Field
 to rise, then step sideways onto the upper deck.
 Click-hold a cube in RELAY or UPLINK to pull it towards you. S drops through code platforms.
 R returns to the checkpoint without clearing solved machinery. Tab shows the
-room overview. Escape opens the menu. F1 shows inputs, outputs and save state.
+room overview. Escape opens the menu. F1 shows inputs, outputs, trace activity and save state.
 The debug panel can return a lost cube to its spawn. In UPLINK, **Evidence** pauses
-play for full assembly, retained trace occurrences and clone provenance. Assembly
+play for full assembly, retained trace occurrences and clone provenance. Code
+platforms show their real addresses with assembly and authored strings below;
+all enabled code slabs accept the hook. Static floors remain unhookable. Assembly
 playback explains machinery that has already responded; it never delays controls.
 
 This pass is tuned and tested for desktop keyboard and mouse. Inherited touch

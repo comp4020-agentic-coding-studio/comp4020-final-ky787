@@ -1,7 +1,7 @@
 import { TracePlayback } from './evidence-presentation.ts';
-import { drawEvidence } from './evidence-render.ts';
+import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
-import { CUBE_SIZE } from './tuning.ts';
+import { CUBE_SIZE, CODE_SLAB_HEIGHT } from './tuning.ts';
 import { Camera } from '../render/camera.ts';
 import { Particles } from '../render/fx.ts';
 import type { Vec2 } from '../engine/geometry.ts';
@@ -75,7 +75,7 @@ export class PuzzleRenderer {
         this.text(r.instruction, 80, r.id === 'uplink' ? 617 : 132, 27, C.ink);
         // Authored conduits communicate input/output relationships, not machine CFG edges.
         const source = r.plate ?? r.lever;
-        if (source) {
+        if (source && r.id !== 'uplink') {
             const anchor = r.platforms.find(p => p.anchor);
             const dest = anchor ? { x: anchor.x + anchor.w / 2, y: anchor.y } : r.exit;
             const on = r.id === 'pressure' ? w.frame.outputs.exitDoor : w.frame.outputs.grappleAnchor;
@@ -98,12 +98,14 @@ export class PuzzleRenderer {
             }
             this.text('RESET FIELD', h.x + 24, h.y + 43, 13, C.red);
         }
+        drawPlatformListings(c, w, this.replay, this.presentation);
         for (const p of w.platforms) {
-            const b = p.def;
+            const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };
             if (b.kind === 'static') {
                 c.fillStyle = C.wall;
                 c.fillRect(b.x, b.y, b.w, b.h);
                 this.line(b.x, b.y, b.x + b.w, b.y, C.line, 3);
+                if (b.w >= 120) this.text('STATIC', b.x + 12, b.y + 27, 9, '#718996');
                 for (let x = b.x + 18; x < b.x + b.w; x += 75)
                     this.line(x, b.y + 14, x + 20, b.y + 14, '#31444d', 2);
                 continue;
@@ -119,28 +121,20 @@ export class PuzzleRenderer {
             c.setLineDash(active ? [] : [5, 5]);
             c.strokeRect(b.x, b.y, b.w, b.h);
             c.setLineDash([]);
-            this.text(b.label ?? b.id, b.x + 10, b.y + Math.min(21, b.h - 6), 12, colour);
-            if (b.h > 40)
-                this.text(active ? 'signal → ON' : 'signal → OFF', b.x + 10, b.y + 43, 11, colour);
+            const address = r.id === 'uplink' ? platformAddress(p, this.replay) : null;
+            this.text(address ?? b.label ?? b.id, b.x + 8, b.y + Math.min(19, b.h - 7), address ? 11 : 12, colour);
+            if (address) {
+                const type = crumble && this.revealBogus ? 'BOGUS' : active ? 'CODE' : 'GHOST';
+                this.text(type, b.x + b.w - 36, b.y + Math.min(18, b.h - 8), 9, colour);
+            }
             if (crumble) {
-                this.text(b.kind === 'crumble-prototype' ? 'prototype' : 'UNSTABLE', b.x + 12, b.y + 49, 11, C.amber);
+                if (!address) this.text('prototype', b.x + 12, b.y + 49, 11, C.amber);
                 if (p.fuse >= 0) {
                     c.fillStyle = C.amber;
                     c.fillRect(b.x, b.y - 5, b.w * p.fuse / 0.6, 3);
                 }
                 if (p.respawn > 0)
                     this.text(`${p.respawn.toFixed(1)}s`, b.x + 50, b.y - 10, 13, C.amber);
-            }
-            if (b.anchor) {
-                const x = b.x + b.w / 2, y = b.y + 6;
-                if (active) {
-                    this.ring(x, y, 14, C.cyan);
-                    this.ring(x, y, 5, C.cyan);
-                    this.line(x, y - 23, x, y - 16, C.cyan);
-                    this.text('HOLD CLICK', b.x + 25, b.y - 29, 13, C.cyan);
-                }
-                else
-                    this.text('ANCHOR OFF', b.x + 24, b.y - 14, 13, C.dim);
             }
             c.globalAlpha = 1;
             if (p.pulse > 0) {
@@ -175,15 +169,6 @@ export class PuzzleRenderer {
             c.setLineDash([]);
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
-        if (r.id === 'uplink') {
-            c.setLineDash([5, 8]);
-            this.line(1510, 920, 1740, 920, w.frame.outputs.liftField ? C.cyan : C.line);
-            this.line(1510, 895, 1510, 920, w.frame.outputs.liftField ? C.cyan : C.line);
-            this.line(1740, 920, 1740, 865, w.frame.outputs.liftField ? C.cyan : C.line);
-            this.line(2320, 320, 1190, 320, w.frame.outputs.exitDoor ? C.cyan : C.line);
-            c.setLineDash([]);
-            this.text('PAYLOAD LINK', 2200, 354, 13, w.frame.outputs.exitDoor ? C.cyan : C.dim);
-        }
         for (const lever of [
             { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' },
             { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
@@ -198,15 +183,17 @@ export class PuzzleRenderer {
             this.ring(x + dx, y - 72, 7, C.ink);
             this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, y + 40, 13, lever.active ? C.cyan : C.amber);
         }
-        const feedback = this.presentation.describe(r.id, w.frame);
-        const displayOn = feedback.active, message = feedback.text;
-        c.fillStyle = '#111f29';
-        c.fillRect(r.display.x, r.display.y, 310, 78);
-        this.line(r.display.x, r.display.y, r.display.x + 310, r.display.y, displayOn ? C.cyan : C.line, 2);
-        this.text(feedback.label, r.display.x + 16, r.display.y + 23, 11, C.dim);
-        const decoded = displayOn ? Math.floor(message.length * (1 - w.displayPulse)) : 0;
-        const display = message.split('').map((ch, i) => i < decoded ? ch : ((i * 17 + Math.floor(w.elapsed * 8)) % 16).toString(16).toUpperCase()).join('');
-        this.text(display, r.display.x + 16, r.display.y + 51, 17, displayOn ? C.cyan : C.dim);
+        if (r.id !== 'uplink') {
+            const feedback = this.presentation.describe(r.id, w.frame);
+            const displayOn = feedback.active, message = feedback.text;
+            c.fillStyle = '#111f29';
+            c.fillRect(r.display.x, r.display.y, 310, 78);
+            this.line(r.display.x, r.display.y, r.display.x + 310, r.display.y, displayOn ? C.cyan : C.line, 2);
+            this.text(feedback.label, r.display.x + 16, r.display.y + 23, 11, C.dim);
+            const decoded = displayOn ? Math.floor(message.length * (1 - w.displayPulse)) : 0;
+            const display = message.split('').map((ch, i) => i < decoded ? ch : ((i * 17 + Math.floor(w.elapsed * 8)) % 16).toString(16).toUpperCase()).join('');
+            this.text(display, r.display.x + 16, r.display.y + 51, 17, displayOn ? C.cyan : C.dim);
+        }
         const e = r.exit;
         c.fillStyle = '#12312f';
         c.fillRect(e.x, e.y, e.w, e.h);
@@ -216,7 +203,7 @@ export class PuzzleRenderer {
         c.fillStyle = '#52616a';
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
         this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
-        drawEvidence(c, w, this.replay, this.revealBogus);
+        drawMachineListings(c, w, this.replay, this.presentation);
         const checkpoint = w.checkpointPosition();
         this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
         c.fillStyle = C.cyan;

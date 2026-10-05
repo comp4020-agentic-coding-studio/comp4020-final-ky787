@@ -1,51 +1,75 @@
-import { bogusInstructions, hex, instructionText, machineExcerpt, signalForBinding, type TracePlayback } from './evidence-presentation.ts';
-import type { PuzzleWorld } from './world.ts';
+import { CODE_SLAB_HEIGHT } from './tuning.ts';
+import { bogusInstructions, hex, instructionText, machineExcerpt, type TracePlayback } from './evidence-presentation.ts';
+import { uplinkEvidence } from './validated-controller.ts';
+import type { PuzzleWorld, PlatformState } from './world.ts';
+import type { MachinePresentation } from './presentation.ts';
 import type { NativeInstruction } from '../data/uplink-bundle.ts';
-/** Authored display positions only; neither geometry nor these connectors represent a CFG. */
-const displays = [
-    { id: 'grapple-anchor-display', label: 'ANCHOR', x: 595, y: 330, target: { x: 780, y: 520 } },
-    { id: 'relay-control-display', label: 'RELAY', x: 990, y: 635, target: { x: 1328, y: 750 } },
-    { id: 'lift-control-display', label: 'LIFT', x: 1690, y: 535, target: { x: 1750, y: 855 } },
-    { id: 'service-landing-display', label: 'SERVICE', x: 1320, y: 310, target: { x: 1505, y: 460 } },
-    { id: 'payload-route-display', label: 'PAYLOAD ROUTE', x: 1400, y: 72, target: { x: 1605, y: 260 } },
-    { id: 'exit-display', label: 'EXIT', x: 740, y: 75, target: { x: 1110, y: 170 } },
-];
-function panel(c: CanvasRenderingContext2D, lines: NativeInstruction[], label: string, x: number, y: number, active: boolean, pulse: number, stepAddress?: number) {
-    c.save();
-    c.font = '11px ui-monospace, monospace';
-    const width = Math.max(310, ...lines.map(i => c.measureText(`${i.rva.toString(16).padStart(8, '0')}  ${instructionText(i)}`).width + 24));
-    const height = 61 + lines.length * 16;
-    c.globalAlpha = active ? 0.96 : 0.55;
-    c.fillStyle = '#0b1720'; c.fillRect(x, y, width, height);
-    c.strokeStyle = pulse > 0 ? '#e2edf1' : active ? '#64e6d5' : '#647e91';
-    c.lineWidth = 1 + pulse * 2; c.strokeRect(x, y, width, height);
-    c.fillStyle = active ? '#64e6d5' : '#9fb1be';
-    c.fillText(`${label} · semantic label`, x + 10, y + 17);
-    c.fillStyle = '#96aec0'; c.font = '10px ui-monospace, monospace';
-    c.fillText(`${hex(lines[0].address)}–${hex(lines.at(-1)!.address + lines.at(-1)!.size)} excl.`, x + 10, y + 33);
-    c.font = '11px ui-monospace, monospace';
-    lines.forEach((i, n) => {
-        const yy = y + 52 + n * 16;
-        if (i.address === stepAddress) { c.fillStyle = '#25534f'; c.fillRect(x + 5, yy - 12, width - 10, 16); }
-        c.fillStyle = '#728d9f'; c.fillText(i.rva.toString(16).padStart(8, '0'), x + 10, yy);
-        c.fillStyle = '#e2edf1'; c.fillText(i.mnemonic, x + 75, yy);
-        c.fillStyle = '#a9bdd1'; c.fillText(i.op_str, x + 75 + c.measureText(`${i.mnemonic} `).width, yy);
-    });
-    c.fillStyle = '#728d9f'; c.font = '9px ui-monospace, monospace';
-    c.fillText('REAL x64 · excerpt · full region in EVIDENCE', x + 10, y + height - 8);
-    c.restore();
-    return { width, height };
+import type { Box } from '../engine/geometry.ts';
+
+/** A real excerpt belongs to the physical slab, rather than a separate tethered card. */
+export function platformListing(platform: PlatformState, replay: TracePlayback): NativeInstruction[] | null {
+    if (!replay.trace) return null;
+    if (platform.def.kind === 'crumble-proven') return bogusInstructions();
+    const binding = uplinkEvidence.machine_bindings.find(b => b.frontend_object.collection === 'platforms' && b.frontend_object.id === platform.def.id);
+    return binding ? machineExcerpt(binding.id, replay.trace) : null;
 }
-export function drawEvidence(c: CanvasRenderingContext2D, w: PuzzleWorld, replay: TracePlayback, revealBogus: boolean): void {
+export function platformAddress(platform: PlatformState, replay: TracePlayback): string | null {
+    const listing = platformListing(platform, replay);
+    return listing ? hex(listing[0].address) : null;
+}
+function text(c: CanvasRenderingContext2D, value: string, x: number, y: number, size: number, colour: string) {
+    c.font = `${size}px ui-monospace, monospace`; c.fillStyle = colour; c.fillText(value, x, y);
+}
+/** The top edge/header is the collider. This hanging listing is decoration, like Crit 5. */
+function listing(c: CanvasRenderingContext2D, lines: NativeInstruction[], slab: Box, active: boolean, pulse: number, stepAddress: number | undefined, message?: string) {
+    c.save(); c.font = '11px ui-monospace, monospace';
+    const width = Math.max(slab.w, 220, ...lines.map(i => c.measureText(instructionText(i)).width + 24));
+    const x = slab.x + (slab.w - width) / 2, y = slab.y + slab.h;
+    const height = 12 + lines.length * 14 + (message ? 24 : 0);
+    c.globalAlpha = active ? 0.92 : 0.35;
+    c.fillStyle = '#0b1720d9'; c.fillRect(x, y, width, height);
+    c.fillStyle = pulse > 0 ? '#64e6d5' : '#385563'; c.fillRect(x, y, 2, height);
+    lines.forEach((i, n) => {
+        const yy = y + 18 + n * 14;
+        if (i.address === stepAddress) { c.fillStyle = '#25534f'; c.fillRect(x + 4, yy - 12, width - 8, 16); }
+        text(c, i.mnemonic, x + 12, yy, 11, '#d6e8f8');
+        text(c, i.op_str, x + 12 + c.measureText(`${i.mnemonic} `).width, yy, 11, '#96b2cc');
+    });
+    if (message) text(c, `"${message}"`, x + 12, y + height - 10, 11, '#e8ca92');
+    c.restore();
+}
+function displayString(w: PuzzleWorld, presentation: MachinePresentation, signal: Parameters<MachinePresentation['describe']>[2], pulse: number): string {
+    const feedback = presentation.describe(w.room.id, w.frame, signal);
+    const count = feedback.active ? Math.floor(feedback.text.length * (1 - pulse)) : 0;
+    return feedback.text.split('').map((ch, i) => i < count ? ch : ((i * 17 + Math.floor(w.elapsed * 8)) % 16).toString(16).toUpperCase()).join('');
+}
+/** Draw below all solid geometry so a nearby listing never conceals another ledge. */
+export function drawPlatformListings(c: CanvasRenderingContext2D, w: PuzzleWorld, replay: TracePlayback, presentation: MachinePresentation): void {
+    if (w.room.id !== 'uplink' || !replay.trace) return;
+    for (const p of w.platforms) {
+        const lines = platformListing(p, replay);
+        if (!lines || p.respawn > 0) continue;
+        listing(c, lines, { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) }, p.solid.enabled, p.def.signal ? replay.pulse(p.def.signal) : 0,
+            p.def.kind === 'crumble-proven' ? undefined : replay.trace.step_instruction_addresses[replay.step],
+            p.def.signal ? displayString(w, presentation, p.def.signal, p.pulse) : undefined);
+    }
+}
+/** Equipment displays share the same address/listing layout; no fake physical code slab. */
+export function drawMachineListings(c: CanvasRenderingContext2D, w: PuzzleWorld, replay: TracePlayback, presentation: MachinePresentation): void {
     const trace = replay.trace;
     if (w.room.id !== 'uplink' || !trace) return;
-    for (const d of displays) {
-        const signal = signalForBinding(d.id), active = w.frame.outputs[signal];
-        const size = panel(c, machineExcerpt(d.id, trace), d.label, d.x, d.y, active, replay.pulse(signal), trace.step_instruction_addresses[replay.step]);
-        // Display-to-machine tether, explicitly presentation geometry, without arrows/CFG claims.
-        c.save(); c.strokeStyle = active ? '#38605e' : '#263945'; c.lineWidth = 1;
-        c.beginPath(); c.moveTo(d.x + size.width / 2, d.y + size.height); c.lineTo(d.target.x, d.target.y); c.stroke(); c.restore();
+    const gate = w.room.gates![0].gates[1], lift = w.room.lifts![0], exit = w.room.exit;
+    const devices = [
+        { id: 'relay-control-display', type: 'RELAY', signal: 'relayGates' as const, box: { x: gate.x - 155, y: gate.y - 155, w: 265, h: 24 }, pulse: w.gates[0].pulse },
+        { id: 'lift-control-display', type: 'LIFT', signal: 'liftField' as const, box: { x: lift.x, y: lift.y + lift.h + 5, w: lift.w, h: 24 }, pulse: w.lifts[0].pulse },
+        { id: 'exit-display', type: 'EXIT', signal: 'exitDoor' as const, box: { x: exit.x - 65, y: exit.y + exit.h + 32, w: 260, h: 24 }, pulse: w.displayPulse },
+    ];
+    for (const d of devices) {
+        const lines = machineExcerpt(d.id, trace), active = w.frame.outputs[d.signal], b = d.box;
+        listing(c, lines, b, active, replay.pulse(d.signal), trace.step_instruction_addresses[replay.step], displayString(w, presentation, d.signal, d.pulse));
+        c.save(); c.globalAlpha = active ? 0.95 : 0.5;
+        c.fillStyle = '#13252e'; c.fillRect(b.x, b.y, b.w, b.h);
+        text(c, hex(lines[0].address), b.x + 10, b.y + 17, 11, active ? '#64e6d5' : '#91a9b5');
+        text(c, d.type, b.x + b.w - 48, b.y + 16, 9, '#829daa'); c.restore();
     }
-    const p = w.platforms.find(p => p.def.id === 'proven-clone')!;
-    panel(c, bogusInstructions(), revealBogus ? 'PROVEN BOGUS / BCF' : 'UNANALYSED REGION', 2020, 555, p.solid.enabled, 0);
 }

@@ -74,7 +74,7 @@ export class SliceGame {
         this.renderer.room(this.world);
         this.sourceBadge.textContent = this.world.frame.source;
         this.evidenceButton.hidden = id !== 'uplink';
-        this.traceView.hidden = id !== 'uplink';
+        this.traceView.hidden = id !== 'uplink' || !this.debug;
         this.memory = JSON.stringify(this.world.memory());
         this.input.releaseAll();
         this.accumulated = 0;
@@ -207,6 +207,7 @@ export class SliceGame {
         }
         this.status.textContent = this.store.status;
         this.debugView.hidden = !this.debug;
+        this.traceView.hidden = this.world.room.id !== 'uplink' || !this.debug;
         if (this.debug)
             this.debugView.querySelector('pre')!.textContent = JSON.stringify(this.snapshot(), null, 2);
         requestAnimationFrame(t => this.frame(t));

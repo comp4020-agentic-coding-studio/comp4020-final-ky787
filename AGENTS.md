@@ -11,12 +11,13 @@
 - Separate binary evidence, coordinate-free controller signals, hand-authored
   geometry and presentation/physics. Physical inputs drive a replaceable
   controller adapter; its outputs drive machinery.
-- C8 mock controllers, strings and crumble examples are gameplay prototypes,
-  never obfuscator evidence. Never invent binary facts or infer bogusness from
+- Tutorial controllers and all string effects remain authored/mock; UPLINK uses
+  retained validated OLLVM evidence. Prototype crumble is not obfuscator evidence. Never invent binary facts or infer bogusness from
   non-execution. Final binary-backed crumble requires retained proof.
 - Distinguish always-solid architecture, ghosted/non-solid inactive code,
-  illuminated/solid active code and prototype crumble. Grapple only marked,
-  enabled anchors; cap range and swing energy. Cube hooks pull cubes.
+  illuminated/solid active code and prototype crumble. Enabled floating code
+  slabs accept hooks across their address bars; static architecture stays
+  unhookable. Cap range and swing energy. Cube hooks pull cubes.
 - Persist meaningful progress (rooms, checkpoints, mechanics, bounded events),
   not physics, on `/data`. Separate visitor progress from room state for later
   shared state. Returning visitors must visibly continue their progress.
@@ -24,5 +25,5 @@
   spec tests against a running app. Verify persistence across process restart.
   Docker is only needed for image validation. Never weaken tests to hide failure.
 - Put durable design/contracts in project documentation; handoffs are not
-  authoritative evidence. Stop after C8 for manual playtesting before binding
-  a real binary to this design.
+  authoritative evidence. Stop for manual playtesting before expanding the
+  accepted puzzle or its validated binary contract.
