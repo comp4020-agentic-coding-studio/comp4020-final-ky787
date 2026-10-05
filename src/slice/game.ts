@@ -6,12 +6,16 @@ import { PuzzleWorld } from './world.ts';
 import { ROOMS, roomById } from './rooms.ts';
 import { freshProgress } from './progress.ts';
 import { ProgressStore } from './storage.ts';
+import { connectionPowered } from './connections.ts';
 export class SliceGame {
     store = new ProgressStore();
     world = new PuzzleWorld(ROOMS[0], freshProgress().rooms.pressure);
     renderer: PuzzleRenderer;
     input = new InputManager(true);
     started = false;
+    overviewVisible = false;
+    private overviewPending = false;
+    private startButton = document.querySelector<HTMLButtonElement>('#start-room')!;
     ended = false;
     debug = false;
     private inspector: EvidenceInspector;
@@ -47,6 +51,15 @@ export class SliceGame {
         this.status = document.querySelector('#save-status')!;
         this.roomTitle = document.querySelector('#room-title')!;
         document.querySelector('#pause')!.addEventListener('click', () => this.showMenu());
+        this.startButton.addEventListener('click', () => {
+            if (!this.overviewVisible || !this.inspector.element.hidden || !this.menu.hidden) return;
+            this.overviewPending = false;
+            this.overviewVisible = false;
+            this.startButton.hidden = true;
+            this.started = true;
+            this.input.releaseAll(); this.input.clearActions();
+            this.canvas.focus();
+        });
         document.querySelector('#debug-toggle')!.addEventListener('click', () => { this.debug = !this.debug; });
         document.querySelector('#return-cube')!.addEventListener('click', () => { this.world.returnCube(); this.canvas.focus(); });
         this.debug = new URL(location.href).searchParams.has('debug');
@@ -66,11 +79,16 @@ export class SliceGame {
     }
     private closeInspector(): void {
         this.inspector.element.hidden = true; this.started = this.resumeAfterInspector;
-        this.input.releaseAll(); this.canvas.focus();
+        this.input.releaseAll();
+        if (this.overviewVisible) this.startButton.focus();
+        else this.canvas.focus();
     }
     private loadRoom(): void {
         const id = this.store.progress.currentRoom;
         this.world = new PuzzleWorld(roomById(id), this.store.progress.rooms[id]);
+        this.overviewPending = id === 'uplink' && this.world.checkpoint === 'entry';
+        this.overviewVisible = false;
+        this.startButton.hidden = true;
         this.renderer.room(this.world);
         this.sourceBadge.textContent = this.world.frame.source;
         this.evidenceButton.hidden = id !== 'uplink';
@@ -82,6 +100,8 @@ export class SliceGame {
     }
     private showMenu(): void {
         this.started = false;
+        this.overviewVisible = false;
+        this.startButton.hidden = true;
         this.inspector.element.hidden = true;
         this.world.cancelGrapple();
         this.input.releaseAll();
@@ -155,10 +175,13 @@ export class SliceGame {
             this.loadRoom();
             this.ended = false;
         }
-        this.started = true;
+        this.started = !this.overviewPending;
+        this.overviewVisible = this.overviewPending;
+        this.startButton.hidden = !this.overviewVisible;
         this.menu.hidden = true;
         this.input.releaseAll();
-        this.canvas.focus();
+        if (this.overviewVisible) this.startButton.focus();
+        else this.canvas.focus();
     }
     private save(events: string[]): void {
         const p = this.store.progress, id = this.world.room.id;
@@ -179,6 +202,7 @@ export class SliceGame {
             p.currentRoom = ROOMS[index + 1].id;
             this.store.save(p);
             this.loadRoom();
+            this.resumeRoom();
         }
         else {
             this.store.save(p);
@@ -192,7 +216,8 @@ export class SliceGame {
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,
-            checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started,
+            connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
+            checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
     private frame(now: number): void {
@@ -204,7 +229,7 @@ export class SliceGame {
             if (!this.inspector.element.hidden) this.closeInspector();
             else if (!this.menu.hidden && this.menu.querySelector('#reset-confirmation:not([hidden])'))
                 this.menu.querySelector<HTMLButtonElement>('#cancel-reset')!.click();
-            else if (this.started)
+            else if (this.started || this.overviewVisible)
                 this.showMenu();
             else
                 (this.menu.querySelector('#continue') as HTMLButtonElement | null)?.click();
@@ -213,6 +238,10 @@ export class SliceGame {
             this.world.respawn();
         const aim = this.renderer.camera.screenToWorld(this.input.screenAim.x, this.input.screenAim.y);
         this.input.sync(aim);
+        if (this.overviewVisible && this.inspector.element.hidden) {
+            const edges = this.input.takeEdges();
+            if (edges.airGrapple || edges.jump) this.startButton.click();
+        }
         if (this.started) {
             this.accumulated += dt;
             while (this.accumulated >= FIXED_DT) {
@@ -242,7 +271,7 @@ export class SliceGame {
         }
         else
             this.accumulated = 0;
-        this.renderer.draw(this.world, dt, aim, this.input.overviewHeld);
+        this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible);
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
         if (replay.trace) {

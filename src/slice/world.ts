@@ -15,6 +15,7 @@ export interface PlatformState {
     solid: Solid;
     pulse: number;
     fuse: number;
+    fuseDuration: number;
     respawn: number;
 }
 export interface MachineEvent {
@@ -60,12 +61,12 @@ export class PuzzleWorld {
             const at = plate ? { x: plate.x, y: plate.y - CUBE_SIZE / 2 } : this.cubeHome()!;
             this.cube = { ...at, vx: 0, vy: 0, carried: false, grounded: true, groundId: 'near' };
         }
-        this.platforms = room.platforms.map(def => ({ def, pulse: 0, fuse: -1, respawn: 0,
+        this.platforms = room.platforms.map(def => ({ def, pulse: 0, fuse: -1, fuseDuration: .6, respawn: 0,
             solid: { ...def, oneWay: def.kind !== 'static', enabled: def.kind !== 'code', grappleable: def.kind !== 'static' && def.kind !== 'code', grappleHeight: Math.min(CODE_SLAB_HEIGHT, def.h), grapplePoint: def.anchor ? { x: def.x + def.w / 2, y: def.y + 6 } : undefined } }));
         this.door = { ...room.exit, id: 'exit-door', oneWay: false, enabled: true, grappleable: false };
         this.solids = [...this.platforms.map(p => p.solid), this.door,
-            { id: 'left-wall', x: -40, y: -800, w: 40, h: 2000, enabled: true, oneWay: false, grappleable: false },
-            { id: 'right-wall', x: room.width, y: -800, w: 40, h: 2000, enabled: true, oneWay: false, grappleable: false }];
+            { id: 'left-wall', x: -40, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false },
+            { id: 'right-wall', x: room.width, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false }];
         this.frame = this.controller.evaluate(room.id, this.inputs);
         this.samplePlate();
         this.evaluate();
@@ -331,14 +332,21 @@ export class PuzzleWorld {
             platform.pulse = Math.max(0, platform.pulse - dt * 1.8);
             if (platform.def.kind !== 'crumble-prototype' && platform.def.kind !== 'crumble-proven')
                 continue;
-            if (platform.fuse < 0 && platform.respawn === 0 && this.player.groundId === platform.def.id)
-                platform.fuse = 0.6;
+            if (platform.fuse < 0 && platform.respawn === 0) {
+                const hooked = this.player.rope.phase === 'attached' && this.player.rope.anchorId === platform.def.id;
+                const hookDelay = hooked ? platform.def.hookCrumbleDelay : undefined;
+                if (this.player.groundId === platform.def.id || hookDelay !== undefined) {
+                    platform.fuseDuration = hookDelay ?? .6;
+                    platform.fuse = platform.fuseDuration;
+                }
+            }
             if (platform.fuse >= 0) {
                 platform.fuse -= dt;
                 if (platform.fuse <= 0) {
                     platform.fuse = -1;
                     platform.respawn = 2.4;
                     platform.solid.enabled = false;
+                    if (this.player.rope.anchorId === platform.def.id) this.cancelGrapple();
                     this.emit('crumble', { x: platform.def.x, y: platform.def.y });
                 }
             }

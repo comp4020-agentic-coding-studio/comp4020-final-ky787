@@ -5,7 +5,7 @@ game. Gameplay comes first: carry a cube, hold a plate, wake a grapple anchor,
 enable lifts and fixed relay gates, and route a payload upstairs. Rooms are hand-authored.
 
 **CONTROL SPINE (UPLINK) uses a validated OLLVM-16 BCF controller**, with retained real assembly
-and an optional proof-backed bogus-code platform. The first three rooms still
+and a proof-backed unstable anchor in the final rope chain. The first three rooms still
 use mock controllers. Room geometry, physics, crumble timing and all string
 reveals remain authored game abstractions. No multiplayer is included. The
 earlier binary-backed tutorial and its tests remain outside the default game.
@@ -21,6 +21,8 @@ earlier binary-backed tutorial and its tests remain outside the default game.
    remaining code steps. The unstable prototype has a safe recovery floor.
 4. **CONTROL SPINE:** route the payload to the core node in a large machine hall. Observe which controls power the
    relay, lift and upper route; some machinery lets you return for the cube.
+   Its opening overview waits for **Space** (or the on-screen button). The final
+   return uses successive rope swings; unstable anchors warn before breaking.
 
 A/D or arrows move. Space/W jumps. Aim at an enabled code slab to preview the grapple;
 press Space again in midair to hook that highlighted target, then once more to
@@ -41,7 +43,9 @@ platforms show their real addresses with assembly and authored strings below;
 all enabled code slabs accept the hook. Static floors remain unhookable. Assembly
 playback explains machinery that has already responded; it never delays controls.
 Selected machine messages use authored single-byte XOR (0x5A), separate from the
-retained OLLVM assembly. Node C reveals a new upper route back across the hall.
+retained OLLVM assembly. Powered lines animate from physical controls to their
+machinery; these are authored wiring diagrams, not native control-flow edges.
+Node C reveals the upper rope route and a catch deck for safe recovery.
 
 This pass is tuned and tested for desktop keyboard and mouse. Inherited touch
 controls are present; touch gameplay has not been tuned or validated.

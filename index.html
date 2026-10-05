@@ -12,13 +12,14 @@
   <main id="app">
     <canvas id="stage" tabindex="0" aria-label="Platform puzzle. A and D move. Space jumps. E carries cubes or flips switches. Press Space in midair to grapple the highlighted anchor, then Space again to release. Hold left click also grapples. R returns to checkpoint."></canvas>
     <section id="menu" aria-label="Start or continue"><div class="menu-card"><p>Loading saved progress…</p></div></section>
+    <button id="start-room" hidden>PRESS SPACE TO START<span>Take a moment to read the chamber</span></button>
     <aside id="debug" hidden><strong>DEVELOPER / CONTROLLER STATE</strong><button id="return-cube">Return cube to spawn</button><pre></pre></aside>
     <div id="trace-status" hidden></div>
     <aside id="evidence" aria-label="Retained binary evidence inspector" hidden>
       <div class="evidence-toolbar"><strong>RETAINED BINARY EVIDENCE · PLAY PAUSED</strong><button>Close / resume</button></div>
       <p>Assembly and controller: validated OLLVM BCF. Labels, placement, physics and string effects: authored.</p>
       <label>Region <select aria-label="Evidence region"></select></label>
-      <label><input type="checkbox"> Reveal proven bogus classification on the optional platform</label>
+      <label><input type="checkbox"> Reveal proven bogus classification on the unstable platform</label>
       <pre></pre>
     </aside>
     <noscript>This game requires JavaScript.</noscript>

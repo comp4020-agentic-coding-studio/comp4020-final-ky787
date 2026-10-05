@@ -59,9 +59,10 @@ describe('LiftField transport', () => {
     });
     it('carried cubes follow the rider once rather than receiving a second lift impulse', () => {
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, switchC: true });
-        Object.assign(w.player, { x: 1740, y: 700 }); w.cube!.carried = true;
+        const startY = w.room.lifts![0].y + 550;
+        Object.assign(w.player, { x: 1740, y: startY }); w.cube!.carried = true;
         for (let n = 0; n < 120; n++) w.step(FIXED_DT, emptyInput());
-        expect(w.player.y).toBeLessThan(510);
+        expect(w.player.y).toBeLessThan(startY - 190);
         expect(w.cube!.y).toBe(w.player.y - 17 - 4 - CUBE_SIZE / 2);
         expect(w.cube!.vy).toBe(0);
     });
@@ -96,7 +97,8 @@ describe('RelayGatePair transport', () => {
     });
     it('player teleport cancels the hook and takes a carried cube along intact', () => {
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, switchB: true });
-        Object.assign(w.player, { x: 148, y: 843, coyote: .1, jumpBuffer: .1 });
+        const entry = w.room.gates![0].gates[0];
+        Object.assign(w.player, { x: entry.x + entry.w / 2, y: entry.y + entry.h - 17, coyote: .1, jumpBuffer: .1 });
         w.cube!.carried = true;
         w.player.rope.phase = 'retracting';
         w.step(FIXED_DT, emptyInput());

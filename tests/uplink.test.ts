@@ -4,6 +4,7 @@ import { emptyInput, type InputState } from '../src/engine/physics.ts';
 import { PuzzleWorld } from '../src/slice/world.ts';
 import { ROOMS } from '../src/slice/rooms.ts';
 import { freshProgress, validProgress } from '../src/slice/progress.ts';
+import { swingReturn } from './helpers/spine-controls.ts';
 const fresh = () => new PuzzleWorld(ROOMS[3], freshProgress().rooms.uplink);
 function tick(w: PuzzleWorld, n = 1, input: Partial<InputState> = {}) {
     const i = { ...emptyInput(), ...input };
@@ -22,7 +23,7 @@ function move(w: PuzzleWorld, x: number, ground?: string) {
 }
 function ride(w: PuzzleWorld) {
     move(w, 1740);
-    until(w, 'rise to landing', () => w.player.y < 190, () => steer(w, 1740));
+    until(w, 'rise to landing', () => w.player.y < w.room.lifts![0].y + 22, () => steer(w, 1740));
     move(w, 1980, 'upper-deck');
 }
 function jump(w: PuzzleWorld, x: number, ground: string) {
@@ -38,8 +39,8 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
         move(w, 363); tick(w, 1, { left: true }); w.interact(); tick(w, 25);
         expect(w.inputs.cubeOnPlate).toBe(true);
         move(w, 440);
-        tick(w, 1, { right: true, grapplePressed: true, grappleHeld: true, aim: { x: 780, y: 526 } });
-        until(w, 'grapple release', () => w.player.x > 880 && w.player.y < 810,
+        tick(w, 1, { right: true, grapplePressed: true, grappleHeld: true, aim: { x: 780, y: 886 } });
+        until(w, 'grapple release', () => w.player.x > 880 && w.player.y < 1170,
             () => ({ right: true, grappleHeld: true }));
         until(w, 'far bank', () => w.player.groundId === 'far', () => ({ right: true }));
         expect(w.deaths).toBe(0);
@@ -59,7 +60,7 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
         expect(w.frame.outputs.exitDoor).toBe(false); expect(w.checkpoint).toBe('upper');
         w = new PuzzleWorld(ROOMS[3], w.memory()); tick(w, 5);
         expect(w.inputs.switchC).toBe(true); expect(w.inputs.cubeOnPlateB).toBe(true);
-        move(w, 2180, 'recovery-step'); move(w, 2080); until(w, 'safe drop', () => w.player.groundId === 'far');
+        move(w, 2180); until(w, 'safe drop', () => w.player.groundId === 'far');
         move(w, 1555, 'far'); w.interact(); expect(w.cube!.carried).toBe(true);
         tick(w, 3); expect(w.inputs.plateB).toBe(false); expect(w.frame.outputs.liftField).toBe(true);
         ride(w); move(w, 2090); jump(w, 2370, 'service');
@@ -72,61 +73,57 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
         expect(validProgress(p)).toBe(true);
         const restored = new PuzzleWorld(ROOMS[3], w.memory());
         expect(restored.cube!.x).toBe(3310); expect(restored.frame.outputs.exitDoor).toBe(true);
-        move(w, 2835); jump(w, 2740, 'upper-route');
-        move(w, 2010); jump(w, 1790, 'return-mid');
-        move(w, 1220); jump(w, 1000, 'return-near');
-        move(w, 490); jump(w, 300, 'uplink-deck');
-        until(w, 'exit on upper return route', () => w.exited, () => ({ left: true }));
-        expect(w.platforms.find(p => p.def.id === 'proven-clone')!.fuse).toBe(-1);
+        move(w, 2860); swingReturn(w);
+        expect(w.events.filter(e => e.kind === 'grapple').length).toBeGreaterThanOrEqual(5);
         expect(w.deaths).toBe(0);
     });
     it('cannot jump the gap, hook an inactive anchor, or pull the near-side payload from the far bank', () => {
         for (const x of [430, 455, 479]) {
-            const w = fresh(); Object.assign(w.player, { x, y: 843 }); tick(w, 3);
-            expect(w.target({ x: 780, y: 526 })).toBeNull();
+            const w = fresh(); Object.assign(w.player, { x, y: 1203 }); tick(w, 3);
+            expect(w.target({ x: 780, y: 886 })).toBeNull();
             tick(w, 1, { right: true, jumpHeld: true, jumpPressed: true });
             until(w, 'gap death', () => w.deaths === 1, () => ({ right: true, jumpHeld: true }));
             expect(w.checkpoint).toBe('entry');
         }
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, cubeOnPlate: true });
-        Object.assign(w.player, { x: 972, y: 843 }); tick(w, 3);
-        tick(w, 90, { grapplePressed: true, grappleHeld: true, aim: { x: 320, y: 838 } });
+        Object.assign(w.player, { x: 972, y: 1203 }); tick(w, 3);
+        tick(w, 90, { grapplePressed: true, grappleHeld: true, aim: { x: 320, y: 1198 } });
         expect(w.pullingCube).toBe(false); expect(w.cube!.x).toBe(320);
     });
     it('cube and run-jump height cannot reach the upper deck; only payload C opens the final route', () => {
-        const w = fresh(); Object.assign(w.player, { x: 1950, y: 843 });
-        Object.assign(w.cube!, { x: 1950, y: 838 }); tick(w, 5);
-        Object.assign(w.player, { x: 1950, y: 780 }); tick(w, 30);
+        const w = fresh(); Object.assign(w.player, { x: 1950, y: 1203 });
+        Object.assign(w.cube!, { x: 1950, y: 1198 }); tick(w, 5);
+        Object.assign(w.player, { x: 1950, y: 1140 }); tick(w, 30);
         expect(w.player.groundId).toBe('cube-body');
         tick(w, 1, { jumpPressed: true, jumpHeld: true });
         let highest = w.player.y;
         for (let n = 0; n < 100; n++) { tick(w, 1, { jumpHeld: true }); highest = Math.min(highest, w.player.y); }
-        expect(highest).toBeGreaterThan(600);
+        expect(highest).toBeGreaterThan(960);
         expect(w.inputs.switchC).toBe(false); expect(w.frame.outputs.liftField).toBe(false);
-        Object.assign(w.player, { x: 3310, y: 243 }); w.inputs.switchC = true; tick(w, 10);
+        Object.assign(w.player, { x: 3310, y: 603 }); w.inputs.switchC = true; tick(w, 10);
         expect(w.inputs.plateC).toBe(true); expect(w.inputs.cubeOnPlateC).toBe(false);
         expect(w.frame.outputs.exitDoor).toBe(false); expect(w.frame.outputs.codePlatformB).toBe(false);
     });
     it('the initial grapple cannot reach the upper control through swinging or repeated re-hooks', () => {
         for (const rehook of [false, true]) {
             const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, cubeOnPlate: true });
-            Object.assign(w.player, { x: 440, y: 843 }); tick(w, 3);
+            Object.assign(w.player, { x: 440, y: 1203 }); tick(w, 3);
             let highest = w.player.y, attached = 0;
             for (let n = 0; n < 1800; n++) {
                 const fire = n === 0 || (rehook && n % 60 === 0);
                 tick(w, 1, { right: Math.floor(n / 90) % 2 === 0, left: Math.floor(n / 90) % 2 === 1,
-                    grapplePressed: fire, grappleHeld: !rehook || n % 60 < 50, reelIn: true, aim: { x: 780, y: 526 } });
+                    grapplePressed: fire, grappleHeld: !rehook || n % 60 < 50, reelIn: true, aim: { x: 780, y: 886 } });
                 highest = Math.min(highest, w.player.y);
                 if (w.player.rope.phase === 'attached') attached++;
             }
             expect(attached).toBeGreaterThan(30);
-            expect(highest).toBeGreaterThan(300);
+            expect(highest).toBeGreaterThan(660);
             expect(w.inputs.switchC).toBe(false); expect(w.frame.outputs.exitDoor).toBe(false);
         }
     });
     it('lifting the cube off its power plate stops the field before it can carry a payload upstairs', () => {
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, cubeOnPlateB: true, cubeTransferred: true, switchB: true });
-        Object.assign(w.player, { x: 1555, y: 843 }); tick(w, 5);
+        Object.assign(w.player, { x: 1555, y: 1203 }); tick(w, 5);
         expect(w.frame.outputs.liftField).toBe(true); w.interact(); tick(w, 2);
         expect(w.cube!.carried).toBe(true); move(w, 1580);
         expect(w.frame.outputs.liftField).toBe(false);
@@ -135,7 +132,7 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
     });
     it('power toggling and recovery keep latched progress and transferred cargo', () => {
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, switchB: true, switchC: true, checkpoint: 'upper', cubeTransferred: true });
-        Object.assign(w.player, { x: 1140, y: 843 }); tick(w, 3); w.interact();
+        Object.assign(w.player, { x: 1140, y: 1203 }); tick(w, 3); w.interact();
         expect(w.frame.outputs.relayGates).toBe(false); expect(w.frame.outputs.liftField).toBe(true);
         w.cube!.carried = true; w.respawn(); tick(w, 3);
         expect(w.player.x).toBe(1980); expect(w.inputs.switchC).toBe(true);
@@ -147,45 +144,44 @@ describe('CONTROL SPINE (validated UPLINK)', () => {
     it('raised payload bay and proven clone cannot bypass the first lift, even from a cube jump', () => {
         for (const x of [1900, 2080, 2220]) {
             const w = fresh();
-            Object.assign(w.cube!, { x, y: 838 });
-            Object.assign(w.player, { x, y: 770 }); tick(w, 60);
+            Object.assign(w.cube!, { x, y: 1198 });
+            Object.assign(w.player, { x, y: 1130 }); tick(w, 60);
             expect(w.player.groundId).toBe('cube-body');
             tick(w, 1, { right: true, jumpPressed: true, jumpHeld: true });
             let hooked = false, highest = w.player.y;
             for (let n = 0; n < 240; n++) {
-                const target = w.target({ x: 2720, y: 336 });
+                const target = w.target({ x: 1280, y: 176 });
                 hooked ||= !!target;
-                tick(w, 1, { right: true, jumpHeld: true, grappleHeld: true, grapplePressed: !!target, aim: { x: 2720, y: 336 } });
+                tick(w, 1, { right: true, jumpHeld: true, grappleHeld: true, grapplePressed: !!target, aim: { x: 1280, y: 176 } });
                 highest = Math.min(highest, w.player.y);
             }
             expect(hooked).toBe(false);
-            expect(highest).toBeGreaterThan(490);
+            expect(highest).toBeGreaterThan(850);
             expect(w.player.x).toBeLessThan(2260);
             expect(w.inputs.switchC).toBe(false);
         }
     });
     it('standing on B cannot power a solo jump into the lift after leaving the plate', () => {
-        const w = fresh(); Object.assign(w.player, { x: 1510, y: 843 }); tick(w, 5);
+        const w = fresh(); Object.assign(w.player, { x: 1510, y: 1203 }); tick(w, 5);
         expect(w.frame.outputs.liftField).toBe(true);
         tick(w, 1, { right: true, jumpPressed: true, jumpHeld: true });
         let highest = w.player.y;
         for (let n = 0; n < 200; n++) { tick(w, 1, { ...steer(w, 1740), jumpHeld: true }); highest = Math.min(highest, w.player.y); }
-        expect(highest).toBeGreaterThan(650);
+        expect(highest).toBeGreaterThan(1010);
         expect(w.frame.outputs.liftField).toBe(false); expect(w.inputs.switchC).toBe(false);
     });
-    it.each([false, true])('the tempting clone is recoverable with the final route off (carried payload: %s)', carried => {
+    it.each([false, true])('missing a cargo jump is recoverable with the final route off (carried payload: %s)', carried => {
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, switchB: true, switchC: true, cubeOnPlateB: true, checkpoint: 'upper' });
-        Object.assign(w.player, { x: 2600, y: 263 }); w.cube!.carried = carried; tick(w, 3);
-        until(w, 'optional shortcut', () => w.player.groundId === 'proven-clone', () => ({ right: true }));
-        tick(w, 180); expect(w.player.groundId).toBe('payload-recovery');
-        move(w, 2350); jump(w, 2250, 'recovery-step'); jump(w, 2360, 'service');
+        Object.assign(w.player, { x: 2600, y: 623 }); w.cube!.carried = carried; tick(w, 3);
+        move(w, 2730, 'payload-recovery');
+        move(w, 2180, 'far'); ride(w); move(w, 2090); jump(w, 2370, 'service');
         expect(w.deaths).toBe(0); expect(w.frame.outputs.codePlatformB).toBe(false);
         expect(w.inputs.cubeOnPlateB).toBe(!carried); expect(w.cube!.carried).toBe(carried);
     });
 
     it.each([2640, 2660])('cargo jump from x=%s tolerates an ordinary held press and a standing start', x => {
         const w = new PuzzleWorld(ROOMS[3], { ...freshProgress().rooms.uplink, switchC: true, checkpoint: 'upper' });
-        Object.assign(w.player, { x, y: 263 }); w.cube!.carried = true; tick(w, 5);
+        Object.assign(w.player, { x, y: 623 }); w.cube!.carried = true; tick(w, 5);
         tick(w, 1, { right: true, jumpPressed: true, jumpHeld: true });
         for (let n = 0; n < 120 && w.player.groundId !== 'node-deck'; n++)
             tick(w, 1, { ...steer(w, 2870), jumpHeld: n < 24 }); // ~200 ms, no special launch timing.

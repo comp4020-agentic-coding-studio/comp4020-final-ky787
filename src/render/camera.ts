@@ -74,7 +74,8 @@ export class Camera {
     if (frame) {
       const pad = CAMERA.framePadding;
       const fit = Math.min(viewW / (frame.w + pad * 2), viewH / (frame.h + pad * 2));
-      const want = clamp(Math.min(base, fit), CAMERA.minZoom, base);
+      // An explicit overview must fit even the larger chamber on a small viewport.
+      const want = Math.max(.1, Math.min(base, fit));
       this.zoom = damp(this.zoom, want, CAMERA.frameRate, dt);
       this.x = damp(this.x, frame.x + frame.w / 2, CAMERA.frameRate, dt);
       this.y = damp(this.y, frame.y + frame.h / 2, CAMERA.frameRate, dt);

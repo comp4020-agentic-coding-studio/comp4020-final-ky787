@@ -41,48 +41,61 @@ The fourth room is now **CONTROL SPINE**, retaining room ID `uplink`, save schem
 redesign of UPLINK, not a fifth room or a new controller. The player-facing goal
 is **ROUTE THE PAYLOAD TO THE CORE NODE**. The three tutorials are unchanged.
 
-The machine hall is **3,540 × 1,100**, enlarged from 2,440 units wide. Its lower
-entry and control wings remain at y=860, with the existing 480-unit death gap
+The machine hall is **3,540 × 1,460**. The rope-route revision adds overhead
+clearance while retaining the lower puzzle's relative dimensions. Entry and
+control wings are at y=1220, with the existing 480-unit death gap
 between x=480 and x=960. The far wing ends at x=2260. The upper control deck is
-at (1870,260), the service slab at (2260,280), and the broad core deck begins at
-(2790,260). Node C moved to (3310,260). A raised recovery plinth at y=490 supports
+at (1870,620), the service slab at (2260,640), and the broad core deck begins at
+(2790,620). Node C is at (3310,620). A raised recovery plinth at y=850 supports
 the upper payload bay; its 370-unit wall prevents lower-wing jump/cube shortcuts.
-An intermediate static step at (2120,385) serves both descent and recovery.
-A brief entry overview establishes the distant exit and major wings without Tab;
-normal follow view resumes after the first 2.2 seconds of play.
+The former LOWER WING / `recovery-step` slab is removed. Walk off the upper
+control deck to the right for a safe direct drop; cargo-bay recovery returns left
+to the lower floor and the latched lift.
 
-The exit is back above the entry, at (210,30), on a static shelf at y=170. Three
-initially ghosted upper return sections span x=470–1090, 1200–1880 and 1990–2820,
-also at y=170. The final route crosses the entire hall without retracing the lower
-relay/cargo journey. Its gaps are 110 units; the upper cargo gaps are 130 and 110.
-Broad landings and the existing held jump are sufficient. No movement tuning changed.
+The entry overview now **waits for Space**, or a click on PRESS SPACE TO START.
+Physics is paused while players inspect the whole chamber. That press is consumed
+without jumping or hooking. Menu/Escape and Evidence remain available. Reloads
+at established far/upper checkpoints resume normally. Overview framing can zoom
+below the normal follow minimum to fit the entire room on smaller screens.
+
+The exit is above the entry at (210,320), on a broad static shelf at y=460.
+Four real return anchors have centres (2720,166), (2240,116), (1760,116),
+and (800,116). The proven clone fills the intervening position (1280,116).
+Each address slab is 200 units wide; the 280-unit gaps are beyond an ordinary
+held run-jump. Swing **under** the slabs and transfer to the next target while
+moving left. The real output also powers a catch deck at (1010,510), 550 units
+wide, below the unstable anchor. The lift ends at y=580, clear of the upper code,
+listings and a normal swing. Upper cargo jumps remain 130 and 110 units wide.
+Rope acceleration, range, reeling, speed caps and vertical limits are unchanged.
 
 ### Intended flow (design notes, not printed in game)
 
-1. Leave the cube on **A (320,860)**. Its real anchor at (780,526) lights immediately.
+1. Leave the cube on **A (320,1220)**. Its real anchor at (780,886) lights immediately.
    Grapple the first gap, leaving the payload behind. The gap cannot be jumped.
-2. Toggle **relay power (1140,860)**. R1's two fixed gates at x=120 and x=1300 power
+2. Toggle **relay power (1140,1220)**. R1's two fixed gates at x=120 and x=1300 power
    up and the far checkpoint is saved. Return through B → A, retrieve the cube,
    and carry it through A → B. This is the first retrieval loop.
-3. Leave the cube on **B (1510,860)** to power the existing lift at x=1630–1870.
+3. Leave the cube on **B (1510,1220)** to power the existing lift at x=1630–1870.
    Ride alone to the upper control deck. Removing B's cube now still cuts power.
-4. Set the physical **lift latch (1970,260)**. It stays set, saves the upper
+4. Set the physical **lift latch (1970,620)**. It stays set, saves the upper
    checkpoint, holds the lift on and illuminates the service slab. The upper
    status says LIFT FIELD LATCHED; the service listing says PAYLOAD STILL REQUIRED.
-5. Walk off the right of the control deck onto the intermediate static step,
-   then take its left drop to the lower control wing. Retrieve B's cube and ride
+5. Walk off the right of the control deck and drop to the lower control wing.
+   Retrieve B's cube and ride
    the latched lift again, carrying it. This is the second retrieval loop; no
    death reset is part of the solution.
 6. Cross the upper bay with two ordinary jumps via the activated service slab.
-   A lower, plausible code shortcut under the second gap is the optional proven
-   clone. Missing either jump or trying the shortcut lands on the recovery
-   plinth. Walk left, jump to the intermediate step and jump back to service.
+   Missing a jump lands on the recovery plinth. Walk left and use the latched
+   lift to return with the payload intact.
 7. Put the cube on **Node C**. Player occupancy alone, including a player carrying
-   the cube, does not satisfy the cargo input. The three return sections appear
+   the cube, does not satisfy the cargo input. Four return anchors and the catch deck appear
    together and the exit unlocks. A 2.2-second authored camera reveal frames the
    new route and distant exit; controls and binary outputs remain immediate.
-8. Leave the cube on C. Hop onto the higher return route, cross its broad sections
-   and enter the exit above the entry wing. The clone is never required.
+8. Leave the cube on C. Jump from the left end of the core deck and hook the first
+   overhead slab. Transfer along the five-anchor chain, including the unstable
+   clone, and release onto the exit shelf. An overloaded clone drops the player
+   onto the catch deck; re-hook after it returns. This replaces the earlier
+   optional-shortcut design at the player's request.
 
 The puzzle asks the player to free a payload from a previously necessary job
 **twice**. Controls are distributed around a lower loop, vertical shaft, upper
@@ -97,7 +110,7 @@ suggest dependencies; no solution checklist or assembly knowledge is required.
 | `relayGates` | Fixed R1 gate pair; assembly beneath its power switch, none on the gates | `relay-control-display` |
 | `liftField` | Existing bounded lift volume/emitter; assembly below it | `lift-control-display` |
 | `codePlatformA` | Payload-bay `service` slab | `service-landing-display` |
-| `codePlatformB` | `upper-route`, `return-mid`, `return-near` together | All three share `payload-route-display` |
+| `codePlatformB` | Four anchors: `upper-route`, `return-mid`, `return-high`, `return-near`; plus `return-catch` | All five share `payload-route-display` |
 | `exitDoor` | Exit above the original entry; assembly below its architecture | `exit-display` |
 | `bridge` | No physical manifestation; retained value remains false | No invented region |
 
@@ -107,7 +120,7 @@ signal, authored label and explicit binding alias. Evidence explains that repeat
 listings are the **same output/region**, not extra native basic blocks. The final
 route shows three real instructions per listing, including the actual output
 store; other controlled machinery retains up to five. The clone keeps all six.
-The return listing is offset beneath its slab to clear the service listing.
+The elevated return listings are separate from service and LiftField graphics.
 
 The five inputs remain exactly `plateA`, `switchB`, `plateB`, `switchC`,
 `cubeOnPlateC`. `validatedTraceController` and the bundle are unchanged. Physical
@@ -115,6 +128,21 @@ state selects the same retained row/trace; there are no supplemental mock UPLINK
 outputs or coordinate-dependent controller conditions. Switch C's memory remains
 in the physical latch. All existing trace occurrences, ordering, semantic writes,
 real addresses, raw bytes and inspector provenance remain authoritative.
+
+### Animated control connections
+
+`src/slice/connections.ts` defines authored physical polylines. Dim wires are
+visible before activation; a powered wire illuminates and carries moving dashes
+and a travelling pulse from its input toward its output. All tutorial controls
+also receive these connections. In CONTROL SPINE, wires link A to the crossing,
+relay power to both gates, B and the upper latch separately to the lift, the latch
+to service, and Node C to the final route and exit. B's wire turns off when its
+cube is freed while the latch feed stays visibly powered.
+
+These are **physical wiring diagrams**, not fabricated CFG edges or retained CPU
+timing. They consume the already-selected frame and cannot delay or modify it.
+The bogus clone has no invented controller feed or successful-trace pulse. Debug
+shows each connection's input/output pair and current powered state.
 
 ### Authored single-byte XOR presentation
 
@@ -141,19 +169,24 @@ passes from the shared experiment. Nothing in that workspace was rebuilt or alte
 collision, grapple, relay and lift physics, crate handling, checkpoint policy,
 crumble timers, camera reveal, semantic labels and XOR messages/animation.
 
-### Optional clone and recovery
+### Unstable rope anchor and recovery
 
-`bcf_clone_originalBB71alteredBB` is the one `crumble-proven` slab at **(2670,330)**,
-200 × 28, under the last cargo jump. It looks like a lower route onto the core
-deck. Ordinary play shows its real address and **UNSTABLE**; Evidence's analysis
+`bcf_clone_originalBB71alteredBB` is the one `crumble-proven` slab at **(1180,110)**,
+200 × 28, in the final rope chain. Ordinary play shows its real address and
+**UNSTABLE**; Evidence's analysis
 checkbox can reveal **PROVEN BOGUS** without removing any of its six instructions.
 It keeps the same raw block, native range and retained proof described below.
 
-Contact starts the existing 0.6-second fuse; it returns after 2.4 seconds. Falling
-lands on `payload-recovery` at y=490. An ordinary walking/jumping route returns
-through `recovery-step` to `service`, with the payload and latch intact. Both unit
-and browser checks traverse that recovery. The accepted solution completes before
-the browser tries the clone. Its physical collapse is a metaphor: the successful
+Foot contact keeps the existing 0.6-second fuse. Loading this particular block
+with the rope starts a **1.65-second** fuse, with a shrinking bar and ANCHOR FAILING
+warning. Re-hooking cannot restart it. Collapse releases its rope immediately;
+it returns after 2.4 seconds. The powered `return-catch` deck supports a deliberate
+failure below, with Node C and all latches intact. It is high enough to see and
+re-hook the returned anchor. Before C, falling here still lands on the lower
+control floor without death, but the intended rope chain is unavailable.
+
+The final route now uses the clone as a temporary support, rather than relegating
+it to an optional cargo shortcut. Its physical collapse is a metaphor: the successful
 controller trace does not execute these unreachable instructions. Nonexecution
 alone is never treated as proof.
 
@@ -163,7 +196,7 @@ The existing entry/far/upper logical checkpoints still fit their original static
 platforms. A/B/C placements reconstruct from the current authored coordinates;
 old UPLINK saves therefore place a saved C payload at the new core, without a
 schema migration. Transferred loose cargo still restores at the safe lower dock
-(1400,838). No animation, grapple, cooldown, velocity or camera reveal is saved.
+(1400,1198). No animation, grapple, cooldown, velocity or camera reveal is saved.
 Tests reload at relay power, at the upper latch with B occupied, and with the
 cube on C; actual server restart tests reconstruct the validated outputs too.
 
@@ -174,45 +207,62 @@ players, networking, new schema, or multiplayer authority are implemented.
 
 ### Playtest review and remaining human questions
 
-The real-control browser route completes both retrieval loops, two lift rides,
-service jumps and the final return with **zero deaths**. It also returns from the
-optional crumble safely without R, preserves all checkpoint reloads, and checks
-that a carried cube does not satisfy C. Geometry tests cover initial run-jumps,
-cube-assisted lower-wing jumps, attempted hooks to the clone from below, initial
-re-hook ascent, B losing power, and full recovery while the final route is off.
+The rope revision preserves tests for both retrieval loops, cargo jumps,
+checkpoint reloads, cube-only C, lower jump/cube bypasses, initial re-hook ascent,
+B losing power, and recovery while the final route is off. It adds five-anchor
+traversal, hook-triggered crumble/cancel/respawn, varied starting positions and
+transfer delays, clearance above the lift, non-jumpable return gaps, all 32
+controller frames' physical wiring and full-room overview framing.
 
-A repeat browser run exposed a marginal uphill jump from service to the core.
-Widening the service slab shortened that gap from 150 to 110 units; the tests
-still require the complete route and safe recovery.
-
-The first screenshot review found a crowded upper bay: the final-route listing
-and service label overlapped. Its three-instruction excerpt and offset listing
-now leave the service assembly readable. The descent step is labelled toward the
-lower wing. The initial jump/grapple, lift response and relay exit tolerances are
-unchanged. This is reachability/behaviour evidence, not a claim that human fun is
-proven by automation.
+Browser testing exposed a real recovery problem: the initial catch deck was too
+low to see/re-hook the returned clone comfortably. Raising it to y=510 makes the
+next target visible and reachable from the recovery area. Late-transfer testing
+also justified ending the lift just below the upper deck at y=580. These are
+geometry adjustments; the controlled rope and lift physics retain their tuning.
+The removed descent step is replaced by a direct safe drop. Missing a cargo jump
+now costs another lift ride, which should be judged in human playtesting.
 
 Manual playtest questions:
 
 - Does the relay activation suggest the first retrieval without additional hints?
 - Does LIFT FIELD LATCHED make the second retrieval obvious enough, while still
   leaving the player to plan the trip?
-- Does the intermediate step read as a safe descent and recovery route? It needs
-  a short turn left to get all the way down; walking right enters the cargo bay.
+- Does the direct right-hand drop from the latch read as safe?
 - Are the two cargo jumps comfortable with normal held Space, including carrying?
-  The safe recovery costs a short climb; it does not reset solved machinery.
+  Recovery keeps solved machinery and the cube, but requires another lift ride.
 - Does the 2.2-second route reveal help orientation without feeling disruptive?
   Distant assembly is small during the reveal; normal view/Evidence retain detail.
-- Is the single unstable shortcut tempting enough before its analysis is revealed?
-- Is the final return satisfying or too long? Its broad platforms need only three
-  gap jumps after the first hop up from the core.
+- Does PRESS SPACE TO START give enough time to orient without feeling like an
+  extra interruption? Is the whole-room view clear at small window sizes?
+- Are powered lines helpful without making the assembly/rope view too busy?
+- Is the unstable anchor's 1.65-second warning readable while moving? Can players
+  anticipate the next target and transfer with Space or click without precision?
+- Is the five-anchor return satisfying? A release too late in the arc can stall
+  the swing; this is not unrestricted horizontal flight. The catch deck and R
+  remain recovery options, with the payload kept on C.
 
 Known inherited limit: grapple rays do not occlude behind architecture. The raised
 plinth/range checks prevent the obvious lower-wing clone shortcut in this layout;
 no exhaustive proof over every possible input sequence is claimed. Human review
 of re-hooking and the new upper bay remains useful before accepting the chamber.
+The main airborne route uses the clone; the forgiving catch deck can also be
+used deliberately as a slower recovery detour. There is no hidden "touched fake
+block" completion flag or extra controller input.
 
-### CONTROL SPINE validation record
+### Rope/wiring revision validation — 2026-10-05
+
+- Typecheck, production build and the pinned 32-state bundle/hash check pass.
+- Unit tests: **169 passed**, two existing conditional skips; includes actual
+  process restarts at relay, upper latch, Node C and after resetting progress.
+- Both running-server HTTP invariants and course evidence checks pass.
+- Full real keyboard/mouse browser route: **94 assertions**, zero console errors.
+  Both the uninterrupted rope chain and deliberate clone-collapse/re-hook route
+  finish with zero deaths, and existing tutorial/save/reset assertions remain.
+- Screenshots: `docs/playtest/control-spine-rope-*`, including held overview,
+  powered wiring, lift clearance, unstable hook warning, collapse and recovery.
+  The exact route log is `docs/playtest/control-spine-rope-browser.txt`.
+
+### Initial CONTROL SPINE validation record (before rope revision)
 
 - `pnpm typecheck`, `pnpm build`, pinned bundle/hash validation: passed.
 - `pnpm test:unit`: **158 passed**, two existing conditional skips. Includes real
@@ -413,17 +463,18 @@ world outputs are never queued behind animation.
 
 The **Evidence** button pauses play and opens full retained regions, raw IDs,
 addresses/bytes, all occurrences, chronological commits, PE identity and proof
-assumptions. It can reveal the optional clone's classification on the canvas.
+assumptions. It can reveal the unstable clone's classification on the canvas.
 The ordered trace HUD appears only with Debug to reduce ordinary play clutter.
 The debug panel includes controller state/trace identity, replay cursor and save
 state. Inspector/reveal state and trace timing are not saved.
 
-### Proven clone as an optional physical metaphor
+### Proven clone as a physical metaphor
 
 Recommended candidate `bcf_clone_originalBB71alteredBB`, raw block `bb_000018AA`,
-native range `0x1400018AA–0x1400018C7` (exclusive), is now the optional lower
-shortcut in CONTROL SPINE's upper cargo bay. See the current placement/recovery
-contract above. Contact retains 0.6 s crumble / 2.4 s respawn. The address and all
+native range `0x1400018AA–0x1400018C7` (exclusive), is the unstable support in
+CONTROL SPINE's final rope chain. See the current placement/recovery contract
+above. Contact retains 0.6 s crumble / 2.4 s respawn; rope load warns for 1.65 s.
+The address and all
 six native instructions remain unchanged. Normal play says UNSTABLE; the inspector
 reveals PROVEN BOGUS and the retained proof. None of those unreachable instructions
 are replayed as successful output events.

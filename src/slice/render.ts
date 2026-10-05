@@ -9,12 +9,14 @@ import { revealMessage, authoredPresentation, type MachinePresentation } from '.
 import type { PuzzleWorld } from './world.ts';
 import { ROOM_IDS } from './controller.ts';
 import { drawMachinery } from './machinery-render.ts';
+import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
     private exitWasOpen = false;
+    connections: MachineConnection[] = [];
     camera = new Camera();
     particles = new Particles();
     private ctx: CanvasRenderingContext2D;
@@ -29,6 +31,7 @@ export class PuzzleRenderer {
         this.camera.viewH = rect.height;
     }
     room(world: PuzzleWorld): void {
+        this.connections = roomConnections(world.room);
         this.resize();
         this.camera.setWorld(world.room.width, world.room.height, 740);
         this.camera.snapTo(world.player.x, world.player.y - 100);
@@ -68,7 +71,7 @@ export class PuzzleRenderer {
         if (r.id === 'uplink' && w.frame.outputs.exitDoor && !this.exitWasOpen) this.returnReveal = 2.2;
         this.exitWasOpen = w.frame.outputs.exitDoor;
         this.returnReveal = Math.max(0, this.returnReveal - dt);
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, (overview || (r.id === 'uplink' && w.checkpoint === 'entry' && w.elapsed < 2.2)) ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 540 } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;
@@ -79,20 +82,9 @@ export class PuzzleRenderer {
             this.line(x, 0, x, r.height, C.grid, 0.6);
         for (let y = 0; y < r.height; y += 50)
             this.line(0, y, r.width, y, C.grid, 0.6);
-        this.text(`0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 575 : 90, 18, C.cyan);
-        this.text(r.instruction, 80, r.id === 'uplink' ? 685 : 132, 27, C.ink);
-        // Authored conduits communicate input/output relationships, not machine CFG edges.
-        const source = r.plate ?? r.lever;
-        if (source && r.id !== 'uplink') {
-            const anchor = r.platforms.find(p => p.anchor);
-            const dest = anchor ? { x: anchor.x + anchor.w / 2, y: anchor.y } : r.exit;
-            const on = r.id === 'pressure' ? w.frame.outputs.exitDoor : w.frame.outputs.grappleAnchor;
-            c.setLineDash([5, 8]);
-            this.line(source.x, source.y + 35, source.x, source.y + 45, on ? C.cyan : C.line);
-            this.line(source.x, source.y + 45, dest.x, source.y + 45, on ? C.cyan : C.line);
-            this.line(dest.x, source.y + 45, dest.x, dest.y, on ? C.cyan : C.line);
-            c.setLineDash([]);
-        }
+        this.text(`0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
+        this.text(r.instruction, 80, r.id === 'uplink' ? 1045 : 132, 27, C.ink);
+        drawConnections(c, this.connections, w);
         for (const h of r.hazards) {
             c.fillStyle = '#552a32';
             c.fillRect(h.x, h.y, h.w, h.h);
@@ -139,7 +131,8 @@ export class PuzzleRenderer {
                 if (!address) this.text('prototype', b.x + 12, b.y + 49, 11, C.amber);
                 if (p.fuse >= 0) {
                     c.fillStyle = C.amber;
-                    c.fillRect(b.x, b.y - 5, b.w * p.fuse / 0.6, 3);
+                    c.fillRect(b.x, b.y - 5, b.w * p.fuse / p.fuseDuration, 3);
+                    if (ropeOn(p.def.id, w)) this.text('ANCHOR FAILING · RELEASE', b.x - 20, b.y - 18, 12, C.amber);
                 }
                 if (p.respawn > 0)
                     this.text(`${p.respawn.toFixed(1)}s`, b.x + 50, b.y - 10, 13, C.amber);
@@ -154,13 +147,12 @@ export class PuzzleRenderer {
             }
         }
         if (r.id === 'uplink') {
-            this.text('CONTROL WING', 1030, 740, 19, C.dim);
-            this.text('LIFT / VERTICAL TRANSPORT', 1625, 775, 13, C.dim);
-            this.text('SERVICE BAY', 2360, 455, 16, C.dim);
-            this.text('CORE NODE', 3080, 90, 22, C.cyan);
-            this.text('← LOWER WING', 2140, 455, 12, C.dim);
-            this.text('RECOVERY DECK', 2900, 535, 14, C.dim);
-            this.text('↑ SERVICE ACCESS', 2280, 545, 12, C.dim);
+            this.text('CONTROL WING', 1030, 1100, 19, C.dim);
+            this.text('LIFT / VERTICAL TRANSPORT', 1625, 1135, 13, C.dim);
+            this.text('SERVICE BAY', 2360, 815, 16, C.dim);
+            this.text('CORE NODE', 3080, 450, 22, C.cyan);
+            this.text('RECOVERY DECK', 2900, 895, 14, C.dim);
+            this.text('← RETURN TO LIFT', 2280, 915, 12, C.dim);
             for (const p of w.platforms.filter(p => p.def.signal === 'codePlatformB'))
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
             if (w.inputs.switchC) {
@@ -184,12 +176,6 @@ export class PuzzleRenderer {
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
         }
         if (r.plateB && r.id !== 'uplink') {
-            // Plate B's exit conduit stays on the wall behind the climbing section.
-            c.setLineDash([5, 8]);
-            const colour = w.frame.outputs.exitDoor ? C.cyan : C.line;
-            this.line(r.plateB.x, r.plateB.y - 85, r.exit.x + r.exit.w / 2, r.plateB.y - 85, colour);
-            this.line(r.exit.x + r.exit.w / 2, r.plateB.y - 85, r.exit.x + r.exit.w / 2, r.exit.y - 45, colour);
-            c.setLineDash([]);
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
         for (const lever of [
@@ -279,3 +265,4 @@ export class PuzzleRenderer {
         }
     }
 }
+function ropeOn(id: string, w: PuzzleWorld): boolean { return w.player.rope.phase === 'attached' && w.player.rope.anchorId === id; }

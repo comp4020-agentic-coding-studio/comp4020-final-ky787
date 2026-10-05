@@ -101,7 +101,7 @@ describe('retained UPLINK controller evidence', () => {
         for (const t of bundle.traces) expect(new Set(t.raw_occurrences.map(o => o.id)).size).toBe(t.raw_occurrences.length);
         // This specimen has no repeated raw visits; preserve the exported visit identity anyway.
     });
-    it('links the optional crumble to actual clone proof, keeps all instructions, and recovers safely', () => {
+    it('links the unstable crumble to actual clone proof, keeps all instructions, and recovers even before C is powered', () => {
         const room = roomById('uplink'), p = room.platforms.find(p => p.id === 'proven-clone')!;
         expect(p.evidenceId).toBe(provenCrumble.proof_id);
         expect(bundle.proof_evidence.clones.some(c => c.id === p.evidenceId)).toBe(true);
@@ -111,7 +111,7 @@ describe('retained UPLINK controller evidence', () => {
         Object.assign(w.player, { x: p.x + p.w / 2, y: p.y - 30, vy: 20 });
         const tick = (n: number) => { for (let i = 0; i < n; i++) w.step(FIXED_DT, emptyInput()); };
         tick(20); expect(w.player.groundId).toBe(p.id);
-        tick(140); expect(w.player.groundId).toBe('payload-recovery'); expect(w.deaths).toBe(0);
+        tick(230); expect(w.player.groundId).toBe('far'); expect(w.deaths).toBe(0);
         expect(w.platforms.find(s => s.def.id === p.id)!.solid.enabled).toBe(false);
         tick(300); expect(w.platforms.find(s => s.def.id === p.id)!.solid.enabled).toBe(true);
         expect(w.frame.outputs.exitDoor).toBe(false);
@@ -130,7 +130,7 @@ describe('retained UPLINK controller evidence', () => {
     it('multiple physical return sections share one retained output and instruction region in every state', () => {
         const w = new PuzzleWorld(roomById('uplink'), freshProgress().rooms.uplink);
         const sections = w.platforms.filter(p => p.def.signal === 'codePlatformB');
-        expect(sections).toHaveLength(3);
+        expect(sections).toHaveLength(5);
         for (let key = 0; key < 32; key++) {
             const frame = validatedTraceController.evaluate('uplink', inputs(key));
             const replay = new TracePlayback(); replay.update(frame, 0);
