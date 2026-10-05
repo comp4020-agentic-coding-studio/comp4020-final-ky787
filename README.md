@@ -41,9 +41,9 @@ This means the stage is not shaped around whatever CFG a compiler happened to pr
 
 ## Current Crit 8 build
 
-The current build contains introductory rooms for pressure plates, switches, grappling and payload routing, followed by a larger UPLINK puzzle combining these mechanics.
+The current build contains introductory rooms for pressure plates, switches, grappling and payload routing, followed by a larger puzzle combining these mechanics.
 
-UPLINK is already driven by a validated OLLVM-16 bogus-control-flow controller. Its real machine instructions appear on the floating code machinery, and the displayed execution follows retained traces from the actual obfuscated binary.
+The fourth level is already driven by a validated OLLVM-16 bogus-control-flow controller. Its real machine instructions appear on the floating code machinery, and the displayed execution follows retained traces from the actual obfuscated binary.
 
 One optional unstable platform uses assembly from a real OLLVM BCF clone whose incoming bogus paths were independently proved infeasible. The crumble behaviour is a game metaphor; the underlying bogus-code classification is real.
 
