@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
-    "dev": "vite",
+    "dev": "node scripts/dev.ts",
+    "dev:client": "vite",
     "build": "pnpm check:uplink && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

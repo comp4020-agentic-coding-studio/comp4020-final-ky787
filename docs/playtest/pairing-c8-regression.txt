@@ -17,10 +17,10 @@ PASS pit respawns quickly without losing switch progress
 PASS ground Space jumps without firing a hook
 PASS air hook uses visible target preview
 PASS tapped airborne Space latches the hook
-PASS switch physical grapple crossing — x=1121
+PASS switch physical grapple crossing — x=1105
 PASS cube pulls toward player without attaching player
 PASS pulled cube can be carried
-PASS relay physical grapple crossing — x=1091
+PASS relay physical grapple crossing — x=1088
 PASS bridge locks but exit still requires Plate B
 PASS relay bridge lever cannot switch back off
 PASS return bridge supports player
@@ -43,7 +43,7 @@ PASS unstable anchor inspector retains proof assumptions and real clone assembly
 PASS UPLINK anchor active: validated state 1
 PASS anchor uses immediate retained output
 PASS Plate A wire powers the crossing machinery
-PASS uplink physical grapple crossing — x=1076
+PASS uplink physical grapple crossing — x=1078
 PASS UPLINK relay power sets far checkpoint
 PASS relay power uses its sci-fi activation cue
 PASS UPLINK relay power can toggle OFF

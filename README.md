@@ -83,3 +83,14 @@ separate, and personal campaign saves keep their existing format.
 See [the multiplayer contract and test flow](docs/c9-multiplayer.md) and
 [the authority ADR](docs/adr/0001-multiplayer-authority.md). Human playtesting is
 the next acceptance step before adding shared cubes or redesigning co-op stages.
+
+## Run locally
+
+Run `pnpm install`, then `pnpm dev`. This starts Vite on `http://localhost:5173`
+and the real HTTP/API/WebSocket server on port 8080 together. No separate backend
+command or production build is needed for development. Local saves persist in
+the ignored `.local-data/` directory; `DATA_DIR` can select another directory.
+Ctrl+C stops both listeners. Use separate browser profiles or a private window
+for the two players.
+
+For separate terminals, use `pnpm dev:server` and `pnpm dev:client` instead.

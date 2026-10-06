@@ -10,7 +10,12 @@ export default defineConfig({
   // Relative asset URLs, so the build works from any path.
   base: "./",
   server: {
-    proxy: { "/api": "http://localhost:8080", "/readme": "http://localhost:8080", "/ws": { target: "ws://localhost:8080", ws: true } },
+    // Preserve Host for the backend's Origin check, including campaign PUTs.
+    proxy: {
+      "/api": { target: "http://127.0.0.1:8080", changeOrigin: false },
+      "/readme": { target: "http://127.0.0.1:8080", changeOrigin: false },
+      "/ws": { target: "ws://127.0.0.1:8080", ws: true, changeOrigin: false },
+    },
     watch: { ignored: [WORKSPACE] },
   },
   optimizeDeps: {

@@ -32,7 +32,10 @@ The Docker runtime copies pruned production dependencies and the shared protocol
 
 The browser derives `ws://host/ws` or `wss://host/ws` from the current page URL.
 Vite proxies `/api`, `/readme` and `/ws` to the same Node server on 8080; the
-browser still sees only its current origin. Fly terminates TLS. The upgrade reads
+browser still sees only its current origin. `pnpm dev` now starts both listeners
+in one development process, waits for the backend before exposing Vite, and
+closes both on Ctrl+C. Its backend binds to loopback; `--host` can expose the
+Vite origin for LAN testing. Fly terminates TLS. The upgrade reads
 the HTTP cookie header and checks the request Origin against Host.
 
 | Module | Responsibility |
@@ -222,9 +225,10 @@ a silent machinery baseline and only plays connection confirmation.
 
 ```sh
 pnpm install --frozen-lockfile
+pnpm dev                             # Vite on 5173 + real API/WS on 8080
+# Or test the production server separately:
 pnpm build
 DATA_DIR=.local-data pnpm start        # HTTP/API/WS on 8080
-pnpm dev                             # optional Vite front end on 5173
 pnpm typecheck
 pnpm test:unit
 pnpm test                            # live HTTP + WebSocket spec on 8080
@@ -232,6 +236,16 @@ pnpm check:browser                   # full C8 browser route
 pnpm check:multiplayer               # own temporary server, two isolated contexts, actual restart
 BN_TEST_TLS=1 pnpm check:multiplayer  # test-only TLS proxy + Secure cookies + WSS
 ```
+
+Development needs no prebuilt `dist`. Its saves default to `.local-data/`, or
+`DATA_DIR` when provided. `pnpm dev --host` exposes the frontend for LAN testing;
+`--port` selects the frontend port and `DEV_API_PORT` selects the backend port.
+The launcher configures the proxy from the backend's actual listening port.
+It preserves the frontend Host header so same-origin campaign writes and
+WebSocket upgrades pass the backend's origin check. Vite reloads frontend edits;
+restart `pnpm dev` after changing server code.
+If running the backend separately, use `pnpm dev:server` and `pnpm dev:client`
+in two terminals. Do not start a second backend on an occupied port 8080.
 
 `BROWSER_BIN=/path/to/chromium-compatible-browser` selects the browser. The local
 machine's Snap Chromium could not launch with the temporary profile; installed
@@ -256,12 +270,15 @@ while holding A before completing the chamber.
 Validation recorded in this pass:
 
 - Typecheck, production build and unchanged pinned 32-state UPLINK bundle pass.
-- 198 unit/server tests pass; two pre-existing conditional skips remain. Coverage
+- 200 unit/server tests pass; two pre-existing conditional skips remain. Coverage
   includes actual SIGKILL/restart, C8 migrations, code collisions, capacity/slots,
   old-socket replacement, stale actions/revisions, release, latches, two-body
   completion, malformed/oversized messages, origin checks and idle unloading.
+  Development launcher tests also cover HTTP/WS proxying, same-origin campaign
+  saves, SIGINT/SIGTERM cleanup, persistence across restart and occupied ports.
 - The complete existing C8 browser route passes 115 assertions, including both
-  CONTROL SPINE solutions, saved checkpoints, campaign reset and audio.
+  CONTROL SPINE solutions, saved checkpoints, campaign reset and audio. It also
+  passes through the combined development server and its Origin-preserving proxy.
 - Two isolated actual browser contexts complete PAIRING BAY with ordinary
   keyboard/mouse input. Neither world nor controller state is mutated by the
   browser test. Remote motion, refresh during the bridge phase, deliberate
@@ -269,8 +286,8 @@ Validation recorded in this pass:
 - The HTTPS/WSS proxy run passes 25 checks. Propagation upper bounds (including
   physical approach/input duration) are A **464 ms**, B **66 ms**, final plate
   **492 ms**. These are local measurements, not Fly/WAN latency claims.
-- Vite's development-origin two-browser run passes 21 checks, with A **444 ms**,
-  B **66 ms**, final plate **461 ms**, including the same physical-input overhead.
+- The combined `pnpm dev` two-browser run passes 21 checks, with A **508 ms**,
+  B **63 ms**, final plate **499 ms**, including the same physical-input overhead.
 - All three running-app HTTP/WebSocket specifications pass on the shared origin.
 - Docker daemon access is unavailable on this machine. The exact runtime COPY
   file set with installed/pruned production dependencies successfully serves
