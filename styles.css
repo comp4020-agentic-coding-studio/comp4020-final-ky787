@@ -305,6 +305,12 @@ p {
 #coop-hud pre { line-height:1.8; margin:2px 0; white-space:pre-wrap; }
 #coop-hud b { color:#b59bff; line-height:1.5; }
 #coop-hud button { pointer-events:auto; }
+.room-code-row { display:flex; align-items:center; gap:12px; }
+#room-code { pointer-events:auto; user-select:all; }
+#copy-room-code { white-space:nowrap; }
+#copy-room-code:disabled { opacity:.5; cursor:default; }
+#copy-room-status { color:#a1eee0; line-height:1.5; }
+#copy-room-status:empty { display:none; }
 .coop-mode #debug { right:auto; left:18px; }
 .progress-reset { margin-top:18px; padding-top:16px; border-top:1px solid #314750; }
 .progress-reset>button { width:100%; }

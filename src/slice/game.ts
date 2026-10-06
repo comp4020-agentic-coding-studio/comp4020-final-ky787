@@ -150,10 +150,25 @@ export class SliceGame {
         this.coopHud.replaceChildren();
         const label = document.createElement('small'); label.textContent = 'PAIRING BAY / ROOM CODE';
         const code = document.createElement('strong'); code.id = 'room-code'; code.textContent = r?.code ?? '····';
+        const codeRow = document.createElement('div'); codeRow.className = 'room-code-row';
+        const copy = document.createElement('button'); copy.id = 'copy-room-code'; copy.type = 'button';
+        copy.textContent = 'COPY CODE'; copy.disabled = !r; copy.setAttribute('aria-label', 'Copy room code to clipboard');
+        const copied = document.createElement('small'); copied.id = 'copy-room-status'; copied.setAttribute('role', 'status');
+        copy.addEventListener('click', async () => {
+            if (!r) return;
+            copy.textContent = 'COPY CODE'; copied.textContent = '';
+            try {
+                await navigator.clipboard.writeText(r.code);
+                copy.textContent = 'COPIED'; copied.textContent = 'Room code copied.';
+            } catch {
+                copied.textContent = 'Copy unavailable. Select the code and copy it manually.';
+            }
+        });
+        codeRow.append(code, copy);
         const who = document.createElement('span'); who.textContent = this.coop.slot ? `YOU — PLAYER ${this.coop.slot}` : 'CONNECTING TO SESSION';
         const list = document.createElement('pre'); list.textContent = slots;
         const state = document.createElement('b'); state.id = 'coop-state'; state.setAttribute('role', 'status'); state.textContent = status;
-        this.coopHud.append(label, code, who, list, state);
+        this.coopHud.append(label, codeRow, copied, who, list, state);
         if (!this.coop.active) {
             const back = document.createElement('button'); back.textContent = 'Back to menu'; back.onclick = () => this.leaveCoop(); this.coopHud.append(back);
         }

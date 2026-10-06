@@ -72,6 +72,8 @@ two reserved visitor-owned slots, no spectators. Disconnecting does not free a
 slot for an unrelated visitor. Create a new room to choose a different partner.
 
 The room code, local slot, both connection states and partner status stay visible.
+**COPY CODE** beside the room code copies it to the clipboard and confirms success;
+if clipboard access is unavailable, the code remains selectable for manual copy.
 Play starts only after the initial authoritative snapshot. A visitor may move
 while waiting for a partner. The initial P1 spawn is off Plate A. The same tab
 remembers the code in `sessionStorage` and automatically rejoins after refresh;
