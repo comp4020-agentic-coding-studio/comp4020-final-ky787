@@ -25,9 +25,7 @@
 - Persist meaningful progress (rooms, checkpoints, mechanics, bounded events),
   not physics, on `/data`. Separate visitor progress from room state for later
   shared state. Returning visitors must visibly continue their progress.
-- Run `pnpm typecheck`, `pnpm test:unit`, `pnpm build`, browser checks and HTTP
-  spec tests against a running app. Verify persistence across process restart.
-  Docker is only needed for image validation. Never weaken tests to hide failure.
+- Use proportionate validation. Do not run the full suite after every edit. For small/local changes, run the narrowest relevant tests plus typecheck where appropriate. Documentation-only, Git-only and push-only tasks require no gameplay test suite. Run browser routes, multiplayer end-to-end tests, persistence restart tests and full builds only when the affected subsystem or task warrants them. Before major milestones/releases, run the complete relevant suite. Never weaken tests to hide failures.
 - Put durable design/contracts in project documentation; handoffs are not
   authoritative evidence. Stop for manual playtesting before expanding the
   accepted puzzle or its validated binary contract.
