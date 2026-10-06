@@ -6,7 +6,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { CODE_ALPHABET, normalizeCode, parseClientMessage, type ClientMessage, type Plate, type ServerMessage, type Slot } from '../src/coop/protocol.ts';
 import { atomicJson } from './atomic-json.ts';
 import { sameOrigin, visitorCookie } from './identity.ts';
-import { acceptsPlate, sharedRoom, validRecord, type RoomRecord } from './pairing-state.ts';
+import { acceptsPlate, sharedRoom, readRoomRecord, type RoomRecord } from './pairing-state.ts';
 
 interface Peer {
     ws: WebSocket; visitor: string; room?: Room; slot?: Slot;
@@ -62,9 +62,10 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         let value: unknown;
         try { value = JSON.parse(await readFile(join(directory, `${code}.json`), 'utf8')); }
         catch (e) { if ((e as NodeJS.ErrnoException).code === 'ENOENT') return null; throw e; }
-        if (!validRecord(value, code)) throw new Error('Invalid room record');
+        const record = readRoomRecord(value, code);
+        if (!record) throw new Error('Invalid room record');
         if (rooms.size >= 64) throw new Error('Room capacity');
-        const room: Room = { record: value, peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
+        const room: Room = { record, peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
         rooms.set(code, room);
         return room;
     }
@@ -93,8 +94,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             }
             if (!code) { error(peer, 'SERVER_BUSY'); return; }
             const now = new Date().toISOString();
-            room = { record: { version: 1, code, level: 'pairing-bay', revision: 0, visitors: [peer.visitor, null],
-                switchB: false, checkpoint: 'entry', completed: false, createdAt: now, updatedAt: now },
+            room = { record: { version: 2, code, level: 'pairing-bay', revision: 0, visitors: [peer.visitor, null],
+                switchB: false, checkpoint: 'entry', exitUnlocked: false, reachedExit: [false, false], completed: false, createdAt: now, updatedAt: now },
                 peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
             rooms.set(code, room);
         } else {
@@ -128,20 +129,26 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         if (message.type === 'create' || message.type === 'join') { await enter(peer, message); return; }
         if (message.type === 'leave') { await disconnect(peer); peer.ws.close(1000, 'Left room'); return; }
         if (!ownsSlot(peer)) { error(peer, 'NOT_JOINED'); return; }
-        if (message.type !== 'occupancy' && message.type !== 'switch') return;
+        if (message.type !== 'occupancy' && message.type !== 'switch' && message.type !== 'exit') return;
         if (message.seq <= peer.actionSeq) { error(peer, 'STALE_ACTION'); return; }
         peer.actionSeq = message.seq;
         const room = peer.room, index = peer.slot - 1;
         if (message.type === 'occupancy') {
-            if (!acceptsPlate(peer.slot, message.plate, room.record)) { error(peer, 'INVALID_ACTION'); return; }
+            if (!acceptsPlate(message.plate, room.record)) { error(peer, 'INVALID_ACTION'); return; }
             if (room.plates[index] === message.plate) return;
             room.plates[index] = message.plate;
-        } else {
-            if (peer.slot !== 2) { error(peer, 'INVALID_ACTION'); return; }
+        } else if (message.type === 'switch') {
             if (room.record.switchB) return;
             room.record.switchB = true; room.record.checkpoint = 'reunion';
+        } else {
+            if (!room.record.exitUnlocked) { error(peer, 'INVALID_ACTION'); return; }
+            if (room.record.reachedExit[index]) return;
+            room.record.reachedExit[index] = true;
         }
-        if (view(room).outputs.exitDoor) room.record.completed = true;
+        const state = view(room);
+        if (room.record.switchB && state.connected.every(Boolean) && state.inputs.finalPlateLeftOccupied && state.inputs.finalPlateRightOccupied)
+            room.record.exitUnlocked = true;
+        room.record.completed = room.record.reachedExit.every(Boolean);
         room.record.revision++;
         await persist(room);
         broadcast(room);

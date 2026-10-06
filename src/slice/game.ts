@@ -119,7 +119,7 @@ export class SliceGame {
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
         if (initial) {
-            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB());
+            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB(), () => this.coop.reachExit());
             this.world = new PuzzleWorld(pairingBay(this.coop.slot), { switchB: room.inputs.switchB, cubeOnPlate: false, cubeOnPlateB: false,
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
             this.renderer.room(this.world); this.sound.reset(this.world);
@@ -135,17 +135,19 @@ export class SliceGame {
             if (!previous.inputs.switchB && room.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever! });
             this.sound.observe(this.world, events);
             if (!previous.completed && room.completed) this.audio.play('complete');
+            else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
         }
     }
     private coopStatus(): void {
         if (!this.coopMode) return;
         if (!this.coop.connected) { this.started = false; this.world.cancelGrapple(); this.input.releaseAll(); }
         const r = this.coop.room;
-        const slots = r ? r.connected.map((on, i) => `PLAYER ${i + 1}   ${on ? 'CONNECTED' : r.assigned[i] ? 'DISCONNECTED' : 'WAITING FOR PARTNER'}`).join('\n') : '';
+        const slots = r ? r.connected.map((on, i) => `PLAYER ${i + 1}   ${on ? 'CONNECTED' : r.assigned[i] ? 'DISCONNECTED' : 'WAITING FOR PARTNER'}${r.reachedExit[i] ? ' · ARRIVED' : ''}`).join('\n') : '';
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;
         const status = !this.coop.connected ? this.coop.status
             : r && !r.connected[partner] ? r.assigned[partner] ? 'PARTNER DISCONNECTED' : 'WAITING FOR PARTNER'
             : r?.completed ? 'PAIRING COMPLETE'
+            : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();
         const label = document.createElement('small'); label.textContent = 'PAIRING BAY / ROOM CODE';
@@ -169,6 +171,11 @@ export class SliceGame {
         const list = document.createElement('pre'); list.textContent = slots;
         const state = document.createElement('b'); state.id = 'coop-state'; state.setAttribute('role', 'status'); state.textContent = status;
         this.coopHud.append(label, codeRow, copied, who, list, state);
+        if (r?.exitUnlocked) {
+            const arrivals = document.createElement('small'); arrivals.id = 'exit-arrivals'; arrivals.setAttribute('role', 'status');
+            arrivals.textContent = `EXIT · ${r.reachedExit.filter(Boolean).length} / 2 ARRIVED${r.completed ? '' : ' · BOTH PLAYERS REQUIRED'}`;
+            this.coopHud.append(arrivals);
+        }
         if (!this.coop.active) {
             const back = document.createElement('button'); back.textContent = 'Back to menu'; back.onclick = () => this.leaveCoop(); this.coopHud.append(back);
         }
@@ -429,7 +436,8 @@ export class SliceGame {
         this.audio.meter();
         if (this.coopMode) this.coop.publish(this.world.player, now);
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
-            this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now) } : undefined);
+            this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now),
+                reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false } : undefined);
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
         if (replay.trace) {

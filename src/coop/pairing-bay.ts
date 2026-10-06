@@ -10,7 +10,7 @@ export function pairingBay(slot: Slot): RoomDef<'pairing-bay'> {
         checkpoint: { x: slot === 1 ? 1050 : 1150, y: 543 },
         plate: { x: 250, y: 560 }, lever: { x: 1060, y: 560 },
         plateB: { x: 1370, y: 560 }, plateC: { x: 1610, y: 560 },
-        display: { x: 1120, y: 240 }, exit: { x: 1760, y: 420, w: 60, h: 140 },
+        display: { x: 1120, y: 240 }, exit: { x: 1700, y: 420, w: 130, h: 140 },
         platforms: [
             { id: 'near', kind: 'static', x: 0, y: 560, w: 460, h: 240 },
             { id: 'far', kind: 'static', x: 880, y: 560, w: 970, h: 240 },

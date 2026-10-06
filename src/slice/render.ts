@@ -64,7 +64,7 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null }): void {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean }): void {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
@@ -167,7 +167,7 @@ export class PuzzleRenderer {
             }
         }
         const plates = [
-            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'pairing-bay' ? 'PLATE A / PLAYER 1' : r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
             { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
             { at: r.plateC, active: r.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
         ];
@@ -184,7 +184,7 @@ export class PuzzleRenderer {
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
         for (const lever of [
-            { at: r.lever, active: w.inputs.switchB, name: r.id === 'pairing-bay' ? 'SWITCH B / P2' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' },
+            { at: r.lever, active: w.inputs.switchB, name: r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' },
             { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
         ]) {
             if (!lever.at) continue;
@@ -217,6 +217,10 @@ export class PuzzleRenderer {
         c.fillStyle = '#52616a';
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
         this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
+        if (r.id === 'pairing-bay') {
+            this.text(players?.completed ? 'PAIRING COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
+            if (w.frame.outputs.exitDoor) this.text(`${players?.reachedExit.filter(Boolean).length ?? 0} / 2 ARRIVED`, e.x + 8, e.y + 38, 12, C.cyan);
+        }
         drawMachineListings(c, w, this.replay, this.presentation);
         const checkpoint = w.checkpointPosition();
         this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
@@ -270,9 +274,9 @@ export class PuzzleRenderer {
         }
         if (r.id === 'pairing-bay') {
             this.text('MOCK MULTIPLAYER TEST · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
-            this.text('P1: HOLD A', 150, 380, 15, C.cyan);
-            this.text('P2: CROSS → LATCH B', 880, 380, 15, '#b59bff');
-            this.text('ONE PLAYER ON EACH FINAL PLATE', 1250, 460, 14, C.ink);
+            this.text('HOLD FOR YOUR PARTNER', 110, 380, 15, C.cyan);
+            this.text('RETURN BRIDGE CONTROL', 900, 380, 15, C.cyan);
+            this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1250, 460, 14, C.ink);
         }
         if (r.id === 'relay')
             this.text('SAFE RECOVERY FLOOR · JUMP BACK UP', 1220, 700, 13, C.dim);

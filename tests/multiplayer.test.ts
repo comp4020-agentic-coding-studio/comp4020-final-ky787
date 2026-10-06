@@ -66,6 +66,10 @@ it('uses bounded explicit messages, normalized unambiguous codes and same-origin
     for (let i = 0; i < 1000; i++) expect(generateCode()).toMatch(CODE_PATTERN);
     expect(normalizeCode(' ab2z ')).toBe('AB2Z');
     for (const code of ['AB01', 'OOOO', 'IIII', 'LLLL', '../X', 'ABCDE', 'AB C']) expect(normalizeCode(code)).toBeNull();
+    expect(parseClientMessage('{\"type\":\"exit\",\"seq\":1}')).toEqual({ type: 'exit', seq: 1 });
+    for (const field of ['slot', 'visitor', 'completed', 'outputs', 'revision'])
+        expect(parseClientMessage(JSON.stringify({ type: 'exit', seq: 1, [field]: 1 }))).toBeNull();
+    for (const seq of [-1, 1.5, null, '1']) expect(parseClientMessage(JSON.stringify({ type: 'exit', seq }))).toBeNull();
     expect(websocketUrl('https://example.fly.dev/play')).toBe('wss://example.fly.dev/ws');
     expect(websocketUrl('http://localhost:5173/')).toBe('ws://localhost:5173/ws');
     for (const raw of ['{', 'null', '[]', '{"type":"occupancy","seq":1,"plate":"plateA","slot":2}', JSON.stringify({ type: 'avatar', seq: 1, avatar: { ...avatar, x: 1e30 } })]) expect(parseClientMessage(raw)).toBeNull();
@@ -92,33 +96,73 @@ it('creates exactly two visitor-owned slots, rejects invalid/unknown/full rooms,
     expect((await p2.wait('avatar')).slot).toBe(1);
 });
 
-it('owns puzzle state, releases momentary occupancy on leave/close, latches B and requires two distinct connected bodies', async () => {
-    const { app, a, p1, p2, code } = await pair();
-    p2.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); expect((await p2.wait('error')).code).toBe('INVALID_ACTION');
-    p1.send({ type: 'switch', seq: 1 }); expect((await p1.wait('error')).code).toBe('INVALID_ACTION');
-    p1.send({ type: 'occupancy', seq: 2, plate: 'plateA' });
-    const on = await p2.wait('room', m => m.room.outputs.grappleAnchor);
-    p1.send({ type: 'occupancy', seq: 3, plate: null });
-    const off = await p2.wait('room', m => m.room.revision > on.room.revision && !m.room.outputs.grappleAnchor);
+it.each([1, 2] as const)('slot %s may hold A, its disconnect releases A, and its partner may latch B', async slot => {
+    const { app, a, b, p1, p2, code } = await pair();
+    const holder = slot === 1 ? p1 : p2, partner = slot === 1 ? p2 : p1;
+    holder.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
+    const on = await partner.wait('room', m => m.room.outputs.grappleAnchor);
+    expect(on.room.inputs.plateAOccupied).toBe(true);
+    holder.send({ type: 'occupancy', seq: 2, plate: null });
+    const off = await partner.wait('room', m => m.room.revision > on.room.revision && !m.room.outputs.grappleAnchor);
     expect(newerRoom(on.room, off.room)).toBe(true); expect(newerRoom(off.room, on.room)).toBe(false); expect(newerRoom(off.room, off.room)).toBe(false);
-    p1.send({ type: 'occupancy', seq: 2, plate: 'plateA' }); expect((await p1.wait('error')).code).toBe('STALE_ACTION');
-    p1.send({ type: 'occupancy', seq: 4, plate: 'plateA' }); await p2.wait('room', m => m.room.revision > off.room.revision && m.room.outputs.grappleAnchor);
-    await p1.close(); const disconnected = await p2.wait('room', m => !m.room.connected[0]);
+    holder.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); expect((await holder.wait('error')).code).toBe('STALE_ACTION');
+    holder.send({ type: 'occupancy', seq: 3, plate: 'plateA' }); await partner.wait('room', m => m.room.revision > off.room.revision && m.room.outputs.grappleAnchor);
+    await holder.close(); const disconnected = await partner.wait('room', m => m.room.revision > off.room.revision && !m.room.connected[slot - 1]);
     expect(disconnected.room.outputs.grappleAnchor).toBe(false);
-    p2.send({ type: 'switch', seq: 2 }); const latched = await p2.wait('room', m => m.room.inputs.switchB);
+    partner.send({ type: 'switch', seq: 1 }); const latched = await partner.wait('room', m => m.room.inputs.switchB);
     expect(latched.room.outputs.returnBridge).toBe(true); expect(latched.room.checkpoint).toBe('reunion');
-    for (const [seq, plate] of [[3, 'finalLeft'], [4, 'finalRight']] as const) {
-        p2.send({ type: 'occupancy', seq, plate });
-        const alone = await p2.wait('room', m => m.room.revision > latched.room.revision && m.room.inputs[plate === 'finalLeft' ? 'finalPlateLeftOccupied' : 'finalPlateRightOccupied']);
-        expect(alone.room.outputs.exitDoor).toBe(false); expect(alone.room.completed).toBe(false);
+    partner.send({ type: 'switch', seq: 2 }); // New sequence, same latch: no extra mutation.
+    partner.send({ type: 'occupancy', seq: 3, plate: 'plateA' });
+    const held = await partner.wait('room', m => m.room.revision > latched.room.revision);
+    expect(held.room.revision).toBe(latched.room.revision + 1); expect(held.room.outputs.returnBridge).toBe(true);
+    await partner.close();
+    const returning = await connect(app.url, (slot === 1 ? a : b).cookie); returning.send({ type: 'join', code });
+    const restored = await returning.wait('snapshot');
+    expect(restored.slot).toBe(slot); expect(restored.room.outputs.grappleAnchor).toBe(false);
+    expect(restored.room.outputs.returnBridge).toBe(true); expect(restored.room.checkpoint).toBe('reunion');
+});
+
+it.each([1, 2] as const)('slot %s on the left unlocks with its partner; both distinct arrivals are still required', async leftSlot => {
+    const { app, a, b, p1, p2, code } = await pair();
+    const peers = [p1, p2], seq = [0, 0];
+    const send = (index: number, message: object) => peers[index].send({ ...message, seq: ++seq[index] });
+    send(0, { type: 'exit' }); expect((await p1.wait('error')).code).toBe('INVALID_ACTION');
+    send(1, { type: 'occupancy', plate: 'finalLeft' }); expect((await p2.wait('error')).code).toBe('INVALID_ACTION');
+    send(0, { type: 'switch' }); let latest = (await p2.wait('room', m => m.room.inputs.switchB)).room;
+    // One connected body alternating plates can never supply two simultaneous inputs.
+    for (const plate of ['finalLeft', 'finalRight', 'finalLeft', 'finalRight', null] as const) {
+        send(0, { type: 'occupancy', plate });
+        latest = (await p2.wait('room', m => m.room.revision > latest.revision)).room;
+        expect(latest.exitUnlocked).toBe(false); expect(latest.completed).toBe(false);
     }
-    const returning = await connect(app.url, a.cookie); returning.send({ type: 'join', code });
-    const snap = await returning.wait('snapshot'); expect(snap.slot).toBe(1); expect(snap.room.inputs.player1OnPlateA).toBe(false);
-    returning.send({ type: 'occupancy', seq: 1, plate: 'finalLeft' });
-    const complete = await p2.wait('room', m => m.room.completed);
-    expect(complete.room.outputs.exitDoor).toBe(true);
-    await p2.close(); const closed = await returning.wait('room', m => !m.room.connected[1]);
-    expect(closed.room.outputs.exitDoor).toBe(false); expect(closed.room.outputs.returnBridge).toBe(true); expect(closed.room.completed).toBe(true);
+    send(0, { type: 'occupancy', plate: 'finalLeft' }); latest = (await p2.wait('room', m => m.room.revision > latest.revision)).room;
+    send(1, { type: 'occupancy', plate: 'finalLeft' }); latest = (await p2.wait('room', m => m.room.revision > latest.revision)).room;
+    expect(latest.exitUnlocked).toBe(false); // Two bodies on the same plate also cannot unlock.
+    for (const i of [0, 1]) {
+        send(i, { type: 'occupancy', plate: null }); latest = (await p2.wait('room', m => m.room.revision > latest.revision)).room;
+    }
+    send(leftSlot - 1, { type: 'occupancy', plate: 'finalLeft' });
+    send(2 - leftSlot, { type: 'occupancy', plate: 'finalRight' });
+    latest = (await p2.wait('room', m => m.room.exitUnlocked)).room;
+    expect(latest.outputs.exitDoor).toBe(true); expect(latest.completed).toBe(false); expect(latest.reachedExit).toEqual([false, false]);
+    for (const i of [0, 1]) {
+        send(i, { type: 'occupancy', plate: null }); latest = (await p2.wait('room', m => m.room.revision > latest.revision)).room;
+        expect(latest.outputs.exitDoor).toBe(true); expect(latest.completed).toBe(false);
+    }
+    expect(latest.inputs.finalPlateLeftOccupied || latest.inputs.finalPlateRightOccupied).toBe(false);
+    const first = leftSlot - 1, second = 1 - first;
+    send(first, { type: 'exit' }); latest = (await peers[second].wait('room', m => m.room.reachedExit[first])).room;
+    expect(latest.reachedExit[second]).toBe(false); expect(latest.completed).toBe(false);
+    send(first, { type: 'exit' }); // Duplicate arrival must not count as another body.
+    peers[first].send({ type: 'exit', seq: seq[first] }); expect((await peers[first].wait('error')).code).toBe('STALE_ACTION');
+    await peers[first].close(); latest = (await peers[second].wait('room', m => m.room.revision > latest.revision && !m.room.connected[first])).room;
+    expect(latest.exitUnlocked).toBe(true); expect(latest.outputs.exitDoor).toBe(true); expect(latest.reachedExit[first]).toBe(true); expect(latest.completed).toBe(false);
+    const returning = await connect(app.url, (first === 0 ? a : b).cookie); returning.send({ type: 'join', code });
+    const recovered = await returning.wait('snapshot');
+    expect(recovered.slot).toBe(leftSlot); expect(recovered.room.reachedExit).toEqual(latest.reachedExit);
+    expect(recovered.room.checkpoint).toBe('reunion'); expect(recovered.room.inputs.plateAOccupied).toBe(false);
+    send(second, { type: 'exit' }); const complete = (await returning.wait('room', m => m.room.completed)).room;
+    expect(complete.outputs.exitDoor).toBe(true); expect(complete.reachedExit).toEqual([true, true]);
 });
 
 it('persists logical state across SIGKILL/restart with no movement or occupancy, preserving C8 progress', async () => {
@@ -132,7 +176,7 @@ it('persists logical state across SIGKILL/restart with no movement or occupancy,
     p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); await p2.wait('room', m => m.room.outputs.grappleAnchor);
     p2.send({ type: 'switch', seq: 1 }); const before = await p1.wait('room', m => m.room.inputs.switchB);
     const disk = JSON.parse(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8'));
-    expect(Object.keys(disk).sort()).toEqual(['version', 'code', 'level', 'revision', 'visitors', 'switchB', 'checkpoint', 'completed', 'createdAt', 'updatedAt'].sort());
+    expect(Object.keys(disk).sort()).toEqual(['version', 'code', 'level', 'revision', 'visitors', 'switchB', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
     expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.checkpoint).toBe('reunion');
     await kill(app.child); const restarted = await launch(dir);
     const rejoined = await connect(restarted.url, a.cookie); rejoined.send({ type: 'join', code });
@@ -146,11 +190,22 @@ it('persists logical state across SIGKILL/restart with no movement or occupancy,
     const partner = await connect(restarted.url, b.cookie); partner.send({ type: 'join', code }); await partner.wait('snapshot');
     rejoined.send({ type: 'occupancy', seq: 1, plate: 'finalLeft' });
     partner.send({ type: 'occupancy', seq: 1, plate: 'finalRight' });
-    const completed = await rejoined.wait('room', m => m.room.completed);
-    await kill(restarted.child); const final = await launch(dir);
+    const unlocked = await rejoined.wait('room', m => m.room.exitUnlocked);
+    expect(unlocked.room.completed).toBe(false);
+    rejoined.send({ type: 'occupancy', seq: 2, plate: null }); rejoined.send({ type: 'exit', seq: 3 });
+    await partner.wait('room', m => m.room.reachedExit[0]);
+    await kill(restarted.child); const afterArrival = await launch(dir);
+    const arrived = await connect(afterArrival.url, a.cookie); arrived.send({ type: 'join', code });
+    const one = (await arrived.wait('snapshot')).room;
+    expect(one.exitUnlocked).toBe(true); expect(one.outputs.exitDoor).toBe(true); expect(one.completed).toBe(false);
+    expect(one.reachedExit).toEqual([true, false]); expect(one.inputs.finalPlateLeftOccupied || one.inputs.finalPlateRightOccupied).toBe(false);
+    const finishing = await connect(afterArrival.url, b.cookie); finishing.send({ type: 'join', code }); await finishing.wait('snapshot');
+    finishing.send({ type: 'exit', seq: 1 }); const completed = await arrived.wait('room', m => m.room.completed);
+    await kill(afterArrival.child); const final = await launch(dir);
     const returning = await connect(final.url, a.cookie); returning.send({ type: 'join', code });
     const savedCompletion = (await returning.wait('snapshot')).room;
-    expect(savedCompletion.completed).toBe(true); expect(savedCompletion.outputs.exitDoor).toBe(false);
+    expect(savedCompletion.completed).toBe(true); expect(savedCompletion.outputs.exitDoor).toBe(true);
+    expect(savedCompletion.reachedExit).toEqual([true, true]);
     expect(savedCompletion.revision).toBeGreaterThan(completed.room.revision);
 });
 
@@ -165,6 +220,27 @@ it('rejects malformed/oversized messages and impersonation, cleans closed socket
     const fast = await connect(app.url, a.cookie); fast.send({ type: 'join', code }); await fast.wait('snapshot');
     for (let seq = 0; seq < 120; seq++) fast.send({ type: 'avatar', seq, avatar });
     expect((await fast.wait('error')).code).toBe('RATE_LIMITED');
+    const impostor = await connect(app.url, a.cookie); impostor.send({ type: 'join', code }); await impostor.wait('snapshot');
+    impostor.send({ type: 'exit', seq: 1, slot: 2 }); expect((await impostor.wait('error')).code).toBe('INVALID_MESSAGE');
+    const unjoined = await connect(app.url, a.cookie); unjoined.send({ type: 'exit', seq: 1 });
+    expect((await unjoined.wait('error')).code).toBe('NOT_JOINED');
+});
+
+it.each([false, true])('migrates a version-1 room (old completion %s) into unlock progress without inventing arrivals', async completed => {
+    const { dir, app, a, b, p1, p2, code } = await pair();
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    await kill(app.child);
+    const path = join(dir, 'rooms', `${code}.json`), legacy = JSON.parse(await readFile(path, 'utf8'));
+    legacy.version = 1; legacy.completed = completed; delete legacy.exitUnlocked; delete legacy.reachedExit;
+    await writeFile(path, JSON.stringify(legacy));
+    const restarted = await launch(dir), returning = await connect(restarted.url, a.cookie);
+    returning.send({ type: 'join', code }); const migrated = (await returning.wait('snapshot')).room;
+    expect(migrated.exitUnlocked).toBe(completed); expect(migrated.outputs.exitDoor).toBe(completed);
+    expect(migrated.completed).toBe(false); expect(migrated.reachedExit).toEqual([false, false]);
+    expect(migrated.outputs.returnBridge).toBe(true); expect(migrated.checkpoint).toBe('reunion');
+    const disk = JSON.parse(await readFile(path, 'utf8'));
+    expect(disk.version).toBe(2); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
+    expect(disk.revision).toBeGreaterThan(legacy.revision);
 });
 
 it('refuses cross-origin/missing-cookie upgrades and shares visitor identity with HTTPS progress cookies', async () => {

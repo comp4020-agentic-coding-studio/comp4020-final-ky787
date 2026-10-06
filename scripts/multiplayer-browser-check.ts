@@ -16,6 +16,8 @@ import type { SliceGame } from '../src/slice/game.ts';
 type Snapshot = ReturnType<SliceGame['snapshot']>;
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const checks: string[] = [], propagation: Record<string, number> = {};
+let scenario = '';
+let shotPrefix = '';
 const shots = process.argv[3] ?? join(tmpdir(), 'bn-pairing-shots');
 const temporary = await mkdtemp(join(tmpdir(), 'bn-pairing-browser-'));
 await mkdir(shots, { recursive: true });
@@ -110,6 +112,7 @@ async function launchBrowser(): Promise<string> {
 }
 async function page(url: string, debuggerUrl: string): Promise<Cdp> {
     const { browserContextId } = await root!.send('Target.createBrowserContext');
+    await root!.send('Browser.grantPermissions', { origin: new URL(url).origin, browserContextId, permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'] });
     const { targetId } = await root!.send('Target.createTarget', { url: 'about:blank', browserContextId });
     const client = await new Cdp(`${new URL(debuggerUrl).origin.replace('http', 'ws')}/devtools/page/${targetId}`).open();
     clients.push(client);
@@ -131,7 +134,7 @@ async function wait(p: Cdp, label: string, predicate: (s: Snapshot) => boolean, 
     throw new Error(`${label}: ${JSON.stringify(last)}`);
 }
 function check(label: string, ok: boolean, detail = '') {
-    const line = `${ok ? 'PASS' : 'FAIL'} ${label}${detail ? ` — ${detail}` : ''}`;
+    const line = `${ok ? 'PASS' : 'FAIL'} ${scenario}${label}${detail ? ` — ${detail}` : ''}`;
     checks.push(line); process.stdout.write(line + '\n'); if (!ok) throw new Error(line);
 }
 async function click(p: Cdp, selector: string) {
@@ -156,100 +159,136 @@ async function mouse(p: Cdp, x: number, y: number, down: boolean) {
     const at = await p.read<{ x: number; y: number }>(`(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();return {x:(${x}-c.originX())*c.zoom+r.left,y:(${y}-c.originY())*c.zoom+r.top};})()`);
     await p.send('Input.dispatchMouseEvent', { type: down ? 'mousePressed' : 'mouseReleased', ...at, button: 'left', buttons: down ? 1 : 0, clickCount: 1 });
 }
-async function shot(p: Cdp, name: string) { const data = await p.send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(shots, name + '.png'), Buffer.from(data.data, 'base64')); }
+async function shot(p: Cdp, name: string) { const data = await p.send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(shots, shotPrefix + name + '.png'), Buffer.from(data.data, 'base64')); }
 
 try {
     const backend = process.argv[2] ?? await startServer();
     const base = process.env.BN_TEST_TLS ? await tlsOrigin(backend) : backend;
     const url = new URL(base).href;
     const debugUrl = await launchBrowser(); root = await new Cdp(debugUrl).open();
-    const a = await page(url, debugUrl), b = await page(url, debugUrl);
-    const originalProgress = (await snapshot(a)).progress;
-    check('two isolated visitors', (await snapshot(a)).persistence.visitor !== (await snapshot(b)).persistence.visitor);
-    await click(a, '#create-room');
-    await wait(a, 'created room', s => s.multiplayer?.websocket === 'CONNECTED');
-    const code = await a.read<string>('document.querySelector("#room-code").textContent');
-    check('displayed human-readable room code', /^[A-HJKMNP-Z2-9]{4}$/.test(code), code);
-    check('Player 1 waiting UI', (await a.read<string>('document.querySelector("#coop-state").textContent')).includes('WAITING FOR PARTNER'));
-    await shot(a, 'pairing-waiting');
-    await click(b, '#join-code'); await b.send('Input.insertText', { text: code.toLowerCase() }); await click(b, '#join-room');
-    await wait(a, 'both connected on A', s => !!s.multiplayer?.shared?.connected.every(Boolean));
-    const joined = await wait(b, 'both connected on B', s => !!s.multiplayer?.shared?.connected.every(Boolean));
-    check('UI join gives Player 2', joined.multiplayer?.slot === 2 && (await snapshot(a)).multiplayer?.slot === 1);
-    check('WebSocket uses the page host/protocol and /ws', joined.multiplayer?.url === base.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws');
-    if (process.env.BN_TEST_TLS) {
-        const cookies = await a.send('Network.getCookies', { urls: [base] });
-        check('TLS proxy assigns one Secure HttpOnly visitor cookie', cookies.cookies.filter((c: { name: string; secure: boolean; httpOnly: boolean }) => c.name === 'bn_visitor' && c.secure && c.httpOnly).length === 1);
+    for (const holderSlot of [1, 2] as const) {
+        const runnerSlot = holderSlot === 1 ? 2 : 1;
+        scenario = `[P${holderSlot} holds / P${runnerSlot} runs] `; shotPrefix = `p${holderSlot}-holds-`;
+        const a = await page(url, debugUrl), b = await page(url, debugUrl);
+        const holder = holderSlot === 1 ? a : b, runner = holderSlot === 1 ? b : a;
+        const originalProgress = [(await snapshot(a)).progress, (await snapshot(b)).progress];
+        check('two isolated visitors', (await snapshot(a)).persistence.visitor !== (await snapshot(b)).persistence.visitor);
+        await click(a, '#create-room');
+        await wait(a, 'created room', s => s.multiplayer?.websocket === 'CONNECTED');
+        const code = await a.read<string>('document.querySelector("#room-code").textContent');
+        check('displayed human-readable room code', /^[A-HJKMNP-Z2-9]{4}$/.test(code), code);
+        check('Player 1 waiting UI', (await a.read<string>('document.querySelector("#coop-state").textContent')).includes('WAITING FOR PARTNER'));
+        await click(a, '#copy-room-code');
+        check('COPY CODE writes the actual clipboard', await a.read('navigator.clipboard.readText()') === code);
+        await shot(a, 'pairing-waiting');
+        await click(b, '#join-code'); await b.send('Input.insertText', { text: code.toLowerCase() }); await click(b, '#join-room');
+        await wait(a, 'both connected on A', s => !!s.multiplayer?.shared?.connected.every(Boolean));
+        const joined = await wait(b, 'both connected on B', s => !!s.multiplayer?.shared?.connected.every(Boolean));
+        check('UI join gives distinct slots', joined.multiplayer?.slot === 2 && (await snapshot(a)).multiplayer?.slot === 1);
+        check('WebSocket uses the page host/protocol and /ws', joined.multiplayer?.url === base.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws');
+        if (process.env.BN_TEST_TLS) {
+            const cookies = await a.send('Network.getCookies', { urls: [base] });
+            check('TLS proxy assigns one Secure HttpOnly visitor cookie', cookies.cookies.filter((c: { name: string; secure: boolean; httpOnly: boolean }) => c.name === 'bn_visitor' && c.secure && c.httpOnly).length === 1);
+        }
+        await wait(a, 'remote avatar on A', s => !!s.multiplayer?.remote);
+        await wait(b, 'remote avatar on B', s => !!s.multiplayer?.remote);
+        check('both clients render remote avatars', true);
+        const start = Date.now(); await walk(holder, 250);
+        await wait(runner, 'anchor powered remotely', s => s.outputs.grappleAnchor);
+        const plateMs = propagation[`p${holderSlot}Holds.plateA`] = Date.now() - start;
+        check('Plate A propagates in under one second including approach', plateMs <= 1000, `${plateMs} ms`);
+        await wait(runner, 'remote movement visible', s => Math.abs((s.multiplayer?.remote?.x ?? 0) - 250) < 60);
+        check('remote avatar moves through ordinary input', true);
+        await shot(runner, 'pairing-anchor-powered');
+
+        await holder.send('Page.navigate', { url: 'about:blank' });
+        const absent = await wait(runner, 'disconnect releases A', s => s.multiplayer?.shared?.connected[holderSlot - 1] === false && !s.outputs.grappleAnchor);
+        check('disconnect removes avatar and releases anchor', !absent.multiplayer?.remote);
+        check('partner disconnected visible', (await runner.read<string>('document.querySelector("#coop-state").textContent')).includes('PARTNER DISCONNECTED'));
+        await shot(runner, 'pairing-disconnected');
+        const history = await holder.send('Page.getNavigationHistory');
+        await holder.send('Page.navigateToHistoryEntry', { entryId: history.entries[history.currentIndex - 1].id });
+        const returned = await wait(holder, 'same-tab back-navigation reconnect', s => s.multiplayer?.websocket === 'CONNECTED');
+        check('reconnect reclaims holder slot without stale occupancy', returned.multiplayer?.slot === holderSlot && !returned.inputs.plateA && Math.abs(returned.player.x - (holderSlot === 1 ? 150 : 405)) < 10);
+        await walk(holder, 250); await wait(runner, 'anchor restored by fresh occupancy', s => s.outputs.grappleAnchor);
+
+        await walk(runner, 430);
+        const deaths = (await snapshot(runner)).deaths;
+        await key(runner, 'KeyD', true); await mouse(runner, 770, 226, true);
+        await wait(runner, 'real hook attachment', s => s.player.rope.phase === 'attached');
+        await wait(runner, 'rightward grapple release', s => s.player.x > 860 && s.player.y < 510 && s.player.vx > 0);
+        await shot(runner, 'pairing-grapple');
+        await mouse(runner, 770, 226, false);
+        await wait(runner, 'far bank', s => s.player.x > 965 && s.player.grounded);
+        await key(runner, 'KeyD', false); await sleep(160);
+        check(`Player ${runnerSlot} crosses with normal grapple input`, (await snapshot(runner)).deaths === deaths);
+        await walk(runner, 1050);
+        const switchAt = Date.now(); await tap(runner, 'KeyE');
+        await wait(holder, 'remote bridge latch', s => s.outputs.bridge);
+        const switchMs = propagation[`p${holderSlot}Holds.switchB`] = Date.now() - switchAt;
+        check('Switch B bridge propagates in under one second', switchMs <= 1000, `${switchMs} ms`);
+        check('shared reunion checkpoint', (await snapshot(holder)).multiplayer?.shared?.checkpoint === 'reunion');
+        await shot(holder, 'pairing-return-bridge');
+        await runner.send('Page.reload');
+        const refreshed = await wait(runner, 'refresh restores runner', s => s.multiplayer?.websocket === 'CONNECTED' && s.checkpoint === 'relay');
+        check('refresh retains slot/latch/checkpoint', refreshed.multiplayer?.slot === runnerSlot && refreshed.outputs.bridge && Math.abs(refreshed.player.x - (runnerSlot === 1 ? 1050 : 1150)) < 10);
+        await walk(holder, 1160);
+        check(`Player ${holderSlot} traverses the materialized bridge`, (await snapshot(holder)).player.x > 1000 && (await snapshot(holder)).deaths === 0);
+
+        // Swap the final-plate assignment as well as the first traversal roles.
+        await walk(holder, 1370); await wait(runner, 'left final plate visible', s => s.multiplayer?.shared?.inputs.finalPlateLeftOccupied === true);
+        check('one final plate cannot unlock or complete', !(await snapshot(runner)).outputs.exitDoor && !(await snapshot(runner)).multiplayer?.shared?.completed);
+        await walk(runner, 1490);
+        const beforeDoor = (await snapshot(holder)).audio.played.door ?? 0;
+        const beforeComplete = (await snapshot(holder)).audio.played.complete ?? 0;
+        const finalAt = Date.now(); await walk(runner, 1610);
+        await wait(holder, 'holder sees unlock', s => !!s.multiplayer?.shared?.exitUnlocked && s.outputs.exitDoor);
+        await wait(runner, 'runner sees unlock', s => !!s.multiplayer?.shared?.exitUnlocked && s.outputs.exitDoor);
+        const finalMs = propagation[`p${holderSlot}Holds.finalPlate`] = Date.now() - finalAt;
+        check('final unlock propagates in under one second including approach', finalMs <= 1000, `${finalMs} ms`);
+        const unlocked = await snapshot(holder);
+        check('two distinct bodies unlock without completing', !unlocked.multiplayer?.shared?.completed && unlocked.multiplayer?.shared?.reachedExit.every(v => !v) === true);
+        check('unlock message is visible', (await holder.read<string>('document.querySelector("#coop-state").textContent')).includes('EXIT UNLOCKED'));
+        await shot(holder, 'pairing-unlocked');
+        // Regroup between the plates before either player approaches the exit.
+        await walk(holder, 1490); await walk(runner, 1500);
+        const released = await wait(holder, 'both final plates released', s => !s.inputs.plateB && !s.inputs.plateC);
+        check('leaving both plates keeps the door open, with no arrivals', released.outputs.exitDoor && !released.multiplayer?.shared?.completed && released.multiplayer?.shared?.reachedExit.every(v => !v) === true);
+        check('unlock plays one door cue and no completion cue', (released.audio.played.door ?? 0) === beforeDoor + 1 && (released.audio.played.complete ?? 0) === beforeComplete);
+        await walk(holder, 1740);
+        const firstArrival = await wait(runner, 'first physical arrival accepted', s => !!s.multiplayer?.shared?.reachedExit[holderSlot - 1]);
+        check('first distinct arrival cannot complete', !firstArrival.multiplayer?.shared?.completed && !firstArrival.multiplayer?.shared?.reachedExit[runnerSlot - 1]);
+        check('arrival count is visible', (await runner.read<string>('document.querySelector("#exit-arrivals").textContent')).includes('1 / 2 ARRIVED'));
+        await shot(runner, 'pairing-first-arrival');
+        await walk(holder, 1680); // Leaving the zone does not erase semantic arrival credit.
+        check('arrival remains recorded after leaving the exit', !!(await snapshot(holder)).multiplayer?.shared?.reachedExit[holderSlot - 1]);
+
+        if (!process.argv[2]) {
+            const port = Number(new URL(backend).port), old = app!, exited = once(old, 'exit'); old.kill('SIGKILL'); await exited;
+            await wait(holder, 'automatic reconnect state', s => s.multiplayer?.websocket === 'RECONNECTING');
+            check('unexpected server loss shows RECONNECTING', true);
+            await startServer(port);
+            await wait(a, 'A rejoins after process restart', s => s.multiplayer?.websocket === 'CONNECTED' && !!s.multiplayer.shared?.connected.every(Boolean));
+            await wait(b, 'B rejoins after process restart', s => s.multiplayer?.websocket === 'CONNECTED' && !!s.multiplayer.shared?.connected.every(Boolean));
+        } else {
+            await holder.send('Page.reload');
+            await wait(holder, 'arrival credit after refresh', s => s.multiplayer?.websocket === 'CONNECTED');
+        }
+        const restored = await snapshot(holder);
+        check('recovery preserves slot, checkpoint, unlock and first arrival', restored.multiplayer?.slot === holderSlot && restored.checkpoint === 'relay' && restored.outputs.bridge && restored.outputs.exitDoor && !!restored.multiplayer?.shared?.reachedExit[holderSlot - 1] && !restored.multiplayer?.shared?.reachedExit[runnerSlot - 1] && !restored.multiplayer?.shared?.completed);
+        check('recovery restores no body-held input', !restored.inputs.plateA && !restored.inputs.plateB && !restored.inputs.plateC);
+        await walk(holder, 1740); // Regroup naturally; its previously earned arrival is still credited.
+        await walk(runner, 1800);
+        await wait(a, 'A completes after both arrivals', s => !!s.multiplayer?.shared?.completed && s.outputs.exitDoor);
+        await wait(b, 'B completes after both arrivals', s => !!s.multiplayer?.shared?.completed && s.outputs.exitDoor);
+        check('both physical arrivals complete on both clients', (await snapshot(a)).multiplayer?.shared?.reachedExit.every(Boolean) === true);
+        check('completion cue waits for the second arrival and plays once', ((await snapshot(holder)).audio.played.complete ?? 0) === beforeComplete + 1);
+        await shot(a, 'pairing-complete-p1'); await shot(b, 'pairing-complete-p2');
+        await click(a, '#debug-toggle'); await shot(a, 'pairing-debug');
+        check('co-op preserves both personal campaign saves', JSON.stringify([(await snapshot(a)).progress, (await snapshot(b)).progress]) === JSON.stringify(originalProgress));
+        await a.send('Page.navigate', { url: 'about:blank' }); await b.send('Page.navigate', { url: 'about:blank' });
     }
-    await wait(a, 'remote avatar on A', s => !!s.multiplayer?.remote);
-    await wait(b, 'remote avatar on B', s => !!s.multiplayer?.remote);
-    check('both clients render remote avatars', true);
-    const start = Date.now(); await walk(a, 250);
-    await wait(b, 'anchor powered remotely', s => s.outputs.grappleAnchor);
-    propagation.plateA = Date.now() - start;
-    check('Plate A propagates in under one second including approach', propagation.plateA <= 1000, `${propagation.plateA} ms`);
-    await wait(b, 'remote movement visible', s => (s.multiplayer?.remote?.x ?? 0) > 210);
-    check('remote avatar moves through ordinary input', true);
-    await shot(b, 'pairing-anchor-powered');
-
-    await a.send('Page.navigate', { url: 'about:blank' });
-    const absent = await wait(b, 'disconnect releases A', s => s.multiplayer?.shared?.connected[0] === false && !s.outputs.grappleAnchor);
-    check('disconnect removes avatar and releases anchor', !absent.multiplayer?.remote);
-    check('partner disconnected visible', (await b.read<string>('document.querySelector("#coop-state").textContent')).includes('PARTNER DISCONNECTED'));
-    await shot(b, 'pairing-disconnected');
-    const history = await a.send('Page.getNavigationHistory');
-    await a.send('Page.navigateToHistoryEntry', { entryId: history.entries[history.currentIndex - 1].id });
-    const returned = await wait(a, 'same-tab back-navigation reconnect', s => s.multiplayer?.websocket === 'CONNECTED');
-    check('reconnect reclaims P1 without stale plate occupancy', returned.multiplayer?.slot === 1 && !returned.inputs.plateA && returned.player.x < 200);
-    await walk(a, 250); await wait(b, 'anchor restored by fresh occupancy', s => s.outputs.grappleAnchor);
-
-    await walk(b, 430);
-    const deaths = (await snapshot(b)).deaths;
-    await key(b, 'KeyD', true); await mouse(b, 770, 226, true);
-    await wait(b, 'real hook attachment', s => s.player.rope.phase === 'attached');
-    await wait(b, 'rightward grapple release', s => s.player.x > 860 && s.player.y < 510 && s.player.vx > 0);
-    await shot(b, 'pairing-grapple');
-    await mouse(b, 770, 226, false);
-    await wait(b, 'far bank', s => s.player.x > 965 && s.player.grounded);
-    await key(b, 'KeyD', false); await sleep(160);
-    check('Player 2 crosses with normal grapple input', (await snapshot(b)).deaths === deaths);
-    await walk(b, 1050);
-    const switchAt = Date.now(); await tap(b, 'KeyE');
-    await wait(a, 'remote bridge latch', s => s.outputs.bridge);
-    propagation.switchB = Date.now() - switchAt;
-    check('Switch B bridge propagates in under one second', propagation.switchB <= 1000, `${propagation.switchB} ms`);
-    check('shared reunion checkpoint', (await snapshot(a)).multiplayer?.shared?.checkpoint === 'reunion');
-    await shot(a, 'pairing-return-bridge');
-    await b.send('Page.reload');
-    const refreshed = await wait(b, 'refresh restores Player 2', s => s.multiplayer?.websocket === 'CONNECTED' && s.checkpoint === 'relay');
-    check('refresh retains slot/latch/checkpoint', refreshed.multiplayer?.slot === 2 && refreshed.outputs.bridge && refreshed.player.x >= 1100);
-    await walk(a, 1160);
-    check('Player 1 traverses the materialized return bridge', (await snapshot(a)).player.x > 1000 && (await snapshot(a)).deaths === 0);
-
-    if (!process.argv[2]) {
-        const port = Number(new URL(backend).port), old = app!, exited = once(old, 'exit'); old.kill('SIGKILL'); await exited;
-        await wait(a, 'automatic reconnect state', s => s.multiplayer?.websocket === 'RECONNECTING');
-        check('unexpected server loss shows RECONNECTING', true);
-        await startServer(port);
-        await wait(a, 'A rejoins after process restart', s => s.multiplayer?.websocket === 'CONNECTED' && !!s.multiplayer.shared?.connected.every(Boolean));
-        await wait(b, 'B rejoins after process restart', s => s.multiplayer?.websocket === 'CONNECTED' && !!s.multiplayer.shared?.connected.every(Boolean));
-        const restoredA = await snapshot(a), restoredB = await snapshot(b);
-        check('both automatic reconnects preserve slots and shared checkpoint', restoredA.multiplayer?.slot === 1 && restoredB.multiplayer?.slot === 2 && restoredA.outputs.bridge && restoredB.outputs.bridge && restoredA.player.x >= 1000 && restoredB.player.x >= 1100);
-        check('process restart restores no body-held input', !restoredA.inputs.plateA && !restoredA.inputs.plateB && !restoredA.inputs.plateC);
-    }
-    await walk(a, 1370); await wait(b, 'left final plate visible', s => s.multiplayer?.shared?.inputs.finalPlateLeftOccupied === true);
-    check('one final plate cannot complete', !(await snapshot(b)).outputs.exitDoor && !(await snapshot(b)).multiplayer?.shared?.completed);
-    await walk(b, 1490);
-    const finalAt = Date.now(); await walk(b, 1610);
-    await wait(a, 'A completes', s => !!s.multiplayer?.shared?.completed && s.outputs.exitDoor);
-    await wait(b, 'B completes', s => !!s.multiplayer?.shared?.completed && s.outputs.exitDoor);
-    propagation.finalPlate = Date.now() - finalAt;
-    check('final plate propagates in under one second including approach', propagation.finalPlate <= 1000, `${propagation.finalPlate} ms`);
-    check('two distinct bodies open exit and complete on both clients', true);
-    await shot(a, 'pairing-complete-p1'); await shot(b, 'pairing-complete-p2');
-    await click(a, '#debug-toggle'); await shot(a, 'pairing-debug');
-    const campaign = (await snapshot(a)).progress;
-    check('co-op leaves personal campaign save unchanged', JSON.stringify(campaign) === JSON.stringify(originalProgress));
+    scenario = ''; shotPrefix = '';
     check('no browser exceptions or console errors', clients.every(c => !c.errors.length), clients.flatMap(c => c.errors).join('\n'));
     await writeFile(join(shots, 'pairing-browser.json'), JSON.stringify({ checks, propagation, url: base, processRestart: !process.argv[2] }, null, 2));
 } catch (e) {

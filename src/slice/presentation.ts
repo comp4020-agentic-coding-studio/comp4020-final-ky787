@@ -13,7 +13,7 @@ export const authoredPresentation: MachinePresentation = {
     describe(room, frame, signal) {
         const o = frame.outputs;
         if (room === 'pairing-bay') return { active: o.grappleAnchor || o.bridge || o.exitDoor,
-            text: o.exitDoor ? 'PAIRING COMPLETE' : o.bridge ? 'TWO PLAYERS · TWO PLATES' : 'HOLD A · PARTNER CROSSES', label: 'MOCK MULTIPLAYER / TEST CONTROLLER' };
+            text: o.exitDoor ? 'EXIT UNLOCKED · REGROUP' : o.bridge ? 'TWO SIGNALS REQUIRED' : 'HOLD A · PARTNER CROSSES', label: 'MOCK MULTIPLAYER / TEST CONTROLLER' };
         if (room === 'uplink') {
             const key = signal ?? (o.exitDoor ? 'exitDoor' : o.codePlatformA ? 'codePlatformA' : o.liftField ? 'liftField' : 'relayGates');
             const messages: Partial<Record<keyof ControllerOutputs, readonly number[]>> = {

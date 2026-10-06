@@ -14,9 +14,11 @@ export interface SharedRoom {
     revision: number;
     assigned: [boolean, boolean];
     connected: [boolean, boolean];
-    inputs: { player1OnPlateA: boolean; switchB: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
+    inputs: { plateAOccupied: boolean; switchB: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
     outputs: { grappleAnchor: boolean; returnBridge: boolean; exitDoor: boolean };
     checkpoint: 'entry' | 'reunion';
+    exitUnlocked: boolean;
+    reachedExit: [boolean, boolean];
     completed: boolean;
 }
 export type ClientMessage =
@@ -25,6 +27,7 @@ export type ClientMessage =
     | { type: 'avatar'; seq: number; avatar: Avatar }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
+    | { type: 'exit'; seq: number }
     | { type: 'leave' }
     | { type: 'ping' };
 export type ServerMessage =
@@ -57,7 +60,7 @@ export function parseClientMessage(raw: string): ClientMessage | null {
     if (v.type === 'avatar' && keys(v, ['type', 'seq', 'avatar']) && sequence(v.seq) && validAvatar(v.avatar)) return v as ClientMessage;
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
         && [null, 'plateA', 'finalLeft', 'finalRight'].includes(v.plate as Plate)) return v as ClientMessage;
-    if (v.type === 'switch' && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
+    if ((v.type === 'switch' || v.type === 'exit') && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
     return null;
 }
 export function websocketUrl(page: string): string {

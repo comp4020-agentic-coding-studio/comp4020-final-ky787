@@ -2,7 +2,9 @@
 
 Implemented 2026-10-06, starting at
 `55aaa36edc75b3be9bfa9ff6cb54a35e05ae2b65`.
-This is a two-player infrastructure/gameplay prototype, awaiting human playtesting.
+This is a two-player infrastructure/gameplay prototype. Two-computer human
+playtesting validated the deployed networking and motivated the role/exit
+correction described below; the revised chamber awaits another manual playtest.
 The four C8 campaign rooms, personal saves and retained CONTROL SPINE binary stay
 independent. No shared cubes or multiplayer CONTROL SPINE are implemented.
 
@@ -89,49 +91,74 @@ turning a still-connected player into a disconnect.
 
 ## PAIRING BAY contract
 
-The chamber is 1,850 × 780. It has no cube. The near bank ends at x=460 and the
+**Player slots identify players; they do not define gameplay roles.** Slots own
+visitor/reconnect identity, avatar colour, movement streams and one distinct
+body's reports. They never gate Plate A, Switch B, a traversal route or either
+final plate. PAIRING BAY has no asymmetric characters. Either player can hold
+for the other, cross first and latch the return bridge.
+
+Two-machine human testing confirmed the deployed networking but exposed fixed
+slot roles and an exit interaction problem: automatic completion while both
+plates remained held was logically valid, yet leaving the plates closed the
+door and prevented a natural physical finish. The revised ending separates the
+cooperative unlock from each player's subsequent arrival.
+
+The chamber is 1,850 × 780, with no cube. The near bank ends at x=460 and the
 far bank begins at x=880. Its 420-unit death gap and anchor centre (770,226)
-reuse the accepted SWITCH traversal proportions. Player 1 starts at (150,543),
-Player 2 at (405,543). Static banks remain solid and unhookable. The code anchor
-and bridge are ghosted/non-solid when inactive and lit/solid/hookable when enabled.
+reuse the accepted SWITCH traversal proportions. Entry spawns remain (150,543)
+and (405,543); these are starting positions, not assigned jobs. Both can walk
+freely between A and the approach. Static banks remain solid and unhookable.
+Inactive code remains ghosted/non-solid; accepted power lights/enables it.
+The exit is now a 130 × 140 area at (1700,420), wide enough for both avatars,
+just beyond the final right plate. No new movement mechanic or tuning is used.
 
 | Semantic input | Ownership/meaning |
 | --- | --- |
-| `player1OnPlateA` | P1's connected body on Plate A (250,560) |
-| `switchB` | P2 interaction at Switch B (1060,560), latched forever |
+| `plateAOccupied` | Either connected body occupies A (250,560) |
+| `switchB` | Either player's own nearby E interaction at B (1060,560), latched |
 | `finalPlateLeftOccupied` | A connected body on left final plate (1370,560) |
 | `finalPlateRightOccupied` | A connected body on right final plate (1610,560) |
 
 Each slot reports **one** of `plateA`, `finalLeft`, `finalRight`, or `null`.
-P2 cannot operate A; P1 cannot operate B. Final occupancy is accepted only after
-B is latched. Reports carry no caller-chosen slot or visitor ID.
+The server derives occupancy from both connected slots. Final plates are accepted
+only after B latches. Reports carry no caller-chosen slot or visitor ID.
 
 | Authoritative output/state | Rule |
 | --- | --- |
-| `grappleAnchor` | P1 currently occupies A |
-| `returnBridge` | B has latched |
-| `exitDoor` | B latched, both players connected, left AND right final plates occupied |
+| `grappleAnchor` | `plateAOccupied` |
+| `returnBridge` | `switchB` |
+| `exitUnlocked` | Permanently latched by two connected distinct bodies on opposite final plates after B |
+| `exitDoor` | `exitUnlocked`, regardless of current plates/connections |
+| `reachedExit[slot - 1]` | Permanently recorded when that slot reports its own physical arrival at the unlocked exit |
 | checkpoint | `entry` initially; `reunion` when B latches |
-| completion | Latched when the exit first opens with two distinct bodies |
+| `completed` | Both `reachedExit` flags are true; unlock alone never completes |
 
-Phase 1: P1 holds A while P2 uses the powered grapple slab to cross. Withdrawing
-A disables the slab and releases its attached rope through the existing rules.
-Phase 2: P2 presses E at B; the return bridge materializes and the shared reunion
-checkpoint is saved. P1 walks across. Phase 3: each player stands on a different
-final plate; both see the exit open and **PAIRING COMPLETE**. Completion is saved
-at that simultaneous condition, so neither player has to abandon a plate to
-reach the doorway. Leaving a final plate closes the door but retains completion.
+Phase 1: either player holds A while the partner uses the grapple slab. Removing
+the last body from A disables the slab and releases its rope through the existing
+rules. Phase 2: either player presses E near B; the bridge materializes and the
+reunion checkpoint is saved. Phase 3: opposite final plates latch the door open
+with **EXIT UNLOCKED · REGROUP**. Both leave their plates and enter the nearby
+exit. The first arrival shows **1 / 2 ARRIVED**; the second produces **PAIRING
+COMPLETE**. P1-left/P2-right and P2-left/P1-right work identically.
 
-The server knows none of these coordinates. With client-authoritative physics,
-the owning browser is trusted to report its own legitimate physical interaction.
-It could lie about its own location. This is an explicit course-scale trust
-tradeoff, not anti-cheat. The server enforces ownership, phase, one plate per
-body, connected membership and monotonic action sequences. A lone connected
-player cannot occupy both final inputs, even by rapidly alternating reports.
+Arrival is deliberately lasting semantic progress, not simultaneous exit
+occupancy: once a player reaches the unlocked exit, walking away or disconnecting
+does not remove their credit. The other distinct player must still reach it.
+Repeated arrival messages from one slot cannot finish for the other. The door
+stays open after plate release, disconnect, reconnect, restart and completion.
 
-All PAIRING BAY machinery/text is labelled **mock multiplayer / test controller**.
-It has no native address, trace, OLLVM provenance or crumble. C8 evidence bytes
-and validated five-input/seven-output UPLINK contract are untouched.
+The server knows none of these coordinates. The owning browser detects its own
+plate contact, switch proximity and player-box overlap with the exit, reporting
+arrival only after the accepted unlock. It never decides shared outputs or
+completion. This course-scale prototype trusts those physical semantic reports;
+a client could lie about its own location. The server enforces ownership, phase,
+one plate per body, connected membership, monotonic sequences and distinct
+arrivals. A lone player alternating plates cannot unlock the door. This is not
+anti-cheat. There is still no player-player collision.
+
+All machinery/text is labelled **mock multiplayer / test controller**. There are
+no native addresses, traces, OLLVM provenance or crumble here. C8 evidence bytes
+and the validated five-input/seven-output UPLINK contract remain untouched.
 
 ## Protocol, revisions and limits
 
@@ -144,13 +171,14 @@ Client messages are JSON discriminated by `type`:
 | `avatar` | `seq`, bounded `avatar` (`x`, `y`, `vx`, `vy`, `facing`, `grounded`, optional visual rope tip as object or null) |
 | `occupancy` | `seq`, `plate` (single enum or null) |
 | `switch` | `seq` (the room's sole switch) |
+| `exit` | `seq` (this connection's own physical arrival, only after unlock) |
 | `leave`, `ping` | none |
 
 Server messages: `snapshot` (assigned slot and full room), `room` (full accepted
 state at a newer revision), `avatar` (server-owned slot, stream ID, sequence and
 bounded visual snapshot), `error` (public code/message) and `pong`. Full room
 state includes level, code, revision, assigned/connected slots, inputs, outputs,
-checkpoint and completion. Other visitors' UUIDs are never broadcast.
+`exitUnlocked`, both `reachedExit` flags, checkpoint and completion. Other visitors' UUIDs are never broadcast.
 
 Every accepted shared mutation increments the durable room revision. Writes
 complete before its revision is acknowledged/broadcast. On close, the body is
@@ -185,7 +213,7 @@ release on handling; a physically severed network is detected within roughly
 
 ```text
 /data/<visitor UUID>.json   existing C8 envelope, version-3 campaign progress
-/data/rooms/<CODE>.json     version-1 shared co-op logical record
+/data/rooms/<CODE>.json     version-2 shared co-op logical record
 ```
 
 No campaign file moves and no new campaign migration is necessary. Existing
@@ -194,34 +222,52 @@ atomic writer preserves temporary-file fsync, rename and directory fsync with
 mode 0600 and acknowledgement after durability, under the single-writer model.
 
 A room record stores version, code, level, revision, the two visitor assignments,
-B latch, checkpoint, completion, and creation/update timestamps. Even momentary
+B latch, checkpoint, `exitUnlocked`, both semantic `reachedExit` flags, completion,
+and creation/update timestamps. Even momentary
 changes persist only the revised logical record: **no plate occupancy, connection
 flags, position, velocity, grapple, socket or interpolation data is saved**.
 Movement alone causes no writes. Corrupt existing room files fail closed without
 replacement. Reserved codes include persisted rooms, even when unloaded.
+
+Version-1 rooms migrate on their next accepted join using the same atomic writer.
+Codes, visitors, B latch, checkpoint, creation time and revision ordering survive.
+The old `completed` flag meant only that both plates had been held; migration
+maps it to `exitUnlocked`, starts `reachedExit` at `[false, false]` and reserves
+new `completed` for actual arrivals. Previously solved rooms keep their open
+exit and need only the new physical finish; no unobserved arrival is fabricated.
+Version-2 validation rejects inconsistent unlock/arrival/completion records
+without replacing the file. Campaign files and their migrations are unchanged.
 
 An inactive in-memory room unloads after five minutes, checked every 30 seconds.
 Its file is retained and loads again by code. Persisted rooms are not automatically
 deleted. Capacity exhaustion returns an explicit busy/unavailable result; this is
 a small single-machine prototype, not an unbounded matchmaking service.
 
-On disconnect the avatar and momentary plate state disappear; B, completion and
-checkpoint remain. Retries start around 300 ms, double to a 5-second maximum
+On disconnect the avatar and momentary plate state disappear; B, exit unlock,
+arrival credits, completion and checkpoint remain. Retries start around 300 ms, double to a 5-second maximum
 plus up to 150 ms jitter. The client also has handshake and server-message
 timeouts. On reconnect the same visitor receives a complete snapshot and spawns
 at the current shared checkpoint: entry spawns above, or reunion P1 (1050,543)
 and P2 (1150,543). Both are off plates on static ground. A live checkpoint update
 does not teleport either player; only reset/death/rejoin reconstructs position.
+Already-arrived players also respawn at this shared checkpoint, keep their
+visible ARRIVED credit and need not repeat any step for completion. They may
+walk back to regroup. A disconnected but previously arrived partner remains
+counted; the remaining player must still reach the exit themselves.
 
 ## Feedback and diagnostics
 
 F1 / Debug exposes transport state/URL, room code, local visitor and slot,
 connected slots, revision, accepted inputs/outputs, server-message age, traffic
-counters, consecutive reconnect attempts, remote-snapshot age and checkpoint.
+counters, consecutive reconnect attempts, remote-snapshot age, checkpoint,
+exit unlock, each arrival and completion.
 Normal HUD omits these diagnostics. Connection confirmation uses an existing cue.
 Plate/code/bridge/door/switch sounds observe applied authoritative transitions;
 reporting local intent does not play the same shared sound again. Rejoin creates
-a silent machinery baseline and only plays connection confirmation.
+a silent machinery baseline and only plays connection confirmation. Permanent
+unlock plays the existing door cue once; leaving plates cannot replay or reverse
+it. First arrival uses a quiet latch confirmation; the second arrival plays the
+completion cue. All come from newly applied authoritative transitions.
 
 ## Running and validation
 
@@ -264,47 +310,57 @@ An explicit URL tests that app without restarting it. Use the Fly command **afte
 an authorized deployment**; this implementation pass does not push or deploy.
 For manual play use a normal window + private window, two different browsers, or
 isolated profiles. Two windows sharing the same cookie represent the same player.
-Create in the first, copy its displayed code, join in the second. Walk P1 onto A,
-hold click + D toward the anchor as P2, release on the rightward swing, press E
-at B, cross as P1, and occupy separate final plates. Try refresh and closing P1
-while holding A before completing the chamber.
+Create in the first, COPY CODE, join in the second. Choose who holds A and who
+grappels first. Try the opposite choice in a new room. After B, use opposite
+final plates, then leave them and walk both bodies into the open exit. Check
+that the first arrival alone does not complete. Try disconnect while holding A,
+refresh after B, and reconnect after one player has arrived. Existing open
+browser tabs should refresh after this coordinated client/server contract update.
 
-Validation recorded in this pass:
+Validation recorded for the symmetric-role / physical-exit correction:
 
 - Typecheck, production build and unchanged pinned 32-state UPLINK bundle pass.
-- 200 unit/server tests pass; two pre-existing conditional skips remain. Coverage
-  includes actual SIGKILL/restart, C8 migrations, code collisions, capacity/slots,
-  old-socket replacement, stale actions/revisions, release, latches, two-body
-  completion, malformed/oversized messages, origin checks and idle unloading.
-  Development launcher tests also cover HTTP/WS proxying, same-origin campaign
-  saves, SIGINT/SIGTERM cleanup, persistence across restart and occupied ports.
-- The complete existing C8 browser route passes 115 assertions, including both
-  CONTROL SPINE solutions, saved checkpoints, campaign reset and audio. It also
-  passes through the combined development server and its Origin-preserving proxy.
-- Two isolated actual browser contexts complete PAIRING BAY with ordinary
-  keyboard/mouse input. Neither world nor controller state is mutated by the
-  browser test. Remote motion, refresh during the bridge phase, deliberate
-  disconnect on A, and automatic rejoin after actual server restart pass.
-- The HTTPS/WSS proxy run passes 25 checks. Propagation upper bounds (including
-  physical approach/input duration) are A **464 ms**, B **66 ms**, final plate
-  **492 ms**. These are local measurements, not Fly/WAN latency claims.
-- The combined `pnpm dev` two-browser run passes 21 checks, with A **508 ms**,
-  B **63 ms**, final plate **499 ms**, including the same physical-input overhead.
-- All three running-app HTTP/WebSocket specifications pass on the shared origin.
-- Docker daemon access is unavailable on this machine. The exact runtime COPY
-  file set with installed/pruned production dependencies successfully serves
-  static HTTP, visitor identity and `/ws` room creation from a temporary directory.
-  An actual image build remains for CI/deployment validation.
+- 211 unit/server tests pass; two pre-existing conditional skips remain. New
+  coverage includes A/B access by either slot, either final-plate assignment,
+  single-body alternation, two bodies on one plate, premature/stale/duplicate
+  arrivals, strict impersonation rejection, permanent unlock and both arrival
+  orders. Actual process restarts preserve partial arrivals and completion;
+  version-1 room migrations retain solved progress without inventing arrivals.
+- Existing session/code/reconnect, malformed/oversized payload, traffic limits,
+  idle unloading, campaign migrations and development-launcher tests still pass.
+- The existing C8 browser route passes all 115 assertions, including both CONTROL
+  SPINE solutions, saves, reset and audio; retained evidence is unchanged.
+- The HTTPS/WSS browser route passes **67 checks** across **both role assignments**.
+  Each run creates/joins through the UI, copies the real clipboard code, moves
+  remote avatars, holds A, grapples, latches B, refreshes, crosses the bridge and
+  swaps the final-plate assignment. Both plates unlock without completing; both
+  bodies leave the plates and physically enter the exit in opposite arrival
+  orders. First-arrival credit survives leaving the zone and an actual SIGKILL /
+  server restart. Door feedback plays once; completion sound waits for arrival 2.
+  No world/controller mutation substitutes for controls. No console errors.
+- Local propagation bounds, including physical approach/input time:
 
-Screenshots and exact logs are in `docs/playtest/pairing-*`.
+  | Roles | Plate A | Switch B | Final unlock |
+  | --- | --- | --- | --- |
+  | P1 holds / P2 runs | 493 ms | 66 ms | 473 ms |
+  | P2 holds / P1 runs | 604 ms | 63 ms | 468 ms |
+
+- Three live HTTP/WebSocket specs pass against the same Node app.
+- Logs and selected screenshots: `docs/playtest/pairing-symmetry-*`. Earlier
+  infrastructure evidence remains under the original `pairing-*` filenames.
+- The prior `7aa75e3` build passed GitHub CI's real Docker build/tests and a Fly
+  deployment, followed by deployed two-browser checks and the user's successful
+  two-computer networking test. This gameplay correction is verified locally;
+  it has not yet been pushed/deployed or manually accepted on two computers.
 
 ## Limits and next acceptance step
 
-Human review is still needed for legibility, cooperation, grapple timing and
-listening balance. No remote Fly deployment was performed; local HTTPS/WSS
-forwarding is verified, while Fly auto-stop timing and WAN latency remain to
-be measured after deployment. Vite's existing large retained-evidence chunk
-advisory remains. Touch multiplayer has not been validated.
+Repeat the two-computer manual playtest after an authorized deployment of this
+correction, swapping all roles in a fresh room. Review permanent unlock feedback,
+physical exit arrival and partial-arrival reconnect behavior. The original build
+has been validated on Fly; the new semantics currently have local HTTPS/WSS
+evidence. Fly auto-stop recovery timing remains unmeasured. Vite's existing large
+retained-evidence chunk advisory remains. Touch multiplayer is unvalidated.
 
 There is no anti-cheat or host migration because there is no host browser.
 Clearing cookies loses anonymous slot ownership. Full rooms retain reservations

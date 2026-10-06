@@ -71,8 +71,11 @@ The goal is to make a good cooperative game whose strange machinery genuinely co
 
 The menu now offers a separate two-player **PAIRING BAY** test chamber. Create a
 room, share its four-character code, and join from a different browser profile or
-private window. One player holds an anchor online, the other latches a return
-bridge, and both must occupy separate final plates to complete the chamber.
+private window. Either player can hold the anchor online or cross first and
+latch the return bridge. Two distinct bodies on separate final plates permanently
+unlock the exit; both players then physically reach it to complete the chamber.
+Slots identify players, not gameplay roles. Unlock and individual arrival credit
+survive reconnects.
 
 Movement remains local and responsive; the existing Node server synchronizes and
 saves shared puzzle state over same-origin WebSockets. Refresh restores the same

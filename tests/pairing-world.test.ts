@@ -9,17 +9,18 @@ import { sharedRoom, type RoomRecord } from '../server/pairing-state.ts';
 import type { Plate, Slot } from '../src/coop/protocol.ts';
 
 function setup(slot: Slot) {
-    const r: RoomRecord = { version: 1, code: 'ABCD', level: 'pairing-bay', revision: 1,
+    const r: RoomRecord = { version: 2, code: 'ABCD', level: 'pairing-bay', revision: 1,
         visitors: ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
-        switchB: false, checkpoint: 'entry', completed: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-    const reported: Plate[] = []; let switches = 0;
-    const authority = new PairingAuthority(sharedRoom(r, [true, true], [null, null]), slot, p => reported.push(p), () => { switches++; });
+        switchB: false, checkpoint: 'entry', exitUnlocked: false, reachedExit: [false, false], completed: false,
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const reported: Plate[] = []; let switches = 0, arrivals = 0;
+    const authority = new PairingAuthority(sharedRoom(r, [true, true], [null, null]), slot, p => reported.push(p), () => { switches++; }, () => { arrivals++; });
     const world = new PuzzleWorld(pairingBay(slot), freshProgress().rooms.switch, undefined, authority);
-    return { world, authority, r, reported, switches: () => switches };
+    return { world, authority, r, reported, switches: () => switches, arrivals: () => arrivals };
 }
-it('reports physical occupancy without locally powering machinery, and never creates a cube', () => {
-    const { world, reported } = setup(1);
-    for (let i = 0; i < 45; i++) world.step(FIXED_DT, { ...emptyInput(), right: world.player.x < 245 });
+it.each([1, 2] as const)('slot %s reports its own physical A occupancy without locally powering machinery or creating a cube', slot => {
+    const { world, reported } = setup(slot);
+    for (let i = 0; i < 65; i++) world.step(FIXED_DT, { ...emptyInput(), right: world.player.x < 245, left: world.player.x > 255 });
     expect(reported).toContain('plateA');
     expect(world.inputs.plateA).toBe(false); expect(world.frame.outputs.grappleAnchor).toBe(false);
     expect(world.cube).toBeNull(); expect(world.frame.source).toBe('mock-multiplayer'); expect(world.frame.evidence).toBeUndefined();
@@ -41,13 +42,34 @@ it('releases the reused grapple when authoritative power is withdrawn', () => {
     world.step(FIXED_DT, { ...emptyInput(), grappleHeld: true });
     expect(world.player.rope.phase).not.toBe('attached'); expect(world.frame.outputs.grappleAnchor).toBe(false);
 });
-it('a switch request cannot latch locally and completion is never inferred from local exit contact', () => {
-    const { world, authority, r, switches } = setup(2);
+it.each([1, 2] as const)('slot %s can request B and report its physical exit arrival, but never decide completion', slot => {
+    const { world, authority, r, switches, arrivals } = setup(slot);
+    world.interact(); expect(switches()).toBe(0);
     // Fixture placement isolates the adapter; the browser suite covers the real approach.
     Object.assign(world.player, { x: 1050, y: 543 }); world.interact();
+    expect(world.interactionHint()).toBe('E · LATCH RETURN BRIDGE');
     expect(switches()).toBe(1); expect(world.frame.outputs.bridge).toBe(false);
-    r.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], ['finalLeft', 'finalRight']);
-    world.syncAuthority(); Object.assign(world.player, { x: 1780, y: 543 }); world.step(FIXED_DT, emptyInput());
+    r.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], [null, null]);
+    world.syncAuthority();
+    Object.assign(world.player, { x: 1780, y: 543 }); authority.sample(world);
+    expect(arrivals()).toBe(0);
+    r.exitUnlocked = true; authority.room = sharedRoom(r, [true, true], [null, null]); world.syncAuthority();
+    Object.assign(world.player, { x: 1600, y: 543 }); authority.sample(world); expect(arrivals()).toBe(0);
+    Object.assign(world.player, { x: 1780, y: 543 }); world.step(FIXED_DT, emptyInput());
+    expect(arrivals()).toBeGreaterThan(0);
     expect(world.frame.outputs.exitDoor).toBe(true); expect(world.exited).toBe(false);
-    world.respawn(); expect(world.player.x).toBe(1150);
+    const count = arrivals(); r.reachedExit[slot - 1] = true; authority.room = sharedRoom(r, [true, true], [null, null]);
+    world.step(FIXED_DT, emptyInput()); expect(arrivals()).toBe(count);
+    world.respawn(); expect(world.player.x).toBe(slot === 1 ? 1050 : 1150);
+});
+
+it.each([1, 2] as const)('slot %s can sense either final plate and releases it when its body leaves', slot => {
+    const { world, authority, r, reported } = setup(slot);
+    r.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], [null, null]);
+    for (const [x, plate] of [[1370, 'finalLeft'], [1610, 'finalRight']] as const) {
+        Object.assign(world.player, { x, y: 543, grounded: true }); authority.sample(world);
+        expect(reported.at(-1)).toBe(plate);
+    }
+    Object.assign(world.player, { x: 1500, y: 543 }); authority.sample(world);
+    expect(reported.at(-1)).toBeNull(); expect(world.frame.outputs.exitDoor).toBe(false);
 });

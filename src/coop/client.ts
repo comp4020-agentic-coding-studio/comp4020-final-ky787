@@ -19,6 +19,7 @@ export class CoopClient {
     private moveSeq = 0;
     private lastSentAt = 0;
     private plate: Plate = null;
+    private exitSent = false;
     constructor(private onRoom: (room: SharedRoom, initial: boolean) => void, private onStatus: () => void) {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
     remembered(): string | null { try { return normalizeCode(sessionStorage.getItem('bn_coop_room') ?? ''); } catch { return null; } }
@@ -46,7 +47,7 @@ export class CoopClient {
             this.deadline = setTimeout(() => ws.close(), 8000);
             ws.onopen = () => {
                 if (generation !== this.generation) { ws.close(); return; }
-                this.lastMessageAt = performance.now(); this.actionSeq = 0; this.moveSeq = 0; this.plate = null;
+                this.lastMessageAt = performance.now(); this.actionSeq = 0; this.moveSeq = 0; this.plate = null; this.exitSent = false;
                 this.send(this.intent);
                 this.heartbeat = setInterval(() => {
                     if (performance.now() - this.lastMessageAt > 10000) ws.close();
@@ -99,6 +100,10 @@ export class CoopClient {
         if (this.send({ type: 'occupancy', seq: ++this.actionSeq, plate })) this.plate = plate;
     }
     switchB(): void { if (this.connected) this.send({ type: 'switch', seq: ++this.actionSeq }); }
+    reachExit(): void {
+        if (this.connected && this.slot && this.room?.exitUnlocked && !this.room.reachedExit[this.slot - 1] && !this.exitSent)
+            this.exitSent = this.send({ type: 'exit', seq: ++this.actionSeq });
+    }
     publish(p: PlayerState, now: number): void {
         if (!this.connected || now - this.lastSentAt < 50) return;
         this.lastSentAt = now;
@@ -118,6 +123,7 @@ export class CoopClient {
         return { websocket: this.status, transport: this.socket ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.socket.readyState] : 'CLOSED',
             url: websocketUrl(location.href), code: this.room?.code, visitor: this.visitor, slot: this.slot,
             connected: this.room?.connected, revision: this.room?.revision, inputs: this.room?.inputs, outputs: this.room?.outputs,
+            exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
             lastServerMessageAgeMs: this.lastMessageAt ? Math.round(now - this.lastMessageAt) : null,
             sent: this.sent, received: this.received, reconnectAttempts: this.reconnectAttempts,
             remoteSnapshotAgeMs: this.remote.lastAt ? Math.round(now - this.remote.lastAt) : null };
