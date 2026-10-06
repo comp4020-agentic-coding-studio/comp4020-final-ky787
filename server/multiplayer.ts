@@ -16,10 +16,16 @@ interface Peer {
 }
 interface Room {
     record: RoomRecord; peers: [Peer | null, Peer | null]; plates: [Plate, Plate];
-    cube: SharedCube;
+    cube: SharedCube; revision: number; needsPersist: boolean;
     idleSince: number; failed: boolean;
 }
-export interface MultiplayerOptions { idleMs?: number; sweepMs?: number; generateCode?: () => string }
+export interface ActionTiming { action: string; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
+export interface MultiplayerOptions {
+    idleMs?: number; sweepMs?: number; generateCode?: () => string;
+    /** Test harness only; never delays transform traffic. */
+    semanticDelayMs?: number;
+    onActionTiming?: (timing: ActionTiming) => void;
+}
 export function generateCode(): string {
     return Array.from({ length: 4 }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 }
@@ -44,7 +50,10 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         peer.ws.send(JSON.stringify(message));
     }
     const error = (peer: Peer, code: string, message = code.replaceAll('_', ' ')) => send(peer, { type: 'error', code, message });
-    const view = (room: Room) => sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cube);
+    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cube), revision: room.revision });
+    // Explicit durable projection. Live occupancy, owners, streams and transforms are absent.
+    const durable = (room: Room) => JSON.stringify([room.record.switchB, room.record.checkpoint, room.record.cubePlacement,
+        room.record.exitUnlocked, room.record.reachedExit, room.record.completed]);
     const broadcast = (room: Room) => { for (const p of room.peers) if (p) send(p, { type: 'room', room: view(room) }); };
     const ownsSlot = (p: Peer): p is Peer & { room: Room; slot: Slot } => !!p.room && !!p.slot && p.room.peers[p.slot - 1] === p && !p.room.failed;
     async function persist(room: Room) {
@@ -67,7 +76,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         const record = readRoomRecord(value, code);
         if (!record) throw new Error('Invalid room record');
         if (rooms.size >= 64) throw new Error('Room capacity');
-        const room: Room = { record, cube: freshCube(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
+        const room: Room = { record, revision: record.revision, needsPersist: (value as { version?: number }).version !== 3, cube: freshCube(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
         rooms.set(code, room);
         return room;
     }
@@ -79,10 +88,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const remaining = room.peers.findIndex(Boolean);
             assignCube(room.cube, remaining < 0 ? null : (remaining + 1) as Slot);
         }
-        room.record.revision++;
-        // Clear immediately in memory; acknowledge the revision only after durable write.
-        // Storage failure closes the other socket too, so a ghost cannot keep playing.
-        await persist(room);
+        room.revision++;
         broadcast(room);
         Object.assign(peer, { room: undefined, slot: undefined });
     }
@@ -102,7 +108,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const now = new Date().toISOString();
             room = { record: { version: 3, cubePlacement: 'spawn', code, level: 'pairing-bay', revision: 0, visitors: [peer.visitor, null],
                 switchB: false, checkpoint: 'entry', exitUnlocked: false, reachedExit: [false, false], completed: false, createdAt: now, updatedAt: now },
-                cube: freshCube(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
+                revision: 0, needsPersist: true, cube: freshCube(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
             rooms.set(code, room);
         } else {
             const code = normalizeCode(message.code);
@@ -115,7 +121,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         if (index < 0) {
             if (room.record.visitors[1]) { error(peer, 'ROOM_FULL'); return; }
             index = 1;
-            room.record.visitors[1] = peer.visitor;
+            room.record.visitors[1] = peer.visitor; room.needsPersist = true;
         }
         const previous = room.peers[index];
         if (previous) {
@@ -125,7 +131,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             previous.ws.close(4001, 'Player reconnected elsewhere');
         }
         peer.room = room; peer.slot = (index + 1) as Slot;
-        room.peers[index] = peer; room.plates[index] = null; room.record.revision++;
+        room.peers[index] = peer; room.plates[index] = null; room.revision++;
         // A replacement is a release too: a refreshed browser is never a ghost holder.
         if (previous && room.cube.physicsAuthority === peer.slot) {
             const partner = room.peers[1 - index];
@@ -133,32 +139,37 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         } else if (room.cube.physicsAuthority === null) {
             assignCube(room.cube, room.peers[0] ? 1 : 2);
         }
-        await persist(room);
+        if (room.needsPersist) {
+            room.record.revision = room.revision;
+            await persist(room); room.needsPersist = false;
+        }
         send(peer, { type: 'snapshot', slot: peer.slot, room: view(room) });
         broadcast(room);
     }
-    async function action(peer: Peer, message: ClientMessage) {
+    async function action(peer: Peer, message: ClientMessage, timing: ActionTiming) {
         if (peer.ws.readyState !== WebSocket.OPEN) return;
         if (message.type === 'create' || message.type === 'join') { await enter(peer, message); return; }
         if (message.type === 'leave') { await disconnect(peer); peer.ws.close(1000, 'Left room'); return; }
         if (!ownsSlot(peer)) { error(peer, 'NOT_JOINED'); return; }
         if (!('seq' in message) || message.type === 'avatar' || message.type === 'cube') return;
-        if (message.seq <= peer.actionSeq) { error(peer, 'STALE_ACTION'); return; }
+        const result = (accepted: boolean) => send(peer, { type: 'action-result', seq: message.seq, accepted, room: view(peer.room) });
+        if (message.seq <= peer.actionSeq) { result(false); error(peer, 'STALE_ACTION'); return; }
         peer.actionSeq = message.seq;
-        const room = peer.room, index = peer.slot - 1;
+        const room = peer.room, index = peer.slot - 1, before = durable(room);
         if ('epoch' in message) {
-            const denied = () => send(peer, { type: 'cube-denied', seq: message.seq });
+            const denied = () => { result(false); send(peer, { type: 'cube-denied', seq: message.seq }); };
             if (message.type === 'cube-occupancy') {
                 if (message.epoch !== room.cube.epoch || room.cube.physicsAuthority !== peer.slot
                     || message.cargo && (!room.record.switchB || room.cube.holder !== null || room.cube.pulling)) { denied(); return; }
                 const placement = message.cargo ? 'cargoPlate' : 'spawn';
-                if (room.record.cubePlacement === placement) return;
+                if (room.record.cubePlacement === placement) { result(true); return; }
                 room.record.cubePlacement = placement;
             } else {
                 if (!room.record.switchB || !interactCube(room.cube, peer.slot, message)) { denied(); return; }
                 if (message.type !== 'cube-pull-stop') room.record.cubePlacement = 'spawn';
             }
-            await commitAction(room);
+            await commitAction(room, before, timing);
+            result(true); broadcast(room);
             return;
         }
         if (message.type === 'occupancy') {
@@ -166,23 +177,30 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             if (room.plates[index] === message.plate) return;
             room.plates[index] = message.plate;
         } else if (message.type === 'switch') {
-            if (room.record.switchB) return;
+            if (room.record.switchB) { result(true); return; }
             room.record.switchB = true; room.record.checkpoint = 'reunion';
         } else {
             if (!room.record.exitUnlocked) { error(peer, 'INVALID_ACTION'); return; }
             if (room.record.reachedExit[index]) return;
             room.record.reachedExit[index] = true;
         }
-        await commitAction(room);
+        await commitAction(room, before, timing);
+        if (message.type === 'switch') result(true);
+        broadcast(room);
     }
-    async function commitAction(room: Room) {
+    async function commitAction(room: Room, before: string, timing: ActionTiming) {
         const state = view(room);
         if (room.record.switchB && state.inputs.cubeOnCargoPlate && state.connected.every(Boolean) && state.inputs.finalPlateLeftOccupied && state.inputs.finalPlateRightOccupied)
             room.record.exitUnlocked = true;
         room.record.completed = room.record.reachedExit.every(Boolean);
-        room.record.revision++;
-        await persist(room);
-        broadcast(room);
+        room.revision++;
+        if (durable(room) !== before) {
+            timing.durable = true;
+            room.record.revision = room.revision; // Last durably acknowledged live revision.
+            const start = performance.now();
+            await persist(room);
+            timing.persistMs = performance.now() - start;
+        }
     }
     server.on('upgrade', (req, socket, head) => {
         const visitor = visitorCookie(req);
@@ -218,10 +236,18 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                     return;
                 }
                 peer.pending++;
+                const receivedAt = performance.now();
+                const readyAt = receivedAt + ('seq' in message ? Math.max(0, Math.min(1000, options.semanticDelayMs ?? 0)) : 0);
                 serial(async () => {
-                    try { await action(peer, message); }
+                    const wait = readyAt - performance.now();
+                    if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
+                    const timing: ActionTiming = { action: message.type, queueMs: performance.now() - receivedAt, persistMs: 0, totalMs: 0, durable: false };
+                    try { await action(peer, message, timing); }
                     catch { error(peer, 'ROOM_UNAVAILABLE', 'ROOM UNAVAILABLE — PLEASE RETRY'); }
-                    finally { peer.pending--; }
+                    finally {
+                        peer.pending--; timing.totalMs = performance.now() - receivedAt;
+                        options.onActionTiming?.(timing);
+                    }
                 });
             });
         });

@@ -1,8 +1,10 @@
 import type { PlayerState } from '../engine/physics.ts';
 import { newerRoom, normalizeCode, websocketUrl, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
 import { RemoteAvatar, RemoteCube } from './remote.ts';
+import { LocalPrediction, type PredictedAction } from './prediction.ts';
 export class CoopClient {
     room: SharedRoom | null = null;
+    prediction = new LocalPrediction();
     slot: Slot | null = null;
     visitor = '';
     status = 'OFFLINE';
@@ -75,6 +77,7 @@ export class CoopClient {
                 this.received++; this.lastMessageAt = performance.now();
                 if (message.type === 'snapshot') {
                     clearTimeout(this.deadline);
+                    this.prediction.clear(performance.now());
                     this.acceptCubeRoom(message.room, true);
                     this.room = message.room; this.slot = message.slot; this.remote.clear();
                     this.intent = { type: 'join', code: this.room.code }; this.remember(this.room.code);
@@ -85,6 +88,18 @@ export class CoopClient {
                     this.room = message.room;
                     if (this.slot && !this.room.connected[this.slot === 1 ? 1 : 0]) this.remote.clear();
                     this.onRoom(this.room, false); this.onStatus();
+                } else if (message.type === 'action-result' && this.connected && this.slot) {
+                    if (newerRoom(this.room, message.room)) {
+                        this.acceptCubeRoom(message.room); this.room = message.room;
+                    } else if (message.room.revision === this.room!.revision) {
+                        // A denial can carry a fresher transform without a semantic revision.
+                        this.acceptCubeRoom(message.room);
+                    }
+                    const resolved = this.prediction.resolve(message.seq, generation, message.accepted, this.room!, this.slot, performance.now());
+                    if (!message.accepted) this.cargo = undefined;
+                    // Reconciliation also runs for a denial with an unchanged room revision.
+                    if (resolved || message.room.revision === this.room!.revision) this.onRoom(this.room!, false);
+                    this.onStatus();
                 } else if (message.type === 'avatar' && message.slot !== this.slot && this.connected && this.room?.connected[message.slot - 1]) {
                     this.remote.push(message.avatar, message.stream, message.seq, performance.now());
                 } else if (message.type === 'cube' && this.connected && !this.ownsCube) {
@@ -103,6 +118,7 @@ export class CoopClient {
             ws.onclose = () => {
                 if (generation !== this.generation) return;
                 clearInterval(this.heartbeat); clearTimeout(this.deadline);
+                this.prediction.clear(performance.now());
                 this.remote.clear(); this.reconnect();
             };
             ws.onerror = () => {}; // close supplies the retry; no duplicate timers.
@@ -123,24 +139,29 @@ export class CoopClient {
         if (!this.connected || this.plate === plate) return;
         if (this.send({ type: 'occupancy', seq: ++this.actionSeq, plate })) this.plate = plate;
     }
-    switchB(): void { if (this.connected) this.send({ type: 'switch', seq: ++this.actionSeq }); }
+    private predict(kind: PredictedAction, transform?: CubeTransform): boolean {
+        if (!this.connected || (kind === 'switch' ? this.prediction.switch : this.prediction.cube)) return false;
+        const seq = ++this.actionSeq, epoch = this.room!.cube.epoch, now = performance.now();
+        const message: ClientMessage = kind === 'switch' ? { type: kind, seq }
+            : kind === 'cube-drop' ? { type: kind, seq, epoch, transform: transform! } : { type: kind, seq, epoch };
+        if (!this.send(message)) return false;
+        return this.prediction.begin(kind, seq, epoch, this.generation, now);
+    }
+    switchB(): boolean { return !this.room?.inputs.switchB && this.predict('switch'); }
     reachExit(): void {
         if (this.connected && this.slot && this.room?.exitUnlocked && !this.room.reachedExit[this.slot - 1] && !this.exitSent)
             this.exitSent = this.send({ type: 'exit', seq: ++this.actionSeq });
     }
-    cubeAction(type: CubeAction | 'cube-drop', transform?: CubeTransform): void {
-        if (!this.connected) return;
-        const base = { seq: ++this.actionSeq, epoch: this.room!.cube.epoch };
-        if (type === 'cube-drop') {
-            if (transform) this.send({ type, ...base, transform });
-        } else this.send({ type, ...base });
+    cubeAction(type: CubeAction | 'cube-drop', transform?: CubeTransform): boolean {
+        if (type === 'cube-drop' && !transform) return false;
+        return this.predict(type, transform);
     }
     cubeOccupancy(cargo: boolean): void {
-        if (!this.ownsCube || this.cargo === cargo) return;
+        if (!this.ownsCube || this.prediction.cube || this.cargo === cargo) return;
         if (this.send({ type: 'cube-occupancy', seq: ++this.actionSeq, epoch: this.room!.cube.epoch, cargo })) this.cargo = cargo;
     }
     publishCube(cube: CubeTransform, now: number): void {
-        if (!this.ownsCube || now - this.cubeSentAt < 50) return;
+        if (!this.ownsCube || this.prediction.cube || now - this.cubeSentAt < 50) return;
         this.cubeSentAt = now;
         const { x, y, vx, vy, grounded } = cube;
         if (this.send({ type: 'cube', epoch: this.room!.cube.epoch, seq: ++this.cubeSeq, transform: { x, y, vx, vy, grounded } })) {
@@ -155,6 +176,7 @@ export class CoopClient {
         this.send({ type: 'avatar', seq: ++this.moveSeq, avatar });
     }
     leave(forget = true): void {
+        this.prediction.clear(performance.now());
         this.active = false; this.generation++;
         clearTimeout(this.retry); clearInterval(this.heartbeat); clearTimeout(this.deadline);
         this.send({ type: 'leave' }); this.socket?.close(1000); this.socket = null;
@@ -169,6 +191,8 @@ export class CoopClient {
             exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
             cubeHolder: this.room?.cube.holder, cubePhysicsAuthority: this.room?.cube.physicsAuthority,
             cubeEpoch: this.room?.cube.epoch, cubePlacement: this.room?.cubePlacement, cubeOnCargoPlate: this.room?.inputs.cubeOnCargoPlate,
+            pendingCubeAction: this.prediction.cube, predictedHolder: this.prediction.cube?.kind === 'cube-pickup' ? this.slot : null,
+            pendingSwitch: this.prediction.switch, interactionTimings: this.prediction.last,
             ownsCubePhysics: this.ownsCube, cubeSnapshotsSent: this.cubeSent, cubeSnapshotsReceived: this.cubeReceived,
             cubeSnapshotAgeMs: this.cubeLastAt ? Math.round(now - this.cubeLastAt) : null,
             lastServerMessageAgeMs: this.lastMessageAt ? Math.round(now - this.lastMessageAt) : null,

@@ -1,6 +1,6 @@
 # One browser simulates the shared cube; the server grants that authority
 
-Date: 2026-10-06. Status: implemented for PAIRING BAY; manual cube playtest pending.
+Date: 2026-10-06. Status: implemented for PAIRING BAY; shared-cube behavior manually accepted on two physical computers.
 Starting HEAD: `cbad2534d2b19f1ff799c9d540f5cd972cad97bd`.
 
 The existing same-origin Node/Fly multiplayer architecture and symmetric exit
@@ -26,8 +26,9 @@ the tuned browser collision/carry/grapple system or introducing server physics.
 The server maintains separate `holder` and `physicsAuthority`. Pickup grants
 both to the authenticated requester. Drop clears holder, retaining the simulator.
 Either player may later claim the free cube. The first accepted serialized
-pickup wins; the other request receives a nonfatal denial, never speculative
-carrying. Slot numbers retain no gameplay priority after initial assignment.
+pickup wins; the other request receives a nonfatal denial. The subsequent
+[responsiveness decision](0003-multiplayer-prediction.md) adds temporary local
+prediction and rollback without changing accepted ownership or publication rights. Slot numbers retain no gameplay priority after initial assignment.
 
 A loose pull can transfer physics authority. An ephemeral `pulling` flag protects
 that grant until release, preventing competing requests from repeatedly stealing

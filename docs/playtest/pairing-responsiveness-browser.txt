@@ -1,0 +1,136 @@
+$ node scripts/multiplayer-browser-check.ts
+PASS [P1 holds / P2 runs] two isolated visitors
+PASS [P1 holds / P2 runs] displayed human-readable room code — WJ3S
+PASS [P1 holds / P2 runs] Player 1 waiting UI
+PASS [P1 holds / P2 runs] COPY CODE writes the actual clipboard
+PASS [P1 holds / P2 runs] UI join gives distinct slots
+PASS [P1 holds / P2 runs] WebSocket uses the page host/protocol and /ws
+PASS [P1 holds / P2 runs] TLS proxy assigns one Secure HttpOnly visitor cookie
+PASS [P1 holds / P2 runs] both clients render remote avatars
+PASS [P1 holds / P2 runs] Plate A propagates in under one second including approach — 494 ms
+PASS [P1 holds / P2 runs] remote avatar moves through ordinary input
+PASS [P1 holds / P2 runs] disconnect removes avatar and releases anchor
+PASS [P1 holds / P2 runs] partner disconnected visible
+PASS [P1 holds / P2 runs] reconnect reclaims holder slot without stale occupancy
+PASS [P1 holds / P2 runs] Player 2 crosses with normal grapple input
+PASS [P1 holds / P2 runs] switch responds before authoritative confirmation — 33 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] partner bridge stays authoritative while local switch is pending
+PASS [P1 holds / P2 runs] Switch B bridge propagates in under one second — 241 ms
+PASS [P1 holds / P2 runs] shared reunion checkpoint
+PASS [P1 holds / P2 runs] refresh retains slot/latch/checkpoint
+PASS [P1 holds / P2 runs] Player 1 traverses the materialized bridge
+PASS [P1 holds / P2 runs] cube-pickup responds before authoritative confirmation — 25 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] cube-pickup responds before authoritative confirmation — 32 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] simultaneous pickup: P1 wins, partner rolls back
+PASS [P1 holds / P2 runs] race confirmation/denial never duplicates pickup feedback
+PASS [P1 holds / P2 runs] cube-drop responds before authoritative confirmation — 32 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] cube-pickup responds before authoritative confirmation — 32 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] cube-drop responds before authoritative confirmation — 26 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] cube-pickup responds before authoritative confirmation — 29 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] pending disconnect/rejoin clears prediction and restores one unheld cube
+PASS [P1 holds / P2 runs] pull starts before grant — 31 ms
+PASS [P1 holds / P2 runs] cube grapple pulls under one granted physics authority
+PASS [P1 holds / P2 runs] cube-pickup responds before authoritative confirmation — 31 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] P1 carries the one cube on both clients
+PASS [P1 holds / P2 runs] player standing on CARGO PLATE cannot power access
+PASS [P1 holds / P2 runs] cube-drop responds before authoritative confirmation — 28 ms local; 200 ms injected
+PASS [P1 holds / P2 runs] one shared drop cue reaches each client
+PASS [P1 holds / P2 runs] handoff P1 → P2 transfers physics authority
+PASS [P1 holds / P2 runs] disconnect transfers one falling/settling cube and revokes old stream
+PASS [P1 holds / P2 runs] reconnect keeps original slot and one unheld cube
+PASS [P1 holds / P2 runs] cube-only cargo holds final access on both clients
+PASS [P1 holds / P2 runs] cube-pickup reports confirmation timing — 204 ms
+PASS [P1 holds / P2 runs] cube-drop reports confirmation timing — 204 ms
+PASS [P1 holds / P2 runs] cube-pull-start reports confirmation timing — 205 ms
+PASS [P1 holds / P2 runs] cube-pull-stop reports confirmation timing — 206 ms
+PASS [P1 holds / P2 runs] cube-pickup reports confirmation timing — 222 ms
+PASS [P1 holds / P2 runs] cube-drop reports confirmation timing — 205 ms
+PASS [P1 holds / P2 runs] both players climb the cargo-powered access step
+PASS [P1 holds / P2 runs] one final plate cannot unlock or complete
+PASS [P1 holds / P2 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P1 holds / P2 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P1 holds / P2 runs] final unlock propagates in under one second including approach — 619 ms
+PASS [P1 holds / P2 runs] two distinct bodies unlock without completing
+PASS [P1 holds / P2 runs] unlock message is visible
+PASS [P1 holds / P2 runs] leaving both plates keeps the door open, with no arrivals
+PASS [P1 holds / P2 runs] released plate feeds go dim while the unlocked door stays open
+PASS [P1 holds / P2 runs] unlock plays one door cue and no completion cue
+PASS [P1 holds / P2 runs] first distinct arrival cannot complete
+PASS [P1 holds / P2 runs] arrival count is visible
+PASS [P1 holds / P2 runs] arrival remains recorded after leaving the exit
+PASS [P1 holds / P2 runs] unexpected server loss shows RECONNECTING
+PASS [P1 holds / P2 runs] recovery preserves slot, checkpoint, unlock and first arrival
+PASS [P1 holds / P2 runs] recovery restores no body-held input
+PASS [P1 holds / P2 runs] recovery restores docked cube and momentary cargo power — {"placement":"cargoPlate","cube":{"x":1310,"y":538,"vx":0,"vy":0,"carried":false,"grounded":true,"groundId":null},"access":true}
+PASS [P1 holds / P2 runs] restart room file contains semantic placement without physics or ownership
+PASS [P1 holds / P2 runs] both physical arrivals complete on both clients
+PASS [P1 holds / P2 runs] completion cue waits for the second arrival and plays once
+PASS [P1 holds / P2 runs] co-op preserves both personal campaign saves
+PASS [P2 holds / P1 runs] two isolated visitors
+PASS [P2 holds / P1 runs] displayed human-readable room code — 4QZZ
+PASS [P2 holds / P1 runs] Player 1 waiting UI
+PASS [P2 holds / P1 runs] COPY CODE writes the actual clipboard
+PASS [P2 holds / P1 runs] UI join gives distinct slots
+PASS [P2 holds / P1 runs] WebSocket uses the page host/protocol and /ws
+PASS [P2 holds / P1 runs] TLS proxy assigns one Secure HttpOnly visitor cookie
+PASS [P2 holds / P1 runs] both clients render remote avatars
+PASS [P2 holds / P1 runs] Plate A propagates in under one second including approach — 676 ms
+PASS [P2 holds / P1 runs] remote avatar moves through ordinary input
+PASS [P2 holds / P1 runs] disconnect removes avatar and releases anchor
+PASS [P2 holds / P1 runs] partner disconnected visible
+PASS [P2 holds / P1 runs] reconnect reclaims holder slot without stale occupancy
+PASS [P2 holds / P1 runs] Player 1 crosses with normal grapple input
+PASS [P2 holds / P1 runs] switch responds before authoritative confirmation — 30 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] partner bridge stays authoritative while local switch is pending
+PASS [P2 holds / P1 runs] Switch B bridge propagates in under one second — 237 ms
+PASS [P2 holds / P1 runs] shared reunion checkpoint
+PASS [P2 holds / P1 runs] refresh retains slot/latch/checkpoint
+PASS [P2 holds / P1 runs] Player 2 traverses the materialized bridge
+PASS [P2 holds / P1 runs] cube-pickup responds before authoritative confirmation — 33 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] cube-pickup responds before authoritative confirmation — 32 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] simultaneous pickup: P2 wins, partner rolls back
+PASS [P2 holds / P1 runs] race confirmation/denial never duplicates pickup feedback
+PASS [P2 holds / P1 runs] cube-drop responds before authoritative confirmation — 30 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] cube-pickup responds before authoritative confirmation — 31 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] cube-drop responds before authoritative confirmation — 31 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] cube-pickup responds before authoritative confirmation — 28 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] pending disconnect/rejoin clears prediction and restores one unheld cube
+PASS [P2 holds / P1 runs] pull starts before grant — 26 ms
+PASS [P2 holds / P1 runs] cube grapple pulls under one granted physics authority
+PASS [P2 holds / P1 runs] cube-pickup responds before authoritative confirmation — 31 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] P2 carries the one cube on both clients
+PASS [P2 holds / P1 runs] player standing on CARGO PLATE cannot power access
+PASS [P2 holds / P1 runs] cube-drop responds before authoritative confirmation — 31 ms local; 200 ms injected
+PASS [P2 holds / P1 runs] one shared drop cue reaches each client
+PASS [P2 holds / P1 runs] handoff P2 → P1 transfers physics authority
+PASS [P2 holds / P1 runs] disconnect transfers one falling/settling cube and revokes old stream
+PASS [P2 holds / P1 runs] reconnect keeps original slot and one unheld cube
+PASS [P2 holds / P1 runs] cube-only cargo holds final access on both clients
+PASS [P2 holds / P1 runs] cube-pickup reports confirmation timing — 204 ms
+PASS [P2 holds / P1 runs] cube-drop reports confirmation timing — 205 ms
+PASS [P2 holds / P1 runs] cube-pull-start reports confirmation timing — 204 ms
+PASS [P2 holds / P1 runs] cube-pull-stop reports confirmation timing — 205 ms
+PASS [P2 holds / P1 runs] cube-pickup reports confirmation timing — 221 ms
+PASS [P2 holds / P1 runs] cube-drop reports confirmation timing — 205 ms
+PASS [P2 holds / P1 runs] both players climb the cargo-powered access step
+PASS [P2 holds / P1 runs] one final plate cannot unlock or complete
+PASS [P2 holds / P1 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P2 holds / P1 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P2 holds / P1 runs] final unlock propagates in under one second including approach — 621 ms
+PASS [P2 holds / P1 runs] two distinct bodies unlock without completing
+PASS [P2 holds / P1 runs] unlock message is visible
+PASS [P2 holds / P1 runs] leaving both plates keeps the door open, with no arrivals
+PASS [P2 holds / P1 runs] released plate feeds go dim while the unlocked door stays open
+PASS [P2 holds / P1 runs] unlock plays one door cue and no completion cue
+PASS [P2 holds / P1 runs] first distinct arrival cannot complete
+PASS [P2 holds / P1 runs] arrival count is visible
+PASS [P2 holds / P1 runs] arrival remains recorded after leaving the exit
+PASS [P2 holds / P1 runs] unexpected server loss shows RECONNECTING
+PASS [P2 holds / P1 runs] recovery preserves slot, checkpoint, unlock and first arrival
+PASS [P2 holds / P1 runs] recovery restores no body-held input
+PASS [P2 holds / P1 runs] recovery restores docked cube and momentary cargo power — {"placement":"cargoPlate","cube":{"x":1310,"y":538,"vx":0,"vy":0,"carried":false,"grounded":true,"groundId":null},"access":true}
+PASS [P2 holds / P1 runs] restart room file contains semantic placement without physics or ownership
+PASS [P2 holds / P1 runs] both physical arrivals complete on both clients
+PASS [P2 holds / P1 runs] completion cue waits for the second arrival and plays once
+PASS [P2 holds / P1 runs] co-op preserves both personal campaign saves
+PASS no browser exceptions or console errors

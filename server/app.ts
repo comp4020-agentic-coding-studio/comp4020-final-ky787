@@ -149,7 +149,9 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
                 res.end();
         }
     });
-    await attachMultiplayer(server, dataDir);
+    await attachMultiplayer(server, dataDir, process.env.NODE_ENV === 'test' ? {
+        semanticDelayMs: Number(process.env.BN_TEST_SEMANTIC_DELAY_MS) || 0,
+    } : {});
     return server;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

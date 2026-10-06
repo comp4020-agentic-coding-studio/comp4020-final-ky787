@@ -170,7 +170,7 @@ export class PuzzleRenderer {
             { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
             { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
             { at: r.plateC, active: r.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
-            { at: r.cargoPlate, active: w.inputs.cubeOnPlate, depth: w.cargoPlateDepth, label: 'CARGO PLATE / CUBE ONLY' },
+            { at: r.cargoPlate, active: w.cargoPlateActive, depth: w.cargoPlateDepth, label: 'CARGO PLATE / CUBE ONLY' },
         ];
         for (const plate of plates) {
             if (!plate.at) continue;

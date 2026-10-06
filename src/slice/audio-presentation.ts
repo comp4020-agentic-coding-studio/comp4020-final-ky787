@@ -11,7 +11,7 @@ export function liftProximity(player: Vec2, box: Box): number {
 function state(w: PuzzleWorld) {
     return { phase: w.player.rope.phase, jumps: w.player.ropeJumpAnchors.length, grounded: w.player.grounded,
         carried: !!w.cube?.carried, plates: [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC,
-            !!w.room.cargoPlate && w.inputs.cubeOnPlate],
+            !!w.room.cargoPlate && w.cargoPlateActive],
         outputs: { ...w.frame.outputs }, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
 }
 type AudioSink = Pick<GameAudio, 'play' | 'setLoop' | 'stopAll'>;
@@ -32,7 +32,7 @@ export class AudioPresentation {
         if (old.phase === 'attached' && next.jumps > old.jumps) play('ropeJump');
         else if (old.grounded && !next.grounded && w.player.vy < -300) play('jump');
         if (w.player.justLanded) play('landing', undefined, Math.min(1, w.player.landingSpeed / 700));
-        if (old.carried !== next.carried) play(next.carried ? 'pickup' : 'drop');
+        if (!w.consumeCubeCorrection() && old.carried !== next.carried) play(next.carried ? 'pickup' : 'drop');
         next.plates.forEach((on, i) => {
             if (on !== old.plates[i]) play('plate', [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i], .8, on ? 1 : .8);
         });

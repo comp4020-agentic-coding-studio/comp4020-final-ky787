@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile, readdir } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile, readdir, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
@@ -434,4 +434,65 @@ it('replacing a carrying socket releases to its partner before stale old-socket 
     replacement.send({ type: 'cube', epoch: held.cube.epoch, seq: 99, transform: { ...cubeTransform, x: 0 } });
     replacement.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
     expect((await p2.wait('room', m => m.room.inputs.plateAOccupied)).room.cube.transform).toEqual(cubeTransform);
+});
+
+it.each([100, 200])('acknowledges semantic actions under %s ms artificial delay; ephemeral state never rewrites disk', async delay => {
+    const dir = await directory(), server = createServer();
+    const timings: import('../server/multiplayer.ts').ActionTiming[] = [];
+    const service = await attachMultiplayer(server, dir, { semanticDelayMs: delay, onActionTiming: value => timings.push(value) });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    cleanups.push(async () => { service.shutdown(); await service.drained(); await new Promise<void>(resolve => server.close(() => resolve())); });
+    const url = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
+    const cookie = 'bn_visitor=11111111-1111-4111-8111-111111111111';
+    const p1 = await connect(url, cookie), p2 = await connect(url, 'bn_visitor=22222222-2222-4222-8222-222222222222');
+    p1.send({ type: 'create' }); const first = await p1.wait('snapshot');
+    p2.send({ type: 'join', code: first.room.code }); await p2.wait('snapshot');
+    const path = join(dir, 'rooms', `${first.room.code}.json`);
+    let disk = await readFile(path, 'utf8');
+    p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
+    const occupied = await p2.wait('room', m => m.room.inputs.plateAOccupied);
+    expect(await readFile(path, 'utf8')).toBe(disk);
+    expect(occupied.room.revision).toBeGreaterThan(JSON.parse(disk).revision);
+    p1.send({ type: 'switch', seq: 2 });
+    // Transform traffic bypasses the delayed semantic queue.
+    p1.send({ type: 'avatar', seq: 1, avatar }); await p2.wait('avatar');
+    expect(await readFile(path, 'utf8')).toBe(disk);
+    const switched = await p1.wait('action-result', m => m.seq === 2);
+    expect(switched.accepted).toBe(true); expect(switched.room.inputs.switchB).toBe(true);
+    disk = await readFile(path, 'utf8'); expect(JSON.parse(disk).switchB).toBe(true);
+    let epoch = switched.room.cube.epoch;
+    p1.send({ type: 'cube-pickup', seq: 3, epoch });
+    p2.send({ type: 'cube-pickup', seq: 1, epoch });
+    const winner = await p1.wait('action-result', m => m.seq === 3), loser = await p2.wait('action-result', m => m.seq === 1);
+    expect(winner.accepted).toBe(true); expect(loser.accepted).toBe(false);
+    expect(loser.room.cube.holder).toBe(1); epoch = winner.room.cube.epoch;
+    expect(await readFile(path, 'utf8')).toBe(disk);
+    const transform = { x: 1250, y: 538, vx: 0, vy: 0, grounded: false };
+    p1.send({ type: 'cube-drop', seq: 4, epoch, transform });
+    epoch = (await p1.wait('action-result', m => m.seq === 4)).room.cube.epoch;
+    p2.send({ type: 'cube-pull-start', seq: 2, epoch });
+    epoch = (await p2.wait('action-result', m => m.seq === 2)).room.cube.epoch;
+    p2.send({ type: 'cube-pull-stop', seq: 3, epoch }); await p2.wait('action-result', m => m.seq === 3);
+    await p1.close(); await p2.wait('room', m => !m.room.connected[0]);
+    const replacement = await connect(url, cookie); replacement.send({ type: 'join', code: first.room.code }); await replacement.wait('snapshot');
+    expect(await readFile(path, 'utf8')).toBe(disk);
+    p2.send({ type: 'cube-occupancy', seq: 4, epoch, cargo: true }); await p2.wait('action-result', m => m.seq === 4);
+    expect(JSON.parse(await readFile(path, 'utf8')).cubePlacement).toBe('cargoPlate');
+    p2.send({ type: 'cube-pickup', seq: 5, epoch }); await p2.wait('action-result', m => m.seq === 5);
+    expect(JSON.parse(await readFile(path, 'utf8')).cubePlacement).toBe('spawn');
+    expect(timings.filter(t => t.durable).map(t => t.action)).toEqual(['switch', 'cube-occupancy', 'cube-pickup']);
+    expect(timings.find(t => t.action === 'cube-drop')).toMatchObject({ durable: false, persistMs: 0 });
+    expect(timings.find(t => t.action === 'switch')!.queueMs).toBeGreaterThanOrEqual(delay - 5);
+});
+
+it('a durable storage failure closes the room without confirming or broadcasting its predicted switch', async () => {
+    const { dir, p1, p2, code } = await pair();
+    const path = join(dir, 'rooms', `${code}.json`);
+    await rm(path); await mkdir(path); // Atomic rename over a directory must fail, including when tests run as root.
+    p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
+    expect((await p2.wait('room', m => m.room.inputs.plateAOccupied)).room.inputs.switchB).toBe(false);
+    p1.send({ type: 'switch', seq: 2 });
+    expect((await p1.wait('error', m => m.code === 'ROOM_UNAVAILABLE')).code).toBe('ROOM_UNAVAILABLE');
+    expect((await p2.wait('error', m => m.code === 'ROOM_UNAVAILABLE')).code).toBe('ROOM_UNAVAILABLE');
+    expect([...p1.messages, ...p2.messages].some(m => 'room' in m && m.room.inputs.switchB)).toBe(false);
 });

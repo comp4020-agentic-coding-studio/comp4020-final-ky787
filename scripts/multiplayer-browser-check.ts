@@ -16,6 +16,7 @@ import type { SliceGame } from '../src/slice/game.ts';
 type Snapshot = ReturnType<SliceGame['snapshot']>;
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const checks: string[] = [], propagation: Record<string, number> = {};
+const semanticDelayMs = Number(process.env.BN_TEST_SEMANTIC_DELAY_MS) || 0;
 let scenario = '';
 let shotPrefix = '';
 const shots = process.argv[3] ?? join(tmpdir(), 'bn-pairing-shots');
@@ -55,7 +56,7 @@ async function tlsOrigin(backend: string): Promise<string> {
     return `https://127.0.0.1:${(proxy.address() as { port: number }).port}/`;
 }
 async function startServer(port = 0): Promise<string> {
-    app = spawn(process.execPath, ['server/app.ts'], { env: { ...process.env, PORT: String(port), DATA_DIR: join(temporary, 'data') }, stdio: ['ignore', 'pipe', 'pipe'] });
+    app = spawn(process.execPath, ['server/app.ts'], { env: { ...process.env, NODE_ENV: 'test', PORT: String(port), DATA_DIR: join(temporary, 'data') }, stdio: ['ignore', 'pipe', 'pipe'] });
     return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('App start timed out')), 6000);
         app!.once('error', reject);
@@ -161,6 +162,47 @@ async function mouse(p: Cdp, x: number, y: number, down: boolean) {
     await p.send('Input.dispatchMouseEvent', { type: down ? 'mousePressed' : 'mouseReleased', ...at, button: 'left', buttons: down ? 1 : 0, clickCount: 1 });
 }
 async function shot(p: Cdp, name: string) { const data = await p.send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(shots, shotPrefix + name + '.png'), Buffer.from(data.data, 'base64')); }
+async function predictedTap(p: Cdp, kind: 'cube-pickup' | 'cube-drop' | 'switch') {
+    if (!semanticDelayMs) { await tap(p, 'KeyE'); return; }
+    const start = Date.now(); await key(p, 'KeyE', true);
+    try {
+        const local = await wait(p, `local ${kind} prediction`, s => kind === 'switch'
+            ? !!s.multiplayer?.pendingSwitch && s.outputs.bridge && !s.multiplayer.shared?.inputs.switchB
+            : s.multiplayer?.pendingCubeAction?.kind === kind && !!s.cube?.carried === (kind === 'cube-pickup'));
+        const ms = Date.now() - start;
+        propagation[scenario + kind + '.localMs'] = ms;
+        check(`${kind} responds before authoritative confirmation`, ms < semanticDelayMs, `${ms} ms local; ${semanticDelayMs} ms injected`);
+        return local;
+    } finally { await key(p, 'KeyE', false); }
+}
+async function nearCube(p: Cdp) {
+    const x = (await snapshot(p)).cube!.x;
+    await walk(p, x - 120); await walk(p, x - 48);
+}
+async function contestedPickup(first: Cdp, second: Cdp, firstSlot: number) {
+    await nearCube(first); await nearCube(second);
+    const firstCues = (await snapshot(first)).audio.played.pickup ?? 0, secondCues = (await snapshot(second)).audio.played.pickup ?? 0;
+    await predictedTap(first, 'cube-pickup'); await predictedTap(second, 'cube-pickup');
+    const winner = await wait(first, 'pickup race winner confirms', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === firstSlot);
+    const loser = await wait(second, 'pickup race loser reconciles', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === firstSlot);
+    check(`simultaneous pickup: P${firstSlot} wins, partner rolls back`, !!winner.cube?.carried && !!loser.cube?.carried
+        && winner.multiplayer?.ownsCubePhysics === true && loser.multiplayer?.ownsCubePhysics === false
+        && loser.multiplayer.interactionTimings['cube-pickup']?.accepted === false);
+    check('race confirmation/denial never duplicates pickup feedback', (winner.audio.played.pickup ?? 0) === firstCues + 1
+        && (loser.audio.played.pickup ?? 0) === secondCues + 1);
+    await wait(second, 'loser cube follows accepted remote holder', s => !!s.cube && !!s.multiplayer?.remote && Math.abs(s.cube.x - s.multiplayer.remote.x) < 5);
+    await predictedTap(first, 'cube-drop'); await wait(second, 'race winner drops', s => s.multiplayer?.cubeHolder === null && !!s.cube?.grounded);
+    await nearCube(second); await predictedTap(second, 'cube-pickup');
+    await wait(first, 'race loser can subsequently win handoff', s => s.multiplayer?.cubeHolder === 3 - firstSlot);
+    await predictedTap(second, 'cube-drop'); await wait(first, 'handoff drops cleanly', s => s.multiplayer?.cubeHolder === null && !!s.cube?.grounded);
+    await nearCube(second); await predictedTap(second, 'cube-pickup');
+    await second.send('Page.navigate', { url: 'about:blank' });
+    await wait(first, 'disconnect during prediction releases any grant', s => !s.multiplayer?.shared?.connected[2 - firstSlot] && s.multiplayer?.cubeHolder === null);
+    const history = await second.send('Page.getNavigationHistory');
+    await second.send('Page.navigateToHistoryEntry', { entryId: history.entries[history.currentIndex - 1].id });
+    const restored = await wait(second, 'pending pickup reconnects without a ghost', s => s.multiplayer?.websocket === 'CONNECTED' && !s.multiplayer.pendingCubeAction && s.multiplayer.cubeHolder === null);
+    check('pending disconnect/rejoin clears prediction and restores one unheld cube', !restored.cube?.carried && restored.multiplayer?.slot === 3 - firstSlot);
+}
 async function finalAccess(p: Cdp) {
     // The resting cargo is an ordinary solid cube; jump over it onto the powered step.
     await walk(p, 1200); await walk(p, (await snapshot(p)).cube!.x - 50);
@@ -241,7 +283,8 @@ try {
         await key(runner, 'KeyD', false); await sleep(160);
         check(`Player ${runnerSlot} crosses with normal grapple input`, (await snapshot(runner)).deaths === deaths);
         await walk(runner, 1050);
-        const switchAt = Date.now(); await tap(runner, 'KeyE');
+        const switchAt = Date.now(); await predictedTap(runner, 'switch');
+        if (semanticDelayMs) check('partner bridge stays authoritative while local switch is pending', !(await snapshot(holder)).outputs.bridge);
         await wait(holder, 'remote bridge latch', s => s.outputs.bridge);
         const switchMs = propagation[`p${holderSlot}Holds.switchB`] = Date.now() - switchAt;
         check('Switch B bridge propagates in under one second', switchMs <= 1000, `${switchMs} ms`);
@@ -253,18 +296,24 @@ try {
         await walk(holder, 1130);
         check(`Player ${holderSlot} traverses the materialized bridge`, (await snapshot(holder)).player.x > 1000 && (await snapshot(holder)).deaths === 0);
 
+        if (semanticDelayMs) await contestedPickup(holder, runner, holderSlot);
+
         // Exactly one shared cube; every interaction below is real mouse/keyboard input.
         await walk(holder, 1080);
         const beforePull = (await snapshot(holder)).cube!;
-        await mouse(holder, beforePull.x, beforePull.y, true);
-        await wait(holder, 'server granted cube pull', s => s.pullingCube && s.multiplayer?.cubePhysicsAuthority === holderSlot);
+        const pullAt = Date.now(); await mouse(holder, beforePull.x, beforePull.y, true);
+        if (semanticDelayMs) {
+            const predicted = await wait(holder, 'predicted pull before authority', s => s.multiplayer?.pendingCubeAction?.kind === 'cube-pull-start' && s.pullingCube);
+            const ms = Date.now() - pullAt; propagation[scenario + 'pull.localMs'] = ms;
+            check('pull starts before grant', !predicted.multiplayer?.shared?.cube.pulling && ms < semanticDelayMs, `${ms} ms`);
+        }
+        await wait(holder, 'server granted cube pull', s => s.pullingCube && !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubePhysicsAuthority === holderSlot);
         await sleep(140);
         await mouse(holder, beforePull.x, beforePull.y, false);
         await wait(runner, 'shared pull released', s => !s.multiplayer?.shared?.cube.pulling && !!s.cube?.grounded);
         check('cube grapple pulls under one granted physics authority', (await snapshot(holder)).cube!.x < beforePull.x - 10
             && (await snapshot(holder)).multiplayer?.ownsCubePhysics === true && (await snapshot(runner)).multiplayer?.ownsCubePhysics === false);
-        const free = (await snapshot(holder)).cube!;
-        await walk(holder, free.x - 48); await tap(holder, 'KeyE');
+        await nearCube(holder); await predictedTap(holder, 'cube-pickup');
         await wait(holder, 'first cube pickup granted', s => s.multiplayer?.cubeHolder === holderSlot && !!s.cube?.carried);
         await wait(runner, 'partner sees first cube carrier', s => s.multiplayer?.cubeHolder === holderSlot && !!s.cube?.carried);
         await walk(holder, 1210);
@@ -275,7 +324,7 @@ try {
         check('player standing on CARGO PLATE cannot power access', !(await snapshot(runner)).multiplayer?.shared?.inputs.cubeOnCargoPlate
             && !(await snapshot(holder)).outputs.codePlatformA);
         const firstDropCues = [(await snapshot(holder)).audio.played.drop ?? 0, (await snapshot(runner)).audio.played.drop ?? 0];
-        await tap(holder, 'KeyE');
+        await predictedTap(holder, 'cube-drop');
         await wait(runner, 'first carrier drops cube', s => s.multiplayer?.cubeHolder === null && !!s.cube?.grounded);
         check('one shared drop cue reaches each client', ((await snapshot(holder)).audio.played.drop ?? 0) === firstDropCues[0] + 1
             && ((await snapshot(runner)).audio.played.drop ?? 0) === firstDropCues[1] + 1);
@@ -306,6 +355,13 @@ try {
         await wait(runner, 'cargo enables final access locally', s => !!s.multiplayer?.shared?.outputs.finalAccess && s.outputs.codePlatformA);
         check('cube-only cargo holds final access on both clients', (await snapshot(holder)).multiplayer?.cubePlacement === 'cargoPlate'
             && (await snapshot(runner)).multiplayer?.cubeHolder === null);
+        for (const p of [holder, runner]) {
+            const diagnostics = (await snapshot(p)).multiplayer!;
+            for (const [kind, timing] of Object.entries(diagnostics.interactionTimings)) {
+                propagation[`P${diagnostics.slot}.${kind}.rttMs`] = timing!.rttMs;
+                if (semanticDelayMs) check(`${kind} reports confirmation timing`, timing!.rttMs >= semanticDelayMs - 10, `${timing!.rttMs} ms`);
+            }
+        }
         await shot(runner, 'pairing-cube-docked');
         await finalAccess(holder); await finalAccess(runner);
         check('both players climb the cargo-powered access step', (await snapshot(holder)).player.y < 340 && (await snapshot(runner)).player.y < 340);
@@ -364,7 +420,8 @@ try {
         check('recovery preserves slot, checkpoint, unlock and first arrival', restored.multiplayer?.slot === holderSlot && restored.checkpoint === 'relay' && restored.outputs.bridge && restored.outputs.exitDoor && !!restored.multiplayer?.shared?.reachedExit[holderSlot - 1] && !restored.multiplayer?.shared?.reachedExit[runnerSlot - 1] && !restored.multiplayer?.shared?.completed);
         check('recovery restores no body-held input', !restored.inputs.plateA && !restored.inputs.plateB && !restored.inputs.plateC);
         check('recovery restores docked cube and momentary cargo power', restored.multiplayer?.cubePlacement === 'cargoPlate'
-            && restored.multiplayer?.cubeHolder === null && restored.outputs.codePlatformA && Math.abs(restored.cube!.x - 1310) < 59 && Math.abs(restored.cube!.y - 538) < 2);
+            && restored.multiplayer?.cubeHolder === null && restored.outputs.codePlatformA && Math.abs(restored.cube!.x - 1310) < 59 && Math.abs(restored.cube!.y - 538) < 2,
+                JSON.stringify({ placement: restored.multiplayer?.cubePlacement, cube: restored.cube, access: restored.outputs.codePlatformA }));
         if (!process.argv[2]) {
             const disk = JSON.parse(await readFile(join(temporary, 'data', 'rooms', `${code}.json`), 'utf8'));
             check('restart room file contains semantic placement without physics or ownership', disk.version === 3 && disk.cubePlacement === 'cargoPlate'
@@ -384,7 +441,7 @@ try {
     }
     scenario = ''; shotPrefix = '';
     check('no browser exceptions or console errors', clients.every(c => !c.errors.length), clients.flatMap(c => c.errors).join('\n'));
-    await writeFile(join(shots, 'pairing-browser.json'), JSON.stringify({ checks, propagation, url: base, processRestart: !process.argv[2] }, null, 2));
+    await writeFile(join(shots, 'pairing-browser.json'), JSON.stringify({ checks, propagation, semanticDelayMs, url: base, processRestart: !process.argv[2] }, null, 2));
 } catch (e) {
     for (let i = 0; i < clients.length; i++) await shot(clients[i], `pairing-failure-${i}`).catch(() => {});
     process.stderr.write(String(e) + '\n'); process.exitCode = 1;

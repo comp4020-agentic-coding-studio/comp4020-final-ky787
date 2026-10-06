@@ -51,6 +51,7 @@ export class RemoteCube {
         this.samples = this.samples.slice(-12);
         return true;
     }
+    latest(): CubeTransform | null { return this.samples.at(-1)?.transform ?? null; }
     sample(now: number): CubeTransform | null {
         if (!this.samples.length) return null;
         const at = now - 100;

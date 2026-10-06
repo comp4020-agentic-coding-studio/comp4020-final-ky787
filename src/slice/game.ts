@@ -120,7 +120,7 @@ export class SliceGame {
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
         if (initial) {
-            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB(), () => this.coop.reachExit(), new SharedCubeAuthority(this.coop));
+            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB(), () => this.coop.reachExit(), new SharedCubeAuthority(this.coop), this.coop.prediction);
             this.world = new PuzzleWorld(pairingBay(this.coop.slot), { switchB: room.inputs.switchB, cubeOnPlate: false, cubeOnPlateB: false,
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
             this.renderer.room(this.world); this.sound.reset(this.world);
@@ -131,9 +131,10 @@ export class SliceGame {
             this.audio.play('latch', .45);
         } else if (this.authority) {
             const previous = this.authority.room;
+            const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
             const events = this.world.events.splice(0);
-            if (!previous.inputs.switchB && room.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever! });
+            if (!switchWasVisible && room.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever! });
             this.sound.observe(this.world, events);
             if (!previous.completed && room.completed) this.audio.play('complete');
             else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
@@ -141,7 +142,7 @@ export class SliceGame {
     }
     private coopStatus(): void {
         if (!this.coopMode) return;
-        if (!this.coop.connected) { this.started = false; this.world.cancelGrapple(); this.input.releaseAll(); }
+        if (!this.coop.connected) { this.started = false; this.world.cancelGrapple(); this.world.syncAuthority(); this.sound.reset(this.world); this.input.releaseAll(); }
         const r = this.coop.room;
         const slots = r ? r.connected.map((on, i) => `PLAYER ${i + 1}   ${on ? 'CONNECTED' : r.assigned[i] ? 'DISCONNECTED' : 'WAITING FOR PARTNER'}${r.reachedExit[i] ? ' · ARRIVED' : ''}`).join('\n') : '';
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;

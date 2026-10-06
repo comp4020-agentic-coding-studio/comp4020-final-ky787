@@ -26,6 +26,8 @@ export interface MachineEvent {
 export interface CubeAuthority {
     readonly simulates: boolean;
     readonly heldLocally: boolean;
+    readonly cargoVisual?: boolean;
+    consumeCorrection?(): boolean;
     sync(world: PuzzleWorld): void;
     pull(start: boolean, held: boolean): boolean;
     cancelPull(): void;
@@ -58,6 +60,8 @@ export class PuzzleWorld {
     plateDepthB = 0;
     plateDepthC = 0;
     cargoPlateDepth = 0;
+    consumeCubeCorrection() { return this.authority?.cube?.consumeCorrection?.() ?? false; }
+    get cargoPlateActive() { return this.authority?.cube?.cargoVisual ?? this.inputs.cubeOnPlate; }
     keyboardGrapple = false;
     private cubeSolid: Solid = { id: 'cube-body', x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
     doorOpen = 0;
@@ -407,7 +411,7 @@ export class PuzzleWorld {
         this.plateDepth += ((this.inputs.plateA ? 1 : 0) - this.plateDepth) * Math.min(1, dt * 16);
         this.plateDepthB += ((this.inputs.plateB ? 1 : 0) - this.plateDepthB) * Math.min(1, dt * 16);
         this.plateDepthC += ((this.inputs.plateC ? 1 : 0) - this.plateDepthC) * Math.min(1, dt * 16);
-        this.cargoPlateDepth += ((this.inputs.cubeOnPlate ? 1 : 0) - this.cargoPlateDepth) * Math.min(1, dt * 16);
+        this.cargoPlateDepth += ((this.cargoPlateActive ? 1 : 0) - this.cargoPlateDepth) * Math.min(1, dt * 16);
         this.doorOpen = clamp(this.doorOpen + (this.frame.outputs.exitDoor ? dt * 3 : -dt * 3), 0, 1);
         this.displayPulse = Math.max(0, this.displayPulse - dt * 0.9);
         if (this.room.hazards.some(h => boxesOverlap(playerBox(this.player), h)) || this.player.y > this.room.height + 50)

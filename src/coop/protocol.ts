@@ -50,6 +50,7 @@ export type ServerMessage =
     | { type: 'avatar'; slot: Slot; stream: number; seq: number; avatar: Avatar }
     | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform }
     | { type: 'cube-denied'; seq: number }
+    | { type: 'action-result'; seq: number; accepted: boolean; room: SharedRoom }
     | { type: 'error'; code: string; message: string }
     | { type: 'pong' };
 export function normalizeCode(value: string): string | null {

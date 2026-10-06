@@ -1,6 +1,7 @@
 import { expect, it, vi } from 'vitest';
 import { acceptCubeSnapshot, assignCube, freshCube, interactCube } from '../server/cube-state.ts';
-import { parseClientMessage, type Slot } from '../src/coop/protocol.ts';
+import { LocalPrediction } from '../src/coop/prediction.ts';
+import { parseClientMessage, type CubeAction, type CubeTransform, type Slot } from '../src/coop/protocol.ts';
 import { RemoteCube, RemoteAvatar } from '../src/coop/remote.ts';
 import { SharedCubeAuthority } from '../src/coop/cube.ts';
 import { PairingAuthority } from '../src/coop/authority.ts';
@@ -91,14 +92,18 @@ function setup(slot: Slot = 1) {
         switchB: true, checkpoint: 'reunion', exitUnlocked: false, reachedExit: [false, false], completed: false,
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     const state = freshCube(); assignCube(state, 1);
-    const client = { room: sharedRoom(record, [true, true], [null, null], state), slot,
+    let seq = 0;
+    const prediction = new LocalPrediction();
+    const client = { connected: true, prediction, room: sharedRoom(record, [true, true], [null, null], state), slot,
         get ownsCube() { return this.room.cube.physicsAuthority === slot; },
-        remote: new RemoteAvatar(), remoteCube: new RemoteCube(), cubeAction: vi.fn(), cubeOccupancy: vi.fn() };
+        remote: new RemoteAvatar(), remoteCube: new RemoteCube(), cubeAction: vi.fn((kind: CubeAction | 'cube-drop', _transform?: CubeTransform) => prediction.begin(kind, ++seq, client.room.cube.epoch, 1, performance.now())), cubeOccupancy: vi.fn() };
     const cube = new SharedCubeAuthority(client);
     const authority = new PairingAuthority(client.room, slot, vi.fn(), vi.fn(), vi.fn(), cube);
     const world = new PuzzleWorld(pairingBay(slot), { ...freshProgress().rooms.relay, checkpoint: 'relay' }, undefined, authority);
-    const update = () => { client.room = sharedRoom(record, [true, true], [null, null], state); authority.room = client.room;
-        client.remoteCube.reset(state, performance.now()); world.syncAuthority(); };
+    const update = (accepted?: boolean) => { client.room = sharedRoom(record, [true, true], [null, null], state); authority.room = client.room;
+        client.remoteCube.reset(state, performance.now());
+        if (accepted !== undefined && prediction.cube) prediction.resolve(prediction.cube.seq, 1, accepted, client.room, slot, performance.now());
+        world.syncAuthority(); };
     return { world, state, record, client, cube, update };
 }
 
@@ -116,22 +121,31 @@ it('only the authority integrates loose physics; remote carried geometry follows
     world.step(FIXED_DT, emptyInput()); expect(world.cube!.x).toBeGreaterThan(1200); expect(world.cube!.y).toBeGreaterThan(430);
 });
 
-it('requests pickup without predicting it, and sounds accepted pickup/drop once on each client', () => {
-    for (const slot of [1, 2] as const) {
-        const { world, state, client, update } = setup(slot);
-        const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink); audio.reset(world);
-        Object.assign(world.player, { x: 1190, y: 543 }); world.interact(); audio.observe(world, []);
-        expect(client.cubeAction).toHaveBeenCalledWith('cube-pickup'); expect(world.cube!.carried).toBe(false); expect(sink.play).not.toHaveBeenCalled();
-        interactCube(state, 1, { type: 'cube-pickup', seq: 1, epoch: state.epoch }); update(); audio.observe(world, []); audio.observe(world, []);
-        expect(sink.play.mock.calls.filter(c => c[0] === 'pickup')).toHaveLength(1);
-        if (slot === 1) {
-            world.interact(); audio.observe(world, []);
-            expect(client.cubeAction).toHaveBeenLastCalledWith('cube-drop', world.cubeDropTransform());
-            expect(sink.play.mock.calls.filter(c => c[0] === 'drop')).toHaveLength(0);
-        }
-        interactCube(state, 1, { type: 'cube-drop', seq: 2, epoch: state.epoch, transform }); update(); audio.observe(world, []); audio.observe(world, []);
-        expect(sink.play.mock.calls.filter(c => c[0] === 'drop')).toHaveLength(1);
-    }
+it.each([1, 2] as const)('slot %s predicts pickup/drop immediately and confirmation preserves motion and plays each cue once', slot => {
+    const { world, state, client, update } = setup(slot);
+    const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink); audio.reset(world);
+    Object.assign(world.player, { x: 1190, y: 543 }); world.interact(); audio.observe(world, []);
+    expect(client.cubeAction).toHaveBeenCalledWith('cube-pickup'); expect(world.cube!.carried).toBe(true);
+    expect(client.room.cube.holder).toBeNull(); expect(client.prediction.cube?.kind).toBe('cube-pickup');
+    interactCube(state, slot, { type: 'cube-pickup', seq: 1, epoch: state.epoch }); update(true); audio.observe(world, []);
+    expect(client.prediction.cube).toBeNull();
+    expect(sink.play.mock.calls.filter(c => c[0] === 'pickup')).toHaveLength(1);
+    world.interact(); audio.observe(world, []);
+    expect(world.cube!.carried).toBe(false); expect(client.room.cube.holder).toBe(slot);
+    world.step(FIXED_DT, emptyInput()); const predictedY = world.cube!.y;
+    interactCube(state, slot, { type: 'cube-drop', seq: 2, epoch: state.epoch, transform }); update(true); audio.observe(world, []);
+    expect(world.cube!.y).toBe(predictedY);
+    expect(sink.play.mock.calls.filter(c => c[0] === 'drop')).toHaveLength(1);
+});
+
+it('losing predicted pickup reconciles to the partner with no contradictory drop cue', () => {
+    const { world, state, client, update } = setup(2);
+    const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink); audio.reset(world);
+    Object.assign(world.player, { x: 1190, y: 543 }); world.interact(); audio.observe(world, []);
+    interactCube(state, 1, { type: 'cube-pickup', seq: 1, epoch: state.epoch }); update(false); audio.observe(world, []);
+    expect(client.prediction.cube).toBeNull(); expect(client.room.cube.holder).toBe(1);
+    expect(world.pullingCube).toBe(false);
+    expect(sink.play.mock.calls.filter(c => c[0] === 'drop')).toHaveLength(0);
 });
 
 it('only the authority cube senses cargo; players cannot substitute, and removing it releases access', () => {
@@ -145,22 +159,24 @@ it('only the authority cube senses cargo; players cannot substitute, and removin
     assignCube(state, 2); update(); client.cubeOccupancy.mockClear(); cube.sample(world); expect(client.cubeOccupancy).not.toHaveBeenCalled();
 });
 
-it('pull force and sound wait for a grant; release before the reply cancels a late grant', () => {
+it('pull begins before a grant, retains predicted motion, and release before a reply cancels the late grant', () => {
     const { world, state, client, update } = setup(2);
     Object.assign(world.player, { x: 1090, y: 543 });
     const input = { ...emptyInput(), grapplePressed: true, grappleHeld: true, aim: { x: 1190, y: 538 } };
     world.step(FIXED_DT, input);
-    expect(client.cubeAction).toHaveBeenCalledWith('cube-pull-start'); expect(world.pullingCube).toBe(false);
-    expect(world.events.some(e => e.kind === 'cube-pull')).toBe(false);
-    interactCube(state, 2, { type: 'cube-pull-start', seq: 1, epoch: state.epoch }); update();
+    expect(client.cubeAction).toHaveBeenCalledWith('cube-pull-start'); expect(world.pullingCube).toBe(true);
+    expect(world.events.some(e => e.kind === 'cube-pull')).toBe(true);
+    const x = world.cube!.x;
+    interactCube(state, 2, { type: 'cube-pull-start', seq: 1, epoch: state.epoch }); update(true);
+    expect(world.cube!.x).toBe(x);
     world.step(FIXED_DT, { ...input, grapplePressed: false });
     expect(world.pullingCube).toBe(true); expect(world.cube!.vx).toBeLessThan(0);
     expect(Math.abs(world.cube!.vx)).toBeLessThanOrEqual(330);
     world.step(FIXED_DT, emptyInput()); expect(world.pullingCube).toBe(false);
     expect(client.cubeAction).toHaveBeenLastCalledWith('cube-pull-stop');
-    interactCube(state, 2, { type: 'cube-pull-stop', seq: 2, epoch: state.epoch }); update();
-    world.step(FIXED_DT, input); world.step(FIXED_DT, emptyInput());
-    interactCube(state, 2, { type: 'cube-pull-start', seq: 3, epoch: state.epoch }); update();
+    interactCube(state, 2, { type: 'cube-pull-stop', seq: 2, epoch: state.epoch }); update(true);
+    world.step(FIXED_DT, { ...input, grapplePressed: true }); world.step(FIXED_DT, emptyInput());
+    interactCube(state, 2, { type: 'cube-pull-start', seq: 3, epoch: state.epoch }); update(true);
     expect(client.cubeAction).toHaveBeenLastCalledWith('cube-pull-stop'); expect(world.pullingCube).toBe(false);
 });
 
@@ -189,4 +205,28 @@ it('cargo access is required to climb to the final deck, with a safe fall and wa
     record.cubePlacement = 'spawn'; update();
     for (let n = 0; n < 100; n++) world.step(FIXED_DT, emptyInput());
     expect(world.player.groundId).toBe('far'); expect(world.deaths).toBe(0);
+});
+
+it('denied predicted pull stops local forces and snaps to the accepted transform', () => {
+    const { world, state, client, update } = setup(2);
+    Object.assign(world.player, { x: 1090, y: 543 });
+    const input = { ...emptyInput(), grapplePressed: true, grappleHeld: true, aim: { x: 1190, y: 538 } };
+    world.step(FIXED_DT, input); expect(world.pullingCube).toBe(true);
+    state.transform = { ...transform, x: 1260 }; assignCube(state, 1); state.pulling = true;
+    update(false);
+    expect(world.pullingCube).toBe(false); expect(world.cube!.x).toBe(1260);
+    expect(client.prediction.cube).toBeNull(); expect(client.prediction.cubeResult?.accepted).toBe(false);
+    world.step(FIXED_DT, { ...input, grapplePressed: false });
+    expect(world.pullingCube).toBe(false); expect(world.cube!.x).toBe(1260);
+});
+
+it('cargo contact predicts only plate feedback, and durable confirmation does not replay it', () => {
+    const { world, record, cube, update } = setup();
+    const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink); audio.reset(world);
+    Object.assign(world.cube!, { x: 1310, y: 538, grounded: true }); cube.sample(world); audio.observe(world, []);
+    expect(world.cargoPlateActive).toBe(true); expect(world.inputs.cubeOnPlate).toBe(false);
+    expect(world.frame.outputs.codePlatformA).toBe(false);
+    record.cubePlacement = 'cargoPlate'; update(); audio.observe(world, []);
+    expect(world.frame.outputs.codePlatformA).toBe(true);
+    expect(sink.play.mock.calls.filter(c => c[0] === 'plate')).toHaveLength(1);
 });

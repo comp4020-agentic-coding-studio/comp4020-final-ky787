@@ -5,15 +5,18 @@ Implemented 2026-10-06, starting at
 The revised role-symmetric multiplayer architecture and physical exit were
 manually accepted on two separate computers. The shared-cube milestone starts
 at `cbad2534d2b19f1ff799c9d540f5cd972cad97bd` and extends that accepted chamber.
-It adds exactly one shared cube and a cube-only cargo phase; this extension still
-requires manual two-computer acceptance. The four C8 rooms, personal saves and
+It adds exactly one shared cube and a cube-only cargo phase, now manually accepted
+on two physical computers. The responsiveness pass starts at
+`aec24f90b212ee9f051bc7cb3f49e3574b5c0d75`; its real-network feel still needs manual
+acceptance after deployment. The four C8 rooms, personal saves and
 retained CONTROL SPINE binary stay independent. No multiplayer CONTROL SPINE,
 relay/lift cube transport or new binary is introduced.
 
 ## Authority and modules
 
 See [ADR 0001](adr/0001-multiplayer-authority.md) and
-[ADR 0002: shared cube simulation](adr/0002-shared-cube-authority.md).
+[ADR 0002: shared cube simulation](adr/0002-shared-cube-authority.md), and
+[ADR 0003: local prediction](adr/0003-multiplayer-prediction.md).
 
 ```text
 Browser A / Browser B
@@ -50,7 +53,8 @@ the HTTP cookie header and checks the request Origin against Host.
 | `server/pairing-state.ts` | Coordinate-free authoritative mock room contract and durable schema |
 | `server/multiplayer.ts` | Slots, serialized logical mutations, persistence, socket lifecycle and avatar/cube forwarding |
 | `server/cube-state.ts` | Ephemeral cube ownership, exclusive pull arbitration and stream validation |
-| `src/coop/cube.ts` | Granted physics boundary, replica/carry presentation and physical cargo sensing |
+| `src/coop/cube.ts` | Confirmed physics boundary, predicted local interaction, reconciliation and physical cargo sensing |
+| `src/coop/prediction.ts` | Local pending actions, generation/sequence correlation and confirmation timings |
 | `src/coop/client.ts` | Identity bootstrap, WebSocket/rejoin/backoff, counters and semantic reports |
 | `src/coop/authority.ts` | Physical sensors and accepted-state adapter; never evaluates shared outputs |
 | `src/coop/pairing-bay.ts` | Hand-authored chamber geometry and per-slot spawn/checkpoint positions |
@@ -187,7 +191,9 @@ and the validated five-input/seven-output UPLINK contract remain untouched.
 
 There is one cube entity. The server owns `holder` and `physicsAuthority`;
 clients request interactions without choosing a slot. Holder means carrying;
-physics authority means the one browser allowed to advance and publish the body.
+physics authority means the one browser allowed to publish the shared body. A
+pending local interaction may advance a temporary predicted presentation, which
+cannot publish snapshots or semantic contact until confirmed.
 
 | Event | Accepted result |
 | --- | --- |
@@ -210,9 +216,9 @@ after release. Reset/death requests a holder drop before moving the avatar back
 to its checkpoint. Loose cubes reaching a hazard return to the authored spawn
 through the same authority's existing recovery physics.
 
-Clients never predict successful pickup/drop or start pull forces before grant.
-Ordinary contested/stale cube requests receive a nonfatal `cube-denied`; the
-session stays connected. The old authority stops on the accepted room update;
+Clients predict local pickup/drop and pull startup while awaiting explicit
+`action-result` confirmation. Contested/stale requests are ordinary rollback,
+not session errors (the compatibility `cube-denied` notification is also retained). The old authority stops on the accepted room update;
 its in-flight snapshots are already rejected by the server's new epoch. No two
 accepted streams advance the shared body. Transfer starts from the most recent
 accepted transform, retaining velocity for a loose body. A disconnected holder
@@ -223,7 +229,7 @@ The authority sends at most 20 snapshots/second using a cube-specific sequence
 and epoch, independent of avatar traffic. The server retains and forwards the
 latest valid transform without simulating physics or writing it to disk. A
 replica interpolates 100 ms behind, with at most 12 samples, no extrapolation and
-no independent integration. Epoch changes and discontinuities over 300 units
+no independent integration outside a pending local prediction. Epoch changes and discontinuities over 300 units
 snap. An interpolated falling cube is not marked grounded before landing. A
 remote carried cube follows the same interpolated avatar using the existing
 carry offset; its holder is always server-owned. Only a resting uncarried cube
@@ -244,6 +250,50 @@ sequence, bounds, interaction availability and puzzle phase; it does not verify
 proximity against server physics. A modified authority client could lie about
 its own cube motion or cargo contact. Normal input checks use the existing reach,
 range, support and pull limits. This is not anti-cheat or lockstep physics.
+
+## Local prediction and reconciliation
+
+Pickup attaches the local cube at the existing carry offset immediately. Drop
+detaches at the existing collision-checked drop transform and starts loose motion.
+Pull startup shows the rope and uses the existing bounded pull forces immediately;
+release stops those forces locally, even if its start grant is still pending. A
+late start grant is followed by an epoch-correct stop request. The confirmed pull
+lock remains exclusive. Each browser has one local cube action pending at a time;
+additional E/click requests wait until it resolves.
+
+`LocalPrediction` is separate from `SharedRoom`. A pending action records kind,
+semantic sequence, source epoch, connection generation, prediction time and send
+time. The server returns `{type: "action-result", seq, accepted, room}` to the
+requester before broadcasting the room. It also acknowledges no-op switch and
+cargo requests. Matching confirmation clears the pending flag while retaining
+valid local motion; it does not reset the cube to the older request transform.
+Denial clears pending carry/pull and restores the latest accepted replica/holder.
+Ownership disagreement snaps instead of smoothing the cube through geometry.
+An unrelated room message alone cannot confirm a prediction. Old sequences and
+old socket generations cannot resolve a new action. Disconnect, leave and rejoin
+clear pending feedback; the reconnect snapshot establishes truth afresh.
+
+**No cube transforms or cargo reports are published while a cube action is
+pending**, including when its requester was already the simulator. A losing
+request therefore cannot overwrite the winner's cube. The first accepted server
+mutation still wins simultaneous pickup; both browsers may briefly show local
+carry, but only one is confirmed and allowed to publish. Partners otherwise see
+only accepted state, using the existing interpolation buffer.
+
+Switch B predicts its local switch and return bridge plus one switch cue. Its
+confirmed latch/checkpoint remain unchanged until the durable acknowledgment.
+Cube requests and final plate reports still check confirmed B; exit reports
+still check confirmed unlock. A predicted bridge cannot grant those semantic
+rights. On denial, the bridge returns to the accepted state.
+
+Cargo contact can depress/light/sound the plate immediately on the confirmed
+simulator, including a pending drop by that simulator. This presentation uses
+`cargoPlateActive`, independently of accepted controller inputs. `finalAccess`
+remains server-only and becomes solid only after durable cargo confirmation.
+Predicted pickup/drop sounds play once locally; confirmation preserves the audio
+baseline. Ownership rollback suppresses a contradictory pickup/drop cue. Remote
+players hear the normal accepted transitions. Pull audio follows local actual
+pull activity; denied/released pulls stop it.
 
 ## Protocol, revisions and limits
 
@@ -266,7 +316,8 @@ Client messages are JSON discriminated by `type`:
 Server messages: `snapshot` (assigned slot and full room), `room` (full accepted
 state at a newer revision), `avatar` (server-owned slot, stream ID, sequence and
 bounded visual snapshot), `cube` (accepted epoch/sequence/transform),
-`cube-denied` (rejected interaction sequence), `error` (public code/message) and
+`action-result` (request sequence, acceptance and full accepted room),
+`cube-denied` (compatibility rejection notification), `error` (public code/message) and
 `pong`. Full room
 state includes level, code, revision, assigned/connected slots, inputs, outputs,
 `exitUnlocked`, both `reachedExit` flags, checkpoint, completion, `cubePlacement`
@@ -274,14 +325,27 @@ and ephemeral cube holder, authority, pull lock, epoch, sequence and latest
 transform (null until first publication after load). Other visitors' UUIDs are
 never broadcast.
 
-Every accepted shared mutation increments the durable room revision. Writes
-complete before its revision is acknowledged/broadcast. On close, the body is
-removed immediately from in-memory logic, then the durable updated revision is
-broadcast. A storage failure closes room connections rather than acknowledge
-unsaved changes. Clients apply ordinary room updates only when their code matches
-and revision increases. A new connection's initial snapshot establishes its
-baseline; missed messages are never replayed. Semantic sequence numbers are
-per-socket and independent of room revisions; stale reports are rejected.
+Every accepted shared mutation increments the **live** room revision. Body plate
+occupancy, cube ownership/pull state, disconnect and existing-visitor reconnect
+broadcast without filesystem writes. The existing serial semantic queue is
+retained, so an ephemeral operation can still wait behind an earlier durable
+operation; it does not add a write of its own. Transform traffic bypasses it.
+
+A mutation that changes B/checkpoint, semantic cargo placement, exit unlock,
+arrivals or completion writes atomically before acknowledgment/broadcast. Room
+creation, slot reservation and legacy migration also save before acknowledgment.
+A storage failure still closes the room rather than acknowledge unsaved progress.
+An ownership change that removes docked cargo therefore waits for that semantic
+placement write; prediction hides it locally.
+
+The version-3 record's existing `revision` stores the last durably acknowledged
+live revision. Ephemeral revisions are not saved by themselves. No schema bump
+is needed. Restart/unload may restore a lower live baseline than the last
+ephemeral update; a new socket's initial snapshot explicitly resets that baseline.
+Within a connection, clients reject ordinary room updates with another code or a
+non-increasing revision. Action results may resolve pending actions at an equal
+revision (denial/no-op), but never replace newer room truth. Cube snapshot epoch
+and sequence ordering remain independent. Semantic sequences remain per socket.
 
 Avatar movement and cube transforms each send at up to 20 Hz, are forwarded only
 to the partner, and never enter
@@ -318,11 +382,12 @@ mode 0600 and acknowledgement after durability, under the single-writer model.
 
 A room record stores version, code, level, revision, the two visitor assignments,
 B latch, checkpoint, `exitUnlocked`, both semantic `reachedExit` flags, completion,
-`cubePlacement: "spawn" | "cargoPlate"`, and creation/update timestamps. Even
-momentary ownership/body-plate changes write only this revised logical record:
+`cubePlacement: "spawn" | "cargoPlate"`, and creation/update timestamps.
+Momentary ownership/body-plate changes do not write this record:
 **no raw transform, velocity, holder, physics authority, pull flag, epoch, sequence,
 body-plate occupancy, connection or interpolation data is saved**. Avatar and
-cube snapshots alone cause no writes. `spawn` also represents arbitrary loose or
+cube snapshots, ordinary ownership/pull transitions and momentary body occupancy
+cause no writes unless they also change durable progression. `spawn` also represents arbitrary loose or
 carried motion; a process restart restores that cube at (1190,538). A docked cube
 restores at cargo centre (1310,538), immediately holding cargo power. Holder is
 always null after process restart, and the first connected slot gets authority.
@@ -364,15 +429,19 @@ connected slots, revision, accepted inputs/outputs, server-message age, traffic
 counters, consecutive reconnect attempts, remote-snapshot age, checkpoint,
 exit unlock, each arrival and completion. Cube diagnostics add holder, physics
 authority, epoch, snapshot age, semantic placement/cargo input, whether this
-client owns physics, and sent/received cube snapshot counters.
+client owns confirmed physics, and sent/received cube snapshot counters.
+`pendingCubeAction`, `predictedHolder` and `pendingSwitch` are explicitly local.
+`interactionTimings` retains the latest result per action with prediction/send
+time, confirmation or denial receive time, accepted flag and RTT in milliseconds.
+These are development diagnostics only, not normal HUD or persistent state.
 Normal HUD omits these diagnostics. Connection confirmation uses an existing cue.
-Cube pickup/drop and plate/code/bridge/door/switch sounds observe applied
-authoritative transitions;
-reporting local intent does not play the same shared sound again. Rejoin creates
+Cube pickup/drop, local cargo contact and Switch B feedback can observe predicted
+transitions. Matching server confirmation never plays them again; partners hear
+the accepted transitions. Rejoin creates
 a silent machinery baseline and only plays connection confirmation. Permanent
 unlock plays the existing door cue once; leaving plates cannot replay or reverse
 it. First arrival uses a quiet latch confirmation; the second arrival plays the
-completion cue. All come from newly applied authoritative transitions.
+completion cue. Unlock/arrival/completion feedback remains authoritative.
 
 ## Running and validation
 
@@ -453,12 +522,59 @@ removes the output mute. Follow AGENTS.md: targeted tests during iteration, then
 one complete relevant milestone validation when stable. C8 evidence, persistence,
 both CONTROL SPINE routes and existing audio checks remain part of that gate.
 
+## Responsiveness validation (2026-10-06)
+
+For delayed semantic handling on a temporary test server:
+
+```sh
+BN_TEST_TLS=1 BN_TEST_SEMANTIC_DELAY_MS=200 pnpm check:multiplayer
+# Or run a development server with the test-only injection explicitly enabled:
+NODE_ENV=test BN_TEST_SEMANTIC_DELAY_MS=100 DATA_DIR=.local-data pnpm dev
+```
+
+The application reads this delay only under `NODE_ENV=test`; it is clamped to
+0–1000 ms. Each semantic request gets an arrival deadline, so queued requests do
+not each add another artificial sleep. Avatar/cube snapshots bypass the delay.
+`attachMultiplayer` also accepts an optional `onActionTiming` observer for tests:
+action type, queue delay, persistence duration, total time through broadcast, and
+whether the operation was durable. Production emits no per-frame timing logs.
+F1 client RTT measures request/confirmation including network and queue time; the
+server callback separates queue and volume costs when diagnosing locally.
+
+Stable milestone evidence:
+
+- Typecheck and production build pass; the pinned UPLINK evidence hash is unchanged.
+- 248 unit/server tests pass with three conditional skips. This includes 100/200 ms
+  semantic-delay tests, exact disk-content checks for ephemeral mutations, durable
+  storage failure, actual SIGKILL recovery, stale generation/sequence replies,
+  prediction publication gates, and seamless/silent confirmation or rollback.
+- All 115 C8 browser checks and three live HTTP/WebSocket specs pass; browser
+  audio stays muted, campaign saves and both CONTROL SPINE routes remain healthy.
+- All 135 real two-context HTTPS/WSS checks pass with 200 ms injected delay. Both
+  pickup race orders, immediate feedback, post-race handoff, pending disconnect,
+  carrying reconnect, docked-cargo restart and both physical exits pass.
+- Observed control-to-local-feedback time was 25–33 ms; cube action confirmation
+  RTT was 204–222 ms in this run. Switch-to-remote-bridge observation was 237–241 ms.
+  These are localhost CDP observations under injected delay, **not Fly measurements**.
+- The first full unit run in the working directory hit a Vite shutdown timeout:
+  its filesystem watcher stalled on `lstat(Workspace)` while SMB was unavailable.
+  The unchanged suite passed against an identical local source copy without that
+  network mount. No timeout/assertion was weakened; Vite configuration is unchanged.
+
+Logs are retained as `docs/playtest/pairing-responsiveness-*`. The browser
+route uses real controls and read-only snapshots, and remains muted by default.
+A reconnect regression found during this pass is covered explicitly: a prior
+successful prediction must not suppress semantic cargo reconstruction in a new
+world. Gameplay geometry, grapple tuning and durable room schema are unchanged.
+
 ## Limits and next acceptance step
 
-The pre-cube architecture has been accepted on two physical computers. Stop here
-for manual acceptance of the cube extension after an authorized deployment. Test
-both ownership directions, contested E/click input, cargo removal/recovery and
-carrier refresh under real network latency. Automated local HTTPS/WSS checks do
+The shared-cube architecture has been accepted on two physical computers. Stop
+for manual acceptance of responsiveness after an authorized deployment: repeat
+pickup/drop, handoff, simultaneous pickup, pull, Switch B and cargo contact on two
+physical computers. Record typical Fly confirmation RTT from F1 alongside the
+subjective local feel. Partner feedback still includes network/interpolation
+delay; final cargo access intentionally waits for durable confirmation. Automated local HTTPS/WSS checks do
 not replace that human acceptance. Fly auto-stop timing and touch multiplayer
 remain unmeasured; Vite's existing retained-evidence chunk-size advisory remains.
 
