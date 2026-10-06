@@ -31,6 +31,7 @@ async function launch(): Promise<{
                 "--disable-gpu",
                 "--no-sandbox",
                 "--no-first-run",
+                ...(process.env.BN_TEST_AUDIO === '1' ? [] : ['--mute-audio']),
                 `--remote-debugging-port=${PORT}`,
                 `--user-data-dir=${profile}`,
                 "--window-size=1600,900",

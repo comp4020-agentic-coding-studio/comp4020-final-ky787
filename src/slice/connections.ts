@@ -38,13 +38,17 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
         }
         add('exit-feed', 'cubeOnPlateC', 'exitDoor', [node, ...trunk, { x: r.exit.x + r.exit.w / 2, y: 40 }, { x: r.exit.x + r.exit.w / 2, y: r.exit.y }]);
     } else {
-        if (r.id === 'relay' || r.id === 'pairing-bay') for (const p of r.platforms.filter(p => p.signal && p.signal !== 'grappleAnchor'))
+        if (r.id === 'relay' || r.id === 'pairing-bay') for (const p of r.platforms.filter(p => p.signal && p.signal !== 'grappleAnchor' && p.id !== 'final-access'))
             add(`switch-${p.id}`, 'switchB', p.signal!, elbow(above(r.lever!), { x: p.x + p.w / 2, y: p.y }, r.lever!.y - 65));
         const control = r.plateB ?? r.plate ?? r.lever!;
         add('exit-feed', r.plateB ? 'plateB' : r.plate ? 'plateA' : 'switchB', 'exitDoor',
             elbow(above(control), { x: r.exit.x + r.exit.w / 2, y: r.exit.y }, control.y - 85));
         if (r.id === 'pairing-bay') add('exit-right-feed', 'plateC', 'exitDoor',
             elbow(above(r.plateC!), { x: r.exit.x + r.exit.w / 2, y: r.exit.y }, r.plateC!.y - 60));
+        if (r.cargoPlate) {
+            const access = r.platforms.find(p => p.id === 'final-access')!;
+            add('cargo-feed', 'cubeOnPlate', 'codePlatformA', elbow(above(r.cargoPlate), { x: access.x, y: access.y + 12 }, r.cargoPlate.y - 65));
+        }
     }
     return wires;
 }

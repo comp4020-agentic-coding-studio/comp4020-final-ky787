@@ -3,6 +3,14 @@ export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
 export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | null;
+export interface CubeTransform { x: number; y: number; vx: number; vy: number; grounded: boolean }
+export type CubePlacement = 'spawn' | 'cargoPlate';
+/** Ephemeral server arbitration, separate from both body reports and durable placement. */
+export interface SharedCube {
+    holder: Slot | null; physicsAuthority: Slot | null; pulling: boolean;
+    epoch: number; seq: number; transform: CubeTransform | null;
+}
+export type CubeAction = 'cube-pickup' | 'cube-pull-start' | 'cube-pull-stop';
 export interface Avatar {
     x: number; y: number; vx: number; vy: number;
     facing: -1 | 1; grounded: boolean;
@@ -14,8 +22,10 @@ export interface SharedRoom {
     revision: number;
     assigned: [boolean, boolean];
     connected: [boolean, boolean];
-    inputs: { plateAOccupied: boolean; switchB: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
-    outputs: { grappleAnchor: boolean; returnBridge: boolean; exitDoor: boolean };
+    inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnCargoPlate: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
+    outputs: { grappleAnchor: boolean; returnBridge: boolean; finalAccess: boolean; exitDoor: boolean };
+    cube: SharedCube;
+    cubePlacement: CubePlacement;
     checkpoint: 'entry' | 'reunion';
     exitUnlocked: boolean;
     reachedExit: [boolean, boolean];
@@ -25,6 +35,10 @@ export type ClientMessage =
     | { type: 'create' }
     | { type: 'join'; code: string }
     | { type: 'avatar'; seq: number; avatar: Avatar }
+    | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform }
+    | { type: CubeAction; seq: number; epoch: number }
+    | { type: 'cube-drop'; seq: number; epoch: number; transform: CubeTransform }
+    | { type: 'cube-occupancy'; seq: number; epoch: number; cargo: boolean }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
     | { type: 'exit'; seq: number }
@@ -34,6 +48,8 @@ export type ServerMessage =
     | { type: 'snapshot'; slot: Slot; room: SharedRoom }
     | { type: 'room'; room: SharedRoom }
     | { type: 'avatar'; slot: Slot; stream: number; seq: number; avatar: Avatar }
+    | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform }
+    | { type: 'cube-denied'; seq: number }
     | { type: 'error'; code: string; message: string }
     | { type: 'pong' };
 export function normalizeCode(value: string): string | null {
@@ -44,6 +60,11 @@ const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v ===
 const keys = (v: Record<string, unknown>, names: string[]) => Object.keys(v).length === names.length && names.every(k => Object.hasOwn(v, k));
 const number = (v: unknown, limit: number) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= limit;
 const sequence = (v: unknown) => Number.isSafeInteger(v) && (v as number) >= 0;
+export function validCubeTransform(v: unknown): v is CubeTransform {
+    return object(v) && keys(v, ['x', 'y', 'vx', 'vy', 'grounded'])
+        && number(v.x, 10000) && number(v.y, 10000) && number(v.vx, 2000) && number(v.vy, 2000)
+        && typeof v.grounded === 'boolean';
+}
 export function validAvatar(v: unknown): v is Avatar {
     return object(v) && keys(v, ['x', 'y', 'vx', 'vy', 'facing', 'grounded', 'rope'])
         && number(v.x, 10000) && number(v.y, 10000) && number(v.vx, 2000) && number(v.vy, 2000)
@@ -52,12 +73,19 @@ export function validAvatar(v: unknown): v is Avatar {
 }
 /** Strict keys also reject attempts to inject slot, visitor, outputs or revisions. */
 export function parseClientMessage(raw: string): ClientMessage | null {
+    if (raw.length > 2048) return null;
     let v: unknown;
     try { v = JSON.parse(raw); } catch { return null; }
     if (!object(v)) return null;
     if (['create', 'leave', 'ping'].includes(v.type as string) && keys(v, ['type'])) return v as ClientMessage;
     if (v.type === 'join' && keys(v, ['type', 'code']) && typeof v.code === 'string' && v.code.length <= 32) return v as ClientMessage;
     if (v.type === 'avatar' && keys(v, ['type', 'seq', 'avatar']) && sequence(v.seq) && validAvatar(v.avatar)) return v as ClientMessage;
+    if ((v.type === 'cube' || v.type === 'cube-drop') && keys(v, ['type', 'seq', 'epoch', 'transform'])
+        && sequence(v.seq) && sequence(v.epoch) && validCubeTransform(v.transform)) return v as ClientMessage;
+    if (['cube-pickup', 'cube-pull-start', 'cube-pull-stop'].includes(v.type as string)
+        && keys(v, ['type', 'seq', 'epoch']) && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
+    if (v.type === 'cube-occupancy' && keys(v, ['type', 'seq', 'epoch', 'cargo'])
+        && sequence(v.seq) && sequence(v.epoch) && typeof v.cargo === 'boolean') return v as ClientMessage;
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
         && [null, 'plateA', 'finalLeft', 'finalRight'].includes(v.plate as Plate)) return v as ClientMessage;
     if ((v.type === 'switch' || v.type === 'exit') && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;

@@ -129,6 +129,8 @@ it.each([1, 2] as const)('slot %s on the left unlocks with its partner; both dis
     send(0, { type: 'exit' }); expect((await p1.wait('error')).code).toBe('INVALID_ACTION');
     send(1, { type: 'occupancy', plate: 'finalLeft' }); expect((await p2.wait('error')).code).toBe('INVALID_ACTION');
     send(0, { type: 'switch' }); let latest = (await p2.wait('room', m => m.room.inputs.switchB)).room;
+    send(0, { type: 'cube-occupancy', epoch: latest.cube.epoch, cargo: true });
+    latest = (await p2.wait('room', m => m.room.inputs.cubeOnCargoPlate)).room;
     // One connected body alternating plates can never supply two simultaneous inputs.
     for (const plate of ['finalLeft', 'finalRight', 'finalLeft', 'finalRight', null] as const) {
         send(0, { type: 'occupancy', plate });
@@ -175,8 +177,10 @@ it('persists logical state across SIGKILL/restart with no movement or occupancy,
     expect(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8')).toBe(stationaryRecord);
     p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); await p2.wait('room', m => m.room.outputs.grappleAnchor);
     p2.send({ type: 'switch', seq: 1 }); const before = await p1.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'cube-occupancy', seq: 2, epoch: before.room.cube.epoch, cargo: true });
+    await p2.wait('room', m => m.room.inputs.cubeOnCargoPlate);
     const disk = JSON.parse(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8'));
-    expect(Object.keys(disk).sort()).toEqual(['version', 'code', 'level', 'revision', 'visitors', 'switchB', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
+    expect(Object.keys(disk).sort()).toEqual(['version', 'cubePlacement', 'code', 'level', 'revision', 'visitors', 'switchB', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
     expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.checkpoint).toBe('reunion');
     await kill(app.child); const restarted = await launch(dir);
     const rejoined = await connect(restarted.url, a.cookie); rejoined.send({ type: 'join', code });
@@ -231,7 +235,7 @@ it.each([false, true])('migrates a version-1 room (old completion %s) into unloc
     p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
     await kill(app.child);
     const path = join(dir, 'rooms', `${code}.json`), legacy = JSON.parse(await readFile(path, 'utf8'));
-    legacy.version = 1; legacy.completed = completed; delete legacy.exitUnlocked; delete legacy.reachedExit;
+    legacy.version = 1; legacy.completed = completed; delete legacy.exitUnlocked; delete legacy.reachedExit; delete legacy.cubePlacement;
     await writeFile(path, JSON.stringify(legacy));
     const restarted = await launch(dir), returning = await connect(restarted.url, a.cookie);
     returning.send({ type: 'join', code }); const migrated = (await returning.wait('snapshot')).room;
@@ -239,7 +243,7 @@ it.each([false, true])('migrates a version-1 room (old completion %s) into unloc
     expect(migrated.completed).toBe(false); expect(migrated.reachedExit).toEqual([false, false]);
     expect(migrated.outputs.returnBridge).toBe(true); expect(migrated.checkpoint).toBe('reunion');
     const disk = JSON.parse(await readFile(path, 'utf8'));
-    expect(disk.version).toBe(2); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
+    expect(disk.version).toBe(3); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
     expect(disk.revision).toBeGreaterThan(legacy.revision);
 });
 
@@ -279,4 +283,155 @@ it('smooths remote presentation, ignores stale frames and resets new streams wit
     remote.push({ ...avatar, x: 0 }, 1, 1, 1150); expect(remote.sample(1150)!.x).toBe(250);
     remote.push({ ...avatar, x: 1050 }, 2, 0, 1200); expect(remote.sample(1200)!.x).toBe(1050);
     remote.clear(); expect(remote.sample(1500)).toBeNull();
+});
+
+const cubeTransform = { x: 1240, y: 490, vx: 55, vy: 80, grounded: false };
+it.each([1, 2] as const)('serializes socket pickup races with slot %s first, then drops and hands off without ending the loser session', async firstSlot => {
+    const { p1, p2, first } = await pair(), peers = [p1, p2];
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    const winner = peers[firstSlot - 1], loser = peers[2 - firstSlot];
+    winner.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
+    // Awaiting acceptance establishes deterministic socket order; pure arbitration also tests same-epoch races.
+    const held = (await loser.wait('room', m => m.room.cube.holder === firstSlot)).room;
+    loser.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
+    expect((await loser.wait('cube-denied')).seq).toBe(2);
+    loser.send({ type: 'cube-drop', seq: 3, epoch: held.cube.epoch, transform: cubeTransform });
+    expect((await loser.wait('cube-denied')).seq).toBe(3);
+    winner.send({ type: 'cube-drop', seq: 3, epoch: held.cube.epoch, transform: cubeTransform });
+    const dropped = (await loser.wait('room', m => m.room.revision > held.revision && m.room.cube.holder === null)).room;
+    expect(dropped.cube.physicsAuthority).toBe(firstSlot); expect(dropped.cube.transform).toEqual(cubeTransform);
+    loser.send({ type: 'cube-pickup', seq: 4, epoch: dropped.cube.epoch });
+    const handoff = (await winner.wait('room', m => m.room.cube.holder === 3 - firstSlot)).room;
+    expect(handoff.cube.physicsAuthority).toBe(3 - firstSlot); expect(handoff.connected).toEqual([true, true]);
+});
+
+it('accepts exactly one holder when both sockets send pickup in the same turn', async () => {
+    const { p1, p2, first } = await pair();
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    for (const p of [p1, p2]) p.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
+    const a = (await p1.wait('room', m => m.room.cube.holder !== null)).room;
+    const b = (await p2.wait('room', m => m.room.cube.holder !== null)).room;
+    expect(a.cube).toEqual(b.cube); expect([1, 2]).toContain(a.cube.holder);
+    await (a.cube.holder === 1 ? p2 : p1).wait('cube-denied');
+});
+
+it('forwards only the current cube stream, arbitrates competing pulls, and never persists snapshot traffic', async () => {
+    const { dir, code, p1, p2, first } = await pair();
+    let epoch = first.room.cube.epoch;
+    const path = join(dir, 'rooms', `${code}.json`), before = await readFile(path, 'utf8');
+    for (let seq = 1; seq <= 20; seq++) p1.send({ type: 'cube', epoch, seq, transform: { ...cubeTransform, x: 1200 + seq } });
+    const last = await p2.wait('cube', m => m.seq === 20); expect(last.transform.x).toBe(1220);
+    expect(await readFile(path, 'utf8')).toBe(before);
+    p1.send({ type: 'cube', epoch, seq: 19, transform: cubeTransform });
+    p2.send({ type: 'cube', epoch, seq: 21, transform: cubeTransform });
+    p1.send({ type: 'switch', seq: 1 }); const switched = (await p1.wait('room', m => m.room.inputs.switchB)).room;
+    expect(switched.cube.seq).toBe(20); expect(switched.cube.transform).toEqual(last.transform);
+    p2.send({ type: 'cube-pull-start', seq: 1, epoch });
+    const pulling = (await p1.wait('room', m => m.room.cube.pulling)).room;
+    expect(pulling.cube.physicsAuthority).toBe(2); expect(pulling.cube.transform).toEqual(last.transform);
+    p1.send({ type: 'cube', epoch, seq: 999, transform: cubeTransform });
+    epoch = pulling.cube.epoch;
+    p1.send({ type: 'cube-pull-start', seq: 2, epoch }); await p1.wait('cube-denied');
+    p1.send({ type: 'cube-occupancy', seq: 3, epoch, cargo: true }); await p1.wait('cube-denied');
+    p2.send({ type: 'cube', seq: 1, epoch, transform: cubeTransform }); await p1.wait('cube', m => m.epoch === epoch);
+    p2.send({ type: 'cube-pull-stop', seq: 2, epoch });
+    const stopped = (await p1.wait('room', m => m.room.revision > pulling.revision && !m.room.cube.pulling)).room;
+    expect(stopped.cube.physicsAuthority).toBe(2); expect(stopped.cube.transform).toEqual(cubeTransform);
+    p2.send({ type: 'cube-occupancy', seq: 3, epoch, cargo: true });
+    for (const p of [p1, p2]) expect((await p.wait('room', m => m.room.inputs.cubeOnCargoPlate)).room.outputs.finalAccess).toBe(true);
+    p2.send({ type: 'cube-occupancy', seq: 4, epoch, cargo: false });
+    expect((await p1.wait('room', m => m.room.revision > stopped.revision + 1)).room.outputs.finalAccess).toBe(false);
+});
+
+it.each([false, true])('transfers disconnected cube authority (carried %s), retaining motion and rejecting old epochs on rejoin', async carried => {
+    const { app, code, a, b, p1, p2, first } = await pair();
+    let epoch = first.room.cube.epoch;
+    // Non-authority disconnect does not revoke or move the cube.
+    await p2.close(); const absent = (await p1.wait('room', m => !m.room.connected[1])).room;
+    expect(absent.cube.epoch).toBe(epoch); expect(absent.cube.physicsAuthority).toBe(1);
+    const partner = await connect(app.url, b.cookie); partner.send({ type: 'join', code }); await partner.wait('snapshot');
+    p1.send({ type: 'switch', seq: 1 }); await partner.wait('room', m => m.room.inputs.switchB);
+    if (carried) {
+        p1.send({ type: 'cube-pickup', seq: 2, epoch });
+        epoch = (await partner.wait('room', m => m.room.cube.holder === 1)).room.cube.epoch;
+    }
+    p1.send({ type: 'cube', seq: 12, epoch, transform: cubeTransform }); await partner.wait('cube', m => m.seq === 12);
+    await p1.close(); const transferred = (await partner.wait('room', m => !m.room.connected[0])).room;
+    expect(transferred.cube.holder).toBeNull(); expect(transferred.cube.physicsAuthority).toBe(2);
+    expect(transferred.cube.transform).toEqual(cubeTransform); expect(transferred.cube.epoch).toBeGreaterThan(epoch);
+    const back = await connect(app.url, a.cookie); back.send({ type: 'join', code }); const returned = (await back.wait('snapshot')).room;
+    expect(returned.cube).toEqual(transferred.cube);
+    back.send({ type: 'cube', seq: 999, epoch, transform: { ...cubeTransform, x: 999 } });
+    back.send({ type: 'cube-pickup', seq: 1, epoch }); await back.wait('cube-denied');
+    partner.send({ type: 'cube', seq: 1, epoch: returned.cube.epoch, transform: { ...cubeTransform, x: 1300 } });
+    expect((await back.wait('cube', m => m.epoch === returned.cube.epoch)).transform.x).toBe(1300);
+    await back.close(); await partner.close();
+    const alone = await connect(app.url, a.cookie); alone.send({ type: 'join', code });
+    const resting = (await alone.wait('snapshot')).room;
+    expect(resting.cube.transform?.x).toBe(1300); expect(resting.cube.holder).toBeNull(); expect(resting.cube.physicsAuthority).toBe(1);
+});
+
+it.each(['spawn', 'cargoPlate'] as const)('restores %s semantically after SIGKILL, with no raw cube state on disk', async placement => {
+    const { dir, app, a, p1, p2, code, first } = await pair();
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    let epoch = first.room.cube.epoch;
+    if (placement === 'spawn') {
+        p1.send({ type: 'cube-pickup', seq: 2, epoch }); epoch = (await p2.wait('room', m => m.room.cube.holder === 1)).room.cube.epoch;
+    }
+    p1.send({ type: 'cube', seq: 1, epoch, transform: cubeTransform }); await p2.wait('cube');
+    if (placement === 'cargoPlate') {
+        p1.send({ type: 'cube-occupancy', seq: 2, epoch, cargo: true }); await p2.wait('room', m => m.room.inputs.cubeOnCargoPlate);
+    }
+    const disk = JSON.parse(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8'));
+    expect(disk.cubePlacement).toBe(placement);
+    for (const key of ['cube', 'transform', 'x', 'y', 'vx', 'vy', 'holder', 'physicsAuthority', 'epoch', 'pulling']) expect(disk).not.toHaveProperty(key);
+    await kill(app.child); const restarted = await launch(dir), back = await connect(restarted.url, a.cookie);
+    back.send({ type: 'join', code }); const restored = (await back.wait('snapshot')).room;
+    expect(restored.cubePlacement).toBe(placement); expect(restored.outputs.finalAccess).toBe(placement === 'cargoPlate');
+    expect(restored.cube.transform).toBeNull(); expect(restored.cube.holder).toBeNull(); expect(restored.cube.physicsAuthority).toBe(1);
+});
+
+it('writes migrated version-2 progress without losing existing unlock or arrival credit', async () => {
+    const { dir, app, a, p1, p2, code } = await pair();
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB); await kill(app.child);
+    const path = join(dir, 'rooms', `${code}.json`), legacy = JSON.parse(await readFile(path, 'utf8'));
+    legacy.version = 2; delete legacy.cubePlacement; legacy.exitUnlocked = true; legacy.reachedExit = [true, false];
+    await writeFile(path, JSON.stringify(legacy));
+    const restarted = await launch(dir), back = await connect(restarted.url, a.cookie); back.send({ type: 'join', code });
+    const restored = (await back.wait('snapshot')).room;
+    expect(restored.exitUnlocked).toBe(true); expect(restored.reachedExit).toEqual([true, false]); expect(restored.cubePlacement).toBe('spawn');
+    expect(JSON.parse(await readFile(path, 'utf8')).version).toBe(3);
+});
+
+it('requires cargo as well as two bodies for unlock, then keeps the exit unlocked when cargo is removed', async () => {
+    const { p1, p2, first } = await pair(), epoch = first.room.cube.epoch;
+    p1.send({ type: 'cube-pickup', seq: 1, epoch }); await p1.wait('cube-denied');
+    p1.send({ type: 'switch', seq: 2 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'occupancy', seq: 3, plate: 'finalLeft' });
+    p2.send({ type: 'occupancy', seq: 1, plate: 'finalRight' });
+    const waiting = (await p1.wait('room', m => m.room.inputs.finalPlateLeftOccupied && m.room.inputs.finalPlateRightOccupied)).room;
+    expect(waiting.exitUnlocked).toBe(false); expect(waiting.outputs.finalAccess).toBe(false);
+    p2.send({ type: 'cube-occupancy', seq: 2, epoch, cargo: true }); await p2.wait('cube-denied');
+    p1.send({ type: 'cube-occupancy', seq: 4, epoch, cargo: true });
+    const unlocked = (await p2.wait('room', m => m.room.exitUnlocked)).room;
+    expect(unlocked.outputs.finalAccess).toBe(true); expect(unlocked.completed).toBe(false);
+    p1.send({ type: 'cube-occupancy', seq: 5, epoch, cargo: false });
+    const removed = (await p2.wait('room', m => m.room.revision > unlocked.revision)).room;
+    expect(removed.outputs.finalAccess).toBe(false); expect(removed.exitUnlocked).toBe(true);
+});
+
+it('replacing a carrying socket releases to its partner before stale old-socket messages can act', async () => {
+    const { app, a, p1, p2, first, code } = await pair();
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
+    const held = (await p2.wait('room', m => m.room.cube.holder === 1)).room;
+    p1.send({ type: 'cube', epoch: held.cube.epoch, seq: 1, transform: cubeTransform }); await p2.wait('cube');
+    const replacement = await connect(app.url, a.cookie); replacement.send({ type: 'join', code });
+    const released = (await replacement.wait('snapshot')).room;
+    expect(released.cube.holder).toBeNull(); expect(released.cube.physicsAuthority).toBe(2);
+    expect(released.cube.transform).toEqual(cubeTransform); expect(released.cube.epoch).toBeGreaterThan(held.cube.epoch);
+    expect((await p1.wait('error')).code).toBe('SESSION_REPLACED');
+    replacement.send({ type: 'cube', epoch: held.cube.epoch, seq: 99, transform: { ...cubeTransform, x: 0 } });
+    replacement.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
+    expect((await p2.wait('room', m => m.room.inputs.plateAOccupied)).room.cube.transform).toEqual(cubeTransform);
 });

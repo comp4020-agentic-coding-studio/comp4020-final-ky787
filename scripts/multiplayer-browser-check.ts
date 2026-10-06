@@ -98,6 +98,7 @@ async function launchBrowser(): Promise<string> {
     const profile = join(temporary, 'chrome');
     for (const executable of [process.env.BROWSER_BIN, 'chromium', 'chromium-browser', 'google-chrome', 'brave-browser'].filter(Boolean) as string[]) {
         browser = spawn(executable, ['--headless', '--no-sandbox', '--disable-gpu', '--no-first-run', '--remote-debugging-port=0',
+            ...(process.env.BN_TEST_AUDIO === '1' ? [] : ['--mute-audio']),
             ...(process.env.BN_TEST_TLS ? ['--ignore-certificate-errors'] : []),
             '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows',
             `--user-data-dir=${profile}`, '--window-size=1600,900', 'about:blank'], { stdio: 'ignore' });
@@ -160,6 +161,23 @@ async function mouse(p: Cdp, x: number, y: number, down: boolean) {
     await p.send('Input.dispatchMouseEvent', { type: down ? 'mousePressed' : 'mouseReleased', ...at, button: 'left', buttons: down ? 1 : 0, clickCount: 1 });
 }
 async function shot(p: Cdp, name: string) { const data = await p.send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(shots, shotPrefix + name + '.png'), Buffer.from(data.data, 'base64')); }
+async function finalAccess(p: Cdp) {
+    // The resting cargo is an ordinary solid cube; jump over it onto the powered step.
+    await walk(p, 1200); await walk(p, (await snapshot(p)).cube!.x - 50);
+    await key(p, 'KeyD', true); await key(p, 'Space', true);
+    try { await wait(p, 'hop past docked cargo', s => s.player.x > 1440); }
+    finally { await key(p, 'KeyD', false); await key(p, 'Space', false); }
+    const landing = await wait(p, 'land after cargo hop', s => s.player.grounded);
+    if (landing.player.groundId !== 'final-access') {
+        await sleep(80); await key(p, 'Space', true);
+        try { await wait(p, 'land on cargo access step', s => s.player.grounded && s.player.groundId === 'final-access'); }
+        finally { await key(p, 'Space', false); }
+    }
+    await sleep(80);
+    await key(p, 'KeyD', true); await key(p, 'Space', true);
+    try { await wait(p, 'land on final deck', s => s.player.x > 1630 && s.player.grounded && s.player.groundId === 'final-deck'); }
+    finally { await key(p, 'KeyD', false); await key(p, 'Space', false); await sleep(160); }
+}
 
 try {
     const backend = process.argv[2] ?? await startServer();
@@ -232,11 +250,69 @@ try {
         await runner.send('Page.reload');
         const refreshed = await wait(runner, 'refresh restores runner', s => s.multiplayer?.websocket === 'CONNECTED' && s.checkpoint === 'relay');
         check('refresh retains slot/latch/checkpoint', refreshed.multiplayer?.slot === runnerSlot && refreshed.outputs.bridge && Math.abs(refreshed.player.x - (runnerSlot === 1 ? 1050 : 1150)) < 10);
-        await walk(holder, 1160);
+        await walk(holder, 1130);
         check(`Player ${holderSlot} traverses the materialized bridge`, (await snapshot(holder)).player.x > 1000 && (await snapshot(holder)).deaths === 0);
 
+        // Exactly one shared cube; every interaction below is real mouse/keyboard input.
+        await walk(holder, 1080);
+        const beforePull = (await snapshot(holder)).cube!;
+        await mouse(holder, beforePull.x, beforePull.y, true);
+        await wait(holder, 'server granted cube pull', s => s.pullingCube && s.multiplayer?.cubePhysicsAuthority === holderSlot);
+        await sleep(140);
+        await mouse(holder, beforePull.x, beforePull.y, false);
+        await wait(runner, 'shared pull released', s => !s.multiplayer?.shared?.cube.pulling && !!s.cube?.grounded);
+        check('cube grapple pulls under one granted physics authority', (await snapshot(holder)).cube!.x < beforePull.x - 10
+            && (await snapshot(holder)).multiplayer?.ownsCubePhysics === true && (await snapshot(runner)).multiplayer?.ownsCubePhysics === false);
+        const free = (await snapshot(holder)).cube!;
+        await walk(holder, free.x - 48); await tap(holder, 'KeyE');
+        await wait(holder, 'first cube pickup granted', s => s.multiplayer?.cubeHolder === holderSlot && !!s.cube?.carried);
+        await wait(runner, 'partner sees first cube carrier', s => s.multiplayer?.cubeHolder === holderSlot && !!s.cube?.carried);
+        await walk(holder, 1210);
+        await wait(runner, 'carried cube follows remote body', s => !!s.cube && !!s.multiplayer?.remote
+            && Math.abs(s.cube.x - s.multiplayer.remote.x) < 5 && Math.abs(s.cube.y - (s.multiplayer.remote.y - 43)) < 5);
+        check(`P${holderSlot} carries the one cube on both clients`, true);
+        await walk(runner, 1310);
+        check('player standing on CARGO PLATE cannot power access', !(await snapshot(runner)).multiplayer?.shared?.inputs.cubeOnCargoPlate
+            && !(await snapshot(holder)).outputs.codePlatformA);
+        const firstDropCues = [(await snapshot(holder)).audio.played.drop ?? 0, (await snapshot(runner)).audio.played.drop ?? 0];
+        await tap(holder, 'KeyE');
+        await wait(runner, 'first carrier drops cube', s => s.multiplayer?.cubeHolder === null && !!s.cube?.grounded);
+        check('one shared drop cue reaches each client', ((await snapshot(holder)).audio.played.drop ?? 0) === firstDropCues[0] + 1
+            && ((await snapshot(runner)).audio.played.drop ?? 0) === firstDropCues[1] + 1);
+        const droppedCube = (await snapshot(runner)).cube!;
+        await walk(runner, droppedCube.x + 48); await tap(runner, 'KeyE');
+        await wait(holder, 'partner wins handoff', s => s.multiplayer?.cubeHolder === runnerSlot && !!s.cube?.carried);
+        check(`handoff P${holderSlot} → P${runnerSlot} transfers physics authority`, (await snapshot(holder)).multiplayer?.cubePhysicsAuthority === runnerSlot
+            && (await snapshot(runner)).multiplayer?.ownsCubePhysics === true && (await snapshot(holder)).multiplayer?.ownsCubePhysics === false);
+        await shot(holder, 'pairing-cube-handoff');
+
+        // A carrying browser goes away. The partner resumes from its last accepted transform.
+        const carriedEpoch = (await snapshot(holder)).multiplayer!.cubeEpoch!;
+        await runner.send('Page.navigate', { url: 'about:blank' });
+        const releasedCube = await wait(holder, 'carrier disconnect releases cube', s => !s.multiplayer?.shared?.connected[runnerSlot - 1]
+            && s.multiplayer?.cubeHolder === null && s.multiplayer?.cubePhysicsAuthority === holderSlot && !!s.cube?.grounded);
+        check('disconnect transfers one falling/settling cube and revokes old stream', releasedCube.multiplayer!.cubeEpoch! > carriedEpoch);
+        const cubeHistory = await runner.send('Page.getNavigationHistory');
+        await runner.send('Page.navigateToHistoryEntry', { entryId: cubeHistory.entries[cubeHistory.currentIndex - 1].id });
+        await wait(runner, 'same cube visitor reconnects', s => s.multiplayer?.websocket === 'CONNECTED' && s.multiplayer.cubeHolder === null);
+        await wait(runner, 'cube replica catches up', s => !!s.cube?.grounded && (s.multiplayer?.cubeSnapshotsReceived ?? 0) > 0);
+        const recovered = (await snapshot(runner)).cube!;
+        check('reconnect keeps original slot and one unheld cube', (await snapshot(runner)).multiplayer?.slot === runnerSlot
+            && (await snapshot(runner)).multiplayer?.cubePhysicsAuthority === holderSlot);
+        await walk(runner, recovered.x - 48); await tap(runner, 'KeyE');
+        await wait(holder, 'returning visitor picks up again', s => s.multiplayer?.cubeHolder === runnerSlot);
+        await walk(runner, 1200); await walk(runner, 1265); await tap(runner, 'KeyE');
+        await wait(holder, 'cargo enables final access remotely', s => !!s.multiplayer?.shared?.inputs.cubeOnCargoPlate && s.outputs.codePlatformA);
+        await wait(runner, 'cargo enables final access locally', s => !!s.multiplayer?.shared?.outputs.finalAccess && s.outputs.codePlatformA);
+        check('cube-only cargo holds final access on both clients', (await snapshot(holder)).multiplayer?.cubePlacement === 'cargoPlate'
+            && (await snapshot(runner)).multiplayer?.cubeHolder === null);
+        await shot(runner, 'pairing-cube-docked');
+        await finalAccess(holder); await finalAccess(runner);
+        check('both players climb the cargo-powered access step', (await snapshot(holder)).player.y < 340 && (await snapshot(runner)).player.y < 340);
+
         // Swap the final-plate assignment as well as the first traversal roles.
-        await walk(holder, 1370); await wait(runner, 'left final plate visible', s => s.multiplayer?.shared?.inputs.finalPlateLeftOccupied === true);
+        await walk(runner, 1800);
+        await walk(holder, 1680); await wait(runner, 'left final plate visible', s => s.multiplayer?.shared?.inputs.finalPlateLeftOccupied === true);
         check('one final plate cannot unlock or complete', !(await snapshot(runner)).outputs.exitDoor && !(await snapshot(runner)).multiplayer?.shared?.completed);
         for (const client of [holder, runner]) {
             const partial = await snapshot(client);
@@ -246,10 +322,10 @@ try {
                 && !partial.outputs.exitDoor);
         }
         await shot(holder, 'pairing-one-signal');
-        await walk(runner, 1490);
+        await walk(runner, 1800);
         const beforeDoor = (await snapshot(holder)).audio.played.door ?? 0;
         const beforeComplete = (await snapshot(holder)).audio.played.complete ?? 0;
-        const finalAt = Date.now(); await walk(runner, 1610);
+        const finalAt = Date.now(); await walk(runner, 1920);
         await wait(holder, 'holder sees unlock', s => !!s.multiplayer?.shared?.exitUnlocked && s.outputs.exitDoor);
         await wait(runner, 'runner sees unlock', s => !!s.multiplayer?.shared?.exitUnlocked && s.outputs.exitDoor);
         const finalMs = propagation[`p${holderSlot}Holds.finalPlate`] = Date.now() - finalAt;
@@ -259,18 +335,18 @@ try {
         check('unlock message is visible', (await holder.read<string>('document.querySelector("#coop-state").textContent')).includes('EXIT UNLOCKED'));
         await shot(holder, 'pairing-unlocked');
         // Regroup between the plates before either player approaches the exit.
-        await walk(holder, 1490); await walk(runner, 1500);
+        await walk(holder, 1800); await walk(runner, 1810);
         const released = await wait(holder, 'both final plates released', s => !s.inputs.plateB && !s.inputs.plateC);
         check('leaving both plates keeps the door open, with no arrivals', released.outputs.exitDoor && !released.multiplayer?.shared?.completed && released.multiplayer?.shared?.reachedExit.every(v => !v) === true);
         check('released plate feeds go dim while the unlocked door stays open',
             released.connections.filter(c => c.output === 'exitDoor').every(c => !c.powered) && released.outputs.exitDoor);
         check('unlock plays one door cue and no completion cue', (released.audio.played.door ?? 0) === beforeDoor + 1 && (released.audio.played.complete ?? 0) === beforeComplete);
-        await walk(holder, 1740);
+        await walk(holder, 2070);
         const firstArrival = await wait(runner, 'first physical arrival accepted', s => !!s.multiplayer?.shared?.reachedExit[holderSlot - 1]);
         check('first distinct arrival cannot complete', !firstArrival.multiplayer?.shared?.completed && !firstArrival.multiplayer?.shared?.reachedExit[runnerSlot - 1]);
         check('arrival count is visible', (await runner.read<string>('document.querySelector("#exit-arrivals").textContent')).includes('1 / 2 ARRIVED'));
         await shot(runner, 'pairing-first-arrival');
-        await walk(holder, 1680); // Leaving the zone does not erase semantic arrival credit.
+        await walk(holder, 1990); // Leaving the zone does not erase semantic arrival credit.
         check('arrival remains recorded after leaving the exit', !!(await snapshot(holder)).multiplayer?.shared?.reachedExit[holderSlot - 1]);
 
         if (!process.argv[2]) {
@@ -287,8 +363,16 @@ try {
         const restored = await snapshot(holder);
         check('recovery preserves slot, checkpoint, unlock and first arrival', restored.multiplayer?.slot === holderSlot && restored.checkpoint === 'relay' && restored.outputs.bridge && restored.outputs.exitDoor && !!restored.multiplayer?.shared?.reachedExit[holderSlot - 1] && !restored.multiplayer?.shared?.reachedExit[runnerSlot - 1] && !restored.multiplayer?.shared?.completed);
         check('recovery restores no body-held input', !restored.inputs.plateA && !restored.inputs.plateB && !restored.inputs.plateC);
-        await walk(holder, 1740); // Regroup naturally; its previously earned arrival is still credited.
-        await walk(runner, 1800);
+        check('recovery restores docked cube and momentary cargo power', restored.multiplayer?.cubePlacement === 'cargoPlate'
+            && restored.multiplayer?.cubeHolder === null && restored.outputs.codePlatformA && Math.abs(restored.cube!.x - 1310) < 59 && Math.abs(restored.cube!.y - 538) < 2);
+        if (!process.argv[2]) {
+            const disk = JSON.parse(await readFile(join(temporary, 'data', 'rooms', `${code}.json`), 'utf8'));
+            check('restart room file contains semantic placement without physics or ownership', disk.version === 3 && disk.cubePlacement === 'cargoPlate'
+                && !['cube', 'holder', 'physicsAuthority', 'x', 'y', 'vx', 'vy', 'transform'].some(k => k in disk));
+            await finalAccess(holder); await finalAccess(runner);
+        } else await finalAccess(holder);
+        await walk(holder, 2070); // Regroup naturally; its previously earned arrival is still credited.
+        await walk(runner, 2130);
         await wait(a, 'A completes after both arrivals', s => !!s.multiplayer?.shared?.completed && s.outputs.exitDoor);
         await wait(b, 'B completes after both arrivals', s => !!s.multiplayer?.shared?.completed && s.outputs.exitDoor);
         check('both physical arrivals complete on both clients', (await snapshot(a)).multiplayer?.shared?.reachedExit.every(Boolean) === true);

@@ -11,6 +11,7 @@ import { GameAudio } from '../audio/game-audio.ts';
 import { AudioPresentation } from './audio-presentation.ts';
 import { CoopClient } from '../coop/client.ts';
 import { PairingAuthority } from '../coop/authority.ts';
+import { SharedCubeAuthority } from '../coop/cube.ts';
 import { pairingBay } from '../coop/pairing-bay.ts';
 import { normalizeCode, type SharedRoom } from '../coop/protocol.ts';
 export class SliceGame {
@@ -119,7 +120,7 @@ export class SliceGame {
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
         if (initial) {
-            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB(), () => this.coop.reachExit());
+            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB(), () => this.coop.reachExit(), new SharedCubeAuthority(this.coop));
             this.world = new PuzzleWorld(pairingBay(this.coop.slot), { switchB: room.inputs.switchB, cubeOnPlate: false, cubeOnPlateB: false,
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
             this.renderer.room(this.world); this.sound.reset(this.world);
@@ -434,10 +435,15 @@ export class SliceGame {
             this.accumulated = 0;
         this.sound.ambience(this.world, this.started && !document.hidden && document.hasFocus());
         this.audio.meter();
-        if (this.coopMode) this.coop.publish(this.world.player, now);
+        if (this.coopMode) {
+            this.authority?.cube?.sync(this.world);
+            this.coop.publish(this.world.player, now);
+            if (this.world.cube) this.coop.publishCube(this.world.cube, now);
+        }
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now),
-                reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false } : undefined);
+                reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
+                remotePullingCube: !!this.coop.room?.cube.pulling && !this.coop.ownsCube } : undefined);
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
         if (replay.trace) {

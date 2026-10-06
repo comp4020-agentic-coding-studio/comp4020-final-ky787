@@ -1,0 +1,9 @@
+$ vitest run
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  2 passed (2)
+      Tests  3 passed (3)
+   Start at  20:16:31
+   Duration  703ms (import 70%, tests 24%, transform 6%, worker 1%)

@@ -2,15 +2,18 @@
 
 Implemented 2026-10-06, starting at
 `55aaa36edc75b3be9bfa9ff6cb54a35e05ae2b65`.
-This is a two-player infrastructure/gameplay prototype. Two-computer human
-playtesting validated the deployed networking and motivated the role/exit
-correction described below; the revised chamber awaits another manual playtest.
-The four C8 campaign rooms, personal saves and retained CONTROL SPINE binary stay
-independent. No shared cubes or multiplayer CONTROL SPINE are implemented.
+The revised role-symmetric multiplayer architecture and physical exit were
+manually accepted on two separate computers. The shared-cube milestone starts
+at `cbad2534d2b19f1ff799c9d540f5cd972cad97bd` and extends that accepted chamber.
+It adds exactly one shared cube and a cube-only cargo phase; this extension still
+requires manual two-computer acceptance. The four C8 rooms, personal saves and
+retained CONTROL SPINE binary stay independent. No multiplayer CONTROL SPINE,
+relay/lift cube transport or new binary is introduced.
 
 ## Authority and modules
 
-See [ADR 0001](adr/0001-multiplayer-authority.md).
+See [ADR 0001](adr/0001-multiplayer-authority.md) and
+[ADR 0002: shared cube simulation](adr/0002-shared-cube-authority.md).
 
 ```text
 Browser A / Browser B
@@ -45,7 +48,9 @@ the HTTP cookie header and checks the request Origin against Host.
 | `src/coop/protocol.ts` | Explicit wire types, strict runtime client validation, code normalization, revision ordering |
 | `server/identity.ts` | Shared C8 visitor-cookie parsing/establishment and origin check |
 | `server/pairing-state.ts` | Coordinate-free authoritative mock room contract and durable schema |
-| `server/multiplayer.ts` | Slots, sessions, serialized logical mutations, persistence, socket lifecycle and avatar forwarding |
+| `server/multiplayer.ts` | Slots, serialized logical mutations, persistence, socket lifecycle and avatar/cube forwarding |
+| `server/cube-state.ts` | Ephemeral cube ownership, exclusive pull arbitration and stream validation |
+| `src/coop/cube.ts` | Granted physics boundary, replica/carry presentation and physical cargo sensing |
 | `src/coop/client.ts` | Identity bootstrap, WebSocket/rejoin/backoff, counters and semantic reports |
 | `src/coop/authority.ts` | Physical sensors and accepted-state adapter; never evaluates shared outputs |
 | `src/coop/pairing-bay.ts` | Hand-authored chamber geometry and per-slot spawn/checkpoint positions |
@@ -103,21 +108,31 @@ plates remained held was logically valid, yet leaving the plates closed the
 door and prevented a natural physical finish. The revised ending separates the
 cooperative unlock from each player's subsequent arrival.
 
-The chamber is 1,850 × 780, with no cube. The near bank ends at x=460 and the
-far bank begins at x=880. Its 420-unit death gap and anchor centre (770,226)
-reuse the accepted SWITCH traversal proportions. Entry spawns remain (150,543)
-and (405,543); these are starting positions, not assigned jobs. Both can walk
-freely between A and the approach. Static banks remain solid and unhookable.
-Inactive code remains ghosted/non-solid; accepted power lights/enables it.
-The exit is now a 130 × 140 area at (1700,420), wide enough for both avatars,
-just beyond the final right plate. No new movement mechanic or tuning is used.
+The chamber is 2,200 × 780. The original near bank (ends x=460), far bank
+(starts x=880), 420-unit death gap, anchor centre (770,226), entry spawns and B
+remain unchanged. The cube starts at (1190,538), beyond initial grapple reach
+from the near bank; cube interaction grants require B. Cubes cannot satisfy A.
+The cargo plate is (1310,560), beside the reunion area. It powers a single
+160-unit code step at (1400,455). The final static deck starts at (1580,340),
+220 above the recovery floor: an ordinary jump, even from a resting cube, cannot
+bypass the inactive step. Two short jumps with cargo power reach it. The floor
+below is safe; losing power lets players fall and return to cargo. Players on
+the final deck can always drop left to return. No new death gap was added.
+
+Final plates are (1680,340) and (1920,340); the 130 × 140 exit is (2030,200).
+Static banks/deck remain solid and unhookable. Inactive code is ghosted/non-solid;
+enabled code accepts hooks across its address bar. The cargo wire lights from
+accepted cube occupancy. The cube retains its existing amber treatment, carry,
+drop, collision and bounded pull tuning. No player-player collision or remote
+avatar impulse can move it.
 
 | Semantic input | Ownership/meaning |
 | --- | --- |
 | `plateAOccupied` | Either connected body occupies A (250,560) |
 | `switchB` | Either player's own nearby E interaction at B (1060,560), latched |
-| `finalPlateLeftOccupied` | A connected body on left final plate (1370,560) |
-| `finalPlateRightOccupied` | A connected body on right final plate (1610,560) |
+| `cubeOnCargoPlate` | Only the granted cube simulator reports resting, uncarried cargo overlap |
+| `finalPlateLeftOccupied` | A connected body on left final plate (1680,340) |
+| `finalPlateRightOccupied` | A connected body on right final plate (1920,340) |
 
 Each slot reports **one** of `plateA`, `finalLeft`, `finalRight`, or `null`.
 The server derives occupancy from both connected slots. Final plates are accepted
@@ -127,7 +142,8 @@ only after B latches. Reports carry no caller-chosen slot or visitor ID.
 | --- | --- |
 | `grappleAnchor` | `plateAOccupied` |
 | `returnBridge` | `switchB` |
-| `exitUnlocked` | Permanently latched by two connected distinct bodies on opposite final plates after B |
+| `finalAccess` | Momentary `cubeOnCargoPlate`; maps to the existing frontend `codePlatformA` signal |
+| `exitUnlocked` | Permanently latched by two connected distinct bodies on opposite final plates with B and cargo power |
 | `exitDoor` | `exitUnlocked`, regardless of current plates/connections |
 | `reachedExit[slot - 1]` | Permanently recorded when that slot reports its own physical arrival at the unlocked exit |
 | checkpoint | `entry` initially; `reunion` when B latches |
@@ -136,7 +152,10 @@ only after B latches. Reports carry no caller-chosen slot or visitor ID.
 Phase 1: either player holds A while the partner uses the grapple slab. Removing
 the last body from A disables the slab and releases its rope through the existing
 rules. Phase 2: either player presses E near B; the bridge materializes and the
-reunion checkpoint is saved. Phase 3: opposite final plates latch the door open
+reunion checkpoint is saved. Phase 3: either player retrieves the shared cube,
+optionally hands it off, and docks it on CARGO PLATE. Cargo holds the short access
+step active as a third hand while both players climb to the final deck. Removing
+the cube deactivates access. Phase 4: opposite final plates latch the door open
 with **EXIT UNLOCKED · REGROUP**. Both leave their plates and enter the nearby
 exit. The first arrival shows **1 / 2 ARRIVED**; the second produces **PAIRING
 COMPLETE**. P1-left/P2-right and P2-left/P1-right work identically.
@@ -151,7 +170,7 @@ does not remove their credit. The other distinct player must still reach it.
 Repeated arrival messages from one slot cannot finish for the other. The door
 stays open after plate release, disconnect, reconnect, restart and completion.
 
-The server knows none of these coordinates. The owning browser detects its own
+The server imports no chamber geometry. The owning browser detects its own
 plate contact, switch proximity and player-box overlap with the exit, reporting
 arrival only after the accepted unlock. It never decides shared outputs or
 completion. This course-scale prototype trusts those physical semantic reports;
@@ -164,6 +183,68 @@ All machinery/text is labelled **mock multiplayer / test controller**. There are
 no native addresses, traces, OLLVM provenance or crumble here. C8 evidence bytes
 and the validated five-input/seven-output UPLINK contract remain untouched.
 
+## Shared cube authority and trust
+
+There is one cube entity. The server owns `holder` and `physicsAuthority`;
+clients request interactions without choosing a slot. Holder means carrying;
+physics authority means the one browser allowed to advance and publish the body.
+
+| Event | Accepted result |
+| --- | --- |
+| Initial connection | P1 if connected, otherwise P2 simulates; this is not a gameplay role |
+| Free pickup | Requester becomes holder and simulator; first serialized mutation wins |
+| Holder drops | Holder clears; the same browser simulates from the accepted proposed drop transform |
+| Partner picks up later | Holder and simulator transfer to the partner |
+| Loose pull starts | Requester becomes simulator; a temporary `pulling` flag locks competing claims |
+| Pull stops | Lock clears; simulator stays assigned for loose motion |
+| Non-authority disconnects | Cube unchanged |
+| Simulator/holder disconnects | Holder and pull clear; connected partner receives latest transform and a new epoch |
+| Last simulator disconnects | No authority; latest transform stays in memory while the room remains loaded |
+| Same-cookie socket replacement | Release carrying/pulling and revoke the old epoch; prefer the connected partner |
+
+The pull lock is only a boolean qualified by the current physics authority, not
+a second persistent owner. Competing pull/pickup requests cannot steal an active
+pull; its owner may pick up the cube. A carried cube cannot be pulled away. Release,
+blur, pause, reset and death cancel the local pull, including a grant that arrives
+after release. Reset/death requests a holder drop before moving the avatar back
+to its checkpoint. Loose cubes reaching a hazard return to the authored spawn
+through the same authority's existing recovery physics.
+
+Clients never predict successful pickup/drop or start pull forces before grant.
+Ordinary contested/stale cube requests receive a nonfatal `cube-denied`; the
+session stays connected. The old authority stops on the accepted room update;
+its in-flight snapshots are already rejected by the server's new epoch. No two
+accepted streams advance the shared body. Transfer starts from the most recent
+accepted transform, retaining velocity for a loose body. A disconnected holder
+releases an ungrounded body to fall/settle. With no accepted transform yet, the
+frontend uses the authored semantic placement instead.
+
+The authority sends at most 20 snapshots/second using a cube-specific sequence
+and epoch, independent of avatar traffic. The server retains and forwards the
+latest valid transform without simulating physics or writing it to disk. A
+replica interpolates 100 ms behind, with at most 12 samples, no extrapolation and
+no independent integration. Epoch changes and discontinuities over 300 units
+snap. An interpolated falling cube is not marked grounded before landing. A
+remote carried cube follows the same interpolated avatar using the existing
+carry offset; its holder is always server-owned. Only a resting uncarried cube
+supports a player. It never becomes a swing anchor, and a player standing on it
+cannot grapple it to self-lift.
+
+The authority browser senses cargo overlap from authored frontend geometry. The
+server accepts only its current-epoch cargo report, with B latched and no holder
+or active pull for positive occupancy. Player body reports cannot name cargo.
+Accepted cargo placement determines `finalAccess`; a client cannot publish that
+output. Pickup/pull immediately clears cargo power, and later resting contact
+can restore it. Unlock and arrival credits remain permanent after cargo removal.
+
+This preserves the course-scale trust model: pickup/pull reach, occlusion, body
+movement, proposed drop location and cargo overlap are trusted physical reports
+from the relevant browser. The server checks membership, ownership, epoch,
+sequence, bounds, interaction availability and puzzle phase; it does not verify
+proximity against server physics. A modified authority client could lie about
+its own cube motion or cargo contact. Normal input checks use the existing reach,
+range, support and pull limits. This is not anti-cheat or lockstep physics.
+
 ## Protocol, revisions and limits
 
 Client messages are JSON discriminated by `type`:
@@ -173,6 +254,10 @@ Client messages are JSON discriminated by `type`:
 | `create` | none |
 | `join` | `code` |
 | `avatar` | `seq`, bounded `avatar` (`x`, `y`, `vx`, `vy`, `facing`, `grounded`, optional visual rope tip as object or null) |
+| `cube` | `epoch`, independent cube `seq`, `transform` (`x`, `y`, `vx`, `vy`, `grounded`) |
+| `cube-pickup`, `cube-pull-start`, `cube-pull-stop` | semantic `seq`, current `epoch` |
+| `cube-drop` | semantic `seq`, current `epoch`, proposed bounded `transform` |
+| `cube-occupancy` | semantic `seq`, current `epoch`, `cargo` boolean |
 | `occupancy` | `seq`, `plate` (single enum or null) |
 | `switch` | `seq` (the room's sole switch) |
 | `exit` | `seq` (this connection's own physical arrival, only after unlock) |
@@ -180,9 +265,14 @@ Client messages are JSON discriminated by `type`:
 
 Server messages: `snapshot` (assigned slot and full room), `room` (full accepted
 state at a newer revision), `avatar` (server-owned slot, stream ID, sequence and
-bounded visual snapshot), `error` (public code/message) and `pong`. Full room
+bounded visual snapshot), `cube` (accepted epoch/sequence/transform),
+`cube-denied` (rejected interaction sequence), `error` (public code/message) and
+`pong`. Full room
 state includes level, code, revision, assigned/connected slots, inputs, outputs,
-`exitUnlocked`, both `reachedExit` flags, checkpoint and completion. Other visitors' UUIDs are never broadcast.
+`exitUnlocked`, both `reachedExit` flags, checkpoint, completion, `cubePlacement`
+and ephemeral cube holder, authority, pull lock, epoch, sequence and latest
+transform (null until first publication after load). Other visitors' UUIDs are
+never broadcast.
 
 Every accepted shared mutation increments the durable room revision. Writes
 complete before its revision is acknowledged/broadcast. On close, the body is
@@ -193,7 +283,8 @@ and revision increases. A new connection's initial snapshot establishes its
 baseline; missed messages are never replayed. Semantic sequence numbers are
 per-socket and independent of room revisions; stale reports are rejected.
 
-Movement is sent at up to 20 Hz, forwarded only to the partner and never enters
+Avatar movement and cube transforms each send at up to 20 Hz, are forwarded only
+to the partner, and never enter
 the logical mutation queue or disk. Coordinates are finite and bounded to
 ±10,000; velocities to ±2,000 (validation bounds, not server physics). Remote
 avatars interpolate about 100 ms behind arrivals using at most 12 samples.
@@ -205,7 +296,7 @@ The original ninja drawing is reused with cyan P1 and violet P2 accents.
 
 Payloads are limited to 2 KiB, exact keys/types are validated, binary messages
 are rejected, and no user-provided paths are accepted. Each socket has a token
-bucket (40 messages/sec, 80 burst), at most eight queued semantic operations;
+bucket (60 messages/sec, 80 burst, allowing both 20 Hz streams), at most eight queued semantic operations;
 the service bounds total queued work (256), peers (128) and loaded rooms (64).
 Slow recipients exceeding 64 KiB buffered outbound data are disconnected.
 Server heartbeat runs every 5 seconds; a missed pong terminates the socket on
@@ -217,7 +308,7 @@ release on handling; a physically severed network is detected within roughly
 
 ```text
 /data/<visitor UUID>.json   existing C8 envelope, version-3 campaign progress
-/data/rooms/<CODE>.json     version-2 shared co-op logical record
+/data/rooms/<CODE>.json     version-3 shared co-op logical record
 ```
 
 No campaign file moves and no new campaign migration is necessary. Existing
@@ -227,11 +318,16 @@ mode 0600 and acknowledgement after durability, under the single-writer model.
 
 A room record stores version, code, level, revision, the two visitor assignments,
 B latch, checkpoint, `exitUnlocked`, both semantic `reachedExit` flags, completion,
-and creation/update timestamps. Even momentary
-changes persist only the revised logical record: **no plate occupancy, connection
-flags, position, velocity, grapple, socket or interpolation data is saved**.
-Movement alone causes no writes. Corrupt existing room files fail closed without
-replacement. Reserved codes include persisted rooms, even when unloaded.
+`cubePlacement: "spawn" | "cargoPlate"`, and creation/update timestamps. Even
+momentary ownership/body-plate changes write only this revised logical record:
+**no raw transform, velocity, holder, physics authority, pull flag, epoch, sequence,
+body-plate occupancy, connection or interpolation data is saved**. Avatar and
+cube snapshots alone cause no writes. `spawn` also represents arbitrary loose or
+carried motion; a process restart restores that cube at (1190,538). A docked cube
+restores at cargo centre (1310,538), immediately holding cargo power. Holder is
+always null after process restart, and the first connected slot gets authority.
+Within a loaded empty room, reconnect instead uses the last in-memory transform.
+Corrupt existing room files fail closed without replacement. Reserved codes include persisted rooms, even when unloaded.
 
 Version-1 rooms migrate on their next accepted join using the same atomic writer.
 Codes, visitors, B latch, checkpoint, creation time and revision ordering survive.
@@ -239,8 +335,10 @@ The old `completed` flag meant only that both plates had been held; migration
 maps it to `exitUnlocked`, starts `reachedExit` at `[false, false]` and reserves
 new `completed` for actual arrivals. Previously solved rooms keep their open
 exit and need only the new physical finish; no unobserved arrival is fabricated.
-Version-2 validation rejects inconsistent unlock/arrival/completion records
-without replacing the file. Campaign files and their migrations are unchanged.
+Version-2 records migrate to version 3 with safe `spawn` placement while preserving
+existing unlock and arrival credit. Version-1 migration also initializes the cube
+at spawn. Version-3 validation rejects inconsistent placement, unlock, arrival
+and completion records without replacing the file. Campaign files and their migrations are unchanged.
 
 An inactive in-memory room unloads after five minutes, checked every 30 seconds.
 Its file is retained and loads again by code. Persisted rooms are not automatically
@@ -264,9 +362,12 @@ counted; the remaining player must still reach the exit themselves.
 F1 / Debug exposes transport state/URL, room code, local visitor and slot,
 connected slots, revision, accepted inputs/outputs, server-message age, traffic
 counters, consecutive reconnect attempts, remote-snapshot age, checkpoint,
-exit unlock, each arrival and completion.
+exit unlock, each arrival and completion. Cube diagnostics add holder, physics
+authority, epoch, snapshot age, semantic placement/cargo input, whether this
+client owns physics, and sent/received cube snapshot counters.
 Normal HUD omits these diagnostics. Connection confirmation uses an existing cue.
-Plate/code/bridge/door/switch sounds observe applied authoritative transitions;
+Cube pickup/drop and plate/code/bridge/door/switch sounds observe applied
+authoritative transitions;
 reporting local intent does not play the same shared sound again. Rejoin creates
 a silent machinery baseline and only plays connection confirmation. Permanent
 unlock plays the existing door cue once; leaving plates cannot replay or reverse
@@ -315,66 +416,64 @@ an authorized deployment**; this implementation pass does not push or deploy.
 For manual play use a normal window + private window, two different browsers, or
 isolated profiles. Two windows sharing the same cookie represent the same player.
 Create in the first, COPY CODE, join in the second. Choose who holds A and who
-grappels first. Try the opposite choice in a new room. After B, use opposite
-final plates, then leave them and walk both bodies into the open exit. Check
+grapples first. Try the opposite choice in a new room. After B, retrieve the
+shared cube, try pulling and handoff in both directions, and dock it on CARGO
+PLATE. Climb the powered access step and use opposite final plates, then leave
+them and walk both bodies into the open exit. Check
 that the first arrival alone does not complete. Try disconnect while holding A,
-refresh after B, and reconnect after one player has arrived. Existing open
+refresh while carrying, restart with cargo docked, and reconnect after one player
+has arrived. Existing open
 browser tabs should refresh after this coordinated client/server contract update.
 
-Validation recorded for the symmetric-role / physical-exit correction:
+Shared-cube milestone validation (2026-10-06):
 
-- Typecheck, production build and unchanged pinned 32-state UPLINK bundle pass.
-- 211 unit/server tests pass; two pre-existing conditional skips remain. New
-  coverage includes A/B access by either slot, either final-plate assignment,
-  single-body alternation, two bodies on one plate, premature/stale/duplicate
-  arrivals, strict impersonation rejection, permanent unlock and both arrival
-  orders. Actual process restarts preserve partial arrivals and completion;
-  version-1 room migrations retain solved progress without inventing arrivals.
-- Existing session/code/reconnect, malformed/oversized payload, traffic limits,
-  idle unloading, campaign migrations and development-launcher tests still pass.
-- The existing C8 browser route passes all 115 assertions, including both CONTROL
-  SPINE solutions, saves, reset and audio; retained evidence is unchanged.
-- The HTTPS/WSS browser route passes **67 checks** across **both role assignments**.
-  Each run creates/joins through the UI, copies the real clipboard code, moves
-  remote avatars, holds A, grapples, latches B, refreshes, crosses the bridge and
-  swaps the final-plate assignment. Both plates unlock without completing; both
-  bodies leave the plates and physically enter the exit in opposite arrival
-  orders. First-arrival credit survives leaving the zone and an actual SIGKILL /
-  server restart. Door feedback plays once; completion sound waits for arrival 2.
-  No world/controller mutation substitutes for controls. No console errors.
-- Local propagation bounds, including physical approach/input time:
+- Typecheck and production build pass; the pinned 32-state UPLINK bundle retains
+  SHA-256 `87dec9e470119a951eb1486e25d62226c72b34367e754b0a14b4e5a818c4c082`.
+- 236 unit/server tests pass, with two existing conditional skips. The focused
+  multiplayer/cube/state/world set contains 48 passing tests.
+- All 95 real two-context HTTPS/WSS checks pass, including both handoff directions,
+  actual carrying disconnect/rejoin and docked-cube process restarts.
+- All 115 C8 browser checks and three live HTTP/WebSocket specs pass. Both CONTROL
+  SPINE routes, campaign persistence and audio remain healthy. No console errors.
+- Screenshots of handoff, docked cargo and completion were visually reviewed.
 
-  | Roles | Plate A | Switch B | Final unlock |
-  | --- | --- | --- | --- |
-  | P1 holds / P2 runs | 493 ms | 66 ms | 473 ms |
-  | P2 holds / P1 runs | 604 ms | 63 ms | 468 ms |
+Exact logs and selected screenshots are in `docs/playtest/pairing-cube-*` and the
+dated shared-cube handoff. Targeted development
+checks cover protocol bounds, exclusive ownership/pulls, handoff symmetry, motion
+stream revocation, real socket disconnect/replacement, semantic SIGKILL recovery,
+version-2 migration, replica collision, sounds and the physical access step. The
+real two-context route uses controls and read-only snapshots; it performs A/B in
+both role assignments, cube pull, pickup, handoff, carrying disconnect/rejoin,
+cargo docking, final access, opposite plates, both exit arrivals and restart with
+cargo docked. No test substitutes world/controller mutation for the browser route.
 
-- Three live HTTP/WebSocket specs pass against the same Node app.
-- Logs and selected screenshots: `docs/playtest/pairing-symmetry-*`. Earlier
-  infrastructure evidence remains under the original `pairing-*` filenames.
-- The prior `7aa75e3` build passed GitHub CI's real Docker build/tests and a Fly
-  deployment, followed by deployed two-browser checks and the user's successful
-  two-computer networking test. This gameplay correction is verified locally;
-  it has not yet been pushed/deployed or manually accepted on two computers.
+Both browser harnesses launch with `--mute-audio` by default. Audio state/cue
+assertions still run without audible output; only explicit `BN_TEST_AUDIO=1`
+removes the output mute. Follow AGENTS.md: targeted tests during iteration, then
+one complete relevant milestone validation when stable. C8 evidence, persistence,
+both CONTROL SPINE routes and existing audio checks remain part of that gate.
 
 ## Limits and next acceptance step
 
-Repeat the two-computer manual playtest after an authorized deployment of this
-correction, swapping all roles in a fresh room. Review permanent unlock feedback,
-physical exit arrival and partial-arrival reconnect behavior. The original build
-has been validated on Fly; the new semantics currently have local HTTPS/WSS
-evidence. Fly auto-stop recovery timing remains unmeasured. Vite's existing large
-retained-evidence chunk advisory remains. Touch multiplayer is unvalidated.
+The pre-cube architecture has been accepted on two physical computers. Stop here
+for manual acceptance of the cube extension after an authorized deployment. Test
+both ownership directions, contested E/click input, cargo removal/recovery and
+carrier refresh under real network latency. Automated local HTTPS/WSS checks do
+not replace that human acceptance. Fly auto-stop timing and touch multiplayer
+remain unmeasured; Vite's existing retained-evidence chunk-size advisory remains.
 
-There is no anti-cheat or host migration because there is no host browser.
-Clearing cookies loses anonymous slot ownership. Full rooms retain reservations
-indefinitely; persisted files need eventual explicit housekeeping if usage grows.
-Loss of the very first create response before a code is received can leave an
-unused saved room when the client retries creation; no gameplay has started yet.
-Subsequent reconnects always rejoin the acknowledged code. No durable state is
-deleted automatically.
+The server does not simulate physics, validate proximity or reconcile dishonest
+clients. Transfers can snap by one publication interval; replicas are about
+100 ms behind. A paused/suspended authority browser can temporarily stop loose
+motion while still connected; a partner can claim the available cube, and an
+actual disconnect transfers it. Avatar/cube collision is approximate across
+latency, with no remote-player impulses. Clearing cookies loses anonymous slot
+ownership; full rooms retain reservations indefinitely. Persistent room files
+need eventual explicit housekeeping if usage grows. Loss of the very first
+create response can leave an unused saved room; subsequent reconnects rejoin the
+acknowledged code. No durable state is deleted automatically.
 
-Stop for manual playtesting. After acceptance, the separate next work is shared
-cube arbitration, possibly multiplayer RELAY, then a genuine cooperative CONTROL
-SPINE redesign. New binary controllers should follow stabilized co-op contracts.
-C9 reflection content is left to the user.
+After manual acceptance, the next separate pass can generalize this primitive
+through RelayGatePair/LiftField, then design a full cooperative chamber. No relay
+or lift transport, multiplayer CONTROL SPINE or new binary belongs in this
+milestone. The C9 reflection remains the user's work.

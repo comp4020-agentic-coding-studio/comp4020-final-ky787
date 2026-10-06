@@ -1,6 +1,6 @@
 import type { PlayerState } from '../engine/physics.ts';
-import { newerRoom, normalizeCode, websocketUrl, type Avatar, type ClientMessage, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
-import { RemoteAvatar } from './remote.ts';
+import { newerRoom, normalizeCode, websocketUrl, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
+import { RemoteAvatar, RemoteCube } from './remote.ts';
 export class CoopClient {
     room: SharedRoom | null = null;
     slot: Slot | null = null;
@@ -9,6 +9,11 @@ export class CoopClient {
     active = false;
     sent = 0; received = 0; reconnectAttempts = 0; lastMessageAt = 0;
     remote = new RemoteAvatar();
+    remoteCube = new RemoteCube();
+    cubeSent = 0; cubeReceived = 0; cubeLastAt = 0;
+    private cubeSeq = 0;
+    private cubeSentAt = 0;
+    private cargo: boolean | undefined;
     private socket: WebSocket | null = null;
     private intent: Extract<ClientMessage, { type: 'create' | 'join' }> = { type: 'create' };
     private retry?: ReturnType<typeof setTimeout>;
@@ -22,6 +27,16 @@ export class CoopClient {
     private exitSent = false;
     constructor(private onRoom: (room: SharedRoom, initial: boolean) => void, private onStatus: () => void) {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
+    get ownsCube(): boolean { return this.connected && this.room!.cube.physicsAuthority === this.slot; }
+    private acceptCubeRoom(room: SharedRoom, initial = false): void {
+        if (initial || room.cube.epoch !== this.room?.cube.epoch) {
+            this.remoteCube.reset(room.cube, performance.now());
+            this.cubeSeq = 0; this.cubeSentAt = 0; this.cargo = undefined;
+            this.cubeLastAt = room.cube.transform ? performance.now() : 0;
+        } else if (room.cube.transform) {
+            this.remoteCube.push(room.cube.transform, room.cube.epoch, room.cube.seq, performance.now());
+        }
+    }
     remembered(): string | null { try { return normalizeCode(sessionStorage.getItem('bn_coop_room') ?? ''); } catch { return null; } }
     private remember(code: string | null): void {
         try { if (code) sessionStorage.setItem('bn_coop_room', code); else sessionStorage.removeItem('bn_coop_room'); } catch { /* Manual room codes still work. */ }
@@ -60,16 +75,25 @@ export class CoopClient {
                 this.received++; this.lastMessageAt = performance.now();
                 if (message.type === 'snapshot') {
                     clearTimeout(this.deadline);
+                    this.acceptCubeRoom(message.room, true);
                     this.room = message.room; this.slot = message.slot; this.remote.clear();
                     this.intent = { type: 'join', code: this.room.code }; this.remember(this.room.code);
                     this.status = 'CONNECTED'; this.reconnectAttempts = 0;
                     this.onRoom(this.room, true); this.onStatus();
                 } else if (message.type === 'room' && newerRoom(this.room, message.room)) {
+                    this.acceptCubeRoom(message.room);
                     this.room = message.room;
                     if (this.slot && !this.room.connected[this.slot === 1 ? 1 : 0]) this.remote.clear();
                     this.onRoom(this.room, false); this.onStatus();
                 } else if (message.type === 'avatar' && message.slot !== this.slot && this.connected && this.room?.connected[message.slot - 1]) {
                     this.remote.push(message.avatar, message.stream, message.seq, performance.now());
+                } else if (message.type === 'cube' && this.connected && !this.ownsCube) {
+                    if (this.remoteCube.push(message.transform, message.epoch, message.seq, performance.now())) {
+                        this.cubeReceived++; this.cubeLastAt = performance.now();
+                    }
+                } else if (message.type === 'cube-denied') {
+                    // Contested/stale interactions are routine, not a room disconnection.
+                    this.cargo = undefined;
                 } else if (message.type === 'error') {
                     if (message.code === 'STALE_ACTION') return;
                     const messageText = message.message;
@@ -104,6 +128,25 @@ export class CoopClient {
         if (this.connected && this.slot && this.room?.exitUnlocked && !this.room.reachedExit[this.slot - 1] && !this.exitSent)
             this.exitSent = this.send({ type: 'exit', seq: ++this.actionSeq });
     }
+    cubeAction(type: CubeAction | 'cube-drop', transform?: CubeTransform): void {
+        if (!this.connected) return;
+        const base = { seq: ++this.actionSeq, epoch: this.room!.cube.epoch };
+        if (type === 'cube-drop') {
+            if (transform) this.send({ type, ...base, transform });
+        } else this.send({ type, ...base });
+    }
+    cubeOccupancy(cargo: boolean): void {
+        if (!this.ownsCube || this.cargo === cargo) return;
+        if (this.send({ type: 'cube-occupancy', seq: ++this.actionSeq, epoch: this.room!.cube.epoch, cargo })) this.cargo = cargo;
+    }
+    publishCube(cube: CubeTransform, now: number): void {
+        if (!this.ownsCube || now - this.cubeSentAt < 50) return;
+        this.cubeSentAt = now;
+        const { x, y, vx, vy, grounded } = cube;
+        if (this.send({ type: 'cube', epoch: this.room!.cube.epoch, seq: ++this.cubeSeq, transform: { x, y, vx, vy, grounded } })) {
+            this.cubeSent++; this.cubeLastAt = now;
+        }
+    }
     publish(p: PlayerState, now: number): void {
         if (!this.connected || now - this.lastSentAt < 50) return;
         this.lastSentAt = now;
@@ -124,6 +167,10 @@ export class CoopClient {
             url: websocketUrl(location.href), code: this.room?.code, visitor: this.visitor, slot: this.slot,
             connected: this.room?.connected, revision: this.room?.revision, inputs: this.room?.inputs, outputs: this.room?.outputs,
             exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
+            cubeHolder: this.room?.cube.holder, cubePhysicsAuthority: this.room?.cube.physicsAuthority,
+            cubeEpoch: this.room?.cube.epoch, cubePlacement: this.room?.cubePlacement, cubeOnCargoPlate: this.room?.inputs.cubeOnCargoPlate,
+            ownsCubePhysics: this.ownsCube, cubeSnapshotsSent: this.cubeSent, cubeSnapshotsReceived: this.cubeReceived,
+            cubeSnapshotAgeMs: this.cubeLastAt ? Math.round(now - this.cubeLastAt) : null,
             lastServerMessageAgeMs: this.lastMessageAt ? Math.round(now - this.lastMessageAt) : null,
             sent: this.sent, received: this.received, reconnectAttempts: this.reconnectAttempts,
             remoteSnapshotAgeMs: this.remote.lastAt ? Math.round(now - this.remote.lastAt) : null };

@@ -22,8 +22,18 @@ export interface MachineEvent {
     kind: string;
     at: Vec2;
 }
+/** Optional shared-body boundary; the existing physics stays in this world. */
+export interface CubeAuthority {
+    readonly simulates: boolean;
+    readonly heldLocally: boolean;
+    sync(world: PuzzleWorld): void;
+    pull(start: boolean, held: boolean): boolean;
+    cancelPull(): void;
+    release(world: PuzzleWorld): void;
+}
 /** Optional external authority supplies accepted state; sensors only report intent. */
 export interface WorldAuthority {
+    cube?: CubeAuthority;
     frame: ControllerFrame;
     inputs: ControllerInputs;
     checkpoint: RoomMemory['checkpoint'];
@@ -47,6 +57,7 @@ export class PuzzleWorld {
     plateDepth = 0;
     plateDepthB = 0;
     plateDepthC = 0;
+    cargoPlateDepth = 0;
     keyboardGrapple = false;
     private cubeSolid: Solid = { id: 'cube-body', x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
     doorOpen = 0;
@@ -77,6 +88,7 @@ export class PuzzleWorld {
             { id: 'left-wall', x: -40, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false },
             { id: 'right-wall', x: room.width, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false }];
         this.frame = this.authority?.frame ?? this.controller.evaluate(room.id, this.inputs);
+        this.authority?.cube?.sync(this);
         this.samplePlate();
         this.evaluate();
         this.events = [];
@@ -176,15 +188,7 @@ export class PuzzleWorld {
         if (this.authority) { this.authority.interact(this); return; }
         const p = this.player, c = this.cube, lever = this.nearLever();
         if (c?.carried) {
-            const ahead = p.x + p.facing * (PLAYER.width / 2 + CUBE_SIZE / 2 + 10);
-            const y = p.y + PLAYER.height / 2 - CUBE_SIZE / 2 - 0.5;
-            const box = { x: ahead - CUBE_SIZE / 2, y: y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE };
-            c.x = this.solids.some(s => s.enabled && !s.oneWay && boxesOverlap(box, s)) ? p.x : ahead;
-            c.y = y;
-            c.carried = false;
-            c.vx = 0;
-            c.vy = 0;
-            c.grounded = false;
+            Object.assign(c, this.cubeDropTransform(), { carried: false });
         }
         else if (lever && !(lever.latch && this.inputs[lever.input])) {
             this.inputs[lever.input] = !this.inputs[lever.input];
@@ -206,9 +210,19 @@ export class PuzzleWorld {
             this.emit('carry');
         }
     }
+    /** Compute a proposed drop without changing the cube before server acceptance. */
+    cubeDropTransform() {
+        const p = this.player;
+        const ahead = p.x + p.facing * (PLAYER.width / 2 + CUBE_SIZE / 2 + 10);
+        const y = p.y + PLAYER.height / 2 - CUBE_SIZE / 2 - 0.5;
+        const box = { x: ahead - CUBE_SIZE / 2, y: y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE };
+        return { x: this.solids.some(s => s.enabled && !s.oneWay && boxesOverlap(box, s)) ? p.x : ahead,
+            y, vx: 0, vy: 0, grounded: false };
+    }
     respawn(): void {
+        this.authority?.cube?.release(this);
         this.player = createPlayer(...this.spawnPoint());
-        if (this.cube?.carried)
+        if (!this.authority?.cube && this.cube?.carried)
             this.returnCube();
         this.cancelGrapple();
         this.deaths++;
@@ -216,6 +230,7 @@ export class PuzzleWorld {
         this.emit('death');
     }
     returnCube(): void {
+        if (this.authority?.cube && !this.authority.cube.simulates) return;
         if (!this.cube || !this.room.cube)
             return;
         Object.assign(this.cube, this.cubeHome(), { vx: 0, vy: 0, carried: false, grounded: false });
@@ -223,6 +238,7 @@ export class PuzzleWorld {
         this.emit('cube-return');
     }
     cancelGrapple(): void {
+        this.authority?.cube?.cancelPull();
         this.keyboardGrapple = false;
         this.pullingCube = false;
         releaseRope(this.player, false);
@@ -261,10 +277,17 @@ export class PuzzleWorld {
     private hookCube(input: InputState): void {
         const c = this.cube, p = this.player;
         if (!c || c.carried || this.room.id === 'pressure' || p.groundId === this.cubeSolid.id) {
+            this.authority?.cube?.cancelPull();
             this.pullingCube = false;
             return;
         }
-        if (input.grapplePressed && Math.hypot(input.aim.x - c.x, input.aim.y - c.y) < 55 && Math.hypot(c.x - p.x, c.y - p.y) < GRAPPLE.maxRange) {
+        const start = input.grapplePressed && Math.hypot(input.aim.x - c.x, input.aim.y - c.y) < 55 && Math.hypot(c.x - p.x, c.y - p.y) < GRAPPLE.maxRange;
+        if (this.authority?.cube) {
+            const pulling = this.authority.cube.pull(start, input.grappleHeld && Math.hypot(c.x - p.x, c.y - p.y) <= GRAPPLE.maxRange + 30);
+            if (start) { input.grapplePressed = false; releaseRope(p, false); }
+            if (pulling && !this.pullingCube) this.emit('cube-pull');
+            this.pullingCube = pulling;
+        } else if (start) {
             // Cube is a pullable body, never inserted into the anchor/solid list.
             this.pullingCube = true;
             releaseRope(p, false);
@@ -290,6 +313,7 @@ export class PuzzleWorld {
             return;
         this.elapsed += dt;
         this.deathFlash = Math.max(0, this.deathFlash - dt);
+        this.authority?.cube?.sync(this);
         if (interact)
             this.interact();
         const input = { ...rawInput };
@@ -301,13 +325,13 @@ export class PuzzleWorld {
         this.evaluate();
         for (const machine of [...this.lifts, ...this.gates]) machine.step(dt);
         this.keyboardHook(input);
-        if (this.keyboardGrapple) this.pullingCube = false;
+        if (this.keyboardGrapple) { this.authority?.cube?.cancelPull(); this.pullingCube = false; }
         else this.hookCube(input);
         if (this.pullingCube) {
             input.grappleHeld = false;
             input.grapplePressed = false;
         }
-        if (this.cube && !this.cube.carried) {
+        if (this.cube && !this.cube.carried && (!this.authority?.cube || this.authority.cube.simulates)) {
             const c = this.cube;
             const field = this.lifts.map(l => l.influence(c, CUBE_SIZE, CUBE_SIZE)).find(Boolean);
             stepBody(c, CUBE_SIZE, this.solids, this.pullingCube ? 300 : CARRY.cubeGravity, CARRY.cubeMaxFall, dt, field);
@@ -345,7 +369,7 @@ export class PuzzleWorld {
             if (this.cube?.carried) { this.cubeTransferred = true; this.emit('relay-cargo'); }
             break;
         }
-        if (this.cube?.carried) Object.assign(this.cube, {
+        if (this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally)) Object.assign(this.cube, {
             x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2,
             vx: 0, vy: 0, grounded: false,
         });
@@ -383,6 +407,7 @@ export class PuzzleWorld {
         this.plateDepth += ((this.inputs.plateA ? 1 : 0) - this.plateDepth) * Math.min(1, dt * 16);
         this.plateDepthB += ((this.inputs.plateB ? 1 : 0) - this.plateDepthB) * Math.min(1, dt * 16);
         this.plateDepthC += ((this.inputs.plateC ? 1 : 0) - this.plateDepthC) * Math.min(1, dt * 16);
+        this.cargoPlateDepth += ((this.inputs.cubeOnPlate ? 1 : 0) - this.cargoPlateDepth) * Math.min(1, dt * 16);
         this.doorOpen = clamp(this.doorOpen + (this.frame.outputs.exitDoor ? dt * 3 : -dt * 3), 0, 1);
         this.displayPulse = Math.max(0, this.displayPulse - dt * 0.9);
         if (this.room.hazards.some(h => boxesOverlap(playerBox(this.player), h)) || this.player.y > this.room.height + 50)
@@ -394,5 +419,5 @@ export class PuzzleWorld {
     }
     target(aim: Vec2) { return this.room.id === 'pressure' ? null : findGrappleTarget(this.player, aim, this.solids, this.player.groundId); }
     /** Apply accepted state even while menus or a reconnect pause local simulation. */
-    syncAuthority(): void { if (this.authority) this.evaluate(); }
+    syncAuthority(): void { if (this.authority) { this.authority.cube?.sync(this); this.evaluate(); } }
 }

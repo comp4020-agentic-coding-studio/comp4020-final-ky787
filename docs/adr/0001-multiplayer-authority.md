@@ -68,8 +68,9 @@ migrates to exit unlock, preserving solved machinery without inventing arrivals;
 both players then perform the newly required physical finish.
 
 PAIRING BAY is an authored mock multiplayer test chamber. It introduces no binary
-or claimed assembly evidence. Shared cubes and multiplayer CONTROL SPINE await
-manual playtesting and a separate design pass.
+or claimed assembly evidence. The revised role/exit contract was subsequently accepted on two physical
+computers. [ADR 0002](0002-shared-cube-authority.md) extends this hybrid with a
+server-arbitrated shared cube; multiplayer CONTROL SPINE remains out of scope.
 
 Implementation limits, exact protocol, persistence paths, lifecycle and validation
 are recorded in [the multiplayer contract](../c9-multiplayer.md). Inactive rooms
@@ -78,4 +79,5 @@ Closed sockets release on handling; undetectable network loss uses a 5-second
 heartbeat with termination after a missed pong. No player-player collision is
 implemented. No Fly configuration change was needed. The original multiplayer
 build passed deployed two-browser checks and subsequent two-computer human
-testing; this revised gameplay contract still requires manual acceptance.
+testing; the revised role/exit contract has also passed two-computer manual acceptance.
+The later shared-cube extension requires its own manual acceptance.

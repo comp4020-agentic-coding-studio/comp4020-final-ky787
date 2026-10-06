@@ -10,7 +10,8 @@ export function liftProximity(player: Vec2, box: Box): number {
 }
 function state(w: PuzzleWorld) {
     return { phase: w.player.rope.phase, jumps: w.player.ropeJumpAnchors.length, grounded: w.player.grounded,
-        carried: !!w.cube?.carried, plates: [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC],
+        carried: !!w.cube?.carried, plates: [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC,
+            !!w.room.cargoPlate && w.inputs.cubeOnPlate],
         outputs: { ...w.frame.outputs }, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
 }
 type AudioSink = Pick<GameAudio, 'play' | 'setLoop' | 'stopAll'>;
@@ -33,7 +34,7 @@ export class AudioPresentation {
         if (w.player.justLanded) play('landing', undefined, Math.min(1, w.player.landingSpeed / 700));
         if (old.carried !== next.carried) play(next.carried ? 'pickup' : 'drop');
         next.plates.forEach((on, i) => {
-            if (on !== old.plates[i]) play('plate', [w.room.plate, w.room.plateB, w.room.plateC][i], .8, on ? 1 : .8);
+            if (on !== old.plates[i]) play('plate', [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i], .8, on ? 1 : .8);
         });
         // One cue per retained output, even when it controls several physical slabs.
         for (const signal of ['grappleAnchor', 'bridge', 'codePlatformA', 'codePlatformB'] as const)

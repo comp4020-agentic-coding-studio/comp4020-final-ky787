@@ -64,7 +64,7 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean }): void {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean }): void {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
@@ -170,6 +170,7 @@ export class PuzzleRenderer {
             { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
             { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
             { at: r.plateC, active: r.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
+            { at: r.cargoPlate, active: w.inputs.cubeOnPlate, depth: w.cargoPlateDepth, label: 'CARGO PLATE / CUBE ONLY' },
         ];
         for (const plate of plates) {
             if (!plate.at) continue;
@@ -239,6 +240,11 @@ export class PuzzleRenderer {
                 this.line(w.player.x, w.player.y, cube.x, cube.y, C.amber);
                 c.setLineDash([]);
             }
+            if (players?.remotePullingCube && players.remote) {
+                c.setLineDash([6, 5]);
+                this.line(players.remote.x, players.remote.y, cube.x, cube.y, C.amber);
+                c.setLineDash([]);
+            }
         }
         const p = w.player, rope = p.rope;
         if (rope.phase !== 'idle') {
@@ -276,7 +282,9 @@ export class PuzzleRenderer {
             this.text('MOCK MULTIPLAYER TEST · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
             this.text('HOLD FOR YOUR PARTNER', 110, 380, 15, C.cyan);
             this.text('RETURN BRIDGE CONTROL', 900, 380, 15, C.cyan);
-            this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1250, 460, 14, C.ink);
+            this.text('A THIRD HAND', 1170, 410, 14, C.amber);
+            this.text('SAFE FLOOR · RETURN TO CARGO', 1200, 660, 12, C.dim);
+            this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1670, 240, 14, C.ink);
         }
         if (r.id === 'relay')
             this.text('SAFE RECOVERY FLOOR · JUMP BACK UP', 1220, 700, 13, C.dim);

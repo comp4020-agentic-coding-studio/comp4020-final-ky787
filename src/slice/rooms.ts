@@ -31,6 +31,7 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     upperLever?: Vec2;
     upperCheckpoint?: Vec2;
     cargoRecovery?: Vec2;
+    cargoPlate?: Vec2;
     lifts?: LiftFieldDef[];
     gates?: RelayGatePairDef[];
     platforms: Platform[];
