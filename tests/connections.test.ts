@@ -15,7 +15,7 @@ it('every physical wire has endpoints inside its chamber and a distinct identity
         }
     }
 });
-it('UPLINK wiring follows all 32 retained frames; an unoccupied B wire turns off while the latch wire stays powered', () => {
+it('UPLINK wiring shows each source across all 32 retained frames, including inputs awaiting another condition', () => {
     const wires = roomConnections(roomById('uplink'));
     for (let key = 0; key < 32; key++) {
         const inputs: ControllerInputs = { plateA: !!(key & 1), switchB: !!(key & 2), plateB: !!(key & 4), switchC: !!(key & 8), cubeOnPlateC: !!(key & 16), plateC: true, cubeOnPlate: false, cubeOnPlateB: false };
@@ -23,8 +23,10 @@ it('UPLINK wiring follows all 32 retained frames; an unoccupied B wire turns off
         expect(connectionPowered(wires.find(w => w.id === 'anchor-feed')!, w)).toBe(inputs.plateA);
         expect(connectionPowered(wires.find(w => w.id === 'plate-lift')!, w)).toBe(inputs.plateB);
         expect(connectionPowered(wires.find(w => w.id === 'latch-lift')!, w)).toBe(inputs.switchC);
-        expect(connectionPowered(wires.find(w => w.id === 'exit-feed')!, w)).toBe(inputs.switchC && inputs.cubeOnPlateC);
-        for (const wire of wires.filter(w => w.id.startsWith('payload-'))) expect(connectionPowered(wire, w)).toBe(w.frame.outputs.codePlatformB);
+        expect(connectionPowered(wires.find(w => w.id === 'exit-feed')!, w)).toBe(inputs.cubeOnPlateC);
+        for (const wire of wires.filter(w => w.id.startsWith('payload-'))) expect(connectionPowered(wire, w)).toBe(inputs.cubeOnPlateC);
+        expect(w.frame.outputs.exitDoor).toBe(inputs.switchC && inputs.cubeOnPlateC);
+        expect(w.frame.outputs.codePlatformB).toBe(inputs.switchC && inputs.cubeOnPlateC);
     }
 });
 it('powered pulses travel around a corner and loop without adding gameplay delay', () => {

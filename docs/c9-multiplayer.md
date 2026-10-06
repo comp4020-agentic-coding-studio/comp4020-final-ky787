@@ -141,6 +141,10 @@ with **EXIT UNLOCKED · REGROUP**. Both leave their plates and enter the nearby
 exit. The first arrival shows **1 / 2 ARRIVED**; the second produces **PAIRING
 COMPLETE**. P1-left/P2-right and P2-left/P1-right work identically.
 
+Each plate's animated connection follows its accepted occupancy independently:
+one held final plate lights its feed while the exit waits for the second signal.
+Released feeds go dim even after the door has permanently unlocked.
+
 Arrival is deliberately lasting semantic progress, not simultaneous exit
 occupancy: once a player reaches the unlocked exit, walking away or disconnecting
 does not remove their credit. The other distinct player must still reach it.

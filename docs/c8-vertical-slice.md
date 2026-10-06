@@ -141,14 +141,17 @@ real addresses, raw bytes and inspector provenance remain authoritative.
 
 `src/slice/connections.ts` defines authored physical polylines. Dim wires are
 visible before activation; a powered wire illuminates and carries moving dashes
-and a travelling pulse from its input toward its output. All tutorial controls
+and a travelling pulse from its input toward its output. Wire illumination follows
+its source input, including a player or cube holding a plate, even when the
+destination still needs another condition. Releasing that input dims its wire;
+the destination retains its own controller-driven state. All tutorial controls
 also receive these connections. In CONTROL SPINE, wires link A to the crossing,
 relay power to both gates, B and the upper latch separately to the lift, the latch
 to service, and Node C to the final route and exit. B's wire turns off when its
 cube is freed while the latch feed stays visibly powered.
 
 These are **physical wiring diagrams**, not fabricated CFG edges or retained CPU
-timing. They consume the already-selected frame and cannot delay or modify it.
+timing. They read the accepted inputs and cannot delay or modify controller outputs.
 The bogus clone has no invented controller feed or successful-trace pulse. Debug
 shows each connection's input/output pair and current powered state.
 

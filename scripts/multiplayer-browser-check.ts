@@ -238,6 +238,14 @@ try {
         // Swap the final-plate assignment as well as the first traversal roles.
         await walk(holder, 1370); await wait(runner, 'left final plate visible', s => s.multiplayer?.shared?.inputs.finalPlateLeftOccupied === true);
         check('one final plate cannot unlock or complete', !(await snapshot(runner)).outputs.exitDoor && !(await snapshot(runner)).multiplayer?.shared?.completed);
+        for (const client of [holder, runner]) {
+            const partial = await snapshot(client);
+            check('held plate lights its own door feed while the other feed and door stay off',
+                partial.connections.some(c => c.id === 'exit-feed' && c.powered)
+                && partial.connections.some(c => c.id === 'exit-right-feed' && !c.powered)
+                && !partial.outputs.exitDoor);
+        }
+        await shot(holder, 'pairing-one-signal');
         await walk(runner, 1490);
         const beforeDoor = (await snapshot(holder)).audio.played.door ?? 0;
         const beforeComplete = (await snapshot(holder)).audio.played.complete ?? 0;
@@ -254,6 +262,8 @@ try {
         await walk(holder, 1490); await walk(runner, 1500);
         const released = await wait(holder, 'both final plates released', s => !s.inputs.plateB && !s.inputs.plateC);
         check('leaving both plates keeps the door open, with no arrivals', released.outputs.exitDoor && !released.multiplayer?.shared?.completed && released.multiplayer?.shared?.reachedExit.every(v => !v) === true);
+        check('released plate feeds go dim while the unlocked door stays open',
+            released.connections.filter(c => c.output === 'exitDoor').every(c => !c.powered) && released.outputs.exitDoor);
         check('unlock plays one door cue and no completion cue', (released.audio.played.door ?? 0) === beforeDoor + 1 && (released.audio.played.complete ?? 0) === beforeComplete);
         await walk(holder, 1740);
         const firstArrival = await wait(runner, 'first physical arrival accepted', s => !!s.multiplayer?.shared?.reachedExit[holderSlot - 1]);

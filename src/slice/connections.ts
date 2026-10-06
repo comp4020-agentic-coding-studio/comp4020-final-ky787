@@ -48,8 +48,9 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
     }
     return wires;
 }
-export function connectionPowered(link: MachineConnection, w: Pick<PuzzleWorld, 'inputs' | 'frame'>): boolean {
-    return w.inputs[link.input] && w.frame.outputs[link.output];
+/** Show the source signal even while the destination waits for other inputs. */
+export function connectionPowered(link: MachineConnection, w: Pick<PuzzleWorld, 'inputs'>): boolean {
+    return w.inputs[link.input];
 }
 /** Constant-speed motion along the authored wire, not a simulated CPU signal delay. */
 export function connectionPulse(points: readonly Vec2[], seconds: number): Vec2 {
