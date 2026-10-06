@@ -1,5 +1,9 @@
 # C8 vertical slice — updated 2026-10-05
 
+Historical C8 record. The separate 2026-10-06 [PAIRING BAY multiplayer pass](c9-multiplayer.md)
+extends the existing Node server and menu. Its room store does not change these
+campaign save paths, controller evidence or accepted physical layouts.
+
 Status: three mock tutorial rooms plus **CONTROL SPINE**, the enlarged
 **validated-trace UPLINK** showcase. The existing Windows OLLVM-16 BCF controller
 is unchanged; this pass redesigns its physical chamber and adds authored XOR

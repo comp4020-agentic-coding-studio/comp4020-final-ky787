@@ -8,7 +8,7 @@ import type { Vec2 } from '../engine/geometry.ts';
 import { revealMessage, authoredPresentation, type MachinePresentation } from './presentation.ts';
 import type { PuzzleWorld } from './world.ts';
 import { ROOM_IDS } from './controller.ts';
-import { canJumpFromRope } from '../engine/physics.ts';
+import { canJumpFromRope, type PlayerState } from '../engine/physics.ts';
 import { drawMachinery } from './machinery-render.ts';
 import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
@@ -64,7 +64,7 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean): void {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null }): void {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
@@ -83,7 +83,7 @@ export class PuzzleRenderer {
             this.line(x, 0, x, r.height, C.grid, 0.6);
         for (let y = 0; y < r.height; y += 50)
             this.line(0, y, r.width, y, C.grid, 0.6);
-        this.text(`0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
+        this.text(r.id === 'pairing-bay' ? 'CO-OP / PAIRING BAY' : `0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
         this.text(r.instruction, 80, r.id === 'uplink' ? 1045 : 132, 27, C.ink);
         drawConnections(c, this.connections, w);
         for (const h of r.hazards) {
@@ -167,9 +167,9 @@ export class PuzzleRenderer {
             }
         }
         const plates = [
-            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
-            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
-            { at: r.plateC, active: w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: 'NODE C / CUBE PAYLOAD' },
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'pairing-bay' ? 'PLATE A / PLAYER 1' : r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
+            { at: r.plateC, active: r.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
         ];
         for (const plate of plates) {
             if (!plate.at) continue;
@@ -180,11 +180,11 @@ export class PuzzleRenderer {
             c.fillRect(x - 45, y - 9 + plate.depth * 6, 90, 7);
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
         }
-        if (r.plateB && r.id !== 'uplink') {
+        if (r.plateB && r.id === 'relay') {
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
         for (const lever of [
-            { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' },
+            { at: r.lever, active: w.inputs.switchB, name: r.id === 'pairing-bay' ? 'SWITCH B / P2' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' },
             { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
         ]) {
             if (!lever.at) continue;
@@ -241,7 +241,15 @@ export class PuzzleRenderer {
             this.line(p.x, p.y, rope.tip.x, rope.tip.y, C.cyan, 2);
             this.ring(rope.tip.x, rope.tip.y, 4, C.ink);
         }
-        drawNinja(c, p, w.elapsed, C.cyan);
+        const localAccent = players?.localSlot === 2 ? '#b59bff' : C.cyan;
+        if (players?.remote) {
+            const other = players.remote, accent = players.localSlot === 1 ? '#b59bff' : C.cyan;
+            if (other.rope.phase !== 'idle') this.line(other.x, other.y, other.rope.tip.x, other.rope.tip.y, accent);
+            drawNinja(c, other, w.elapsed, accent);
+            this.text(`PLAYER ${players.localSlot === 1 ? 2 : 1}`, other.x - 32, other.y - 30, 10, accent);
+        }
+        drawNinja(c, p, w.elapsed, localAccent);
+        if (players) this.text(`YOU / P${players.localSlot}`, p.x - 26, p.y - 30, 10, localAccent);
         const hint = w.interactionHint();
         if (hint)
             this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
@@ -255,10 +263,16 @@ export class PuzzleRenderer {
         }
         if (rope.phase === 'attached') this.text(canJumpFromRope(p) ? 'SPACE · JUMP OFF' : 'SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
         else if (w.keyboardGrapple) this.text('SPACE · CANCEL HOOK', p.x - 65, p.y - 48, 13, C.cyan);
-        if (r.id === 'switch' || r.id === 'relay') {
+        if (r.id === 'switch' || r.id === 'relay' || r.id === 'pairing-bay') {
             this.text('HOLD CLICK + D', 305, 440, 15, C.ink);
             this.text('OR SPACE IN THE AIR', 285, 461, 13, C.cyan);
             this.text('Release as you swing right', 310, 483, 12, C.dim);
+        }
+        if (r.id === 'pairing-bay') {
+            this.text('MOCK MULTIPLAYER TEST · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
+            this.text('P1: HOLD A', 150, 380, 15, C.cyan);
+            this.text('P2: CROSS → LATCH B', 880, 380, 15, '#b59bff');
+            this.text('ONE PLAYER ON EACH FINAL PLATE', 1250, 460, 14, C.ink);
         }
         if (r.id === 'relay')
             this.text('SAFE RECOVERY FLOOR · JUMP BACK UP', 1220, 700, 13, C.dim);

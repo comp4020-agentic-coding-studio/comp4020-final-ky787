@@ -9,13 +9,16 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
+RUN pnpm prune --prod --ignore-scripts
 
-# One small Node HTTP process serves the build and atomic progress files on /data.
+# One Node process serves HTTP, /ws and atomic visitor/room files on /data.
 FROM docker.io/library/node:24.21.0-slim
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/dist/ ./dist/
+COPY --from=build /app/node_modules/ ./node_modules/
 COPY server/ ./server/
 COPY src/slice/progress.ts src/slice/controller.ts ./src/slice/
+COPY src/coop/protocol.ts ./src/coop/
 COPY package.json README.md ./
 CMD ["node", "server/app.ts"]

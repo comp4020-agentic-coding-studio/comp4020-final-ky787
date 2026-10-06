@@ -1,16 +1,17 @@
 import { createServer } from 'node:http';
-import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, open, rename, unlink } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { resolve, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { freshProgress, validProgress, readProgress, type Progress } from '../src/slice/progress.ts';
+import { atomicJson } from './atomic-json.ts';
+import { ensureVisitor, sameOrigin } from './identity.ts';
+import { attachMultiplayer } from './multiplayer.ts';
 interface RecordData {
     id: string;
     revision: number;
     updatedAt: string | null;
     progress: Progress;
 }
-const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 /** One Fly machine/volume. Per-visitor serialization + revision checks prevent lost tab writes. */
 export async function createApp(dataDir: string, siteDir = resolve('dist')) {
     await mkdir(dataDir, { recursive: true });
@@ -42,48 +43,30 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
         }
     }
     async function save(record: RecordData): Promise<void> {
-        const path = join(dataDir, `${record.id}.json`), temp = `${path}.${randomUUID()}.tmp`;
-        try {
-            const handle = await open(temp, 'wx', 0o600);
-            try {
-                await handle.writeFile(JSON.stringify(record));
-                await handle.sync();
-            }
-            finally {
-                await handle.close();
-            }
-            await rename(temp, path);
-            const directory = await open(dataDir, 'r');
-            try {
-                await directory.sync();
-            }
-            finally {
-                await directory.close();
-            }
-        }
-        finally {
-            await unlink(temp).catch(() => { });
-        }
+        await atomicJson(join(dataDir, `${record.id}.json`), record);
     }
     const mime: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.ogg': 'audio/ogg', '.txt': 'text/plain' };
-    return createServer(async (req, res) => {
+    const server = createServer(async (req, res) => {
         const json = (code: number, value: unknown) => { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); };
         try {
             const url = new URL(req.url ?? '/', 'http://localhost');
+            if (url.pathname === '/api/identity') {
+                if (req.method !== 'GET') { json(405, { error: 'Method not allowed' }); return; }
+                if (!sameOrigin(req)) { json(403, { error: 'Origin mismatch' }); return; }
+                json(200, { id: ensureVisitor(req, res) });
+                return;
+            }
             if (url.pathname === '/api/progress') {
                 if (!['GET', 'PUT'].includes(req.method ?? '')) {
                     json(405, { error: 'Method not allowed' });
                     return;
                 }
                 // Same-origin writes only, including behind Fly's TLS proxy.
-                if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) {
+                if (!sameOrigin(req)) {
                     json(403, { error: 'Origin mismatch' });
                     return;
                 }
-                const cookie = req.headers.cookie?.split(';').map(s => s.trim()).find(s => s.startsWith('bn_visitor='))?.slice(11);
-                const id = cookie && uuid.test(cookie) ? cookie : randomUUID();
-                if (id !== cookie)
-                    res.setHeader('Set-Cookie', `bn_visitor=${id}; HttpOnly; SameSite=Lax; Path=/; Max-Age=31536000${req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : ''}`);
+                const id = ensureVisitor(req, res);
                 let body = '';
                 if (req.method === 'PUT') {
                     for await (const chunk of req) {
@@ -166,11 +149,13 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
                 res.end();
         }
     });
+    await attachMultiplayer(server, dataDir);
+    return server;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
     const server = await createApp(process.env.DATA_DIR ?? '/data');
     server.listen(Number(process.env.PORT ?? 8080), '0.0.0.0', () => console.log(`Binary Ninja listening on ${(server.address() as {
         port: number;
     }).port}`));
-    process.on('SIGTERM', () => server.close(() => process.exit(0)));
+    process.on('SIGTERM', () => { server.emit('shutdown'); server.close(() => process.exit(0)); });
 }

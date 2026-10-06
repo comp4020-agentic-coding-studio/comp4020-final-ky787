@@ -23,4 +23,11 @@ I did experiments and playtested various game ideas, one that tried to piece tog
 - [6c31f23 — CONTROL SPINE showcase](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/6c31f236322b73cd2fd2fe2ac0aa1f33ed869888): Enlarged UPLINK into a chamber with two payload-retrieval loops without changing its validated controller contract. Added authored XOR message effects, clearly separate from binary evidence, and retained route screenshots.
 - [409b076 — Clearer connections and grapple finale](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/409b076e7e5611c37781c212298518b659cadb75): Added animated powered connections and a held overview so players could read the room. Reworked the final route into a grapple sequence with an unstable anchor and safe recovery.
 
+## Multiplayer implementation record — 2026-10-06
+
+The separate PAIRING BAY infrastructure pass adds real two-browser sessions to
+the existing Node server. [The technical record](docs/c9-multiplayer.md) documents
+authority, persistence, browser validation and remaining deployment limits;
+[ADR 0001](docs/adr/0001-multiplayer-authority.md) records the architecture choice.
+This implementation record does not supply or replace the C9 personal reflection.
 

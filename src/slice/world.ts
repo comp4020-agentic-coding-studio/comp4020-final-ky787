@@ -22,6 +22,15 @@ export interface MachineEvent {
     kind: string;
     at: Vec2;
 }
+/** Optional external authority supplies accepted state; sensors only report intent. */
+export interface WorldAuthority {
+    frame: ControllerFrame;
+    inputs: ControllerInputs;
+    checkpoint: RoomMemory['checkpoint'];
+    sample(world: PuzzleWorld): void;
+    interact(world: PuzzleWorld): void;
+    hint(world: PuzzleWorld): string;
+}
 /** Physical simulation only. Controller adapter has no access to coordinates or bodies. */
 export class PuzzleWorld {
     player = createPlayer(0, 0);
@@ -48,7 +57,7 @@ export class PuzzleWorld {
     exited = false;
     pullingCube = false;
     events: MachineEvent[] = [];
-    constructor(readonly room: RoomDef, memory: RoomMemory, private controller: RoomController = roomController) {
+    constructor(readonly room: RoomDef, memory: RoomMemory, private controller: RoomController = roomController, private authority?: WorldAuthority) {
         this.inputs.switchB = memory.switchB;
         this.inputs.switchC = memory.switchC ?? false;
         this.cubeTransferred = memory.cubeTransferred ?? false;
@@ -67,7 +76,7 @@ export class PuzzleWorld {
         this.solids = [...this.platforms.map(p => p.solid), this.door,
             { id: 'left-wall', x: -40, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false },
             { id: 'right-wall', x: room.width, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false }];
-        this.frame = this.controller.evaluate(room.id, this.inputs);
+        this.frame = this.authority?.frame ?? this.controller.evaluate(room.id, this.inputs);
         this.samplePlate();
         this.evaluate();
         this.events = [];
@@ -90,6 +99,7 @@ export class PuzzleWorld {
         return !!plate && Math.abs(body.x - plate.x) < 45 + width / 2 - 8 && Math.abs(body.y + height / 2 - plate.y) < 5;
     }
     private samplePlate(): void {
+        if (this.authority) { this.authority.sample(this); return; }
         const c = this.cube, p = this.player;
         const occupied = (plate: Vec2 | undefined) => ({
             cube: !!c && !c.carried && c.grounded && this.onPlate(c, CUBE_SIZE, CUBE_SIZE, plate),
@@ -124,7 +134,11 @@ export class PuzzleWorld {
     }
     private evaluate(): void {
         const old = this.frame.outputs;
-        this.frame = this.controller.evaluate(this.room.id, { ...this.inputs });
+        if (this.authority) {
+            this.inputs = { ...this.authority.inputs };
+            this.checkpoint = this.authority.checkpoint;
+        }
+        this.frame = this.authority?.frame ?? this.controller.evaluate(this.room.id, { ...this.inputs });
         for (const p of this.platforms) {
             if (p.def.kind !== 'code')
                 continue;
@@ -147,6 +161,7 @@ export class PuzzleWorld {
         this.door.enabled = !this.frame.outputs.exitDoor;
     }
     interactionHint(): string {
+        if (this.authority) return this.authority.hint(this);
         if (this.cube?.carried)
             return 'E · put down cube';
         const lever = this.nearLever();
@@ -158,6 +173,7 @@ export class PuzzleWorld {
         return '';
     }
     interact(): void {
+        if (this.authority) { this.authority.interact(this); return; }
         const p = this.player, c = this.cube, lever = this.nearLever();
         if (c?.carried) {
             const ahead = p.x + p.facing * (PLAYER.width / 2 + CUBE_SIZE / 2 + 10);
@@ -371,10 +387,12 @@ export class PuzzleWorld {
         this.displayPulse = Math.max(0, this.displayPulse - dt * 0.9);
         if (this.room.hazards.some(h => boxesOverlap(playerBox(this.player), h)) || this.player.y > this.room.height + 50)
             this.respawn();
-        if (this.frame.outputs.exitDoor && boxesOverlap(playerBox(this.player), this.room.exit)) {
+        if (!this.authority && this.frame.outputs.exitDoor && boxesOverlap(playerBox(this.player), this.room.exit)) {
             this.exited = true;
             this.emit('complete');
         }
     }
     target(aim: Vec2) { return this.room.id === 'pressure' ? null : findGrappleTarget(this.player, aim, this.solids, this.player.groundId); }
+    /** Apply accepted state even while menus or a reconnect pause local simulation. */
+    syncAuthority(): void { if (this.authority) this.evaluate(); }
 }

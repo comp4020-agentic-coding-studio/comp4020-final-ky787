@@ -10,7 +10,7 @@ export function liftProximity(player: Vec2, box: Box): number {
 }
 function state(w: PuzzleWorld) {
     return { phase: w.player.rope.phase, jumps: w.player.ropeJumpAnchors.length, grounded: w.player.grounded,
-        carried: !!w.cube?.carried, plates: [w.inputs.plateA, w.inputs.plateB, w.inputs.cubeOnPlateC],
+        carried: !!w.cube?.carried, plates: [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC],
         outputs: { ...w.frame.outputs }, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
 }
 type AudioSink = Pick<GameAudio, 'play' | 'setLoop' | 'stopAll'>;

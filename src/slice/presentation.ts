@@ -1,7 +1,7 @@
 import { decodeXor, revealXor, XOR_MESSAGES } from './xor-presentation.ts';
-import type { ControllerFrame, ControllerOutputs, RoomId } from './controller.ts';
+import type { ControllerFrame, ControllerOutputs, WorldRoomId } from './controller.ts';
 export interface MachinePresentation {
-    describe(room: RoomId, frame: Readonly<ControllerFrame>, signal?: keyof ControllerOutputs): {
+    describe(room: WorldRoomId, frame: Readonly<ControllerFrame>, signal?: keyof ControllerOutputs): {
         active: boolean;
         text: string;
         label: string;
@@ -12,6 +12,8 @@ export interface MachinePresentation {
 export const authoredPresentation: MachinePresentation = {
     describe(room, frame, signal) {
         const o = frame.outputs;
+        if (room === 'pairing-bay') return { active: o.grappleAnchor || o.bridge || o.exitDoor,
+            text: o.exitDoor ? 'PAIRING COMPLETE' : o.bridge ? 'TWO PLAYERS · TWO PLATES' : 'HOLD A · PARTNER CROSSES', label: 'MOCK MULTIPLAYER / TEST CONTROLLER' };
         if (room === 'uplink') {
             const key = signal ?? (o.exitDoor ? 'exitDoor' : o.codePlatformA ? 'codePlatformA' : o.liftField ? 'liftField' : 'relayGates');
             const messages: Partial<Record<keyof ControllerOutputs, readonly number[]>> = {

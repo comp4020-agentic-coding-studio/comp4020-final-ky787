@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { freshProgress, type Progress } from '../src/slice/progress.ts';
 const URL_BASE = process.argv[2] ?? "http://localhost:8080/";
 const SHOTS = process.argv[3] ?? join(tmpdir(), "binary-ninja-shots");
-const BROWSERS = ["chromium-browser", "chromium", "google-chrome", "google-chrome-stable"];
+const BROWSERS = [process.env.BROWSER_BIN, "chromium-browser", "chromium", "google-chrome", "google-chrome-stable", "brave-browser"].filter(Boolean) as string[];
 const PORT = 9334;
 interface Cdp {
     send: (method: string, params?: Record<string, unknown>) => Promise<Record<string, unknown>>;

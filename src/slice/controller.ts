@@ -1,6 +1,8 @@
 /** Coordinate-free physical controller contract. Evidence belongs to the selected adapter. */
 export const ROOM_IDS = ["pressure", "switch", "relay", "uplink"] as const;
 export type RoomId = typeof ROOM_IDS[number];
+/** Campaign IDs deliberately exclude the separate co-op session. */
+export type WorldRoomId = RoomId | 'pairing-bay';
 export interface ControllerInputs {
     plateA: boolean;
     plateB: boolean;
@@ -21,15 +23,16 @@ export interface ControllerOutputs {
     liftField: boolean;
 }
 export interface ControllerFrame {
-    source: "mock-greybox" | "validated-trace";
+    source: "mock-greybox" | "validated-trace" | "mock-multiplayer";
     outputs: ControllerOutputs;
     evidence?: { stateId: number; traceId: string; specimenId: string; binarySha256: string };
 }
 export interface RoomController {
-    evaluate(room: RoomId, inputs: Readonly<ControllerInputs>): ControllerFrame;
+    evaluate(room: WorldRoomId, inputs: Readonly<ControllerInputs>): ControllerFrame;
 }
 export const mockController: RoomController = {
     evaluate(room, i) {
+        if (room === 'pairing-bay') throw new Error('PAIRING BAY requires server authority');
         const uplink = room === 'uplink';
         const anchor = room === "switch" ? i.switchB : (room === "relay" || uplink) && i.plateA;
         return { source: "mock-greybox", outputs: {

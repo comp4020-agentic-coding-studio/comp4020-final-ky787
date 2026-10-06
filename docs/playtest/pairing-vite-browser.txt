@@ -1,0 +1,21 @@
+PASS two isolated visitors
+PASS displayed human-readable room code — BET8
+PASS Player 1 waiting UI
+PASS UI join gives Player 2
+PASS WebSocket uses the page host/protocol and /ws
+PASS both clients render remote avatars
+PASS Plate A propagates in under one second including approach — 444 ms
+PASS remote avatar moves through ordinary input
+PASS disconnect removes avatar and releases anchor
+PASS partner disconnected visible
+PASS reconnect reclaims P1 without stale plate occupancy
+PASS Player 2 crosses with normal grapple input
+PASS Switch B bridge propagates in under one second — 66 ms
+PASS shared reunion checkpoint
+PASS refresh retains slot/latch/checkpoint
+PASS Player 1 traverses the materialized return bridge
+PASS one final plate cannot complete
+PASS final plate propagates in under one second including approach — 461 ms
+PASS two distinct bodies open exit and complete on both clients
+PASS co-op leaves personal campaign save unchanged
+PASS no browser exceptions or console errors

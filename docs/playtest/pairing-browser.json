@@ -1,0 +1,36 @@
+{
+  "checks": [
+    "PASS two isolated visitors",
+    "PASS displayed human-readable room code — MDEC",
+    "PASS Player 1 waiting UI",
+    "PASS UI join gives Player 2",
+    "PASS WebSocket uses the page host/protocol and /ws",
+    "PASS TLS proxy assigns one Secure HttpOnly visitor cookie",
+    "PASS both clients render remote avatars",
+    "PASS Plate A propagates in under one second including approach — 464 ms",
+    "PASS remote avatar moves through ordinary input",
+    "PASS disconnect removes avatar and releases anchor",
+    "PASS partner disconnected visible",
+    "PASS reconnect reclaims P1 without stale plate occupancy",
+    "PASS Player 2 crosses with normal grapple input",
+    "PASS Switch B bridge propagates in under one second — 66 ms",
+    "PASS shared reunion checkpoint",
+    "PASS refresh retains slot/latch/checkpoint",
+    "PASS Player 1 traverses the materialized return bridge",
+    "PASS unexpected server loss shows RECONNECTING",
+    "PASS both automatic reconnects preserve slots and shared checkpoint",
+    "PASS process restart restores no body-held input",
+    "PASS one final plate cannot complete",
+    "PASS final plate propagates in under one second including approach — 492 ms",
+    "PASS two distinct bodies open exit and complete on both clients",
+    "PASS co-op leaves personal campaign save unchanged",
+    "PASS no browser exceptions or console errors"
+  ],
+  "propagation": {
+    "plateA": 464,
+    "switchB": 66,
+    "finalPlate": 492
+  },
+  "url": "https://127.0.0.1:35035/",
+  "processRestart": true
+}

@@ -2,7 +2,8 @@
 
 - Gameplay comes first: hand-authored cooperative platform puzzles, never
   physical layouts generated from CFGs. C8 is four rooms (three tutorials plus UPLINK) for one player;
-  no networking, accounts or new binaries.
+  keep it independent of PAIRING BAY co-op sessions on the existing Node server.
+  No accounts or new binaries in this multiplayer infrastructure pass.
 - Keep `Workspace/binary_ninja/comp4020-crit5-Ky787` and
   `Workspace/seeing_through_obfuscation` read-only. Preserve research artifacts
   in `Workspace/binary_binja_redesign`; dated notes belong in its `handoffs/`.

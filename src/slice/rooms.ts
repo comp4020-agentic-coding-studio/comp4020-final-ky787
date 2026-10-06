@@ -1,6 +1,6 @@
 import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
-import type { ControllerOutputs, RoomId } from "./controller.ts";
+import type { ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 export interface Platform extends Box {
     id: string;
@@ -15,8 +15,8 @@ export interface Platform extends Box {
     anchor?: boolean;
     label?: string;
 }
-export interface RoomDef {
-    id: RoomId;
+export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
+    id: Id;
     title: string;
     instruction: string;
     width: number;
@@ -39,7 +39,7 @@ export interface RoomDef {
     display: Vec2;
 }
 const floor = (id: string, x: number, y: number, w: number, h = 160): Platform => ({ id, x, y, w, h, kind: "static" });
-export const ROOMS: readonly RoomDef[] = [
+export const ROOMS: readonly RoomDef<RoomId>[] = [
     {
         id: "pressure", title: "PRESSURE", instruction: "PUT THE CUBE ON THE BUTTON",
         width: 1250, height: 720, spawn: { x: 140, y: 543 }, checkpoint: { x: 140, y: 543 },
@@ -104,4 +104,4 @@ export const ROOMS: readonly RoomDef[] = [
         exit: { x: 210, y: 320, w: 60, h: 140 },
     },
 ];
-export function roomById(id: RoomId): RoomDef { return ROOMS.find(r => r.id === id)!; }
+export function roomById(id: RoomId): RoomDef<RoomId> { return ROOMS.find(r => r.id === id)!; }

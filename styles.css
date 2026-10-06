@@ -294,6 +294,18 @@ p {
 .level-grid small { display:block; font:9px ui-monospace,monospace; margin-top:6px; color:#91a9b5; }
 .level-grid [aria-current] { border-color:#64e6d5; }
 .level-select>small { font:10px/1.5 ui-monospace,monospace; color:#91a9b5; }
+.coop-entry { margin-top:20px; padding-top:18px; border-top:1px solid #314750; }
+.coop-entry form { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px; }
+.coop-entry label { font:10px ui-monospace,monospace; }
+.coop-entry input { width:90px; padding:10px; color:#e2edf1; background:#101c23; border:1px solid #647d89; border-radius:4px; font:18px ui-monospace,monospace; text-transform:uppercase; letter-spacing:3px; }
+#join-error { color:#fa817e; font-size:12px; }
+#coop-hud { position:absolute; top:14px; right:18px; padding:14px 18px; background:#0c131aeF; border:1px solid #43545d; border-radius:6px; max-width:300px; display:flex; flex-direction:column; gap:6px; font:11px ui-monospace,monospace; pointer-events:none; }
+#coop-hud[hidden] { display:none; }
+#coop-hud strong { font-size:30px; letter-spacing:6px; color:#64e6d5; }
+#coop-hud pre { line-height:1.8; margin:2px 0; white-space:pre-wrap; }
+#coop-hud b { color:#b59bff; line-height:1.5; }
+#coop-hud button { pointer-events:auto; }
+.coop-mode #debug { right:auto; left:18px; }
 .progress-reset { margin-top:18px; padding-top:16px; border-top:1px solid #314750; }
 .progress-reset>button { width:100%; }
 .progress-reset>small { display:block; margin-top:8px; color:#91a9b5; }
