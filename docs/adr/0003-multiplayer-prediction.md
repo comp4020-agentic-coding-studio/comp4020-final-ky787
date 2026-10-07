@@ -1,6 +1,6 @@
 # Predict locally, reconcile to server authority
 
-Date: 2026-10-06. Status: implemented; real-network responsiveness acceptance pending.
+Date: 2026-10-06. Status: manually accepted on two physical computers before the mechanics-lab milestone.
 Starting HEAD: `aec24f90b212ee9f051bc7cb3f49e3574b5c0d75`.
 
 Two-computer testing accepted the shared cube but found pickup, drop, pull startup

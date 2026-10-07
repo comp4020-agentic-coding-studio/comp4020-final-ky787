@@ -8,6 +8,7 @@ import type { Vec2 } from '../engine/geometry.ts';
 import { revealMessage, authoredPresentation, type MachinePresentation } from './presentation.ts';
 import type { PuzzleWorld } from './world.ts';
 import { ROOM_IDS } from './controller.ts';
+import { isCoopLevel } from '../coop/protocol.ts';
 import { canJumpFromRope, type PlayerState } from '../engine/physics.ts';
 import { drawMachinery } from './machinery-render.ts';
 import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
@@ -72,7 +73,7 @@ export class PuzzleRenderer {
         if (r.id === 'uplink' && w.frame.outputs.exitDoor && !this.exitWasOpen) this.returnReveal = 2.2;
         this.exitWasOpen = w.frame.outputs.exitDoor;
         this.returnReveal = Math.max(0, this.returnReveal - dt);
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' || r.id === 'lift-lab' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;
@@ -83,7 +84,7 @@ export class PuzzleRenderer {
             this.line(x, 0, x, r.height, C.grid, 0.6);
         for (let y = 0; y < r.height; y += 50)
             this.line(0, y, r.width, y, C.grid, 0.6);
-        this.text(r.id === 'pairing-bay' ? 'CO-OP / PAIRING BAY' : `0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
+        this.text(isCoopLevel(r.id) ? `CO-OP / ${r.title}` : `0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
         this.text(r.instruction, 80, r.id === 'uplink' ? 1045 : 132, 27, C.ink);
         drawConnections(c, this.connections, w);
         for (const h of r.hazards) {
@@ -167,7 +168,7 @@ export class PuzzleRenderer {
             }
         }
         const plates = [
-            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'lift-lab' ? 'HOLD / LIFT POWER' : r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
             { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
             { at: r.plateC, active: r.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
             { at: r.cargoPlate, active: w.cargoPlateActive, depth: w.cargoPlateDepth, label: 'CARGO PLATE / CUBE ONLY' },
@@ -185,7 +186,7 @@ export class PuzzleRenderer {
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
         for (const lever of [
-            { at: r.lever, active: w.inputs.switchB, name: r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' },
+            { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
             { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
         ]) {
             if (!lever.at) continue;
@@ -218,8 +219,8 @@ export class PuzzleRenderer {
         c.fillStyle = '#52616a';
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
         this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
-        if (r.id === 'pairing-bay') {
-            this.text(players?.completed ? 'PAIRING COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
+        if (isCoopLevel(r.id)) {
+            this.text(players?.completed ? r.id === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
             if (w.frame.outputs.exitDoor) this.text(`${players?.reachedExit.filter(Boolean).length ?? 0} / 2 ARRIVED`, e.x + 8, e.y + 38, 12, C.cyan);
         }
         drawMachineListings(c, w, this.replay, this.presentation);
@@ -285,6 +286,22 @@ export class PuzzleRenderer {
             this.text('A THIRD HAND', 1170, 410, 14, C.amber);
             this.text('SAFE FLOOR · RETURN TO CARGO', 1200, 660, 12, C.dim);
             this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1670, 240, 14, C.ink);
+        }
+        if (isCoopLevel(r.id) && r.id !== 'pairing-bay') {
+            this.text('MOCK MECHANICS LAB · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
+            if (r.id === 'relay-lab') {
+                this.text('E · POWER CONTROL', 305, 410, 13, C.cyan);
+                this.text('TRY LOOSE CARGO, THEN CARRY IT', 80, 355, 13, C.amber);
+                this.text('JUMP INTO B TO RETURN', 1045, 590, 12, C.dim);
+            } else if (r.id === 'lift-lab') {
+                this.text('E · LATCH + SHARED CHECKPOINT', 760, 235, 12, C.cyan);
+                this.text('HOLD HERE FOR YOUR PARTNER', 220, 740, 14, C.cyan);
+                this.text('R · RESET ONLY YOUR BODY', 805, 455, 12, C.dim);
+            } else {
+                this.text('STEP · SHORT WARNING', 400, 485, 12, C.amber);
+                this.text('HOOK · LONG WARNING', 865, 275, 12, C.amber);
+                this.text('BOTH TESTS UNLOCK THE EXIT', 800, 440, 12, C.dim);
+            }
         }
         if (r.id === 'relay')
             this.text('SAFE RECOVERY FLOOR · JUMP BACK UP', 1220, 700, 13, C.dim);

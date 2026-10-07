@@ -5,13 +5,13 @@ import { PuzzleWorld } from '../src/slice/world.ts';
 import { freshProgress } from '../src/slice/progress.ts';
 import { emptyInput } from '../src/engine/physics.ts';
 import { FIXED_DT } from '../src/engine/constants.ts';
-import { sharedRoom, type RoomRecord } from '../server/pairing-state.ts';
+import { sharedRoom, type RoomRecord } from '../server/coop-state.ts';
 import type { Plate, Slot } from '../src/coop/protocol.ts';
 
 function setup(slot: Slot) {
-    const r: RoomRecord = { version: 3, cubePlacement: 'spawn', code: 'ABCD', level: 'pairing-bay', revision: 1,
+    const r: RoomRecord<'pairing-bay'> = { version: 4, cubePlacement: 'spawn', code: 'ABCD', level: 'pairing-bay', revision: 1,
         visitors: ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
-        switchB: false, checkpoint: 'entry', exitUnlocked: false, reachedExit: [false, false], completed: false,
+        levelState: { switchB: false }, checkpoint: 'entry', exitUnlocked: false, reachedExit: [false, false], completed: false,
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     const reported: Plate[] = []; let switches = 0, arrivals = 0;
     const authority = new PairingAuthority(sharedRoom(r, [true, true], [null, null]), slot, p => reported.push(p), () => { switches++; }, () => { arrivals++; });
@@ -49,7 +49,7 @@ it.each([1, 2] as const)('slot %s can request B and report its physical exit arr
     Object.assign(world.player, { x: 1050, y: 543 }); world.interact();
     expect(world.interactionHint()).toBe('E · LATCH RETURN BRIDGE');
     expect(switches()).toBe(1); expect(world.frame.outputs.bridge).toBe(false);
-    r.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], [null, null]);
+    r.levelState.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], [null, null]);
     world.syncAuthority();
     Object.assign(world.player, { x: 2100, y: 323 }); authority.sample(world);
     expect(arrivals()).toBe(0);
@@ -65,7 +65,7 @@ it.each([1, 2] as const)('slot %s can request B and report its physical exit arr
 
 it.each([1, 2] as const)('slot %s can sense either final plate and releases it when its body leaves', slot => {
     const { world, authority, r, reported } = setup(slot);
-    r.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], [null, null]);
+    r.levelState.switchB = true; r.checkpoint = 'reunion'; authority.room = sharedRoom(r, [true, true], [null, null]);
     for (const [x, plate] of [[1680, 'finalLeft'], [1920, 'finalRight']] as const) {
         Object.assign(world.player, { x, y: 323, grounded: true }); authority.sample(world);
         expect(reported.at(-1)).toBe(plate);

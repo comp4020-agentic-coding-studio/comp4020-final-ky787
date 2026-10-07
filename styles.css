@@ -328,3 +328,11 @@ p {
 .audio-settings input { width:100%; min-width:0; accent-color:#64e6d5; }
 #start-room { position:absolute; bottom:32px; left:50%; transform:translateX(-50%); padding:16px 30px; border-color:#64e6d5; color:#d8fff5; background:#101e27ee; font:600 16px ui-monospace,monospace; letter-spacing:2px; }
 #start-room span { display:block; margin-top:9px; font:12px ui-monospace,monospace; letter-spacing:0; color:#91a9b5; }
+
+/* Short mechanics lab selector; joins discover the creator's chosen lab. */
+.coop-labs { display: grid; gap: 8px; margin: 12px 0; }
+.coop-lab { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 12px; border: 1px solid #344955; border-radius: 6px; }
+.coop-lab strong, .coop-lab small { display: block; }
+.coop-lab strong { color: #64e6d5; font-size: 12px; }
+.coop-lab small { color: #a8bac3; margin-top: 5px; font-size: 11px; }
+.coop-lab button { width: auto; margin: 0; flex-shrink: 0; }

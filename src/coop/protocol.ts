@@ -2,7 +2,14 @@
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
-export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | null;
+export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab'] as const;
+export type CoopLevelId = typeof COOP_LEVELS[number];
+export const isCoopLevel = (v: unknown): v is CoopLevelId => COOP_LEVELS.includes(v as CoopLevelId);
+export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | 'liftControl' | null;
+export type Discontinuity = 'relay' | 'respawn' | 'recovery';
+export type CrumbleId = 'crumbleA' | 'crumbleB';
+export type CrumbleTrigger = 'foot' | 'hook';
+export interface CrumblePhase { phase: 'stable' | 'warning' | 'broken'; remainingMs: number; durationMs: number }
 export interface CubeTransform { x: number; y: number; vx: number; vy: number; grounded: boolean }
 export type CubePlacement = 'spawn' | 'cargoPlate';
 /** Ephemeral server arbitration, separate from both body reports and durable placement. */
@@ -16,41 +23,51 @@ export interface Avatar {
     facing: -1 | 1; grounded: boolean;
     rope: { x: number; y: number } | null;
 }
-export interface SharedRoom {
+export interface LevelStateMap {
+    'pairing-bay': {
+        inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnCargoPlate: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
+        outputs: { grappleAnchor: boolean; returnBridge: boolean; finalAccess: boolean; exitDoor: boolean };
+    };
+    'relay-lab': { relayEnabled: boolean };
+    'lift-lab': { lowerHeld: boolean; liftLatched: boolean; liftEnabled: boolean };
+    'crumble-lab': { tested: { foot: boolean; hook: boolean }; platforms: Record<CrumbleId, CrumblePhase> };
+}
+interface SharedSession {
     code: string;
-    level: 'pairing-bay';
     revision: number;
     assigned: [boolean, boolean];
     connected: [boolean, boolean];
-    inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnCargoPlate: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
-    outputs: { grappleAnchor: boolean; returnBridge: boolean; finalAccess: boolean; exitDoor: boolean };
-    cube: SharedCube;
-    cubePlacement: CubePlacement;
-    checkpoint: 'entry' | 'reunion';
+    checkpoint: 'entry' | 'reunion' | 'upper';
     exitUnlocked: boolean;
     reachedExit: [boolean, boolean];
     completed: boolean;
 }
+export type SharedRoom<L extends CoopLevelId = CoopLevelId> = { [K in L]: SharedSession & { level: K; levelState: LevelStateMap[K] }
+    & (K extends 'crumble-lab' ? { cube: null; cubePlacement: null } : { cube: SharedCube; cubePlacement: CubePlacement }) }[L];
+export const cubeAvailable = (room: SharedRoom | null): boolean => !!room?.cube && (room.level !== 'pairing-bay' || room.levelState.inputs.switchB);
 export type ClientMessage =
-    | { type: 'create' }
+    | { type: 'create'; level?: CoopLevelId }
     | { type: 'join'; code: string }
-    | { type: 'avatar'; seq: number; avatar: Avatar }
-    | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform }
+    | { type: 'avatar'; seq: number; avatar: Avatar; discontinuity?: Discontinuity }
+    | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform; discontinuity?: Discontinuity }
     | { type: CubeAction; seq: number; epoch: number }
     | { type: 'cube-drop'; seq: number; epoch: number; transform: CubeTransform }
     | { type: 'cube-occupancy'; seq: number; epoch: number; cargo: boolean }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
+    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' }
+    | { type: 'crumble-trigger'; seq: number; platform: CrumbleId; trigger: CrumbleTrigger }
+    | { type: 'local-reset'; seq: number }
     | { type: 'exit'; seq: number }
     | { type: 'leave' }
     | { type: 'ping' };
-export type ServerMessage =
-    | { type: 'snapshot'; slot: Slot; room: SharedRoom }
-    | { type: 'room'; room: SharedRoom }
-    | { type: 'avatar'; slot: Slot; stream: number; seq: number; avatar: Avatar }
-    | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform }
+export type ServerMessage<L extends CoopLevelId = CoopLevelId> =
+    | { type: 'snapshot'; slot: Slot; room: SharedRoom<L> }
+    | { type: 'room'; room: SharedRoom<L> }
+    | { type: 'avatar'; slot: Slot; stream: number; seq: number; avatar: Avatar; discontinuity?: Discontinuity }
+    | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform; discontinuity?: Discontinuity }
     | { type: 'cube-denied'; seq: number }
-    | { type: 'action-result'; seq: number; accepted: boolean; room: SharedRoom }
+    | { type: 'action-result'; seq: number; accepted: boolean; room: SharedRoom<L> }
     | { type: 'error'; code: string; message: string }
     | { type: 'pong' };
 export function normalizeCode(value: string): string | null {
@@ -61,6 +78,8 @@ const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v ===
 const keys = (v: Record<string, unknown>, names: string[]) => Object.keys(v).length === names.length && names.every(k => Object.hasOwn(v, k));
 const number = (v: unknown, limit: number) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= limit;
 const sequence = (v: unknown) => Number.isSafeInteger(v) && (v as number) >= 0;
+const streamKeys = (v: Record<string, unknown>, names: string[]) => keys(v, names)
+    || keys(v, [...names, 'discontinuity']) && ['relay', 'respawn', 'recovery'].includes(v.discontinuity as string);
 export function validCubeTransform(v: unknown): v is CubeTransform {
     return object(v) && keys(v, ['x', 'y', 'vx', 'vy', 'grounded'])
         && number(v.x, 10000) && number(v.y, 10000) && number(v.vx, 2000) && number(v.vy, 2000)
@@ -79,17 +98,22 @@ export function parseClientMessage(raw: string): ClientMessage | null {
     try { v = JSON.parse(raw); } catch { return null; }
     if (!object(v)) return null;
     if (['create', 'leave', 'ping'].includes(v.type as string) && keys(v, ['type'])) return v as ClientMessage;
+    if (v.type === 'create' && keys(v, ['type', 'level']) && isCoopLevel(v.level)) return v as ClientMessage;
     if (v.type === 'join' && keys(v, ['type', 'code']) && typeof v.code === 'string' && v.code.length <= 32) return v as ClientMessage;
-    if (v.type === 'avatar' && keys(v, ['type', 'seq', 'avatar']) && sequence(v.seq) && validAvatar(v.avatar)) return v as ClientMessage;
-    if ((v.type === 'cube' || v.type === 'cube-drop') && keys(v, ['type', 'seq', 'epoch', 'transform'])
+    if (v.type === 'avatar' && streamKeys(v, ['type', 'seq', 'avatar']) && sequence(v.seq) && validAvatar(v.avatar)) return v as ClientMessage;
+    if ((v.type === 'cube' && streamKeys(v, ['type', 'seq', 'epoch', 'transform']) || v.type === 'cube-drop' && keys(v, ['type', 'seq', 'epoch', 'transform']))
         && sequence(v.seq) && sequence(v.epoch) && validCubeTransform(v.transform)) return v as ClientMessage;
     if (['cube-pickup', 'cube-pull-start', 'cube-pull-stop'].includes(v.type as string)
         && keys(v, ['type', 'seq', 'epoch']) && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
     if (v.type === 'cube-occupancy' && keys(v, ['type', 'seq', 'epoch', 'cargo'])
         && sequence(v.seq) && sequence(v.epoch) && typeof v.cargo === 'boolean') return v as ClientMessage;
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
-        && [null, 'plateA', 'finalLeft', 'finalRight'].includes(v.plate as Plate)) return v as ClientMessage;
-    if ((v.type === 'switch' || v.type === 'exit') && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
+        && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl'].includes(v.plate as Plate)) return v as ClientMessage;
+    if (['switch', 'exit', 'local-reset'].includes(v.type as string) && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
+    if (v.type === 'control' && keys(v, ['type', 'seq', 'control']) && sequence(v.seq)
+        && ['relayPower', 'liftLatch'].includes(v.control as string)) return v as ClientMessage;
+    if (v.type === 'crumble-trigger' && keys(v, ['type', 'seq', 'platform', 'trigger']) && sequence(v.seq)
+        && ['crumbleA', 'crumbleB'].includes(v.platform as string) && ['foot', 'hook'].includes(v.trigger as string)) return v as ClientMessage;
     return null;
 }
 export function websocketUrl(page: string): string {

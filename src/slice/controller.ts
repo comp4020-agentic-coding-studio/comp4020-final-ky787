@@ -1,8 +1,9 @@
 /** Coordinate-free physical controller contract. Evidence belongs to the selected adapter. */
+import { isCoopLevel, type CoopLevelId } from '../coop/protocol.ts';
 export const ROOM_IDS = ["pressure", "switch", "relay", "uplink"] as const;
 export type RoomId = typeof ROOM_IDS[number];
 /** Campaign IDs deliberately exclude the separate co-op session. */
-export type WorldRoomId = RoomId | 'pairing-bay';
+export type WorldRoomId = RoomId | CoopLevelId;
 export interface ControllerInputs {
     plateA: boolean;
     plateB: boolean;
@@ -32,7 +33,7 @@ export interface RoomController {
 }
 export const mockController: RoomController = {
     evaluate(room, i) {
-        if (room === 'pairing-bay') throw new Error('PAIRING BAY requires server authority');
+        if (isCoopLevel(room)) throw new Error('Co-op labs require server authority');
         const uplink = room === 'uplink';
         const anchor = room === "switch" ? i.switchB : (room === "relay" || uplink) && i.plateA;
         return { source: "mock-greybox", outputs: {

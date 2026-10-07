@@ -3,7 +3,7 @@ import { CUBE_SIZE } from '../slice/tuning.ts';
 import type { CubeAuthority, PuzzleWorld } from '../slice/world.ts';
 import type { CoopClient } from './client.ts';
 import type { ActionResult } from './prediction.ts';
-import type { CubeTransform } from './protocol.ts';
+import { cubeAvailable, type CubeTransform } from './protocol.ts';
 
 type CubeTransport = Pick<CoopClient, 'room' | 'slot' | 'ownsCube' | 'connected' | 'prediction' | 'remote' | 'remoteCube' | 'cubeAction' | 'cubeOccupancy'>;
 
@@ -19,12 +19,12 @@ export class SharedCubeAuthority implements CubeAuthority {
     get simulates() { return this.client.connected && (this.client.ownsCube || !!this.client.prediction.cube); }
     get heldLocally() {
         const pending = this.client.prediction.cube;
-        return this.client.connected && !this.releaseAt && (pending ? pending.kind === 'cube-pickup' : this.client.room?.cube.holder === this.client.slot);
+        return this.client.connected && !this.releaseAt && (pending ? pending.kind === 'cube-pickup' : this.client.room?.cube?.holder === this.client.slot);
     }
     consumeCorrection(): boolean { const value = this.correction; this.correction = false; return value; }
     sync(w: PuzzleWorld): void {
         const c = w.cube, room = this.client.room;
-        if (!c || !room) return;
+        if (!c || !room?.cube) return;
         const state = room.cube, pending = this.client.prediction.cube, result = this.client.prediction.cubeResult;
         const resolved = result !== this.result;
         this.result = result;
@@ -61,8 +61,8 @@ export class SharedCubeAuthority implements CubeAuthority {
     private near(w: PuzzleWorld) { return !!w.cube && Math.hypot(w.player.x - w.cube.x, w.player.y - w.cube.y) < CARRY.reach; }
     hint(w: PuzzleWorld): string {
         if (this.heldLocally) return 'E · put down cube';
-        if (!this.client.room?.inputs.switchB || !this.near(w)) return '';
-        return this.client.room.cube.holder ? 'PARTNER CARRYING' : 'E · carry cube';
+        if (!cubeAvailable(this.client.room) || !this.near(w)) return '';
+        return this.client.room?.cube?.holder ? 'PARTNER CARRYING' : 'E · carry cube';
     }
     interact(w: PuzzleWorld): boolean {
         if (this.client.prediction.cube) return this.heldLocally || this.near(w);
@@ -74,22 +74,22 @@ export class SharedCubeAuthority implements CubeAuthority {
             }
             return true;
         }
-        if (this.client.room?.inputs.switchB && this.near(w)) {
-            if (!this.client.room.cube.holder && this.client.cubeAction('cube-pickup')) { this.wantsPull = false; this.sync(w); }
+        if (cubeAvailable(this.client.room) && this.near(w)) {
+            if (!this.client.room?.cube?.holder && this.client.cubeAction('cube-pickup')) { this.wantsPull = false; this.sync(w); }
             return true;
         }
         return false;
     }
     pull(start: boolean, held: boolean): boolean {
         const state = this.client.room?.cube;
-        if (start && held && this.client.room?.inputs.switchB && !state?.holder && !this.client.prediction.cube)
+        if (start && held && cubeAvailable(this.client.room) && !state?.holder && !this.client.prediction.cube)
             this.wantsPull = this.client.cubeAction('cube-pull-start');
         if (!held) this.cancelPull();
         return this.wantsPull && this.simulates && !state?.holder
             && (this.client.prediction.cube?.kind === 'cube-pull-start' || !!state?.pulling);
     }
     private stop(): void {
-        if (this.client.room?.cube.pulling && this.client.ownsCube && !this.client.prediction.cube) this.client.cubeAction('cube-pull-stop');
+        if (this.client.room?.cube?.pulling && this.client.ownsCube && !this.client.prediction.cube) this.client.cubeAction('cube-pull-stop');
     }
     cancelPull(): void { this.wantsPull = false; this.stop(); }
     release(w: PuzzleWorld): void {
@@ -100,9 +100,10 @@ export class SharedCubeAuthority implements CubeAuthority {
         else if (this.client.cubeAction('cube-drop', drop)) Object.assign(w.cube!, drop, { carried: false, groundId: null });
     }
     sample(w: PuzzleWorld): void {
+        if (!w.room.cargoPlate) return;
         if (!this.client.ownsCube || this.client.prediction.cube && this.client.prediction.cube.kind !== 'cube-drop') { this.cargoVisual = undefined; return; }
         const c = w.cube, at = w.room.cargoPlate;
-        this.cargoVisual = !!c && !!at && !c.carried && !this.client.room?.cube.pulling && c.grounded
+        this.cargoVisual = !!c && !!at && !c.carried && !this.client.room?.cube?.pulling && c.grounded
             && Math.abs(c.x - at.x) < 45 + CUBE_SIZE / 2 - 8 && Math.abs(c.y + CUBE_SIZE / 2 - at.y) < 5;
         this.client.cubeOccupancy(this.cargoVisual);
     }

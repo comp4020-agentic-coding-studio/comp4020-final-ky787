@@ -1,5 +1,6 @@
 import type { PuzzleWorld } from './world.ts';
 import type { MachinePresentation } from './presentation.ts';
+import { isCoopLevel } from '../coop/protocol.ts';
 
 /** Machinery graphics consume power/transients; they never decide physical state. */
 export function drawMachinery(c: CanvasRenderingContext2D, w: PuzzleWorld, presentation: MachinePresentation): void {
@@ -51,7 +52,7 @@ export function drawMachinery(c: CanvasRenderingContext2D, w: PuzzleWorld, prese
             c.globalAlpha = 1;
             text('↔', g.x + 10, g.y + 57, colour, 28);
         } else text('×', g.x + 18, g.y + 58, colour, 24);
-        text(`RELAY ${pair.def.id} · ${g.id}`, g.x - 35, g.y - 20, colour);
+        text(isCoopLevel(w.room.id) ? `GATE ${g.id}` : `RELAY ${pair.def.id} · ${g.id}`, g.x - (isCoopLevel(w.room.id) ? 8 : 35), g.y - 20, colour);
         text(pair.enabled ? 'LINK ON ↔' : 'OFF', g.x - 8, g.y + g.h + 28, colour);
         if (pair.pulse > 0) {
             c.globalAlpha = pair.pulse; c.strokeStyle = '#e4d9ff'; c.lineWidth = 2;

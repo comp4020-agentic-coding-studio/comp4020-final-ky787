@@ -1,21 +1,24 @@
 import { createPlayer, type PlayerState } from '../engine/physics.ts';
-import type { Avatar, CubeTransform, SharedCube } from './protocol.ts';
+import type { Avatar, CubeTransform, SharedCube, Discontinuity } from './protocol.ts';
 /** 100 ms presentation delay. No remote body enters local collision or sensor lists. */
 export class RemoteAvatar {
     private samples: { at: number; avatar: Avatar }[] = [];
     private stream = -1;
     private sequence = -1;
     lastAt = 0;
-    clear(): void { this.samples = []; this.sequence = -1; this.stream = -1; this.lastAt = 0; }
-    push(avatar: Avatar, stream: number, seq: number, now: number): void {
+    lastDiscontinuity: { kind: Discontinuity; seq: number; at: number; x: number; y: number } | null = null;
+    clear(): void { this.samples = []; this.sequence = -1; this.stream = -1; this.lastAt = 0; this.lastDiscontinuity = null; }
+    push(avatar: Avatar, stream: number, seq: number, now: number, discontinuity?: Discontinuity): boolean {
         if (stream !== this.stream) { this.clear(); this.stream = stream; }
-        if (seq <= this.sequence) return;
+        if (seq <= this.sequence) return false;
         this.sequence = seq; this.lastAt = now;
         const last = this.samples.at(-1);
         // Respawn is a discontinuity; do not draw a flight across the pit.
-        if (last && Math.hypot(avatar.x - last.avatar.x, avatar.y - last.avatar.y) > 300) this.samples = [];
+        if (discontinuity || last && Math.hypot(avatar.x - last.avatar.x, avatar.y - last.avatar.y) > 300) this.samples = [];
+        if (discontinuity) this.lastDiscontinuity = { kind: discontinuity, seq, at: now, x: avatar.x, y: avatar.y };
         this.samples.push({ at: now, avatar });
         this.samples = this.samples.slice(-12);
+        return true;
     }
     sample(now: number): PlayerState | null {
         if (!this.samples.length) return null;
@@ -36,17 +39,20 @@ export class RemoteCube {
     private epoch = -1;
     private sequence = -1;
     lastAt = 0;
+    lastDiscontinuity: { kind: Discontinuity; seq: number; at: number; x: number; y: number } | null = null;
     reset(cube: SharedCube, now: number): void {
         this.epoch = cube.epoch; this.sequence = cube.seq;
         this.samples = cube.transform ? [{ at: now, transform: { ...cube.transform } }] : [];
         this.lastAt = cube.transform ? now : 0;
+        this.lastDiscontinuity = null;
     }
-    push(transform: CubeTransform, epoch: number, seq: number, now: number): boolean {
+    push(transform: CubeTransform, epoch: number, seq: number, now: number, discontinuity?: Discontinuity): boolean {
         // Only an accepted room mutation may establish a new epoch.
         if (epoch !== this.epoch || seq <= this.sequence) return false;
         this.sequence = seq; this.lastAt = now;
         const last = this.samples.at(-1)?.transform;
-        if (last && Math.hypot(transform.x - last.x, transform.y - last.y) > 300) this.samples = [];
+        if (discontinuity || last && Math.hypot(transform.x - last.x, transform.y - last.y) > 300) this.samples = [];
+        if (discontinuity) this.lastDiscontinuity = { kind: discontinuity, seq, at: now, x: transform.x, y: transform.y };
         this.samples.push({ at: now, transform: { ...transform } });
         this.samples = this.samples.slice(-12);
         return true;

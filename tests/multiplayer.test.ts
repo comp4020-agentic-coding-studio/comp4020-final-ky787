@@ -1,57 +1,16 @@
-import { spawn, type ChildProcess } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile, readdir, mkdir } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { readFile, rm, writeFile, readdir, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { once } from 'node:events';
 import { createServer } from 'node:http';
 import { WebSocket } from 'ws';
-import { afterEach, expect, it } from 'vitest';
-import { CODE_PATTERN, normalizeCode, newerRoom, parseClientMessage, websocketUrl, type ServerMessage, type SharedRoom } from '../src/coop/protocol.ts';
+import { expect, it } from 'vitest';
+import { CODE_PATTERN, normalizeCode, newerRoom, parseClientMessage, websocketUrl } from '../src/coop/protocol.ts';
 import { RemoteAvatar } from '../src/coop/remote.ts';
 import { attachMultiplayer, generateCode } from '../server/multiplayer.ts';
 import { freshProgress } from '../src/slice/progress.ts';
 
-const cleanups: (() => Promise<unknown>)[] = [];
-afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
-const avatar = { x: 200, y: 543, vx: 0, vy: 0, facing: 1 as const, grounded: true, rope: null };
-async function directory() { const dir = await mkdtemp(join(tmpdir(), 'bn-coop-')); cleanups.push(() => rm(dir, { recursive: true, force: true })); return dir; }
-async function launch(dir: string) {
-    const child = spawn(process.execPath, ['server/app.ts'], { env: { ...process.env, PORT: '0', DATA_DIR: dir }, stdio: ['ignore', 'pipe', 'pipe'] });
-    cleanups.push(async () => { if (child.exitCode === null && child.signalCode === null) { const exit = once(child, 'exit'); child.kill('SIGKILL'); await exit; } });
-    const url = await new Promise<string>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Server did not start')), 5000);
-        child.once('error', reject);
-        child.stdout!.on('data', b => { const port = String(b).match(/listening on (\d+)/)?.[1]; if (port) { clearTimeout(timeout); resolve(`http://127.0.0.1:${port}`); } });
-    });
-    return { url, child };
-}
-async function kill(child: ChildProcess) { const exit = once(child, 'exit'); child.kill('SIGKILL'); await exit; }
-async function identity(url: string) {
-    const res = await fetch(`${url}/api/identity`);
-    return { cookie: res.headers.get('set-cookie')!.split(';')[0], id: (await res.json()).id as string };
-}
-async function connect(url: string, cookie: string) {
-    const ws = new WebSocket(url.replace('http', 'ws') + '/ws', { headers: { Cookie: cookie, Origin: url } });
-    const messages: ServerMessage[] = [];
-    const listeners = new Set<() => void>();
-    ws.on('message', bytes => { messages.push(JSON.parse(bytes.toString())); for (const fn of listeners) fn(); });
-    ws.on('error', () => {});
-    await once(ws, 'open');
-    cleanups.push(async () => { if (ws.readyState === WebSocket.CLOSED) return; const closed = once(ws, 'close'); ws.terminate(); await closed; });
-    async function wait<T extends ServerMessage['type']>(type: T, predicate: (value: Extract<ServerMessage, { type: T }>) => boolean = () => true): Promise<Extract<ServerMessage, { type: T }>> {
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => { listeners.delete(check); reject(new Error(`Timed out waiting for ${type}: ${JSON.stringify(messages)}`)); }, 4000);
-            function check() {
-                const i = messages.findIndex(m => m.type === type && predicate(m as Extract<ServerMessage, { type: T }>));
-                if (i < 0) return;
-                const m = messages.splice(i, 1)[0]; clearTimeout(timeout); listeners.delete(check); resolve(m as Extract<ServerMessage, { type: T }>);
-            }
-            listeners.add(check); check();
-        });
-    }
-    return { ws, messages, wait, send: (value: unknown) => ws.send(JSON.stringify(value)),
-        close: async () => { const closed = once(ws, 'close'); ws.close(); await closed; } };
-}
+import { avatar, cleanups, directory, launch, kill, identity, connect } from './helpers/coop-server.ts';
+
 async function pair() {
     const dir = await directory(), app = await launch(dir);
     const a = await identity(app.url), b = await identity(app.url);
@@ -84,14 +43,14 @@ it('creates exactly two visitor-owned slots, rejects invalid/unknown/full rooms,
     p3.send({ type: 'join', code: code === 'ZZZZ' ? 'ZZZY' : 'ZZZZ' }); expect((await p3.wait('error')).code).toBe('ROOM_NOT_FOUND');
     p3.send({ type: 'join', code }); expect((await p3.wait('error')).code).toBe('ROOM_FULL');
     p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
-    await p2.wait('room', m => m.room.outputs.grappleAnchor);
+    await p2.wait('room', m => m.room.levelState.outputs.grappleAnchor);
     const replacement = await connect(app.url, a.cookie); replacement.send({ type: 'join', code });
     const restored = await replacement.wait('snapshot');
     expect(restored.slot).toBe(1); expect(restored.room.connected).toEqual([true, true]);
-    expect(restored.room.outputs.grappleAnchor).toBe(false);
+    expect(restored.room.levelState.outputs.grappleAnchor).toBe(false);
     expect((await p1.wait('error')).code).toBe('SESSION_REPLACED');
     replacement.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
-    await p2.wait('room', m => m.room.revision > restored.room.revision && m.room.outputs.grappleAnchor);
+    await p2.wait('room', m => m.room.revision > restored.room.revision && m.room.levelState.outputs.grappleAnchor);
     replacement.send({ type: 'avatar', seq: 1, avatar });
     expect((await p2.wait('avatar')).slot).toBe(1);
 });
@@ -100,26 +59,26 @@ it.each([1, 2] as const)('slot %s may hold A, its disconnect releases A, and its
     const { app, a, b, p1, p2, code } = await pair();
     const holder = slot === 1 ? p1 : p2, partner = slot === 1 ? p2 : p1;
     holder.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
-    const on = await partner.wait('room', m => m.room.outputs.grappleAnchor);
-    expect(on.room.inputs.plateAOccupied).toBe(true);
+    const on = await partner.wait('room', m => m.room.levelState.outputs.grappleAnchor);
+    expect(on.room.levelState.inputs.plateAOccupied).toBe(true);
     holder.send({ type: 'occupancy', seq: 2, plate: null });
-    const off = await partner.wait('room', m => m.room.revision > on.room.revision && !m.room.outputs.grappleAnchor);
+    const off = await partner.wait('room', m => m.room.revision > on.room.revision && !m.room.levelState.outputs.grappleAnchor);
     expect(newerRoom(on.room, off.room)).toBe(true); expect(newerRoom(off.room, on.room)).toBe(false); expect(newerRoom(off.room, off.room)).toBe(false);
     holder.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); expect((await holder.wait('error')).code).toBe('STALE_ACTION');
-    holder.send({ type: 'occupancy', seq: 3, plate: 'plateA' }); await partner.wait('room', m => m.room.revision > off.room.revision && m.room.outputs.grappleAnchor);
+    holder.send({ type: 'occupancy', seq: 3, plate: 'plateA' }); await partner.wait('room', m => m.room.revision > off.room.revision && m.room.levelState.outputs.grappleAnchor);
     await holder.close(); const disconnected = await partner.wait('room', m => m.room.revision > off.room.revision && !m.room.connected[slot - 1]);
-    expect(disconnected.room.outputs.grappleAnchor).toBe(false);
-    partner.send({ type: 'switch', seq: 1 }); const latched = await partner.wait('room', m => m.room.inputs.switchB);
-    expect(latched.room.outputs.returnBridge).toBe(true); expect(latched.room.checkpoint).toBe('reunion');
+    expect(disconnected.room.levelState.outputs.grappleAnchor).toBe(false);
+    partner.send({ type: 'switch', seq: 1 }); const latched = await partner.wait('room', m => m.room.levelState.inputs.switchB);
+    expect(latched.room.levelState.outputs.returnBridge).toBe(true); expect(latched.room.checkpoint).toBe('reunion');
     partner.send({ type: 'switch', seq: 2 }); // New sequence, same latch: no extra mutation.
     partner.send({ type: 'occupancy', seq: 3, plate: 'plateA' });
     const held = await partner.wait('room', m => m.room.revision > latched.room.revision);
-    expect(held.room.revision).toBe(latched.room.revision + 1); expect(held.room.outputs.returnBridge).toBe(true);
+    expect(held.room.revision).toBe(latched.room.revision + 1); expect(held.room.levelState.outputs.returnBridge).toBe(true);
     await partner.close();
     const returning = await connect(app.url, (slot === 1 ? a : b).cookie); returning.send({ type: 'join', code });
     const restored = await returning.wait('snapshot');
-    expect(restored.slot).toBe(slot); expect(restored.room.outputs.grappleAnchor).toBe(false);
-    expect(restored.room.outputs.returnBridge).toBe(true); expect(restored.room.checkpoint).toBe('reunion');
+    expect(restored.slot).toBe(slot); expect(restored.room.levelState.outputs.grappleAnchor).toBe(false);
+    expect(restored.room.levelState.outputs.returnBridge).toBe(true); expect(restored.room.checkpoint).toBe('reunion');
 });
 
 it.each([1, 2] as const)('slot %s on the left unlocks with its partner; both distinct arrivals are still required', async leftSlot => {
@@ -128,9 +87,9 @@ it.each([1, 2] as const)('slot %s on the left unlocks with its partner; both dis
     const send = (index: number, message: object) => peers[index].send({ ...message, seq: ++seq[index] });
     send(0, { type: 'exit' }); expect((await p1.wait('error')).code).toBe('INVALID_ACTION');
     send(1, { type: 'occupancy', plate: 'finalLeft' }); expect((await p2.wait('error')).code).toBe('INVALID_ACTION');
-    send(0, { type: 'switch' }); let latest = (await p2.wait('room', m => m.room.inputs.switchB)).room;
+    send(0, { type: 'switch' }); let latest = (await p2.wait('room', m => m.room.levelState.inputs.switchB)).room;
     send(0, { type: 'cube-occupancy', epoch: latest.cube.epoch, cargo: true });
-    latest = (await p2.wait('room', m => m.room.inputs.cubeOnCargoPlate)).room;
+    latest = (await p2.wait('room', m => m.room.levelState.inputs.cubeOnCargoPlate)).room;
     // One connected body alternating plates can never supply two simultaneous inputs.
     for (const plate of ['finalLeft', 'finalRight', 'finalLeft', 'finalRight', null] as const) {
         send(0, { type: 'occupancy', plate });
@@ -146,25 +105,25 @@ it.each([1, 2] as const)('slot %s on the left unlocks with its partner; both dis
     send(leftSlot - 1, { type: 'occupancy', plate: 'finalLeft' });
     send(2 - leftSlot, { type: 'occupancy', plate: 'finalRight' });
     latest = (await p2.wait('room', m => m.room.exitUnlocked)).room;
-    expect(latest.outputs.exitDoor).toBe(true); expect(latest.completed).toBe(false); expect(latest.reachedExit).toEqual([false, false]);
+    expect(latest.levelState.outputs.exitDoor).toBe(true); expect(latest.completed).toBe(false); expect(latest.reachedExit).toEqual([false, false]);
     for (const i of [0, 1]) {
         send(i, { type: 'occupancy', plate: null }); latest = (await p2.wait('room', m => m.room.revision > latest.revision)).room;
-        expect(latest.outputs.exitDoor).toBe(true); expect(latest.completed).toBe(false);
+        expect(latest.levelState.outputs.exitDoor).toBe(true); expect(latest.completed).toBe(false);
     }
-    expect(latest.inputs.finalPlateLeftOccupied || latest.inputs.finalPlateRightOccupied).toBe(false);
+    expect(latest.levelState.inputs.finalPlateLeftOccupied || latest.levelState.inputs.finalPlateRightOccupied).toBe(false);
     const first = leftSlot - 1, second = 1 - first;
     send(first, { type: 'exit' }); latest = (await peers[second].wait('room', m => m.room.reachedExit[first])).room;
     expect(latest.reachedExit[second]).toBe(false); expect(latest.completed).toBe(false);
     send(first, { type: 'exit' }); // Duplicate arrival must not count as another body.
     peers[first].send({ type: 'exit', seq: seq[first] }); expect((await peers[first].wait('error')).code).toBe('STALE_ACTION');
     await peers[first].close(); latest = (await peers[second].wait('room', m => m.room.revision > latest.revision && !m.room.connected[first])).room;
-    expect(latest.exitUnlocked).toBe(true); expect(latest.outputs.exitDoor).toBe(true); expect(latest.reachedExit[first]).toBe(true); expect(latest.completed).toBe(false);
+    expect(latest.exitUnlocked).toBe(true); expect(latest.levelState.outputs.exitDoor).toBe(true); expect(latest.reachedExit[first]).toBe(true); expect(latest.completed).toBe(false);
     const returning = await connect(app.url, (first === 0 ? a : b).cookie); returning.send({ type: 'join', code });
     const recovered = await returning.wait('snapshot');
     expect(recovered.slot).toBe(leftSlot); expect(recovered.room.reachedExit).toEqual(latest.reachedExit);
-    expect(recovered.room.checkpoint).toBe('reunion'); expect(recovered.room.inputs.plateAOccupied).toBe(false);
+    expect(recovered.room.checkpoint).toBe('reunion'); expect(recovered.room.levelState.inputs.plateAOccupied).toBe(false);
     send(second, { type: 'exit' }); const complete = (await returning.wait('room', m => m.room.completed)).room;
-    expect(complete.outputs.exitDoor).toBe(true); expect(complete.reachedExit).toEqual([true, true]);
+    expect(complete.levelState.outputs.exitDoor).toBe(true); expect(complete.reachedExit).toEqual([true, true]);
 });
 
 it('persists logical state across SIGKILL/restart with no movement or occupancy, preserving C8 progress', async () => {
@@ -175,19 +134,19 @@ it('persists logical state across SIGKILL/restart with no movement or occupancy,
     for (let seq = 1; seq <= 20; seq++) p1.send({ type: 'avatar', seq, avatar: { ...avatar, x: avatar.x + seq } });
     await p2.wait('avatar', m => m.seq === 20);
     expect(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8')).toBe(stationaryRecord);
-    p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); await p2.wait('room', m => m.room.outputs.grappleAnchor);
-    p2.send({ type: 'switch', seq: 1 }); const before = await p1.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); await p2.wait('room', m => m.room.levelState.outputs.grappleAnchor);
+    p2.send({ type: 'switch', seq: 1 }); const before = await p1.wait('room', m => m.room.levelState.inputs.switchB);
     p1.send({ type: 'cube-occupancy', seq: 2, epoch: before.room.cube.epoch, cargo: true });
-    await p2.wait('room', m => m.room.inputs.cubeOnCargoPlate);
+    await p2.wait('room', m => m.room.levelState.inputs.cubeOnCargoPlate);
     const disk = JSON.parse(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8'));
-    expect(Object.keys(disk).sort()).toEqual(['version', 'cubePlacement', 'code', 'level', 'revision', 'visitors', 'switchB', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
+    expect(Object.keys(disk).sort()).toEqual(['version', 'cubePlacement', 'code', 'level', 'revision', 'visitors', 'levelState', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
     expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.checkpoint).toBe('reunion');
     await kill(app.child); const restarted = await launch(dir);
     const rejoined = await connect(restarted.url, a.cookie); rejoined.send({ type: 'join', code });
     const after = await rejoined.wait('snapshot');
     expect(after.slot).toBe(1); expect(after.room.revision).toBeGreaterThan(before.room.revision);
-    expect(after.room.checkpoint).toBe('reunion'); expect(after.room.outputs.returnBridge).toBe(true);
-    expect(after.room.outputs.grappleAnchor).toBe(false); expect(after.room.connected).toEqual([true, false]);
+    expect(after.room.checkpoint).toBe('reunion'); expect(after.room.levelState.outputs.returnBridge).toBe(true);
+    expect(after.room.levelState.outputs.grappleAnchor).toBe(false); expect(after.room.connected).toEqual([true, false]);
     const campaign = await (await fetch(restarted.url + '/api/progress', { headers: { Cookie: a.cookie } })).json();
     expect(campaign.progress).toEqual(progress); expect(campaign.id).toBe(a.id);
     expect((await readdir(join(dir, 'rooms'))).filter(x => x.endsWith('.tmp'))).toEqual([]);
@@ -201,24 +160,24 @@ it('persists logical state across SIGKILL/restart with no movement or occupancy,
     await kill(restarted.child); const afterArrival = await launch(dir);
     const arrived = await connect(afterArrival.url, a.cookie); arrived.send({ type: 'join', code });
     const one = (await arrived.wait('snapshot')).room;
-    expect(one.exitUnlocked).toBe(true); expect(one.outputs.exitDoor).toBe(true); expect(one.completed).toBe(false);
-    expect(one.reachedExit).toEqual([true, false]); expect(one.inputs.finalPlateLeftOccupied || one.inputs.finalPlateRightOccupied).toBe(false);
+    expect(one.exitUnlocked).toBe(true); expect(one.levelState.outputs.exitDoor).toBe(true); expect(one.completed).toBe(false);
+    expect(one.reachedExit).toEqual([true, false]); expect(one.levelState.inputs.finalPlateLeftOccupied || one.levelState.inputs.finalPlateRightOccupied).toBe(false);
     const finishing = await connect(afterArrival.url, b.cookie); finishing.send({ type: 'join', code }); await finishing.wait('snapshot');
     finishing.send({ type: 'exit', seq: 1 }); const completed = await arrived.wait('room', m => m.room.completed);
     await kill(afterArrival.child); const final = await launch(dir);
     const returning = await connect(final.url, a.cookie); returning.send({ type: 'join', code });
     const savedCompletion = (await returning.wait('snapshot')).room;
-    expect(savedCompletion.completed).toBe(true); expect(savedCompletion.outputs.exitDoor).toBe(true);
+    expect(savedCompletion.completed).toBe(true); expect(savedCompletion.levelState.outputs.exitDoor).toBe(true);
     expect(savedCompletion.reachedExit).toEqual([true, true]);
     expect(savedCompletion.revision).toBeGreaterThan(completed.room.revision);
 });
 
 it('rejects malformed/oversized messages and impersonation, cleans closed sockets, and bounds traffic', async () => {
     const { app, a, p1, p2, code } = await pair();
-    p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); await p2.wait('room', m => m.room.outputs.grappleAnchor);
+    p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' }); await p2.wait('room', m => m.room.levelState.outputs.grappleAnchor);
     p1.send({ type: 'occupancy', seq: 2, slot: 2, plate: 'finalLeft' });
     expect((await p1.wait('error')).code).toBe('INVALID_MESSAGE');
-    expect((await p2.wait('room', m => !m.room.connected[0])).room.outputs.grappleAnchor).toBe(false);
+    expect((await p2.wait('room', m => !m.room.connected[0])).room.levelState.outputs.grappleAnchor).toBe(false);
     const big = await connect(app.url, a.cookie); const bigClosed = once(big.ws, 'close'); big.ws.send('x'.repeat(4096)); expect((await bigClosed)[0]).toBe(1009);
     const bad = await connect(app.url, a.cookie); bad.ws.send('{'); expect((await bad.wait('error')).code).toBe('INVALID_MESSAGE');
     const fast = await connect(app.url, a.cookie); fast.send({ type: 'join', code }); await fast.wait('snapshot');
@@ -232,18 +191,18 @@ it('rejects malformed/oversized messages and impersonation, cleans closed socket
 
 it.each([false, true])('migrates a version-1 room (old completion %s) into unlock progress without inventing arrivals', async completed => {
     const { dir, app, a, b, p1, p2, code } = await pair();
-    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.levelState.inputs.switchB);
     await kill(app.child);
     const path = join(dir, 'rooms', `${code}.json`), legacy = JSON.parse(await readFile(path, 'utf8'));
-    legacy.version = 1; legacy.completed = completed; delete legacy.exitUnlocked; delete legacy.reachedExit; delete legacy.cubePlacement;
+    legacy.switchB = legacy.levelState.switchB; delete legacy.levelState; legacy.version = 1; legacy.completed = completed; delete legacy.exitUnlocked; delete legacy.reachedExit; delete legacy.cubePlacement;
     await writeFile(path, JSON.stringify(legacy));
     const restarted = await launch(dir), returning = await connect(restarted.url, a.cookie);
     returning.send({ type: 'join', code }); const migrated = (await returning.wait('snapshot')).room;
-    expect(migrated.exitUnlocked).toBe(completed); expect(migrated.outputs.exitDoor).toBe(completed);
+    expect(migrated.exitUnlocked).toBe(completed); expect(migrated.levelState.outputs.exitDoor).toBe(completed);
     expect(migrated.completed).toBe(false); expect(migrated.reachedExit).toEqual([false, false]);
-    expect(migrated.outputs.returnBridge).toBe(true); expect(migrated.checkpoint).toBe('reunion');
+    expect(migrated.levelState.outputs.returnBridge).toBe(true); expect(migrated.checkpoint).toBe('reunion');
     const disk = JSON.parse(await readFile(path, 'utf8'));
-    expect(disk.version).toBe(3); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
+    expect(disk.version).toBe(4); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
     expect(disk.revision).toBeGreaterThan(legacy.revision);
 });
 
@@ -288,7 +247,7 @@ it('smooths remote presentation, ignores stale frames and resets new streams wit
 const cubeTransform = { x: 1240, y: 490, vx: 55, vy: 80, grounded: false };
 it.each([1, 2] as const)('serializes socket pickup races with slot %s first, then drops and hands off without ending the loser session', async firstSlot => {
     const { p1, p2, first } = await pair(), peers = [p1, p2];
-    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.levelState.inputs.switchB);
     const winner = peers[firstSlot - 1], loser = peers[2 - firstSlot];
     winner.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
     // Awaiting acceptance establishes deterministic socket order; pure arbitration also tests same-epoch races.
@@ -307,7 +266,7 @@ it.each([1, 2] as const)('serializes socket pickup races with slot %s first, the
 
 it('accepts exactly one holder when both sockets send pickup in the same turn', async () => {
     const { p1, p2, first } = await pair();
-    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.levelState.inputs.switchB);
     for (const p of [p1, p2]) p.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
     const a = (await p1.wait('room', m => m.room.cube.holder !== null)).room;
     const b = (await p2.wait('room', m => m.room.cube.holder !== null)).room;
@@ -324,7 +283,7 @@ it('forwards only the current cube stream, arbitrates competing pulls, and never
     expect(await readFile(path, 'utf8')).toBe(before);
     p1.send({ type: 'cube', epoch, seq: 19, transform: cubeTransform });
     p2.send({ type: 'cube', epoch, seq: 21, transform: cubeTransform });
-    p1.send({ type: 'switch', seq: 1 }); const switched = (await p1.wait('room', m => m.room.inputs.switchB)).room;
+    p1.send({ type: 'switch', seq: 1 }); const switched = (await p1.wait('room', m => m.room.levelState.inputs.switchB)).room;
     expect(switched.cube.seq).toBe(20); expect(switched.cube.transform).toEqual(last.transform);
     p2.send({ type: 'cube-pull-start', seq: 1, epoch });
     const pulling = (await p1.wait('room', m => m.room.cube.pulling)).room;
@@ -338,9 +297,9 @@ it('forwards only the current cube stream, arbitrates competing pulls, and never
     const stopped = (await p1.wait('room', m => m.room.revision > pulling.revision && !m.room.cube.pulling)).room;
     expect(stopped.cube.physicsAuthority).toBe(2); expect(stopped.cube.transform).toEqual(cubeTransform);
     p2.send({ type: 'cube-occupancy', seq: 3, epoch, cargo: true });
-    for (const p of [p1, p2]) expect((await p.wait('room', m => m.room.inputs.cubeOnCargoPlate)).room.outputs.finalAccess).toBe(true);
+    for (const p of [p1, p2]) expect((await p.wait('room', m => m.room.levelState.inputs.cubeOnCargoPlate)).room.levelState.outputs.finalAccess).toBe(true);
     p2.send({ type: 'cube-occupancy', seq: 4, epoch, cargo: false });
-    expect((await p1.wait('room', m => m.room.revision > stopped.revision + 1)).room.outputs.finalAccess).toBe(false);
+    expect((await p1.wait('room', m => m.room.revision > stopped.revision + 1)).room.levelState.outputs.finalAccess).toBe(false);
 });
 
 it.each([false, true])('transfers disconnected cube authority (carried %s), retaining motion and rejecting old epochs on rejoin', async carried => {
@@ -350,7 +309,7 @@ it.each([false, true])('transfers disconnected cube authority (carried %s), reta
     await p2.close(); const absent = (await p1.wait('room', m => !m.room.connected[1])).room;
     expect(absent.cube.epoch).toBe(epoch); expect(absent.cube.physicsAuthority).toBe(1);
     const partner = await connect(app.url, b.cookie); partner.send({ type: 'join', code }); await partner.wait('snapshot');
-    p1.send({ type: 'switch', seq: 1 }); await partner.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 1 }); await partner.wait('room', m => m.room.levelState.inputs.switchB);
     if (carried) {
         p1.send({ type: 'cube-pickup', seq: 2, epoch });
         epoch = (await partner.wait('room', m => m.room.cube.holder === 1)).room.cube.epoch;
@@ -373,56 +332,56 @@ it.each([false, true])('transfers disconnected cube authority (carried %s), reta
 
 it.each(['spawn', 'cargoPlate'] as const)('restores %s semantically after SIGKILL, with no raw cube state on disk', async placement => {
     const { dir, app, a, p1, p2, code, first } = await pair();
-    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.levelState.inputs.switchB);
     let epoch = first.room.cube.epoch;
     if (placement === 'spawn') {
         p1.send({ type: 'cube-pickup', seq: 2, epoch }); epoch = (await p2.wait('room', m => m.room.cube.holder === 1)).room.cube.epoch;
     }
     p1.send({ type: 'cube', seq: 1, epoch, transform: cubeTransform }); await p2.wait('cube');
     if (placement === 'cargoPlate') {
-        p1.send({ type: 'cube-occupancy', seq: 2, epoch, cargo: true }); await p2.wait('room', m => m.room.inputs.cubeOnCargoPlate);
+        p1.send({ type: 'cube-occupancy', seq: 2, epoch, cargo: true }); await p2.wait('room', m => m.room.levelState.inputs.cubeOnCargoPlate);
     }
     const disk = JSON.parse(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8'));
     expect(disk.cubePlacement).toBe(placement);
     for (const key of ['cube', 'transform', 'x', 'y', 'vx', 'vy', 'holder', 'physicsAuthority', 'epoch', 'pulling']) expect(disk).not.toHaveProperty(key);
     await kill(app.child); const restarted = await launch(dir), back = await connect(restarted.url, a.cookie);
     back.send({ type: 'join', code }); const restored = (await back.wait('snapshot')).room;
-    expect(restored.cubePlacement).toBe(placement); expect(restored.outputs.finalAccess).toBe(placement === 'cargoPlate');
+    expect(restored.cubePlacement).toBe(placement); expect(restored.levelState.outputs.finalAccess).toBe(placement === 'cargoPlate');
     expect(restored.cube.transform).toBeNull(); expect(restored.cube.holder).toBeNull(); expect(restored.cube.physicsAuthority).toBe(1);
 });
 
 it('writes migrated version-2 progress without losing existing unlock or arrival credit', async () => {
     const { dir, app, a, p1, p2, code } = await pair();
-    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB); await kill(app.child);
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.levelState.inputs.switchB); await kill(app.child);
     const path = join(dir, 'rooms', `${code}.json`), legacy = JSON.parse(await readFile(path, 'utf8'));
-    legacy.version = 2; delete legacy.cubePlacement; legacy.exitUnlocked = true; legacy.reachedExit = [true, false];
+    legacy.switchB = legacy.levelState.switchB; delete legacy.levelState; legacy.version = 2; delete legacy.cubePlacement; legacy.exitUnlocked = true; legacy.reachedExit = [true, false];
     await writeFile(path, JSON.stringify(legacy));
     const restarted = await launch(dir), back = await connect(restarted.url, a.cookie); back.send({ type: 'join', code });
     const restored = (await back.wait('snapshot')).room;
     expect(restored.exitUnlocked).toBe(true); expect(restored.reachedExit).toEqual([true, false]); expect(restored.cubePlacement).toBe('spawn');
-    expect(JSON.parse(await readFile(path, 'utf8')).version).toBe(3);
+    expect(JSON.parse(await readFile(path, 'utf8')).version).toBe(4);
 });
 
 it('requires cargo as well as two bodies for unlock, then keeps the exit unlocked when cargo is removed', async () => {
     const { p1, p2, first } = await pair(), epoch = first.room.cube.epoch;
     p1.send({ type: 'cube-pickup', seq: 1, epoch }); await p1.wait('cube-denied');
-    p1.send({ type: 'switch', seq: 2 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 2 }); await p2.wait('room', m => m.room.levelState.inputs.switchB);
     p1.send({ type: 'occupancy', seq: 3, plate: 'finalLeft' });
     p2.send({ type: 'occupancy', seq: 1, plate: 'finalRight' });
-    const waiting = (await p1.wait('room', m => m.room.inputs.finalPlateLeftOccupied && m.room.inputs.finalPlateRightOccupied)).room;
-    expect(waiting.exitUnlocked).toBe(false); expect(waiting.outputs.finalAccess).toBe(false);
+    const waiting = (await p1.wait('room', m => m.room.levelState.inputs.finalPlateLeftOccupied && m.room.levelState.inputs.finalPlateRightOccupied)).room;
+    expect(waiting.exitUnlocked).toBe(false); expect(waiting.levelState.outputs.finalAccess).toBe(false);
     p2.send({ type: 'cube-occupancy', seq: 2, epoch, cargo: true }); await p2.wait('cube-denied');
     p1.send({ type: 'cube-occupancy', seq: 4, epoch, cargo: true });
     const unlocked = (await p2.wait('room', m => m.room.exitUnlocked)).room;
-    expect(unlocked.outputs.finalAccess).toBe(true); expect(unlocked.completed).toBe(false);
+    expect(unlocked.levelState.outputs.finalAccess).toBe(true); expect(unlocked.completed).toBe(false);
     p1.send({ type: 'cube-occupancy', seq: 5, epoch, cargo: false });
     const removed = (await p2.wait('room', m => m.room.revision > unlocked.revision)).room;
-    expect(removed.outputs.finalAccess).toBe(false); expect(removed.exitUnlocked).toBe(true);
+    expect(removed.levelState.outputs.finalAccess).toBe(false); expect(removed.exitUnlocked).toBe(true);
 });
 
 it('replacing a carrying socket releases to its partner before stale old-socket messages can act', async () => {
     const { app, a, p1, p2, first, code } = await pair();
-    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.inputs.switchB);
+    p1.send({ type: 'switch', seq: 1 }); await p2.wait('room', m => m.room.levelState.inputs.switchB);
     p1.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch });
     const held = (await p2.wait('room', m => m.room.cube.holder === 1)).room;
     p1.send({ type: 'cube', epoch: held.cube.epoch, seq: 1, transform: cubeTransform }); await p2.wait('cube');
@@ -433,7 +392,7 @@ it('replacing a carrying socket releases to its partner before stale old-socket 
     expect((await p1.wait('error')).code).toBe('SESSION_REPLACED');
     replacement.send({ type: 'cube', epoch: held.cube.epoch, seq: 99, transform: { ...cubeTransform, x: 0 } });
     replacement.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
-    expect((await p2.wait('room', m => m.room.inputs.plateAOccupied)).room.cube.transform).toEqual(cubeTransform);
+    expect((await p2.wait('room', m => m.room.levelState.inputs.plateAOccupied)).room.cube.transform).toEqual(cubeTransform);
 });
 
 it.each([100, 200])('acknowledges semantic actions under %s ms artificial delay; ephemeral state never rewrites disk', async delay => {
@@ -450,7 +409,7 @@ it.each([100, 200])('acknowledges semantic actions under %s ms artificial delay;
     const path = join(dir, 'rooms', `${first.room.code}.json`);
     let disk = await readFile(path, 'utf8');
     p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
-    const occupied = await p2.wait('room', m => m.room.inputs.plateAOccupied);
+    const occupied = await p2.wait('room', m => m.room.levelState.inputs.plateAOccupied);
     expect(await readFile(path, 'utf8')).toBe(disk);
     expect(occupied.room.revision).toBeGreaterThan(JSON.parse(disk).revision);
     p1.send({ type: 'switch', seq: 2 });
@@ -458,8 +417,8 @@ it.each([100, 200])('acknowledges semantic actions under %s ms artificial delay;
     p1.send({ type: 'avatar', seq: 1, avatar }); await p2.wait('avatar');
     expect(await readFile(path, 'utf8')).toBe(disk);
     const switched = await p1.wait('action-result', m => m.seq === 2);
-    expect(switched.accepted).toBe(true); expect(switched.room.inputs.switchB).toBe(true);
-    disk = await readFile(path, 'utf8'); expect(JSON.parse(disk).switchB).toBe(true);
+    expect(switched.accepted).toBe(true); expect(switched.room.levelState.inputs.switchB).toBe(true);
+    disk = await readFile(path, 'utf8'); expect(JSON.parse(disk).levelState.switchB).toBe(true);
     let epoch = switched.room.cube.epoch;
     p1.send({ type: 'cube-pickup', seq: 3, epoch });
     p2.send({ type: 'cube-pickup', seq: 1, epoch });
@@ -490,9 +449,9 @@ it('a durable storage failure closes the room without confirming or broadcasting
     const path = join(dir, 'rooms', `${code}.json`);
     await rm(path); await mkdir(path); // Atomic rename over a directory must fail, including when tests run as root.
     p1.send({ type: 'occupancy', seq: 1, plate: 'plateA' });
-    expect((await p2.wait('room', m => m.room.inputs.plateAOccupied)).room.inputs.switchB).toBe(false);
+    expect((await p2.wait('room', m => m.room.levelState.inputs.plateAOccupied)).room.levelState.inputs.switchB).toBe(false);
     p1.send({ type: 'switch', seq: 2 });
     expect((await p1.wait('error', m => m.code === 'ROOM_UNAVAILABLE')).code).toBe('ROOM_UNAVAILABLE');
     expect((await p2.wait('error', m => m.code === 'ROOM_UNAVAILABLE')).code).toBe('ROOM_UNAVAILABLE');
-    expect([...p1.messages, ...p2.messages].some(m => 'room' in m && m.room.inputs.switchB)).toBe(false);
+    expect([...p1.messages, ...p2.messages].some(m => 'room' in m && m.room.levelState.inputs.switchB)).toBe(false);
 });

@@ -26,7 +26,8 @@ export class LocalPrediction {
         const pending = key && this[key];
         if (!key || !pending || pending.generation !== generation) return false;
         const c = room.cube;
-        const matches = pending.kind === 'switch' ? room.inputs.switchB
+        const matches = pending.kind === 'switch' ? room.level === 'pairing-bay' && room.levelState.inputs.switchB
+            : !c ? false
             : pending.kind === 'cube-pickup' ? c.holder === slot && c.physicsAuthority === slot && c.epoch > pending.epoch
             : pending.kind === 'cube-pull-start' ? c.holder === null && c.physicsAuthority === slot && c.pulling && c.epoch > pending.epoch
             : pending.kind === 'cube-drop' ? c.holder === null && c.physicsAuthority === slot && c.epoch > pending.epoch

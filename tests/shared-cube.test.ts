@@ -6,7 +6,7 @@ import { RemoteCube, RemoteAvatar } from '../src/coop/remote.ts';
 import { SharedCubeAuthority } from '../src/coop/cube.ts';
 import { PairingAuthority } from '../src/coop/authority.ts';
 import { pairingBay } from '../src/coop/pairing-bay.ts';
-import { sharedRoom, type RoomRecord } from '../server/pairing-state.ts';
+import { sharedRoom, type RoomRecord } from '../server/coop-state.ts';
 import { PuzzleWorld } from '../src/slice/world.ts';
 import { emptyInput } from '../src/engine/physics.ts';
 import { FIXED_DT } from '../src/engine/constants.ts';
@@ -87,9 +87,9 @@ it('buffers remote motion, holds when samples stop, and snaps transfers/disconti
 });
 
 function setup(slot: Slot = 1) {
-    const record: RoomRecord = { version: 3, cubePlacement: 'spawn', code: 'ABCD', level: 'pairing-bay', revision: 1,
+    const record: RoomRecord<'pairing-bay'> = { version: 4, cubePlacement: 'spawn', code: 'ABCD', level: 'pairing-bay', revision: 1,
         visitors: ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
-        switchB: true, checkpoint: 'reunion', exitUnlocked: false, reachedExit: [false, false], completed: false,
+        levelState: { switchB: true }, checkpoint: 'reunion', exitUnlocked: false, reachedExit: [false, false], completed: false,
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     const state = freshCube(); assignCube(state, 1);
     let seq = 0;

@@ -22,6 +22,18 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
             [above(source), { x: source.x, y: source.y - 130 }, { x: anchor.x - 75, y: source.y - 130 },
                 { x: anchor.x - 75, y: anchor.y + 12 }, { x: anchor.x, y: anchor.y + 12 }]);
     }
+    if (r.id === 'relay-lab') {
+        for (const gate of r.gates![0].gates) add(`relay-${gate.id}`, 'switchB', 'relayGates',
+            elbow(above(r.lever!), { x: gate.x + gate.w / 2, y: gate.y }, 385));
+        return wires;
+    }
+    if (r.id === 'lift-lab') {
+        const lift = r.lifts![0];
+        add('control-lift', 'plateA', 'liftField', elbow(above(r.plate!), { x: lift.x, y: 755 }, 780));
+        add('latch-lift', 'switchC', 'liftField', elbow(above(r.upperLever!), { x: lift.x + lift.w, y: 375 }, 295));
+        return wires;
+    }
+    if (r.id === 'crumble-lab') return wires;
     if (r.id === 'uplink') {
         const relay = above(r.lever!), lift = r.lifts![0], upper = above(r.upperLever!);
         for (const gate of r.gates![0].gates)

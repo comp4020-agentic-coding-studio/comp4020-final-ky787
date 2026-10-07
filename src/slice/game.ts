@@ -10,10 +10,9 @@ import { connectionPowered } from './connections.ts';
 import { GameAudio } from '../audio/game-audio.ts';
 import { AudioPresentation } from './audio-presentation.ts';
 import { CoopClient } from '../coop/client.ts';
-import { PairingAuthority } from '../coop/authority.ts';
-import { SharedCubeAuthority } from '../coop/cube.ts';
-import { pairingBay } from '../coop/pairing-bay.ts';
-import { normalizeCode, type SharedRoom } from '../coop/protocol.ts';
+import { createCoopAuthority, type CoopAuthority } from '../coop/lab-authority.ts';
+import { COOP_LABS } from '../coop/labs.ts';
+import { isCoopLevel, normalizeCode, type CoopLevelId, type SharedRoom } from '../coop/protocol.ts';
 export class SliceGame {
     store = new ProgressStore();
     world = new PuzzleWorld(ROOMS[0], freshProgress().rooms.pressure);
@@ -45,7 +44,7 @@ export class SliceGame {
     coop = new CoopClient((room, initial) => this.applyCoop(room, initial), () => this.coopStatus());
     private coopMode = false;
     private coopPaused = false;
-    private authority: PairingAuthority | null = null;
+    private authority: CoopAuthority | null = null;
     private coopHud = document.createElement('aside');
     constructor(readonly host: HTMLElement, readonly canvas: HTMLCanvasElement) {
         const unlock = () => { void this.audio.unlock(); };
@@ -109,23 +108,23 @@ export class SliceGame {
         const code = this.coop.remembered();
         if (code) this.enterCoop(code);
     }
-    private enterCoop(code?: string): void {
+    private enterCoop(code?: string, level: CoopLevelId = 'pairing-bay'): void {
         this.started = false; this.coopMode = true; this.coopPaused = false; this.authority = null;
         this.overviewVisible = false; this.overviewPending = false; this.startButton.hidden = true;
         this.inspector.element.hidden = true; this.evidenceButton.hidden = true;
         this.menu.hidden = true; this.input.releaseAll(); this.world.cancelGrapple();
-        this.coopHud.hidden = false; this.coop.start(code);
+        this.coopHud.hidden = false; this.coop.start(code, level);
         this.host.classList.add('coop-mode');
     }
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
         if (initial) {
-            this.authority = new PairingAuthority(room, this.coop.slot, plate => this.coop.occupy(plate), () => this.coop.switchB(), () => this.coop.reachExit(), new SharedCubeAuthority(this.coop), this.coop.prediction);
-            this.world = new PuzzleWorld(pairingBay(this.coop.slot), { switchB: room.inputs.switchB, cubeOnPlate: false, cubeOnPlateB: false,
+            this.authority = createCoopAuthority(room, this.coop);
+            this.world = new PuzzleWorld(COOP_LABS[room.level].room(this.coop.slot), { switchB: false, cubeOnPlate: false, cubeOnPlateB: false,
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
             this.renderer.room(this.world); this.sound.reset(this.world);
             this.input.releaseAll(); this.accumulated = 0;
-            this.roomTitle.textContent = 'CO-OP / PAIRING BAY'; this.sourceBadge.textContent = 'mock-multiplayer';
+            this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
             this.started = !this.coopPaused; this.canvas.focus();
             this.audio.setActive(this.started && !document.hidden && document.hasFocus());
             this.audio.play('latch', .45);
@@ -134,8 +133,12 @@ export class SliceGame {
             const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
             const events = this.world.events.splice(0);
-            if (!switchWasVisible && room.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever! });
+            if (!switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever! });
+            if (previous.checkpoint !== room.checkpoint) events.push({ kind: 'checkpoint', at: this.world.checkpointPosition() });
+            if (previous.level === 'lift-lab' && room.level === 'lift-lab' && !previous.levelState.liftLatched && room.levelState.liftLatched)
+                events.push({ kind: 'lift-latch', at: this.world.room.upperLever! });
             this.sound.observe(this.world, events);
+            for (const event of events) if (event.kind === 'crumble') this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
             if (!previous.completed && room.completed) this.audio.play('complete');
             else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
         }
@@ -148,11 +151,11 @@ export class SliceGame {
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;
         const status = !this.coop.connected ? this.coop.status
             : r && !r.connected[partner] ? r.assigned[partner] ? 'PARTNER DISCONNECTED' : 'WAITING FOR PARTNER'
-            : r?.completed ? 'PAIRING COMPLETE'
+            : r?.completed ? r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
             : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();
-        const label = document.createElement('small'); label.textContent = 'PAIRING BAY / ROOM CODE';
+        const label = document.createElement('small'); label.textContent = `${r ? COOP_LABS[r.level].title : 'CO-OP LAB'} / ROOM CODE`;
         const code = document.createElement('strong'); code.id = 'room-code'; code.textContent = r?.code ?? '····';
         const codeRow = document.createElement('div'); codeRow.className = 'room-code-row';
         const copy = document.createElement('button'); copy.id = 'copy-room-code'; copy.type = 'button';
@@ -191,7 +194,7 @@ export class SliceGame {
         this.coopPaused = true; this.started = false; this.coop.occupy(null);
         this.audio.setActive(false); this.world.cancelGrapple(); this.input.releaseAll();
         this.menu.hidden = false;
-        this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">CO-OP / MOCK TEST CHAMBER</span><h2>PAIRING BAY</h2><p>Room ${this.coop.room?.code ?? 'connecting'} · You are Player ${this.coop.slot ?? '…'}</p><p>Your slot and shared checkpoint stay saved when you leave.</p><button id="continue" class="primary">CONTINUE PAIRING BAY</button><button id="leave-coop">LEAVE ROOM / SINGLE PLAYER</button><p class="fine">A / D move · Space jump · E switch<br>Hold click + D to cross · R shared checkpoint</p></div>`;
+        this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">CO-OP / MOCK TEST CHAMBER</span><h2>${this.world.room.title}</h2><p>Room ${this.coop.room?.code ?? 'connecting'} · You are Player ${this.coop.slot ?? '…'}</p><p>Your slot and shared checkpoint stay saved when you leave.</p><button id="continue" class="primary">CONTINUE ${this.world.room.title}</button><button id="leave-coop">LEAVE ROOM / SINGLE PLAYER</button><p class="fine">A / D move · Space jump · E interact<br>Hold click to hook · R resets only you</p></div>`;
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
         this.menu.querySelector('#leave-coop')!.addEventListener('click', () => this.leaveCoop());
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus();
@@ -241,9 +244,9 @@ export class SliceGame {
         <small>All rooms available · keeps each room’s saved progress</small>
       </nav>
       <section class="coop-entry" aria-label="Co-op">
-        <span class="eyebrow">CO-OP / PAIRING BAY</span>
-        <p class="fine">Two players. One shared chamber. Mock test controller.</p>
-        <button id="create-room">CREATE ROOM</button>
+        <span class="eyebrow">CO-OP LABS</span>
+        <p class="fine">Two players. Shared mechanics. Mock test controllers.</p>
+        <div class="coop-labs">${Object.entries(COOP_LABS).map(([id, lab]) => `<div class="coop-lab"><div><strong>${lab.title}</strong><small>${lab.description}</small></div><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div>
         <form id="join-room-form"><label for="join-code">ROOM CODE</label><input id="join-code" name="code" maxlength="8" placeholder="7K3M" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button id="join-room" type="submit">JOIN ROOM</button></form>
         <p id="join-error" role="status"></p>
       </section>
@@ -264,7 +267,7 @@ export class SliceGame {
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
-        this.menu.querySelector('#create-room')!.addEventListener('click', () => this.enterCoop());
+        for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-create-lab]')) button.addEventListener('click', () => this.enterCoop(undefined, button.dataset.createLab as CoopLevelId));
         this.menu.querySelector('#join-room-form')!.addEventListener('submit', event => {
             event.preventDefault();
             const code = normalizeCode(this.menu.querySelector<HTMLInputElement>('#join-code')!.value);
@@ -289,7 +292,7 @@ export class SliceGame {
                 if (!room) return;
                 if (room.id !== this.world.room.id) {
                     // Save logical state before switching. Merely visiting never completes a room.
-                    if (this.world.room.id !== 'pairing-bay') p.rooms[this.world.room.id] = this.world.memory();
+                    if (!isCoopLevel(this.world.room.id)) p.rooms[this.world.room.id] = this.world.memory();
                     p.currentRoom = room.id;
                     this.store.save(p);
                     this.ended = false;
@@ -340,7 +343,7 @@ export class SliceGame {
     }
     private save(events: string[]): void {
         const p = this.store.progress, id = this.world.room.id;
-        if (id === 'pairing-bay') return;
+        if (isCoopLevel(id)) return;
         p.rooms[id] = this.world.memory();
         for (const event of events) {
             if (!p.mechanics.includes(event) && event !== 'death')
@@ -352,7 +355,7 @@ export class SliceGame {
     }
     private advance(): void {
         const p = this.store.progress, id = this.world.room.id, index = ROOMS.findIndex(r => r.id === id);
-        if (id === 'pairing-bay') return;
+        if (isCoopLevel(id)) return;
         if (!p.completedRooms.includes(id))
             p.completedRooms.push(id);
         if (index < ROOMS.length - 1) {
@@ -438,13 +441,15 @@ export class SliceGame {
         this.audio.meter();
         if (this.coopMode) {
             this.authority?.cube?.sync(this.world);
+            this.authority?.crumble?.sync(this.world);
+            this.sound.observe(this.world, this.coop.takeMachineryEvents());
             this.coop.publish(this.world.player, now);
             if (this.world.cube) this.coop.publishCube(this.world.cube, now);
         }
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
-                remotePullingCube: !!this.coop.room?.cube.pulling && !this.coop.ownsCube } : undefined);
+                remotePullingCube: !!this.coop.room?.cube?.pulling && !this.coop.ownsCube } : undefined);
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
         if (replay.trace) {

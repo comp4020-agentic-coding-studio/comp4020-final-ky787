@@ -70,6 +70,6 @@ claims it or disconnect detection transfers authority. Existing heartbeat,
 session, persistence and single-process Fly boundaries remain unchanged.
 
 The authoritative contract, exact protocol, recovery rules and validation live
-in [c9-multiplayer.md](../c9-multiplayer.md). RelayGatePair/LiftField transport,
-multiplayer CONTROL SPINE and new binary controllers require a later accepted
-mechanics/design pass.
+in [c9-multiplayer.md](../c9-multiplayer.md). RelayGatePair/LiftField transport is implemented in the mock labs of
+[ADR 0004](0004-coop-labs-and-transient-machinery.md), pending separate manual
+acceptance. Multiplayer CONTROL SPINE and new binaries remain out of scope.

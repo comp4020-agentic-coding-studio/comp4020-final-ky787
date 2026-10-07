@@ -49,6 +49,8 @@ export class AudioPresentation {
         for (const e of events) {
             if (e.kind === 'switch' && !events.some(e => e.kind === 'lift-latch')) play('switch', e.at);
             if (e.kind === 'lift-latch') play('latch', e.at);
+            if (e.kind === 'checkpoint' && !events.some(e => e.kind === 'lift-latch')) play('latch', e.at, .6);
+            if (e.kind === 'crumble-respawn') play('codePower', e.at, .5);
             if (e.kind === 'crumble') play('crumbleBreak', e.at);
         }
         // A carried payload emits both events; a loose cube emits only relay-cargo.

@@ -80,4 +80,6 @@ heartbeat with termination after a missed pong. No player-player collision is
 implemented. No Fly configuration change was needed. The original multiplayer
 build passed deployed two-browser checks and subsequent two-computer human
 testing; the revised role/exit contract has also passed two-computer manual acceptance.
-The later shared-cube extension requires its own manual acceptance.
+The later shared-cube and responsiveness extensions are also manually accepted.
+The mechanics labs in [ADR 0004](0004-coop-labs-and-transient-machinery.md) await
+their own two-computer acceptance.
