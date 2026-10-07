@@ -298,7 +298,9 @@ traffic counters. These remain debug details; the normal HUD stays compact.
 
 The 2026-10-07 [milestone regression record](playtest/coop-labs-regression.txt)
 contains the complete passing local gate, including TLS and artificial semantic
-delay. Automated checks do not replace the pending two-computer playtest.
+delay. The [deployed validation record](playtest/coop-labs-deployment.txt) confirms
+all four routes over live HTTPS/WSS. Automated checks do not replace the pending
+two-computer playtest.
 
 During development use the narrow relevant tests. Before this milestone ships,
 run one complete relevant gate:
