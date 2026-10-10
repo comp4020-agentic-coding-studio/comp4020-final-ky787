@@ -67,15 +67,17 @@ The goal is not to disguise an obfuscation study as a game.
 
 The goal is to make a good cooperative game whose strange machinery genuinely comes from the reverse-engineering work behind it.
 
-## Multiplayer infrastructure: PAIRING BAY
+## Multiplayer infrastructure: CO-OP LABS
 
-The menu now offers a separate two-player **PAIRING BAY** test chamber. Create a
+The menu offers separate two-player **CO-OP LABS**. Create a
 room, share its four-character code, and join from a different browser profile or
-private window. Either player can hold the anchor online or cross first and
+private window. PAIRING BAY tests shared inputs and cube handoff. Either player can hold the anchor online or cross first and
 latch the return bridge. Two distinct bodies on separate final plates permanently
 unlock the exit; both players then physically reach it to complete the chamber.
 Slots identify players, not gameplay roles. Unlock and individual arrival credit
-survive reconnects.
+survive reconnects. RELAY, LIFT and CRUMBLE LAB test shared machinery. BOOST LAB
+lets either player hold the cube overhead while their partner jumps onto it and
+then reaches an upper switch, opening a return route for both.
 
 Movement remains local and responsive; the existing Node server synchronizes and
 saves shared puzzle state over same-origin WebSockets. Refresh restores the same
@@ -84,8 +86,9 @@ infrastructure. The C8 campaign and CONTROL SPINE's validated evidence remain
 separate, and personal campaign saves keep their existing format.
 
 See [the multiplayer contract and test flow](docs/c9-multiplayer.md) and
-[the authority ADR](docs/adr/0001-multiplayer-authority.md). Human playtesting is
-the next acceptance step before adding shared cubes or redesigning co-op stages.
+[the authority ADR](docs/adr/0001-multiplayer-authority.md). The latest relay
+egress fix and partner-held boost await two-computer human playtesting before
+expanding final co-op stages.
 
 ## Run locally
 

@@ -2,7 +2,7 @@
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
-export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab'] as const;
+export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab'] as const;
 export type CoopLevelId = typeof COOP_LEVELS[number];
 export const isCoopLevel = (v: unknown): v is CoopLevelId => COOP_LEVELS.includes(v as CoopLevelId);
 export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | 'liftControl' | null;
@@ -30,6 +30,7 @@ export interface LevelStateMap {
     };
     'relay-lab': { relayEnabled: boolean };
     'lift-lab': { lowerHeld: boolean; liftLatched: boolean; liftEnabled: boolean };
+    'boost-lab': { routeLatched: boolean };
     'crumble-lab': { tested: { foot: boolean; hook: boolean }; platforms: Record<CrumbleId, CrumblePhase> };
 }
 interface SharedSession {
@@ -55,7 +56,7 @@ export type ClientMessage =
     | { type: 'cube-occupancy'; seq: number; epoch: number; cargo: boolean }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
-    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' }
+    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' }
     | { type: 'crumble-trigger'; seq: number; platform: CrumbleId; trigger: CrumbleTrigger }
     | { type: 'local-reset'; seq: number }
     | { type: 'exit'; seq: number }
@@ -111,7 +112,7 @@ export function parseClientMessage(raw: string): ClientMessage | null {
         && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl'].includes(v.plate as Plate)) return v as ClientMessage;
     if (['switch', 'exit', 'local-reset'].includes(v.type as string) && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
     if (v.type === 'control' && keys(v, ['type', 'seq', 'control']) && sequence(v.seq)
-        && ['relayPower', 'liftLatch'].includes(v.control as string)) return v as ClientMessage;
+        && ['relayPower', 'liftLatch', 'boostRoute'].includes(v.control as string)) return v as ClientMessage;
     if (v.type === 'crumble-trigger' && keys(v, ['type', 'seq', 'platform', 'trigger']) && sequence(v.seq)
         && ['crumbleA', 'crumbleB'].includes(v.platform as string) && ['foot', 'hook'].includes(v.trigger as string)) return v as ClientMessage;
     return null;

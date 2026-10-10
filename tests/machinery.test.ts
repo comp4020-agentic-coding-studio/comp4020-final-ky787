@@ -109,4 +109,17 @@ describe('RelayGatePair transport', () => {
         expect(w.gates[0].cooldown('player')).toBeGreaterThan(0);
         expect(w.events.some(e => e.kind === 'relay-cargo')).toBe(true);
     });
+    it('revalidates the alternate shared-cube lane against walls and bounds', () => {
+        const g = pair(), p = createPlayer(128, 583); g.power(true);
+        const cube: Solid = { ...floor, id: 'cube-body', x: 638, y: 556, w: 44, h: 44 };
+        const wall: Solid = { ...floor, id: 'wall', x: 600, y: 500, w: 35, h: 100 };
+        expect(g.teleport('player', p, 22, 34, [floor, wall], bounds, 0, cube)).toBeNull();
+        expect(p.x).toBe(128); expect(g.cooldown('player')).toBe(0);
+        expect(g.teleport('player', p, 22, 34, [floor], bounds, 0, cube)).not.toBeNull();
+        expect(p.x).toBe(625);
+        const edge = pair(); edge.power(true); edge.def.gates[1].x = 40;
+        Object.assign(p, { x: 128, y: 583 });
+        expect(edge.teleport('player', p, 22, 34, [floor], bounds, 0, { ...cube, x: 0 })).toBeNull();
+        expect(p.x).toBe(128);
+    });
 });

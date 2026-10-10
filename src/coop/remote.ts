@@ -1,6 +1,6 @@
 import { createPlayer, type PlayerState } from '../engine/physics.ts';
 import type { Avatar, CubeTransform, SharedCube, Discontinuity } from './protocol.ts';
-/** 100 ms presentation delay. No remote body enters local collision or sensor lists. */
+/** 100 ms presentation delay. Avatars never enter collision/sensor lists themselves. */
 export class RemoteAvatar {
     private samples: { at: number; avatar: Avatar }[] = [];
     private stream = -1;
@@ -20,6 +20,7 @@ export class RemoteAvatar {
         this.samples = this.samples.slice(-12);
         return true;
     }
+    latest(): Avatar | null { return this.samples.at(-1)?.avatar ?? null; }
     sample(now: number): PlayerState | null {
         if (!this.samples.length) return null;
         const at = now - 100;

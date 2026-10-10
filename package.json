@@ -22,7 +22,8 @@
     "check:multiplayer-pairing": "node scripts/multiplayer-browser-check.ts",
     "check:multiplayer-relay": "node scripts/labs-browser-check.ts relay-lab",
     "check:multiplayer-lift": "node scripts/labs-browser-check.ts lift-lab",
-    "check:multiplayer-crumble": "node scripts/labs-browser-check.ts crumble-lab"
+    "check:multiplayer-crumble": "node scripts/labs-browser-check.ts crumble-lab",
+    "check:multiplayer-boost": "node scripts/labs-browser-check.ts boost-lab"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

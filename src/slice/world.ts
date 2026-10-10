@@ -7,7 +7,7 @@ import { type ControllerInputs, type ControllerFrame, type RoomController } from
 import type { RoomMemory } from './progress.ts';
 import type { Platform, RoomDef } from './rooms.ts';
 import { LiftField, RelayGatePair } from './machinery.ts';
-import type { Discontinuity } from '../coop/protocol.ts';
+import type { Discontinuity, Slot } from '../coop/protocol.ts';
 export interface Cube extends LooseBody {
     carried: boolean;
 }
@@ -28,6 +28,8 @@ export interface CubeAuthority {
     readonly simulates: boolean;
     readonly heldLocally: boolean;
     readonly cargoVisual?: boolean;
+    /** Local avatar movement only: never architecture, a cube body, sensor or anchor. */
+    readonly partnerSupport?: { carrier: Slot; surface: Solid } | null;
     consumeCorrection?(): boolean;
     sync(world: PuzzleWorld): void;
     pull(start: boolean, held: boolean): boolean;
@@ -67,6 +69,8 @@ export class PuzzleWorld {
     cargoPlateDepth = 0;
     consumeCubeCorrection() { return this.authority?.cube?.consumeCorrection?.() ?? false; }
     get cargoPlateActive() { return this.authority?.cube?.cargoVisual ?? this.inputs.cubeOnPlate; }
+    get partnerCubeSupport() { return this.authority?.cube?.partnerSupport ?? null; }
+    get groundedOnPartnerCube() { return this.player.grounded && this.player.groundId === 'partner-cube-support'; }
     keyboardGrapple = false;
     private cubeSolid: Solid = { id: 'cube-body', x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
     doorOpen = 0;
@@ -370,15 +374,27 @@ export class PuzzleWorld {
             input.grappleHeld = false;
         }
         const wasAttached = this.player.rope.phase === 'attached';
-        stepPlayer(this.player, input, this.cubeSolid.enabled ? [...this.solids, this.cubeSolid] : this.solids, dt, field);
+        const support = this.partnerCubeSupport?.surface;
+        if (this.player.groundId === 'partner-cube-support' && (!support
+            || this.player.x + PLAYER.width / 2 <= support.x || this.player.x - PLAYER.width / 2 >= support.x + support.w
+            || Math.abs(this.player.y + PLAYER.height / 2 - support.y) > 1.5)) {
+            this.player.grounded = false;
+            this.player.groundId = null;
+        }
+        const movementSolids = [...this.solids, ...(this.cubeSolid.enabled ? [this.cubeSolid] : []), ...(support ? [support] : [])];
+        stepPlayer(this.player, input, movementSolids, dt, field);
         if (!wasAttached && this.player.rope.phase === 'attached') this.emit('grapple');
         if (this.keyboardGrapple && (this.player.grounded || ['idle', 'retracting'].includes(this.player.rope.phase))) {
             this.keyboardGrapple = false;
             releaseRope(this.player, false);
         }
         const carrying = this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally);
+        // A shared loose cube selects a bounded outward egress lane. Keep all room
+        // geometry and full carried-payload/bounds checks; preserve C8 clearance.
+        // Partner support is movement-only and never participates in clearance.
+        const egressSolids = this.cubeSolid.enabled && !this.authority?.cube ? [...this.solids, this.cubeSolid] : this.solids;
         for (const pair of this.gates) if (pair.teleport('player', this.player, carrying ? CUBE_SIZE : PLAYER.width, PLAYER.height,
-            this.cubeSolid.enabled ? [...this.solids, this.cubeSolid] : this.solids, this.room, carrying ? CARRY.holdGap + CUBE_SIZE : 0)) {
+            egressSolids, this.room, carrying ? CARRY.holdGap + CUBE_SIZE : 0, this.authority?.cube ? this.cubeSolid : undefined)) {
             this.cancelGrapple();
             this.player.coyote = 0;
             this.player.jumpBuffer = 0;

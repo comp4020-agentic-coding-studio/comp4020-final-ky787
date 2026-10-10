@@ -48,18 +48,27 @@ export class RelayGatePair extends PoweredMachine {
     }
     cooldown(id: string): number { return this.cooldowns.get(id) ?? 0; }
     teleport(id: string, body: LooseBody, width: number, height: number,
-        solids: readonly Solid[], bounds: { width: number; height: number }, carriedHeight = 0): GateTransit | null {
+        solids: readonly Solid[], bounds: { width: number; height: number }, carriedHeight = 0, sharedCube?: Solid): GateTransit | null {
         if (!this.enabled || this.cooldown(id)) return null;
         const index = this.def.gates.findIndex(g => boxesOverlap(
             { x: body.x - width / 2, y: body.y - height / 2, w: width, h: height }, g));
         if (index < 0) return null;
         const from = this.def.gates[index], to = this.def.gates[1 - index];
-        const x = to.exitSide > 0 ? to.x + to.w + width / 2 + 18 : to.x - width / 2 - 18;
+        let x = to.exitSide > 0 ? to.x + to.w + width / 2 + 18 : to.x - width / 2 - 18;
         const y = to.y + to.h - height / 2;
         const box = { x: x - width / 2, y: y - height / 2 - carriedHeight, w: width, h: height + carriedHeight };
         // Authored exits must be inside the room and clear for the whole payload.
-        if (box.x < 0 || box.x + box.w > bounds.width || box.y < 0 || box.y + box.h > bounds.height
-            || solids.some(s => s.enabled && boxesOverlap(box, s))) return null;
+        const unsafe = () => box.x < 0 || box.x + box.w > bounds.width || box.y < 0 || box.y + box.h > bounds.height
+            || solids.some(s => s.enabled && boxesOverlap(box, s));
+        if (unsafe()) return null;
+        if (sharedCube?.enabled && boxesOverlap(box, sharedCube)) {
+            // One bounded outward lane, past the shared cube, never toward the
+            // arrival gate. Revalidate the entire payload against architecture.
+            const alternate = to.exitSide > 0 ? sharedCube.x + sharedCube.w + width / 2 + 2 : sharedCube.x - width / 2 - 2;
+            if (Math.abs(alternate - x) > 96) return null;
+            x = alternate; box.x = x - width / 2;
+            if (unsafe()) return null;
+        }
         Object.assign(body, { x, y, vx: to.exitSide * Math.min(Math.abs(body.vx), 240), vy: 0, grounded: false, groundId: null });
         this.cooldowns.set(id, .65);
         this.pulse = 1;

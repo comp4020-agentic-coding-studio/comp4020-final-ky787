@@ -1,0 +1,371 @@
+2026-10-11 local relay-egress / BOOST LAB validation
+Starting and ending HEAD: 81422495b19e16b931b51ae298381f7970f3b1a2 (uncommitted working tree)
+Typecheck: PASS. Browser output muted; BROWSER_BIN=/usr/bin/brave-browser.
+Focused machinery + lab-world + lab-server gate: 55 passed.
+Final stronger relay overlap/bounds assertions: 2 passed.
+Initial pre-fix test: B -> A failed (x=1008, expected 441); A -> B passed.
+Initial C8 invocation had no server; successful rerun used isolated /tmp data on :8080.
+No deployment or two-computer acceptance claimed.
+
+=== Build / retained UPLINK validation ===
+Validated uplink_controller_ollvm_bcf_v1: 32 states, 32 traces; SHA-256 87dec9e470119a951eb1486e25d62226c72b34367e754b0a14b4e5a818c4c082
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 43 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   2.55 kB │ gzip:   1.34 kB
+dist/assets/index--H14LWfh.css    7.83 kB │ gzip:   2.41 kB
+dist/assets/index-C_2kuzWN.js     2.47 kB │ gzip:   1.18 kB
+dist/assets/game-CKuFn2Nb.js    990.33 kB │ gzip: 118.97 kB
+
+✓ built in 148ms
+
+=== Milestone unit gate ===
+$ vitest run --config vitest.unit.config.ts
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  27 passed (27)
+      Tests  301 passed | 3 skipped (304)
+   Start at  08:44:29
+   Duration  11.37s (tests 61%, transform 25%, import 11%, environment 3%)
+
+  Transform  transforming modules took 10.55s · 25% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+=== Live HTTP/WebSocket specs ===
+$ vitest run
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  2 passed (2)
+      Tests  3 passed (3)
+   Start at  08:45:49
+   Duration  731ms (import 69%, tests 27%, transform 4%, worker 1%)
+
+=== C8 browser / both CONTROL SPINE routes ===
+$ node scripts/browser-check.ts http://localhost:8080/
+PASS new visitor starts at pressure
+PASS audio waits for the first real gesture
+PASS all four rooms available from the menu
+PASS level select supports keyboard navigation
+PASS all audio assets decode without errors
+PASS selecting UPLINK does not complete skipped rooms
+PASS UPLINK direct room selection: validated state 0
+PASS reload continues the selected room
+PASS level select returns to an unfinished tutorial
+PASS cube carried
+PASS cube holds plate after player leaves
+PASS cube and plate interactions play sounds
+PASS inactive anchor has no collision or hook
+PASS switch enables anchor immediately
+PASS switch can be turned off
+PASS pit respawns quickly without losing switch progress
+PASS ground Space jumps without firing a hook
+PASS air hook uses visible target preview
+PASS tapped airborne Space latches the hook
+PASS switch physical grapple crossing — x=1122
+PASS cube pulls toward player without attaching player
+PASS pulled cube can be carried
+PASS relay physical grapple crossing — x=1091
+PASS bridge locks but exit still requires Plate B
+PASS relay bridge lever cannot switch back off
+PASS return bridge supports player
+PASS checkpoint reset keeps solved machinery
+PASS reload offers CONTINUE — RELAY
+PASS reload restores checkpoint, plate and bridge
+PASS retrieve cube from A across permanent bridge
+PASS removing cube disables anchor but keeps bridge and closed exit
+PASS cube transferred to B opens the exit
+PASS reload restores cube at B with bridge and exit open
+PASS player stands on cube while it holds Plate B
+PASS crumble does not kill player
+PASS debug exposes mock inputs and persistence
+PASS three tutorial rooms complete
+PASS opening overview waits indefinitely without moving the player
+PASS Space starts the chamber without also jumping
+PASS UPLINK entry: validated state 0
+PASS real assembly inspector pauses play and shows PE provenance
+PASS unstable anchor inspector retains proof assumptions and real clone assembly
+PASS UPLINK anchor active: validated state 1
+PASS anchor uses immediate retained output
+PASS Plate A wire powers the crossing machinery
+PASS uplink physical grapple crossing — x=1079
+PASS UPLINK relay power sets far checkpoint
+PASS relay power uses its sci-fi activation cue
+PASS UPLINK relay power can toggle OFF
+PASS UPLINK reload preserves initial cube and powered gate
+PASS UPLINK far reload: validated state 3
+PASS UPLINK player gate B to A
+PASS UPLINK retrieve initial payload
+PASS UPLINK carried payload reaches far gate
+PASS both relay trips play a teleport cue
+PASS UPLINK cube B powers lift and anchor turns off
+PASS powered lift has one audible local hum
+PASS menu pauses machinery audio
+PASS background tab silences lift and reel
+PASS UPLINK upper switch latches lift but needs payload
+PASS lift power and its latch have distinct cues
+PASS UPLINK upper latch cannot be undone
+PASS UPLINK upper checkpoint restores cube holding B
+PASS UPLINK upper reload: validated state 14
+PASS UPLINK retrieve B after latching the lift
+PASS lift wiring shows the latch retaining power after B is freed
+PASS CONTROL SPINE second lift ride carries the payload
+PASS CONTROL SPINE player alone on C cannot unlock the return
+PASS UPLINK payload activates route without remote completion
+PASS UPLINK payload delivered: validated state 26
+PASS one retained signal powers four return anchors and the catch deck
+PASS final rope chain uses upper-route
+PASS Space jumps off upper-route with sideways carry
+PASS final rope chain uses return-mid
+PASS Space jumps off return-mid with sideways carry
+PASS final rope chain uses return-high
+PASS upper rope clears the lift volume
+PASS Space jumps off return-high with sideways carry
+PASS final rope chain uses return-near
+PASS Space jumps off return-near with sideways carry
+PASS final rope chain uses proven-clone
+PASS unstable anchor warns when loaded by the rope
+PASS Space jumps off proven-clone with sideways carry
+PASS UPLINK full retrieval route has no deaths
+PASS rope jumps and the final transformation play decoded audio
+PASS four-room completion saved
+PASS reload restores UPLINK latch, payload and final route
+PASS UPLINK Node C reload: validated state 26
+PASS final rope chain uses upper-route
+PASS final rope chain uses return-mid
+PASS final rope chain uses return-high
+PASS upper rope clears the lift volume
+PASS final rope chain uses return-near
+PASS final rope chain uses proven-clone
+PASS unstable anchor warns when loaded by the rope
+PASS unstable hook failure preserves C and lands safely
+PASS catch deck offers a normal jump onto the exit shelf
+PASS unstable recovery completes the rope route without a death reset
+PASS unstable anchor plays warning and break cues
+PASS selecting a completed room restores its checkpoint and cube
+PASS returning to UPLINK keeps upper latch and final payload
+PASS UPLINK return through level select: validated state 26
+PASS compact menu selects rooms with saved switch state
+PASS reset asks for confirmation and focuses Cancel
+PASS cancel reset preserves all progress without a save write
+PASS Escape cancels reset and keeps the menu paused
+PASS confirmed reset clears every room, checkpoint, mechanic and event
+PASS reload retains reset and anonymous visitor identity
+PASS reset clears CONTROL SPINE latch, cargo and validated output frame
+PASS UPLINK reset CONTROL SPINE: validated state 0
+PASS mute is accessible and stops all sound
+PASS volume slider works with keyboard controls
+PASS reload retains mute and volume separately from game progress
+PASS sound can be enabled again
+PASS no console errors
+screenshots: /tmp/binary-ninja-shots
+
+=== PAIRING BAY / both roles / restart ===
+$ node scripts/multiplayer-browser-check.ts
+PASS [P1 holds / P2 runs] two isolated visitors
+PASS [P1 holds / P2 runs] displayed human-readable room code — ZHSG
+PASS [P1 holds / P2 runs] Player 1 waiting UI
+PASS [P1 holds / P2 runs] COPY CODE writes the actual clipboard
+PASS [P1 holds / P2 runs] UI join gives distinct slots
+PASS [P1 holds / P2 runs] WebSocket uses the page host/protocol and /ws
+PASS [P1 holds / P2 runs] both clients render remote avatars
+PASS [P1 holds / P2 runs] Plate A propagates in under one second including approach — 464 ms
+PASS [P1 holds / P2 runs] remote avatar moves through ordinary input
+PASS [P1 holds / P2 runs] disconnect removes avatar and releases anchor
+PASS [P1 holds / P2 runs] partner disconnected visible
+PASS [P1 holds / P2 runs] reconnect reclaims holder slot without stale occupancy
+PASS [P1 holds / P2 runs] Player 2 crosses with normal grapple input
+PASS [P1 holds / P2 runs] Switch B bridge propagates in under one second — 72 ms
+PASS [P1 holds / P2 runs] shared reunion checkpoint
+PASS [P1 holds / P2 runs] refresh retains slot/latch/checkpoint
+PASS [P1 holds / P2 runs] Player 1 traverses the materialized bridge
+PASS [P1 holds / P2 runs] cube grapple pulls under one granted physics authority
+PASS [P1 holds / P2 runs] P1 carries the one cube on both clients
+PASS [P1 holds / P2 runs] player standing on CARGO PLATE cannot power access
+PASS [P1 holds / P2 runs] one shared drop cue reaches each client
+PASS [P1 holds / P2 runs] handoff P1 → P2 transfers physics authority
+PASS [P1 holds / P2 runs] disconnect transfers one falling/settling cube and revokes old stream
+PASS [P1 holds / P2 runs] reconnect keeps original slot and one unheld cube
+PASS [P1 holds / P2 runs] cube-only cargo holds final access on both clients
+PASS [P1 holds / P2 runs] both players climb the cargo-powered access step
+PASS [P1 holds / P2 runs] one final plate cannot unlock or complete
+PASS [P1 holds / P2 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P1 holds / P2 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P1 holds / P2 runs] final unlock propagates in under one second including approach — 631 ms
+PASS [P1 holds / P2 runs] two distinct bodies unlock without completing
+PASS [P1 holds / P2 runs] unlock message is visible
+PASS [P1 holds / P2 runs] leaving both plates keeps the door open, with no arrivals
+PASS [P1 holds / P2 runs] released plate feeds go dim while the unlocked door stays open
+PASS [P1 holds / P2 runs] unlock plays one door cue and no completion cue
+PASS [P1 holds / P2 runs] first distinct arrival cannot complete
+PASS [P1 holds / P2 runs] arrival count is visible
+PASS [P1 holds / P2 runs] arrival remains recorded after leaving the exit
+PASS [P1 holds / P2 runs] unexpected server loss shows RECONNECTING
+PASS [P1 holds / P2 runs] recovery preserves slot, checkpoint, unlock and first arrival
+PASS [P1 holds / P2 runs] recovery restores no body-held input
+PASS [P1 holds / P2 runs] recovery restores docked cube and momentary cargo power — {"placement":"cargoPlate","cube":{"x":1310,"y":538,"vx":0,"vy":0,"carried":false,"grounded":true,"groundId":"far"},"access":true}
+PASS [P1 holds / P2 runs] restart room file contains semantic placement without physics or ownership
+PASS [P1 holds / P2 runs] both physical arrivals complete on both clients
+PASS [P1 holds / P2 runs] completion cue waits for the second arrival and plays once
+PASS [P1 holds / P2 runs] co-op preserves both personal campaign saves
+PASS [P2 holds / P1 runs] two isolated visitors
+PASS [P2 holds / P1 runs] displayed human-readable room code — 4BKD
+PASS [P2 holds / P1 runs] Player 1 waiting UI
+PASS [P2 holds / P1 runs] COPY CODE writes the actual clipboard
+PASS [P2 holds / P1 runs] UI join gives distinct slots
+PASS [P2 holds / P1 runs] WebSocket uses the page host/protocol and /ws
+PASS [P2 holds / P1 runs] both clients render remote avatars
+PASS [P2 holds / P1 runs] Plate A propagates in under one second including approach — 635 ms
+PASS [P2 holds / P1 runs] remote avatar moves through ordinary input
+PASS [P2 holds / P1 runs] disconnect removes avatar and releases anchor
+PASS [P2 holds / P1 runs] partner disconnected visible
+PASS [P2 holds / P1 runs] reconnect reclaims holder slot without stale occupancy
+PASS [P2 holds / P1 runs] Player 1 crosses with normal grapple input
+PASS [P2 holds / P1 runs] Switch B bridge propagates in under one second — 67 ms
+PASS [P2 holds / P1 runs] shared reunion checkpoint
+PASS [P2 holds / P1 runs] refresh retains slot/latch/checkpoint
+PASS [P2 holds / P1 runs] Player 2 traverses the materialized bridge
+PASS [P2 holds / P1 runs] cube grapple pulls under one granted physics authority
+PASS [P2 holds / P1 runs] P2 carries the one cube on both clients
+PASS [P2 holds / P1 runs] player standing on CARGO PLATE cannot power access
+PASS [P2 holds / P1 runs] one shared drop cue reaches each client
+PASS [P2 holds / P1 runs] handoff P2 → P1 transfers physics authority
+PASS [P2 holds / P1 runs] disconnect transfers one falling/settling cube and revokes old stream
+PASS [P2 holds / P1 runs] reconnect keeps original slot and one unheld cube
+PASS [P2 holds / P1 runs] cube-only cargo holds final access on both clients
+PASS [P2 holds / P1 runs] both players climb the cargo-powered access step
+PASS [P2 holds / P1 runs] one final plate cannot unlock or complete
+PASS [P2 holds / P1 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P2 holds / P1 runs] held plate lights its own door feed while the other feed and door stay off
+PASS [P2 holds / P1 runs] final unlock propagates in under one second including approach — 651 ms
+PASS [P2 holds / P1 runs] two distinct bodies unlock without completing
+PASS [P2 holds / P1 runs] unlock message is visible
+PASS [P2 holds / P1 runs] leaving both plates keeps the door open, with no arrivals
+PASS [P2 holds / P1 runs] released plate feeds go dim while the unlocked door stays open
+PASS [P2 holds / P1 runs] unlock plays one door cue and no completion cue
+PASS [P2 holds / P1 runs] first distinct arrival cannot complete
+PASS [P2 holds / P1 runs] arrival count is visible
+PASS [P2 holds / P1 runs] arrival remains recorded after leaving the exit
+PASS [P2 holds / P1 runs] unexpected server loss shows RECONNECTING
+PASS [P2 holds / P1 runs] recovery preserves slot, checkpoint, unlock and first arrival
+PASS [P2 holds / P1 runs] recovery restores no body-held input
+PASS [P2 holds / P1 runs] recovery restores docked cube and momentary cargo power — {"placement":"cargoPlate","cube":{"x":1310,"y":538,"vx":0,"vy":0,"carried":false,"grounded":true,"groundId":"far"},"access":true}
+PASS [P2 holds / P1 runs] restart room file contains semantic placement without physics or ownership
+PASS [P2 holds / P1 runs] both physical arrivals complete on both clients
+PASS [P2 holds / P1 runs] completion cue waits for the second arrival and plays once
+PASS [P2 holds / P1 runs] co-op preserves both personal campaign saves
+PASS no browser exceptions or console errors
+
+=== RELAY LAB / both slots / untouched cargo both directions ===
+$ node scripts/labs-browser-check.ts relay-lab
+PASS [relay-lab / P1 acts] joining by code discovers the selected lab
+PASS [relay-lab / P1 acts] either operator powers both local gate pairs
+PASS [relay-lab / P1 acts] one loose cube snaps and keeps its simulator/epoch
+PASS [relay-lab / P1 acts] remote avatar appears at destination with an explicit marker
+PASS [relay-lab / P1 acts] both players transit A to B with untouched loose cargo
+PASS [relay-lab / P1 acts] carried cube follows snapped holder without ownership transfer
+PASS [relay-lab / P1 acts] both players transit B to A without moving cargo or bouncing back
+PASS [relay-lab / P1 acts] one physical arrival cannot complete
+PASS [relay-lab / P1 acts] two distinct physical arrivals complete on both clients
+PASS [relay-lab / P1 acts] C8 visitor progress remains independent
+PASS [relay-lab / P2 acts] joining by code discovers the selected lab
+PASS [relay-lab / P2 acts] either operator powers both local gate pairs
+PASS [relay-lab / P2 acts] one loose cube snaps and keeps its simulator/epoch
+PASS [relay-lab / P2 acts] remote avatar appears at destination with an explicit marker
+PASS [relay-lab / P2 acts] both players transit A to B with untouched loose cargo
+PASS [relay-lab / P2 acts] carried cube follows snapped holder without ownership transfer
+PASS [relay-lab / P2 acts] both players transit B to A without moving cargo or bouncing back
+PASS [relay-lab / P2 acts] one physical arrival cannot complete
+PASS [relay-lab / P2 acts] two distinct physical arrivals complete on both clients
+PASS [relay-lab / P2 acts] C8 visitor progress remains independent
+PASS [relay-lab / P2 acts] no browser exceptions or console errors
+
+=== LIFT LAB / both roles / reset and death ===
+$ node scripts/labs-browser-check.ts lift-lab
+PASS [lift-lab / P1 acts] joining by code discovers the selected lab
+PASS [lift-lab / P1 acts] either player holds the lower control
+PASS [lift-lab / P1 acts] loose cube rises with one physics authority
+PASS [lift-lab / P1 acts] partner sees lift motion
+PASS [lift-lab / P1 acts] checkpoint update leaves lower partner in place
+PASS [lift-lab / P1 acts] reset moves only the resetting player to their upper slot
+PASS [lift-lab / P1 acts] second player rides after lower control releases
+PASS [lift-lab / P1 acts] carried cube keeps its offset and holder
+PASS [lift-lab / P1 acts] ordinary death releases carry and respawns upper without resetting partner
+PASS [lift-lab / P1 acts] one physical arrival cannot complete
+PASS [lift-lab / P1 acts] two distinct physical arrivals complete on both clients
+PASS [lift-lab / P1 acts] C8 visitor progress remains independent
+PASS [lift-lab / P2 acts] joining by code discovers the selected lab
+PASS [lift-lab / P2 acts] either player holds the lower control
+PASS [lift-lab / P2 acts] loose cube rises with one physics authority
+PASS [lift-lab / P2 acts] partner sees lift motion
+PASS [lift-lab / P2 acts] checkpoint update leaves lower partner in place
+PASS [lift-lab / P2 acts] reset moves only the resetting player to their upper slot
+PASS [lift-lab / P2 acts] second player rides after lower control releases
+PASS [lift-lab / P2 acts] carried cube keeps its offset and holder
+PASS [lift-lab / P2 acts] ordinary death releases carry and respawns upper without resetting partner
+PASS [lift-lab / P2 acts] one physical arrival cannot complete
+PASS [lift-lab / P2 acts] two distinct physical arrivals complete on both clients
+PASS [lift-lab / P2 acts] C8 visitor progress remains independent
+PASS [lift-lab / P2 acts] no browser exceptions or console errors
+
+=== CRUMBLE LAB / both slots / reconnect and restart ===
+$ node scripts/labs-browser-check.ts crumble-lab
+PASS [crumble-lab / P1 acts] joining by code discovers the selected lab
+PASS [crumble-lab / P1 acts] partner sees one shared foot warning
+PASS [crumble-lab / P1 acts] authoritative collapse disables collision and hooks on both
+PASS [crumble-lab / P1 acts] one falling player does not reset partner
+PASS [crumble-lab / P1 acts] hook warning uses the longer authored delay
+PASS [crumble-lab / P1 acts] reconnect receives remaining shared warning
+PASS [crumble-lab / P1 acts] hook collapse waits longer than foot collapse
+PASS [crumble-lab / P1 acts] attached local rope cancels at shared collapse
+PASS [crumble-lab / P1 acts] actual server restart restores ephemeral platforms stable
+PASS [crumble-lab / P1 acts] one physical arrival cannot complete
+PASS [crumble-lab / P1 acts] two distinct physical arrivals complete on both clients
+PASS [crumble-lab / P1 acts] C8 visitor progress remains independent
+PASS [crumble-lab / P2 acts] joining by code discovers the selected lab
+PASS [crumble-lab / P2 acts] partner sees one shared foot warning
+PASS [crumble-lab / P2 acts] authoritative collapse disables collision and hooks on both
+PASS [crumble-lab / P2 acts] one falling player does not reset partner
+PASS [crumble-lab / P2 acts] hook warning uses the longer authored delay
+PASS [crumble-lab / P2 acts] reconnect receives remaining shared warning
+PASS [crumble-lab / P2 acts] hook collapse waits longer than foot collapse
+PASS [crumble-lab / P2 acts] attached local rope cancels at shared collapse
+PASS [crumble-lab / P2 acts] actual server restart restores ephemeral platforms stable
+PASS [crumble-lab / P2 acts] one physical arrival cannot complete
+PASS [crumble-lab / P2 acts] two distinct physical arrivals complete on both clients
+PASS [crumble-lab / P2 acts] C8 visitor progress remains independent
+PASS [crumble-lab / P2 acts] no browser exceptions or console errors
+
+=== BOOST LAB / both holders / drop, reset, disconnect, finish ===
+$ node scripts/labs-browser-check.ts boost-lab
+PASS [boost-lab / P1 acts] joining by code discovers the selected lab
+PASS [boost-lab / P1 acts] a normal floor jump cannot reach the high ledge
+PASS [boost-lab / P1 acts] carrier has no self support
+PASS [boost-lab / P1 acts] slight grounded holder motion keeps support without launching rider
+PASS [boost-lab / P1 acts] drop releases support without resetting climber
+PASS [boost-lab / P1 acts] holder reset preserves partner body
+PASS [boost-lab / P1 acts] disconnect releases cube without resetting climber
+PASS [boost-lab / P1 acts] jumping away keeps accepted cube holder and simulator
+PASS [boost-lab / P1 acts] upper switch leaves holder below and opens a permanent return route
+PASS [boost-lab / P1 acts] one physical arrival cannot complete
+PASS [boost-lab / P1 acts] two distinct physical arrivals complete on both clients
+PASS [boost-lab / P1 acts] C8 visitor progress remains independent
+PASS [boost-lab / P2 acts] joining by code discovers the selected lab
+PASS [boost-lab / P2 acts] a normal floor jump cannot reach the high ledge
+PASS [boost-lab / P2 acts] carrier has no self support
+PASS [boost-lab / P2 acts] slight grounded holder motion keeps support without launching rider
+PASS [boost-lab / P2 acts] drop releases support without resetting climber
+PASS [boost-lab / P2 acts] holder reset preserves partner body
+PASS [boost-lab / P2 acts] disconnect releases cube without resetting climber
+PASS [boost-lab / P2 acts] jumping away keeps accepted cube holder and simulator
+PASS [boost-lab / P2 acts] upper switch leaves holder below and opens a permanent return route
+PASS [boost-lab / P2 acts] one physical arrival cannot complete
+PASS [boost-lab / P2 acts] two distinct physical arrivals complete on both clients
+PASS [boost-lab / P2 acts] C8 visitor progress remains independent
+PASS [boost-lab / P2 acts] no browser exceptions or console errors

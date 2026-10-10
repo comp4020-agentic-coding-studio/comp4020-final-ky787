@@ -297,6 +297,9 @@ export class PuzzleRenderer {
                 this.text('E · LATCH + SHARED CHECKPOINT', 760, 235, 12, C.cyan);
                 this.text('HOLD HERE FOR YOUR PARTNER', 220, 740, 14, C.cyan);
                 this.text('R · RESET ONLY YOUR BODY', 805, 455, 12, C.dim);
+            } else if (r.id === 'boost-lab') {
+                this.text('BOOST HERE', 430, 570, 13, C.cyan);
+                this.text('E · OPEN RETURN ROUTE', 640, 350, 12, C.cyan);
             } else {
                 this.text('STEP · SHORT WARNING', 400, 485, 12, C.amber);
                 this.text('HOOK · LONG WARNING', 865, 275, 12, C.amber);

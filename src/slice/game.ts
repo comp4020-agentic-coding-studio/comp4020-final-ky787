@@ -372,7 +372,7 @@ export class SliceGame {
     }
     snapshot() {
         return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, inputs: this.world.inputs, outputs: this.world.frame.outputs,
-            multiplayer: this.coopMode ? { ...this.coop.diagnostics(), shared: this.coop.room, remote: this.coop.remote.sample(performance.now()) } : null,
+            multiplayer: this.coopMode ? { ...this.coop.diagnostics(), ...this.supportDiagnostics(), shared: this.coop.room, remote: this.coop.remote.sample(performance.now()) } : null,
             source: this.world.frame.source, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
@@ -381,6 +381,12 @@ export class SliceGame {
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             audio: this.audio.snapshot(),
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
+    }
+    private supportDiagnostics() {
+        const support = this.world.partnerCubeSupport;
+        return { partnerCubeSupportActive: !!support, supportCarrierSlot: support?.carrier ?? null,
+            supportPosition: support ? { x: support.surface.x, y: support.surface.y } : null,
+            groundedOnPartnerCube: this.world.groundedOnPartnerCube };
     }
     private frame(now: number): void {
         const dt = Math.min(MAX_FRAME_TIME, this.last ? (now - this.last) / 1000 : 0);
@@ -471,7 +477,7 @@ export class SliceGame {
         this.traceView.hidden = this.world.room.id !== 'uplink' || !this.debug;
         if (this.debug)
             this.debugView.querySelector('pre')!.textContent = JSON.stringify(this.coopMode
-                ? { multiplayer: this.coop.diagnostics(), checkpoint: this.coop.room?.checkpoint, completed: this.coop.room?.completed,
+                ? { multiplayer: { ...this.coop.diagnostics(), ...this.supportDiagnostics() }, checkpoint: this.coop.room?.checkpoint, completed: this.coop.room?.completed,
                     player: { x: this.world.player.x, y: this.world.player.y, rope: this.world.player.rope.phase } }
                 : this.snapshot(), null, 2);
         requestAnimationFrame(t => this.frame(t));

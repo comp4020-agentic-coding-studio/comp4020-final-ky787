@@ -1,18 +1,20 @@
 # Multiplayer mechanics laboratories
 
 The room-code, symmetric two-player, shared-cube and prediction foundation was
-manually accepted on two physical computers. The current mechanics-lab milestone
-starts at `e3bc06469f0be79f73ffd0f95de3882e6cff3bc0` (2026-10-07). It generalizes
-that foundation to four short **authored mock test rooms**. These labs await
-manual two-computer acceptance; they are not a final cooperative campaign.
+manually accepted on two physical computers. Subsequent two-player mechanics-lab
+testing reproduced a loose-cube relay obstruction. The 2026-10-11 pass starts at
+`81422495b19e16b931b51ae298381f7970f3b1a2`, fixes that obstruction and adds BOOST LAB
+to the four existing **authored mock test rooms**. The revised relay behavior and
+partner-held boost await two-computer acceptance; these are not a final campaign.
 
 C8's four single-player rooms, anonymous visitor progress and retained CONTROL
 SPINE controller remain independent. No accounts, matchmaking, new binaries,
 player-player collision, server player physics, or invented assembly are added.
 See [ADR 0001](adr/0001-multiplayer-authority.md),
 [ADR 0002](adr/0002-shared-cube-authority.md),
-[ADR 0003](adr/0003-multiplayer-prediction.md), and
-[ADR 0004](adr/0004-coop-labs-and-transient-machinery.md).
+[ADR 0003](adr/0003-multiplayer-prediction.md),
+[ADR 0004](adr/0004-coop-labs-and-transient-machinery.md), and
+[ADR 0005](adr/0005-partner-cube-support.md).
 
 ## Architecture and deployment
 
@@ -71,6 +73,7 @@ against loaded and persisted rooms, and distinct invalid/unknown/full errors.
 | `relay-lab` | Player / loose / carried relay transport | `relayEnabled` | yes | Relay power latch |
 | `lift-lab` | Shared vertical transport / checkpoint | `liftLatched` | yes | Upper latch/checkpoint |
 | `crumble-lab` | Shared step / hook unstable blocks | `tested.foot`, `tested.hook` | no | Both trigger styles accepted |
+| `boost-lab` | Partner-held cube boost / return steps | `routeLatched` | yes | Upper shared switch |
 
 `SharedRoom` is a union discriminated by `level`. Common session fields are code,
 revision, assigned/connected slots, checkpoint, cube/semantic placement when
@@ -123,7 +126,20 @@ The granted cube browser alone executes `teleport('cube', ...)` for loose cargo.
 Transit keeps holder, physics authority and cube epoch. A carried cube follows
 its holder, using the existing carried-height clearance. A cube held by the
 partner never enlarges the local player's clearance or emits local cargo transit.
-The normal collision clearance test still refuses an obstructed destination.
+The original obstruction test accidentally included the resting shared
+`cube-body` alongside authored solids. A cube left at a receiving gate could
+therefore reject every subsequent player. Current RELAY LAB reproduces this
+permanently B → A; A → B falls clear on its lower receiving floor.
+
+Player egress now separates that shared cube from authored blockers. The normal
+destination must still pass every enabled authored-solid and room-bound check.
+If occupied by the resting cube, the player exits just beyond it on the gate's
+outward side (two-unit gap, at most 96 units of adjustment). The entire alternate
+payload box must also pass those checks. No cube is moved or duplicated. An
+ignore-only approach was rejected because ordinary collision could push the
+arrival back into the gate. Unsafe walls, floors, doors and room bounds still
+reject transit. Partner-held support is never in either clearance list. C8's
+clearance inputs, cube transit and all per-entity cooldowns are unchanged.
 
 The next player/cube stream snapshot carries `discontinuity: "relay"` after a
 transit (`"respawn"` for local death/reset, `"recovery"` for cube recovery).
@@ -147,7 +163,7 @@ The upper latch saves the generic shared checkpoint `upper`, holds lift power
 and unlocks the exit. It does **not** teleport live players. Later death, R or
 rejoin spawns that slot at its upper position: P1 (790,343), P2 (885,343).
 PAIRING BAY maps its saved `reunion` to the existing world checkpoint positions;
-relay/crumble labs use entry. Player coordinates are never persisted.
+relay/crumble/boost labs use entry. Player coordinates are never persisted.
 
 Ordinary death and **R reset only the local player**. Shared latches, checkpoint,
 exit credits and partner simulation remain. The local cube release uses the
@@ -210,8 +226,9 @@ is stopped after local release. Prediction never changes the accepted room.
 PAIRING BAY's predicted B bridge cannot grant confirmed cargo/exit rights.
 
 Replicas interpolate 100 ms behind using at most 12 samples, never integrate a
-second loose body or extrapolate forever. Only a resting uncarried cube supports
-a player; cube hooks pull, never swing. Remote avatars have no player collision
+second loose body or extrapolate forever. A resting uncarried cube supports
+a player; a partner-held cube adds the restricted support below. Cube hooks pull,
+never swing. Remote avatars have no player collision
 and cannot activate local sensors. Consequential physical reports are trusted
 from the owning browser; this remains a course-scale cooperative trust model.
 
@@ -220,6 +237,41 @@ then each authenticated slot reports its own overlap with the open exit. The
 first arrival cannot complete; both permanent `reachedExit` flags are required.
 Walking away, disconnecting or restarting preserves earned arrival credit.
 Completion is semantic progression, not simultaneous occupancy of a tiny zone.
+
+## Partner-held cube boost and BOOST LAB
+
+The accepted shared holder may support the **other** local avatar through a
+one-way cube-top surface. The carrier never collides with their own held cube.
+Jumping up through it, landing/grounding, normal jumping off, Down drop-through
+and landing sound all reuse ordinary player physics. The surface is movement
+only: no grapple target, pressure-plate body, architecture, relay blocker, second
+cube or transfer of physics authority. Player bodies still pass through each
+other. Local cube prediction never grants partner support.
+
+Both latest and interpolated carrier states must be grounded; the accepted
+holder must be connected and avatar/cube snapshots at most 250 ms old. Support
+uses the same interpolated position as the visible overhead cube. The latest
+snapshot removes support as soon as the carrier becomes airborne, without waiting
+for the 100 ms presentation buffer. Explicit relay/respawn snaps suppress it for
+100 ms. Drop or authoritative release/reset/disconnect removes it at the next
+local movement step. The rider falls normally and is never reset or transported
+with the holder. Existing coyote time is retained.
+
+There is no horizontal rider transport or transferred impulse. Slight movement
+is tolerated while the cube remains underfoot; moving away makes the rider fall.
+Airborne elevators are unsupported. Network stalls can temporarily remove the
+surface. This is local movement evaluated from accepted shared holder state and
+remote presentation, within the existing cooperative trust model, without server
+player physics, rollback or anti-cheat.
+
+BOOST LAB (`boost-lab`) starts both players below a 190-unit upper ledge. The
+held cube top is 82 units above the floor; a second normal jump comfortably
+reaches the ledge. A floor jump or resting loose-cube jump cannot reach it. Either
+player can hold or climb. The upper switch sends the ordinary shared control
+`boostRoute`; accepted `routeLatched` permanently enables two return steps and
+unlocks the exit. The holder climbs those steps, then both physically enter the
+exit. Reset/rejoin starts at entry; the saved return route remains available.
+All geometry, controls and strings are authored/mock, with no binary evidence.
 
 ## Protocol and persistence
 
@@ -234,7 +286,7 @@ Completion is semantic progression, not simultaneous occupancy of a tiny zone.
 | cube-occupancy | semantic `seq`, `epoch`, `cargo`; only PAIRING BAY simulator |
 | occupancy | `seq`, one allowed `plate` or null; lift uses `liftControl` |
 | switch | `seq`; accepted PAIRING BAY B latch |
-| control | `seq`, `relayPower` or `liftLatch`, restricted by level |
+| control | `seq`, `relayPower`, `liftLatch` or `boostRoute`, restricted by level |
 | crumble-trigger | `seq`, `platform`, `foot` or `hook`, only CRUMBLE LAB |
 | local-reset | `seq`; release this body only |
 | exit | `seq`; own physical arrival after accepted unlock |
@@ -265,7 +317,7 @@ last durable watermark. Initial reconnect snapshots reset that baseline.
 Do not persist player/cube coordinates, velocity, holder, physics grants, pull
 flags, epochs, sequences, body occupancy, relay cooldowns, lift positions,
 crumble timers or interpolation. Arbitrary cargo restores at its authored spawn;
-PAIRING BAY docked cargo restores at its plate. Relay/lift labs have no docked
+PAIRING BAY docked cargo restores at its plate. Relay/lift/boost labs have no docked
 placement, so their cubes restore at spawn. Power derives from saved latches.
 
 On accepted join, validated versions 1–3 migrate atomically to version 4. Code,
@@ -292,9 +344,17 @@ baseline, plus the existing connection cue. Browser validation is muted by defau
 F1 includes level, checkpoint, level state/power, live revision, accepted cube
 holder/authority/epoch/placement, local pending actions and RTT, local/remote
 teleport markers, crumble phases with approximate remaining time, stream ages and
-traffic counters. These remain debug details; the normal HUD stays compact.
+traffic counters. It also shows `partnerCubeSupportActive`, carrier slot, surface
+position and `groundedOnPartnerCube`. These remain debug details; the normal HUD stays compact.
 
 ## Validation and manual acceptance
+
+The [2026-10-11 relay/boost regression record](playtest/2026-10-11-relay-boost-regression.txt)
+records the pre-fix failure, focused checks and passing local milestone gate.
+Both BOOST LAB holder arrangements and untouched loose-cargo relay directions
+passed with real browser input. The C8, PAIRING BAY, lift and crumble regressions
+also passed. This working-tree pass has not been deployed or manually accepted
+on two physical computers.
 
 The 2026-10-07 [milestone regression record](playtest/coop-labs-regression.txt)
 contains the complete passing local gate, including TLS and artificial semantic
@@ -315,6 +375,7 @@ pnpm check:multiplayer-pairing     # accepted Pairing Bay route + restart
 pnpm check:multiplayer-relay       # relay, loose/carry, both actor slots
 pnpm check:multiplayer-lift        # both roles, cube, checkpoint, reset/death
 pnpm check:multiplayer-crumble     # phases, hook, reconnect and process restart
+pnpm check:multiplayer-boost       # both holder roles, drop/reset/disconnect, two-body finish
 ```
 
 `BROWSER_BIN=/usr/bin/brave-browser` selects a usable Chromium engine on this
@@ -343,6 +404,12 @@ and join by code on the other. Swap roles in a new room:
 - CRUMBLE: either player steps/hooks; both see warning and coherent collapse;
   attached rope releases; one player can fall/die independently; platforms
   respawn for both. Refresh during warning/broken to inspect recovery.
+- BOOST: P1 holds/P2 climbs, then swap. Move the grounded holder slightly; drop,
+  reset/die and disconnect while supporting. Confirm the partner falls without
+  reset or launch. Jumping holders must lose support. Latch the return steps and
+  physically finish with both bodies. Carry the cube through a relay afterward.
+- RELAY regression: drop cargo through without following; leave it exactly where
+  it lands. Both players transit repeatedly in both directions without moving it.
 - All labs: finish with both bodies, reconnect/restart, and verify C8 progress
   remains separate. PAIRING BAY should feel as it did in the accepted build.
 

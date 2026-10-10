@@ -160,7 +160,7 @@ export class CoopClient {
         return this.prediction.begin(kind, seq, epoch, this.generation, now);
     }
     switchB(): boolean { return this.room?.level === 'pairing-bay' && !this.room.levelState.inputs.switchB && this.predict('switch'); }
-    control(control: 'relayPower' | 'liftLatch'): void {
+    control(control: Extract<ClientMessage, { type: 'control' }>['control']): void {
         if (!this.connected || [...this.pendingControls.values()].includes(control)) return;
         const seq = ++this.actionSeq;
         if (this.send({ type: 'control', seq, control })) this.pendingControls.set(seq, control);

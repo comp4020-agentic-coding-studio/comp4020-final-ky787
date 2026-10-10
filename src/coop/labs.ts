@@ -5,6 +5,20 @@ import { pairingBay } from './pairing-bay.ts';
 /** Hand-authored mechanics laboratories, all using mock controllers. */
 export const COOP_LABS: Record<CoopLevelId, { title: string; description: string; room: (slot: Slot) => RoomDef }> = {
     'pairing-bay': { title: 'PAIRING BAY', description: 'Shared inputs, cube handoff, two-player finish', room: pairingBay },
+    'boost-lab': { title: 'BOOST LAB', description: 'Hold the cube. Boost your partner. Swap roles.', room: slot => ({
+        id: 'boost-lab', title: 'BOOST LAB', instruction: 'USE THE CUBE TO REACH THE UPPER ROUTE',
+        width: 1150, height: 760, spawn: { x: slot === 1 ? 110 : 200, y: 583 }, checkpoint: { x: slot === 1 ? 110 : 200, y: 583 },
+        cube: { x: 300, y: 578 }, lever: { x: 720, y: 410 }, display: { x: 820, y: 540 },
+        exit: { x: 950, y: 270, w: 130, h: 140 },
+        platforms: [
+            { id: 'floor', kind: 'static', x: 0, y: 600, w: 1150, h: 160 },
+            // 190 above the floor; held cube top is 82 up, then a normal held jump.
+            { id: 'upper', kind: 'static', x: 550, y: 410, w: 600, h: 32 },
+            { id: 'return-step-low', kind: 'code', x: 280, y: 510, w: 150, h: 24, signal: 'bridge', label: 'RETURN STEP' },
+            { id: 'return-step-high', kind: 'code', x: 430, y: 430, w: 150, h: 24, signal: 'bridge', label: 'UPPER ROUTE' },
+        ],
+        hazards: [],
+    }) },
     'relay-lab': { title: 'RELAY LAB', description: 'Player and cube relay synchronization', room: slot => ({
         id: 'relay-lab', title: 'RELAY LAB', instruction: 'POWER THE RELAY. TAKE YOUR PARTNER AND CUBE THROUGH.',
         width: 1500, height: 760, spawn: { x: slot === 1 ? 110 : 200, y: 543 }, checkpoint: { x: slot === 1 ? 110 : 200, y: 543 },

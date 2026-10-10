@@ -9,6 +9,7 @@ export interface DurableStates {
     'pairing-bay': { switchB: boolean };
     'relay-lab': { relayEnabled: boolean };
     'lift-lab': { liftLatched: boolean };
+    'boost-lab': { routeLatched: boolean };
     'crumble-lab': { tested: { foot: boolean; hook: boolean } };
 }
 export interface SessionRecord {

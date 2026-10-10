@@ -6,6 +6,8 @@ import type { ActionResult } from './prediction.ts';
 import { cubeAvailable, type CubeTransform } from './protocol.ts';
 
 type CubeTransport = Pick<CoopClient, 'room' | 'slot' | 'ownsCube' | 'connected' | 'prediction' | 'remote' | 'remoteCube' | 'cubeAction' | 'cubeOccupancy'>;
+/** Five nominal stream intervals; stop supporting on stalled/suspended streams. */
+export const PARTNER_SUPPORT_MAX_AGE_MS = 250;
 
 /** Temporary local feedback overlays the replica; only confirmed authority publishes. */
 export class SharedCubeAuthority implements CubeAuthority {
@@ -15,6 +17,7 @@ export class SharedCubeAuthority implements CubeAuthority {
     private correction = false;
     private releaseAt: CubeTransform | null = null;
     cargoVisual: boolean | undefined;
+    partnerSupport: CubeAuthority['partnerSupport'] = null;
     constructor(private client: CubeTransport) { this.result = client.prediction.cubeResult; }
     get simulates() { return this.client.connected && (this.client.ownsCube || !!this.client.prediction.cube); }
     get heldLocally() {
@@ -23,6 +26,7 @@ export class SharedCubeAuthority implements CubeAuthority {
     }
     consumeCorrection(): boolean { const value = this.correction; this.correction = false; return value; }
     sync(w: PuzzleWorld): void {
+        this.partnerSupport = null;
         const c = w.cube, room = this.client.room;
         if (!c || !room?.cube) return;
         const state = room.cube, pending = this.client.prediction.cube, result = this.client.prediction.cubeResult;
@@ -47,9 +51,25 @@ export class SharedCubeAuthority implements CubeAuthority {
         }
         c.carried = this.client.connected && (pending ? pending.kind === 'cube-pickup' && !this.releaseAt : state.holder !== null);
         if (c.carried) {
-            const body = this.heldLocally ? w.player : this.client.remote.sample(performance.now());
+            const now = performance.now();
+            const body = this.heldLocally ? w.player : this.client.remote.sample(now);
             if (body) Object.assign(c, { x: body.x, y: body.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2, vx: 0, vy: 0 });
             c.grounded = false;
+            const remote = this.client.remote, holder = state.holder;
+            // Accepted holder only, including during prediction reconciliation.
+            // Latest grounding revokes immediately, ahead of the display buffer.
+            // Use the same interpolated position as the visible cube, with no
+            // rider displacement/velocity transfer (including relay/respawn snaps).
+            if (!pending && holder && holder !== this.client.slot && room.connected[holder - 1]
+                && body?.grounded && remote.latest()?.grounded
+                && now - remote.lastAt <= PARTNER_SUPPORT_MAX_AGE_MS
+                && this.client.remoteCube.latest() && now - this.client.remoteCube.lastAt <= PARTNER_SUPPORT_MAX_AGE_MS
+                && (!remote.lastDiscontinuity || now - remote.lastDiscontinuity.at >= 100)) {
+                this.partnerSupport = { carrier: holder, surface: {
+                    id: 'partner-cube-support', x: c.x - CUBE_SIZE / 2, y: c.y - CUBE_SIZE / 2,
+                    w: CUBE_SIZE, h: 1, enabled: true, oneWay: true, grappleable: false,
+                } };
+            }
         }
         if (!pending && this.releaseAt) {
             const drop = this.releaseAt; this.releaseAt = null;

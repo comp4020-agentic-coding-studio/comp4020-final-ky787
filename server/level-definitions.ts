@@ -3,9 +3,22 @@ import type { LevelDefinition } from './coop-state.ts';
 import { crumbleView, triggerCrumble } from './crumble-state.ts';
 import { pairingDefinition } from './pairing-state.ts';
 
-/** Four small coordinate-free mock controllers. No frontend geometry imports. */
+/** Small coordinate-free mock controllers. No frontend geometry imports. */
 export const LEVEL_DEFINITIONS: { [K in CoopLevelId]: LevelDefinition<K> } = {
     'pairing-bay': pairingDefinition,
+    'boost-lab': {
+        cube: true, defaults: () => ({ routeLatched: false }),
+        valid: r => Object.keys(r.levelState).length === 1 && typeof r.levelState.routeLatched === 'boolean'
+            && r.checkpoint === 'entry' && r.cubePlacement === 'spawn' && r.exitUnlocked === r.levelState.routeLatched,
+        acceptsPlate: p => p === null,
+        action: ({ record }, m) => {
+            if (m.type !== 'control' || m.control !== 'boostRoute') return false;
+            record.levelState.routeLatched = true; return true;
+        },
+        project: ({ record }) => ({ ...record.levelState }),
+        unlock: ({ record }) => record.levelState.routeLatched,
+        cubeEnabled: () => true,
+    },
     'relay-lab': {
         cube: true, defaults: () => ({ relayEnabled: false }),
         valid: r => Object.keys(r.levelState).length === 1 && typeof r.levelState.relayEnabled === 'boolean'

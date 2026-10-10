@@ -1,4 +1,4 @@
-import { expect, it, vi } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { CoopClient } from '../src/coop/client.ts';
 import { createCoopAuthority } from '../src/coop/lab-authority.ts';
 import { COOP_LABS } from '../src/coop/labs.ts';
@@ -8,10 +8,12 @@ import { newRecord, sharedRoom } from '../server/coop-state.ts';
 import { assignCube, freshCube } from '../server/cube-state.ts';
 import { advanceCrumble, freshCrumble, triggerCrumble } from '../server/crumble-state.ts';
 import { PuzzleWorld } from '../src/slice/world.ts';
-import { emptyInput } from '../src/engine/physics.ts';
+import { emptyInput, playerBox } from '../src/engine/physics.ts';
+import { boxesOverlap } from '../src/engine/geometry.ts';
 import { FIXED_DT } from '../src/engine/constants.ts';
 import { AudioPresentation } from '../src/slice/audio-presentation.ts';
 import { avatar } from './helpers/coop-server.ts';
+afterEach(() => vi.restoreAllMocks());
 
 function setup(level: CoopLevelId, slot: Slot, physics: Slot = slot) {
     const record = newRecord('ABCD', '11111111-1111-4111-8111-111111111111', level), cube = level === 'crumble-lab' ? null : freshCube(), crumble = freshCrumble();
@@ -32,6 +34,158 @@ function setup(level: CoopLevelId, slot: Slot, physics: Slot = slot) {
     return { record, cube, crumble, client, authority, world, sync };
 }
 const steps = (w: PuzzleWorld, n: number) => { for (let i = 0; i < n; i++) w.step(FIXED_DT, emptyInput()); };
+it.each([0, 1])('untouched loose cargo at gate %s cannot deadlock later P1 and P2 transit', source => {
+    const fixtures = [setup('relay-lab', 1), setup('relay-lab', 2, 1)];
+    for (const f of fixtures) {
+        if (f.record.level !== 'relay-lab') throw new Error('fixture');
+        f.record.levelState.relayEnabled = true; f.record.exitUnlocked = true; f.sync();
+    }
+    const w = fixtures[0].world, [from, to] = [w.gates[0].def.gates[source], w.gates[0].def.gates[1 - source]];
+    const cube = w.cube!;
+    Object.assign(cube, { x: from.x + from.w / 2, y: from.y + from.h - 22, vx: 0, vy: 0, grounded: false });
+    w.step(FIXED_DT, emptyInput());
+    expect(w.events.filter(e => e.kind === 'relay-cargo')).toHaveLength(1);
+    expect(w.gates[0].cooldown('cube')).toBeGreaterThan(0);
+    steps(w, 120); // Nobody follows, retrieves or moves the cargo.
+    expect(cube.grounded).toBe(true);
+    const resting = { x: cube.x, y: cube.y, vx: cube.vx, vy: cube.vy, grounded: cube.grounded };
+    fixtures[1].cube!.transform = resting;
+    fixtures[1].client.remoteCube.reset(fixtures[1].cube!, performance.now()); fixtures[1].sync();
+    for (const f of fixtures) {
+        Object.assign(f.world.player, { x: from.x + from.w / 2, y: from.y + from.h - 17, vx: 0, vy: 0 });
+        f.world.step(FIXED_DT, emptyInput());
+        expect(f.world.player.x).toBe(source === 0 ? to.x + to.w + 29 : resting.x - 22 - 11 - 2);
+        expect(f.client.lastLocalDiscontinuity?.kind).toBe('relay');
+        expect(f.world.cube).toMatchObject(resting);
+        expect(f.world.cube!.carried).toBe(false);
+        expect(f.cube!.physicsAuthority).toBe(1);
+        steps(f.world, 90); // Ordinary cube overlap resolution must not cause a relay loop.
+        const body = playerBox(f.world.player);
+        expect(body.x).toBeGreaterThanOrEqual(0); expect(body.x + body.w).toBeLessThanOrEqual(f.world.room.width);
+        expect(body.y).toBeGreaterThanOrEqual(0); expect(body.y + body.h).toBeLessThanOrEqual(f.world.room.height);
+        expect(f.world.solids.some(s => s.enabled && boxesOverlap(body, s))).toBe(false);
+        expect(boxesOverlap(body, { x: resting.x - 22, y: resting.y - 22, w: 44, h: 44 })).toBe(false);
+        expect(f.world.cube).toMatchObject(resting);
+        expect(f.world.events.filter(e => e.kind === 'teleport')).toHaveLength(1);
+    }
+    expect(w.cube).toBe(cube);
+    expect(w.events.filter(e => e.kind === 'relay-cargo')).toHaveLength(1);
+});
+it.each(['wall', 'floor', 'bounds'] as const)('shared player egress still refuses unsafe authored %s', obstacle => {
+    const { world: w, record, sync } = setup('relay-lab', 1);
+    if (record.level !== 'relay-lab') throw new Error('fixture');
+    record.levelState.relayEnabled = true; record.exitUnlocked = true; sync();
+    if (obstacle === 'bounds') w.room.gates![0].gates[1].x = w.room.width - 50;
+    else w.solids.push({ id: 'unsafe-exit', x: 1050, y: obstacle === 'floor' ? 550 : 450, w: 100, h: 100,
+        enabled: true, oneWay: false, grappleable: false });
+    Object.assign(w.player, { x: 485, y: 543 }); w.step(FIXED_DT, emptyInput());
+    expect(w.player.x).toBe(485); expect(w.gates[0].cooldown('player')).toBe(0);
+});
+
+function boostFixture(slot: Slot) {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+    const holder = (3 - slot) as Slot, f = setup('boost-lab', slot, holder);
+    f.cube!.holder = holder;
+    f.cube!.transform = { x: 475, y: 540, vx: 0, vy: 0, grounded: false };
+    f.client.remoteCube.reset(f.cube!, 1000);
+    f.client.remote.push({ ...avatar, x: 475, y: 583, grounded: true }, 1, 1, 1000);
+    f.sync();
+    Object.assign(f.world.player, { x: 475, y: 583, grounded: true, groundId: 'floor' });
+    return f;
+}
+function jumpOntoCube(w: PuzzleWorld) {
+    for (let n = 0; n < 72; n++) w.step(FIXED_DT, { ...emptyInput(), jumpPressed: n === 0, jumpHeld: true });
+    expect(w.groundedOnPartnerCube).toBe(true);
+    expect(w.player.y).toBe(501);
+}
+it.each([1, 2] as const)('P%s lands through the underside onto the partner cube and jumps normally to BOOST LAB upper', slot => {
+    const { world: w, cube, client } = boostFixture(slot);
+    const epoch = cube!.epoch, holder = cube!.holder;
+    const soundSink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, sound = new AudioPresentation(soundSink); sound.reset(w);
+    for (let n = 0; n < 72; n++) {
+        w.step(FIXED_DT, { ...emptyInput(), jumpPressed: n === 0, jumpHeld: true });
+        sound.observe(w, w.events.splice(0));
+    }
+    expect(w.groundedOnPartnerCube).toBe(true); expect(w.player.y).toBe(501);
+    expect(soundSink.play.mock.calls.some(c => c[0] === 'landing')).toBe(true);
+    expect(w.partnerCubeSupport?.surface).toMatchObject({ oneWay: true, grappleable: false });
+    expect(w.solids.some(s => s.id === 'partner-cube-support')).toBe(false);
+    expect(w.target(w.cube!)).toBeNull();
+    expect(w.cube!.grounded).toBe(false);
+    for (let n = 0; n < 75; n++) w.step(FIXED_DT, { ...emptyInput(), jumpPressed: n === 0, jumpHeld: true, right: w.player.x < 640 });
+    expect(w.player.groundId).toBe('upper'); expect(w.player.y).toBe(393);
+    expect(cube!.holder).toBe(holder); expect(cube!.physicsAuthority).toBe(holder); expect(cube!.epoch).toBe(epoch);
+    expect(client.occupy).not.toHaveBeenCalled();
+    expect(w.frame.source).toBe('mock-multiplayer'); expect(w.frame.evidence).toBeUndefined();
+});
+it('BOOST LAB upper is unreachable by a floor jump, or a jump from a resting loose cube', () => {
+    const { world: w } = setup('boost-lab', 1);
+    for (const base of [600, 556]) {
+        Object.assign(w.player, { x: 475, y: base - 17, grounded: true, vx: 0, vy: 0 });
+        let highestFeet = base;
+        for (let n = 0; n < 80; n++) {
+            w.step(FIXED_DT, { ...emptyInput(), jumpPressed: n === 0, jumpHeld: true, right: true });
+            highestFeet = Math.min(highestFeet, w.player.y + 17);
+            expect(w.player.groundId).not.toBe('upper');
+        }
+        expect(highestFeet).toBeGreaterThan(410);
+    }
+});
+it.each([1, 2] as const)('P%s never collides with their own held cube or their partner body', slot => {
+    const f = boostFixture(slot);
+    f.cube!.holder = slot; f.cube!.physicsAuthority = slot; f.sync();
+    expect(f.world.partnerCubeSupport).toBeNull();
+    for (let n = 0; n < 100; n++) f.world.step(FIXED_DT, { ...emptyInput(), jumpHeld: true, jumpPressed: n === 0 });
+    expect(f.world.player.groundId).toBe('floor'); expect(f.world.cube!.carried).toBe(true);
+    expect(f.world.player.x).toBe(475);
+});
+it.each(['drop', 'disconnect', 'reset', 'airborne', 'stale-avatar', 'stale-cube', 'relay'] as const)('partner support disappears cleanly on %s', reason => {
+    const f = boostFixture(2), w = f.world;
+    jumpOntoCube(w);
+    if (reason === 'drop' || reason === 'disconnect' || reason === 'reset') {
+        f.cube!.holder = null;
+        f.cube!.transform = { x: 520, y: 578, vx: 0, vy: 0, grounded: false };
+        f.client.remoteCube.reset(f.cube!, 1000); f.sync();
+        if (reason === 'disconnect') f.client.room!.connected[0] = false;
+    } else if (reason === 'airborne') f.client.remote.push({ ...avatar, x: 475, y: 580, grounded: false }, 1, 2, 1000);
+    else if (reason === 'stale-avatar') f.client.remote.lastAt = 749;
+    else if (reason === 'stale-cube') f.client.remoteCube.lastAt = 749;
+    else f.client.remote.push({ ...avatar, x: 900, y: 393, grounded: true }, 1, 2, 1000, 'relay');
+    w.step(FIXED_DT, emptyInput());
+    expect(w.partnerCubeSupport).toBeNull(); expect(w.player.grounded).toBe(false);
+    expect(w.player.y).toBeGreaterThan(501); expect(w.player.vy).toBeGreaterThan(0);
+    expect(w.player.x).toBe(475); expect(w.deaths).toBe(0);
+});
+it('slight holder movement follows cube presentation without moving or launching the rider', () => {
+    const f = boostFixture(2), w = f.world;
+    jumpOntoCube(w);
+    f.client.remote.push({ ...avatar, x: 483, y: 583, vx: 30, grounded: true }, 1, 2, 1050);
+    vi.mocked(performance.now).mockReturnValue(1150);
+    steps(w, 20);
+    expect(w.groundedOnPartnerCube).toBe(true);
+    expect(w.partnerCubeSupport!.surface.x).toBe(w.cube!.x - 22);
+    expect(w.player.x).toBe(475); expect(w.player.y).toBe(501); expect(w.player.vy).toBe(0);
+});
+it('partner support neither holds lift controls nor acts as relay destination geometry', () => {
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+    const f = setup('lift-lab', 2, 1);
+    f.cube!.holder = 1; f.cube!.transform = { x: 440, y: 780, vx: 0, vy: 0, grounded: false };
+    f.client.remoteCube.reset(f.cube!, 1000);
+    f.client.remote.push({ ...avatar, x: 440, y: 823, grounded: true }, 1, 1, 1000); f.sync();
+    Object.assign(f.world.player, { x: 440, y: 741, vy: 0 }); steps(f.world, 5);
+    expect(f.world.groundedOnPartnerCube).toBe(true); expect(f.client.occupy).toHaveBeenLastCalledWith(null);
+    expect(f.world.frame.outputs.liftField).toBe(false);
+    const r = setup('relay-lab', 2, 1);
+    if (r.record.level !== 'relay-lab') throw new Error('fixture');
+    r.record.levelState.relayEnabled = true; r.cube!.holder = 1;
+    // Cube top overlaps the player egress box (holder is on the raised arrival floor).
+    r.cube!.transform = { x: 1065, y: 540, vx: 0, vy: 0, grounded: false };
+    r.client.remoteCube.reset(r.cube!, 1000);
+    r.client.remote.push({ ...avatar, x: 1065, y: 583, grounded: true }, 1, 1, 1000); r.sync();
+    expect(r.world.partnerCubeSupport).not.toBeNull();
+    Object.assign(r.world.player, { x: 485, y: 543 }); r.world.step(FIXED_DT, emptyInput());
+    expect(r.world.player.x).toBe(1065); expect(r.world.cube!.carried).toBe(true);
+});
 it.each([1, 2] as const)('P%s uses the original relay for player, loose and carried cube, retaining authority', slot => {
     const { world: w, record, cube, client, sync } = setup('relay-lab', slot);
     if (record.level !== 'relay-lab') throw new Error('fixture');

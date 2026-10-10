@@ -36,6 +36,24 @@ it('rejects unknown levels/controls/platforms and extra authority fields at the 
     const r = newRecord('ABCD', '11111111-1111-4111-8111-111111111111', 'lift-lab');
     expect(readRoomRecord({ ...r, levelState: { relayEnabled: true } }, 'ABCD')).toBeNull();
 });
+it.each([1, 2] as const)('BOOST LAB P%s upper latch persists the shared return route and requires both arrivals', async slot => {
+    const { p1, p2, app, dir, code, a } = await pair('boost-lab'), peers = [p1, p2], climber = peers[slot - 1], holder = peers[2 - slot];
+    climber.send({ type: 'exit', seq: 1 });
+    expect((await climber.wait('action-result', m => m.seq === 1)).accepted).toBe(false);
+    climber.send({ type: 'control', seq: 2, control: 'relayPower' });
+    expect((await climber.wait('action-result', m => m.seq === 2)).accepted).toBe(false);
+    climber.send({ type: 'control', seq: 3, control: 'boostRoute' });
+    const latched = (await holder.wait('room', m => m.room.levelState.routeLatched)).room;
+    expect(latched.exitUnlocked).toBe(true); expect(latched.checkpoint).toBe('entry');
+    climber.send({ type: 'exit', seq: 4 });
+    expect((await holder.wait('room', m => m.room.reachedExit[slot - 1])).room.completed).toBe(false);
+    holder.send({ type: 'exit', seq: 1 }); await climber.wait('room', m => m.room.completed);
+    const disk = JSON.parse(await readFile(join(dir, 'rooms', code + '.json'), 'utf8'));
+    expect(disk.levelState).toEqual({ routeLatched: true }); expect(disk).not.toHaveProperty('partnerSupport');
+    await kill(app.child); const restarted = await launch(dir), back = await connect<'boost-lab'>(restarted.url, a.cookie);
+    back.send({ type: 'join', code });
+    expect((await back.wait('snapshot')).room).toMatchObject({ levelState: { routeLatched: true }, completed: true, cube: { holder: null } });
+});
 it.each([1, 2] as Slot[])('relay by P%s forwards semantic snaps, keeps cube authority, and requires both arrivals', async slot => {
     const { p1, p2, first, dir, code, app, a } = await pair('relay-lab'), peers = [p1, p2], source = peers[slot - 1], remote = peers[2 - slot];
     source.send({ type: 'control', seq: 1, control: 'liftLatch' }); expect((await source.wait('action-result', m => m.seq === 1)).accepted).toBe(false);

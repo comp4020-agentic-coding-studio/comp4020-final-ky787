@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { isCoopLevel } from '../src/coop/protocol.ts';
 const level = process.argv[2];
-if (!isCoopLevel(level) || level === 'pairing-bay') throw new Error('Choose relay-lab, lift-lab or crumble-lab');
+if (!isCoopLevel(level) || level === 'pairing-bay') throw new Error('Choose relay-lab, lift-lab, crumble-lab or boost-lab');
 const h = await coopBrowser({ shots: process.argv[4] });
 const { key, tap, walk, wait, snapshot, check, click, mouse, shot, sleep } = h;
 const labState = (s: GameSnapshot) => s.multiplayer?.shared;
@@ -18,7 +18,7 @@ async function hop(p: Cdp, x: number) {
 }
 async function pickup(p: Cdp) {
     const at = (await snapshot(p)).cube!;
-    await walk(p, at.x - 48); await tap(p, 'KeyE');
+    await walk(p, at.x - 34); await tap(p, 'KeyE');
     await wait(p, 'pickup accepted', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === s.multiplayer?.slot);
 }
 async function transit(p: Cdp, forward: boolean) {
@@ -53,6 +53,11 @@ async function relay(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
     const remote = await wait(partner, 'remote avatar relay snap', s => s.multiplayer?.lastRemoteDiscontinuity?.kind === 'relay' && (s.multiplayer.remote?.x ?? 0) > 1036);
     check('remote avatar appears at destination with an explicit marker', remote.multiplayer!.lastRemoteDiscontinuity!.x > 1036);
     await shot(partner, 'relay-loose-and-player');
+    await wait(actor, 'loose cube settles untouched', s => !!s.cube?.grounded);
+    const restingForward = (await snapshot(actor)).cube!;
+    await transit(partner, true);
+    check('both players transit A to B with untouched loose cargo', Math.abs((await snapshot(actor)).cube!.x - restingForward.x) < 1);
+    await walk(partner, 1190);
     // Pick up at the destination, then transport the carried body in both directions.
     await wait(actor, 'destination landing', s => s.player.grounded);
     await tap(actor, 'KeyE'); await wait(actor, 'destination pickup', s => s.multiplayer?.cubeHolder === actorSlot && !s.multiplayer.pendingCubeAction);
@@ -62,10 +67,89 @@ async function relay(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
     await transit(actor, true);
     const carried = await wait(partner, 'carried forward arrives together', s => (s.multiplayer?.remote?.x ?? 0) > 1036 && !!s.cube?.carried && Math.abs(s.cube.x - s.multiplayer!.remote!.x) < 2);
     check('carried cube follows snapped holder without ownership transfer', carried.multiplayer?.cubeHolder === actorSlot && carried.multiplayer.cubePhysicsAuthority === actorSlot && carried.multiplayer.cubeEpoch === carryEpoch);
+    // Drop from a jump beside B so only loose cargo travels back to A.
+    await wait(actor, 'carried arrival lands', s => s.player.grounded);
+    await walk(actor, 1120); await walk(actor, 1090);
+    await key(actor, 'Space', true);
+    try {
+        await wait(actor, 'jump beside B', s => s.player.y < 548);
+        await tap(actor, 'KeyE');
+    } finally { await key(actor, 'Space', false); }
+    await wait(partner, 'reverse loose cube settles at A', s => !!s.cube?.grounded && s.cube.x < 450 && s.multiplayer?.cubeHolder === null);
+    const restingReverse = (await snapshot(partner)).cube!;
+    await wait(actor, 'dropper lands beside B', s => s.player.grounded);
+    await transit(actor, false);
+    await transit(partner, false);
+    await sleep(800);
+    const reverse = await snapshot(partner);
+    check('both players transit B to A without moving cargo or bouncing back', (await snapshot(actor)).player.x < 450 && reverse.player.x < 450
+        && Math.abs(reverse.cube!.x - restingReverse.x) < 1 && Math.abs(reverse.cube!.y - restingReverse.y) < 1);
+    await tap(actor, 'KeyE'); await wait(actor, 'pick up reverse cargo', s => s.multiplayer?.cubeHolder === actorSlot && !s.multiplayer.pendingCubeAction);
+    await transit(actor, true);
     await walk(actor, 1190);
     await transit(partner, true); await walk(partner, 1150);
     await shot(actor, 'relay-carried');
     await finish(a, b, 1340);
+}
+async function boost(a: Cdp, b: Cdp, holderSlot: 1 | 2) {
+    const holder = holderSlot === 1 ? a : b, climber = holderSlot === 1 ? b : a;
+    await pickup(holder); await walk(holder, 475);
+    await hop(climber, 610);
+    check('a normal floor jump cannot reach the high ledge', (await snapshot(climber)).player.groundId === 'floor');
+    await walk(climber, 475);
+    await wait(climber, 'fresh partner cube support', s => !!s.multiplayer?.partnerCubeSupportActive);
+    check('carrier has no self support', !(await snapshot(holder)).multiplayer?.partnerCubeSupportActive);
+    async function mount() {
+        const x = (await snapshot(climber)).cube!.x;
+        await walk(climber, x);
+        // Brake and align using real short key presses; the shared walk helper
+        // deliberately permits run-speed stopping drift, wider than this cube.
+        for (let n = 0; n < 25; n++) {
+            const dx = x - (await snapshot(climber)).player.x;
+            if (Math.abs(dx) < 8) break;
+            const direction = dx > 0 ? 'KeyD' : 'KeyA';
+            await key(climber, direction, true); await sleep(35); await key(climber, direction, false); await sleep(100);
+        }
+        await key(climber, 'Space', true);
+        try { await wait(climber, 'lands on partner cube', s => !!s.multiplayer?.groundedOnPartnerCube); }
+        finally { await key(climber, 'Space', false); }
+    }
+    await mount();
+    const held = (await snapshot(holder)).multiplayer!;
+    await shot(climber, 'held-cube-landing');
+    await key(holder, 'KeyD', true); await sleep(35); await key(holder, 'KeyD', false);
+    await sleep(200);
+    check('slight grounded holder motion keeps support without launching rider', (await snapshot(climber)).multiplayer?.groundedOnPartnerCube === true);
+    await tap(holder, 'KeyE');
+    const dropped = await wait(climber, 'drop removes support and rider falls', s => s.multiplayer?.cubeHolder === null && !s.multiplayer.partnerCubeSupportActive && s.player.y > 520);
+    check('drop releases support without resetting climber', dropped.deaths === 0 && !dropped.cube?.carried);
+    await wait(climber, 'climber lands after drop', s => s.player.groundId === 'floor');
+    await pickup(holder); await walk(holder, 475); await mount();
+    await tap(holder, 'KeyR');
+    await wait(climber, 'holder reset releases support', s => s.multiplayer?.cubeHolder === null && !s.multiplayer.partnerCubeSupportActive && s.player.groundId === 'floor');
+    check('holder reset preserves partner body', (await snapshot(climber)).deaths === 0);
+    await pickup(holder); await walk(holder, 475); await mount();
+    await holder.send('Page.navigate', { url: 'about:blank' });
+    await wait(climber, 'disconnect releases support', s => s.multiplayer?.cubeHolder === null && !s.multiplayer.partnerCubeSupportActive && !s.multiplayer.shared?.connected[holderSlot - 1]);
+    const history = await holder.send('Page.getNavigationHistory');
+    await holder.send('Page.navigateToHistoryEntry', { entryId: history.entries[history.currentIndex - 1].id });
+    await wait(holder, 'holder reconnects', s => s.multiplayer?.websocket === 'CONNECTED' && s.room === 'boost-lab');
+    await wait(climber, 'climber lands after disconnect', s => s.player.groundId === 'floor');
+    check('disconnect releases cube without resetting climber', (await snapshot(climber)).deaths === 0);
+    await pickup(holder); await walk(holder, 475); await mount();
+    // A normal second jump crosses the 190-unit ledge; no grapple or state mutation.
+    await key(climber, 'Space', true);
+    try { await walk(climber, 635); } finally { await key(climber, 'Space', false); }
+    await wait(climber, 'second jump lands upper', s => s.player.groundId === 'upper');
+    check('jumping away keeps accepted cube holder and simulator', (await snapshot(holder)).multiplayer?.cubeHolder === holderSlot
+        && (await snapshot(holder)).multiplayer?.cubePhysicsAuthority === holderSlot && held.cubeHolder === holderSlot);
+    await walk(climber, 720); await tap(climber, 'KeyE');
+    await wait(holder, 'shared switch opens return steps', s => s.outputs.bridge && s.multiplayer?.shared?.exitUnlocked === true);
+    check('upper switch leaves holder below and opens a permanent return route', (await snapshot(holder)).player.groundId === 'floor');
+    await walk(holder, 330); await hop(holder, 345); await hop(holder, 495); await hop(holder, 650);
+    await wait(holder, 'holder regroups on upper ledge', s => s.player.groundId === 'upper');
+    await shot(climber, 'regroup');
+    await finish(a, b, 985);
 }
 async function lift(a: Cdp, b: Cdp, riderSlot: 1 | 2) {
     const rider = riderSlot === 1 ? a : b, operator = riderSlot === 1 ? b : a;
@@ -171,6 +255,7 @@ try {
         if (level === 'relay-lab') await relay(a, b, slot);
         if (level === 'lift-lab') await lift(a, b, slot);
         if (level === 'crumble-lab') await crumbleRoute(a, b, slot, backend);
+        if (level === 'boost-lab') await boost(a, b, slot);
         check('C8 visitor progress remains independent', JSON.stringify([(await snapshot(a)).progress, (await snapshot(b)).progress]) === JSON.stringify(progress));
         await shot(a, 'complete'); await a.send('Page.navigate', { url: 'about:blank' }); await b.send('Page.navigate', { url: 'about:blank' });
     }

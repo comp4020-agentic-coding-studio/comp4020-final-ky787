@@ -50,7 +50,7 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
         }
         add('exit-feed', 'cubeOnPlateC', 'exitDoor', [node, ...trunk, { x: r.exit.x + r.exit.w / 2, y: 40 }, { x: r.exit.x + r.exit.w / 2, y: r.exit.y }]);
     } else {
-        if (r.id === 'relay' || r.id === 'pairing-bay') for (const p of r.platforms.filter(p => p.signal && p.signal !== 'grappleAnchor' && p.id !== 'final-access'))
+        if (r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'boost-lab') for (const p of r.platforms.filter(p => p.signal && p.signal !== 'grappleAnchor' && p.id !== 'final-access'))
             add(`switch-${p.id}`, 'switchB', p.signal!, elbow(above(r.lever!), { x: p.x + p.w / 2, y: p.y }, r.lever!.y - 65));
         const control = r.plateB ?? r.plate ?? r.lever!;
         add('exit-feed', r.plateB ? 'plateB' : r.plate ? 'plateA' : 'switchB', 'exitDoor',
