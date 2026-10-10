@@ -16,24 +16,49 @@ export class SharedCubeAuthority implements CubeAuthority {
     private result: ActionResult | null = null;
     private correction = false;
     private releaseAt: CubeTransform | null = null;
+    private firewallContact = false;
+    private resetSeen: number;
+    private resetEffectEpoch = -1;
     cargoVisual: boolean | undefined;
     partnerSupport: CubeAuthority['partnerSupport'] = null;
-    constructor(private client: CubeTransport) { this.result = client.prediction.cubeResult; }
-    get simulates() { return this.client.connected && (this.client.ownsCube || !!this.client.prediction.cube); }
+    constructor(private client: CubeTransport) {
+        this.result = client.prediction.cubeResult;
+        this.resetSeen = client.room?.cube?.lastReset?.epoch ?? -1;
+    }
+    get resetting() { return this.client.connected && (this.firewallContact || this.client.prediction.cube?.kind === 'cube-reset'); }
+    get simulates() { return this.client.connected && !this.resetting && (this.client.ownsCube || !!this.client.prediction.cube); }
     get heldLocally() {
         const pending = this.client.prediction.cube;
-        return this.client.connected && !this.releaseAt && (pending ? pending.kind === 'cube-pickup' : this.client.room?.cube?.holder === this.client.slot);
+        return this.client.connected && !this.resetting && !this.releaseAt && (pending ? pending.kind === 'cube-pickup' : this.client.room?.cube?.holder === this.client.slot);
     }
     consumeCorrection(): boolean { const value = this.correction; this.correction = false; return value; }
     sync(w: PuzzleWorld): void {
         this.partnerSupport = null;
         const c = w.cube, room = this.client.room;
         if (!c || !room?.cube) return;
-        const state = room.cube, pending = this.client.prediction.cube, result = this.client.prediction.cubeResult;
+        const state = room.cube, result = this.client.prediction.cubeResult;
         const resolved = result !== this.result;
         this.result = result;
+        const resetChanged = !!state.lastReset && state.lastReset.epoch !== this.resetSeen;
+        if (resetChanged) {
+            this.resetSeen = state.lastReset!.epoch;
+            if (this.resetEffectEpoch !== this.resetSeen) w.events.push({ kind: 'cube-firewall', at: { x: c.x, y: c.y } });
+            this.firewallContact = false; this.wantsPull = false; this.releaseAt = null;
+            w.pullingCube = false; this.correction = true;
+        }
+        if (!this.client.connected || !this.client.ownsCube) this.firewallContact = false;
+        // Contact can happen during a predicted drop/pull/pickup. Wait for that
+        // result, then use the accepted epoch. A reset/death race can retry with
+        // the new epoch; loss of authority abandons the report and follows truth.
+        if (this.firewallContact && !this.client.prediction.cube && this.client.cubeAction('cube-reset'))
+            this.resetEffectEpoch = state.epoch + 1;
+        const pending = this.client.prediction.cube;
+        if (this.resetting) {
+            c.carried = false; c.grounded = false; w.pullingCube = false;
+            return; // Dissolve locally; no physics/publication or invented spawn.
+        }
         const rollback = resolved && !result?.accepted;
-        const keep = pending || resolved && result?.accepted && this.client.ownsCube;
+        const keep = !resetChanged && (pending || resolved && result?.accepted && result.kind !== 'cube-reset' && this.client.ownsCube);
         const at = room.cubePlacement === 'cargoPlate' ? { x: w.room.cargoPlate!.x, y: w.room.cargoPlate!.y - CUBE_SIZE / 2 } : w.room.cube!;
         if (rollback) {
             this.wantsPull = false; this.releaseAt = null; this.correction = true;
@@ -79,12 +104,22 @@ export class SharedCubeAuthority implements CubeAuthority {
         if (!this.client.ownsCube || pending && pending.kind !== 'cube-drop') this.cargoVisual = undefined;
     }
     private near(w: PuzzleWorld) { return !!w.cube && Math.hypot(w.player.x - w.cube.x, w.player.y - w.cube.y) < CARRY.reach; }
+    firewall(w: PuzzleWorld): boolean {
+        if (!this.client.ownsCube || this.resetting) return false;
+        this.firewallContact = true; this.correction = true;
+        this.wantsPull = false; this.releaseAt = null;
+        w.pullingCube = false; this.partnerSupport = null;
+        this.sync(w);
+        return true;
+    }
     hint(w: PuzzleWorld): string {
+        if (this.resetting) return '';
         if (this.heldLocally) return 'E · put down cube';
         if (!cubeAvailable(this.client.room) || !this.near(w)) return '';
         return this.client.room?.cube?.holder ? 'PARTNER CARRYING' : 'E · carry cube';
     }
     interact(w: PuzzleWorld): boolean {
+        if (this.resetting) return true;
         if (this.client.prediction.cube) return this.heldLocally || this.near(w);
         if (this.heldLocally) {
             const transform = w.cubeDropTransform();
@@ -101,6 +136,7 @@ export class SharedCubeAuthority implements CubeAuthority {
         return false;
     }
     pull(start: boolean, held: boolean): boolean {
+        if (this.resetting) return false;
         const state = this.client.room?.cube;
         if (start && held && cubeAvailable(this.client.room) && !state?.holder && !this.client.prediction.cube)
             this.wantsPull = this.client.cubeAction('cube-pull-start');
@@ -120,6 +156,7 @@ export class SharedCubeAuthority implements CubeAuthority {
         else if (this.client.cubeAction('cube-drop', drop)) Object.assign(w.cube!, drop, { carried: false, groundId: null });
     }
     sample(w: PuzzleWorld): void {
+        if (this.resetting) { this.cargoVisual = undefined; return; }
         if (!w.room.cargoPlate) return;
         if (!this.client.ownsCube || this.client.prediction.cube && this.client.prediction.cube.kind !== 'cube-drop') { this.cargoVisual = undefined; return; }
         const c = w.cube, at = w.room.cargoPlate;

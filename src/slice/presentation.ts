@@ -14,10 +14,11 @@ export const authoredPresentation: MachinePresentation = {
         const o = frame.outputs;
         if (room === 'pairing-bay') return { active: o.grappleAnchor || o.bridge || o.exitDoor,
             text: o.exitDoor ? 'EXIT UNLOCKED · REGROUP' : o.bridge ? 'TWO SIGNALS REQUIRED' : 'HOLD A · PARTNER CROSSES', label: 'MOCK MULTIPLAYER / TEST CONTROLLER' };
-        if (room === 'relay-lab' || room === 'lift-lab' || room === 'crumble-lab' || room === 'boost-lab') return {
+        if (room === 'relay-lab' || room === 'lift-lab' || room === 'crumble-lab' || room === 'boost-lab' || room === 'firewall-lab') return {
             active: true, label: 'MOCK MECHANICS LAB / TEST CONTROLLER',
             text: signal === 'liftField' ? o.exitDoor ? 'LIFT LATCHED' : 'LIFT ON' : o.exitDoor ? 'EXIT UNLOCKED · BOTH PLAYERS' : room === 'relay-lab' ? 'LATCH POWER · TRANSIT'
-                : room === 'lift-lab' ? 'HOLD BELOW · LATCH ABOVE' : room === 'boost-lab' ? 'HOLD CUBE · BOOST PARTNER' : 'TEST A STEP AND A HOOK',
+                : room === 'lift-lab' ? 'HOLD BELOW · LATCH ABOVE' : room === 'boost-lab' ? 'HOLD CUBE · BOOST PARTNER'
+                : room === 'firewall-lab' ? 'BEAMS STAY LIVE' : 'TEST A STEP AND A HOOK',
         };
         if (room === 'uplink') {
             const key = signal ?? (o.exitDoor ? 'exitDoor' : o.codePlatformA ? 'codePlatformA' : o.liftField ? 'liftField' : 'relayGates');

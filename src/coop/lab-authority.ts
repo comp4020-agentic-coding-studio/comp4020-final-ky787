@@ -39,6 +39,15 @@ class BoostAuthority extends LabAuthority<'boost-lab'> {
     }
     override hint(w: PuzzleWorld) { return super.hint(w) || (near(w) ? this.room.levelState.routeLatched ? 'UPPER ROUTE OPEN' : 'E · OPEN RETURN ROUTE' : ''); }
 }
+class FirewallAuthority extends LabAuthority<'firewall-lab'> {
+    get frame() { return frame(this.room.exitUnlocked); }
+    override get inputs() { return { ...inputs(), switchB: this.room.levelState.checkpointSet }; }
+    override interact(w: PuzzleWorld) {
+        if (this.cube?.interact(w)) return;
+        if (near(w) && !this.room.levelState.checkpointSet) this.client.control('firewallCheckpoint');
+    }
+    override hint(w: PuzzleWorld) { return super.hint(w) || (near(w) ? this.room.levelState.checkpointSet ? 'CHECKPOINT SAVED · EXIT OPEN' : 'E · SAVE CHECKPOINT + OPEN EXIT' : ''); }
+}
 class LiftAuthority extends LabAuthority<'lift-lab'> {
     get frame() { return frame(this.room.exitUnlocked, { liftField: this.room.levelState.liftEnabled }); }
     override get inputs() { return { ...inputs(), plateA: this.room.levelState.lowerHeld, switchC: this.room.levelState.liftLatched }; }
@@ -96,6 +105,7 @@ const factories = {
     'pairing-bay': (r: SharedRoom<'pairing-bay'>, c: CoopClient) => new PairingAuthority(r, c.slot!, p => c.occupy(p), () => c.switchB(), () => c.reachExit(), new SharedCubeAuthority(c), c.prediction),
     'relay-lab': (r: SharedRoom<'relay-lab'>, c: CoopClient) => new RelayAuthority(r, c),
     'boost-lab': (r: SharedRoom<'boost-lab'>, c: CoopClient) => new BoostAuthority(r, c),
+    'firewall-lab': (r: SharedRoom<'firewall-lab'>, c: CoopClient) => new FirewallAuthority(r, c),
     'lift-lab': (r: SharedRoom<'lift-lab'>, c: CoopClient) => new LiftAuthority(r, c),
     'crumble-lab': (r: SharedRoom<'crumble-lab'>, c: CoopClient) => new CrumbleLabAuthority(r, c),
 };

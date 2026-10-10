@@ -6,6 +6,9 @@ testing reproduced a loose-cube relay obstruction. The 2026-10-11 pass starts at
 `81422495b19e16b931b51ae298381f7970f3b1a2`, fixes that obstruction and adds BOOST LAB
 to the four existing **authored mock test rooms**. The revised relay behavior and
 partner-held boost await two-computer acceptance; these are not a final campaign.
+The subsequent static-firewall pass starts at
+`d85106d9ef91c444d8931ffd597ea65f56aa861b` and adds FIREWALL LAB. Its acceptance
+also remains a human two-computer playtest.
 
 C8's four single-player rooms, anonymous visitor progress and retained CONTROL
 SPINE controller remain independent. No accounts, matchmaking, new binaries,
@@ -13,8 +16,9 @@ player-player collision, server player physics, or invented assembly are added.
 See [ADR 0001](adr/0001-multiplayer-authority.md),
 [ADR 0002](adr/0002-shared-cube-authority.md),
 [ADR 0003](adr/0003-multiplayer-prediction.md),
-[ADR 0004](adr/0004-coop-labs-and-transient-machinery.md), and
-[ADR 0005](adr/0005-partner-cube-support.md).
+[ADR 0004](adr/0004-coop-labs-and-transient-machinery.md),
+[ADR 0005](adr/0005-partner-cube-support.md), and
+[ADR 0006](adr/0006-static-firewalls.md).
 
 ## Architecture and deployment
 
@@ -53,6 +57,7 @@ protocol and coordinate-free server modules, never research `Workspace` files.
 | `src/coop/client.ts`, `prediction.ts` | Session lifecycle, responsive local interaction, result reconciliation |
 | `src/coop/cube.ts`, `remote.ts` | One-body simulation boundary and bounded presentation interpolation |
 | `src/slice/world.ts` | Reused player/cube/relay/lift/grapple/collision machinery |
+| `src/slice/firewall.ts`, `firewall-render.ts` | Authored lethal rectangles and reusable beam presentation |
 
 Without `WorldAuthority`, C8 retains its existing controller and local crumble
 path. With authority, sensors report intent and accepted outputs drive machinery.
@@ -74,6 +79,7 @@ against loaded and persisted rooms, and distinct invalid/unknown/full errors.
 | `lift-lab` | Shared vertical transport / checkpoint | `liftLatched` | yes | Upper latch/checkpoint |
 | `crumble-lab` | Shared step / hook unstable blocks | `tested.foot`, `tested.hook` | no | Both trigger styles accepted |
 | `boost-lab` | Partner-held cube boost / return steps | `routeLatched` | yes | Upper shared switch |
+| `firewall-lab` | Static beams / independent death / shared cube destruction | `checkpointSet` | yes | Entry checkpoint switch |
 
 `SharedRoom` is a union discriminated by `level`. Common session fields are code,
 revision, assigned/connected slots, checkpoint, cube/semantic placement when
@@ -163,7 +169,8 @@ The upper latch saves the generic shared checkpoint `upper`, holds lift power
 and unlocks the exit. It does **not** teleport live players. Later death, R or
 rejoin spawns that slot at its upper position: P1 (790,343), P2 (885,343).
 PAIRING BAY maps its saved `reunion` to the existing world checkpoint positions;
-relay/crumble/boost labs use entry. Player coordinates are never persisted.
+FIREWALL LAB also uses `reunion`; relay/crumble/boost labs use entry. Player
+coordinates are never persisted.
 
 Ordinary death and **R reset only the local player**. Shared latches, checkpoint,
 exit credits and partner simulation remain. The local cube release uses the
@@ -273,6 +280,73 @@ unlocks the exit. The holder climbs those steps, then both physically enter the
 exit. Reset/rejoin starts at entry; the saved return route remains available.
 All geometry, controls and strings are authored/mock, with no binary evidence.
 
+## Static firewalls and FIREWALL LAB
+
+**This firewall is a game-authored hazard and is not binary/obfuscator evidence.**
+Rooms optionally define `firewalls: FirewallDef[]`. Each definition has an `id`,
+top-left `x/y`, `orientation: "horizontal" | "vertical"`, positive `length`, and
+optional positive `thickness` (default 12). Horizontal boxes are length ×
+thickness; vertical boxes are thickness × length. Collision and rendering use
+the same derived rectangle. Beam geometry stays entirely in frontend room data.
+
+Firewalls are always visible and lethal. They never enter the solid, support,
+grapple-target, pressure-plate, controller-output or relay-clearance lists.
+Crit 5 supplies only the orange glow, bright core, mesh and emitter-post visual
+reference. Mesh flicker changes presentation, never collision or activation.
+No timed opening, warning, charge, sweep, moving gate, authentication or watchdog
+state is ported. A short `firewallZap` reuses the already-approved Kenney CC0
+`firewall-open.ogg` asset at a higher playback rate; no ambient loop or new asset.
+
+The local player's physical box overlapping a beam causes ordinary local death
+with cause `firewall`: release grapple/momentary input, release carry if needed,
+and respawn at the current shared checkpoint. Partner, switches, checkpoint,
+exit unlock and arrival credits survive. There is no server player simulation.
+
+Only the accepted cube physics authority reports actual cube-box contact, loose
+or carried, via `{type:"cube-reset", seq, epoch, cause:"firewall"}`. This is a
+trusted semantic sensor report like the existing occupancy system; the server
+validates membership, current authority, epoch and sequence, not room geometry.
+A replica cannot request a reset for somebody else's cube. The server clears
+holder/pull, retains the reporting connected authority, increments the epoch,
+clears the transform/stream sequence, and sets `cubePlacement:"spawn"`. The
+original authored cube spawn is resolved by each frontend, never a checkpoint,
+carrier location or previous cargo plate. Changed durable placement is persisted
+before acknowledgment; transforms, epochs and the `lastReset` effect marker
+remain ephemeral. Disconnects use the existing authority-transfer rules.
+
+Contact immediately dissolves the authority's local cube and cancels pull;
+simulation/publication pause until reconciliation. No predicted spawn becomes
+shared truth. Contact during an in-flight pickup/drop/pull waits for its accepted
+epoch; a death/release race can retry with the newer epoch while authority is
+retained. Loss of authority or connection follows the accepted state. Both
+clients snap the single existing cube to spawn on acceptance; old epochs cannot
+resurrect its pre-destruction position. A newly accepted reset also cancels stale
+carry/pull prediction. Rejoin uses a silent effect baseline.
+
+A held cube touching by itself resets the cube without killing its carrier.
+When both physical boxes touch, cube contact is reported before the ordinary
+player death releases it. A pulled cube clears shared pull and local rope
+feedback. Only actual cube geometry is tested, never the partner support surface.
+Accepted reset removes that surface; its rider falls normally and dies only on
+their own beam contact. Loose cube contact is checked before and after relay
+transit and after lift integration; relay cooldowns and ownership rules remain.
+
+`firewall-lab` has a 150-unit horizontal beam with default thickness and a
+80-unit vertical beam with thickness 16. A drop perch and short safe overpass
+allow repeated carry, drop and pull experiments without room restarts. Carry
+under the horizontal beam to destroy only the overhead cube; drop from the perch
+to test falling cargo. Carry over the walkway, drop before the vertical beam,
+jump over it and pull cargo through from the far side. Walk/jump/fall into beams
+to test player death. The entry switch saves `reunion` (P1 130,623; P2 220,623)
+and opens the exit; both physical arrivals are still required. It never turns
+either beam off.
+
+Known limits: contact uses the existing fixed-step physical boxes, not pixel
+alpha; glow/posts are decorative. Level authors must keep original cube spawns
+and player checkpoints clear of beams. Remote destruction arrives with the
+accepted reset, so its presentation may lag by network latency. No rollback,
+anti-cheat, new player authority, or general player collision is introduced.
+
 ## Protocol and persistence
 
 | Client message | Fields |
@@ -283,10 +357,11 @@ All geometry, controls and strings are authored/mock, with no binary evidence.
 | cube | `epoch`, independent `seq`, bounded `transform`, optional `discontinuity` |
 | cube-pickup / cube-pull-start / cube-pull-stop | semantic `seq`, current `epoch` |
 | cube-drop | semantic `seq`, `epoch`, bounded proposed `transform` |
+| cube-reset | semantic `seq`, current `epoch`, `cause:"firewall"`; current simulator only |
 | cube-occupancy | semantic `seq`, `epoch`, `cargo`; only PAIRING BAY simulator |
 | occupancy | `seq`, one allowed `plate` or null; lift uses `liftControl` |
 | switch | `seq`; accepted PAIRING BAY B latch |
-| control | `seq`, `relayPower`, `liftLatch` or `boostRoute`, restricted by level |
+| control | `seq`, `relayPower`, `liftLatch`, `boostRoute` or `firewallCheckpoint`, restricted by level |
 | crumble-trigger | `seq`, `platform`, `foot` or `hook`, only CRUMBLE LAB |
 | local-reset | `seq`; release this body only |
 | exit | `seq`; own physical arrival after accepted unlock |
@@ -317,7 +392,7 @@ last durable watermark. Initial reconnect snapshots reset that baseline.
 Do not persist player/cube coordinates, velocity, holder, physics grants, pull
 flags, epochs, sequences, body occupancy, relay cooldowns, lift positions,
 crumble timers or interpolation. Arbitrary cargo restores at its authored spawn;
-PAIRING BAY docked cargo restores at its plate. Relay/lift/boost labs have no docked
+PAIRING BAY docked cargo restores at its plate unless destroyed. Relay/lift/boost/firewall labs have no docked
 placement, so their cubes restore at spawn. Power derives from saved latches.
 
 On accepted join, validated versions 1–3 migrate atomically to version 4. Code,
@@ -345,9 +420,17 @@ F1 includes level, checkpoint, level state/power, live revision, accepted cube
 holder/authority/epoch/placement, local pending actions and RTT, local/remote
 teleport markers, crumble phases with approximate remaining time, stream ages and
 traffic counters. It also shows `partnerCubeSupportActive`, carrier slot, surface
-position and `groundedOnPartnerCube`. These remain debug details; the normal HUD stays compact.
+position and `groundedOnPartnerCube`, firewall IDs/rectangles, `lastDeath`, and the
+accepted cube's `lastCubeReset` marker/epoch. These remain debug details; the normal HUD stays compact.
 
 ## Validation and manual acceptance
+
+The [2026-10-11 firewall regression record](playtest/2026-10-11-firewall-regression.txt)
+records 322 passing unit/server tests (2 skipped), typecheck/build, live specs,
+C8 and all existing co-op browser routes. FIREWALL LAB passed 43 assertions with
+both acting slots at normal latency and again over HTTPS/WSS with 200 ms semantic
+delay. The final wire-routing presentation adjustment received narrow connection
+checks and the delayed browser run. No deployment or human acceptance is claimed.
 
 The [2026-10-11 relay/boost regression record](playtest/2026-10-11-relay-boost-regression.txt)
 records the pre-fix failure, focused checks and passing local milestone gate.
@@ -376,6 +459,7 @@ pnpm check:multiplayer-relay       # relay, loose/carry, both actor slots
 pnpm check:multiplayer-lift        # both roles, cube, checkpoint, reset/death
 pnpm check:multiplayer-crumble     # phases, hook, reconnect and process restart
 pnpm check:multiplayer-boost       # both holder roles, drop/reset/disconnect, two-body finish
+pnpm check:multiplayer-firewall    # both slots, independent deaths, loose/carry/pull resets, finish
 ```
 
 `BROWSER_BIN=/usr/bin/brave-browser` selects a usable Chromium engine on this
@@ -410,6 +494,13 @@ and join by code on the other. Swap roles in a new room:
   physically finish with both bodies. Carry the cube through a relay afterward.
 - RELAY regression: drop cargo through without following; leave it exactly where
   it lands. Both players transit repeatedly in both directions without moving it.
+- FIREWALL: set the checkpoint, walk/jump/fall into each beam and verify only the
+  touching player respawns. Drop cargo from the perch; carry into the horizontal
+  beam with each slot; pull through the vertical beam from its far side. Each
+  destruction must restore one cube at the same original spawn. Confirm carry
+  alone can touch without killing its holder; then touch with both bodies.
+  Repeat after reconnect. Beams must remain lit before/after the switch. Use the
+  overpass and jump the vertical beam to finish with both players.
 - All labs: finish with both bodies, reconnect/restart, and verify C8 progress
   remains separate. PAIRING BAY should feel as it did in the accepted build.
 

@@ -12,11 +12,16 @@ export function assignCube(cube: SharedCube, slot: Slot | null): void {
     cube.seq = -1;
 }
 
-type Interaction = Extract<ClientMessage, { type: 'cube-pickup' | 'cube-pull-start' | 'cube-pull-stop' | 'cube-drop' }>;
+type Interaction = Extract<ClientMessage, { type: 'cube-pickup' | 'cube-pull-start' | 'cube-pull-stop' | 'cube-drop' | 'cube-reset' }>;
 /** Called only in the server's serialized semantic queue, with the authenticated slot. */
 export function interactCube(cube: SharedCube, slot: Slot, message: Interaction): boolean {
     if (message.epoch !== cube.epoch) return false;
-    if (message.type === 'cube-drop') {
+    if (message.type === 'cube-reset') {
+        if (cube.physicsAuthority !== slot) return false;
+        assignCube(cube, slot);
+        cube.transform = null; // Each frontend resolves the original authored spawn.
+        cube.lastReset = { epoch: cube.epoch, cause: message.cause };
+    } else if (message.type === 'cube-drop') {
         if (cube.holder !== slot) return false;
         assignCube(cube, slot);
         cube.transform = { ...message.transform, grounded: false };

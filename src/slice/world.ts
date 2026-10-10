@@ -8,6 +8,8 @@ import type { RoomMemory } from './progress.ts';
 import type { Platform, RoomDef } from './rooms.ts';
 import { LiftField, RelayGatePair } from './machinery.ts';
 import type { Discontinuity, Slot } from '../coop/protocol.ts';
+import { firewallBox, touchingFirewall, type Firewall } from './firewall.ts';
+export type DeathCause = 'reset' | 'hazard' | 'fall' | 'firewall';
 export interface Cube extends LooseBody {
     carried: boolean;
 }
@@ -22,12 +24,16 @@ export interface PlatformState {
 export interface MachineEvent {
     kind: string;
     at: Vec2;
+    cause?: DeathCause;
+    firewallId?: string;
 }
 /** Optional shared-body boundary; the existing physics stays in this world. */
 export interface CubeAuthority {
     readonly simulates: boolean;
     readonly heldLocally: boolean;
     readonly cargoVisual?: boolean;
+    readonly resetting?: boolean;
+    firewall?(world: PuzzleWorld): boolean;
     /** Local avatar movement only: never architecture, a cube body, sensor or anchor. */
     readonly partnerSupport?: { carrier: Slot; surface: Solid } | null;
     consumeCorrection?(): boolean;
@@ -60,6 +66,7 @@ export class PuzzleWorld {
     inputs: ControllerInputs = { plateA: false, plateB: false, plateC: false, cubeOnPlate: false, cubeOnPlateB: false, cubeOnPlateC: false, switchB: false, switchC: false };
     lifts: LiftField[];
     gates: RelayGatePair[];
+    firewalls: Firewall[];
     cubeTransferred = false;
     frame: ControllerFrame;
     checkpoint: RoomMemory['checkpoint'] = 'entry';
@@ -71,12 +78,14 @@ export class PuzzleWorld {
     get cargoPlateActive() { return this.authority?.cube?.cargoVisual ?? this.inputs.cubeOnPlate; }
     get partnerCubeSupport() { return this.authority?.cube?.partnerSupport ?? null; }
     get groundedOnPartnerCube() { return this.player.grounded && this.player.groundId === 'partner-cube-support'; }
+    get cubeResetting() { return this.authority?.cube?.resetting ?? false; }
     keyboardGrapple = false;
     private cubeSolid: Solid = { id: 'cube-body', x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
     doorOpen = 0;
     displayPulse = 0;
     elapsed = 0;
     deaths = 0;
+    lastDeath: { cause: DeathCause; at: Vec2; firewallId?: string } | null = null;
     deathFlash = 0;
     exited = false;
     pullingCube = false;
@@ -87,6 +96,7 @@ export class PuzzleWorld {
         this.cubeTransferred = memory.cubeTransferred ?? false;
         this.lifts = (room.lifts ?? []).map(def => new LiftField(def));
         this.gates = (room.gates ?? []).map(def => new RelayGatePair(def));
+        this.firewalls = (room.firewalls ?? []).map(def => ({ def, box: firewallBox(def) }));
         this.checkpoint = memory.checkpoint;
         this.player = createPlayer(...this.spawnPoint());
         if (room.cube) {
@@ -233,7 +243,9 @@ export class PuzzleWorld {
         return { x: this.solids.some(s => s.enabled && !s.oneWay && boxesOverlap(box, s)) ? p.x : ahead,
             y, vx: 0, vy: 0, grounded: false };
     }
-    respawn(): void {
+    respawn(cause: DeathCause = 'reset', firewallId?: string): void {
+        const at = { x: this.player.x, y: this.player.y };
+        this.lastDeath = { cause, at, ...(firewallId ? { firewallId } : {}) };
         this.authority?.cube?.release(this);
         this.authority?.reset?.();
         this.player = createPlayer(...this.spawnPoint());
@@ -243,7 +255,37 @@ export class PuzzleWorld {
         this.cancelGrapple();
         this.deaths++;
         this.deathFlash = 0.35;
-        this.emit('death');
+        this.events.push({ kind: 'death', at: cause === 'firewall' ? at : { x: this.player.x, y: this.player.y }, cause, firewallId });
+    }
+    private carriedPose(): void {
+        if (this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally)) Object.assign(this.cube, {
+            x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2,
+            vx: 0, vy: 0, grounded: false,
+        });
+    }
+    private cubeFirewall(): boolean {
+        const c = this.cube;
+        if (!c || !this.firewalls.length || this.cubeResetting) return this.cubeResetting;
+        const hit = touchingFirewall(this.firewalls, { x: c.x - CUBE_SIZE / 2, y: c.y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE });
+        if (!hit) return false;
+        const at = { x: c.x, y: c.y };
+        if (this.authority?.cube) {
+            if (!this.authority.cube.firewall?.(this)) return false;
+        } else {
+            Object.assign(c, this.room.cube, { vx: 0, vy: 0, carried: false, grounded: false, groundId: null });
+            this.pullingCube = false;
+        }
+        this.events.push({ kind: 'cube-firewall', at, cause: 'firewall', firewallId: hit.def.id });
+        return true;
+    }
+    private playerFirewall(): boolean {
+        if (!this.firewalls.length) return false;
+        this.carriedPose();
+        this.cubeFirewall(); // Payload contact must be reported before death releases it.
+        const hit = touchingFirewall(this.firewalls, playerBox(this.player));
+        if (!hit) return false;
+        this.respawn('firewall', hit.def.id);
+        return true;
     }
     returnCube(): void {
         if (this.authority?.cube && !this.authority.cube.simulates) return;
@@ -353,7 +395,7 @@ export class PuzzleWorld {
             const c = this.cube;
             const field = this.lifts.map(l => l.influence(c, CUBE_SIZE, CUBE_SIZE)).find(Boolean);
             stepBody(c, CUBE_SIZE, this.solids, this.pullingCube ? 300 : CARRY.cubeGravity, CARRY.cubeMaxFall, dt, field);
-            for (const pair of this.gates) if (pair.teleport('cube', c, CUBE_SIZE, CUBE_SIZE, this.solids, this.room)) {
+            if (!this.cubeFirewall()) for (const pair of this.gates) if (pair.teleport('cube', c, CUBE_SIZE, CUBE_SIZE, this.solids, this.room)) {
                 this.cubeTransferred = true;
                 this.pullingCube = false;
                 this.authority?.cube?.cancelPull();
@@ -361,9 +403,9 @@ export class PuzzleWorld {
                 this.emit('relay-cargo', c);
                 break;
             }
-            if (c.y > this.room.height || this.room.hazards.some(h => boxesOverlap(h, {
+            if (!this.cubeFirewall() && (c.y > this.room.height || this.room.hazards.some(h => boxesOverlap(h, {
                 x: c.x - CUBE_SIZE / 2, y: c.y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE,
-            }))) this.returnCube();
+            })))) this.returnCube();
         }
         this.updateCubeSolid();
         const field = this.lifts.map(l => l.influence(this.player, PLAYER.width, PLAYER.height)).find(Boolean);
@@ -388,6 +430,7 @@ export class PuzzleWorld {
             this.keyboardGrapple = false;
             releaseRope(this.player, false);
         }
+        if (this.playerFirewall()) return;
         const carrying = this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally);
         // A shared loose cube selects a bounded outward egress lane. Keep all room
         // geometry and full carried-payload/bounds checks; preserve C8 clearance.
@@ -403,10 +446,8 @@ export class PuzzleWorld {
             if (carrying) { this.cubeTransferred = true; this.emit('relay-cargo'); this.authority?.discontinuity?.('cube', 'relay'); }
             break;
         }
-        if (this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally)) Object.assign(this.cube, {
-            x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2,
-            vx: 0, vy: 0, grounded: false,
-        });
+        this.carriedPose();
+        if (this.playerFirewall()) return;
         this.samplePlate();
         this.evaluate();
         this.authority?.crumble?.sample(this);
@@ -446,8 +487,8 @@ export class PuzzleWorld {
         this.cargoPlateDepth += ((this.cargoPlateActive ? 1 : 0) - this.cargoPlateDepth) * Math.min(1, dt * 16);
         this.doorOpen = clamp(this.doorOpen + (this.frame.outputs.exitDoor ? dt * 3 : -dt * 3), 0, 1);
         this.displayPulse = Math.max(0, this.displayPulse - dt * 0.9);
-        if (this.room.hazards.some(h => boxesOverlap(playerBox(this.player), h)) || this.player.y > this.room.height + 50)
-            this.respawn();
+        if (this.room.hazards.some(h => boxesOverlap(playerBox(this.player), h))) this.respawn('hazard');
+        else if (this.player.y > this.room.height + 50) this.respawn('fall');
         if (!this.authority && this.frame.outputs.exitDoor && boxesOverlap(playerBox(this.player), this.room.exit)) {
             this.exited = true;
             this.emit('complete');

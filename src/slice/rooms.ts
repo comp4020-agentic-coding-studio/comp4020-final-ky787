@@ -2,6 +2,7 @@ import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
 import type { ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
+import type { FirewallDef } from './firewall.ts';
 export interface Platform extends Box {
     id: string;
     kind: "static" | "code" | "crumble-prototype" | "crumble-proven";
@@ -34,6 +35,7 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     cargoPlate?: Vec2;
     lifts?: LiftFieldDef[];
     gates?: RelayGatePairDef[];
+    firewalls?: FirewallDef[];
     platforms: Platform[];
     hazards: Box[];
     exit: Box;

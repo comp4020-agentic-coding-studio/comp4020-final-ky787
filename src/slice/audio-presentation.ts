@@ -26,7 +26,8 @@ export class AudioPresentation {
             const distance = at ? Math.hypot(at.x - w.player.x, at.y - w.player.y) : 0;
             this.audio.play(cue, level * Math.max(0, 1 - distance / 1100), rate);
         };
-        if (events.some(e => e.kind === 'death')) { this.audio.stopAll(); play('death'); return; }
+        const death = events.find(e => e.kind === 'death');
+        if (death) { this.audio.stopAll(); play(death.cause === 'firewall' ? 'firewallZap' : 'death'); return; }
         if (next.phase === 'firing' && old.phase !== 'firing') play('hookFire');
         if (next.phase === 'attached' && old.phase !== 'attached') play('hookAttach');
         if (old.phase === 'attached' && next.jumps > old.jumps) play('ropeJump');
@@ -52,6 +53,7 @@ export class AudioPresentation {
             if (e.kind === 'checkpoint' && !events.some(e => e.kind === 'lift-latch')) play('latch', e.at, .6);
             if (e.kind === 'crumble-respawn') play('codePower', e.at, .5);
             if (e.kind === 'crumble') play('crumbleBreak', e.at);
+            if (e.kind === 'cube-firewall') play('firewallZap', e.at);
         }
         // A carried payload emits both events; a loose cube emits only relay-cargo.
         const transit = events.find(e => e.kind === 'teleport') ?? events.find(e => e.kind === 'relay-cargo');

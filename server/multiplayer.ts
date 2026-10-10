@@ -167,7 +167,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                 if (room.record.cubePlacement === placement) { result(true); return; }
                 room.record.cubePlacement = placement;
             } else {
-                if (!definition(room.record.level).cubeEnabled(room.record) || !interactCube(room.cube, peer.slot, message)) { denied(); return; }
+                if ((message.type !== 'cube-reset' && !definition(room.record.level).cubeEnabled(room.record))
+                    || !interactCube(room.cube, peer.slot, message)) { denied(); return; }
                 if (message.type !== 'cube-pull-stop') room.record.cubePlacement = 'spawn';
             }
             await commitAction(room, before, timing);

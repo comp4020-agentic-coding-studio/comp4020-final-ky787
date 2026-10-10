@@ -11,6 +11,7 @@ import { ROOM_IDS } from './controller.ts';
 import { isCoopLevel } from '../coop/protocol.ts';
 import { canJumpFromRope, type PlayerState } from '../engine/physics.ts';
 import { drawMachinery } from './machinery-render.ts';
+import { drawFirewalls } from './firewall-render.ts';
 import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
@@ -158,6 +159,7 @@ export class PuzzleRenderer {
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
         }
         drawMachinery(c, w, this.presentation);
+        drawFirewalls(c, w.firewalls, w.elapsed);
         if (r.id === 'uplink') {
             // Labels sit clear of the shaft edges and are drawn AFTER the field.
             const lift = w.lifts[0].def;
@@ -228,7 +230,7 @@ export class PuzzleRenderer {
         this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
         c.fillStyle = C.cyan;
         c.fillRect(checkpoint.x, checkpoint.y - 47, 20, 10);
-        if (w.cube) {
+        if (w.cube && !w.cubeResetting) {
             const cube = w.cube;
             c.fillStyle = '#393b32';
             c.fillRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
@@ -300,6 +302,10 @@ export class PuzzleRenderer {
             } else if (r.id === 'boost-lab') {
                 this.text('BOOST HERE', 430, 570, 13, C.cyan);
                 this.text('E · OPEN RETURN ROUTE', 640, 350, 12, C.cyan);
+            } else if (r.id === 'firewall-lab') {
+                this.text('E · SAVE CHECKPOINT', 60, 480, 12, C.cyan);
+                this.text('DROP / CARRY / PULL', 350, 450, 13, C.amber);
+                this.text('ALWAYS LIVE · JUMP OVER →', 760, 485, 12, C.amber);
             } else {
                 this.text('STEP · SHORT WARNING', 400, 485, 12, C.amber);
                 this.text('HOOK · LONG WARNING', 865, 275, 12, C.amber);

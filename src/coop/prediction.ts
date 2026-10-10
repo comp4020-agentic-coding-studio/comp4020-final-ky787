@@ -31,6 +31,7 @@ export class LocalPrediction {
             : pending.kind === 'cube-pickup' ? c.holder === slot && c.physicsAuthority === slot && c.epoch > pending.epoch
             : pending.kind === 'cube-pull-start' ? c.holder === null && c.physicsAuthority === slot && c.pulling && c.epoch > pending.epoch
             : pending.kind === 'cube-drop' ? c.holder === null && c.physicsAuthority === slot && c.epoch > pending.epoch
+            : pending.kind === 'cube-reset' ? c.holder === null && !c.pulling && c.lastReset?.epoch === pending.epoch + 1
             : c.physicsAuthority === slot && !c.pulling && c.epoch === pending.epoch;
         this.finish(key, pending, accepted && matches, now);
         return true;
@@ -44,4 +45,5 @@ export class LocalPrediction {
     clear(now: number): void {
         for (const key of ['cube', 'switch'] as const) if (this[key]) this.finish(key, this[key], false, now);
     }
+    cancelCube(now: number): void { if (this.cube) this.finish('cube', this.cube, false, now); }
 }

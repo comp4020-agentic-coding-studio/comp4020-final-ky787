@@ -34,6 +34,11 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
         return wires;
     }
     if (r.id === 'crumble-lab') return wires;
+    if (r.id === 'firewall-lab') {
+        // The switch opens only the exit. Keep its wire clear of the always-live beams.
+        add('exit-feed', 'switchB', 'exitDoor', elbow(above(r.lever!), { x: r.exit.x + r.exit.w / 2, y: r.exit.y }, 300));
+        return wires;
+    }
     if (r.id === 'uplink') {
         const relay = above(r.lever!), lift = r.lifts![0], upper = above(r.upperLever!);
         for (const gate of r.gates![0].gates)

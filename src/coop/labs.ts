@@ -5,6 +5,22 @@ import { pairingBay } from './pairing-bay.ts';
 /** Hand-authored mechanics laboratories, all using mock controllers. */
 export const COOP_LABS: Record<CoopLevelId, { title: string; description: string; room: (slot: Slot) => RoomDef }> = {
     'pairing-bay': { title: 'PAIRING BAY', description: 'Shared inputs, cube handoff, two-player finish', room: pairingBay },
+    'firewall-lab': { title: 'FIREWALL LAB', description: 'Static beams, local respawn, shared cube recovery', room: slot => ({
+        id: 'firewall-lab', title: 'FIREWALL LAB', instruction: 'BEAMS STAY LIVE. TEST THE CUBE, THEN REGROUP.',
+        width: 1450, height: 800, spawn: { x: slot === 1 ? 90 : 180, y: 623 }, checkpoint: { x: slot === 1 ? 130 : 220, y: 623 },
+        cube: { x: 280, y: 618 }, lever: { x: 110, y: 640 }, display: { x: 1040, y: 340 },
+        exit: { x: 1260, y: 500, w: 130, h: 140 },
+        platforms: [
+            { id: 'floor', kind: 'static', x: 0, y: 640, w: 1450, h: 160 },
+            { id: 'drop-perch', kind: 'static', x: 320, y: 540, w: 120, h: 20 },
+            { id: 'safe-overpass', kind: 'static', x: 480, y: 450, w: 180, h: 20 },
+        ],
+        firewalls: [
+            { id: 'horizontal-test', x: 460, y: 560, orientation: 'horizontal', length: 150 },
+            { id: 'vertical-test', x: 860, y: 560, orientation: 'vertical', length: 80, thickness: 16 },
+        ],
+        hazards: [],
+    }) },
     'boost-lab': { title: 'BOOST LAB', description: 'Hold the cube. Boost your partner. Swap roles.', room: slot => ({
         id: 'boost-lab', title: 'BOOST LAB', instruction: 'USE THE CUBE TO REACH THE UPPER ROUTE',
         width: 1150, height: 760, spawn: { x: slot === 1 ? 110 : 200, y: 583 }, checkpoint: { x: slot === 1 ? 110 : 200, y: 583 },

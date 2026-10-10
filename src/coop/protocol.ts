@@ -2,7 +2,7 @@
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
-export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab'] as const;
+export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab'] as const;
 export type CoopLevelId = typeof COOP_LEVELS[number];
 export const isCoopLevel = (v: unknown): v is CoopLevelId => COOP_LEVELS.includes(v as CoopLevelId);
 export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | 'liftControl' | null;
@@ -16,8 +16,10 @@ export type CubePlacement = 'spawn' | 'cargoPlate';
 export interface SharedCube {
     holder: Slot | null; physicsAuthority: Slot | null; pulling: boolean;
     epoch: number; seq: number; transform: CubeTransform | null;
+    /** Ephemeral accepted reset marker, retained across later grants for presentation. */
+    lastReset?: { epoch: number; cause: 'firewall' };
 }
-export type CubeAction = 'cube-pickup' | 'cube-pull-start' | 'cube-pull-stop';
+export type CubeAction = 'cube-pickup' | 'cube-pull-start' | 'cube-pull-stop' | 'cube-reset';
 export interface Avatar {
     x: number; y: number; vx: number; vy: number;
     facing: -1 | 1; grounded: boolean;
@@ -31,6 +33,7 @@ export interface LevelStateMap {
     'relay-lab': { relayEnabled: boolean };
     'lift-lab': { lowerHeld: boolean; liftLatched: boolean; liftEnabled: boolean };
     'boost-lab': { routeLatched: boolean };
+    'firewall-lab': { checkpointSet: boolean };
     'crumble-lab': { tested: { foot: boolean; hook: boolean }; platforms: Record<CrumbleId, CrumblePhase> };
 }
 interface SharedSession {
@@ -51,12 +54,13 @@ export type ClientMessage =
     | { type: 'join'; code: string }
     | { type: 'avatar'; seq: number; avatar: Avatar; discontinuity?: Discontinuity }
     | { type: 'cube'; epoch: number; seq: number; transform: CubeTransform; discontinuity?: Discontinuity }
-    | { type: CubeAction; seq: number; epoch: number }
+    | { type: Exclude<CubeAction, 'cube-reset'>; seq: number; epoch: number }
+    | { type: 'cube-reset'; seq: number; epoch: number; cause: 'firewall' }
     | { type: 'cube-drop'; seq: number; epoch: number; transform: CubeTransform }
     | { type: 'cube-occupancy'; seq: number; epoch: number; cargo: boolean }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
-    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' }
+    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' | 'firewallCheckpoint' }
     | { type: 'crumble-trigger'; seq: number; platform: CrumbleId; trigger: CrumbleTrigger }
     | { type: 'local-reset'; seq: number }
     | { type: 'exit'; seq: number }
@@ -106,13 +110,15 @@ export function parseClientMessage(raw: string): ClientMessage | null {
         && sequence(v.seq) && sequence(v.epoch) && validCubeTransform(v.transform)) return v as ClientMessage;
     if (['cube-pickup', 'cube-pull-start', 'cube-pull-stop'].includes(v.type as string)
         && keys(v, ['type', 'seq', 'epoch']) && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
+    if (v.type === 'cube-reset' && keys(v, ['type', 'seq', 'epoch', 'cause']) && v.cause === 'firewall'
+        && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
     if (v.type === 'cube-occupancy' && keys(v, ['type', 'seq', 'epoch', 'cargo'])
         && sequence(v.seq) && sequence(v.epoch) && typeof v.cargo === 'boolean') return v as ClientMessage;
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
         && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl'].includes(v.plate as Plate)) return v as ClientMessage;
     if (['switch', 'exit', 'local-reset'].includes(v.type as string) && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
     if (v.type === 'control' && keys(v, ['type', 'seq', 'control']) && sequence(v.seq)
-        && ['relayPower', 'liftLatch', 'boostRoute'].includes(v.control as string)) return v as ClientMessage;
+        && ['relayPower', 'liftLatch', 'boostRoute', 'firewallCheckpoint'].includes(v.control as string)) return v as ClientMessage;
     if (v.type === 'crumble-trigger' && keys(v, ['type', 'seq', 'platform', 'trigger']) && sequence(v.seq)
         && ['crumbleA', 'crumbleB'].includes(v.platform as string) && ['foot', 'hook'].includes(v.trigger as string)) return v as ClientMessage;
     return null;

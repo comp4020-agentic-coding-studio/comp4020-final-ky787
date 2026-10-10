@@ -138,7 +138,10 @@ export class SliceGame {
             if (previous.level === 'lift-lab' && room.level === 'lift-lab' && !previous.levelState.liftLatched && room.levelState.liftLatched)
                 events.push({ kind: 'lift-latch', at: this.world.room.upperLever! });
             this.sound.observe(this.world, events);
-            for (const event of events) if (event.kind === 'crumble') this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
+            for (const event of events) {
+                if (event.kind === 'crumble') this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
+                if (event.kind === 'cube-firewall') this.renderer.particles.burst(event.at.x, event.at.y, 14, '#ff943e', 170);
+            }
             if (!previous.completed && room.completed) this.audio.play('complete');
             else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
         }
@@ -377,6 +380,7 @@ export class SliceGame {
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,
+            firewalls: this.world.firewalls.map(f => ({ id: f.def.id, ...f.box })), lastDeath: this.world.lastDeath, cubeResetting: this.world.cubeResetting,
             connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             audio: this.audio.snapshot(),
@@ -426,6 +430,8 @@ export class SliceGame {
                 for (const event of events) {
                     if (event.kind === 'crumble')
                         this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
+                    else if (event.cause === 'firewall' || event.kind === 'cube-firewall')
+                        this.renderer.particles.burst(event.at.x, event.at.y, 14, '#ff943e', 170);
                     else
                         this.renderer.particles.burst(event.at.x, event.at.y, 10, '#64e6d5', 120);
                 }
@@ -450,7 +456,7 @@ export class SliceGame {
             this.authority?.crumble?.sync(this.world);
             this.sound.observe(this.world, this.coop.takeMachineryEvents());
             this.coop.publish(this.world.player, now);
-            if (this.world.cube) this.coop.publishCube(this.world.cube, now);
+            if (this.world.cube && !this.world.cubeResetting) this.coop.publishCube(this.world.cube, now);
         }
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now),
@@ -478,7 +484,8 @@ export class SliceGame {
         if (this.debug)
             this.debugView.querySelector('pre')!.textContent = JSON.stringify(this.coopMode
                 ? { multiplayer: { ...this.coop.diagnostics(), ...this.supportDiagnostics() }, checkpoint: this.coop.room?.checkpoint, completed: this.coop.room?.completed,
-                    player: { x: this.world.player.x, y: this.world.player.y, rope: this.world.player.rope.phase } }
+                    player: { x: this.world.player.x, y: this.world.player.y, rope: this.world.player.rope.phase },
+                    firewalls: this.world.firewalls, lastDeath: this.world.lastDeath }
                 : this.snapshot(), null, 2);
         requestAnimationFrame(t => this.frame(t));
     }

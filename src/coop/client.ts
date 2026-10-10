@@ -39,6 +39,11 @@ export class CoopClient {
     get ownsCube(): boolean { return this.connected && this.room!.cube?.physicsAuthority === this.slot; }
     private acceptCubeRoom(room: SharedRoom, initial = false): void {
         if (!room.cube) return;
+        if (room.cube.lastReset && room.cube.lastReset.epoch !== this.room?.cube?.lastReset?.epoch) {
+            if (this.prediction.cube && this.prediction.cube.kind !== 'cube-reset')
+                this.prediction.cancelCube(performance.now()); // A reset beats stale carry/pull feedback.
+            this.cubeDiscontinuity = undefined; // An unsent pre-destruction relay snap must not follow the new spawn.
+        }
         if (initial || room.cube.epoch !== this.room?.cube?.epoch) {
             this.remoteCube.reset(room.cube, performance.now());
             this.cubeSeq = 0; this.cubeSentAt = 0; this.cargo = undefined;
@@ -155,6 +160,7 @@ export class CoopClient {
         if (!this.connected || (kind === 'switch' ? this.prediction.switch : this.prediction.cube)) return false;
         const seq = ++this.actionSeq, epoch = this.room!.cube?.epoch ?? 0, now = performance.now();
         const message: ClientMessage = kind === 'switch' ? { type: kind, seq }
+            : kind === 'cube-reset' ? { type: kind, seq, epoch, cause: 'firewall' }
             : kind === 'cube-drop' ? { type: kind, seq, epoch, transform: transform! } : { type: kind, seq, epoch };
         if (!this.send(message)) return false;
         return this.prediction.begin(kind, seq, epoch, this.generation, now);
@@ -226,6 +232,7 @@ export class CoopClient {
             exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
             cubeHolder: this.room?.cube?.holder, cubePhysicsAuthority: this.room?.cube?.physicsAuthority,
             cubeEpoch: this.room?.cube?.epoch, cubePlacement: this.room?.cubePlacement, cubeOnCargoPlate: this.room?.level === 'pairing-bay' && this.room.levelState.inputs.cubeOnCargoPlate,
+            lastCubeReset: this.room?.cube?.lastReset ?? null,
             pendingCubeAction: this.prediction.cube, predictedHolder: this.prediction.cube?.kind === 'cube-pickup' ? this.slot : null,
             pendingSwitch: this.prediction.switch, interactionTimings: this.prediction.last,
             ownsCubePhysics: this.ownsCube, cubeSnapshotsSent: this.cubeSent, cubeSnapshotsReceived: this.cubeReceived,

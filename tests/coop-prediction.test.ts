@@ -169,6 +169,32 @@ it('accepted remote carried transit emits one cue and stale stream markers canno
     ws.receive({ type: 'avatar', slot: 2, stream: 1, seq: 1, avatar, discontinuity: 'relay' });
     expect(client.takeMachineryEvents()).toEqual([]); expect(client.remote.sample(performance.now())!.x).toBe(280);
 });
+it('accepted firewall reset cancels stale pickup prediction and rejects a late old result/transform', async () => {
+    const { client, ws, state, record, view, world } = await setup();
+    assignCube(state, 2); record.revision++; ws.receive({ type: 'room', room: view() });
+    Object.assign(world.player, { x: 1190, y: 543 }); world.interact();
+    const seq = client.prediction.cube!.seq, stale = structuredClone(view());
+    expect(world.cube!.carried).toBe(true);
+    interactCube(state, 2, { type: 'cube-reset', seq: 1, epoch: state.epoch, cause: 'firewall' }); record.revision++;
+    ws.receive({ type: 'room', room: view() });
+    expect(client.prediction.cube).toBeNull(); expect(world.cube).toMatchObject({ ...world.room.cube, carried: false });
+    ws.receive({ type: 'action-result', seq, accepted: true, room: stale });
+    ws.receive({ type: 'cube', epoch: stale.cube!.epoch, seq: 999, transform: { x: 500, y: 500, vx: 0, vy: 0, grounded: false } });
+    world.syncAuthority();
+    expect(world.cube).toMatchObject({ ...world.room.cube, carried: false });
+    expect(world.events.filter(e => e.kind === 'cube-firewall')).toHaveLength(1);
+});
+it('firewall reset discards an unsent relay marker and publishes only the accepted spawn epoch', async () => {
+    const { client, ws, state, record, view, world } = await setup();
+    client.markDiscontinuity('cube', 'relay'); client.cubeAction('cube-reset');
+    const pending = client.prediction.cube!;
+    client.publishCube(world.cube!, 1000); expect(ws.sent.at(-1)?.type).toBe('cube-reset');
+    interactCube(state, 1, { type: 'cube-reset', seq: pending.seq, epoch: state.epoch, cause: 'firewall' }); record.revision++;
+    ws.receive({ type: 'action-result', seq: pending.seq, accepted: true, room: view() });
+    client.publishCube(world.cube!, 1001);
+    expect(ws.sent.at(-1)).toMatchObject({ type: 'cube', epoch: state.epoch, transform: world.room.cube });
+    expect(ws.sent.at(-1)).not.toHaveProperty('discontinuity');
+});
 it('delayed crumble prediction cannot collapse; denial reconciles without duplicate warning/collapse sound', async () => {
     await setup();
     const client = new CoopClient(() => {}, () => {}); cleanups.push(() => client.leave()); client.start('ABCD');

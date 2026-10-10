@@ -78,6 +78,9 @@ Slots identify players, not gameplay roles. Unlock and individual arrival credit
 survive reconnects. RELAY, LIFT and CRUMBLE LAB test shared machinery. BOOST LAB
 lets either player hold the cube overhead while their partner jumps onto it and
 then reaches an upper switch, opening a return route for both.
+FIREWALL LAB tests always-active horizontal/vertical beams, independent player
+respawns and shared cube destruction/recovery. These are authored hazards with
+no binary or obfuscator evidence claims.
 
 Movement remains local and responsive; the existing Node server synchronizes and
 saves shared puzzle state over same-origin WebSockets. Refresh restores the same
@@ -87,7 +90,7 @@ separate, and personal campaign saves keep their existing format.
 
 See [the multiplayer contract and test flow](docs/c9-multiplayer.md) and
 [the authority ADR](docs/adr/0001-multiplayer-authority.md). The latest relay
-egress fix and partner-held boost await two-computer human playtesting before
+egress fix, partner-held boost and static firewalls await two-computer human playtesting before
 expanding final co-op stages.
 
 ## Run locally

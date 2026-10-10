@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { isCoopLevel } from '../src/coop/protocol.ts';
 const level = process.argv[2];
-if (!isCoopLevel(level) || level === 'pairing-bay') throw new Error('Choose relay-lab, lift-lab, crumble-lab or boost-lab');
+if (!isCoopLevel(level) || level === 'pairing-bay') throw new Error('Choose relay-lab, lift-lab, crumble-lab, boost-lab or firewall-lab');
 const h = await coopBrowser({ shots: process.argv[4] });
 const { key, tap, walk, wait, snapshot, check, click, mouse, shot, sleep } = h;
 const labState = (s: GameSnapshot) => s.multiplayer?.shared;
@@ -151,6 +151,92 @@ async function boost(a: Cdp, b: Cdp, holderSlot: 1 | 2) {
     await shot(climber, 'regroup');
     await finish(a, b, 985);
 }
+async function firewall(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
+    const actor = actorSlot === 1 ? a : b, partner = actorSlot === 1 ? b : a;
+    async function reclaim(p: Cdp) {
+        const s = await snapshot(p), at = s.cube!;
+        await walk(p, at.x + (s.player.x > at.x ? 34 : -34)); await tap(p, 'KeyE');
+        await wait(p, 'firewall cube pickup', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === s.multiplayer?.slot);
+    }
+    async function perch(p: Cdp) {
+        await walk(p, 240); await hop(p, 383);
+        await wait(p, 'perch reached from clear jump approach', s => s.player.groundId === 'drop-perch');
+    }
+    async function faceDropEdge(p: Cdp) {
+        // The generic walk helper permits run-speed braking drift. Use short
+        // real inputs here so arrival from either side drops off the right edge.
+        for (let n = 0; n < 35; n++) {
+            const dx = 424 - (await snapshot(p)).player.x;
+            if (Math.abs(dx) < 2) break;
+            const keyCode = dx > 0 ? 'KeyD' : 'KeyA';
+            await key(p, keyCode, true); await sleep(25); await key(p, keyCode, false); await sleep(100);
+        }
+        await key(p, 'KeyD', true); await sleep(15); await key(p, 'KeyD', false); await sleep(100);
+    }
+    await walk(actor, 110); await tap(actor, 'KeyE');
+    await wait(partner, 'shared checkpoint accepted', s => s.multiplayer?.checkpoint === 'reunion');
+    const beams = (await snapshot(actor)).firewalls;
+    check('two authored beam orientations and lengths', beams.some(f => f.w === 150 && f.h === 12) && beams.some(f => f.w === 16 && f.h === 80));
+    // Fall from the test perch into the horizontal beam; the loose cube stays at spawn.
+    const partnerAt = (await snapshot(partner)).player;
+    await walk(actor, 210); await hop(actor, 383); const deaths = (await snapshot(actor)).deaths;
+    await key(actor, 'KeyD', true);
+    try { await wait(actor, 'horizontal beam kills falling player', s => s.deaths === deaths + 1); }
+    finally { await key(actor, 'KeyD', false); }
+    const respawn = await snapshot(actor);
+    check('horizontal death uses the shared checkpoint and firewall cause', respawn.lastDeath?.cause === 'firewall'
+        && Math.abs(respawn.player.x - (actorSlot === 1 ? 130 : 220)) < 2);
+    check('partner survives in place', (await snapshot(partner)).deaths === 0 && Math.abs((await snapshot(partner)).player.x - partnerAt.x) < 2);
+    await walk(partner, 210); await hop(partner, 383); await hop(partner, 530); await walk(partner, 790);
+    await key(partner, 'KeyD', true);
+    try { await wait(partner, 'vertical beam kills walker', s => s.deaths === 1); }
+    finally { await key(partner, 'KeyD', false); }
+    check('second player dies independently at vertical beam', (await snapshot(partner)).lastDeath?.firewallId === 'vertical-test'
+        && (await snapshot(actor)).deaths === deaths + 1);
+    async function resetOnBoth(epoch: number) {
+        for (const p of [a, b]) {
+            const s = await wait(p, 'accepted cube reset to original spawn', s => !!s.multiplayer?.lastCubeReset
+                && s.multiplayer.lastCubeReset.epoch > epoch && !s.multiplayer.pendingCubeAction && !s.cubeResetting
+                && !!s.cube && Math.abs(s.cube.x - 280) < 2 && Math.abs(s.cube.y - 618) < 2);
+            check('one shared cube restored with carry and pull cleared', s.multiplayer?.cubeHolder === null && !s.multiplayer.shared?.cube?.pulling && !s.cube!.carried);
+        }
+    }
+    // A perch lets the loose body fall into the beam while its former holder stays safe.
+    await reclaim(actor); await perch(actor);
+    await wait(actor, 'drop perch landing', s => s.player.groundId === 'drop-perch');
+    await faceDropEdge(actor);
+    const dropEpoch = (await snapshot(actor)).multiplayer!.cubeEpoch!;
+    await tap(actor, 'KeyE'); await resetOnBoth(dropEpoch);
+    check('dropped loose cube is destroyed without harming its dropper', (await snapshot(actor)).deaths === deaths + 1);
+    await shot(actor, 'loose-cube-reset');
+    // Either slot can hold the cube into the beam while their own body fits below it.
+    for (const holder of [actor, partner]) {
+        await reclaim(holder);
+        const before = await snapshot(holder), epoch = before.multiplayer!.cubeEpoch!;
+        await walk(holder, 500); await resetOnBoth(epoch);
+        check('held cube alone touches: holder lives and both see reset', (await snapshot(holder)).deaths === before.deaths);
+    }
+    // Pull from the far side of the vertical beam: body stays safe, cargo crosses it.
+    await reclaim(actor); await perch(actor); await hop(actor, 530); await walk(actor, 700);
+    check('safe overpass preserves carried cube', (await snapshot(actor)).multiplayer?.cubeHolder === actorSlot);
+    await wait(actor, 'safe landing beyond horizontal beam', s => s.player.groundId === 'floor');
+    await walk(actor, 700);
+    await key(actor, 'KeyA', true); await sleep(15); await key(actor, 'KeyA', false); await sleep(100);
+    await tap(actor, 'KeyE'); // Put cargo behind the player so it cannot block the approach jump.
+    await wait(actor, 'loose drop before pull', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === null);
+    await walk(actor, 790); await hop(actor, 970);
+    const cargo = (await snapshot(actor)).cube!, pullEpoch = (await snapshot(actor)).multiplayer!.cubeEpoch!;
+    await mouse(actor, cargo.x, cargo.y, true);
+    try { await resetOnBoth(pullEpoch); } finally { await mouse(actor, cargo.x, cargo.y, false); }
+    check('grapple-pulled destruction clears rope and pull feedback', !(await snapshot(actor)).pullingCube
+        && (await snapshot(actor)).player.rope.phase !== 'attached');
+    await shot(actor, 'pulled-cube-reset');
+    // Both routes remain easy to traverse after repeated independent recovery.
+    for (const p of [a, b]) if ((await snapshot(p)).player.x < 880) {
+        await walk(p, 790); await hop(p, 970);
+    }
+    await finish(a, b, 1290);
+}
 async function lift(a: Cdp, b: Cdp, riderSlot: 1 | 2) {
     const rider = riderSlot === 1 ? a : b, operator = riderSlot === 1 ? b : a;
     await walk(operator, 245);
@@ -256,6 +342,7 @@ try {
         if (level === 'lift-lab') await lift(a, b, slot);
         if (level === 'crumble-lab') await crumbleRoute(a, b, slot, backend);
         if (level === 'boost-lab') await boost(a, b, slot);
+        if (level === 'firewall-lab') await firewall(a, b, slot);
         check('C8 visitor progress remains independent', JSON.stringify([(await snapshot(a)).progress, (await snapshot(b)).progress]) === JSON.stringify(progress));
         await shot(a, 'complete'); await a.send('Page.navigate', { url: 'about:blank' }); await b.send('Page.navigate', { url: 'about:blank' });
     }

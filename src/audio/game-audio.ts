@@ -10,6 +10,7 @@ export const SOUNDS = {
     crumbleWarn: { file: 'crumble-start.ogg', gain: .55, cooldown: .25 },
     crumbleBreak: { file: 'crumble-break.ogg', gain: .48, cooldown: .2 },
     death: { file: 'crumble-break.ogg', gain: .42, cooldown: .4, rate: .72 },
+    firewallZap: { file: 'firewall-open.ogg', gain: .42, cooldown: .18, rate: 1.3 },
     plate: { file: 'metal-touch.ogg', gain: .65, cooldown: .1 },
     pickup: { file: 'metal-touch.ogg', gain: .45, cooldown: .12, rate: 1.2 },
     drop: { file: 'metal-touch.ogg', gain: .55, cooldown: .12, rate: .85 },

@@ -10,6 +10,7 @@ export interface DurableStates {
     'relay-lab': { relayEnabled: boolean };
     'lift-lab': { liftLatched: boolean };
     'boost-lab': { routeLatched: boolean };
+    'firewall-lab': { checkpointSet: boolean };
     'crumble-lab': { tested: { foot: boolean; hook: boolean } };
 }
 export interface SessionRecord {

@@ -6,6 +6,20 @@ import { pairingDefinition } from './pairing-state.ts';
 /** Small coordinate-free mock controllers. No frontend geometry imports. */
 export const LEVEL_DEFINITIONS: { [K in CoopLevelId]: LevelDefinition<K> } = {
     'pairing-bay': pairingDefinition,
+    'firewall-lab': {
+        cube: true, defaults: () => ({ checkpointSet: false }),
+        valid: r => Object.keys(r.levelState).length === 1 && typeof r.levelState.checkpointSet === 'boolean'
+            && r.checkpoint === (r.levelState.checkpointSet ? 'reunion' : 'entry') && r.cubePlacement === 'spawn'
+            && r.exitUnlocked === r.levelState.checkpointSet,
+        acceptsPlate: p => p === null,
+        action: ({ record }, m) => {
+            if (m.type !== 'control' || m.control !== 'firewallCheckpoint') return false;
+            record.levelState.checkpointSet = true; record.checkpoint = 'reunion'; return true;
+        },
+        project: ({ record }) => ({ ...record.levelState }),
+        unlock: ({ record }) => record.levelState.checkpointSet,
+        cubeEnabled: () => true,
+    },
     'boost-lab': {
         cube: true, defaults: () => ({ routeLatched: false }),
         valid: r => Object.keys(r.levelState).length === 1 && typeof r.levelState.routeLatched === 'boolean'
