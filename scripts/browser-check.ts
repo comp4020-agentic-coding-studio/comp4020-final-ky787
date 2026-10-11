@@ -221,6 +221,7 @@ interface Snap {
     ended: boolean;
     started: boolean;
     overviewVisible: boolean;
+    camera: { kind: string; frame: { x: number; y: number; w: number; h: number } | null };
     connections: { id: string; powered: boolean }[];
     progress: Progress;
     audio: { state: string; active: boolean; loaded: number; failed: string[]; voices: number; loops: string[];
@@ -327,7 +328,11 @@ async function cross(cdp: Cdp, anchorX: number, keyboard = false, anchorY = 226)
         await mouseAt(cdp, anchorX, anchorY, 'mouseMoved');
         check('air hook uses visible target preview', await evaluate(cdp, '!!binaryNinja.world.target(binaryNinja.input.state.aim)'));
         await tap(cdp, 'Space'); // Catch the ring; releasing the key keeps it attached.
-    } else await mouseAt(cdp, anchorX, anchorY);
+    } else {
+        // Deliberate takeoff gives the mouse-hook route a repeatable launch;
+        // reeling from a standstill can settle before its release waypoint.
+        await tap(cdp, 'Space'); await mouseAt(cdp, anchorX, anchorY);
+    }
     await waitFor(cdp, 'hook attachment', s => s.player.rope.phase === 'attached');
     if (keyboard) check('tapped airborne Space latches the hook', (await snap(cdp)).keyboardGrapple);
     await waitFor(cdp, 'rightward release point', s => s.player.x > anchorX + 90 && s.player.y < anchorY + 284 && s.player.vx > 0);
@@ -484,11 +489,16 @@ async function uplinkRoute(cdp: Cdp) {
     await alignTo(cdp, 3267);
     await tap(cdp, 'KeyD'); await tap(cdp, 'KeyE');
     await waitFor(cdp, 'upper payload delivered', s => s.inputs.cubeOnPlateC);
+    await waitFor(cdp, 'CONTROL SPINE automatic return view', s => s.camera.kind === 'legacy');
+    check('CONTROL SPINE retains its authored temporary return framing', (await snap(cdp)).camera.frame?.h === 850);
     check('UPLINK payload activates route without remote completion', (await snap(cdp)).outputs.codePlatformB && !(await snap(cdp)).ended);
     await checkValidatedFrame(cdp, 'payload delivered');
     await shot(cdp, 'control-spine-payload');
     await sleep(1200); await shot(cdp, 'control-spine-automatic-return-reveal');
-    await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'control-spine-final-overview'); await key(cdp, 'keyUp', 'Tab'); await sleep(700);
+    await key(cdp, 'keyDown', 'Tab'); await sleep(700); await shot(cdp, 'control-spine-final-overview');
+    check('Tab overrides CONTROL SPINE automatic framing', (await snap(cdp)).camera.kind === 'overview');
+    await key(cdp, 'keyUp', 'Tab'); await sleep(700);
+    check('expired CONTROL SPINE reveal returns to player following', (await snap(cdp)).camera.kind === 'follow');
     check('one retained signal powers four return anchors and the catch deck', (await snap(cdp)).platforms.filter(p => ['upper-route', 'return-mid', 'return-high', 'return-near', 'return-catch'].includes(p.id)).every(p => p.enabled));
     await alignTo(cdp, 2860); await ropeReturn(cdp);
     check('UPLINK full retrieval route has no deaths', (await snap(cdp)).deaths === 0);
@@ -612,7 +622,9 @@ async function main() {
         await mouseAt(cdp, 260, 542, 'mouseReleased');
         await tap(cdp, 'KeyE');
         check('pulled cube can be carried', (await snap(cdp)).cube?.carried === true);
-        await walkTo(cdp, 325);
+        // Place centrally: walking overshoot can leave the cube under the
+        // intended x440 bank landing, making the next jump land on the cube.
+        await alignTo(cdp, 325, 'near'); await tap(cdp, 'KeyD');
         await tap(cdp, 'KeyE');
         await waitFor(cdp, 'relay plate', s => s.inputs.cubeOnPlate);
         // Land and aim on the near bank; a timed coast after jumping the cube can pass the lip.

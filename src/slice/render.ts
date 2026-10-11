@@ -14,12 +14,15 @@ import { canJumpFromRope, type PlayerState } from '../engine/physics.ts';
 import { drawMachinery } from './machinery-render.ts';
 import { drawFirewalls } from './firewall-render.ts';
 import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
+import { ContextualCamera } from './camera-reveals.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
     private exitWasOpen = false;
+    private cameraDeaths = 0;
+    cameraReveals = new ContextualCamera();
     connections: MachineConnection[] = [];
     camera = new Camera();
     particles = new Particles();
@@ -41,6 +44,8 @@ export class PuzzleRenderer {
         this.camera.snapTo(world.player.x, world.player.y - 100);
         this.particles.clear();
         this.returnReveal = 0;
+        this.cameraDeaths = world.deaths;
+        this.cameraReveals.reset(world);
         this.exitWasOpen = world.frame.outputs.exitDoor;
         this.replay = new TracePlayback();
         this.replay.update(world.frame, 0);
@@ -67,15 +72,19 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }): void {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; connected?: boolean; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }): void {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
+        if (w.deaths !== this.cameraDeaths || players?.connected === false) this.returnReveal = 0;
+        this.cameraDeaths = w.deaths;
         // Authored reveal of the final physical route; outputs and controls never wait for it.
         if (r.id === 'uplink' && w.frame.outputs.exitDoor && !this.exitWasOpen) this.returnReveal = 2.2;
         this.exitWasOpen = w.frame.outputs.exitDoor;
         this.returnReveal = Math.max(0, this.returnReveal - dt);
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' || r.id === 'lift-lab' || r.id === 'crossfeed-vault' || r.id === 'race-condition' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        const reveal = this.cameraReveals.update(w, dt, overview, players?.connected !== false,
+            this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null);
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, reveal.frame, r.id === 'uplink' || r.id === 'lift-lab' || r.id === 'crossfeed-vault' || r.id === 'race-condition' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;

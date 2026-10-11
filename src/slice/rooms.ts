@@ -4,6 +4,15 @@ import type { Box, Vec2 } from "../engine/geometry.ts";
 import type { MachineSignal, ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 import type { FirewallDef } from './firewall.ts';
+/** Local presentation only. Targets include inactive/ghost manifestations. */
+export interface CameraReveal {
+    platformIds?: readonly string[];
+    bounds?: Box;
+    /** World-space margin; defaults to 64. */
+    padding?: number;
+    /** Seconds for a local control interaction; held plates have no timeout. */
+    duration?: number;
+}
 export interface Platform extends Box {
     id: string;
     kind: "static" | "code" | "crumble-prototype" | "crumble-proven";
@@ -33,8 +42,8 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     cube?: Vec2;
     cubes?: { id: CubeId; spawn: Vec2; mark: string }[];
     cubePads?: { id: Exclude<CubePlacement, 'spawn'>; at: Vec2; label: string }[];
-    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'phase' | 'commit'; at: Vec2; label: string; kind?: 'toggle' | 'terminal' }[];
-    plates?: { id: PressurePlateId; at: Vec2; label: string }[];
+    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'phase' | 'commit'; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; cameraReveal?: CameraReveal }[];
+    plates?: { id: PressurePlateId; at: Vec2; label: string; cameraReveal?: CameraReveal }[];
     wires?: import('./connections.ts').MachineConnection[];
     regions?: { at: Vec2; label: string }[];
     plate?: Vec2;

@@ -80,13 +80,27 @@ async function route(url: string, debug: string, reverse: boolean) {
     }
     await align(operator, 180);
     await wait(operator, 'cube lands on buffer', s => state(s).levelState.buffer.phase === 'window');
+    check('DROP A immediately frames cargo for its local operator', (await snapshot(operator)).camera.id === 'dropA' && (await snapshot(runner)).camera.kind === 'follow');
     await align(operator, 80); await align(runner, 1880);
     await wait(operator, 'accepted receiver delivery', s => state(s).levelState.inputs.payloadDelivered);
     for (const p of [operator, runner]) await wait(p, 'receiver cube settles visibly', s => !!s.cubes.cubeA?.grounded && Math.abs(s.cubes.cubeA.y - 1018) < 1);
     check('cargo delivered by timed A release / B press', state(await snapshot(operator)).cubePlacements.cubeA === 'receiver' && state(await snapshot(runner)).cubePlacements.cubeA === 'receiver');
+    check('DROP B frames cargo, while leaving A restores local follow', (await snapshot(runner)).camera.id === 'dropB' && (await snapshot(operator)).camera.kind === 'follow');
+    await shot(runner, 'drop-b-camera');
     await launchDeck(operator); await align(operator, 615);
     await launchDeck(runner); await align(runner, 705);
+    await align(operator, 690); await tap(operator, 'KeyE');
+    await wait(operator, 'local lever reveal off TRACE', s => s.camera.kind === 'control' && s.camera.id === 'phase');
+    check('local lever reveal does not hijack the runner', (await snapshot(runner)).camera.kind === 'follow');
+    await wait(operator, 'brief reveal expires despite ongoing snapshots', s => s.camera.kind === 'follow');
+    await align(operator, 615); await tap(operator, 'KeyE');
     await wait(runner, 'trace powers phase A', s => state(s).levelState.outputs.phaseA);
+    await key(operator, 'Tab', true); await wait(operator, 'manual overview has priority', s => s.camera.kind === 'overview');
+    await key(operator, 'Tab', false); await wait(operator, 'held TRACE resumes after overview', s => s.camera.id === 'trace');
+    await sleep(1800);
+    const spanFrame = JSON.stringify((await snapshot(operator)).camera.frame);
+    check('TRACE stays framed beyond the lever timeout', (await snapshot(operator)).camera.kind === 'plate');
+    await shot(operator, 'trace-camera');
     await key(runner, 'KeyD', true); await mouse(runner, 1005, 365, true);
     await wait(runner, 'hook 1', s => s.player.rope.anchorId === 'span1');
     check('first substantial grapple attached', true);
@@ -103,6 +117,8 @@ async function route(url: string, debug: string, reverse: boolean) {
             check(`${target.id} fuse shared at 1.55 seconds`, state(await snapshot(operator)).levelState.platforms[target.id as 'crumbleA' | 'crumbleB'].durationMs === 1550);
         }
         check(`real swing catches ${target.id}`, !(await snapshot(runner)).player.grounded);
+        const operatorView = (await snapshot(operator)).camera;
+        check(`phase handover to ${target.id} keeps the operator frame stable`, operatorView.kind === 'plate' && JSON.stringify(operatorView.frame) === spanFrame);
     }
     check('all four deliberate transfers retain the airborne chain', (await snapshot(runner)).player.ropeJumpAnchors.join(',') === 'span1,crumbleA,span3,crumbleB');
     await wait(runner, 'last arc', s => s.player.x > s.player.rope.anchor.x + 90 && s.player.vx > 450 && s.player.vy < 0, 3500);
@@ -111,7 +127,10 @@ async function route(url: string, debug: string, reverse: boolean) {
     await key(runner,'KeyD',false); await sleep(160); await shot(runner,'right-deck');
     check('runner crossed all five blocks, no floor or death shortcut', (await snapshot(runner)).deaths === 0);
     await pickup(runner,'cubeB'); await place(runner,'cubeB',3470,'return');
+    await wait(runner, 'local body on RETURN reveals the bridge', s => s.camera.id === 'return');
+    await sleep(700); await shot(runner, 'return-camera');
     await hop(runner,3580); await wait(operator,'cube holds return', s => state(s).levelState.inputs.returnOccupied);
+    check('cube-held RETURN does not force a camera reveal', (await snapshot(runner)).camera.kind === 'follow');
     await walk(operator,3360); await wait(runner,'trace ghosts after operator leaves', s => !state(s).levelState.outputs.spanMaster);
     check('Cube B substitutes for a body on RETURN', state(await snapshot(runner)).cubePlacements.cubeB === 'return' && state(await snapshot(runner)).levelState.outputs.returnBridge);
     await pickup(runner,'cubeB'); await align(runner,3750);

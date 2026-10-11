@@ -391,6 +391,7 @@ export class SliceGame {
             connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             audio: this.audio.snapshot(),
+            camera: { ...this.renderer.cameraReveals.selection, x: this.renderer.camera.x, y: this.renderer.camera.y, zoom: this.renderer.camera.zoom },
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
     private supportDiagnostics() {
@@ -465,7 +466,7 @@ export class SliceGame {
             for (const [id, cube] of cubeEntries(this.world.cubes)) if (!this.world.cubeIsResetting(id)) this.coop.publishCube(cube, now, id);
         }
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
-            this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now),
+            this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, connected: this.coop.connected, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
                 remotePullingCubes: cubeEntries(this.coop.room?.cubes ?? {}).filter(([id, c]) => c.pulling && !this.coop.ownsCubeFor(id)).map(([id]) => id) } : undefined);
         this.inspector.update(this.renderer.replay);

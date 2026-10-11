@@ -7,7 +7,7 @@ import { PLAYER } from '../engine/constants.ts';
 import type { SharedCubeAuthority } from './cube.ts';
 import type { LocalPrediction } from './prediction.ts';
 
-export const bodyOnPlate = (w: PuzzleWorld, at?: Vec2) => !!at && w.player.grounded
+export const bodyOnPlate = (w: Pick<PuzzleWorld, 'player'>, at?: Vec2) => !!at && w.player.grounded
     && Math.abs(w.player.x - at.x) < 45 + PLAYER.width / 2 - 8 && Math.abs(w.player.y + PLAYER.height / 2 - at.y) < 5;
 export function sampleExit(w: PuzzleWorld, room: Pick<SharedRoom, 'exitUnlocked' | 'reachedExit'>, slot: Slot, reach: () => void): void {
     if (room.exitUnlocked && !room.reachedExit[slot - 1] && boxesOverlap(playerBox(w.player), w.room.exit)) reach();

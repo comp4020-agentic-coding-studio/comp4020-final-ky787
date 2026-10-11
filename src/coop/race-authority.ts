@@ -57,7 +57,7 @@ export class RaceAuthority implements WorldAuthority {
     interact(w: PuzzleWorld) {
         for (const c of this.ordered(w)) if (c.interact(w)) return;
         const c = this.control(w);
-        if (c && (c.id === 'phase' || !this.room.levelState.inputs.finalControl)) this.client.control(c.id);
+        if (c && (c.id === 'phase' || !this.room.levelState.inputs.finalControl) && this.client.control(c.id)) return c.id;
     }
     hint(w: PuzzleWorld) {
         for (const c of this.ordered(w)) { const hint = c.hint(w); if (hint) return hint; }

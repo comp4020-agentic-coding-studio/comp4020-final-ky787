@@ -48,7 +48,10 @@ it('RACE lever predicts presentation immediately, sounds once on acceptance, and
     const ws = Socket.instances[0]; ws.onopen(); ws.receive({ type: 'snapshot', slot: 1, room: view() });
     const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink);
     Object.assign(world!.player, { x: 615, y: 703 }); world!.step(FIXED_DT, emptyInput()); audio.reset(world!);
-    client.control('phase'); const pending = client.pendingPhase!;
+    world!.interact(); const pending = client.pendingPhase!;
+    expect(world!.localControl).toEqual({ id: 'phase', sequence: 1 });
+    world!.interact(); // An already-pending intent cannot restart presentation.
+    expect(world!.localControl?.sequence).toBe(1);
     world!.step(FIXED_DT, emptyInput()); audio.observe(world!, world!.events.splice(0));
     expect(client.room!.levelState).toMatchObject({ inputs: { phase: false } });
     expect(world!.power('phaseB')).toBe(true); expect(world!.physicalPower('phaseB')).toBe(false);
@@ -56,11 +59,13 @@ it('RACE lever predicts presentation immediately, sounds once on acceptance, and
     ws.receive({ type: 'action-result', seq: pending.seq, accepted: true, room: view() });
     world!.step(FIXED_DT, emptyInput()); audio.observe(world!, world!.events.splice(0));
     expect(sink.play.mock.calls.filter(c => c[0] === 'switch')).toHaveLength(1);
-    client.control('phase'); const denied = client.pendingPhase!; world!.syncAuthority();
+    expect(world!.localControl?.sequence).toBe(1);
+    world!.interact(); const denied = client.pendingPhase!; world!.syncAuthority();
     expect(world!.power('phaseA')).toBe(true);
     ws.receive({ type: 'action-result', seq: denied.seq, accepted: false, room: view() });
     expect(client.pendingPhase).toBeNull(); expect(world!.power('phaseA')).toBe(false);
     expect(world!.power('phaseB')).toBe(true);
+    expect(world!.localControl?.sequence).toBe(2); // Confirmation/denial is not another local edge.
 });
 async function setup(switchB = true) {
     Socket.instances = [];

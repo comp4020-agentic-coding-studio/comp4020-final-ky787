@@ -173,13 +173,15 @@ export class CoopClient {
         return this.prediction.begin(kind, seq, epoch, this.generation, now, cubeId);
     }
     switchB(): boolean { return this.room?.level === 'pairing-bay' && !this.room.levelState.inputs.switchB && this.predict('switch'); }
-    control(control: Extract<ClientMessage, { type: 'control' }>['control']): void {
-        if (!this.connected || [...this.pendingControls.values()].includes(control)) return;
+    control(control: Extract<ClientMessage, { type: 'control' }>['control']): boolean {
+        if (!this.connected || [...this.pendingControls.values()].includes(control)) return false;
         const seq = ++this.actionSeq;
         if (this.send({ type: 'control', seq, control })) {
             this.pendingControls.set(seq, control);
             if (control === 'phase' && this.room?.level === 'race-condition') this.pendingPhase = { seq, value: !this.room.levelState.inputs.phase };
+            return true;
         }
+        return false;
     }
     bufferContact(): void {
         const c = this.room?.cubes.cubeA;

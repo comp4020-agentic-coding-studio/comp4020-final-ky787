@@ -1,4 +1,4 @@
-import type { RoomDef, Platform } from '../slice/rooms.ts';
+import type { RoomDef, Platform, CameraReveal } from '../slice/rooms.ts';
 import type { MachineConnection } from '../slice/connections.ts';
 import type { Slot } from './protocol.ts';
 
@@ -12,6 +12,9 @@ export function raceCondition(slot: Slot): RoomDef<'race-condition'> {
         { id: 'span5', x: 2930, y: 350, signal: 'phaseA', label: '05 / A', kind: 'code', w: 150, h: 30 },
     ];
     const wires: MachineConnection[] = [];
+    const cargoView: CameraReveal = { bounds: { x: 70, y: 390, w: 280, h: 715 }, padding: 64 };
+    const spanView: CameraReveal = { platformIds: span.map(p => p.id), bounds: { x: 540, y: 150, w: 2820, h: 760 }, padding: 70 };
+    const returnView: CameraReveal = { platformIds: ['return-bridge'], bounds: { x: 560, y: 640, w: 3000, h: 150 }, padding: 70 };
     const wire = (id: string, output: MachineConnection['output'], x: number, y: number, toX: number, toY: number, viaY: number, inverted = false) =>
         wires.push({ id, input: 'plateA', output, resolved: true, inverted,
             points: [{ x, y }, { x, y: viaY }, { x: toX, y: viaY }, { x: toX, y: toY }] });
@@ -29,13 +32,13 @@ export function raceCondition(slot: Slot): RoomDef<'race-condition'> {
         spawn: { x: slot === 1 ? 120 : 250, y: 1223 }, checkpoint: { x: slot === 1 ? 585 : 695, y: 703 },
         cubes: [{ id: 'cubeA', mark: 'A', spawn: { x: 205, y: 478 } }, { id: 'cubeB', mark: 'B', spawn: { x: 3570, y: 698 } }],
         plates: [
-            { id: 'dropA', at: { x: 180, y: 1240 }, label: 'DROP A' },
-            { id: 'dropB', at: { x: 1880, y: 1240 }, label: 'DROP B' },
+            { id: 'dropA', at: { x: 180, y: 1240 }, label: 'DROP A', cameraReveal: cargoView },
+            { id: 'dropB', at: { x: 1880, y: 1240 }, label: 'DROP B', cameraReveal: cargoView },
             { id: 'receiver', at: { x: 205, y: 1040 }, label: 'RECEIVER' },
-            { id: 'trace', at: { x: 615, y: 720 }, label: 'TRACE ENABLE' },
-            { id: 'return', at: { x: 3470, y: 720 }, label: 'RETURN' },
+            { id: 'trace', at: { x: 615, y: 720 }, label: 'TRACE ENABLE', cameraReveal: spanView },
+            { id: 'return', at: { x: 3470, y: 720 }, label: 'RETURN', cameraReveal: returnView },
         ],
-        controls: [{ id: 'phase', kind: 'toggle', at: { x: 655, y: 720 }, label: 'PHASE' },
+        controls: [{ id: 'phase', kind: 'toggle', at: { x: 655, y: 720 }, label: 'PHASE', cameraReveal: spanView },
             { id: 'commit', kind: 'terminal', at: { x: 4000, y: 530 }, label: 'COMMIT' }],
         platforms: [
             { id: 'floor', kind: 'static', x: 0, y: 1240, w: 4180, h: 180 },

@@ -22,6 +22,12 @@ and high final control. The cargo enclosure sits beside the swing volume so it
 does not interrupt the runner's arcs. DROP B faces the same visible machine from
 the central floor. The code return bridge ghosts across the whole span.
 
+Local body contact with DROP A/B, TRACE ENABLE and RETURN now selects a sustained
+camera view of the affected machinery. PHASE off TRACE briefly reveals the span;
+on TRACE, repeated toggles keep the same view. Tab/initial overview has priority.
+These [authored camera targets](camera-reveals.md) affect only the operator's
+presentation and do not change accepted machinery or the partner's camera.
+
 | Region | Authored geometry |
 | --- | --- |
 | Cargo Clock | Open visual frame, x90–320; top y500, buffer y680, beams y800/860, receiver y1040 |

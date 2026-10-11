@@ -120,7 +120,7 @@ it('visible enclosure walls prevent pulling payloads through cargo or the unsolv
 });
 
 it('COMMIT cannot be reached by pressing E through the underside of its ledge', () => {
-    const f = setup(), control = vi.spyOn(f.client, 'control').mockImplementation(() => {});
+    const f = setup(), control = vi.spyOn(f.client, 'control').mockReturnValue(true);
     for (const y of [575, 550]) {
         f.w.player = createPlayer(4000, y); f.w.interact(); expect(control).not.toHaveBeenCalled();
     }

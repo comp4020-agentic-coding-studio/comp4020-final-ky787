@@ -30,7 +30,7 @@ export class CrossfeedAuthority implements WorldAuthority {
     interact(w: PuzzleWorld) {
         for (const cube of this.ordered(w)) if (cube.interact(w)) return;
         const control = this.control(w);
-        if (control && !this.room.levelState.inputs[control.id as 'switchB' | 'switchC' | 'switchD']) this.client.control(control.id);
+        if (control && !this.room.levelState.inputs[control.id as 'switchB' | 'switchC' | 'switchD'] && this.client.control(control.id)) return control.id;
     }
     hint(w: PuzzleWorld) {
         for (const cube of this.ordered(w)) { const hint = cube.hint(w); if (hint) return hint; }

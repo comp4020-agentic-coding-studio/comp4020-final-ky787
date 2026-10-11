@@ -11,6 +11,8 @@ import { CAMERA } from "../engine/constants.ts";
 import { clamp, damp } from "../engine/geometry.ts";
 import type { Box, Vec2 } from "../engine/geometry.ts";
 
+export interface CameraFrame extends Box { padding?: number }
+
 export class Camera {
   x = 0;
   y = 0;
@@ -64,7 +66,7 @@ export class Camera {
     velocity: Vec2,
     viewW: number,
     viewH: number,
-    frame: Box | null,
+    frame: CameraFrame | null,
     rail: { offsetY: number; minY: number; maxY: number } | null = null,
   ): void {
     this.viewW = viewW;
@@ -72,7 +74,7 @@ export class Camera {
     const base = this.baseZoom(viewW, viewH);
 
     if (frame) {
-      const pad = CAMERA.framePadding;
+      const pad = frame.padding ?? CAMERA.framePadding;
       const fit = Math.min(viewW / (frame.w + pad * 2), viewH / (frame.h + pad * 2));
       // An explicit overview must fit even the larger chamber on a small viewport.
       const want = Math.max(.1, Math.min(base, fit));

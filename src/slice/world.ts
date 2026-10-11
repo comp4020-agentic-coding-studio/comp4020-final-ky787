@@ -55,7 +55,8 @@ export interface WorldAuthority {
     inputs: ControllerInputs;
     checkpoint: RoomMemory['checkpoint'];
     sample(world: PuzzleWorld): void;
-    interact(world: PuzzleWorld): void;
+    /** Optional authored control ID for local presentation, never shared state. */
+    interact(world: PuzzleWorld): string | void;
     hint(world: PuzzleWorld): string;
 }
 /** Physical simulation only. Controller adapter has no access to coordinates or bodies. */
@@ -105,6 +106,9 @@ export class PuzzleWorld {
     deathFlash = 0;
     exited = false;
     events: MachineEvent[] = [];
+    /** Local input edge, independent of accepted output/snapshot changes. */
+    localControl: { id: string; sequence: number } | null = null;
+    private controlSequence = 0;
     constructor(readonly room: RoomDef, memory: RoomMemory, private controller: RoomController = roomController, private authority?: WorldAuthority) {
         this.inputs.switchB = memory.switchB;
         this.inputs.switchC = memory.switchC ?? false;
@@ -233,12 +237,17 @@ export class PuzzleWorld {
         return '';
     }
     interact(): void {
-        if (this.authority) { this.authority.interact(this); return; }
+        if (this.authority) {
+            const id = this.authority.interact(this);
+            if (id) this.localControl = { id, sequence: ++this.controlSequence };
+            return;
+        }
         const p = this.player, c = this.cube, lever = this.nearLever();
         if (c?.carried) {
             Object.assign(c, this.cubeDropTransform(), { carried: false });
         }
         else if (lever && !(lever.latch && this.inputs[lever.input])) {
+            this.localControl = { id: lever.input, sequence: ++this.controlSequence };
             this.inputs[lever.input] = !this.inputs[lever.input];
             this.emit('switch', lever.at);
             if (lever.input === 'switchC') {
