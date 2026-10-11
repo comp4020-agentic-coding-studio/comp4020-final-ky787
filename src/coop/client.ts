@@ -1,12 +1,12 @@
 import type { PlayerState } from '../engine/physics.ts';
-import { newerRoom, normalizeCode, websocketUrl, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
+import { cubeEntries, newerRoom, normalizeCode, websocketUrl, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
 import { RemoteAvatar, RemoteCube } from './remote.ts';
 import { LocalPrediction, type PredictedAction } from './prediction.ts';
 export class CoopClient {
     room: SharedRoom | null = null;
     roomReceivedAt = 0;
     private playerDiscontinuity?: Discontinuity;
-    private cubeDiscontinuity?: Discontinuity;
+    private cubeDiscontinuities: CubeMap<Discontinuity> = {};
     lastLocalDiscontinuity: { entity: string; kind: Discontinuity; at: number } | null = null;
     private machineryEvents: { kind: string; at: { x: number; y: number } }[] = [];
     private pendingControls = new Map<number, string>();
@@ -18,11 +18,13 @@ export class CoopClient {
     active = false;
     sent = 0; received = 0; reconnectAttempts = 0; lastMessageAt = 0;
     remote = new RemoteAvatar();
-    remoteCube = new RemoteCube();
+    private replicas: CubeMap<RemoteCube> = {};
+    cubeReplica(id: CubeId = 'cube'): RemoteCube { return this.replicas[id] ??= new RemoteCube(); }
+    get remoteCube() { return this.cubeReplica(); }
     cubeSent = 0; cubeReceived = 0; cubeLastAt = 0;
-    private cubeSeq = 0;
-    private cubeSentAt = 0;
-    private cargo: boolean | undefined;
+    private cubeSeq: CubeMap<number> = {};
+    private cubeSentAt: CubeMap<number> = {};
+    private placements: CubeMap<CubePlacement> = {};
     private socket: WebSocket | null = null;
     private intent: Extract<ClientMessage, { type: 'create' | 'join' }> = { type: 'create' };
     private retry?: ReturnType<typeof setTimeout>;
@@ -36,20 +38,22 @@ export class CoopClient {
     private exitSent = false;
     constructor(private onRoom: (room: SharedRoom, initial: boolean) => void, private onStatus: () => void) {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
-    get ownsCube(): boolean { return this.connected && this.room!.cube?.physicsAuthority === this.slot; }
+    get ownsCube(): boolean { return this.ownsCubeFor('cube'); }
+    ownsCubeFor(id: CubeId): boolean { return this.connected && this.room!.cubes[id]?.physicsAuthority === this.slot; }
     private acceptCubeRoom(room: SharedRoom, initial = false): void {
-        if (!room.cube) return;
-        if (room.cube.lastReset && room.cube.lastReset.epoch !== this.room?.cube?.lastReset?.epoch) {
-            if (this.prediction.cube && this.prediction.cube.kind !== 'cube-reset')
-                this.prediction.cancelCube(performance.now()); // A reset beats stale carry/pull feedback.
-            this.cubeDiscontinuity = undefined; // An unsent pre-destruction relay snap must not follow the new spawn.
-        }
-        if (initial || room.cube.epoch !== this.room?.cube?.epoch) {
-            this.remoteCube.reset(room.cube, performance.now());
-            this.cubeSeq = 0; this.cubeSentAt = 0; this.cargo = undefined;
-            this.cubeLastAt = room.cube.transform ? performance.now() : 0;
-        } else if (room.cube.transform) {
-            this.remoteCube.push(room.cube.transform, room.cube.epoch, room.cube.seq, performance.now());
+        if (initial) { this.replicas = {}; this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; }
+        for (const [id, cube] of cubeEntries(room.cubes)) {
+            const old = this.room?.cubes[id], replica = this.cubeReplica(id);
+            if (cube.lastReset && cube.lastReset.epoch !== old?.lastReset?.epoch) {
+                if (this.prediction.cube?.cubeId === id && this.prediction.cube.kind !== 'cube-reset')
+                    this.prediction.cancelCube(performance.now());
+                delete this.cubeDiscontinuities[id];
+            }
+            if (initial || cube.epoch !== old?.epoch) {
+                replica.reset(cube, performance.now());
+                this.cubeSeq[id] = 0; this.cubeSentAt[id] = 0; delete this.placements[id];
+                this.cubeLastAt = cube.transform ? performance.now() : 0;
+            } else if (cube.transform) replica.push(cube.transform, cube.epoch, cube.seq, performance.now());
         }
     }
     remembered(): string | null { try { return normalizeCode(sessionStorage.getItem('bn_coop_room') ?? ''); } catch { return null; } }
@@ -77,7 +81,7 @@ export class CoopClient {
             this.deadline = setTimeout(() => ws.close(), 8000);
             ws.onopen = () => {
                 if (generation !== this.generation) { ws.close(); return; }
-                this.lastMessageAt = performance.now(); this.actionSeq = 0; this.moveSeq = 0; this.plate = null; this.exitSent = false; this.lastSentAt = 0; this.playerDiscontinuity = undefined; this.cubeDiscontinuity = undefined;
+                this.lastMessageAt = performance.now(); this.actionSeq = 0; this.moveSeq = 0; this.plate = null; this.exitSent = false; this.lastSentAt = 0; this.playerDiscontinuity = undefined; this.cubeDiscontinuities = {};
                 this.send(this.intent);
                 this.heartbeat = setInterval(() => {
                     if (performance.now() - this.lastMessageAt > 10000) ws.close();
@@ -111,21 +115,21 @@ export class CoopClient {
                     this.pendingControls.delete(message.seq);
                     for (const [id, pending] of this.pendingCrumble) if (pending.seq === message.seq) this.pendingCrumble.delete(id);
                     const resolved = this.prediction.resolve(message.seq, generation, message.accepted, this.room!, this.slot, performance.now());
-                    if (!message.accepted) this.cargo = undefined;
+                    if (!message.accepted) this.placements = {};
                     // Reconciliation also runs for a denial with an unchanged room revision.
                     if (resolved || message.room.revision === this.room!.revision) this.onRoom(this.room!, false);
                     this.onStatus();
                 } else if (message.type === 'avatar' && message.slot !== this.slot && this.connected && this.room?.connected[message.slot - 1]) {
                     if (this.remote.push(message.avatar, message.stream, message.seq, performance.now(), message.discontinuity) && message.discontinuity === 'relay')
                         this.machineryEvents.push({ kind: 'teleport', at: message.avatar });
-                } else if (message.type === 'cube' && this.connected && !this.ownsCube) {
-                    if (this.remoteCube.push(message.transform, message.epoch, message.seq, performance.now(), message.discontinuity)) {
+                } else if (message.type === 'cube' && this.connected && !!this.room?.cubes[message.cubeId] && !this.ownsCubeFor(message.cubeId)) {
+                    if (this.cubeReplica(message.cubeId).push(message.transform, message.epoch, message.seq, performance.now(), message.discontinuity)) {
                         this.cubeReceived++; this.cubeLastAt = performance.now();
-                        if (message.discontinuity === 'relay' && !this.room?.cube?.holder) this.machineryEvents.push({ kind: 'relay-cargo', at: message.transform });
+                        if (message.discontinuity === 'relay' && !this.room?.cubes[message.cubeId]?.holder) this.machineryEvents.push({ kind: 'relay-cargo', at: message.transform });
                     }
                 } else if (message.type === 'cube-denied') {
                     // Contested/stale interactions are routine, not a room disconnection.
-                    this.cargo = undefined;
+                    this.placements = {};
                 } else if (message.type === 'error') {
                     if (message.code === 'STALE_ACTION') return;
                     const messageText = message.message;
@@ -156,14 +160,14 @@ export class CoopClient {
         if (!this.connected || this.plate === plate) return;
         if (this.send({ type: 'occupancy', seq: ++this.actionSeq, plate })) this.plate = plate;
     }
-    private predict(kind: PredictedAction, transform?: CubeTransform): boolean {
+    private predict(kind: PredictedAction, transform?: CubeTransform, cubeId: CubeId = 'cube', cause: CubeResetCause = 'firewall'): boolean {
         if (!this.connected || (kind === 'switch' ? this.prediction.switch : this.prediction.cube)) return false;
-        const seq = ++this.actionSeq, epoch = this.room!.cube?.epoch ?? 0, now = performance.now();
+        const seq = ++this.actionSeq, epoch = this.room!.cubes[cubeId]?.epoch ?? 0, now = performance.now();
         const message: ClientMessage = kind === 'switch' ? { type: kind, seq }
-            : kind === 'cube-reset' ? { type: kind, seq, epoch, cause: 'firewall' }
-            : kind === 'cube-drop' ? { type: kind, seq, epoch, transform: transform! } : { type: kind, seq, epoch };
+            : kind === 'cube-reset' ? { type: kind, cubeId, seq, epoch, cause }
+            : kind === 'cube-drop' ? { type: kind, cubeId, seq, epoch, transform: transform! } : { type: kind, cubeId, seq, epoch };
         if (!this.send(message)) return false;
-        return this.prediction.begin(kind, seq, epoch, this.generation, now);
+        return this.prediction.begin(kind, seq, epoch, this.generation, now, cubeId);
     }
     switchB(): boolean { return this.room?.level === 'pairing-bay' && !this.room.levelState.inputs.switchB && this.predict('switch'); }
     control(control: Extract<ClientMessage, { type: 'control' }>['control']): void {
@@ -179,29 +183,34 @@ export class CoopClient {
     localReset(): void {
         if (this.connected && this.send({ type: 'local-reset', seq: ++this.actionSeq })) this.plate = null;
     }
-    markDiscontinuity(entity: 'player' | 'cube', kind: Discontinuity): void {
-        if (entity === 'player') this.playerDiscontinuity = kind; else this.cubeDiscontinuity = kind;
-        this.lastLocalDiscontinuity = { entity, kind, at: performance.now() };
+    markDiscontinuity(entity: 'player' | 'cube', kind: Discontinuity, cubeId: CubeId = 'cube'): void {
+        if (entity === 'player') this.playerDiscontinuity = kind; else this.cubeDiscontinuities[cubeId] = kind;
+        this.lastLocalDiscontinuity = { entity: entity === 'cube' ? cubeId : entity, kind, at: performance.now() };
     }
     takeMachineryEvents() { return this.machineryEvents.splice(0); }
     reachExit(): void {
         if (this.connected && this.slot && this.room?.exitUnlocked && !this.room.reachedExit[this.slot - 1] && !this.exitSent)
             this.exitSent = this.send({ type: 'exit', seq: ++this.actionSeq });
     }
-    cubeAction(type: CubeAction | 'cube-drop', transform?: CubeTransform): boolean {
-        if (type === 'cube-drop' && !transform) return false;
-        return this.predict(type, transform);
+    cubeAction(type: CubeAction | 'cube-drop', transform?: CubeTransform, id: CubeId = 'cube', cause: CubeResetCause = 'firewall'): boolean {
+        if (!this.room?.cubes[id] || type === 'cube-drop' && !transform) return false;
+        if ((type === 'cube-pickup' || type === 'cube-pull-start') && cubeEntries(this.room.cubes).some(([other, c]) => other !== id
+            && (c.holder === this.slot || c.pulling && c.physicsAuthority === this.slot))) return false;
+        return this.predict(type, transform, id, cause);
     }
-    cubeOccupancy(cargo: boolean): void {
-        if (!this.ownsCube || this.prediction.cube || this.cargo === cargo) return;
-        if (this.send({ type: 'cube-occupancy', seq: ++this.actionSeq, epoch: this.room!.cube!.epoch, cargo })) this.cargo = cargo;
+    cubeOccupancy(value: CubePlacement | boolean, id: CubeId = 'cube'): void {
+        const placement = typeof value === 'boolean' ? value ? 'cargoPlate' : 'spawn' : value;
+        if (!this.ownsCubeFor(id) || this.prediction.cube?.cubeId === id || this.placements[id] === placement) return;
+        if (this.send({ type: 'cube-occupancy', cubeId: id, seq: ++this.actionSeq, epoch: this.room!.cubes[id]!.epoch, placement })) this.placements[id] = placement;
     }
-    publishCube(cube: CubeTransform, now: number): void {
-        if (!this.ownsCube || this.prediction.cube || !this.cubeDiscontinuity && now - this.cubeSentAt < 50) return;
-        this.cubeSentAt = now;
+    publishCube(cube: CubeTransform, now: number, id: CubeId = 'cube'): void {
+        const discontinuity = this.cubeDiscontinuities[id];
+        if (!this.ownsCubeFor(id) || this.prediction.cube?.cubeId === id || !discontinuity && now - (this.cubeSentAt[id] ?? 0) < 50) return;
+        this.cubeSentAt[id] = now;
         const { x, y, vx, vy, grounded } = cube;
-        if (this.send({ type: 'cube', epoch: this.room!.cube!.epoch, seq: ++this.cubeSeq, transform: { x, y, vx, vy, grounded }, ...(this.cubeDiscontinuity ? { discontinuity: this.cubeDiscontinuity } : {}) })) {
-            this.cubeDiscontinuity = undefined; this.cubeSent++; this.cubeLastAt = now;
+        if (this.send({ type: 'cube', cubeId: id, epoch: this.room!.cubes[id]!.epoch, seq: this.cubeSeq[id] = (this.cubeSeq[id] ?? 0) + 1,
+            transform: { x, y, vx, vy, grounded }, ...(discontinuity ? { discontinuity } : {}) })) {
+            delete this.cubeDiscontinuities[id]; this.cubeSent++; this.cubeLastAt = now;
         }
     }
     publish(p: PlayerState, now: number): void {
@@ -230,6 +239,7 @@ export class CoopClient {
             crumblePhases: this.room?.level === 'crumble-lab' ? Object.fromEntries(Object.entries(this.room.levelState.platforms)
                 .map(([id, p]) => [id, { ...p, remainingMs: Math.round(Math.max(0, p.remainingMs - (now - this.roomReceivedAt))) }])) : undefined,
             exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
+            cubes: this.room?.cubes, cubePlacements: this.room?.cubePlacements,
             cubeHolder: this.room?.cube?.holder, cubePhysicsAuthority: this.room?.cube?.physicsAuthority,
             cubeEpoch: this.room?.cube?.epoch, cubePlacement: this.room?.cubePlacement, cubeOnCargoPlate: this.room?.level === 'pairing-bay' && this.room.levelState.inputs.cubeOnCargoPlate,
             lastCubeReset: this.room?.cube?.lastReset ?? null,

@@ -4,6 +4,7 @@ import type { CoopClient } from './client.ts';
 import { SharedCubeAuthority } from './cube.ts';
 import { PairingAuthority, sampleExit, bodyOnPlate } from './authority.ts';
 import type { CoopLevelId, CrumbleId, SharedRoom } from './protocol.ts';
+import { CrossfeedAuthority } from './crossfeed-authority.ts';
 
 export interface CoopAuthority extends WorldAuthority { room: SharedRoom }
 const inputs = (): ControllerInputs => ({ plateA: false, plateB: false, plateC: false, cubeOnPlate: false, cubeOnPlateB: false, cubeOnPlateC: false, switchB: false, switchC: false });
@@ -102,6 +103,7 @@ export class SharedCrumbleAuthority implements CrumbleAuthority {
     }
 }
 const factories = {
+    'crossfeed-vault': (r: SharedRoom<'crossfeed-vault'>, c: CoopClient) => new CrossfeedAuthority(r, c),
     'pairing-bay': (r: SharedRoom<'pairing-bay'>, c: CoopClient) => new PairingAuthority(r, c.slot!, p => c.occupy(p), () => c.switchB(), () => c.reachExit(), new SharedCubeAuthority(c), c.prediction),
     'relay-lab': (r: SharedRoom<'relay-lab'>, c: CoopClient) => new RelayAuthority(r, c),
     'boost-lab': (r: SharedRoom<'boost-lab'>, c: CoopClient) => new BoostAuthority(r, c),
@@ -113,6 +115,6 @@ export function createCoopAuthority(room: SharedRoom, client: CoopClient): CoopA
     const factory = factories[room.level] as (room: SharedRoom, client: CoopClient) => CoopAuthority;
     const authority = factory(room, client);
     authority.reset = () => client.localReset();
-    authority.discontinuity = (entity, reason) => client.markDiscontinuity(entity, reason);
+    authority.discontinuity = (entity, reason, cubeId) => client.markDiscontinuity(entity, reason, cubeId);
     return authority;
 }

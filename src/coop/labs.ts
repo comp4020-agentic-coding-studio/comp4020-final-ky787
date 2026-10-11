@@ -1,9 +1,11 @@
 import type { RoomDef } from '../slice/rooms.ts';
 import type { CoopLevelId, Slot } from './protocol.ts';
 import { pairingBay } from './pairing-bay.ts';
+import { crossfeedVault } from './crossfeed-vault.ts';
 
-/** Hand-authored mechanics laboratories, all using mock controllers. */
+/** Hand-authored co-op rooms: accepted mechanics labs and the provisional chamber. */
 export const COOP_LABS: Record<CoopLevelId, { title: string; description: string; room: (slot: Slot) => RoomDef }> = {
+    'crossfeed-vault': { title: 'CROSSFEED VAULT', description: 'First full cooperative puzzle', room: crossfeedVault },
     'pairing-bay': { title: 'PAIRING BAY', description: 'Shared inputs, cube handoff, two-player finish', room: pairingBay },
     'firewall-lab': { title: 'FIREWALL LAB', description: 'Static beams, local respawn, shared cube recovery', room: slot => ({
         id: 'firewall-lab', title: 'FIREWALL LAB', instruction: 'BEAMS STAY LIVE. TEST THE CUBE, THEN REGROUP.',

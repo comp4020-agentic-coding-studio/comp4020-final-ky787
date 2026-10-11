@@ -1,3 +1,4 @@
+import { cubeEntries } from '../coop/protocol.ts';
 import { EvidenceInspector } from './evidence-inspector.ts';
 import { FIXED_DT, MAX_FRAME_TIME } from '../engine/constants.ts';
 import { InputManager } from '../ui/input.ts';
@@ -125,7 +126,9 @@ export class SliceGame {
             this.renderer.room(this.world); this.sound.reset(this.world);
             this.input.releaseAll(); this.accumulated = 0;
             this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
-            this.started = !this.coopPaused; this.canvas.focus();
+            this.overviewVisible = room.level === 'crossfeed-vault' && initial && room.checkpoint === 'entry';
+            this.overviewPending = this.overviewVisible; this.startButton.hidden = !this.overviewVisible;
+            this.started = !this.coopPaused && !this.overviewVisible; this.canvas.focus();
             this.audio.setActive(this.started && !document.hidden && document.hasFocus());
             this.audio.play('latch', .45);
         } else if (this.authority) {
@@ -133,10 +136,12 @@ export class SliceGame {
             const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
             const events = this.world.events.splice(0);
-            if (!switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever! });
+            if (!switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
             if (previous.checkpoint !== room.checkpoint) events.push({ kind: 'checkpoint', at: this.world.checkpointPosition() });
             if (previous.level === 'lift-lab' && room.level === 'lift-lab' && !previous.levelState.liftLatched && room.levelState.liftLatched)
                 events.push({ kind: 'lift-latch', at: this.world.room.upperLever! });
+            if (previous.level === 'crossfeed-vault' && room.level === 'crossfeed-vault') for (const id of ['switchC', 'switchD'] as const)
+                if (!previous.levelState.inputs[id] && room.levelState.inputs[id]) events.push({ kind: 'switch', at: this.world.room.controls!.find(c => c.id === id)!.at });
             this.sound.observe(this.world, events);
             for (const event of events) {
                 if (event.kind === 'crumble') this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
@@ -154,7 +159,7 @@ export class SliceGame {
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;
         const status = !this.coop.connected ? this.coop.status
             : r && !r.connected[partner] ? r.assigned[partner] ? 'PARTNER DISCONNECTED' : 'WAITING FOR PARTNER'
-            : r?.completed ? r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
+            : r?.completed ? r.level === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
             : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();
@@ -247,9 +252,10 @@ export class SliceGame {
         <small>All rooms available · keeps each room’s saved progress</small>
       </nav>
       <section class="coop-entry" aria-label="Co-op">
-        <span class="eyebrow">CO-OP LABS</span>
-        <p class="fine">Two players. Shared mechanics. Mock test controllers.</p>
-        <div class="coop-labs">${Object.entries(COOP_LABS).map(([id, lab]) => `<div class="coop-lab"><div><strong>${lab.title}</strong><small>${lab.description}</small></div><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div>
+        <span class="eyebrow">CO-OP CHAMBERS</span>
+        <div class="coop-lab"><div><strong>CROSSFEED VAULT</strong><small>First full cooperative puzzle</small></div><button data-create-lab="crossfeed-vault">CREATE ROOM</button></div>
+        <span class="eyebrow">MECHANICS LABS</span>
+        <div class="coop-labs">${Object.entries(COOP_LABS).filter(([id]) => id !== 'crossfeed-vault').map(([id, lab]) => `<div class="coop-lab"><div><strong>${lab.title}</strong><small>${lab.description}</small></div><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div>
         <form id="join-room-form"><label for="join-code">ROOM CODE</label><input id="join-code" name="code" maxlength="8" placeholder="7K3M" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button id="join-room" type="submit">JOIN ROOM</button></form>
         <p id="join-error" role="status"></p>
       </section>
@@ -374,13 +380,13 @@ export class SliceGame {
         }
     }
     snapshot() {
-        return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, inputs: this.world.inputs, outputs: this.world.frame.outputs,
+        return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, cubes: this.world.cubes, inputs: this.world.inputs, outputs: this.world.frame.outputs,
             multiplayer: this.coopMode ? { ...this.coop.diagnostics(), ...this.supportDiagnostics(), shared: this.coop.room, remote: this.coop.remote.sample(performance.now()) } : null,
             source: this.world.frame.source, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,
-            firewalls: this.world.firewalls.map(f => ({ id: f.def.id, ...f.box })), lastDeath: this.world.lastDeath, cubeResetting: this.world.cubeResetting,
+            firewalls: this.world.firewalls.map(f => ({ id: f.def.id, ...f.box })), lastDeath: this.world.lastDeath, cubeResetting: this.world.cubeResetting, resettingCubes: cubeEntries(this.world.cubes).filter(([id]) => this.world.cubeIsResetting(id)).map(([id]) => id),
             connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             audio: this.audio.snapshot(),
@@ -388,7 +394,7 @@ export class SliceGame {
     }
     private supportDiagnostics() {
         const support = this.world.partnerCubeSupport;
-        return { partnerCubeSupportActive: !!support, supportCarrierSlot: support?.carrier ?? null,
+        return { partnerCubeSupportActive: !!support, supportCubeId: support?.cubeId ?? null, supportCarrierSlot: support?.carrier ?? null,
             supportPosition: support ? { x: support.surface.x, y: support.surface.y } : null,
             groundedOnPartnerCube: this.world.groundedOnPartnerCube };
     }
@@ -452,16 +458,15 @@ export class SliceGame {
         this.sound.ambience(this.world, this.started && !document.hidden && document.hasFocus());
         this.audio.meter();
         if (this.coopMode) {
-            this.authority?.cube?.sync(this.world);
-            this.authority?.crumble?.sync(this.world);
+            this.world.syncAuthority();
             this.sound.observe(this.world, this.coop.takeMachineryEvents());
             this.coop.publish(this.world.player, now);
-            if (this.world.cube && !this.world.cubeResetting) this.coop.publishCube(this.world.cube, now);
+            for (const [id, cube] of cubeEntries(this.world.cubes)) if (!this.world.cubeIsResetting(id)) this.coop.publishCube(cube, now, id);
         }
         this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
-                remotePullingCube: !!this.coop.room?.cube?.pulling && !this.coop.ownsCube } : undefined);
+                remotePullingCubes: cubeEntries(this.coop.room?.cubes ?? {}).filter(([id, c]) => c.pulling && !this.coop.ownsCubeFor(id)).map(([id]) => id) } : undefined);
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
         if (replay.trace) {

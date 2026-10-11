@@ -272,7 +272,7 @@ try {
                 JSON.stringify({ placement: restored.multiplayer?.cubePlacement, cube: restored.cube, access: restored.outputs.codePlatformA }));
         if (!process.argv[2]) {
             const disk = JSON.parse(await readFile(join(temporary, 'data', 'rooms', `${code}.json`), 'utf8'));
-            check('restart room file contains semantic placement without physics or ownership', disk.version === 4 && disk.cubePlacement === 'cargoPlate'
+            check('restart room file contains semantic placement without physics or ownership', disk.version === 5 && disk.cubePlacements.cube === 'cargoPlate'
                 && !['cube', 'holder', 'physicsAuthority', 'x', 'y', 'vx', 'vy', 'transform'].some(k => k in disk));
             await finalAccess(holder); await finalAccess(runner);
         } else await finalAccess(holder);

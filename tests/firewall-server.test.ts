@@ -11,21 +11,21 @@ it.each([1, 2] as const)('P%s alone may reset its cube: broadcasts, stale stream
     const owner = slot === 1 ? p1 : p2, replica = slot === 1 ? p2 : p1;
     owner.send({ type: 'control', control: 'firewallCheckpoint', seq: 1 });
     await replica.wait('room', m => m.room.checkpoint === 'reunion');
-    owner.send({ type: 'cube-pickup', epoch: initial.cube.epoch, seq: 2 });
+    owner.send({ type: 'cube-pickup', cubeId: 'cube' as const, epoch: initial.cube.epoch, seq: 2 });
     const carried = (await replica.wait('room', m => m.room.cube.holder === slot)).room;
     const transform = { x: 500, y: 580, vx: 0, vy: 0, grounded: false };
-    owner.send({ type: 'cube', epoch: carried.cube.epoch, seq: 1, transform }); await replica.wait('cube');
-    replica.send({ type: 'cube-reset', epoch: carried.cube.epoch, seq: 1, cause: 'firewall' });
+    owner.send({ type: 'cube', cubeId: 'cube' as const, epoch: carried.cube.epoch, seq: 1, transform }); await replica.wait('cube');
+    replica.send({ type: 'cube-reset', cubeId: 'cube' as const, epoch: carried.cube.epoch, seq: 1, cause: 'firewall' });
     expect((await replica.wait('action-result', m => m.seq === 1)).accepted).toBe(false);
-    owner.send({ type: 'cube-reset', epoch: carried.cube.epoch, seq: 3, cause: 'firewall' });
+    owner.send({ type: 'cube-reset', cubeId: 'cube' as const, epoch: carried.cube.epoch, seq: 3, cause: 'firewall' });
     const reset = await owner.wait('action-result', m => m.seq === 3);
     expect(reset.accepted).toBe(true);
     expect(reset.room.cube).toMatchObject({ holder: null, pulling: false, physicsAuthority: slot, epoch: carried.cube.epoch + 1, seq: -1, transform: null,
         lastReset: { cause: 'firewall', epoch: carried.cube.epoch + 1 } });
     const accepted = (await replica.wait('room', m => !!m.room.cube.lastReset)).room;
     expect(accepted).toEqual(reset.room); expect(accepted.cubePlacement).toBe('spawn');
-    owner.send({ type: 'cube', epoch: carried.cube.epoch, seq: 999, transform });
-    owner.send({ type: 'cube-reset', epoch: carried.cube.epoch, seq: 4, cause: 'firewall' });
+    owner.send({ type: 'cube', cubeId: 'cube' as const, epoch: carried.cube.epoch, seq: 999, transform });
+    owner.send({ type: 'cube-reset', cubeId: 'cube' as const, epoch: carried.cube.epoch, seq: 4, cause: 'firewall' });
     const stale = await owner.wait('action-result', m => m.seq === 4);
     expect(stale.accepted).toBe(false); expect(stale.room.cube).toEqual(accepted.cube);
     // Ordinary local death does not clear the checkpoint, latch, or other arrival.
@@ -38,24 +38,24 @@ it.each([1, 2] as const)('P%s alone may reset its cube: broadcasts, stale stream
     back.send({ type: 'join', code: initial.code });
     expect((await back.wait('snapshot')).room.cube).toMatchObject({ transform: null, holder: null, epoch: accepted.cube.epoch });
     const disk = JSON.parse(await readFile(join(dir, 'rooms', initial.code + '.json'), 'utf8'));
-    expect(disk).toMatchObject({ cubePlacement: 'spawn', checkpoint: 'reunion', levelState: { checkpointSet: true } });
+    expect(disk).toMatchObject({ cubePlacements: { cube: 'spawn' }, checkpoint: 'reunion', levelState: { checkpointSet: true } });
     expect(disk).not.toHaveProperty('cube'); expect(disk).not.toHaveProperty('firewalls');
 });
 it('destruction clears durable cargo placement, survives restart, and invalidates pull ownership', async () => {
     const dir = await directory(), app = await launch(dir), id = await identity(app.url), p = await connect(app.url, id.cookie);
     p.send({ type: 'create', level: 'pairing-bay' }); const start = (await p.wait('snapshot')).room;
     p.send({ type: 'switch', seq: 1 }); await p.wait('action-result', m => m.seq === 1);
-    p.send({ type: 'cube-occupancy', epoch: start.cube.epoch, seq: 2, cargo: true });
+    p.send({ type: 'cube-occupancy', cubeId: 'cube' as const, epoch: start.cube.epoch, seq: 2, placement: 'cargoPlate' });
     expect((await p.wait('action-result', m => m.seq === 2)).room.cubePlacement).toBe('cargoPlate');
-    p.send({ type: 'cube-reset', epoch: start.cube.epoch, seq: 3, cause: 'firewall' });
+    p.send({ type: 'cube-reset', cubeId: 'cube' as const, epoch: start.cube.epoch, seq: 3, cause: 'firewall' });
     const reset = (await p.wait('action-result', m => m.seq === 3)).room;
     expect(reset.cubePlacement).toBe('spawn'); expect(reset.checkpoint).toBe('reunion');
     const path = join(dir, 'rooms', start.code + '.json');
-    expect(JSON.parse(await readFile(path, 'utf8')).cubePlacement).toBe('spawn');
-    p.send({ type: 'cube-pull-start', epoch: reset.cube.epoch, seq: 4 });
+    expect(JSON.parse(await readFile(path, 'utf8')).cubePlacements.cube).toBe('spawn');
+    p.send({ type: 'cube-pull-start', cubeId: 'cube' as const, epoch: reset.cube.epoch, seq: 4 });
     const pulled = (await p.wait('action-result', m => m.seq === 4)).room;
     expect(pulled.cube.pulling).toBe(true);
-    p.send({ type: 'cube-reset', epoch: pulled.cube.epoch, seq: 5, cause: 'firewall' });
+    p.send({ type: 'cube-reset', cubeId: 'cube' as const, epoch: pulled.cube.epoch, seq: 5, cause: 'firewall' });
     expect((await p.wait('action-result', m => m.seq === 5)).room.cube).toMatchObject({ pulling: false, epoch: pulled.cube.epoch + 1, transform: null });
     await kill(app.child); const restarted = await launch(dir), back = await connect(restarted.url, id.cookie);
     back.send({ type: 'join', code: start.code });

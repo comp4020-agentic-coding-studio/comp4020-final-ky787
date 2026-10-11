@@ -7,7 +7,7 @@ import { type ControllerInputs, type ControllerFrame, type RoomController } from
 import type { RoomMemory } from './progress.ts';
 import type { Platform, RoomDef } from './rooms.ts';
 import { LiftField, RelayGatePair } from './machinery.ts';
-import type { Discontinuity, Slot } from '../coop/protocol.ts';
+import { cubeEntries, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type Discontinuity, type Slot } from '../coop/protocol.ts';
 import { firewallBox, touchingFirewall, type Firewall } from './firewall.ts';
 export type DeathCause = 'reset' | 'hazard' | 'fall' | 'firewall';
 export interface Cube extends LooseBody {
@@ -33,9 +33,9 @@ export interface CubeAuthority {
     readonly heldLocally: boolean;
     readonly cargoVisual?: boolean;
     readonly resetting?: boolean;
-    firewall?(world: PuzzleWorld): boolean;
+    firewall?(world: PuzzleWorld, cause?: CubeResetCause): boolean;
     /** Local avatar movement only: never architecture, a cube body, sensor or anchor. */
-    readonly partnerSupport?: { carrier: Slot; surface: Solid } | null;
+    readonly partnerSupport?: { cubeId?: CubeId; carrier: Slot; surface: Solid } | null;
     consumeCorrection?(): boolean;
     sync(world: PuzzleWorld): void;
     pull(start: boolean, held: boolean): boolean;
@@ -46,9 +46,10 @@ export interface CubeAuthority {
 export interface CrumbleAuthority { sync(world: PuzzleWorld): void; sample(world: PuzzleWorld): void }
 export interface WorldAuthority {
     cube?: CubeAuthority;
+    cubes?: CubeMap<CubeAuthority>;
     crumble?: CrumbleAuthority;
     reset?(): void;
-    discontinuity?(entity: 'player' | 'cube', reason: Discontinuity): void;
+    discontinuity?(entity: 'player' | 'cube', reason: Discontinuity, cubeId?: CubeId): void;
     frame: ControllerFrame;
     inputs: ControllerInputs;
     checkpoint: RoomMemory['checkpoint'];
@@ -59,7 +60,21 @@ export interface WorldAuthority {
 /** Physical simulation only. Controller adapter has no access to coordinates or bodies. */
 export class PuzzleWorld {
     player = createPlayer(0, 0);
-    cube: Cube | null = null;
+    cubes: CubeMap<Cube> = {};
+    /** Legacy single-cube view; C8 and accepted one-cube labs retain their API. */
+    get cube(): Cube | null { return this.cubes.cube ?? null; }
+    cubeAuthority(id: CubeId = 'cube') { return this.authority?.cubes?.[id] ?? (id === 'cube' ? this.authority?.cube : undefined); }
+    private syncCubes() { for (const [id] of cubeEntries(this.cubes)) this.cubeAuthority(id)?.sync(this); }
+    cubeIsResetting(id: CubeId) { return this.cubeAuthority(id)?.resetting ?? false; }
+    cubeSpawn(id: CubeId = 'cube'): Vec2 | undefined { return id === 'cube' ? this.room.cube : this.room.cubes?.find(c => c.id === id)?.spawn; }
+    cubePlacementPosition(id: CubeId, placement: CubePlacement = 'spawn'): Vec2 {
+        const at = placement === 'cargoPlate' ? this.room.cargoPlate : this.room.cubePads?.find(p => p.id === placement)?.at;
+        return at ? { x: at.x, y: at.y - CUBE_SIZE / 2 } : this.cubeSpawn(id)!;
+    }
+    setCubePulling(id: CubeId, on: boolean) { if (on) this.pullingCubeId = id; else if (this.pullingCubeId === id) this.pullingCubeId = null; }
+    pullingCubeId: CubeId | null = null;
+    get pullingCube() { return this.pullingCubeId !== null; }
+    set pullingCube(on: boolean) { this.pullingCubeId = on ? this.pullingCubeId ?? 'cube' : null; }
     platforms: PlatformState[];
     solids: Solid[];
     door: Solid;
@@ -74,13 +89,13 @@ export class PuzzleWorld {
     plateDepthB = 0;
     plateDepthC = 0;
     cargoPlateDepth = 0;
-    consumeCubeCorrection() { return this.authority?.cube?.consumeCorrection?.() ?? false; }
+    consumeCubeCorrection() { return cubeEntries(this.cubes).map(([id]) => this.cubeAuthority(id)?.consumeCorrection?.() ?? false).some(Boolean); }
     get cargoPlateActive() { return this.authority?.cube?.cargoVisual ?? this.inputs.cubeOnPlate; }
-    get partnerCubeSupport() { return this.authority?.cube?.partnerSupport ?? null; }
-    get groundedOnPartnerCube() { return this.player.grounded && this.player.groundId === 'partner-cube-support'; }
+    get partnerCubeSupport() { return cubeEntries(this.cubes).map(([id]) => this.cubeAuthority(id)?.partnerSupport).find(Boolean) ?? null; }
+    get groundedOnPartnerCube() { return this.player.grounded && !!this.player.groundId?.startsWith('partner-cube-support'); }
     get cubeResetting() { return this.authority?.cube?.resetting ?? false; }
     keyboardGrapple = false;
-    private cubeSolid: Solid = { id: 'cube-body', x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
+    private cubeSolids: CubeMap<Solid> = {};
     doorOpen = 0;
     displayPulse = 0;
     elapsed = 0;
@@ -88,7 +103,6 @@ export class PuzzleWorld {
     lastDeath: { cause: DeathCause; at: Vec2; firewallId?: string } | null = null;
     deathFlash = 0;
     exited = false;
-    pullingCube = false;
     events: MachineEvent[] = [];
     constructor(readonly room: RoomDef, memory: RoomMemory, private controller: RoomController = roomController, private authority?: WorldAuthority) {
         this.inputs.switchB = memory.switchB;
@@ -102,8 +116,11 @@ export class PuzzleWorld {
         if (room.cube) {
             const plate = memory.cubeOnPlateC ? room.plateC : memory.cubeOnPlateB ? room.plateB : memory.cubeOnPlate ? room.plate : undefined;
             const at = plate ? { x: plate.x, y: plate.y - CUBE_SIZE / 2 } : this.cubeHome()!;
-            this.cube = { ...at, vx: 0, vy: 0, carried: false, grounded: true, groundId: 'near' };
+            this.cubes.cube = { ...at, vx: 0, vy: 0, carried: false, grounded: true, groundId: 'near' };
         }
+        for (const def of room.cubes ?? []) this.cubes[def.id] = { ...def.spawn, vx: 0, vy: 0, carried: false, grounded: true, groundId: null };
+        for (const [id] of cubeEntries(this.cubes)) this.cubeSolids[id] = { id: id === 'cube' ? 'cube-body' : `cube-body:${id}`,
+            x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
         this.platforms = room.platforms.map(def => ({ def, pulse: 0, fuse: -1, fuseDuration: .6, respawn: 0,
             solid: { ...def, oneWay: def.kind !== 'static', enabled: def.kind !== 'code', grappleable: def.kind !== 'static' && def.kind !== 'code', grappleHeight: Math.min(CODE_SLAB_HEIGHT, def.h), grapplePoint: def.anchor ? { x: def.x + def.w / 2, y: def.y + 6 } : undefined } }));
         this.door = { ...room.exit, id: 'exit-door', oneWay: false, enabled: true, grappleable: false };
@@ -111,7 +128,7 @@ export class PuzzleWorld {
             { id: 'left-wall', x: -40, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false },
             { id: 'right-wall', x: room.width, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false }];
         this.frame = this.authority?.frame ?? this.controller.evaluate(room.id, this.inputs);
-        this.authority?.cube?.sync(this);
+        this.syncCubes();
         this.samplePlate();
         this.evaluate();
         this.authority?.crumble?.sync(this);
@@ -163,10 +180,12 @@ export class PuzzleWorld {
         return controls.find(s => s.at && Math.hypot(this.player.x - s.at.x, this.player.y - (s.at.y - 25)) < 72);
     }
     private updateCubeSolid(): void {
-        const c = this.cube;
-        // Only a resting cube supports the player: no midair drop/jump ladder exploit.
-        this.cubeSolid.enabled = !!c && !c.carried && c.grounded;
-        if (c) { this.cubeSolid.x = c.x - CUBE_SIZE / 2; this.cubeSolid.y = c.y - CUBE_SIZE / 2; }
+        for (const [id, c] of cubeEntries(this.cubes)) {
+            const solid = this.cubeSolids[id]!;
+            // Resting only; each payload independently supports the avatar.
+            solid.enabled = !this.cubeIsResetting(id) && !c.carried && c.grounded;
+            solid.x = c.x - CUBE_SIZE / 2; solid.y = c.y - CUBE_SIZE / 2;
+        }
     }
     private evaluate(): void {
         const old = this.frame.outputs;
@@ -175,6 +194,7 @@ export class PuzzleWorld {
             this.checkpoint = this.authority.checkpoint;
         }
         this.frame = this.authority?.frame ?? this.controller.evaluate(this.room.id, { ...this.inputs });
+        for (const p of this.platforms) if (p.def.openWhen) p.solid.enabled = !this.frame.outputs[p.def.openWhen];
         for (const p of this.platforms) {
             if (p.def.kind !== 'code')
                 continue;
@@ -246,7 +266,7 @@ export class PuzzleWorld {
     respawn(cause: DeathCause = 'reset', firewallId?: string): void {
         const at = { x: this.player.x, y: this.player.y };
         this.lastDeath = { cause, at, ...(firewallId ? { firewallId } : {}) };
-        this.authority?.cube?.release(this);
+        for (const [id] of cubeEntries(this.cubes)) this.cubeAuthority(id)?.release(this);
         this.authority?.reset?.();
         this.player = createPlayer(...this.spawnPoint());
         this.authority?.discontinuity?.('player', 'respawn');
@@ -258,22 +278,21 @@ export class PuzzleWorld {
         this.events.push({ kind: 'death', at: cause === 'firewall' ? at : { x: this.player.x, y: this.player.y }, cause, firewallId });
     }
     private carriedPose(): void {
-        if (this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally)) Object.assign(this.cube, {
-            x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2,
-            vx: 0, vy: 0, grounded: false,
+        for (const [id, c] of cubeEntries(this.cubes)) if (c.carried && (!this.cubeAuthority(id) || this.cubeAuthority(id)!.heldLocally)) Object.assign(c, {
+            x: this.player.x, y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE / 2, vx: 0, vy: 0, grounded: false,
         });
     }
-    private cubeFirewall(): boolean {
-        const c = this.cube;
-        if (!c || !this.firewalls.length || this.cubeResetting) return this.cubeResetting;
+    private cubeFirewall(id: CubeId = 'cube'): boolean {
+        const c = this.cubes[id], authority = this.cubeAuthority(id);
+        if (!c || !this.firewalls.length || this.cubeIsResetting(id)) return this.cubeIsResetting(id);
         const hit = touchingFirewall(this.firewalls, { x: c.x - CUBE_SIZE / 2, y: c.y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE });
         if (!hit) return false;
         const at = { x: c.x, y: c.y };
-        if (this.authority?.cube) {
-            if (!this.authority.cube.firewall?.(this)) return false;
+        if (authority) {
+            if (!authority.firewall?.(this)) return false;
         } else {
-            Object.assign(c, this.room.cube, { vx: 0, vy: 0, carried: false, grounded: false, groundId: null });
-            this.pullingCube = false;
+            Object.assign(c, this.cubeSpawn(id), { vx: 0, vy: 0, carried: false, grounded: false, groundId: null });
+            this.setCubePulling(id, false);
         }
         this.events.push({ kind: 'cube-firewall', at, cause: 'firewall', firewallId: hit.def.id });
         return true;
@@ -281,23 +300,23 @@ export class PuzzleWorld {
     private playerFirewall(): boolean {
         if (!this.firewalls.length) return false;
         this.carriedPose();
-        this.cubeFirewall(); // Payload contact must be reported before death releases it.
+        for (const [id] of cubeEntries(this.cubes)) this.cubeFirewall(id); // Payload contact must be reported before death releases it.
         const hit = touchingFirewall(this.firewalls, playerBox(this.player));
         if (!hit) return false;
         this.respawn('firewall', hit.def.id);
         return true;
     }
-    returnCube(): void {
-        if (this.authority?.cube && !this.authority.cube.simulates) return;
-        if (!this.cube || !this.room.cube)
-            return;
-        Object.assign(this.cube, this.cubeHome(), { vx: 0, vy: 0, carried: false, grounded: false });
-        this.authority?.discontinuity?.('cube', 'recovery');
-        this.pullingCube = false;
+    returnCube(id: CubeId = 'cube'): void {
+        const c = this.cubes[id], authority = this.cubeAuthority(id);
+        if (!c || authority && !authority.simulates) return;
+        if (authority) { authority.firewall?.(this, 'recovery'); return; }
+        Object.assign(c, id === 'cube' ? this.cubeHome() : this.cubeSpawn(id), { vx: 0, vy: 0, carried: false, grounded: false });
+        this.authority?.discontinuity?.('cube', 'recovery', id);
+        this.setCubePulling(id, false);
         this.emit('cube-return');
     }
     cancelGrapple(): void {
-        this.authority?.cube?.cancelPull();
+        for (const [id] of cubeEntries(this.cubes)) this.cubeAuthority(id)?.cancelPull();
         this.keyboardGrapple = false;
         this.pullingCube = false;
         releaseRope(this.player, false);
@@ -334,37 +353,26 @@ export class PuzzleWorld {
         if (this.keyboardGrapple) input.grappleHeld = true;
     }
     private hookCube(input: InputState): void {
-        const c = this.cube, p = this.player;
-        if (!c || c.carried || this.room.id === 'pressure' || p.groundId === this.cubeSolid.id) {
-            this.authority?.cube?.cancelPull();
-            this.pullingCube = false;
-            return;
-        }
-        const start = input.grapplePressed && Math.hypot(input.aim.x - c.x, input.aim.y - c.y) < 55 && Math.hypot(c.x - p.x, c.y - p.y) < GRAPPLE.maxRange;
-        if (this.authority?.cube) {
-            const pulling = this.authority.cube.pull(start, input.grappleHeld && Math.hypot(c.x - p.x, c.y - p.y) <= GRAPPLE.maxRange + 30);
+        const p = this.player;
+        const candidate = input.grapplePressed ? cubeEntries(this.cubes).filter(([id, c]) => !c.carried && !this.cubeIsResetting(id)
+            && p.groundId !== this.cubeSolids[id]!.id && Math.hypot(input.aim.x - c.x, input.aim.y - c.y) < 55
+            && Math.hypot(c.x - p.x, c.y - p.y) < GRAPPLE.maxRange)
+            .sort((a, b) => Math.hypot(input.aim.x - a[1].x, input.aim.y - a[1].y) - Math.hypot(input.aim.x - b[1].x, input.aim.y - b[1].y))[0]?.[0] : undefined;
+        for (const [id, c] of cubeEntries(this.cubes)) {
+            const authority = this.cubeAuthority(id);
+            if (c.carried || this.room.id === 'pressure' || p.groundId === this.cubeSolids[id]!.id) {
+                authority?.cancelPull(); this.setCubePulling(id, false); continue;
+            }
+            const start = candidate === id;
+            const held = input.grappleHeld && Math.hypot(c.x - p.x, c.y - p.y) <= GRAPPLE.maxRange + 30;
+            const pulling = authority ? authority.pull(start, held) : held && (start || this.pullingCubeId === id);
             if (start) { input.grapplePressed = false; releaseRope(p, false); }
-            if (pulling && !this.pullingCube) this.emit('cube-pull');
-            this.pullingCube = pulling;
-        } else if (start) {
-            // Cube is a pullable body, never inserted into the anchor/solid list.
-            this.pullingCube = true;
-            releaseRope(p, false);
-            this.emit('cube-pull');
-        }
-        if (!input.grappleHeld || Math.hypot(c.x - p.x, c.y - p.y) > GRAPPLE.maxRange + 30)
-            this.pullingCube = false;
-        if (!this.pullingCube)
-            return;
-        const dx = p.x - c.x, dy = p.y - CUBE_SIZE / 2 - c.y, d = Math.hypot(dx, dy);
-        if (d > CUBE_SIZE) {
-            c.grounded = false;
-            c.vx = dx / d * Math.min(330, d * 5);
-            c.vy = dy / d * Math.min(330, d * 5) - 55;
-        }
-        else {
-            c.vx = 0;
-            c.vy = 0;
+            if (pulling && this.pullingCubeId !== id) this.emit('cube-pull');
+            this.setCubePulling(id, pulling);
+            if (!pulling) continue;
+            const dx = p.x - c.x, dy = p.y - CUBE_SIZE / 2 - c.y, d = Math.hypot(dx, dy);
+            if (d > CUBE_SIZE) { c.grounded = false; c.vx = dx / d * Math.min(330, d * 5); c.vy = dy / d * Math.min(330, d * 5) - 55; }
+            else { c.vx = 0; c.vy = 0; }
         }
     }
     step(dt: number, rawInput: InputState, interact = false): void {
@@ -372,7 +380,7 @@ export class PuzzleWorld {
             return;
         this.elapsed += dt;
         this.deathFlash = Math.max(0, this.deathFlash - dt);
-        this.authority?.cube?.sync(this);
+        this.syncCubes();
         this.authority?.crumble?.sync(this);
         if (interact)
             this.interact();
@@ -385,27 +393,25 @@ export class PuzzleWorld {
         this.evaluate();
         for (const machine of [...this.lifts, ...this.gates]) machine.step(dt);
         this.keyboardHook(input);
-        if (this.keyboardGrapple) { this.authority?.cube?.cancelPull(); this.pullingCube = false; }
+        if (this.keyboardGrapple) { for (const [id] of cubeEntries(this.cubes)) this.cubeAuthority(id)?.cancelPull(); this.pullingCube = false; }
         else this.hookCube(input);
         if (this.pullingCube) {
             input.grappleHeld = false;
             input.grapplePressed = false;
         }
-        if (this.cube && !this.cube.carried && (!this.authority?.cube || this.authority.cube.simulates)) {
-            const c = this.cube;
+        for (const [id, c] of cubeEntries(this.cubes)) if (!c.carried && (!this.cubeAuthority(id) || this.cubeAuthority(id)!.simulates)) {
+            const authority = this.cubeAuthority(id);
             const field = this.lifts.map(l => l.influence(c, CUBE_SIZE, CUBE_SIZE)).find(Boolean);
-            stepBody(c, CUBE_SIZE, this.solids, this.pullingCube ? 300 : CARRY.cubeGravity, CARRY.cubeMaxFall, dt, field);
-            if (!this.cubeFirewall()) for (const pair of this.gates) if (pair.teleport('cube', c, CUBE_SIZE, CUBE_SIZE, this.solids, this.room)) {
+            stepBody(c, CUBE_SIZE, this.solids, this.pullingCubeId === id ? 300 : CARRY.cubeGravity, CARRY.cubeMaxFall, dt, field);
+            if (!this.cubeFirewall(id)) for (const pair of this.gates) if (pair.teleport(id, c, CUBE_SIZE, CUBE_SIZE, this.solids, this.room)) {
                 this.cubeTransferred = true;
-                this.pullingCube = false;
-                this.authority?.cube?.cancelPull();
-                this.authority?.discontinuity?.('cube', 'relay');
-                this.emit('relay-cargo', c);
-                break;
+                this.setCubePulling(id, false); authority?.cancelPull();
+                this.authority?.discontinuity?.('cube', 'relay', id);
+                this.emit('relay-cargo', c); break;
             }
-            if (!this.cubeFirewall() && (c.y > this.room.height || this.room.hazards.some(h => boxesOverlap(h, {
+            if (!this.cubeFirewall(id) && (c.y > this.room.height || this.room.hazards.some(h => boxesOverlap(h, {
                 x: c.x - CUBE_SIZE / 2, y: c.y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE,
-            })))) this.returnCube();
+            })))) this.returnCube(id);
         }
         this.updateCubeSolid();
         const field = this.lifts.map(l => l.influence(this.player, PLAYER.width, PLAYER.height)).find(Boolean);
@@ -417,13 +423,13 @@ export class PuzzleWorld {
         }
         const wasAttached = this.player.rope.phase === 'attached';
         const support = this.partnerCubeSupport?.surface;
-        if (this.player.groundId === 'partner-cube-support' && (!support
+        if (this.player.groundId?.startsWith('partner-cube-support') && (!support
             || this.player.x + PLAYER.width / 2 <= support.x || this.player.x - PLAYER.width / 2 >= support.x + support.w
             || Math.abs(this.player.y + PLAYER.height / 2 - support.y) > 1.5)) {
             this.player.grounded = false;
             this.player.groundId = null;
         }
-        const movementSolids = [...this.solids, ...(this.cubeSolid.enabled ? [this.cubeSolid] : []), ...(support ? [support] : [])];
+        const movementSolids = [...this.solids, ...Object.values(this.cubeSolids).filter(s => s.enabled), ...(support ? [support] : [])];
         stepPlayer(this.player, input, movementSolids, dt, field);
         if (!wasAttached && this.player.rope.phase === 'attached') this.emit('grapple');
         if (this.keyboardGrapple && (this.player.grounded || ['idle', 'retracting'].includes(this.player.rope.phase))) {
@@ -431,19 +437,20 @@ export class PuzzleWorld {
             releaseRope(this.player, false);
         }
         if (this.playerFirewall()) return;
-        const carrying = this.cube?.carried && (!this.authority?.cube || this.authority.cube.heldLocally);
+        const carrying = cubeEntries(this.cubes).find(([id, c]) => c.carried && (!this.cubeAuthority(id) || this.cubeAuthority(id)!.heldLocally))?.[0];
         // A shared loose cube selects a bounded outward egress lane. Keep all room
         // geometry and full carried-payload/bounds checks; preserve C8 clearance.
         // Partner support is movement-only and never participates in clearance.
-        const egressSolids = this.cubeSolid.enabled && !this.authority?.cube ? [...this.solids, this.cubeSolid] : this.solids;
+        const restingCubes = Object.values(this.cubeSolids).filter(s => s.enabled);
+        const egressSolids = !this.authority ? [...this.solids, ...restingCubes] : this.solids;
         for (const pair of this.gates) if (pair.teleport('player', this.player, carrying ? CUBE_SIZE : PLAYER.width, PLAYER.height,
-            egressSolids, this.room, carrying ? CARRY.holdGap + CUBE_SIZE : 0, this.authority?.cube ? this.cubeSolid : undefined)) {
+            egressSolids, this.room, carrying ? CARRY.holdGap + CUBE_SIZE : 0, this.authority ? restingCubes : undefined)) {
             this.cancelGrapple();
             this.player.coyote = 0;
             this.player.jumpBuffer = 0;
             this.emit('teleport');
             this.authority?.discontinuity?.('player', 'relay');
-            if (carrying) { this.cubeTransferred = true; this.emit('relay-cargo'); this.authority?.discontinuity?.('cube', 'relay'); }
+            if (carrying) { this.cubeTransferred = true; this.emit('relay-cargo'); this.authority?.discontinuity?.('cube', 'relay', carrying); }
             break;
         }
         this.carriedPose();
@@ -496,5 +503,5 @@ export class PuzzleWorld {
     }
     target(aim: Vec2) { return this.room.id === 'pressure' ? null : findGrappleTarget(this.player, aim, this.solids, this.player.groundId); }
     /** Apply accepted state even while menus or a reconnect pause local simulation. */
-    syncAuthority(): void { if (this.authority) { this.authority.cube?.sync(this); this.authority.crumble?.sync(this); this.evaluate(); } }
+    syncAuthority(): void { if (this.authority) { this.syncCubes(); this.authority.crumble?.sync(this); this.evaluate(); } }
 }

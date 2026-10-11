@@ -1,3 +1,4 @@
+import type { CubeId, CubePlacement } from '../coop/protocol.ts';
 import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
 import type { ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
@@ -13,6 +14,8 @@ export interface Platform extends Box {
     /** Authored load tolerance; proof classifies code, not this physical timer. */
     hookCrumbleDelay?: number;
     signal?: keyof ControllerOutputs;
+    /** Authored solid service door; an accepted output opens it permanently. */
+    openWhen?: keyof ControllerOutputs;
     anchor?: boolean;
     label?: string;
 }
@@ -25,6 +28,10 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     spawn: Vec2;
     checkpoint: Vec2;
     cube?: Vec2;
+    cubes?: { id: CubeId; spawn: Vec2; mark: string }[];
+    cubePads?: { id: Exclude<CubePlacement, 'spawn'>; at: Vec2; label: string }[];
+    controls?: { id: 'switchB' | 'switchC' | 'switchD'; at: Vec2; label: string }[];
+    regions?: { at: Vec2; label: string }[];
     plate?: Vec2;
     plateB?: Vec2;
     plateC?: Vec2;

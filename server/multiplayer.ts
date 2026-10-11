@@ -3,11 +3,11 @@ import { randomInt } from 'node:crypto';
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { WebSocketServer, WebSocket } from 'ws';
-import { CODE_ALPHABET, normalizeCode, parseClientMessage, type ClientMessage, type Plate, type ServerMessage, type SharedCube, type Slot } from '../src/coop/protocol.ts';
-import { acceptCubeSnapshot, assignCube, freshCube, interactCube } from './cube-state.ts';
+import { CODE_ALPHABET, normalizeCode, parseClientMessage, type ClientMessage, type Plate, type ServerMessage, type SharedCube, type CubeMap, type Slot } from '../src/coop/protocol.ts';
+import { acceptCubeSnapshot, assignCube, interactCube } from './cube-state.ts';
 import { atomicJson } from './atomic-json.ts';
 import { sameOrigin, visitorCookie } from './identity.ts';
-import { definition, newRecord, sharedRoom, readRoomRecord, type RoomRecord } from './coop-state.ts';
+import { definition, newRecord, sharedRoom, freshCubes, readRoomRecord, type RoomRecord } from './coop-state.ts';
 import { advanceCrumble, crumbleDue, freshCrumble, type CrumbleRuntime } from './crumble-state.ts';
 
 interface Peer {
@@ -17,7 +17,7 @@ interface Peer {
 }
 interface Room {
     record: RoomRecord; peers: [Peer | null, Peer | null]; plates: [Plate, Plate];
-    cube: SharedCube | null; crumble: CrumbleRuntime; revision: number; needsPersist: boolean;
+    cubes: CubeMap<SharedCube>; crumble: CrumbleRuntime; revision: number; needsPersist: boolean;
     idleSince: number; failed: boolean;
 }
 export interface ActionTiming { action: string; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
@@ -51,9 +51,9 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         peer.ws.send(JSON.stringify(message));
     }
     const error = (peer: Peer, code: string, message = code.replaceAll('_', ' ')) => send(peer, { type: 'error', code, message });
-    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cube, room.crumble), revision: room.revision });
+    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cubes, room.crumble), revision: room.revision });
     // Explicit durable projection. Live occupancy, owners, streams and transforms are absent.
-    const durable = (room: Room) => JSON.stringify([room.record.levelState, room.record.checkpoint, room.record.cubePlacement,
+    const durable = (room: Room) => JSON.stringify([room.record.levelState, room.record.checkpoint, room.record.cubePlacements,
         room.record.exitUnlocked, room.record.reachedExit, room.record.completed]);
     const broadcast = (room: Room) => { for (const p of room.peers) if (p) send(p, { type: 'room', room: view(room) }); };
     const ownsSlot = (p: Peer): p is Peer & { room: Room; slot: Slot } => !!p.room && !!p.slot && p.room.peers[p.slot - 1] === p && !p.room.failed;
@@ -77,7 +77,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         const record = readRoomRecord(value, code);
         if (!record) throw new Error('Invalid room record');
         if (rooms.size >= 64) throw new Error('Room capacity');
-        const room: Room = { record, revision: record.revision, needsPersist: (value as { version?: number }).version !== 4, cube: definition(record.level).cube ? freshCube() : null, crumble: freshCrumble(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
+        const room: Room = { record, revision: record.revision, needsPersist: (value as { version?: number }).version !== 5, cubes: freshCubes(record.level), crumble: freshCrumble(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
         rooms.set(code, room);
         return room;
     }
@@ -85,9 +85,9 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         if (!ownsSlot(peer)) return;
         const room = peer.room, index = peer.slot - 1;
         room.peers[index] = null; room.plates[index] = null; room.idleSince = Date.now();
-        if (room.cube?.physicsAuthority === peer.slot) {
+        for (const cube of Object.values(room.cubes)) if (cube.physicsAuthority === peer.slot) {
             const remaining = room.peers.findIndex(Boolean);
-            assignCube(room.cube, remaining < 0 ? null : (remaining + 1) as Slot);
+            assignCube(cube, remaining < 0 ? null : (remaining + 1) as Slot);
         }
         room.revision++;
         broadcast(room);
@@ -108,7 +108,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             if (!code) { error(peer, 'SERVER_BUSY'); return; }
             const level = message.level ?? 'pairing-bay';
             room = { record: newRecord(code, peer.visitor, level), revision: 0, needsPersist: true,
-                cube: definition(level).cube ? freshCube() : null, crumble: freshCrumble(),
+                cubes: freshCubes(level), crumble: freshCrumble(),
                 peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
             rooms.set(code, room);
         } else {
@@ -134,11 +134,11 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         peer.room = room; peer.slot = (index + 1) as Slot;
         room.peers[index] = peer; room.plates[index] = null; room.revision++;
         // A replacement is a release too: a refreshed browser is never a ghost holder.
-        if (previous && room.cube?.physicsAuthority === peer.slot) {
+        for (const cube of Object.values(room.cubes)) if (previous && cube.physicsAuthority === peer.slot) {
             const partner = room.peers[1 - index];
-            assignCube(room.cube, partner?.slot ?? peer.slot);
-        } else if (room.cube?.physicsAuthority === null) {
-            assignCube(room.cube, room.peers[0] ? 1 : 2);
+            assignCube(cube, partner?.slot ?? peer.slot);
+        } else if (cube.physicsAuthority === null) {
+            assignCube(cube, room.peers[0] ? 1 : 2);
         }
         if (room.needsPersist) {
             room.record.revision = room.revision;
@@ -158,18 +158,24 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         peer.actionSeq = message.seq;
         const room = peer.room, index = peer.slot - 1, before = durable(room);
         if ('epoch' in message) {
-            const denied = () => { result(false); send(peer, { type: 'cube-denied', seq: message.seq }); };
-            if (!room.cube) { denied(); return; }
+            const denied = () => { result(false); send(peer, { type: 'cube-denied', cubeId: message.cubeId, seq: message.seq }); };
+            const cube = room.cubes[message.cubeId], def = definition(room.record.level);
+            if (!cube || !def.cubeIds.includes(message.cubeId)) { denied(); return; }
             if (message.type === 'cube-occupancy') {
-                if (room.record.level !== 'pairing-bay' || message.epoch !== room.cube.epoch || room.cube.physicsAuthority !== peer.slot
-                    || message.cargo && (!definition(room.record.level).cubeEnabled(room.record) || room.cube.holder !== null || room.cube.pulling)) { denied(); return; }
-                const placement = message.cargo ? 'cargoPlate' : 'spawn';
-                if (room.record.cubePlacement === placement) { result(true); return; }
-                room.record.cubePlacement = placement;
+                const placement = message.placement;
+                if (message.epoch !== cube.epoch || cube.physicsAuthority !== peer.slot
+                    || placement !== 'spawn' && (!def.cubeEnabled(room.record, message.cubeId) || cube.holder !== null || cube.pulling
+                        || !def.acceptsPlacement?.(room.record, placement)
+                        || Object.entries(room.record.cubePlacements).some(([id, p]) => id !== message.cubeId && p === placement))) { denied(); return; }
+                if (room.record.cubePlacements[message.cubeId] === placement) { result(true); return; }
+                room.record.cubePlacements[message.cubeId] = placement;
             } else {
-                if ((message.type !== 'cube-reset' && !definition(room.record.level).cubeEnabled(room.record))
-                    || !interactCube(room.cube, peer.slot, message)) { denied(); return; }
-                if (message.type !== 'cube-pull-stop') room.record.cubePlacement = 'spawn';
+                const anotherControlled = Object.entries(room.cubes).some(([id, c]) => id !== message.cubeId
+                    && (c.holder === peer.slot || c.pulling && c.physicsAuthority === peer.slot));
+                if ((message.type === 'cube-pickup' || message.type === 'cube-pull-start') && anotherControlled
+                    || message.type !== 'cube-reset' && !def.cubeEnabled(room.record, message.cubeId)
+                    || !interactCube(cube, peer.slot, message)) { denied(); return; }
+                if (message.type !== 'cube-pull-stop') room.record.cubePlacements[message.cubeId] = 'spawn';
             }
             await commitAction(room, before, timing);
             result(true); broadcast(room);
@@ -183,7 +189,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         } else if (message.type === 'local-reset') {
             // Death/reset affects this body only. A pending pickup is serialized before this release.
             room.plates[index] = null;
-            if (room.cube?.physicsAuthority === peer.slot && (room.cube.holder || room.cube.pulling)) assignCube(room.cube, peer.slot);
+            for (const cube of Object.values(room.cubes)) if (cube.physicsAuthority === peer.slot && (cube.holder || cube.pulling)) assignCube(cube, peer.slot);
         } else if (message.type === 'exit') {
             if (!room.record.exitUnlocked) { result(false); error(peer, 'INVALID_ACTION'); return; }
             if (room.record.reachedExit[index]) { result(true); return; }
@@ -218,22 +224,25 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         if (!visitor) { reject(401); return; }
         if (peers.size >= 128) { reject(503); return; }
         wss.handleUpgrade(req, socket, head, ws => {
-            const peer: Peer = { ws, visitor, actionSeq: -1, avatarSeq: -1, stream: ++stream, alive: true, joinedAt: Date.now(), tokens: 80, refilled: Date.now(), pending: 0 };
+            const peer: Peer = { ws, visitor, actionSeq: -1, avatarSeq: -1, stream: ++stream, alive: true, joinedAt: Date.now(), tokens: 120, refilled: Date.now(), pending: 0 };
             peers.add(peer);
             ws.on('error', () => {}); // Protocol violations close this socket, never the process.
             ws.on('pong', () => { peer.alive = true; });
             ws.on('close', () => { peers.delete(peer); serial(() => disconnect(peer)); });
             ws.on('message', (bytes, binary) => {
                 const now = Date.now();
-                peer.tokens = Math.min(80, peer.tokens + (now - peer.refilled) * .06); peer.refilled = now;
+                // Avatar + two independent cube streams = 60 Hz; retain bounded input headroom.
+                peer.tokens = Math.min(120, peer.tokens + (now - peer.refilled) * .09); peer.refilled = now;
                 if (--peer.tokens < 0 || peer.pending >= 8 || queued >= 256) { error(peer, 'RATE_LIMITED'); ws.close(1008, 'Too many messages'); return; }
                 const message = binary ? null : parseClientMessage(bytes.toString());
                 if (!message) { error(peer, 'INVALID_MESSAGE'); ws.close(1008, 'Invalid message'); return; }
                 if (message.type === 'ping') { send(peer, { type: 'pong' }); return; }
                 if (message.type === 'cube') {
-                    if (!ownsSlot(peer) || !peer.room.cube || !acceptCubeSnapshot(peer.room.cube, peer.slot, message)) return;
+                    if (!ownsSlot(peer)) return;
+                    const cube = peer.room.cubes[message.cubeId];
+                    if (!cube || !acceptCubeSnapshot(cube, peer.slot, message)) return;
                     for (const other of peer.room.peers) if (other && other !== peer)
-                        send(other, { ...message, transform: peer.room.cube.transform! });
+                        send(other, { ...message, transform: cube.transform! });
                     return;
                 }
                 if (message.type === 'avatar') {

@@ -6,7 +6,7 @@ import type { PuzzleWorld } from './world.ts';
 /** Authored physical wiring, NEVER native control-flow edges or trace timing. */
 export interface MachineConnection {
     id: string;
-    input: keyof ControllerInputs;
+    input: keyof ControllerInputs | 'switchD';
     output: keyof ControllerOutputs;
     points: Vec2[];
 }
@@ -15,6 +15,22 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
     const add = (id: string, input: MachineConnection['input'], output: MachineConnection['output'], points: Vec2[]) => wires.push({ id, input, output, points });
     const above = (p: Vec2) => ({ x: p.x, y: p.y - 12 });
     const elbow = (from: Vec2, to: Vec2, y: number) => [from, { x: from.x, y }, { x: to.x, y }, to];
+    if (r.id === 'crossfeed-vault') {
+        const control = (id: string) => above(r.controls!.find(c => c.id === id)!.at);
+        const lift = r.lifts![0], anchor = r.platforms.find(p => p.signal === 'grappleAnchor')!;
+        add('body-anchor', 'plateA', 'grappleAnchor', elbow(above(r.plate!), { x: anchor.x, y: anchor.y + 12 }, 1330));
+        add('bridge-latch', 'switchB', 'bridge', elbow(control('switchB'), { x: 2220, y: 1500 }, 1420));
+        add('cargo-lift', 'cubeOnPlate', 'liftField', elbow(above(r.cubePads![0].at), { x: lift.x + lift.w, y: 1420 }, 1430));
+        add('lift-latch', 'switchC', 'liftField', elbow(control('switchC'), { x: lift.x, y: 790 }, 670));
+        for (const gate of r.gates![0].gates) add(`relay-${gate.id}`, 'switchC', 'relayGates', elbow(control('switchC'), { x: gate.x, y: gate.y }, 1020));
+        add('service-latch', 'switchC', 'relayGates', elbow(control('switchC'), { x: 1318, y: 1120 }, 1040));
+        add('upper-route', 'switchD', 'codePlatformA', elbow(control('switchD'), { x: 2800, y: 750 }, 690));
+        for (const pad of r.cubePads!.slice(1)) add(`cargo-${pad.id}`, pad.id === 'finalLeft' ? 'cubeOnPlateB' : 'cubeOnPlateC', 'codePlatformB',
+            elbow(above(pad.at), { x: pad.at.x, y: 400 }, 530));
+        for (const [at, input] of [[r.plateB!, 'plateB'], [r.plateC!, 'plateC']] as const)
+            add(`vault-${input}`, input, 'exitDoor', elbow(above(at), { x: r.exit.x + r.exit.w / 2, y: r.exit.y }, 130));
+        return wires;
+    }
     const anchor = r.platforms.find(p => p.id === 'anchor');
     if (anchor) {
         const source = r.id === 'switch' ? r.lever! : r.plate!;
@@ -70,8 +86,8 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
     return wires;
 }
 /** Show the source signal even while the destination waits for other inputs. */
-export function connectionPowered(link: MachineConnection, w: Pick<PuzzleWorld, 'inputs'>): boolean {
-    return w.inputs[link.input];
+export function connectionPowered(link: MachineConnection, w: Pick<PuzzleWorld, 'inputs'> & Partial<Pick<PuzzleWorld, 'frame'>>): boolean {
+    return link.input === 'switchD' ? !!w.frame?.outputs.codePlatformA : w.inputs[link.input];
 }
 /** Constant-speed motion along the authored wire, not a simulated CPU signal delay. */
 export function connectionPulse(points: readonly Vec2[], seconds: number): Vec2 {

@@ -67,9 +67,13 @@ The goal is not to disguise an obfuscation study as a game.
 
 The goal is to make a good cooperative game whose strange machinery genuinely comes from the reverse-engineering work behind it.
 
-## Multiplayer infrastructure: CO-OP LABS
+## Cooperative chambers and mechanics labs
 
-The menu offers separate two-player **CO-OP LABS**. Create a
+The menu offers **CO-OP CHAMBERS** and separate **MECHANICS LABS**.
+[CROSSFEED VAULT](docs/crossfeed-vault.md) is the first full chamber: two named
+payloads, temporary lift power, relay logistics, a partner boost and a final
+two-cube/two-player assembly. Its mock logical contract is provisional until
+human playtest acceptance; no binary integration is claimed. Create a
 room, share its four-character code, and join from a different browser profile or
 private window. PAIRING BAY tests shared inputs and cube handoff. Either player can hold the anchor online or cross first and
 latch the return bridge. Two distinct bodies on separate final plates permanently
@@ -89,9 +93,10 @@ infrastructure. The C8 campaign and CONTROL SPINE's validated evidence remain
 separate, and personal campaign saves keep their existing format.
 
 See [the multiplayer contract and test flow](docs/c9-multiplayer.md) and
-[the authority ADR](docs/adr/0001-multiplayer-authority.md). The latest relay
-egress fix, partner-held boost and static firewalls await two-computer human playtesting before
-expanding final co-op stages.
+[the authority ADR](docs/adr/0001-multiplayer-authority.md). The existing lab
+mechanics were manually accepted before CROSSFEED development. CROSSFEED now
+requires its own human two-computer puzzle playtest before contract freezing or
+binary generation.
 
 ## Run locally
 

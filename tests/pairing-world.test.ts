@@ -9,7 +9,7 @@ import { sharedRoom, type RoomRecord } from '../server/coop-state.ts';
 import type { Plate, Slot } from '../src/coop/protocol.ts';
 
 function setup(slot: Slot) {
-    const r: RoomRecord<'pairing-bay'> = { version: 4, cubePlacement: 'spawn', code: 'ABCD', level: 'pairing-bay', revision: 1,
+    const r: RoomRecord<'pairing-bay'> = { version: 5, cubePlacements: { cube: 'spawn' }, code: 'ABCD', level: 'pairing-bay', revision: 1,
         visitors: ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
         levelState: { switchB: false }, checkpoint: 'entry', exitUnlocked: false, reachedExit: [false, false], completed: false,
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };

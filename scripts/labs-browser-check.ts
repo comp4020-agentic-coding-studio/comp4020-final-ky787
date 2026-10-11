@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { isCoopLevel } from '../src/coop/protocol.ts';
 const level = process.argv[2];
-if (!isCoopLevel(level) || level === 'pairing-bay') throw new Error('Choose relay-lab, lift-lab, crumble-lab, boost-lab or firewall-lab');
+if (!isCoopLevel(level) || level === 'pairing-bay' || level === 'crossfeed-vault') throw new Error('Choose relay-lab, lift-lab, crumble-lab, boost-lab or firewall-lab');
 const h = await coopBrowser({ shots: process.argv[4] });
 const { key, tap, walk, wait, snapshot, check, click, mouse, shot, sleep } = h;
 const labState = (s: GameSnapshot) => s.multiplayer?.shared;
@@ -69,7 +69,18 @@ async function relay(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
     check('carried cube follows snapped holder without ownership transfer', carried.multiplayer?.cubeHolder === actorSlot && carried.multiplayer.cubePhysicsAuthority === actorSlot && carried.multiplayer.cubeEpoch === carryEpoch);
     // Drop from a jump beside B so only loose cargo travels back to A.
     await wait(actor, 'carried arrival lands', s => s.player.grounded);
-    await walk(actor, 1120); await walk(actor, 1090);
+    await walk(actor, 1120);
+    // walk() permits stopping drift. Align deliberately, then face the gate;
+    // a second short walk can otherwise reverse facing and drop away from B.
+    for (let n = 0; n < 25; n++) {
+        const dx = 1084 - (await snapshot(actor)).player.x;
+        if (Math.abs(dx) < 5) break;
+        const direction = dx > 0 ? 'KeyD' : 'KeyA';
+        await key(actor, direction, true); await sleep(25); await key(actor, direction, false); await sleep(120);
+    }
+    await key(actor, 'KeyA', true); await sleep(25); await key(actor, 'KeyA', false); await sleep(120);
+    const dropper = (await snapshot(actor)).player;
+    check('reverse drop is beside B and facing into its volume', dropper.x > 1068 && dropper.x < 1095 && dropper.facing === -1);
     await key(actor, 'Space', true);
     try {
         await wait(actor, 'jump beside B', s => s.player.y < 548);
@@ -146,7 +157,17 @@ async function boost(a: Cdp, b: Cdp, holderSlot: 1 | 2) {
     await walk(climber, 720); await tap(climber, 'KeyE');
     await wait(holder, 'shared switch opens return steps', s => s.outputs.bridge && s.multiplayer?.shared?.exitUnlocked === true);
     check('upper switch leaves holder below and opens a permanent return route', (await snapshot(holder)).player.groundId === 'floor');
-    await walk(holder, 330); await hop(holder, 345); await hop(holder, 495); await hop(holder, 650);
+    await walk(holder, 330);
+    // Give each step a full jump before walking toward the next ledge. The
+    // short first hop otherwise cuts jump height as soon as its x target is met.
+    for (const [x, top, ground] of [[345, 510, 'return-step-low'], [495, 430, 'return-step-high'], [650, 410, 'upper']] as const) {
+        await key(holder, 'Space', true);
+        try {
+            await wait(holder, `return jump clears ${ground}`, s => !s.player.grounded && s.player.y + 17 < top - 4);
+            await walk(holder, x);
+        } finally { await key(holder, 'Space', false); }
+        await wait(holder, `return landing on ${ground}`, s => s.player.grounded && s.player.groundId === ground);
+    }
     await wait(holder, 'holder regroups on upper ledge', s => s.player.groundId === 'upper');
     await shot(climber, 'regroup');
     await finish(a, b, 985);

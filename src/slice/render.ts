@@ -1,3 +1,4 @@
+import { cubeEntries, type CubeId } from '../coop/protocol.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
@@ -66,7 +67,7 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean }): void {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }): void {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
@@ -74,7 +75,7 @@ export class PuzzleRenderer {
         if (r.id === 'uplink' && w.frame.outputs.exitDoor && !this.exitWasOpen) this.returnReveal = 2.2;
         this.exitWasOpen = w.frame.outputs.exitDoor;
         this.returnReveal = Math.max(0, this.returnReveal - dt);
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' || r.id === 'lift-lab' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' || r.id === 'lift-lab' || r.id === 'crossfeed-vault' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;
@@ -105,6 +106,7 @@ export class PuzzleRenderer {
         for (const p of w.platforms) {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };
             if (b.kind === 'static') {
+                if (!p.solid.enabled) continue;
                 c.fillStyle = C.wall;
                 c.fillRect(b.x, b.y, b.w, b.h);
                 this.line(b.x, b.y, b.x + b.w, b.y, C.line, 3);
@@ -158,6 +160,7 @@ export class PuzzleRenderer {
             for (const p of w.platforms.filter(p => p.def.signal === 'codePlatformB'))
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
         }
+        for (const region of r.regions ?? []) this.text(region.label, region.at.x, region.at.y, 24, C.dim);
         drawMachinery(c, w, this.presentation);
         drawFirewalls(c, w.firewalls, w.elapsed);
         if (r.id === 'uplink') {
@@ -170,10 +173,11 @@ export class PuzzleRenderer {
             }
         }
         const plates = [
-            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'lift-lab' ? 'HOLD / LIFT POWER' : r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
-            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
-            { at: r.plateC, active: r.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'crossfeed-vault' ? 'A' : r.id === 'lift-lab' ? 'HOLD / LIFT POWER' : r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'crossfeed-vault' ? 'VAULT / LEFT' : r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
+            { at: r.plateC, active: r.id === 'pairing-bay' || r.id === 'crossfeed-vault' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'crossfeed-vault' ? 'VAULT / RIGHT' : r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
             { at: r.cargoPlate, active: w.cargoPlateActive, depth: w.cargoPlateDepth, label: 'CARGO PLATE / CUBE ONLY' },
+            ...(r.cubePads ?? []).map(p => ({ at: p.at, active: p.id === 'liftCargo' ? w.inputs.cubeOnPlate : p.id === 'finalLeft' ? w.inputs.cubeOnPlateB : w.inputs.cubeOnPlateC, depth: 0, label: p.label })),
         ];
         for (const plate of plates) {
             if (!plate.at) continue;
@@ -190,6 +194,7 @@ export class PuzzleRenderer {
         for (const lever of [
             { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
             { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
+            ...(r.controls ?? []).map(s => ({ at: s.at, active: s.id === 'switchD' ? w.frame.outputs.codePlatformA : w.inputs[s.id], name: s.label, latch: true })),
         ]) {
             if (!lever.at) continue;
             const { x, y } = lever.at;
@@ -201,7 +206,7 @@ export class PuzzleRenderer {
             this.ring(x + dx, y - 72, 7, C.ink);
             this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, y + 40, 13, lever.active ? C.cyan : C.amber);
         }
-        if (r.id !== 'uplink') {
+        if (r.id !== 'uplink' && r.id !== 'crossfeed-vault') {
             const feedback = this.presentation.describe(r.id, w.frame);
             const displayOn = feedback.active, message = feedback.text;
             c.fillStyle = '#111f29';
@@ -222,7 +227,7 @@ export class PuzzleRenderer {
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
         this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
         if (isCoopLevel(r.id)) {
-            this.text(players?.completed ? r.id === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
+            this.text(players?.completed ? r.id === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.id === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
             if (w.frame.outputs.exitDoor) this.text(`${players?.reachedExit.filter(Boolean).length ?? 0} / 2 ARRIVED`, e.x + 8, e.y + 38, 12, C.cyan);
         }
         drawMachineListings(c, w, this.replay, this.presentation);
@@ -230,20 +235,20 @@ export class PuzzleRenderer {
         this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
         c.fillStyle = C.cyan;
         c.fillRect(checkpoint.x, checkpoint.y - 47, 20, 10);
-        if (w.cube && !w.cubeResetting) {
-            const cube = w.cube;
+        for (const [id, cube] of cubeEntries(w.cubes)) if (!w.cubeIsResetting(id)) {
             c.fillStyle = '#393b32';
             c.fillRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
             c.strokeStyle = C.amber;
             c.lineWidth = 3;
             c.strokeRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
-            this.ring(cube.x, cube.y, 8, C.amber);
-            if (w.pullingCube) {
+            const mark = r.cubes?.find(c => c.id === id)?.mark;
+            if (mark) this.text(mark, cube.x - 6, cube.y + 6, 18, C.amber); else this.ring(cube.x, cube.y, 8, C.amber);
+            if (w.pullingCubeId === id) {
                 c.setLineDash([6, 5]);
                 this.line(w.player.x, w.player.y, cube.x, cube.y, C.amber);
                 c.setLineDash([]);
             }
-            if (players?.remotePullingCube && players.remote) {
+            if ((players?.remotePullingCubes?.includes(id) || id === 'cube' && players?.remotePullingCube) && players?.remote) {
                 c.setLineDash([6, 5]);
                 this.line(players.remote.x, players.remote.y, cube.x, cube.y, C.amber);
                 c.setLineDash([]);
@@ -289,7 +294,7 @@ export class PuzzleRenderer {
             this.text('SAFE FLOOR · RETURN TO CARGO', 1200, 660, 12, C.dim);
             this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1670, 240, 14, C.ink);
         }
-        if (isCoopLevel(r.id) && r.id !== 'pairing-bay') {
+        if (isCoopLevel(r.id) && r.id !== 'pairing-bay' && r.id !== 'crossfeed-vault') {
             this.text('MOCK MECHANICS LAB · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
             if (r.id === 'relay-lab') {
                 this.text('E · POWER CONTROL', 305, 410, 13, C.cyan);

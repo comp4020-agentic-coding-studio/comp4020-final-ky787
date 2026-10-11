@@ -111,6 +111,8 @@ async function connect(url: string): Promise<Cdp> {
     });
     await send("Runtime.enable");
     await send("Page.enable");
+    // Match the co-op harness: OS/headless focus changes must not cancel held keys.
+    await send("Emulation.setFocusEmulationEnabled", { enabled: true });
     return { send, close: () => socket.close(), errors };
 }
 async function evaluate<T>(cdp: Cdp, expression: string): Promise<T> {
@@ -386,12 +388,15 @@ async function liftRide(cdp: Cdp) {
         await click(cdp, '#continue');
         await waitFor(cdp, 'lift hum resumes', s => s.audio.loops.includes('liftHum'));
         const original = await cdp.send('Target.getTargetInfo') as { targetInfo: { targetId: string } };
+        // This assertion intentionally tests real blur/visibility behavior.
+        await cdp.send('Emulation.setFocusEmulationEnabled', { enabled: false });
         const other = await cdp.send('Target.createTarget', { url: 'about:blank' }) as { targetId: string };
         await cdp.send('Target.activateTarget', { targetId: other.targetId }); await sleep(200);
         check('background tab silences lift and reel', !(await snap(cdp)).audio.active && (await snap(cdp)).audio.voices === 0);
         await cdp.send('Target.activateTarget', { targetId: original.targetInfo.targetId });
         await cdp.send('Target.closeTarget', { targetId: other.targetId });
         await waitFor(cdp, 'lift sound after returning to tab', s => s.audio.loops.includes('liftHum'));
+        await cdp.send('Emulation.setFocusEmulationEnabled', { enabled: true });
         checkedLiftAudio = true;
     }
     await shot(cdp, 'control-spine-lift-rider');
@@ -764,6 +769,8 @@ async function main() {
             writeFileSync(join(SHOTS, 'last-snapshot.json'), JSON.stringify(await snap(cdp), null, 2));
         }
         console.log(`screenshots: ${SHOTS}`);
+        // Brave's launcher can exit before its owned browser process.
+        await cdp?.send('Browser.close');
         cdp?.close();
         browser.kill();
         rmSync(browser.profile, { recursive: true, force: true });

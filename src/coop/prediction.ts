@@ -1,8 +1,8 @@
-import type { CubeAction, SharedRoom, Slot } from './protocol.ts';
+import type { CubeId, CubeAction, SharedRoom, Slot } from './protocol.ts';
 
 export type PredictedAction = CubeAction | 'cube-drop' | 'switch';
 export interface PendingAction {
-    kind: PredictedAction; seq: number; epoch: number; generation: number;
+    kind: PredictedAction; cubeId: CubeId; seq: number; epoch: number; generation: number;
     predictedAt: number; sentAt: number;
 }
 export interface ActionResult extends PendingAction {
@@ -15,17 +15,17 @@ export class LocalPrediction {
     switch: PendingAction | null = null;
     cubeResult: ActionResult | null = null;
     last: Partial<Record<PredictedAction, ActionResult>> = {};
-    begin(kind: PredictedAction, seq: number, epoch: number, generation: number, now: number): boolean {
+    begin(kind: PredictedAction, seq: number, epoch: number, generation: number, now: number, cubeId: CubeId = 'cube'): boolean {
         const key = kind === 'switch' ? 'switch' : 'cube';
         if (this[key]) return false;
-        this[key] = { kind, seq, epoch, generation, predictedAt: now, sentAt: now };
+        this[key] = { kind, cubeId, seq, epoch, generation, predictedAt: now, sentAt: now };
         return true;
     }
     resolve(seq: number, generation: number, accepted: boolean, room: SharedRoom, slot: Slot, now: number): boolean {
         const key = this.cube?.seq === seq ? 'cube' : this.switch?.seq === seq ? 'switch' : null;
         const pending = key && this[key];
         if (!key || !pending || pending.generation !== generation) return false;
-        const c = room.cube;
+        const c = room.cubes[pending.cubeId];
         const matches = pending.kind === 'switch' ? room.level === 'pairing-bay' && room.levelState.inputs.switchB
             : !c ? false
             : pending.kind === 'cube-pickup' ? c.holder === slot && c.physicsAuthority === slot && c.epoch > pending.epoch

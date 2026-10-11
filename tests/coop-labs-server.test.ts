@@ -17,9 +17,10 @@ async function pair<L extends CoopLevelId>(level: L) {
 it.each(COOP_LEVELS)('creator selects %s, joiner discovers it, and only that level state is durable', async level => {
     const { dir, code, first, second, app, a } = await pair(level);
     expect(first.room.level).toBe(level); expect(second.room.level).toBe(level);
-    expect(first.room.cube === null).toBe(level === 'crumble-lab');
+    expect(Object.keys(first.room.cubes)).toEqual(level === 'crumble-lab' ? [] : level === 'crossfeed-vault' ? ['cubeA', 'cubeB'] : ['cube']);
+    expect(first.room.cube === null).toBe(level === 'crumble-lab' || level === 'crossfeed-vault');
     const disk = JSON.parse(await readFile(join(dir, 'rooms', code + '.json'), 'utf8'));
-    expect(disk.version).toBe(4); expect(disk.level).toBe(level);
+    expect(disk.version).toBe(5); expect(disk.level).toBe(level);
     expect(disk.levelState).toEqual(newRecord(code, a.id, level).levelState);
     for (const name of ['cube', 'plates', 'crumble', 'transform', 'physicsAuthority', 'connected']) expect(disk).not.toHaveProperty(name);
     await kill(app.child); const restarted = await launch(dir), back = await connect(restarted.url, a.cookie);
@@ -60,16 +61,16 @@ it.each([1, 2] as Slot[])('relay by P%s forwards semantic snaps, keeps cube auth
     source.send({ type: 'control', seq: 2, control: 'relayPower' });
     const powered = (await remote.wait('room', m => m.room.levelState.relayEnabled)).room;
     expect(powered.exitUnlocked).toBe(true); expect(powered.completed).toBe(false);
-    source.send({ type: 'cube-pickup', seq: 3, epoch: first.room.cube.epoch });
+    source.send({ type: 'cube-pickup', cubeId: 'cube' as const, seq: 3, epoch: first.room.cube.epoch });
     const held = (await remote.wait('room', m => m.room.cube.holder === slot)).room;
     source.send({ type: 'avatar', seq: 1, avatar, discontinuity: 'relay' });
     expect(await remote.wait('avatar')).toMatchObject({ slot, discontinuity: 'relay', avatar });
     const transform = { x: 1080, y: 500, vx: 0, vy: 0, grounded: false };
-    source.send({ type: 'cube', seq: 1, epoch: held.cube.epoch, transform, discontinuity: 'relay' });
+    source.send({ type: 'cube', cubeId: 'cube' as const, seq: 1, epoch: held.cube.epoch, transform, discontinuity: 'relay' });
     expect(await remote.wait('cube')).toMatchObject({ epoch: held.cube.epoch, discontinuity: 'relay', transform });
-    source.send({ type: 'cube-drop', seq: 4, epoch: held.cube.epoch, transform });
+    source.send({ type: 'cube-drop', cubeId: 'cube' as const, seq: 4, epoch: held.cube.epoch, transform });
     const dropped = (await remote.wait('room', m => m.room.cube.holder === null && m.room.cube.epoch > held.cube.epoch)).room;
-    source.send({ type: 'cube', seq: 1, epoch: dropped.cube.epoch, transform, discontinuity: 'relay' });
+    source.send({ type: 'cube', cubeId: 'cube' as const, seq: 1, epoch: dropped.cube.epoch, transform, discontinuity: 'relay' });
     expect((await remote.wait('cube', m => m.epoch === dropped.cube.epoch)).discontinuity).toBe('relay');
     source.send({ type: 'exit', seq: 5 });
     const arrival = (await remote.wait('room', m => m.room.reachedExit[slot - 1])).room;
@@ -84,7 +85,7 @@ it.each([1, 2] as Slot[])('P%s powers the lift, reset releases only that body/ca
     const { p1, p2, first, dir, app, code, a } = await pair('lift-lab'), peers = [p1, p2], operator = peers[slot - 1], rider = peers[2 - slot];
     operator.send({ type: 'occupancy', seq: 1, plate: 'liftControl' });
     expect((await rider.wait('room', m => m.room.levelState.liftEnabled)).room.levelState.liftLatched).toBe(false);
-    operator.send({ type: 'cube-pickup', seq: 2, epoch: first.room.cube.epoch }); await rider.wait('room', m => m.room.cube.holder === slot);
+    operator.send({ type: 'cube-pickup', cubeId: 'cube' as const, seq: 2, epoch: first.room.cube.epoch }); await rider.wait('room', m => m.room.cube.holder === slot);
     operator.send({ type: 'local-reset', seq: 3 });
     const reset = (await rider.wait('room', m => !m.room.levelState.lowerHeld && m.room.revision > first.room.revision + 2)).room;
     expect(reset.cube.holder).toBeNull(); expect(reset.cube.physicsAuthority).toBe(slot); expect(reset.levelState.liftEnabled).toBe(false);
@@ -114,7 +115,7 @@ it('crumble timing uses the server clock: short foot, longer hook, and one full 
 });
 it.each([1, 2] as Slot[])('P%s triggers shared crumble, reconnect receives deadlines, reset is local, and process restart reconstructs stable', async slot => {
     const { p1, p2, app, dir, a, b, code } = await pair('crumble-lab'), peers = [p1, p2], source = peers[slot - 1], remote = peers[2 - slot];
-    source.send({ type: 'cube-pickup', seq: 1, epoch: 0 }); expect((await source.wait('action-result', m => m.seq === 1)).accepted).toBe(false);
+    source.send({ type: 'cube-pickup', cubeId: 'cube' as const, seq: 1, epoch: 0 }); expect((await source.wait('action-result', m => m.seq === 1)).accepted).toBe(false);
     source.send({ type: 'crumble-trigger', seq: 2, platform: 'crumbleA', trigger: 'foot' });
     const warning = (await remote.wait('room', m => m.room.levelState.platforms.crumbleA.phase === 'warning')).room;
     const warningDisk = await readFile(join(dir, 'rooms', code + '.json'), 'utf8');
@@ -139,7 +140,7 @@ it.each([1, 2] as Slot[])('P%s triggers shared crumble, reconnect receives deadl
     source.send({ type: 'exit', seq: 5 }); expect((await duringBreak.wait('room', m => m.room.reachedExit[slot - 1])).room.completed).toBe(false);
     duringBreak.send({ type: 'exit', seq: 1 }); await source.wait('room', m => m.room.completed);
     const path = join(dir, 'rooms', code + '.json'), disk = JSON.parse(await readFile(path, 'utf8'));
-    expect(disk.levelState).toEqual({ tested: { foot: true, hook: true } }); expect(disk.cubePlacement).toBeNull();
+    expect(disk.levelState).toEqual({ tested: { foot: true, hook: true } }); expect(disk.cubePlacements).toEqual({});
     await kill(app.child); const restarted = await launch(dir), back = await connect<'crumble-lab'>(restarted.url, a.cookie);
     back.send({ type: 'join', code }); const restored = (await back.wait('snapshot')).room;
     expect(Object.values(restored.levelState.platforms).every(p => p.phase === 'stable')).toBe(true);
@@ -152,5 +153,5 @@ it('migrates a real version-3 disk file preserving docked cargo and completed ar
     await writeFile(path, JSON.stringify(r)); const restarted = await launch(dir), back = await connect(restarted.url, a.cookie);
     back.send({ type: 'join', code }); const restored = (await back.wait('snapshot')).room;
     expect(restored).toMatchObject({ level: 'pairing-bay', checkpoint: 'reunion', cubePlacement: 'cargoPlate', completed: true, reachedExit: [true, true] });
-    const disk = JSON.parse(await readFile(path, 'utf8')); expect(disk.version).toBe(4); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(r.createdAt);
+    const disk = JSON.parse(await readFile(path, 'utf8')); expect(disk.version).toBe(5); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(r.createdAt);
 });

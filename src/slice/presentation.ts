@@ -12,6 +12,7 @@ export interface MachinePresentation {
 export const authoredPresentation: MachinePresentation = {
     describe(room, frame, signal) {
         const o = frame.outputs;
+        if (room === 'crossfeed-vault') return { active: true, text: o.exitDoor ? 'VAULT OPEN' : 'CROSSFEED VAULT', label: 'MOCK MULTIPLAYER CONTROLLER / BINARY INTEGRATION PENDING' };
         if (room === 'pairing-bay') return { active: o.grappleAnchor || o.bridge || o.exitDoor,
             text: o.exitDoor ? 'EXIT UNLOCKED · REGROUP' : o.bridge ? 'TWO SIGNALS REQUIRED' : 'HOLD A · PARTNER CROSSES', label: 'MOCK MULTIPLAYER / TEST CONTROLLER' };
         if (room === 'relay-lab' || room === 'lift-lab' || room === 'crumble-lab' || room === 'boost-lab' || room === 'firewall-lab') return {

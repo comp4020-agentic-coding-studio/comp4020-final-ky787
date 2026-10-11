@@ -1,14 +1,12 @@
-# Multiplayer mechanics laboratories
+# Multiplayer chambers and mechanics laboratories
 
-The room-code, symmetric two-player, shared-cube and prediction foundation was
-manually accepted on two physical computers. Subsequent two-player mechanics-lab
-testing reproduced a loose-cube relay obstruction. The 2026-10-11 pass starts at
-`81422495b19e16b931b51ae298381f7970f3b1a2`, fixes that obstruction and adds BOOST LAB
-to the four existing **authored mock test rooms**. The revised relay behavior and
-partner-held boost await two-computer acceptance; these are not a final campaign.
-The subsequent static-firewall pass starts at
-`d85106d9ef91c444d8931ffd597ea65f56aa861b` and adds FIREWALL LAB. Its acceptance
-also remains a human two-computer playtest.
+The room-code, shared-cube, prediction and mechanics laboratories (including
+corrected relay egress, partner boost and static firewalls) were manually accepted
+on two physical computers before CROSSFEED VAULT. The first full cooperative
+chamber starts from `33e632878594bd4de75568ed00dd7f9028856e07` and extends the
+accepted cube primitive to two independent named payloads. Its controller remains
+honestly mock; the [chamber contract](crossfeed-vault.md) is **PROVISIONAL UNTIL
+HUMAN PLAYTEST ACCEPTANCE**. This milestone does not generate a binary.
 
 C8's four single-player rooms, anonymous visitor progress and retained CONTROL
 SPINE controller remain independent. No accounts, matchmaking, new binaries,
@@ -18,7 +16,8 @@ See [ADR 0001](adr/0001-multiplayer-authority.md),
 [ADR 0003](adr/0003-multiplayer-prediction.md),
 [ADR 0004](adr/0004-coop-labs-and-transient-machinery.md),
 [ADR 0005](adr/0005-partner-cube-support.md), and
-[ADR 0006](adr/0006-static-firewalls.md).
+[ADR 0006](adr/0006-static-firewalls.md), and
+[ADR 0007](adr/0007-named-shared-cubes.md).
 
 ## Architecture and deployment
 
@@ -65,7 +64,8 @@ Campaign `ROOM_IDS` remain exactly pressure, switch, relay and uplink.
 
 ## Sessions, menu and level model
 
-The **CO-OP LABS** menu offers a CREATE button per lab and one room-code JOIN.
+The menu separates **CO-OP CHAMBERS** (CROSSFEED VAULT) from **MECHANICS LABS**.
+Each offers CREATE; the common JOIN needs only a room code.
 The creator supplies a `CoopLevelId`. The joiner supplies only the code; the
 snapshot selects both geometry and authority adapter. There is no requirement
 to separately select matching rooms. Codes still use four characters from
@@ -74,6 +74,7 @@ against loaded and persisted rooms, and distinct invalid/unknown/full errors.
 
 | Level ID | Lab | Durable level state | Cube | Exit unlock |
 | --- | --- | --- | --- | --- |
+| `crossfeed-vault` | Full interconnected chamber | `switchB`, `switchC`, `switchD` | `cubeA`, `cubeB` | Two distinct cube pads + opposite body plates |
 | `pairing-bay` | Shared inputs, grapple, cargo, handoff | `switchB` | yes | B + cargo + opposite final body plates |
 | `relay-lab` | Player / loose / carried relay transport | `relayEnabled` | yes | Relay power latch |
 | `lift-lab` | Shared vertical transport / checkpoint | `liftLatched` | yes | Upper latch/checkpoint |
@@ -82,10 +83,10 @@ against loaded and persisted rooms, and distinct invalid/unknown/full errors.
 | `firewall-lab` | Static beams / independent death / shared cube destruction | `checkpointSet` | yes | Entry checkpoint switch |
 
 `SharedRoom` is a union discriminated by `level`. Common session fields are code,
-revision, assigned/connected slots, checkpoint, cube/semantic placement when
-applicable, `exitUnlocked`, `reachedExit[2]`, and `completed`. `levelState` contains
+revision, assigned/connected slots, checkpoint, named `cubes` / `cubePlacements`, `exitUnlocked`, `reachedExit[2]`, and `completed`. `levelState` contains
 only that lab's inputs/outputs, latches, or ephemeral phases. A crumble room has
-`cube: null` and `cubePlacement: null`. Durable records use the same level tag
+`cubes: {}` and `cubePlacements: {}`. Single-cube rooms retain legacy `cube` /
+`cubePlacement` snapshot aliases; CROSSFEED and CRUMBLE expose null aliases. Durable records use the same level tag
 with a separate, smaller level-specific state; runtime phases never leak into it.
 
 `GET /api/identity` establishes the existing anonymous HttpOnly `bn_visitor` UUID
@@ -140,7 +141,7 @@ permanently B → A; A → B falls clear on its lower receiving floor.
 Player egress now separates that shared cube from authored blockers. The normal
 destination must still pass every enabled authored-solid and room-bound check.
 If occupied by the resting cube, the player exits just beyond it on the gate's
-outward side (two-unit gap, at most 96 units of adjustment). The entire alternate
+outward side (two-unit gap, at most 96 units of adjustment per resting payload). The entire alternate
 payload box must also pass those checks. No cube is moved or duplicated. An
 ignore-only approach was rejected because ordinary collision could push the
 arrival back into the gate. Unsafe walls, floors, doors and room bounds still
@@ -215,7 +216,11 @@ obfuscator evidence. C8 continues using its pre-existing local timers.
 
 ## Common cube and physical completion
 
-One server-arbitrated cube primitive serves PAIRING BAY, RELAY LAB and LIFT LAB.
+One server-arbitrated cube primitive serves every cube-bearing co-op room.
+CROSSFEED uses two independent instances keyed by `cubeA` / `cubeB`; existing
+rooms use `cube`. A browser may simulate both loose cubes, but each player may
+carry or pull only one. Prediction, transforms, resets, boost support and relay
+cooldowns identify their cube. See ADR 0007 for the per-entity extension.
 Pickup grants holder+simulator to the authenticated requester; first accepted
 serialized request wins. Drop clears holder and retains the simulator. Loose
 pull may transfer authority; its exclusive pull flag prevents competing steals
@@ -225,7 +230,7 @@ sockets release held/pulling state and transfer to the connected partner, or
 pause physics if neither is connected. There is no host-only gameplay role.
 
 Only the accepted simulator publishes transforms/contact, at most 20 Hz. Local
-pickup/drop/pull prediction stays responsive, but no pending cube action can
+pickup/drop/pull prediction stays responsive, but the cube named by a pending action cannot
 publish predicted transforms or cargo state. Explicit action results correlate
 sequence, connection generation and source epoch; acceptance keeps valid motion,
 denial restores accepted ownership/transform and cancels pull. A late pull grant
@@ -308,7 +313,7 @@ trusted semantic sensor report like the existing occupancy system; the server
 validates membership, current authority, epoch and sequence, not room geometry.
 A replica cannot request a reset for somebody else's cube. The server clears
 holder/pull, retains the reporting connected authority, increments the epoch,
-clears the transform/stream sequence, and sets `cubePlacement:"spawn"`. The
+clears the transform/stream sequence, and sets `cubePlacements[cubeId]:"spawn"`. The
 original authored cube spawn is resolved by each frontend, never a checkpoint,
 carrier location or previous cargo plate. Changed durable placement is persisted
 before acknowledgment; transforms, epochs and the `lastReset` effect marker
@@ -354,14 +359,14 @@ anti-cheat, new player authority, or general player collision is introduced.
 | create | `level` (omitted means legacy PAIRING BAY) |
 | join | `code` only |
 | avatar | `seq`, bounded `avatar`, optional `discontinuity` |
-| cube | `epoch`, independent `seq`, bounded `transform`, optional `discontinuity` |
-| cube-pickup / cube-pull-start / cube-pull-stop | semantic `seq`, current `epoch` |
-| cube-drop | semantic `seq`, `epoch`, bounded proposed `transform` |
-| cube-reset | semantic `seq`, current `epoch`, `cause:"firewall"`; current simulator only |
-| cube-occupancy | semantic `seq`, `epoch`, `cargo`; only PAIRING BAY simulator |
+| cube | `cubeId`, `epoch`, independent `seq`, bounded `transform`, optional `discontinuity` |
+| cube-pickup / cube-pull-start / cube-pull-stop | `cubeId`, semantic `seq`, current `epoch` |
+| cube-drop | `cubeId`, semantic `seq`, `epoch`, bounded proposed `transform` |
+| cube-reset | `cubeId`, semantic `seq`, current `epoch`, `cause:"firewall"` or `"recovery"`; current simulator only |
+| cube-occupancy | `cubeId`, semantic `seq`, `epoch`, room-valid `placement`; only that cube’s simulator |
 | occupancy | `seq`, one allowed `plate` or null; lift uses `liftControl` |
 | switch | `seq`; accepted PAIRING BAY B latch |
-| control | `seq`, `relayPower`, `liftLatch`, `boostRoute` or `firewallCheckpoint`, restricted by level |
+| control | `seq`, `relayPower`, `liftLatch`, `boostRoute`, `firewallCheckpoint`, or CROSSFEED `switchB/C/D`, restricted by level |
 | crumble-trigger | `seq`, `platform`, `foot` or `hook`, only CRUMBLE LAB |
 | local-reset | `seq`; release this body only |
 | exit | `seq`; own physical arrival after accepted unlock |
@@ -371,18 +376,18 @@ Server messages remain snapshot/room/avatar/cube/action-result/cube-denied/error
 pong. Room snapshots carry the discriminated state; never another visitor's UUID.
 Exact client keys reject injected slots, owners, outputs and revisions. Payloads
 are ≤2 KiB; finite coordinates are bounded to ±10,000 and velocities to ±2,000.
-Token bucket: 60 messages/sec, 80 burst; eight pending semantic requests per peer,
+Token bucket: 90 messages/sec, 120 burst (avatar + two 20 Hz cube streams plus inputs); eight pending semantic requests per peer,
 256 queued overall, 128 peers and 64 loaded rooms. Slow outbound recipients over
 64 KiB are disconnected. Heartbeat is 5 seconds; missed pongs terminate on the
 next pass. Retries use bounded backoff up to 5 seconds plus jitter.
 
 ```text
 /data/<visitor UUID>.json   unchanged C8 campaign envelope/progress
-/data/rooms/<CODE>.json     version-4 co-op logical record
+/data/rooms/<CODE>.json     version-5 co-op logical record
 ```
 
 Common durable fields: version, code, level, revision, visitors, checkpoint,
-cubePlacement (or null), exitUnlocked, reachedExit, completed, createdAt, updatedAt.
+cubePlacements (map, empty when cubeless), exitUnlocked, reachedExit, completed, createdAt, updatedAt.
 `levelState` has exactly the durable fields listed in the lab table. Durable
 mutations use the existing atomic file/fsync/rename/directory-fsync writer and
 acknowledge only afterward. Failure closes the room rather than exposing unsaved
@@ -395,7 +400,10 @@ crumble timers or interpolation. Arbitrary cargo restores at its authored spawn;
 PAIRING BAY docked cargo restores at its plate unless destroyed. Relay/lift/boost/firewall labs have no docked
 placement, so their cubes restore at spawn. Power derives from saved latches.
 
-On accepted join, validated versions 1–3 migrate atomically to version 4. Code,
+On accepted join, validated versions 1–4 migrate atomically to version 5.
+Version 4 maps its placement to `{cube: previousPlacement}` (or `{}` for CRUMBLE).
+CROSSFEED stores each payload’s spawn/liftCargo/finalLeft/finalRight placement.
+It restores arbitrary cargo at that payload’s own original spawn. No physics is persisted. Code,
 visitors, B latch, checkpoint, cargo placement, unlock, arrivals, completion and
 creation time survive. Version 1's former plates-only completion still becomes
 unlock with no invented arrivals; versions 1–2 initialize the then-absent cube at
@@ -459,7 +467,8 @@ pnpm check:multiplayer-relay       # relay, loose/carry, both actor slots
 pnpm check:multiplayer-lift        # both roles, cube, checkpoint, reset/death
 pnpm check:multiplayer-crumble     # phases, hook, reconnect and process restart
 pnpm check:multiplayer-boost       # both holder roles, drop/reset/disconnect, two-body finish
-pnpm check:multiplayer-firewall    # both slots, independent deaths, loose/carry/pull resets, finish
+pnpm check:multiplayer-firewall
+pnpm check:crossfeed    # both slots, independent deaths, loose/carry/pull resets, finish
 ```
 
 `BROWSER_BIN=/usr/bin/brave-browser` selects a usable Chromium engine on this

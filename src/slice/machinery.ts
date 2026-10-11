@@ -48,7 +48,7 @@ export class RelayGatePair extends PoweredMachine {
     }
     cooldown(id: string): number { return this.cooldowns.get(id) ?? 0; }
     teleport(id: string, body: LooseBody, width: number, height: number,
-        solids: readonly Solid[], bounds: { width: number; height: number }, carriedHeight = 0, sharedCube?: Solid): GateTransit | null {
+        solids: readonly Solid[], bounds: { width: number; height: number }, carriedHeight = 0, sharedCube?: Solid | readonly Solid[]): GateTransit | null {
         if (!this.enabled || this.cooldown(id)) return null;
         const index = this.def.gates.findIndex(g => boxesOverlap(
             { x: body.x - width / 2, y: body.y - height / 2, w: width, h: height }, g));
@@ -61,11 +61,15 @@ export class RelayGatePair extends PoweredMachine {
         const unsafe = () => box.x < 0 || box.x + box.w > bounds.width || box.y < 0 || box.y + box.h > bounds.height
             || solids.some(s => s.enabled && boxesOverlap(box, s));
         if (unsafe()) return null;
-        if (sharedCube?.enabled && boxesOverlap(box, sharedCube)) {
+        const cubes = !sharedCube ? [] : Array.isArray(sharedCube) ? sharedCube : [sharedCube as Solid];
+        const normalX = x;
+        for (let attempts = 0; attempts < cubes.length; attempts++) {
+            const obstacle = cubes.find(c => c.enabled && boxesOverlap(box, c));
+            if (!obstacle) break;
             // One bounded outward lane, past the shared cube, never toward the
             // arrival gate. Revalidate the entire payload against architecture.
-            const alternate = to.exitSide > 0 ? sharedCube.x + sharedCube.w + width / 2 + 2 : sharedCube.x - width / 2 - 2;
-            if (Math.abs(alternate - x) > 96) return null;
+            const alternate = to.exitSide > 0 ? obstacle.x + obstacle.w + width / 2 + 2 : obstacle.x - width / 2 - 2;
+            if (Math.abs(alternate - normalX) > 96 * Math.max(1, cubes.length)) return null;
             x = alternate; box.x = x - width / 2;
             if (unsafe()) return null;
         }

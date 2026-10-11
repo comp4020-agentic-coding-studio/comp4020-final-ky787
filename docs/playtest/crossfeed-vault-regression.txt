@@ -1,0 +1,92 @@
+CROSSFEED VAULT milestone regression — 2026-10-11
+
+Starting local/remote HEAD: 33e632878594bd4de75568ed00dd7f9028856e07 (main).
+Tested implementation: the CROSSFEED VAULT / named shared cube change set.
+Human two-computer acceptance: PENDING.
+Controller: mock-multiplayer / binary integration pending.
+Contract: PROVISIONAL UNTIL HUMAN PLAYTEST ACCEPTANCE.
+This record describes authored gameplay validation, not binary evidence.
+
+Development used focused protocol/server/prediction/world tests and the new
+real-input chamber route. One relevant milestone gate followed stabilization;
+passed suites were not rerun after each geometry or browser-harness adjustment.
+Browser routes use keyboard/mouse input and read-only diagnostics. They never
+set world coordinates, shared state or controller outputs. Audio output is
+muted by the harness by default.
+
+CROSSFEED: pnpm check:crossfeed — PASS, 23 assertions
+- Create chamber and join only by code; two independent payloads; honest source.
+- Full route: P1 body A, P2 grapple/B; P1 lift/C and carried B relay; P2 boost
+  holder, P1 second jump/D; retrieve A through permanent routes; deliver both.
+- Cube A powers lift temporarily; C preserves lift after cargo removal and
+  changes checkpoint without moving the lower partner.
+- Direct service carry destroys only B; its walking holder and A remain intact.
+- B relay preserves identity/ownership while A stays below.
+- Both final pad assignments are physically exercised: A-left/B-right then
+  B-left/A-right. Two cubes alone do not unlock the body puzzle.
+- Opposite bodies latch exit. Leaving plates preserves unlock. One physical
+  arrival cannot complete; two physical arrivals complete on both clients.
+- Short reversed scenario through D: P2 holds A, rides lift and carries/relays
+  B; P1 is boost holder and P2 climbs. No redundant second long final solve.
+- All four browser clients report no runtime exceptions or console errors.
+
+Foundation / milestone
+- pnpm typecheck — PASS.
+- pnpm test:unit — PASS: 344 passed, 2 skipped, 31 test files.
+- Final schema review: focused tests/multicube-server.test.ts — PASS, 8 tests;
+  named latch validation and v4 docked-progress migration explicitly checked.
+- pnpm build — PASS. Existing large-chunk advisory only.
+- Retained UPLINK validation — PASS: 32 states, 32 traces; unchanged bundle
+  SHA-256 87dec9e470119a951eb1486e25d62226c72b34367e754b0a14b4e5a818c4c082.
+- pnpm test against an isolated running server — PASS: 3 tests, 2 files.
+- pnpm check:evidence — PASS. No binary/evidence or reflection changes.
+
+Focused foundation coverage includes independent carry/pull arbitration,
+contested pickup, per-cube stream/epoch rejection and relay snap, B-only firewall
+and death-zone reset, A preservation, both loose simulators, 20 Hz avatar plus
+two cube streams, trusted-simulator contacts, pad capacity, distinct final
+bodies/cubes, both pad assignments, named prediction rollback isolation,
+grounded named partner support, lift/relay/firewall interaction, server restart
+and v4 one-cube/cubeless migration. No transforms or owners persist.
+
+Existing browser milestone routes
+- C8 / CONTROL SPINE: PASS, 115 assertions (including persistence and audio).
+- PAIRING BAY: PASS, 133 assertions, both roles, 400 ms semantic delay;
+  prediction, arbitration, disconnect/reconnect, process restart, separate C8 saves.
+- RELAY LAB: PASS, 23 assertions, both actors; untouched loose destination
+  cargo in both directions, carried cargo, snap, cooldown and distinct arrivals.
+- LIFT LAB: PASS, 25 assertions, both riders; loose/carried cargo, checkpoint,
+  second rider, independent reset/death and shared completion.
+- CRUMBLE LAB: PASS, 25 assertions, both actors; foot/hook, reconnect/restart,
+  independent death, authoritative collapse and shared completion.
+- BOOST LAB: PASS, 25 assertions, both holder roles; second jump, slight holder
+  motion, drop/reset/disconnect support removal, permanent return and completion.
+- FIREWALL LAB: PASS, 43 assertions, both acting slots; independent deaths,
+  loose/carried/pulled resets, original spawn, cleared pull and shared completion.
+
+All milestone commands exited successfully. Final typecheck passed after the
+harness-only corrections below. No passed gameplay suite was repeated solely
+for documentation changes.
+
+Harness corrections made while retaining all acceptance assertions:
+- C8 now emulates focus during normal movement to avoid OS/headless blur
+  clearing held keys. Its intentional background-audio test disables emulated
+  focus, verifies real blur silence and return, then restores focus emulation.
+  Cleanup explicitly closes its owned Brave browser process.
+- Relay reverse-drop setup now aligns and faces the gate with short ordinary
+  key presses. Stopping drift had made the old second walk face away from B.
+- Boost return steps wait for full jump clearance and the named landing before
+  the next jump. A short horizontal target had cut a variable-height jump early.
+No game movement constants or accepted lab geometry were changed for these.
+
+Retained gameplay capture: docs/playtest/crossfeed-vault-overview.png.
+Local route artifacts: /tmp/bn-crossfeed-shots/checks.txt,
+/tmp/bn-crossfeed-shots/full-overview.png, full-boost-support.png,
+full-vault-unlocked.png, full-complete.png, reverse-boost-support.png and
+reverse-D-latched.png. Milestone logs: /tmp/crossfeed-gate-*.txt.
+
+Manual acceptance and known limits are in docs/crossfeed-vault.md. Judge room
+clarity, thinking, relay discovery, boost satisfaction, A retrieval/backtracking,
+final assembly, engagement, length, creative shortcuts and recovery on two
+physical computers. Automated completion is not human puzzle acceptance.
+STOP before contract freezing or binary generation.

@@ -139,7 +139,7 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         await p.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at, button: 'left', buttons: 0, clickCount: 1 });
         await sleep(80);
     }
-    const keys: Record<string, [string, number]> = { KeyA: ['a', 65], KeyD: ['d', 68], KeyE: ['e', 69], Space: [' ', 32], Tab: ['Tab', 9], KeyR: ['r', 82] };
+    const keys: Record<string, [string, number]> = { KeyA: ['a', 65], KeyD: ['d', 68], KeyE: ['e', 69], Space: [' ', 32], Tab: ['Tab', 9], KeyR: ['r', 82], KeyS: ['s', 83] };
     async function key(p: Cdp, code: string, down: boolean) {
         const [key, vk] = keys[code];
         await p.send('Input.dispatchKeyEvent', { type: down ? 'rawKeyDown' : 'keyUp', code, key, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk });

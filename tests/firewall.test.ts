@@ -38,8 +38,8 @@ function fixture(slot: Slot = 1, physics: Slot = slot, level: CoopLevelId = 'fir
     };
     const acceptReset = () => {
         const pending = client.prediction.cube!;
-        expect(interactCube(cube, slot, { type: 'cube-reset', seq: pending.seq, epoch: pending.epoch, cause: 'firewall' })).toBe(true);
-        record.cubePlacement = 'spawn'; client.room = sharedRoom(record, [true, true], [null, null], cube);
+        expect(interactCube(cube, slot, { type: 'cube-reset', cubeId: 'cube' as const, seq: pending.seq, epoch: pending.epoch, cause: 'firewall' })).toBe(true);
+        record.cubePlacements.cube = 'spawn'; client.room = sharedRoom(record, [true, true], [null, null], cube);
         client.prediction.resolve(pending.seq, 1, true, client.room, slot, performance.now()); sync();
     };
     return { world, cube, record, client, authority, request, sync, acceptReset };
@@ -69,7 +69,7 @@ it.each(['loose', 'carried', 'both', 'pull'] as const)('%s cube contact dissolve
             Object.assign(w.player, { x: 670, y: 623 });
             f.authority.cube!.pull(true, true);
             const pending = f.client.prediction.cube!;
-            interactCube(f.cube, 1, { type: 'cube-pull-start', epoch: f.cube.epoch, seq: pending.seq });
+            interactCube(f.cube, 1, { type: 'cube-pull-start', cubeId: 'cube' as const, epoch: f.cube.epoch, seq: pending.seq });
             f.client.room = sharedRoom(f.record, [true, true], [null, null], f.cube);
             f.client.prediction.resolve(pending.seq, 1, true, f.client.room, 1, 10);
         }
@@ -99,7 +99,7 @@ it('contact during a pending carry action waits for the accepted epoch, then res
     const f = fixture(); f.client.prediction.begin('cube-pickup', 77, f.cube.epoch, 1, 0);
     Object.assign(f.world.player, { x: 500, y: 623 }); steps(f.world);
     expect(f.world.cubeResetting).toBe(true); expect(f.request).not.toHaveBeenCalled();
-    expect(interactCube(f.cube, 1, { type: 'cube-pickup', seq: 77, epoch: f.cube.epoch })).toBe(true);
+    expect(interactCube(f.cube, 1, { type: 'cube-pickup', cubeId: 'cube' as const, seq: 77, epoch: f.cube.epoch })).toBe(true);
     f.client.room = sharedRoom(f.record, [true, true], [null, null], f.cube);
     f.client.prediction.resolve(77, 1, true, f.client.room, 1, 10); f.sync();
     expect(f.client.prediction.cube).toMatchObject({ kind: 'cube-reset', epoch: f.cube.epoch });
@@ -122,7 +122,7 @@ it('accepted destruction removes partner support without killing or launching it
     f.client.remote.push({ x: 700, y: 623, vx: 0, vy: 0, grounded: true, facing: 1, rope: null }, 1, 1, 1000); f.sync();
     Object.assign(f.world.player, { x: 700, y: 541, grounded: true, groundId: 'partner-cube-support' }); steps(f.world);
     expect(f.world.groundedOnPartnerCube).toBe(true);
-    expect(interactCube(f.cube, 1, { type: 'cube-reset', seq: 1, epoch: f.cube.epoch, cause: 'firewall' })).toBe(true); f.sync(); steps(f.world);
+    expect(interactCube(f.cube, 1, { type: 'cube-reset', cubeId: 'cube' as const, seq: 1, epoch: f.cube.epoch, cause: 'firewall' })).toBe(true); f.sync(); steps(f.world);
     expect(f.world.partnerCubeSupport).toBeNull(); expect(f.world.player.grounded).toBe(false);
     expect(f.world.player.y).toBeGreaterThan(541); expect(f.world.player.vy).toBeGreaterThan(0); expect(f.world.deaths).toBe(0);
     expect(f.world.cube).toMatchObject(f.world.room.cube!);
@@ -145,13 +145,13 @@ it.each(['relay', 'lift'] as const)('%s can deliver loose cargo into a firewall 
     }
 });
 it('cube reset schema rejects invented causes/coordinates and stale or foreign streams cannot resurrect cargo', () => {
-    const message = { type: 'cube-reset', seq: 1, epoch: 1, cause: 'firewall' } as const;
+    const message = { type: 'cube-reset', cubeId: 'cube' as const, seq: 1, epoch: 1, cause: 'firewall' } as const;
     expect(parseClientMessage(JSON.stringify(message))).toEqual(message);
     for (const patch of [{ cause: 'arbitrary' }, { spawn: { x: 99, y: 99 } }, { slot: 1 }])
         expect(parseClientMessage(JSON.stringify({ ...message, ...patch }))).toBeNull();
     const c = freshCube(); assignCube(c, 1);
     expect(interactCube(c, 2, message)).toBe(false); expect(interactCube(c, 1, message)).toBe(true);
     expect(interactCube(c, 1, message)).toBe(false);
-    expect(acceptCubeSnapshot(c, 1, { type: 'cube', seq: 99, epoch: 1, transform: { x: 500, y: 550, vx: 0, vy: 0, grounded: false } })).toBe(false);
+    expect(acceptCubeSnapshot(c, 1, { type: 'cube', cubeId: 'cube' as const, seq: 99, epoch: 1, transform: { x: 500, y: 550, vx: 0, vy: 0, grounded: false } })).toBe(false);
     expect(c.transform).toBeNull(); expect(c.epoch).toBe(2);
 });

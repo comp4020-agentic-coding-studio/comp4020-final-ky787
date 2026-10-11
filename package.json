@@ -19,6 +19,7 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "start": "node server/app.ts",
     "dev:server": "DATA_DIR=.local-data node server/app.ts",
+    "check:crossfeed": "node scripts/crossfeed-browser-check.ts",
     "check:multiplayer-pairing": "node scripts/multiplayer-browser-check.ts",
     "check:multiplayer-relay": "node scripts/labs-browser-check.ts relay-lab",
     "check:multiplayer-lift": "node scripts/labs-browser-check.ts lift-lab",
