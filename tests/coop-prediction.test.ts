@@ -15,6 +15,7 @@ import { createCoopAuthority } from '../src/coop/lab-authority.ts';
 import { COOP_LABS } from '../src/coop/labs.ts';
 import { createPlayer, emptyInput } from '../src/engine/physics.ts';
 import { FIXED_DT } from '../src/engine/constants.ts';
+import { selectChamber } from '../server/party-state.ts';
 
 class Socket {
     static OPEN = 1;
@@ -29,6 +30,37 @@ class Socket {
 }
 const cleanups: (() => void)[] = [];
 afterEach(() => { for (const fn of cleanups.splice(0)) fn(); vi.unstubAllGlobals(); });
+it('a new accepted instance reconstructs once on the same socket and clears all old prediction/presentation', async () => {
+    Socket.instances = [];
+    vi.stubGlobal('WebSocket', Socket);
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ id: 'visitor' }) })));
+    vi.stubGlobal('location', { href: 'http://localhost/' });
+    const old = newRecord('ABCD', 'visitor', 'race-condition');
+    const cubes = freshCubes(old.level); for (const c of Object.values(cubes)) assignCube(c, 1);
+    const calls: { level: string; initial: boolean }[] = [];
+    const client = new CoopClient((room, initial) => calls.push({ level: room.level, initial }), () => {});
+    cleanups.push(() => client.leave()); client.start();
+    await vi.waitFor(() => expect(Socket.instances).toHaveLength(1));
+    const ws = Socket.instances[0]; ws.onopen(); ws.receive({ type: 'snapshot', slot: 1, room: sharedRoom(old, [true, true], [null, null], cubes) });
+    client.occupy('trace'); client.control('phase'); client.triggerCrumble('crumbleA', 'hook');
+    client.cubeAction('cube-pickup', undefined, 'cubeB'); client.markDiscontinuity('player', 'relay');
+    const pending = client.prediction.cube!;
+    ws.receive({ type: 'avatar', levelInstance: 1, slot: 2, stream: 1, seq: 1, avatar: { x: 999, y: 999, vx: 0, vy: 0, facing: 1, grounded: true, rope: null }, discontinuity: 'relay' });
+    const next = selectChamber(old, 'visitor', 'crossfeed-vault')!; next.revision = 10;
+    const room = sharedRoom(next, [true, true], [null, null]);
+    ws.receive({ type: 'action-result', seq: 99, accepted: true, room });
+    ws.receive({ type: 'room', room }); // broadcast of same transition cannot reconstruct again
+    expect(calls).toEqual([{ level: 'race-condition', initial: true }, { level: 'crossfeed-vault', initial: true }]);
+    expect(client.prediction.cube).toBeNull(); expect(client.pendingPhase).toBeNull(); expect(client.pendingCrumble.size).toBe(0);
+    expect(client.remote.sample(performance.now())).toBeNull(); expect(client.takeMachineryEvents()).toEqual([]); expect(client.lastLocalDiscontinuity).toBeNull();
+    ws.receive({ type: 'action-result', seq: pending.seq, accepted: true, room: { ...sharedRoom(old, [true, true], [null, null], cubes), revision: 999 } });
+    ws.receive({ type: 'avatar', levelInstance: 1, slot: 2, stream: 99, seq: 99, avatar: { x: 999, y: 999, vx: 0, vy: 0, facing: 1, grounded: true, rope: null } });
+    ws.receive({ type: 'cube', levelInstance: 1, cubeId: 'cubeB', epoch: 1, seq: 99, transform: { x: 999, y: 999, vx: 0, vy: 0, grounded: true } });
+    expect(client.room?.level).toBe('crossfeed-vault'); expect(client.remote.sample(performance.now())).toBeNull();
+    client.occupy('plateA'); client.publish(createPlayer(1800, 1000), performance.now() + 1000);
+    expect(ws.sent.filter(m => 'seq' in m).slice(-2).every(m => m.levelInstance === 2)).toBe(true);
+    expect(Socket.instances).toHaveLength(1);
+});
 it('RACE lever predicts presentation immediately, sounds once on acceptance, and reconciles a denial', async () => {
     Socket.instances = [];
     vi.stubGlobal('WebSocket', Socket);
@@ -72,7 +104,7 @@ async function setup(switchB = true) {
     vi.stubGlobal('WebSocket', Socket);
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ id: 'visitor' }) })));
     vi.stubGlobal('location', { href: 'http://localhost/' });
-    const record: RoomRecord<'pairing-bay'> = { version: 5, code: 'ABCD', level: 'pairing-bay', revision: 1, visitors: ['a', 'b'], levelState: { switchB },
+    const record: RoomRecord<'pairing-bay'> = { version: 6, party: null, levelInstance: 1, code: 'ABCD', level: 'pairing-bay', revision: 1, visitors: ['a', 'b'], levelState: { switchB },
         checkpoint: switchB ? 'reunion' : 'entry', cubePlacements: { cube: 'spawn' }, exitUnlocked: false, reachedExit: [false, false], completed: false,
         createdAt: '', updatedAt: '' };
     const state = freshCube(); assignCube(state, 1);
@@ -284,7 +316,7 @@ it('prediction/denial for A never pauses or rewinds B, and a B relay marker only
     ws.receive({ type: 'action-result', seq: client.prediction.cube!.seq, accepted: true, room: view() });
     const beforeA = { ...world!.cubes.cubeA! };
     assignCube(cubes.cubeB!, 2); record.revision++; ws.receive({ type: 'room', room: view() });
-    ws.receive({ type: 'cube', cubeId: 'cubeB', seq: 1, epoch: cubes.cubeB!.epoch, transform: { x: 3290, y: 918, vx: 0, vy: 0, grounded: true }, discontinuity: 'relay' });
+    ws.receive({ type: 'cube', levelInstance: record.levelInstance, cubeId: 'cubeB', seq: 1, epoch: cubes.cubeB!.epoch, transform: { x: 3290, y: 918, vx: 0, vy: 0, grounded: true }, discontinuity: 'relay' });
     world!.syncAuthority(); expect(world!.cubes.cubeB!.x).toBe(3290); expect(world!.cubes.cubeA).toEqual(beforeA);
     expect(client.cubeReplica('cubeB').lastDiscontinuity?.kind).toBe('relay'); expect(client.cubeReplica('cubeA').lastDiscontinuity).toBeNull();
 });

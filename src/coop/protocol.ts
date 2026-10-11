@@ -1,4 +1,5 @@
 /** Wire contract: shared logic is coordinate-free; avatars are disposable presentation. */
+import { isCampaignLevel, type CampaignLevel, type PartyState } from './campaign.ts';
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
@@ -64,6 +65,8 @@ export interface LevelStateMap {
     'crumble-lab': { tested: { foot: boolean; hook: boolean }; platforms: Record<CrumbleId, CrumblePhase> };
 }
 interface SharedSession {
+    party: PartyState | null;
+    levelInstance: number;
     cubes: CubeMap<SharedCube>;
     cubePlacements: CubeMap<CubePlacement>;
     code: string;
@@ -80,7 +83,9 @@ export type SharedRoom<L extends CoopLevelId = CoopLevelId> = { [K in L]: Shared
 export const cubeAvailable = (room: SharedRoom | null, id: CubeId = 'cube'): boolean => !!room?.cubes[id]
     && (room.level !== 'pairing-bay' || room.levelState.inputs.switchB)
     && (room.level !== 'crossfeed-vault' || (id === 'cubeA' ? room.levelState.inputs.switchB : room.levelState.inputs.switchC));
-export type ClientMessage =
+type ClientPayload =
+    | { type: 'create-party' }
+    | { type: 'select-level'; seq: number; level: CampaignLevel }
     | { type: 'create'; level?: CoopLevelId }
     | { type: 'join'; code: string }
     | { type: 'avatar'; seq: number; avatar: Avatar; discontinuity?: Discontinuity }
@@ -98,12 +103,14 @@ export type ClientMessage =
     | { type: 'exit'; seq: number }
     | { type: 'leave' }
     | { type: 'ping' };
+/** Legacy fixed-level fixtures may omit generation; parties must always supply it. */
+export type ClientMessage = ClientPayload & { levelInstance?: number };
 export type ServerMessage<L extends CoopLevelId = CoopLevelId> =
     | { type: 'snapshot'; slot: Slot; room: SharedRoom<L> }
     | { type: 'room'; room: SharedRoom<L> }
-    | { type: 'avatar'; slot: Slot; stream: number; seq: number; avatar: Avatar; discontinuity?: Discontinuity }
-    | { type: 'cube'; cubeId: CubeId; epoch: number; seq: number; transform: CubeTransform; discontinuity?: Discontinuity }
-    | { type: 'cube-denied'; cubeId: CubeId; seq: number }
+    | { type: 'avatar'; levelInstance?: number; slot: Slot; stream: number; seq: number; avatar: Avatar; discontinuity?: Discontinuity }
+    | { type: 'cube'; levelInstance?: number; cubeId: CubeId; epoch: number; seq: number; transform: CubeTransform; discontinuity?: Discontinuity }
+    | { type: 'cube-denied'; levelInstance?: number; cubeId: CubeId; seq: number }
     | { type: 'action-result'; seq: number; accepted: boolean; room: SharedRoom<L> }
     | { type: 'error'; code: string; message: string }
     | { type: 'pong' };
@@ -134,6 +141,15 @@ export function parseClientMessage(raw: string): ClientMessage | null {
     let v: unknown;
     try { v = JSON.parse(raw); } catch { return null; }
     if (!object(v)) return null;
+    const { levelInstance, ...payload } = v;
+    if (Object.hasOwn(v, 'levelInstance') && (!sequence(levelInstance) || (levelInstance as number) < 1 || !Object.hasOwn(v, 'seq'))) return null;
+    if (v.type === 'select-level' && levelInstance === undefined) return null;
+    const message = parsePayload(payload);
+    return message ? { ...message, ...(levelInstance !== undefined ? { levelInstance: levelInstance as number } : {}) } : null;
+}
+function parsePayload(v: Record<string, unknown>): ClientMessage | null {
+    if (v.type === 'create-party' && keys(v, ['type'])) return { type: 'create-party' };
+    if (v.type === 'select-level' && keys(v, ['type', 'seq', 'level']) && sequence(v.seq) && isCampaignLevel(v.level)) return v as ClientMessage;
     if (['create', 'leave', 'ping'].includes(v.type as string) && keys(v, ['type'])) return v as ClientMessage;
     if (v.type === 'create' && keys(v, ['type', 'level']) && isCoopLevel(v.level)) return v as ClientMessage;
     if (v.type === 'join' && keys(v, ['type', 'code']) && typeof v.code === 'string' && v.code.length <= 32) return v as ClientMessage;
@@ -165,5 +181,5 @@ export function websocketUrl(page: string): string {
 }
 /** An initial snapshot resets the connection epoch; ordinary updates must advance it. */
 export function newerRoom(current: SharedRoom | null, incoming: SharedRoom): boolean {
-    return !current || current.code === incoming.code && incoming.revision > current.revision;
+    return !current || current.code === incoming.code && incoming.levelInstance >= current.levelInstance && incoming.revision > current.revision;
 }

@@ -41,7 +41,7 @@ export class Cdp {
         return result.result.value;
     }
 }
-export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options: { shots?: string } = {}) {
+export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options: { shots?: string; internalLabs?: boolean } = {}) {
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const checks: string[] = [];
     const shots = options.shots ?? join(tmpdir(), 'bn-coop-shots');
@@ -115,7 +115,9 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         await client.send('Runtime.enable'); await client.send('Page.enable');
         await client.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false });
         await client.send('Emulation.setFocusEmulationEnabled', { enabled: true });
-        await client.send('Page.navigate', { url });
+        const target = new URL(url);
+        if (options.internalLabs !== false) target.searchParams.set('labs', '1');
+        await client.send('Page.navigate', { url: target.href });
         await wait(client, 'campaign loaded', s => s.persistence.visitor !== '');
         return client;
     }

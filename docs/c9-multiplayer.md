@@ -1,5 +1,13 @@
 # Multiplayer chambers and mechanics laboratories
 
+The current public flow uses persistent host-controlled **CO-OP CAMPAIGN** parties.
+One code spans CROSSFEED VAULT and RACE CONDITION; schema v6 preserves membership,
+completion badges and the current level instance. Lobby, synchronized transitions,
+victory, replay and v5 compatibility are defined in
+[ADR 0009](adr/0009-persistent-coop-parties.md). Mechanics labs are now internal
+fixtures (`?labs=1`). The historical descriptions below retain their original
+fixed-room scope unless superseded by that ADR. C8 remains independent.
+
 RACE CONDITION (`race-condition`) is the second provisional chamber. Human testing
 found CROSSFEED mechanically successful but too easy and sequential; the new
 chamber explores reversible cargo/trace/return state. See its [design contract](race-condition.md)

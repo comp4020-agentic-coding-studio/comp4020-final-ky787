@@ -1,3 +1,4 @@
+import { isCampaignLevel, type CampaignLevel } from './campaign.ts';
 import type { PlayerState } from '../engine/physics.ts';
 import { cubeEntries, newerRoom, normalizeCode, websocketUrl, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
 import { RemoteAvatar, RemoteCube } from './remote.ts';
@@ -26,7 +27,7 @@ export class CoopClient {
     private cubeSentAt: CubeMap<number> = {};
     private placements: CubeMap<CubePlacement> = {};
     private socket: WebSocket | null = null;
-    private intent: Extract<ClientMessage, { type: 'create' | 'join' }> = { type: 'create' };
+    private intent: Extract<ClientMessage, { type: 'create' | 'create-party' | 'join' }> = { type: 'create-party' };
     private retry?: ReturnType<typeof setTimeout>;
     private heartbeat?: ReturnType<typeof setInterval>;
     private deadline?: ReturnType<typeof setTimeout>;
@@ -40,8 +41,10 @@ export class CoopClient {
     private exitSent = false;
     constructor(private onRoom: (room: SharedRoom, initial: boolean) => void, private onStatus: () => void) {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
+    get isHost(): boolean { return !!this.room?.party && this.slot === 1; }
+    get playing(): boolean { return this.connected && (!this.room!.party || this.room!.party.phase === 'playing'); }
     get ownsCube(): boolean { return this.ownsCubeFor('cube'); }
-    ownsCubeFor(id: CubeId): boolean { return this.connected && this.room!.cubes[id]?.physicsAuthority === this.slot; }
+    ownsCubeFor(id: CubeId): boolean { return this.playing && this.room!.cubes[id]?.physicsAuthority === this.slot; }
     private acceptCubeRoom(room: SharedRoom, initial = false): void {
         if (initial) { this.replicas = {}; this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; }
         for (const [id, cube] of cubeEntries(room.cubes)) {
@@ -62,12 +65,30 @@ export class CoopClient {
     private remember(code: string | null): void {
         try { if (code) sessionStorage.setItem('bn_coop_room', code); else sessionStorage.removeItem('bn_coop_room'); } catch { /* Manual room codes still work. */ }
     }
-    start(code?: string, level: CoopLevelId = 'pairing-bay'): void {
+    start(code?: string, level?: CoopLevelId): void {
         this.leave(false);
         if (code !== undefined && !normalizeCode(code)) { this.status = 'ENTER A FOUR-CHARACTER ROOM CODE'; this.onStatus(); return; }
         this.active = true; this.reconnectAttempts = 0; this.room = null; this.slot = null;
-        this.intent = code ? { type: 'join', code: normalizeCode(code)! } : { type: 'create', level };
+        this.intent = code ? { type: 'join', code: normalizeCode(code)! } : level ? { type: 'create', level } : { type: 'create-party' };
         void this.connect();
+    }
+    private clearLevel(): void {
+        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear();
+        this.pendingPhase = null; this.bufferEpoch = -1; this.remote.clear(); this.replicas = {};
+        this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; this.cubeLastAt = 0;
+        this.plate = null; this.exitSent = false; this.lastSentAt = 0;
+        this.playerDiscontinuity = undefined; this.cubeDiscontinuities = {}; this.lastLocalDiscontinuity = null;
+        this.machineryEvents = [];
+    }
+    private adoptRoom(room: SharedRoom, initial = false): boolean {
+        const rebuild = initial || !this.room || room.levelInstance !== this.room.levelInstance || room.level !== this.room.level;
+        if (rebuild) this.clearLevel();
+        this.acceptCubeRoom(room, rebuild); this.room = room; this.roomReceivedAt = performance.now();
+        return rebuild;
+    }
+    selectLevel(level: CampaignLevel): boolean {
+        return this.connected && this.isHost && isCampaignLevel(level)
+            && this.send({ type: 'select-level', seq: ++this.actionSeq, level });
     }
     private async connect(): Promise<void> {
         const generation = ++this.generation;
@@ -94,22 +115,23 @@ export class CoopClient {
                 if (generation !== this.generation) return;
                 const message = JSON.parse(String(event.data)) as ServerMessage;
                 this.received++; this.lastMessageAt = performance.now();
+                if (message.type !== 'snapshot' && 'room' in message && this.room
+                    && (message.room.code !== this.room.code || message.room.levelInstance < this.room.levelInstance)) return;
+                if (['avatar', 'cube', 'cube-denied'].includes(message.type) && !this.streamMatches(message as { levelInstance?: number })) return;
                 if (message.type === 'snapshot') {
                     clearTimeout(this.deadline);
-                    this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.bufferEpoch = -1;
-                    this.acceptCubeRoom(message.room, true);
-                    this.room = message.room; this.roomReceivedAt = performance.now(); this.slot = message.slot; this.remote.clear();
-                    this.intent = { type: 'join', code: this.room.code }; this.remember(this.room.code);
+                    this.adoptRoom(message.room, true); this.slot = message.slot;
+                    this.intent = { type: 'join', code: message.room.code }; this.remember(message.room.code);
                     this.status = 'CONNECTED'; this.reconnectAttempts = 0;
-                    this.onRoom(this.room, true); this.onStatus();
+                    this.onRoom(message.room, true); this.onStatus();
                 } else if (message.type === 'room' && newerRoom(this.room, message.room)) {
-                    this.acceptCubeRoom(message.room);
-                    this.room = message.room; this.roomReceivedAt = performance.now();
-                    if (this.slot && !this.room.connected[this.slot === 1 ? 1 : 0]) this.remote.clear();
-                    this.onRoom(this.room, false); this.onStatus();
+                    const rebuild = this.adoptRoom(message.room);
+                    if (this.slot && !this.room!.connected[this.slot === 1 ? 1 : 0]) this.remote.clear();
+                    this.onRoom(this.room!, rebuild); this.onStatus();
                 } else if (message.type === 'action-result' && this.connected && this.slot) {
                     if (newerRoom(this.room, message.room)) {
-                        this.acceptCubeRoom(message.room); this.room = message.room; this.roomReceivedAt = performance.now();
+                        const rebuild = this.adoptRoom(message.room);
+                        if (rebuild) { this.onRoom(this.room!, true); this.onStatus(); return; }
                     } else if (message.room.revision === this.room!.revision) {
                         // A denial can carry a fresher transform without a semantic revision.
                         this.acceptCubeRoom(message.room); this.room = message.room; this.roomReceivedAt = performance.now();
@@ -154,7 +176,15 @@ export class CoopClient {
         clearTimeout(this.retry);
         this.retry = setTimeout(() => void this.connect(), Math.min(5000, 300 * 2 ** Math.min(5, this.reconnectAttempts - 1)) + Math.random() * 150);
     }
+    private streamMatches(message: { levelInstance?: number }): boolean {
+        return !!this.room && (message.levelInstance === this.room.levelInstance
+            || !this.room.party && message.levelInstance === undefined);
+    }
     private send(message: ClientMessage): boolean {
+        if ('seq' in message) {
+            if (!this.room || message.type !== 'select-level' && !this.playing) return false;
+            message = { ...message, levelInstance: this.room.levelInstance };
+        }
         if (this.socket?.readyState !== WebSocket.OPEN || this.socket.bufferedAmount > 8192) return false;
         this.socket.send(JSON.stringify(message)); this.sent++;
         return true;
@@ -246,7 +276,7 @@ export class CoopClient {
         const now = performance.now();
         return { websocket: this.status, transport: this.socket ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.socket.readyState] : 'CLOSED',
             url: websocketUrl(location.href), code: this.room?.code, visitor: this.visitor, slot: this.slot,
-            connected: this.room?.connected, revision: this.room?.revision, level: this.room?.level, checkpoint: this.room?.checkpoint, levelState: this.room?.levelState,
+            party: this.room?.party, host: this.isHost, levelInstance: this.room?.levelInstance, connected: this.room?.connected, revision: this.room?.revision, level: this.room?.level, checkpoint: this.room?.checkpoint, levelState: this.room?.levelState,
             lastLocalDiscontinuity: this.lastLocalDiscontinuity, lastRemoteDiscontinuity: this.remote.lastDiscontinuity, lastCubeDiscontinuity: this.remoteCube.lastDiscontinuity,
             pendingControls: [...this.pendingControls.values()], pendingCrumble: [...this.pendingCrumble.keys()],
             pendingPhase: this.pendingPhase,

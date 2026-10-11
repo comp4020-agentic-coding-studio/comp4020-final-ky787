@@ -87,7 +87,7 @@ it('buffers remote motion, holds when samples stop, and snaps transfers/disconti
 });
 
 function setup(slot: Slot = 1) {
-    const record: RoomRecord<'pairing-bay'> = { version: 5, cubePlacements: { cube: 'spawn' }, code: 'ABCD', level: 'pairing-bay', revision: 1,
+    const record: RoomRecord<'pairing-bay'> = { version: 6, party: null, levelInstance: 1, cubePlacements: { cube: 'spawn' }, code: 'ABCD', level: 'pairing-bay', revision: 1,
         visitors: ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
         levelState: { switchB: true }, checkpoint: 'reunion', exitUnlocked: false, reachedExit: [false, false], completed: false,
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };

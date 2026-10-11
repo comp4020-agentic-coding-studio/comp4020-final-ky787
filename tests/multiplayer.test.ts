@@ -139,7 +139,7 @@ it('persists logical state across SIGKILL/restart with no movement or occupancy,
     p1.send({ type: 'cube-occupancy', cubeId: 'cube' as const, seq: 2, epoch: before.room.cube.epoch, placement: 'cargoPlate' });
     await p2.wait('room', m => m.room.levelState.inputs.cubeOnCargoPlate);
     const disk = JSON.parse(await readFile(join(dir, 'rooms', `${code}.json`), 'utf8'));
-    expect(Object.keys(disk).sort()).toEqual(['version', 'cubePlacements', 'code', 'level', 'revision', 'visitors', 'levelState', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
+    expect(Object.keys(disk).sort()).toEqual(['version', 'party', 'levelInstance', 'cubePlacements', 'code', 'level', 'revision', 'visitors', 'levelState', 'checkpoint', 'exitUnlocked', 'reachedExit', 'completed', 'createdAt', 'updatedAt'].sort());
     expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.checkpoint).toBe('reunion');
     await kill(app.child); const restarted = await launch(dir);
     const rejoined = await connect(restarted.url, a.cookie); rejoined.send({ type: 'join', code });
@@ -209,7 +209,7 @@ it.each([false, true])('migrates a version-1 room (old completion %s) into unloc
     expect(migrated.completed).toBe(false); expect(migrated.reachedExit).toEqual([false, false]);
     expect(migrated.levelState.outputs.returnBridge).toBe(true); expect(migrated.checkpoint).toBe('reunion');
     const disk = JSON.parse(await readFile(path, 'utf8'));
-    expect(disk.version).toBe(5); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
+    expect(disk.version).toBe(6); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(legacy.createdAt);
     expect(disk.revision).toBeGreaterThan(legacy.revision);
 });
 
@@ -366,7 +366,7 @@ it('writes migrated version-2 progress without losing existing unlock or arrival
     const restarted = await launch(dir), back = await connect(restarted.url, a.cookie); back.send({ type: 'join', code });
     const restored = (await back.wait('snapshot')).room;
     expect(restored.exitUnlocked).toBe(true); expect(restored.reachedExit).toEqual([true, false]); expect(restored.cubePlacement).toBe('spawn');
-    expect(JSON.parse(await readFile(path, 'utf8')).version).toBe(5);
+    expect(JSON.parse(await readFile(path, 'utf8')).version).toBe(6);
 });
 
 it('requires cargo as well as two bodies for unlock, then keeps the exit unlocked when cargo is removed', async () => {

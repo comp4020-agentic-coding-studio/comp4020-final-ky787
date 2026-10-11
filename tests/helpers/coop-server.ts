@@ -29,8 +29,9 @@ export async function identity(url: string) {
 export async function connect<L extends CoopLevelId = 'pairing-bay'>(url: string, cookie: string) {
     const ws = new WebSocket(url.replace('http', 'ws') + '/ws', { headers: { Cookie: cookie, Origin: url } });
     const messages: ServerMessage<L>[] = [];
+    let levelInstance: number | undefined;
     const listeners = new Set<() => void>();
-    ws.on('message', bytes => { messages.push(JSON.parse(bytes.toString())); for (const fn of listeners) fn(); });
+    ws.on('message', bytes => { const message = JSON.parse(bytes.toString()); if (message.room) levelInstance = message.room.levelInstance; messages.push(message); for (const fn of listeners) fn(); });
     ws.on('error', () => {});
     await once(ws, 'open');
     cleanups.push(async () => { if (ws.readyState === WebSocket.CLOSED) return; const closed = once(ws, 'close'); ws.terminate(); await closed; });
@@ -45,6 +46,7 @@ export async function connect<L extends CoopLevelId = 'pairing-bay'>(url: string
             listeners.add(check); check();
         });
     }
-    return { ws, messages, wait, send: (value: unknown) => ws.send(JSON.stringify(value)),
+    return { ws, messages, wait, send: (value: unknown) => ws.send(JSON.stringify(value && typeof value === 'object' && 'seq' in value && !('levelInstance' in value) ? { ...value, levelInstance } : value)),
+        sendRaw: (value: unknown) => ws.send(JSON.stringify(value)),
         close: async () => { const closed = once(ws, 'close'); ws.close(); await closed; } };
 }

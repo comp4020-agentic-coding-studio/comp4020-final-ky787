@@ -1,3 +1,5 @@
+import { COOP_CAMPAIGN } from '../coop/campaign.ts';
+import { partyMenu, type PartyView } from '../coop/party-menu.ts';
 import { cubeEntries } from '../coop/protocol.ts';
 import { EvidenceInspector } from './evidence-inspector.ts';
 import { FIXED_DT, MAX_FRAME_TIME } from '../engine/constants.ts';
@@ -45,6 +47,8 @@ export class SliceGame {
     coop = new CoopClient((room, initial) => this.applyCoop(room, initial), () => this.coopStatus());
     private coopMode = false;
     private coopPaused = false;
+    private partyView: PartyView = 'lobby';
+    private partyMenuKey = '';
     private authority: CoopAuthority | null = null;
     private coopHud = document.createElement('aside');
     constructor(readonly host: HTMLElement, readonly canvas: HTMLCanvasElement) {
@@ -109,7 +113,7 @@ export class SliceGame {
         const code = this.coop.remembered();
         if (code) this.enterCoop(code);
     }
-    private enterCoop(code?: string, level: CoopLevelId = 'pairing-bay'): void {
+    private enterCoop(code?: string, level?: CoopLevelId): void {
         this.started = false; this.coopMode = true; this.coopPaused = false; this.authority = null;
         this.overviewVisible = false; this.overviewPending = false; this.startButton.hidden = true;
         this.inspector.element.hidden = true; this.evidenceButton.hidden = true;
@@ -119,7 +123,10 @@ export class SliceGame {
     }
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
+        const wasVictory = this.authority?.room.party?.phase === 'victory';
         if (initial) {
+            this.started = false; this.coopPaused = false; this.menu.hidden = true; this.partyMenuKey = ''; this.partyView = 'pause';
+            this.world.cancelGrapple(); this.input.releaseAll(); this.input.clearActions(); this.audio.stopAll();
             this.authority = createCoopAuthority(room, this.coop);
             this.world = new PuzzleWorld(COOP_LABS[room.level].room(this.coop.slot), { switchB: false, cubeOnPlate: false, cubeOnPlateB: false,
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
@@ -128,7 +135,7 @@ export class SliceGame {
             this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
             this.overviewVisible = (room.level === 'crossfeed-vault' || room.level === 'race-condition') && initial && room.checkpoint === 'entry';
             this.overviewPending = this.overviewVisible; this.startButton.hidden = !this.overviewVisible;
-            this.started = !this.coopPaused && !this.overviewVisible; this.canvas.focus();
+            this.started = this.coop.playing && !this.coopPaused && !this.overviewVisible; this.canvas.focus();
             this.audio.setActive(this.started && !document.hidden && document.hasFocus());
             this.audio.play('latch', .45);
         } else if (this.authority) {
@@ -150,6 +157,11 @@ export class SliceGame {
             if (!previous.completed && room.completed) this.audio.play('complete');
             else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
         }
+        if (room.party && room.party.phase !== 'playing') {
+            this.started = false; this.overviewVisible = false; this.overviewPending = false; this.startButton.hidden = true;
+            this.input.releaseAll(); this.input.clearActions(); this.world.cancelGrapple();
+            this.showPartyMenu(wasVictory && !initial && this.partyView === 'choose' ? 'choose' : room.party.phase === 'victory' ? 'victory' : 'lobby');
+        }
     }
     private coopStatus(): void {
         if (!this.coopMode) return;
@@ -158,12 +170,13 @@ export class SliceGame {
         const slots = r ? r.connected.map((on, i) => `PLAYER ${i + 1}   ${on ? 'CONNECTED' : r.assigned[i] ? 'DISCONNECTED' : 'WAITING FOR PARTNER'}${r.reachedExit[i] ? ' · ARRIVED' : ''}`).join('\n') : '';
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;
         const status = !this.coop.connected ? this.coop.status
+            : r?.party && this.coop.slot === 2 && !r.connected[0] ? 'HOST DISCONNECTED — WAITING FOR RECONNECT'
             : r && !r.connected[partner] ? r.assigned[partner] ? 'PARTNER DISCONNECTED' : 'WAITING FOR PARTNER'
             : r?.completed ? r.level === 'race-condition' ? 'TRACE COMPLETE' : r.level === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
             : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();
-        const label = document.createElement('small'); label.textContent = `${r ? COOP_LABS[r.level].title : 'CO-OP LAB'} / ROOM CODE`;
+        const label = document.createElement('small'); label.textContent = `${r ? COOP_LABS[r.level].title : 'CO-OP CAMPAIGN'} / PARTY CODE`;
         const code = document.createElement('strong'); code.id = 'room-code'; code.textContent = r?.code ?? '····';
         const codeRow = document.createElement('div'); codeRow.className = 'room-code-row';
         const copy = document.createElement('button'); copy.id = 'copy-room-code'; copy.type = 'button';
@@ -189,6 +202,8 @@ export class SliceGame {
             arrivals.textContent = `EXIT · ${r.reachedExit.filter(Boolean).length} / 2 ARRIVED${r.completed ? '' : ' · BOTH PLAYERS REQUIRED'}`;
             this.coopHud.append(arrivals);
         }
+        if (r?.party && (r.party.phase !== 'playing' || this.coopPaused)) this.showPartyMenu(this.partyView);
+        this.coopHud.hidden = !!r?.party && !this.menu.hidden;
         if (!this.coop.active) {
             const back = document.createElement('button'); back.textContent = 'Back to menu'; back.onclick = () => this.leaveCoop(); this.coopHud.append(back);
         }
@@ -198,7 +213,34 @@ export class SliceGame {
         this.host.classList.remove('coop-mode');
         this.ended = false; this.loadRoom(); this.showMenu();
     }
+    private showPartyMenu(view: PartyView): void {
+        const r = this.coop.room;
+        if (!r?.party || !this.coop.slot) return;
+        if (r.party.phase === 'lobby') view = 'lobby';
+        if (r.party.phase === 'victory' && view !== 'choose') view = 'victory';
+        const key = JSON.stringify([view, r.code, r.levelInstance, r.party, r.connected, r.assigned, this.coop.status]);
+        if (this.partyMenuKey === key && !this.menu.hidden) return;
+        this.partyView = view; this.partyMenuKey = key; this.coopPaused = true; this.started = false;
+        this.coop.occupy(null); this.world.cancelGrapple(); this.input.releaseAll(); this.input.clearActions();
+        this.audio.setActive(false); this.overviewVisible = false; this.startButton.hidden = true;
+        this.menu.hidden = false; this.coopHud.hidden = true;
+        this.menu.innerHTML = partyMenu(r, this.coop.slot, this.coop.connected, view);
+        this.menu.querySelector('#party-audio')!.innerHTML = this.audioMenu(); this.bindAudio();
+        this.menu.querySelector('#party-copy')!.addEventListener('click', async () => {
+            const feedback = this.menu.querySelector('#party-copy-status')!;
+            try { await navigator.clipboard.writeText(r.code); feedback.textContent = ' COPIED'; }
+            catch { feedback.textContent = ' Select the code to copy.'; }
+        });
+        for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-select-level]')) button.addEventListener('click', () => {
+            const level = COOP_CAMPAIGN.find(l => l.id === button.dataset.selectLevel);
+            if (level && this.coop.selectLevel(level.id)) for (const b of this.menu.querySelectorAll<HTMLButtonElement>('[data-select-level]')) b.disabled = true;
+        });
+        this.menu.querySelector('#choose-chamber')?.addEventListener('click', () => this.showPartyMenu('choose'));
+        this.menu.querySelector('#continue')?.addEventListener('click', () => this.resumeRoom());
+        this.menu.querySelector('#leave-coop')!.addEventListener('click', () => this.leaveCoop());
+    }
     private showCoopMenu(): void {
+        if (this.coop.room?.party) { this.showPartyMenu('pause'); return; }
         this.coopPaused = true; this.started = false; this.coop.occupy(null);
         this.audio.setActive(false); this.world.cancelGrapple(); this.input.releaseAll();
         this.menu.hidden = false;
@@ -240,24 +282,23 @@ export class SliceGame {
         this.input.releaseAll();
         this.menu.hidden = false;
         const p = this.store.progress, saved = this.store.updatedAt;
-        this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA / CAMPAIGN + CO-OP</span>
-      <h2>${this.ended ? 'Control Spine complete.' : 'Small inputs.<br>Big changes.'}</h2>
-      <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Three tutorials. One bigger puzzle.<br>Route the payload to the core node.'}</p>
+        this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA</span>
+      <h2>${this.ended ? 'Control Spine complete.' : 'Play together.'}</h2>
+      <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Learn the tools. Then tackle the co-op campaign.'}</p>
       <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${roomById(p.currentRoom).title} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${roomById(p.currentRoom).title}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       <nav class="level-select" aria-label="Level select">
-        <span class="eyebrow">SINGLE PLAYER / CHOOSE A ROOM</span>
+        <span class="eyebrow">TUTORIAL</span>
         <div class="level-grid">${ROOMS.map((room, index) => `<button data-room="${room.id}" ${room.id === p.currentRoom ? 'aria-current="true"' : ''}><strong>0${index + 1} / ${room.title}</strong><small>${room.id === p.currentRoom ? 'CURRENT' : p.completedRooms.includes(room.id) ? 'COMPLETE' : 'PLAY'}</small></button>`).join('')}</div>
         <small>All rooms available · keeps each room’s saved progress</small>
       </nav>
       <section class="coop-entry" aria-label="Co-op">
-        <span class="eyebrow">CO-OP CHAMBERS</span>
-        <div class="coop-lab"><div><strong>RACE CONDITION</strong><small>Deliver the payload. Keep the trace alive.</small></div><button data-create-lab="race-condition">CREATE ROOM</button></div>
-        <div class="coop-lab"><div><strong>CROSSFEED VAULT</strong><small>First full cooperative puzzle</small></div><button data-create-lab="crossfeed-vault">CREATE ROOM</button></div>
-        <span class="eyebrow">MECHANICS LABS</span>
-        <div class="coop-labs">${Object.entries(COOP_LABS).filter(([id]) => id !== 'crossfeed-vault' && id !== 'race-condition').map(([id, lab]) => `<div class="coop-lab"><div><strong>${lab.title}</strong><small>${lab.description}</small></div><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div>
-        <form id="join-room-form"><label for="join-code">ROOM CODE</label><input id="join-code" name="code" maxlength="8" placeholder="7K3M" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button id="join-room" type="submit">JOIN ROOM</button></form>
+        <span class="eyebrow">CO-OP CAMPAIGN</span>
+        <p class="campaign-preview">${COOP_CAMPAIGN.map((l, i) => `0${i + 1} — ${l.title}`).join('<br>')}</p>
+        <button id="create-party" class="primary">CREATE PARTY</button>
+        ${new URL(location.href).searchParams.get('labs') === '1' ? `<details class="internal-labs" open><summary>INTERNAL REGRESSION ROOMS</summary><div class="coop-labs">${Object.entries(COOP_LABS).map(([id, lab]) => `<div class="coop-lab"><strong>${lab.title}</strong><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div></details>` : ''}
+        <form id="join-room-form"><label for="join-code">JOIN PARTY</label><input id="join-code" name="code" maxlength="8" placeholder="7K3M" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button id="join-room" type="submit">JOIN PARTY</button></form>
         <p id="join-error" role="status"></p>
       </section>
       <div class="progress-reset">
@@ -269,14 +310,11 @@ export class SliceGame {
           <div class="reset-actions"><button id="cancel-reset">Cancel</button><button id="confirm-reset" class="danger">Reset all progress</button></div>
         </div>
       </div>
-      <fieldset class="audio-settings"><legend>SOUND</legend>
-        <button id="audio-mute" type="button" aria-pressed="${this.audio.getPreferences().muted}">${this.audio.getPreferences().muted ? 'Sound off' : 'Sound on'}</button>
-        <label for="audio-volume">Volume <output id="audio-volume-value">${Math.round(this.audio.getPreferences().volume * 100)}%</output></label>
-        <input id="audio-volume" type="range" min="0" max="100" value="${Math.round(this.audio.getPreferences().volume * 100)}">
-      </fieldset>
+      ${this.audioMenu()}
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
+        this.menu.querySelector('#create-party')!.addEventListener('click', () => this.enterCoop());
         for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-create-lab]')) button.addEventListener('click', () => this.enterCoop(undefined, button.dataset.createLab as CoopLevelId));
         this.menu.querySelector('#join-room-form')!.addEventListener('submit', event => {
             event.preventDefault();
@@ -284,17 +322,7 @@ export class SliceGame {
             if (!code) { this.menu.querySelector('#join-error')!.textContent = 'ENTER A FOUR-CHARACTER ROOM CODE'; return; }
             this.enterCoop(code);
         });
-        this.menu.querySelector<HTMLButtonElement>('#audio-mute')!.addEventListener('click', e => {
-            this.audio.setPreferences({ muted: !this.audio.getPreferences().muted });
-            const button = e.currentTarget as HTMLButtonElement;
-            button.textContent = this.audio.getPreferences().muted ? 'Sound off' : 'Sound on';
-            button.setAttribute('aria-pressed', String(this.audio.getPreferences().muted));
-        });
-        this.menu.querySelector<HTMLInputElement>('#audio-volume')!.addEventListener('input', e => {
-            const value = (e.currentTarget as HTMLInputElement).valueAsNumber;
-            this.audio.setPreferences({ volume: value / 100 });
-            this.menu.querySelector('#audio-volume-value')!.textContent = `${value}%`;
-        });
+        this.bindAudio();
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
         for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-room]')) {
             button.addEventListener('click', () => {
@@ -335,9 +363,32 @@ export class SliceGame {
             this.showMenu();
         });
     }
+    private audioMenu(): string {
+        return `<fieldset class="audio-settings"><legend>SOUND</legend>
+        <button id="audio-mute" type="button" aria-pressed="${this.audio.getPreferences().muted}">${this.audio.getPreferences().muted ? 'Sound off' : 'Sound on'}</button>
+        <label for="audio-volume">Volume <output id="audio-volume-value">${Math.round(this.audio.getPreferences().volume * 100)}%</output></label>
+        <input id="audio-volume" type="range" min="0" max="100" value="${Math.round(this.audio.getPreferences().volume * 100)}">
+      </fieldset>`;
+    }
+    private bindAudio(): void {
+        this.menu.querySelector<HTMLButtonElement>('#audio-mute')!.addEventListener('click', e => {
+            this.audio.setPreferences({ muted: !this.audio.getPreferences().muted });
+            const button = e.currentTarget as HTMLButtonElement;
+            button.textContent = this.audio.getPreferences().muted ? 'Sound off' : 'Sound on';
+            button.setAttribute('aria-pressed', String(this.audio.getPreferences().muted));
+        });
+        this.menu.querySelector<HTMLInputElement>('#audio-volume')!.addEventListener('input', e => {
+            const value = (e.currentTarget as HTMLInputElement).valueAsNumber;
+            this.audio.setPreferences({ volume: value / 100 });
+            this.menu.querySelector('#audio-volume-value')!.textContent = `${value}%`;
+        });
+    }
     private resumeRoom(): void {
         if (this.coopMode) {
-            this.coopPaused = false; this.started = this.coop.connected; this.menu.hidden = true; this.input.releaseAll(); this.canvas.focus(); return;
+            if (!this.coop.playing) return;
+            this.coopPaused = false; this.partyMenuKey = ''; this.partyView = 'pause'; this.started = !this.overviewPending;
+            this.overviewVisible = this.overviewPending; this.startButton.hidden = !this.overviewVisible;
+            this.menu.hidden = true; this.coopHud.hidden = false; this.input.releaseAll(); this.input.clearActions(); this.canvas.focus(); return;
         }
         if (this.ended) {
             this.loadRoom();
@@ -459,7 +510,7 @@ export class SliceGame {
             this.accumulated = 0;
         this.sound.ambience(this.world, this.started && !document.hidden && document.hasFocus());
         this.audio.meter();
-        if (this.coopMode) {
+        if (this.coopMode && this.coop.playing) {
             this.world.syncAuthority();
             this.sound.observe(this.world, this.coop.takeMachineryEvents());
             this.coop.publish(this.world.player, now);

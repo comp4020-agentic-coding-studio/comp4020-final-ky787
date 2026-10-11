@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /** Real-input two-browser chamber route. Reads snapshots; never writes world/controller state. */
+import { pathToFileURL } from 'node:url';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import type { CubeId, SharedRoom } from '../src/coop/protocol.ts';
-type Snapshot = Omit<GameSnapshot, 'multiplayer'> & { multiplayer: (Omit<NonNullable<GameSnapshot['multiplayer']>, 'shared'> & { shared: SharedRoom<'crossfeed-vault'> | null }) | null };
-const h = await coopBrowser<Snapshot>({ shots: process.env.BN_SHOTS ?? '/tmp/bn-crossfeed-shots' });
+type Snapshot = GameSnapshot;
+export async function crossfeedRoute(h: Awaited<ReturnType<typeof coopBrowser<Snapshot>>>, url: string, debug: string, reverse = false, partyPlayers?: [Cdp, Cdp]) {
 const { snapshot, wait, check, click, key, tap, walk, mouse, sleep, shot } = h;
-const state = (s: Snapshot) => s.multiplayer!.shared!;
+const state = (s: Snapshot) => s.multiplayer!.shared! as SharedRoom<'crossfeed-vault'>;
 async function align(p: Cdp, x: number) {
     let dx = x - (await snapshot(p)).player.x;
     if (Math.abs(dx) > 65) await walk(p, x - Math.sign(dx) * 35);
@@ -70,14 +71,16 @@ async function mount(p: Cdp, id: CubeId) {
 async function vault(p: Cdp) {
     await align(p, 1730); await hop(p, 1800, 'vault-rise-low'); await hop(p, 1980, 'vault-rise-high'); await hop(p, 2140, 'vault-cargo-deck');
 }
-async function route(url: string, debug: string, reverse: boolean) {
     h.scenario = reverse ? '[reversed roles] ' : '[full chamber] '; h.shotPrefix = reverse ? 'reverse-' : 'full-';
-    const a = await h.page(url, debug), b = await h.page(url, debug);
+    const [a, b] = partyPlayers ?? [await h.page(url, debug), await h.page(url, debug)];
     const holder = reverse ? b : a, runner = reverse ? a : b;
+    if (!partyPlayers) {
     await click(a, '[data-create-lab="crossfeed-vault"]');
     const created = await wait(a, 'created CROSSFEED', s => s.room === 'crossfeed-vault' && !!s.multiplayer?.code);
     await click(b, '#join-code'); await b.send('Input.insertText', { text: created.multiplayer!.code }); await click(b, '#join-room');
     await wait(b, 'join discovers chamber', s => s.room === 'crossfeed-vault' && !!s.multiplayer?.shared?.connected.every(Boolean));
+    }
+    const created = await snapshot(a);
     await sleep(1500); await shot(a, 'overview');
     check('one large chamber, two named cubes, honest mock source', Object.keys(created.cubes).join(',') === 'cubeA,cubeB' && created.source === 'mock-multiplayer' && !created.evidence);
     for (const p of [a, b]) { await tap(p, 'Space'); await wait(p, 'overview dismissed', s => s.started && !s.overviewVisible); }
@@ -143,14 +146,20 @@ async function route(url: string, debug: string, reverse: boolean) {
     check('exit stays open after both players leave final plates', (await snapshot(runner)).outputs.exitDoor);
     await walk(runner, 2550); await wait(holder, 'one physical arrival', s => state(s).reachedExit.filter(Boolean).length === 1);
     check('one arrival does not complete room', !state(await snapshot(holder)).completed);
-    await walk(holder, 2610); await wait(runner, 'two physical arrivals complete vault', s => state(s).completed);
+    await key(holder, 'KeyA', true);
+    try { await wait(runner, 'two physical arrivals complete vault', s => state(s).completed); } finally { await key(holder, 'KeyA', false); }
     await shot(runner, 'complete');
     check('CROSSFEED completed through real controls', state(await snapshot(holder)).completed && (await snapshot(holder)).deaths === 0 && (await snapshot(runner)).deaths === 0);
 }
+
+async function main() {
+const h = await coopBrowser<Snapshot>({ shots: process.env.BN_SHOTS ?? '/tmp/bn-crossfeed-shots' });
+const { check, shot, snapshot } = h;
+
 try {
     const url = process.argv[2] ?? await h.startServer(), debug = await h.launch();
-    await route(url, debug, false);
-    if (!process.env.BN_CROSSFEED_FORWARD_ONLY) await route(url, debug, true);
+    await crossfeedRoute(h, url, debug, false);
+    if (!process.env.BN_CROSSFEED_FORWARD_ONLY) await crossfeedRoute(h, url, debug, true);
     for (const c of h.clients) check('browser has no runtime errors', c.errors.length === 0, c.errors.join('\n'));
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {
@@ -161,3 +170,6 @@ try {
     await writeFile(join(h.shots, 'error.txt'), String(e));
     console.error(String(e).split(': {')[0]); process.exitCode = 1;
 } finally { await h.cleanup(); }
+
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /** Real-input two-browser chamber route. Reads snapshots; never writes world/controller state. */
+import { pathToFileURL } from 'node:url';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import type { CubeId, SharedRoom } from '../src/coop/protocol.ts';
-type Snapshot = Omit<GameSnapshot, 'multiplayer'> & { multiplayer: (Omit<NonNullable<GameSnapshot['multiplayer']>, 'shared'> & { shared: SharedRoom<'race-condition'> | null }) | null };
-const h = await coopBrowser<Snapshot>({ shots: process.env.BN_SHOTS ?? '/tmp/bn-race-shots' });
+type Snapshot = GameSnapshot;
+export async function raceRoute(h: Awaited<ReturnType<typeof coopBrowser<Snapshot>>>, url: string, debug: string, reverse = false, partyPlayers?: [Cdp, Cdp]) {
 const { snapshot, wait, check, click, key, tap, walk, mouse, sleep, shot } = h;
-const state = (s: Snapshot) => s.multiplayer!.shared!;
+const state = (s: Snapshot) => s.multiplayer!.shared! as SharedRoom<'race-condition'>;
 async function align(p: Cdp, x: number) {
     let dx = x - (await snapshot(p)).player.x;
     if (Math.abs(dx) > 65) await walk(p, x - Math.sign(dx) * 35);
@@ -58,13 +59,16 @@ async function launchDeck(p: Cdp) {
     await align(p, 260);
     for (const [x, ground] of [[332,'launch-step-0'],[397,'launch-step-1'],[462,'launch-step-2'],[527,'launch-step-3'],[600,'launch']] as const) await hop(p, x, ground);
 }
-async function route(url: string, debug: string, reverse: boolean) {
     h.scenario = reverse ? '[reverse] ' : '[full] '; h.shotPrefix = reverse ? 'reverse-' : 'full-';
-    const a = await h.page(url, debug), b = await h.page(url, debug), operator = reverse ? b : a, runner = reverse ? a : b;
+    const [a, b] = partyPlayers ?? [await h.page(url, debug), await h.page(url, debug)];
+    const operator = reverse ? b : a, runner = reverse ? a : b;
+    if (!partyPlayers) {
     await click(a, '[data-create-lab="race-condition"]');
     const created = await wait(a, 'created RACE', s => s.room === 'race-condition' && !!s.multiplayer?.code);
     await click(b, '#join-code'); await b.send('Input.insertText', { text: created.multiplayer!.code }); await click(b, '#join-room');
     await wait(b, 'join discovers RACE', s => s.room === 'race-condition' && state(s).connected.every(Boolean));
+    }
+    const created = await snapshot(a);
     await sleep(800); await shot(a, 'overview');
     for (const p of [a,b]) { await tap(p, 'Space'); await wait(p, 'dismiss overview', s => s.started && !s.overviewVisible); }
     check('named payloads and honest mock controller', Object.keys(created.cubes).length === 2 && created.source === 'mock-multiplayer' && !created.evidence);
@@ -156,14 +160,20 @@ async function route(url: string, debug: string, reverse: boolean) {
     await walk(operator,3780); await wait(operator,'back on right deck',s=>s.player.groundId==='right-deck');
     await walk(operator,4050); await wait(runner,'one arrival only',s=>state(s).reachedExit.filter(Boolean).length===1);
     check('one arrival cannot complete',!state(await snapshot(runner)).completed);
-    await walk(runner,4070); await wait(operator,'two arrivals complete',s=>state(s).completed);
+    await key(runner, 'KeyD', true);
+    try { await wait(operator,'two arrivals complete',s=>state(s).completed); } finally { await key(runner, 'KeyD', false); }
     check('RACE complete using real controls', state(await snapshot(runner)).completed);
     await shot(operator,'complete');
 }
+
+async function main() {
+const h = await coopBrowser<Snapshot>({ shots: process.env.BN_SHOTS ?? '/tmp/bn-race-shots' });
+const { check, shot, snapshot } = h;
+
 try {
     const url = process.argv[2] ?? await h.startServer(), debug = await h.launch();
-    if (!process.env.BN_RACE_REVERSE_ONLY) await route(url, debug, false);
-    if (!process.env.BN_RACE_FORWARD_ONLY) await route(url, debug, true);
+    if (!process.env.BN_RACE_REVERSE_ONLY) await raceRoute(h, url, debug, false);
+    if (!process.env.BN_RACE_FORWARD_ONLY) await raceRoute(h, url, debug, true);
     for (const c of h.clients) check('browser has no runtime errors', c.errors.length === 0, c.errors.join('\n'));
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {
@@ -174,3 +184,6 @@ try {
     await writeFile(join(h.shots, 'error.txt'), String(e));
     console.error(String(e).split(': {')[0]); process.exitCode = 1;
 } finally { await h.cleanup(); }
+
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

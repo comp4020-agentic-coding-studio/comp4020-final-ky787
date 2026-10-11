@@ -20,7 +20,7 @@ it.each(COOP_LEVELS)('creator selects %s, joiner discovers it, and only that lev
     expect(Object.keys(first.room.cubes)).toEqual(level === 'crumble-lab' ? [] : level === 'crossfeed-vault' || level === 'race-condition' ? ['cubeA', 'cubeB'] : ['cube']);
     expect(first.room.cube === null).toBe(level === 'crumble-lab' || level === 'crossfeed-vault' || level === 'race-condition');
     const disk = JSON.parse(await readFile(join(dir, 'rooms', code + '.json'), 'utf8'));
-    expect(disk.version).toBe(5); expect(disk.level).toBe(level);
+    expect(disk.version).toBe(6); expect(disk.level).toBe(level);
     expect(disk.levelState).toEqual(newRecord(code, a.id, level).levelState);
     for (const name of ['cube', 'plates', 'crumble', 'transform', 'physicsAuthority', 'connected']) expect(disk).not.toHaveProperty(name);
     await kill(app.child); const restarted = await launch(dir), back = await connect(restarted.url, a.cookie);
@@ -153,5 +153,5 @@ it('migrates a real version-3 disk file preserving docked cargo and completed ar
     await writeFile(path, JSON.stringify(r)); const restarted = await launch(dir), back = await connect(restarted.url, a.cookie);
     back.send({ type: 'join', code }); const restored = (await back.wait('snapshot')).room;
     expect(restored).toMatchObject({ level: 'pairing-bay', checkpoint: 'reunion', cubePlacement: 'cargoPlate', completed: true, reachedExit: [true, true] });
-    const disk = JSON.parse(await readFile(path, 'utf8')); expect(disk.version).toBe(5); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(r.createdAt);
+    const disk = JSON.parse(await readFile(path, 'utf8')); expect(disk.version).toBe(6); expect(disk.visitors).toEqual([a.id, b.id]); expect(disk.createdAt).toBe(r.createdAt);
 });

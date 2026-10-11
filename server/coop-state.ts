@@ -1,4 +1,5 @@
 import { CODE_PATTERN, isCoopLevel, cubeEntries, type CubeId, type CubeMap, type ClientMessage, type CoopLevelId, type CubePlacement, type LevelStateMap, type Plate, type SharedCube, type SharedRoom } from '../src/coop/protocol.ts';
+import { isCampaignLevel, type PartyState } from '../src/coop/campaign.ts';
 import { UUID } from './identity.ts';
 import { freshCube } from './cube-state.ts';
 import { freshCrumble, type CrumbleRuntime } from './crumble-state.ts';
@@ -17,7 +18,7 @@ export interface DurableStates {
     'crumble-lab': { tested: { foot: boolean; hook: boolean } };
 }
 export interface SessionRecord {
-    version: 5; code: string; revision: number; visitors: [string, string | null];
+    version: 6; party: PartyState | null; levelInstance: number; code: string; revision: number; visitors: [string, string | null];
     checkpoint: 'entry' | 'reunion' | 'upper';
     exitUnlocked: boolean; reachedExit: [boolean, boolean]; completed: boolean;
     createdAt: string; updatedAt: string;
@@ -45,14 +46,29 @@ export function definition<L extends CoopLevelId>(level: L): LevelDefinition<L> 
     return LEVEL_DEFINITIONS[level] as LevelDefinition<L>;
 }
 export function newRecord<L extends CoopLevelId>(code: string, visitor: string, level: L, now = new Date().toISOString()): RoomRecord<L> {
-    return { version: 5, code, level, levelState: definition(level).defaults(), revision: 0, visitors: [visitor, null],
+    return { version: 6, party: isCampaignLevel(level) ? { phase: 'playing', completedLevels: [] } : null, levelInstance: 1, code, level, levelState: definition(level).defaults(), revision: 0, visitors: [visitor, null],
         cubePlacements: Object.fromEntries(definition(level).cubeIds.map(id => [id, 'spawn'])), checkpoint: 'entry', exitUnlocked: false,
         reachedExit: [false, false], completed: false, createdAt: now, updatedAt: now } as RoomRecord<L>;
 }
 export function validRecord(value: unknown, code: string): value is RoomRecord {
+    if (!validChamber(value, code, 6)) return false;
+    const r = value as RoomRecord;
+    if (!Number.isSafeInteger(r.levelInstance) || r.levelInstance < 1) return false;
+    if (!isCampaignLevel(r.level)) return r.party === null;
+    const p = r.party;
+    return !!p && Object.keys(p).length === 2 && ['lobby', 'playing', 'victory'].includes(p.phase)
+        && Array.isArray(p.completedLevels) && p.completedLevels.every(isCampaignLevel)
+        && new Set(p.completedLevels).size === p.completedLevels.length
+        && (p.phase === 'victory') === r.completed && (!r.completed || p.completedLevels.includes(r.level))
+        && (p.phase !== 'lobby' || r.levelInstance === 1 && r.revision >= 0 && !r.exitUnlocked
+            && r.checkpoint === 'entry' && !p.completedLevels.length
+            && JSON.stringify(r.levelState) === JSON.stringify(definition(r.level).defaults())
+            && Object.values(r.cubePlacements).every(v => v === 'spawn'));
+}
+function validChamber(value: unknown, code: string, version: number): boolean {
     if (!value || typeof value !== 'object') return false;
     const r = value as RoomRecord;
-    return r.version === 5 && r.code === code && CODE_PATTERN.test(code) && isCoopLevel(r.level)
+    return r.version === version && r.code === code && CODE_PATTERN.test(code) && isCoopLevel(r.level)
         && Number.isSafeInteger(r.revision) && r.revision >= 0
         && Array.isArray(r.visitors) && r.visitors.length === 2 && UUID.test(r.visitors[0])
         && (r.visitors[1] === null || UUID.test(r.visitors[1]) && r.visitors[1] !== r.visitors[0])
@@ -70,18 +86,24 @@ export function validRecord(value: unknown, code: string): value is RoomRecord {
 }
 export function readRoomRecord(value: unknown, code: string): RoomRecord | null {
     if (validRecord(value, code)) return value;
+    if (validChamber(value, code, 5)) {
+        const old = value as RoomRecord;
+        const migrated = { ...old, version: 6, levelInstance: 1,
+            party: isCampaignLevel(old.level) ? { phase: old.completed ? 'victory' : 'playing', completedLevels: old.completed ? [old.level] : [] } : null };
+        return validRecord(migrated, code) ? migrated : null;
+    }
     if (value && typeof value === 'object' && 'version' in value && value.version === 4) {
         const { cubePlacement, ...session } = value as Record<string, unknown>;
         if (!isCoopLevel(session.level) || session.level === 'crossfeed-vault' || session.level === 'race-condition') return null;
         if (session.level === 'crumble-lab' ? cubePlacement !== null : !['spawn', 'cargoPlate'].includes(cubePlacement as string)) return null;
         const migrated = { ...session, version: 5, cubePlacements: session.level === 'crumble-lab' ? {} : { cube: cubePlacement } };
-        return validRecord(migrated, code) ? migrated : null;
+        return readRoomRecord(migrated, code);
     }
     const old = readLegacyPairingRecord(value, code);
     if (!old) return null;
     const { switchB, cubePlacement, ...session } = old;
     const migrated = { ...session, version: 5, cubePlacements: { cube: cubePlacement }, levelState: { switchB } };
-    return validRecord(migrated, code) ? migrated : null;
+    return readRoomRecord(migrated, code);
 }
 export const freshCubes = (level: CoopLevelId): CubeMap<SharedCube> => Object.fromEntries(definition(level).cubeIds.map(id => [id, freshCube()]));
 export function sharedRoom<L extends CoopLevelId>(record: RoomRecord<L>, connected: [boolean, boolean], plates: [Plate, Plate],
@@ -89,7 +111,7 @@ export function sharedRoom<L extends CoopLevelId>(record: RoomRecord<L>, connect
     const held = plates.map((p, i) => connected[i] ? p : null) as [Plate, Plate];
     const collection = cube && 'holder' in cube ? { cube } : cube ?? {};
     const cubes = Object.fromEntries(cubeEntries(collection).map(([id, c]) => [id, { ...c, transform: c.transform ? { ...c.transform } : null }]));
-    return { code: record.code, level: record.level, revision: record.revision, assigned: [true, record.visitors[1] !== null], connected,
+    return { party: record.party ? { ...record.party, completedLevels: [...record.party.completedLevels] } : null, levelInstance: record.levelInstance, code: record.code, level: record.level, revision: record.revision, assigned: [true, record.visitors[1] !== null], connected,
         levelState: definition(record.level).project({ record, held, crumble, race, now }),
         cubes, cubePlacements: { ...record.cubePlacements },
         cube: cubes.cube ?? null, cubePlacement: record.cubePlacements.cube ?? null,

@@ -67,36 +67,31 @@ The goal is not to disguise an obfuscation study as a game.
 
 The goal is to make a good cooperative game whose strange machinery genuinely comes from the reverse-engineering work behind it.
 
-## Cooperative chambers and mechanics labs
+## Tutorial and co-op campaign
 
-The menu offers **CO-OP CHAMBERS** and separate **MECHANICS LABS**.
-[CROSSFEED VAULT](docs/crossfeed-vault.md) is the first full chamber: two named
-payloads, temporary lift power, relay logistics, a partner boost and a final
-two-cube/two-player assembly. Its mock logical contract is provisional until
-human playtest acceptance; no binary integration is claimed. Create a
-room, share its four-character code, and join from a different browser profile or
-private window. PAIRING BAY tests shared inputs and cube handoff. Either player can hold the anchor online or cross first and
-latch the return bridge. Two distinct bodies on separate final plates permanently
-unlock the exit; both players then physically reach it to complete the chamber.
-Slots identify players, not gameplay roles. Unlock and individual arrival credit
-survive reconnects. RELAY, LIFT and CRUMBLE LAB test shared machinery. BOOST LAB
-lets either player hold the cube overhead while their partner jumps onto it and
-then reaches an upper switch, opening a return route for both.
-FIREWALL LAB tests always-active horizontal/vertical beams, independent player
-respawns and shared cube destruction/recovery. These are authored hazards with
-no binary or obfuscator evidence claims.
+The public menu has **TUTORIAL** (PRESSURE, SWITCH, RELAY, CONTROL SPINE) and
+**CO-OP CAMPAIGN**. Tutorial progress and CONTROL SPINE's validated evidence keep
+their existing single-player saves and contracts.
 
-Movement remains local and responsive; the existing Node server synchronizes and
-saves shared puzzle state over same-origin WebSockets. Refresh restores the same
-visitor's slot and shared checkpoint. PAIRING BAY is explicitly mock test
-infrastructure. The C8 campaign and CONTROL SPINE's validated evidence remain
-separate, and personal campaign saves keep their existing format.
+Choose **CREATE PARTY**, share the four-character code, and have a partner use
+**JOIN PARTY** from another computer/profile. The creator is the durable host and
+selects a chamber for both players. Campaign order is **CROSSFEED VAULT**, then
+**RACE CONDITION**. Both are available for playtesting. The code and membership
+stay the same across selections, refreshes and restarts.
 
-See [the multiplayer contract and test flow](docs/c9-multiplayer.md) and
-[the authority ADR](docs/adr/0001-multiplayer-authority.md). The existing lab
-mechanics were manually accepted before CROSSFEED development. CROSSFEED now
-requires its own human two-computer puzzle playtest before contract freezing or
-binary generation.
+Both players must physically finish. A shared victory screen then lets the host
+choose **NEXT CHAMBER** or **CHOOSE CHAMBER**; guests wait for the host. Selecting
+or replaying a chamber starts its puzzle fresh but preserves completion badges.
+The host can also choose another chamber from the pause menu. Host disconnect
+never transfers navigation control to the guest.
+
+Mechanics labs remain internal regression fixtures, available via `?labs=1` and
+the existing browser harnesses. They are hidden from the public menu, not deleted.
+`pnpm check:campaign` exercises both full chamber solves in one persistent party.
+See [the party architecture](docs/adr/0009-persistent-coop-parties.md),
+[the multiplayer contract](docs/c9-multiplayer.md), and the provisional chamber
+contracts for [CROSSFEED](docs/crossfeed-vault.md) and [RACE](docs/race-condition.md).
+Co-op controllers remain honestly mock; this milestone generates no binaries.
 
 ## Run locally
 

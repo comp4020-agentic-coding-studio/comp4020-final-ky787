@@ -72,7 +72,8 @@ async function finalAccess(p: Cdp) {
 try {
     const backend = process.argv[2] ?? await startServer();
     const base = process.env.BN_TEST_TLS ? await tlsOrigin(backend) : backend;
-    const url = new URL(base).href;
+    const target = new URL(base); target.searchParams.set('labs', '1');
+    const url = target.href;
     const debugUrl = await h.launch();
     for (const holderSlot of [1, 2] as const) {
         const runnerSlot = holderSlot === 1 ? 2 : 1;

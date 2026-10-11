@@ -336,3 +336,19 @@ p {
 .coop-lab strong { color: #64e6d5; font-size: 12px; }
 .coop-lab small { color: #a8bac3; margin-top: 5px; font-size: 11px; }
 .coop-lab button { width: auto; margin: 0; flex-shrink: 0; }
+.party-card { width:min(650px,90%); }
+.party-code { padding:16px 0; border-block:1px solid #314750; font:12px ui-monospace,monospace; }
+.party-code strong { color:#64e6d5; font-size:28px; letter-spacing:5px; margin:0 12px; }
+.party-members { display:grid; gap:12px; margin:20px 0; font:11px ui-monospace,monospace; }
+.party-members b { color:#64e6d5; }
+.campaign-select { display:grid; gap:12px; margin:24px 0; }
+.campaign-chamber { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px; border:1px solid #38515c; }
+.campaign-chamber strong { font:13px ui-monospace,monospace; }
+.campaign-chamber small { display:block; margin-top:7px; color:#64e6d5; }
+.party-card .secondary { display:block; margin:16px auto; border-color:transparent; }
+.party-card #leave-coop { margin-top:18px; }
+#party-victory { border-top:3px solid #64e6d5; text-align:center; padding-block:46px; }
+#party-victory .victory-message { color:#64e6d5; letter-spacing:2px; }
+#party-victory #next-chamber { margin-top:22px; padding:22px; font-size:18px; }
+.campaign-preview { font:12px/1.9 ui-monospace,monospace; }
+.internal-labs { margin:18px 0; }
