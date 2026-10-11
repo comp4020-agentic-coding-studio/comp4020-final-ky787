@@ -25,6 +25,8 @@ export const PLAYER = {
   accel: 3400,
   airAccel: 1900,
   maxRunSpeed: 380,
+  /** +12% sustained grounded travel; air control and jump/grapple tuning unchanged. */
+  maxGroundRunSpeed: 426,
   groundFriction: 2900,
   airDrag: 130,
   gravity: 3400,

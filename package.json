@@ -25,7 +25,8 @@
     "check:multiplayer-lift": "node scripts/labs-browser-check.ts lift-lab",
     "check:multiplayer-crumble": "node scripts/labs-browser-check.ts crumble-lab",
     "check:multiplayer-boost": "node scripts/labs-browser-check.ts boost-lab",
-    "check:multiplayer-firewall": "node scripts/labs-browser-check.ts firewall-lab"
+    "check:multiplayer-firewall": "node scripts/labs-browser-check.ts firewall-lab",
+    "check:race": "node scripts/race-browser-check.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

@@ -109,7 +109,7 @@ export class SharedCubeAuthority implements CubeAuthority {
         if (state.pulling && this.owns && !this.wantsPull) this.stop();
         if (!this.owns || pending && pending.kind !== 'cube-drop') this.cargoVisual = undefined;
     }
-    private near(w: PuzzleWorld) { return !!w.cubes[this.id] && Math.hypot(w.player.x - w.cubes[this.id]!.x, w.player.y - w.cubes[this.id]!.y) < CARRY.reach; }
+    private near(w: PuzzleWorld) { return !!w.cubes[this.id] && w.cubeReachable(this.id) && Math.hypot(w.player.x - w.cubes[this.id]!.x, w.player.y - w.cubes[this.id]!.y) < CARRY.reach; }
     firewall(w: PuzzleWorld, cause: CubeResetCause = 'firewall'): boolean {
         if (!this.owns || this.resetting) return false;
         this.resetCause = cause; this.firewallContact = true; this.correction = true;
@@ -163,13 +163,13 @@ export class SharedCubeAuthority implements CubeAuthority {
     }
     sample(w: PuzzleWorld): void {
         if (this.resetting) { this.cargoVisual = undefined; return; }
-        const pads = w.room.cubePads ?? (w.room.cargoPlate ? [{ id: 'cargoPlate' as const, at: w.room.cargoPlate }] : []);
+        const pads = w.room.plates ?? w.room.cubePads ?? (w.room.cargoPlate ? [{ id: 'cargoPlate' as const, at: w.room.cargoPlate }] : []);
         if (!pads.length) return;
         if (!this.owns || this.pending && this.pending.kind !== 'cube-drop') { this.cargoVisual = undefined; return; }
         const c = w.cubes[this.id], state = this.client.room?.cubes[this.id];
         const pad = c && !c.carried && !state?.pulling && c.grounded ? pads.find(({ id, at }) =>
             Math.abs(c.x - at.x) < 45 + CUBE_SIZE / 2 - 8 && Math.abs(c.y + CUBE_SIZE / 2 - at.y) < 5
-            && !Object.entries(this.client.room!.cubePlacements).some(([other, placement]) => other !== this.id && placement === id)) : undefined;
+            && (w.room.plates || !Object.entries(this.client.room!.cubePlacements).some(([other, placement]) => other !== this.id && placement === id))) : undefined;
         this.cargoVisual = !!pad;
         this.client.cubeOccupancy(pad?.id ?? 'spawn', this.id);
     }

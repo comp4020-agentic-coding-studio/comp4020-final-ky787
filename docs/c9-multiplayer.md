@@ -1,5 +1,22 @@
 # Multiplayer chambers and mechanics laboratories
 
+RACE CONDITION (`race-condition`) is the second provisional chamber. Human testing
+found CROSSFEED mechanically successful but too easy and sequential; the new
+chamber explores reversible cargo/trace/return state. See its [design contract](race-condition.md)
+and [ADR 0008](adr/0008-reversible-coop-machinery.md). `pnpm check:race` runs both
+role arrangements with real controls. Binary generation remains pending acceptance.
+
+The named-cube authority and v5 persistence model are retained. RACE adds an
+epoch-qualified buffer contact report, transient server deadlines for cargo and
+phase/return handover, and locally predicted toggle presentation. No coordinates
+or player physics move to the server. New ordinary plates accept players or
+resting cubes; CROSSFEED's specialized sensors are visibly scanners/sockets and
+its one-shot controls are terminals. New chamber wires show resolved destination
+power; controlled ghosts remain visible at 25%. Grounded running increases from
+380 to 426; air/jump/grapple tuning and C8 controller contracts stay unchanged.
+
+The historical milestones below retain their original scope and rationale.
+
 The room-code, shared-cube, prediction and mechanics laboratories (including
 corrected relay egress, partner boost and static firewalls) were manually accepted
 on two physical computers before CROSSFEED VAULT. The first full cooperative
@@ -468,6 +485,7 @@ pnpm check:multiplayer-lift        # both roles, cube, checkpoint, reset/death
 pnpm check:multiplayer-crumble     # phases, hook, reconnect and process restart
 pnpm check:multiplayer-boost       # both holder roles, drop/reset/disconnect, two-body finish
 pnpm check:multiplayer-firewall
+pnpm check:race         # timed cargo, all five hooks, required unstable blocks, return/boost, both roles
 pnpm check:crossfeed    # both slots, independent deaths, loose/carry/pull resets, finish
 ```
 

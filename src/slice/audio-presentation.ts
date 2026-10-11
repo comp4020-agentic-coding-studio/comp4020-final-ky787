@@ -11,9 +11,9 @@ export function liftProximity(player: Vec2, box: Box): number {
 }
 function state(w: PuzzleWorld) {
     return { phase: w.player.rope.phase, jumps: w.player.ropeJumpAnchors.length, grounded: w.player.grounded,
-        carried: Object.fromEntries(cubeEntries(w.cubes).map(([id, c]) => [id, c.carried])), plates: [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC,
+        carried: Object.fromEntries(cubeEntries(w.cubes).map(([id, c]) => [id, c.carried])), plates: w.room.plates ? [w.inputs.plateA, w.inputs.plateB, w.inputs.cubeOnPlate, w.inputs.plateC, w.inputs.cubeOnPlateB] : [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC,
             !!w.room.cargoPlate && w.cargoPlateActive],
-        outputs: { ...w.frame.outputs }, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
+        outputs: { ...w.frame.outputs }, signals: { ...w.frame.signals }, timer: w.frame.timer?.phase, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
 }
 type AudioSink = Pick<GameAudio, 'play' | 'setLoop' | 'stopAll'>;
 export class AudioPresentation {
@@ -36,8 +36,11 @@ export class AudioPresentation {
         if (w.player.justLanded) play('landing', undefined, Math.min(1, w.player.landingSpeed / 700));
         for (const [id, c] of cubeEntries(w.cubes)) if (!w.cubeAuthority(id)?.consumeCorrection?.() && old.carried[id] !== next.carried[id]) play(next.carried[id] ? 'pickup' : 'drop', c);
         next.plates.forEach((on, i) => {
-            if (on !== old.plates[i]) play('plate', [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i], .8, on ? 1 : .8);
+            if (on !== old.plates[i]) play('plate', w.room.plates?.[i]?.at ?? [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i], .8, on ? 1 : .8);
         });
+        if (next.timer === 'window' && old.timer !== 'window') play('crumbleWarn', w.room.plates?.find(p => p.id === 'receiver')?.at, .65);
+        // Phase is cued once by the predicted lever; cargo apparatus transitions share one bounded cue.
+        if (['topBridge', 'bufferBridge', 'safetyFirewall', 'raceFirewall'].some(s => old.signals[s as keyof typeof old.signals] !== next.signals[s as keyof typeof next.signals])) play('codePower', undefined, .6);
         // One cue per retained output, even when it controls several physical slabs.
         for (const signal of ['grappleAnchor', 'bridge', 'codePlatformA', 'codePlatformB'] as const)
             if (old.outputs[signal] !== next.outputs[signal]) play('codePower', undefined, .75, next.outputs[signal] ? 1 : .75);
@@ -50,6 +53,7 @@ export class AudioPresentation {
         }
         for (const e of events) {
             if (e.kind === 'switch' && !events.some(e => e.kind === 'lift-latch')) play('switch', e.at);
+            if (e.kind === 'terminal') play('latch', e.at);
             if (e.kind === 'lift-latch') play('latch', e.at);
             if (e.kind === 'checkpoint' && !events.some(e => e.kind === 'lift-latch')) play('latch', e.at, .6);
             if (e.kind === 'crumble-respawn') play('codePower', e.at, .5);

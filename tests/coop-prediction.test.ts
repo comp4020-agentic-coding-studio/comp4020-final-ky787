@@ -29,6 +29,39 @@ class Socket {
 }
 const cleanups: (() => void)[] = [];
 afterEach(() => { for (const fn of cleanups.splice(0)) fn(); vi.unstubAllGlobals(); });
+it('RACE lever predicts presentation immediately, sounds once on acceptance, and reconciles a denial', async () => {
+    Socket.instances = [];
+    vi.stubGlobal('WebSocket', Socket);
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ id: 'visitor' }) })));
+    vi.stubGlobal('location', { href: 'http://localhost/' });
+    const r = newRecord('ABCD', 'visitor', 'race-condition'); r.cubePlacements.cubeA = 'receiver';
+    const view = () => sharedRoom(r, [true, true], ['trace', null]);
+    let world: PuzzleWorld, authority: ReturnType<typeof createCoopAuthority>;
+    const client = new CoopClient((room, initial) => {
+        if (initial) {
+            authority = createCoopAuthority(room, client);
+            world = new PuzzleWorld(COOP_LABS['race-condition'].room(1), freshProgress().rooms.relay, undefined, authority);
+        } else { authority.room = room; world.syncAuthority(); }
+    }, () => {});
+    cleanups.push(() => client.leave()); client.start(undefined, 'race-condition');
+    await vi.waitFor(() => expect(Socket.instances).toHaveLength(1));
+    const ws = Socket.instances[0]; ws.onopen(); ws.receive({ type: 'snapshot', slot: 1, room: view() });
+    const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink);
+    Object.assign(world!.player, { x: 615, y: 703 }); world!.step(FIXED_DT, emptyInput()); audio.reset(world!);
+    client.control('phase'); const pending = client.pendingPhase!;
+    world!.step(FIXED_DT, emptyInput()); audio.observe(world!, world!.events.splice(0));
+    expect(client.room!.levelState).toMatchObject({ inputs: { phase: false } });
+    expect(world!.power('phaseB')).toBe(true); expect(world!.physicalPower('phaseB')).toBe(false);
+    r.levelState.phase = true; r.revision++;
+    ws.receive({ type: 'action-result', seq: pending.seq, accepted: true, room: view() });
+    world!.step(FIXED_DT, emptyInput()); audio.observe(world!, world!.events.splice(0));
+    expect(sink.play.mock.calls.filter(c => c[0] === 'switch')).toHaveLength(1);
+    client.control('phase'); const denied = client.pendingPhase!; world!.syncAuthority();
+    expect(world!.power('phaseA')).toBe(true);
+    ws.receive({ type: 'action-result', seq: denied.seq, accepted: false, room: view() });
+    expect(client.pendingPhase).toBeNull(); expect(world!.power('phaseA')).toBe(false);
+    expect(world!.power('phaseB')).toBe(true);
+});
 async function setup(switchB = true) {
     Socket.instances = [];
     vi.stubGlobal('WebSocket', Socket);

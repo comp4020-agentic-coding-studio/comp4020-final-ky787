@@ -16,8 +16,8 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
         plate: { x: 1870, y: 1500 }, plateB: { x: 2160, y: 260 }, plateC: { x: 3040, y: 260 },
         cubePads: [{ id: 'liftCargo', at: { x: 1750, y: 1500 }, label: 'CARGO / C' },
             { id: 'finalLeft', at: { x: 2210, y: 560 }, label: 'E' }, { id: 'finalRight', at: { x: 2940, y: 560 }, label: 'F' }],
-        controls: [{ id: 'switchB', at: { x: 2560, y: 1500 }, label: 'B' },
-            { id: 'switchC', at: { x: 1210, y: 750 }, label: 'C' }, { id: 'switchD', at: { x: 3900, y: 750 }, label: 'D' }],
+        controls: [{ id: 'switchB', kind: 'terminal', at: { x: 2560, y: 1500 }, label: 'B' },
+            { id: 'switchC', kind: 'terminal', at: { x: 1210, y: 750 }, label: 'C' }, { id: 'switchD', kind: 'terminal', at: { x: 3900, y: 750 }, label: 'D' }],
         display: { x: 1680, y: 1040 }, exit: { x: 2520, y: 120, w: 140, h: 140 },
         platforms: [
             stone('central-floor', 200, 1500, 1800, 280), stone('access-balcony', 2420, 1500, 1900, 280),

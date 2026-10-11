@@ -51,7 +51,7 @@ export function drawPlatformListings(c: CanvasRenderingContext2D, w: PuzzleWorld
         if (!lines || p.respawn > 0) continue;
         listing(c, lines, { ...p.def, x: p.def.x + (p.def.listingOffsetX ?? 0), h: Math.min(CODE_SLAB_HEIGHT, p.def.h) }, p.solid.enabled, p.def.signal ? replay.pulse(p.def.signal) : 0,
             p.def.kind === 'crumble-proven' ? undefined : replay.trace.step_instruction_addresses[replay.step],
-            p.def.signal ? displayString(w, presentation, p.def.signal, p.pulse) : undefined);
+            p.def.signal ? displayString(w, presentation, p.def.signal as keyof import('./controller.ts').ControllerOutputs, p.pulse) : undefined);
     }
 }
 /** Equipment displays share the same address/listing layout; no fake physical code slab. */

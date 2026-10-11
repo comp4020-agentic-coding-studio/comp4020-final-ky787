@@ -126,7 +126,7 @@ export class SliceGame {
             this.renderer.room(this.world); this.sound.reset(this.world);
             this.input.releaseAll(); this.accumulated = 0;
             this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
-            this.overviewVisible = room.level === 'crossfeed-vault' && initial && room.checkpoint === 'entry';
+            this.overviewVisible = (room.level === 'crossfeed-vault' || room.level === 'race-condition') && initial && room.checkpoint === 'entry';
             this.overviewPending = this.overviewVisible; this.startButton.hidden = !this.overviewVisible;
             this.started = !this.coopPaused && !this.overviewVisible; this.canvas.focus();
             this.audio.setActive(this.started && !document.hidden && document.hasFocus());
@@ -136,7 +136,7 @@ export class SliceGame {
             const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
             const events = this.world.events.splice(0);
-            if (!switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
+            if (room.level !== 'race-condition' && !switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
             if (previous.checkpoint !== room.checkpoint) events.push({ kind: 'checkpoint', at: this.world.checkpointPosition() });
             if (previous.level === 'lift-lab' && room.level === 'lift-lab' && !previous.levelState.liftLatched && room.levelState.liftLatched)
                 events.push({ kind: 'lift-latch', at: this.world.room.upperLever! });
@@ -159,7 +159,7 @@ export class SliceGame {
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;
         const status = !this.coop.connected ? this.coop.status
             : r && !r.connected[partner] ? r.assigned[partner] ? 'PARTNER DISCONNECTED' : 'WAITING FOR PARTNER'
-            : r?.completed ? r.level === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
+            : r?.completed ? r.level === 'race-condition' ? 'TRACE COMPLETE' : r.level === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
             : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();
@@ -253,9 +253,10 @@ export class SliceGame {
       </nav>
       <section class="coop-entry" aria-label="Co-op">
         <span class="eyebrow">CO-OP CHAMBERS</span>
+        <div class="coop-lab"><div><strong>RACE CONDITION</strong><small>Deliver the payload. Keep the trace alive.</small></div><button data-create-lab="race-condition">CREATE ROOM</button></div>
         <div class="coop-lab"><div><strong>CROSSFEED VAULT</strong><small>First full cooperative puzzle</small></div><button data-create-lab="crossfeed-vault">CREATE ROOM</button></div>
         <span class="eyebrow">MECHANICS LABS</span>
-        <div class="coop-labs">${Object.entries(COOP_LABS).filter(([id]) => id !== 'crossfeed-vault').map(([id, lab]) => `<div class="coop-lab"><div><strong>${lab.title}</strong><small>${lab.description}</small></div><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div>
+        <div class="coop-labs">${Object.entries(COOP_LABS).filter(([id]) => id !== 'crossfeed-vault' && id !== 'race-condition').map(([id, lab]) => `<div class="coop-lab"><div><strong>${lab.title}</strong><small>${lab.description}</small></div><button ${id === 'pairing-bay' ? 'id="create-room"' : ''} data-create-lab="${id}">CREATE</button></div>`).join('')}</div>
         <form id="join-room-form"><label for="join-code">ROOM CODE</label><input id="join-code" name="code" maxlength="8" placeholder="7K3M" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button id="join-room" type="submit">JOIN ROOM</button></form>
         <p id="join-error" role="status"></p>
       </section>
@@ -382,7 +383,7 @@ export class SliceGame {
     snapshot() {
         return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, cubes: this.world.cubes, inputs: this.world.inputs, outputs: this.world.frame.outputs,
             multiplayer: this.coopMode ? { ...this.coop.diagnostics(), ...this.supportDiagnostics(), shared: this.coop.room, remote: this.coop.remote.sample(performance.now()) } : null,
-            source: this.world.frame.source, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
+            source: this.world.frame.source, signals: this.world.frame.signals, controllerStatus: this.coopMode ? 'mock multiplayer controller / binary integration pending' : undefined, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,
@@ -488,7 +489,7 @@ export class SliceGame {
         this.traceView.hidden = this.world.room.id !== 'uplink' || !this.debug;
         if (this.debug)
             this.debugView.querySelector('pre')!.textContent = JSON.stringify(this.coopMode
-                ? { multiplayer: { ...this.coop.diagnostics(), ...this.supportDiagnostics() }, checkpoint: this.coop.room?.checkpoint, completed: this.coop.room?.completed,
+                ? { controller: 'mock multiplayer controller / binary integration pending', signals: this.world.frame.signals, multiplayer: { ...this.coop.diagnostics(), ...this.supportDiagnostics() }, checkpoint: this.coop.room?.checkpoint, completed: this.coop.room?.completed,
                     player: { x: this.world.player.x, y: this.world.player.y, rope: this.world.player.rope.phase },
                     firewalls: this.world.firewalls, lastDeath: this.world.lastDeath }
                 : this.snapshot(), null, 2);

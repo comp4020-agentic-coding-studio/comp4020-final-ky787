@@ -545,6 +545,8 @@ export function stepPlayer(
   solids: readonly Solid[],
   dt: number,
   field?: VerticalMotion,
+  /** Current C8/co-op opts in; retained pre-C8 World keeps its original movement. */
+  groundRunLimit: number = PLAYER.maxRunSpeed,
 ): void {
   p.justLanded = false;
   p.coyote = Math.max(0, p.coyote - dt);
@@ -571,11 +573,12 @@ export function stepPlayer(
     p.vy *= Math.exp(-GRAPPLE.swingVerticalDrag * dt);
   } else if (dir !== 0) {
     const accel = p.grounded ? PLAYER.accel : PLAYER.airAccel;
-    const over = Math.abs(p.vx) >= PLAYER.maxRunSpeed && Math.sign(p.vx) === dir;
+    const runLimit = p.grounded ? groundRunLimit : PLAYER.maxRunSpeed;
+    const over = Math.abs(p.vx) >= runLimit && Math.sign(p.vx) === dir;
     if (!over) {
       p.vx += dir * accel * dt;
-      if (Math.sign(p.vx) === dir && Math.abs(p.vx) > PLAYER.maxRunSpeed) {
-        p.vx = dir * PLAYER.maxRunSpeed;
+      if (Math.sign(p.vx) === dir && Math.abs(p.vx) > runLimit) {
+        p.vx = dir * runLimit;
       }
     }
   } else if (p.grounded) {

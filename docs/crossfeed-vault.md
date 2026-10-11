@@ -2,6 +2,13 @@
 
 **PROVISIONAL UNTIL HUMAN PLAYTEST ACCEPTANCE**
 
+2026-10-11 follow-up: human playtesting confirmed mechanical feasibility but found
+the puzzle too easy, staged and dependent on permanent unlocks. RACE CONDITION
+explores a different design; CROSSFEED's logical contract is not frozen for binary
+generation. Its specialized body/cube sensors now render as biometric scanners
+and payload sockets, B/C/D as one-shot terminals, and wires show resolved
+destination power. The accepted puzzle rules and geometry are unchanged.
+
 Room ID: `crossfeed-vault`. Starting implementation HEAD:
 `33e632878594bd4de75568ed00dd7f9028856e07`.
 

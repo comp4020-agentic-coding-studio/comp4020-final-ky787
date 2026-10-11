@@ -2,10 +2,12 @@ import type { CoopLevelId } from '../src/coop/protocol.ts';
 import type { LevelDefinition } from './coop-state.ts';
 import { crumbleView, triggerCrumble } from './crumble-state.ts';
 import { pairingDefinition } from './pairing-state.ts';
+import { raceDefinition } from './race-state.ts';
 import { crossfeedDefinition } from './crossfeed-state.ts';
 
 /** Small coordinate-free mock controllers. No frontend geometry imports. */
 export const LEVEL_DEFINITIONS: { [K in CoopLevelId]: LevelDefinition<K> } = {
+    'race-condition': raceDefinition,
     'crossfeed-vault': crossfeedDefinition,
     'pairing-bay': pairingDefinition,
     'firewall-lab': {

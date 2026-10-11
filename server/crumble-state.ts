@@ -6,9 +6,9 @@ interface RuntimePhase { phase: CrumblePhase['phase']; deadline: number; duratio
 export type CrumbleRuntime = Record<CrumbleId, RuntimePhase>;
 const stable = (): RuntimePhase => ({ phase: 'stable', deadline: 0, durationMs: 0 });
 export const freshCrumble = (): CrumbleRuntime => ({ crumbleA: stable(), crumbleB: stable() });
-export function triggerCrumble(state: CrumbleRuntime, id: CrumbleId, trigger: CrumbleTrigger, now: number): boolean {
+export function triggerCrumble(state: CrumbleRuntime, id: CrumbleId, trigger: CrumbleTrigger, now: number, warningMs: number = CRUMBLE_TIMING[trigger]): boolean {
     if (state[id].phase !== 'stable') return false;
-    const durationMs = CRUMBLE_TIMING[trigger];
+    const durationMs = warningMs;
     state[id] = { phase: 'warning', deadline: now + durationMs, durationMs };
     return true;
 }

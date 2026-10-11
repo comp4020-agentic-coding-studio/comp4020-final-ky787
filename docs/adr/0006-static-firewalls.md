@@ -1,5 +1,8 @@
 # Static authored firewalls use local contact and accepted cube resets
 
+RACE CONDITION later adds optional authored controller power while retaining the
+always-on default and this reset protocol. See [ADR 0008](0008-reversible-coop-machinery.md).
+
 Date: 2026-10-11. Status: implemented; awaiting two-computer acceptance.
 Starting HEAD: `d85106d9ef91c444d8931ffd597ea65f56aa861b`.
 

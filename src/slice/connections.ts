@@ -1,5 +1,5 @@
 import type { Vec2 } from '../engine/geometry.ts';
-import type { ControllerInputs, ControllerOutputs } from './controller.ts';
+import type { ControllerInputs, MachineSignal } from './controller.ts';
 import type { RoomDef } from './rooms.ts';
 import type { PuzzleWorld } from './world.ts';
 
@@ -7,12 +7,16 @@ import type { PuzzleWorld } from './world.ts';
 export interface MachineConnection {
     id: string;
     input: keyof ControllerInputs | 'switchD';
-    output: keyof ControllerOutputs;
+    /** Resolved output by default; false preserves legacy source-wire presentation. */
+    resolved?: boolean;
+    inverted?: boolean;
+    output: MachineSignal;
     points: Vec2[];
 }
 export function roomConnections(r: RoomDef): MachineConnection[] {
+    if (r.wires) return r.wires;
     const wires: MachineConnection[] = [];
-    const add = (id: string, input: MachineConnection['input'], output: MachineConnection['output'], points: Vec2[]) => wires.push({ id, input, output, points });
+    const add = (id: string, input: MachineConnection['input'], output: MachineConnection['output'], points: Vec2[]) => wires.push({ id, input, output, points, resolved: r.id === 'crossfeed-vault' });
     const above = (p: Vec2) => ({ x: p.x, y: p.y - 12 });
     const elbow = (from: Vec2, to: Vec2, y: number) => [from, { x: from.x, y }, { x: to.x, y }, to];
     if (r.id === 'crossfeed-vault') {
@@ -87,6 +91,7 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
 }
 /** Show the source signal even while the destination waits for other inputs. */
 export function connectionPowered(link: MachineConnection, w: Pick<PuzzleWorld, 'inputs'> & Partial<Pick<PuzzleWorld, 'frame'>>): boolean {
+    if (link.resolved !== false) return !!(w.frame?.signals?.[link.output] ?? w.frame?.outputs[link.output as keyof NonNullable<typeof w.frame>['outputs']]);
     return link.input === 'switchD' ? !!w.frame?.outputs.codePlatformA : w.inputs[link.input];
 }
 /** Constant-speed motion along the authored wire, not a simulated CPU signal delay. */
@@ -110,6 +115,7 @@ export function drawConnections(c: CanvasRenderingContext2D, links: readonly Mac
         c.strokeStyle = on ? colour : '#344955'; c.globalAlpha = on ? .65 : .45;
         c.lineWidth = on ? 2 : 1;
         c.beginPath(); link.points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); c.stroke();
+        if (link.inverted) { c.font = '11px monospace'; c.fillStyle = on ? colour : '#718996'; c.fillText('NOT', link.points[1].x + 8, link.points[1].y - 8); }
         if (!on) continue;
         c.setLineDash([9, 28]); c.lineDashOffset = -w.elapsed * 70; c.globalAlpha = .95; c.stroke();
         c.setLineDash([]); c.lineDashOffset = 0;

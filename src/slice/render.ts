@@ -75,7 +75,7 @@ export class PuzzleRenderer {
         if (r.id === 'uplink' && w.frame.outputs.exitDoor && !this.exitWasOpen) this.returnReveal = 2.2;
         this.exitWasOpen = w.frame.outputs.exitDoor;
         this.returnReveal = Math.max(0, this.returnReveal - dt);
-        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' || r.id === 'lift-lab' || r.id === 'crossfeed-vault' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, overview ? { x: 0, y: 0, w: r.width, h: r.height } : this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null, r.id === 'uplink' || r.id === 'lift-lab' || r.id === 'crossfeed-vault' || r.id === 'race-condition' ? null : { offsetY: -140, minY: 340, maxY: 390 });
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
         c.fillStyle = C.bg;
@@ -116,9 +116,9 @@ export class PuzzleRenderer {
                 continue;
             }
             const crumble = b.kind === 'crumble-prototype' || b.kind === 'crumble-proven';
-            const active = p.solid.enabled;
+            const active = p.solid.enabled && (!b.signal || w.power(b.signal));
             const colour = crumble ? C.amber : active ? C.cyan : C.dim;
-            c.globalAlpha = active ? 1 : 0.4;
+            c.globalAlpha = active ? 1 : 0.25;
             c.fillStyle = crumble ? '#342c24' : active ? '#173d3d' : '#14222b';
             c.fillRect(b.x, b.y, b.w, b.h);
             c.strokeStyle = colour;
@@ -133,7 +133,7 @@ export class PuzzleRenderer {
                 this.text(type, b.x + b.w - type.length * 5.5 - 6, b.y + Math.min(18, b.h - 8), 9, colour);
             }
             if (crumble) {
-                if (!address) this.text('prototype', b.x + 12, b.y + 49, 11, C.amber);
+                if (!address) this.text(r.id === 'race-condition' ? 'UNSTABLE' : 'prototype', b.x + 12, b.y + 49, 11, C.amber);
                 if (p.fuse >= 0) {
                     c.fillStyle = C.amber;
                     c.fillRect(b.x, b.y - 5, b.w * p.fuse / p.fuseDuration, 3);
@@ -143,7 +143,7 @@ export class PuzzleRenderer {
                     this.text(`${p.respawn.toFixed(1)}s`, b.x + 50, b.y - 10, 13, C.amber);
             }
             c.globalAlpha = 1;
-            if (p.pulse > 0) {
+            if (active && p.pulse > 0) {
                 c.globalAlpha = p.pulse;
                 c.strokeStyle = C.cyan;
                 c.lineWidth = 3;
@@ -163,6 +163,13 @@ export class PuzzleRenderer {
         for (const region of r.regions ?? []) this.text(region.label, region.at.x, region.at.y, 24, C.dim);
         drawMachinery(c, w, this.presentation);
         drawFirewalls(c, w.firewalls, w.elapsed);
+        if (r.id === 'race-condition') {
+            const timer = w.frame.timer!;
+            c.fillStyle = '#35434b'; c.fillRect(130, 650, 150, 8);
+            c.fillStyle = timer.phase === 'expired' ? C.red : C.amber;
+            c.fillRect(130, 650, 150 * timer.fraction, 8);
+            this.text(timer.phase === 'window' ? `${timer.seconds.toFixed(1)}s` : timer.phase === 'expired' ? 'EXPIRED' : timer.phase === 'released' ? 'TRANSFER' : 'BUFFER', 140, 634, 14, C.amber);
+        }
         if (r.id === 'uplink') {
             // Labels sit clear of the shaft edges and are drawn AFTER the field.
             const lift = w.lifts[0].def;
@@ -173,10 +180,11 @@ export class PuzzleRenderer {
             }
         }
         const plates = [
-            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'crossfeed-vault' ? 'A' : r.id === 'lift-lab' ? 'HOLD / LIFT POWER' : r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
-            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'crossfeed-vault' ? 'VAULT / LEFT' : r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
-            { at: r.plateC, active: r.id === 'pairing-bay' || r.id === 'crossfeed-vault' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'crossfeed-vault' ? 'VAULT / RIGHT' : r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
+            { at: r.plate, active: w.inputs.plateA, depth: w.plateDepth, label: r.id === 'crossfeed-vault' ? 'A / SCANNER' : r.id === 'lift-lab' ? 'HOLD / LIFT POWER' : r.id === 'pairing-bay' || r.id === 'relay' || r.id === 'uplink' ? 'PLATE A / ANCHOR' : 'BUTTON' },
+            { at: r.plateB, active: w.inputs.plateB, depth: w.plateDepthB, label: r.id === 'crossfeed-vault' ? 'LEFT / SCANNER' : r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT' },
+            { at: r.plateC, active: r.id === 'pairing-bay' || r.id === 'crossfeed-vault' ? w.inputs.plateC : w.inputs.cubeOnPlateC, depth: w.plateDepthC, label: r.id === 'crossfeed-vault' ? 'RIGHT / SCANNER' : r.id === 'pairing-bay' ? 'FINAL / RIGHT' : 'NODE C / CUBE PAYLOAD' },
             { at: r.cargoPlate, active: w.cargoPlateActive, depth: w.cargoPlateDepth, label: 'CARGO PLATE / CUBE ONLY' },
+            ...(r.plates ?? []).map(p => ({ at: p.at, active: p.id === 'dropA' ? w.inputs.plateA : p.id === 'dropB' ? w.inputs.plateB : p.id === 'trace' ? w.inputs.plateC : p.id === 'receiver' ? w.inputs.cubeOnPlate : w.inputs.cubeOnPlateB, depth: 0, label: p.label })),
             ...(r.cubePads ?? []).map(p => ({ at: p.at, active: p.id === 'liftCargo' ? w.inputs.cubeOnPlate : p.id === 'finalLeft' ? w.inputs.cubeOnPlateB : w.inputs.cubeOnPlateC, depth: 0, label: p.label })),
         ];
         for (const plate of plates) {
@@ -186,6 +194,11 @@ export class PuzzleRenderer {
             c.fillRect(x - 51, y - 3, 102, 13);
             c.fillStyle = plate.active ? C.cyan : C.amber;
             c.fillRect(x - 45, y - 9 + plate.depth * 6, 90, 7);
+            if (r.id === 'crossfeed-vault') {
+                const socket = r.cubePads?.some(p => p.at === plate.at);
+                if (socket) { c.strokeStyle = plate.active ? C.cyan : C.amber; c.strokeRect(x - 27, y - 52, 54, 49); }
+                else { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
+            }
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
         }
         if (r.plateB && r.id === 'relay') {
@@ -194,19 +207,23 @@ export class PuzzleRenderer {
         for (const lever of [
             { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
             { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
-            ...(r.controls ?? []).map(s => ({ at: s.at, active: s.id === 'switchD' ? w.frame.outputs.codePlatformA : w.inputs[s.id], name: s.label, latch: true })),
+            ...(r.controls ?? []).map(s => ({ at: s.at, active: s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id], name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle' })),
         ]) {
             if (!lever.at) continue;
             const { x, y } = lever.at;
             c.fillStyle = C.wall;
             c.fillRect(x - 24, y - 36, 48, 36);
+            if ('terminal' in lever && lever.terminal) {
+                c.fillStyle = lever.active ? C.cyan : C.amber; c.fillRect(x - 17, y - 31, 34, 19);
+                this.text(lever.name + (lever.active ? ' / COMMITTED' : ''), x - 55, y + 40, 13, lever.active ? C.cyan : C.amber); continue;
+            }
             this.ring(x, y - 33, 8, C.line);
             const dx = lever.active ? 19 : -19;
             this.line(x, y - 33, x + dx, y - 72, lever.active ? C.cyan : C.amber, 6);
             this.ring(x + dx, y - 72, 7, C.ink);
-            this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, y + 40, 13, lever.active ? C.cyan : C.amber);
+            this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, r.id === 'race-condition' ? y - 90 : y + 40, 13, lever.active ? C.cyan : C.amber);
         }
-        if (r.id !== 'uplink' && r.id !== 'crossfeed-vault') {
+        if (r.id !== 'uplink' && r.id !== 'crossfeed-vault' && r.id !== 'race-condition') {
             const feedback = this.presentation.describe(r.id, w.frame);
             const displayOn = feedback.active, message = feedback.text;
             c.fillStyle = '#111f29';
@@ -227,7 +244,7 @@ export class PuzzleRenderer {
         c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
         this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
         if (isCoopLevel(r.id)) {
-            this.text(players?.completed ? r.id === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.id === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
+            this.text(players?.completed ? r.id === 'race-condition' ? 'TRACE COMPLETE' : r.id === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.id === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
             if (w.frame.outputs.exitDoor) this.text(`${players?.reachedExit.filter(Boolean).length ?? 0} / 2 ARRIVED`, e.x + 8, e.y + 38, 12, C.cyan);
         }
         drawMachineListings(c, w, this.replay, this.presentation);
@@ -294,7 +311,7 @@ export class PuzzleRenderer {
             this.text('SAFE FLOOR · RETURN TO CARGO', 1200, 660, 12, C.dim);
             this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1670, 240, 14, C.ink);
         }
-        if (isCoopLevel(r.id) && r.id !== 'pairing-bay' && r.id !== 'crossfeed-vault') {
+        if (isCoopLevel(r.id) && r.id !== 'pairing-bay' && r.id !== 'crossfeed-vault' && r.id !== 'race-condition') {
             this.text('MOCK MECHANICS LAB · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
             if (r.id === 'relay-lab') {
                 this.text('E · POWER CONTROL', 305, 410, 13, C.cyan);

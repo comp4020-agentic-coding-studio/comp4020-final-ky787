@@ -2,10 +2,12 @@
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
-export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab', 'crossfeed-vault'] as const;
+export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab', 'crossfeed-vault', 'race-condition'] as const;
 export type CoopLevelId = typeof COOP_LEVELS[number];
 export const isCoopLevel = (v: unknown): v is CoopLevelId => COOP_LEVELS.includes(v as CoopLevelId);
-export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | 'liftControl' | null;
+export const PRESSURE_PLATES = ['dropA', 'dropB', 'receiver', 'trace', 'return'] as const;
+export type PressurePlateId = typeof PRESSURE_PLATES[number];
+export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | 'liftControl' | PressurePlateId | null;
 export type Discontinuity = 'relay' | 'respawn' | 'recovery';
 export type CrumbleId = 'crumbleA' | 'crumbleB';
 export type CrumbleTrigger = 'foot' | 'hook';
@@ -15,7 +17,7 @@ export const CUBE_IDS = ['cube', 'cubeA', 'cubeB'] as const;
 export type CubeId = typeof CUBE_IDS[number];
 export type CubeMap<T> = Partial<Record<CubeId, T>>;
 export const cubeEntries = <T>(map: CubeMap<T>): [CubeId, T][] => Object.entries(map) as [CubeId, T][];
-export type CubePlacement = 'spawn' | 'cargoPlate' | 'liftCargo' | 'finalLeft' | 'finalRight';
+export type CubePlacement = 'spawn' | 'cargoPlate' | 'liftCargo' | 'finalLeft' | 'finalRight' | PressurePlateId;
 export type CubeResetCause = 'firewall' | 'recovery';
 /** Ephemeral server arbitration, separate from both body reports and durable placement. */
 export interface SharedCube {
@@ -30,7 +32,22 @@ export interface Avatar {
     facing: -1 | 1; grounded: boolean;
     rope: { x: number; y: number } | null;
 }
+export interface RaceInputs {
+    dropA: boolean; dropB: boolean; payloadDelivered: boolean; traceOccupied: boolean;
+    phase: boolean; returnOccupied: boolean; finalControl: boolean;
+}
+export interface RaceOutputs {
+    topBridge: boolean; bufferBridge: boolean; safetyFirewall: boolean; raceFirewall: boolean;
+    spanMaster: boolean; phaseA: boolean; phaseB: boolean; returnBridge: boolean; exitDoor: boolean;
+}
 export interface LevelStateMap {
+    'race-condition': {
+        inputs: RaceInputs; outputs: RaceOutputs;
+        physical: { phaseA: boolean; phaseB: boolean; returnBridge: boolean };
+        handoverMs: number;
+        buffer: { phase: 'idle' | 'window' | 'released' | 'expired'; remainingMs: number; durationMs: number };
+        platforms: Record<CrumbleId, CrumblePhase>;
+    };
     'crossfeed-vault': {
         inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnLiftCargo: boolean; switchC: boolean; switchD: boolean;
             cubeOnFinalLeft: boolean; cubeOnFinalRight: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
@@ -59,7 +76,7 @@ interface SharedSession {
     completed: boolean;
 }
 export type SharedRoom<L extends CoopLevelId = CoopLevelId> = { [K in L]: SharedSession & { level: K; levelState: LevelStateMap[K] }
-    & (K extends 'crumble-lab' | 'crossfeed-vault' ? { cube: null; cubePlacement: null } : { cube: SharedCube; cubePlacement: CubePlacement }) }[L];
+    & (K extends 'crumble-lab' | 'crossfeed-vault' | 'race-condition' ? { cube: null; cubePlacement: null } : { cube: SharedCube; cubePlacement: CubePlacement }) }[L];
 export const cubeAvailable = (room: SharedRoom | null, id: CubeId = 'cube'): boolean => !!room?.cubes[id]
     && (room.level !== 'pairing-bay' || room.levelState.inputs.switchB)
     && (room.level !== 'crossfeed-vault' || (id === 'cubeA' ? room.levelState.inputs.switchB : room.levelState.inputs.switchC));
@@ -72,9 +89,10 @@ export type ClientMessage =
     | { type: 'cube-reset'; cubeId: CubeId; seq: number; epoch: number; cause: CubeResetCause }
     | { type: 'cube-drop'; cubeId: CubeId; seq: number; epoch: number; transform: CubeTransform }
     | { type: 'cube-occupancy'; cubeId: CubeId; seq: number; epoch: number; placement: CubePlacement }
+    | { type: 'cube-contact'; cubeId: CubeId; seq: number; epoch: number; sensor: 'buffer' }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
-    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' | 'firewallCheckpoint' | 'switchB' | 'switchC' | 'switchD' }
+    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' | 'firewallCheckpoint' | 'switchB' | 'switchC' | 'switchD' | 'phase' | 'commit' }
     | { type: 'crumble-trigger'; seq: number; platform: CrumbleId; trigger: CrumbleTrigger }
     | { type: 'local-reset'; seq: number }
     | { type: 'exit'; seq: number }
@@ -128,12 +146,14 @@ export function parseClientMessage(raw: string): ClientMessage | null {
     if (v.type === 'cube-reset' && keys(v, ['type', 'cubeId', 'seq', 'epoch', 'cause']) && ['firewall', 'recovery'].includes(v.cause as string)
         && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
     if (v.type === 'cube-occupancy' && keys(v, ['type', 'cubeId', 'seq', 'epoch', 'placement'])
-        && sequence(v.seq) && sequence(v.epoch) && ['spawn', 'cargoPlate', 'liftCargo', 'finalLeft', 'finalRight'].includes(v.placement as string)) return v as ClientMessage;
+        && sequence(v.seq) && sequence(v.epoch) && ['spawn', 'cargoPlate', 'liftCargo', 'finalLeft', 'finalRight', ...PRESSURE_PLATES].includes(v.placement as string)) return v as ClientMessage;
+    if (v.type === 'cube-contact' && keys(v, ['type', 'cubeId', 'seq', 'epoch', 'sensor']) && v.sensor === 'buffer'
+        && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
-        && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl'].includes(v.plate as Plate)) return v as ClientMessage;
+        && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl', ...PRESSURE_PLATES].includes(v.plate as Plate)) return v as ClientMessage;
     if (['switch', 'exit', 'local-reset'].includes(v.type as string) && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
     if (v.type === 'control' && keys(v, ['type', 'seq', 'control']) && sequence(v.seq)
-        && ['relayPower', 'liftLatch', 'boostRoute', 'firewallCheckpoint', 'switchB', 'switchC', 'switchD'].includes(v.control as string)) return v as ClientMessage;
+        && ['relayPower', 'liftLatch', 'boostRoute', 'firewallCheckpoint', 'switchB', 'switchC', 'switchD', 'phase', 'commit'].includes(v.control as string)) return v as ClientMessage;
     if (v.type === 'crumble-trigger' && keys(v, ['type', 'seq', 'platform', 'trigger']) && sequence(v.seq)
         && ['crumbleA', 'crumbleB'].includes(v.platform as string) && ['foot', 'hook'].includes(v.trigger as string)) return v as ClientMessage;
     return null;

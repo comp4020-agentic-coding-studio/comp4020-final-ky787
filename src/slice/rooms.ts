@@ -1,7 +1,7 @@
-import type { CubeId, CubePlacement } from '../coop/protocol.ts';
+import type { CubeId, CubePlacement, PressurePlateId } from '../coop/protocol.ts';
 import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
-import type { ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
+import type { MachineSignal, ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 import type { FirewallDef } from './firewall.ts';
 export interface Platform extends Box {
@@ -13,10 +13,13 @@ export interface Platform extends Box {
     listingOffsetX?: number;
     /** Authored load tolerance; proof classifies code, not this physical timer. */
     hookCrumbleDelay?: number;
-    signal?: keyof ControllerOutputs;
+    signal?: MachineSignal;
     /** Authored solid service door; an accepted output opens it permanently. */
     openWhen?: keyof ControllerOutputs;
     anchor?: boolean;
+    hookable?: boolean;
+    /** A visible sealed enclosure prevents reaching/pulling a payload through its walls. */
+    blocksCubeInteraction?: boolean;
     label?: string;
 }
 export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
@@ -30,7 +33,9 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     cube?: Vec2;
     cubes?: { id: CubeId; spawn: Vec2; mark: string }[];
     cubePads?: { id: Exclude<CubePlacement, 'spawn'>; at: Vec2; label: string }[];
-    controls?: { id: 'switchB' | 'switchC' | 'switchD'; at: Vec2; label: string }[];
+    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'phase' | 'commit'; at: Vec2; label: string; kind?: 'toggle' | 'terminal' }[];
+    plates?: { id: PressurePlateId; at: Vec2; label: string }[];
+    wires?: import('./connections.ts').MachineConnection[];
     regions?: { at: Vec2; label: string }[];
     plate?: Vec2;
     plateB?: Vec2;

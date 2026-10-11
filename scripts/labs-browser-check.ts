@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { isCoopLevel } from '../src/coop/protocol.ts';
 const level = process.argv[2];
-if (!isCoopLevel(level) || level === 'pairing-bay' || level === 'crossfeed-vault') throw new Error('Choose relay-lab, lift-lab, crumble-lab, boost-lab or firewall-lab');
+if (!isCoopLevel(level) || level === 'pairing-bay' || level === 'crossfeed-vault' || level === 'race-condition') throw new Error('Choose relay-lab, lift-lab, crumble-lab, boost-lab or firewall-lab');
 const h = await coopBrowser({ shots: process.argv[4] });
 const { key, tap, walk, wait, snapshot, check, click, mouse, shot, sleep } = h;
 const labState = (s: GameSnapshot) => s.multiplayer?.shared;
@@ -15,6 +15,16 @@ async function hop(p: Cdp, x: number) {
     await key(p, 'Space', true);
     try { await walk(p, x); } finally { await key(p, 'Space', false); }
     await wait(p, 'hop lands', s => s.player.grounded);
+}
+async function align(p: Cdp, x: number) {
+    let dx = x - (await snapshot(p)).player.x;
+    if (Math.abs(dx) > 65) await walk(p, x - Math.sign(dx) * 50);
+    for (let n = 0; n < 35; n++) {
+        dx = x - (await snapshot(p)).player.x; if (Math.abs(dx) < 4) return;
+        const direction = dx > 0 ? 'KeyD' : 'KeyA';
+        await key(p, direction, true); await sleep(25); await key(p, direction, false); await sleep(100);
+    }
+    throw new Error(`Could not align at ${x}`);
 }
 async function pickup(p: Cdp) {
     const at = (await snapshot(p)).cube!;
@@ -44,7 +54,12 @@ async function relay(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
     await hop(partner, 375); await tap(partner, 'KeyE');
     await wait(actor, 'shared relay power', s => s.outputs.relayGates);
     check('either operator powers both local gate pairs', (await snapshot(partner)).gates.every(g => g.enabled));
-    await pickup(actor); await walk(actor, 407); await tap(actor, 'KeyE');
+    // Stop outside the carried-width gate boundary. Run-speed braking drift
+    // must not turn this loose-cargo regression into a carried player transit.
+    await pickup(actor); await align(actor, 425);
+    await key(actor, 'KeyD', true); await sleep(15); await key(actor, 'KeyD', false); await sleep(100);
+    check('loose drop begins outside player relay contact', (await snapshot(actor)).player.x < 446);
+    await tap(actor, 'KeyE');
     await wait(actor, 'loose cargo accepted', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === null);
     const epoch = (await snapshot(actor)).multiplayer!.cubeEpoch;
     const loose = await wait(partner, 'remote loose cube relay snap', s => s.multiplayer?.lastCubeDiscontinuity?.kind === 'relay' && !!s.cube && s.cube.x > 1036);
@@ -245,7 +260,7 @@ async function firewall(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
     await key(actor, 'KeyA', true); await sleep(15); await key(actor, 'KeyA', false); await sleep(100);
     await tap(actor, 'KeyE'); // Put cargo behind the player so it cannot block the approach jump.
     await wait(actor, 'loose drop before pull', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === null);
-    await walk(actor, 790); await hop(actor, 970);
+    await align(actor, 790); await hop(actor, 970);
     const cargo = (await snapshot(actor)).cube!, pullEpoch = (await snapshot(actor)).multiplayer!.cubeEpoch!;
     await mouse(actor, cargo.x, cargo.y, true);
     try { await resetOnBoth(pullEpoch); } finally { await mouse(actor, cargo.x, cargo.y, false); }
@@ -254,7 +269,7 @@ async function firewall(a: Cdp, b: Cdp, actorSlot: 1 | 2) {
     await shot(actor, 'pulled-cube-reset');
     // Both routes remain easy to traverse after repeated independent recovery.
     for (const p of [a, b]) if ((await snapshot(p)).player.x < 880) {
-        await walk(p, 790); await hop(p, 970);
+        await align(p, 790); await hop(p, 970);
     }
     await finish(a, b, 1290);
 }

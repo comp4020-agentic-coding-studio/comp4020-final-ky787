@@ -1,10 +1,12 @@
 import type { RoomDef } from '../slice/rooms.ts';
 import type { CoopLevelId, Slot } from './protocol.ts';
 import { pairingBay } from './pairing-bay.ts';
+import { raceCondition } from './race-condition.ts';
 import { crossfeedVault } from './crossfeed-vault.ts';
 
 /** Hand-authored co-op rooms: accepted mechanics labs and the provisional chamber. */
 export const COOP_LABS: Record<CoopLevelId, { title: string; description: string; room: (slot: Slot) => RoomDef }> = {
+    'race-condition': { title: 'RACE CONDITION', description: 'Deliver the payload. Keep the trace alive.', room: raceCondition },
     'crossfeed-vault': { title: 'CROSSFEED VAULT', description: 'First full cooperative puzzle', room: crossfeedVault },
     'pairing-bay': { title: 'PAIRING BAY', description: 'Shared inputs, cube handoff, two-player finish', room: pairingBay },
     'firewall-lab': { title: 'FIREWALL LAB', description: 'Static beams, local respawn, shared cube recovery', room: slot => ({

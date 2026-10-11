@@ -3,7 +3,9 @@ import type { PuzzleWorld, WorldAuthority, CrumbleAuthority } from '../slice/wor
 import type { CoopClient } from './client.ts';
 import { SharedCubeAuthority } from './cube.ts';
 import { PairingAuthority, sampleExit, bodyOnPlate } from './authority.ts';
-import type { CoopLevelId, CrumbleId, SharedRoom } from './protocol.ts';
+import type { CoopLevelId, SharedRoom } from './protocol.ts';
+import { SharedCrumbleAuthority } from './crumble.ts';
+import { RaceAuthority } from './race-authority.ts';
 import { CrossfeedAuthority } from './crossfeed-authority.ts';
 
 export interface CoopAuthority extends WorldAuthority { room: SharedRoom }
@@ -65,44 +67,8 @@ class CrumbleLabAuthority extends LabAuthority<'crumble-lab'> {
     get frame() { return frame(this.room.exitUnlocked); }
 }
 
-/** Countdown is presentation only. Only a BROKEN snapshot can remove collision. */
-export class SharedCrumbleAuthority implements CrumbleAuthority {
-    private phases = new Map<string, string>();
-    constructor(private client: CoopClient) {}
-    sync(w: PuzzleWorld): void {
-        const room = this.client.room;
-        if (room?.level !== 'crumble-lab') return;
-        const now = performance.now(), age = Math.max(0, now - this.client.roomReceivedAt);
-        for (const p of w.platforms) {
-            if (p.def.id !== 'crumbleA' && p.def.id !== 'crumbleB') continue;
-            const id = p.def.id, state = room.levelState.platforms[id], pending = this.client.pendingCrumble.get(id);
-            const phase = state.phase, previous = this.phases.get(id);
-            const remaining = Math.max(0, state.remainingMs - age) / 1000;
-            p.fuseDuration = (state.durationMs || (pending?.trigger === 'hook' ? 1650 : 600)) / 1000;
-            p.fuse = phase === 'warning' ? remaining : phase === 'stable' && pending ? Math.max(0, p.fuseDuration - (now - pending.at) / 1000) : -1;
-            p.respawn = phase === 'broken' ? Math.max(.001, remaining) : 0;
-            p.solid.enabled = phase !== 'broken'; p.solid.grappleable = p.solid.enabled;
-            if (phase === 'broken') {
-                if (w.player.rope.anchorId === id) w.cancelGrapple();
-                if (previous !== undefined && previous !== 'broken') w.events.push({ kind: 'crumble', at: { x: p.def.x, y: p.def.y } });
-            } else if (previous === 'broken' && phase === 'stable') {
-                p.pulse = 1; w.events.push({ kind: 'crumble-respawn', at: { x: p.def.x, y: p.def.y } });
-            }
-            this.phases.set(id, phase);
-        }
-    }
-    sample(w: PuzzleWorld): void {
-        const room = this.client.room;
-        if (room?.level !== 'crumble-lab') return;
-        for (const id of ['crumbleA', 'crumbleB'] as CrumbleId[]) {
-            if (room.levelState.platforms[id].phase !== 'stable') continue;
-            if (w.player.grounded && w.player.groundId === id) this.client.triggerCrumble(id, 'foot');
-            else if (w.player.rope.phase === 'attached' && w.player.rope.anchorId === id) this.client.triggerCrumble(id, 'hook');
-        }
-        this.sync(w);
-    }
-}
 const factories = {
+    'race-condition': (r: SharedRoom<'race-condition'>, c: CoopClient) => new RaceAuthority(r, c),
     'crossfeed-vault': (r: SharedRoom<'crossfeed-vault'>, c: CoopClient) => new CrossfeedAuthority(r, c),
     'pairing-bay': (r: SharedRoom<'pairing-bay'>, c: CoopClient) => new PairingAuthority(r, c.slot!, p => c.occupy(p), () => c.switchB(), () => c.reachExit(), new SharedCubeAuthority(c), c.prediction),
     'relay-lab': (r: SharedRoom<'relay-lab'>, c: CoopClient) => new RelayAuthority(r, c),

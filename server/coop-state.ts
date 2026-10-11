@@ -4,8 +4,10 @@ import { freshCube } from './cube-state.ts';
 import { freshCrumble, type CrumbleRuntime } from './crumble-state.ts';
 import { readLegacyPairingRecord } from './pairing-state.ts';
 import { LEVEL_DEFINITIONS } from './level-definitions.ts';
+import { freshRace, type RaceRuntime } from './race-state.ts';
 
 export interface DurableStates {
+    'race-condition': { phase: boolean; finalControl: boolean };
     'crossfeed-vault': { switchB: boolean; switchC: boolean; switchD: boolean };
     'pairing-bay': { switchB: boolean };
     'relay-lab': { relayEnabled: boolean };
@@ -25,7 +27,7 @@ export type RoomRecord<L extends CoopLevelId = CoopLevelId> = { [K in L]: Sessio
 } }[L];
 export type SemanticAction = Extract<ClientMessage, { type: 'switch' | 'control' | 'crumble-trigger' }>;
 export interface LevelContext<L extends CoopLevelId = CoopLevelId> {
-    record: RoomRecord<L>; held: [Plate, Plate]; crumble: CrumbleRuntime; now: number;
+    record: RoomRecord<L>; held: [Plate, Plate]; crumble: CrumbleRuntime; race: RaceRuntime; now: number;
 }
 export interface LevelDefinition<L extends CoopLevelId> {
     cubeIds: readonly CubeId[];
@@ -70,7 +72,7 @@ export function readRoomRecord(value: unknown, code: string): RoomRecord | null 
     if (validRecord(value, code)) return value;
     if (value && typeof value === 'object' && 'version' in value && value.version === 4) {
         const { cubePlacement, ...session } = value as Record<string, unknown>;
-        if (!isCoopLevel(session.level) || session.level === 'crossfeed-vault') return null;
+        if (!isCoopLevel(session.level) || session.level === 'crossfeed-vault' || session.level === 'race-condition') return null;
         if (session.level === 'crumble-lab' ? cubePlacement !== null : !['spawn', 'cargoPlate'].includes(cubePlacement as string)) return null;
         const migrated = { ...session, version: 5, cubePlacements: session.level === 'crumble-lab' ? {} : { cube: cubePlacement } };
         return validRecord(migrated, code) ? migrated : null;
@@ -83,12 +85,12 @@ export function readRoomRecord(value: unknown, code: string): RoomRecord | null 
 }
 export const freshCubes = (level: CoopLevelId): CubeMap<SharedCube> => Object.fromEntries(definition(level).cubeIds.map(id => [id, freshCube()]));
 export function sharedRoom<L extends CoopLevelId>(record: RoomRecord<L>, connected: [boolean, boolean], plates: [Plate, Plate],
-    cube: CubeMap<SharedCube> | SharedCube | null = freshCubes(record.level), crumble = freshCrumble(), now = Date.now()): SharedRoom<L> {
+    cube: CubeMap<SharedCube> | SharedCube | null = freshCubes(record.level), crumble = freshCrumble(), now = Date.now(), race = freshRace()): SharedRoom<L> {
     const held = plates.map((p, i) => connected[i] ? p : null) as [Plate, Plate];
     const collection = cube && 'holder' in cube ? { cube } : cube ?? {};
     const cubes = Object.fromEntries(cubeEntries(collection).map(([id, c]) => [id, { ...c, transform: c.transform ? { ...c.transform } : null }]));
     return { code: record.code, level: record.level, revision: record.revision, assigned: [true, record.visitors[1] !== null], connected,
-        levelState: definition(record.level).project({ record, held, crumble, now }),
+        levelState: definition(record.level).project({ record, held, crumble, race, now }),
         cubes, cubePlacements: { ...record.cubePlacements },
         cube: cubes.cube ?? null, cubePlacement: record.cubePlacements.cube ?? null,
         checkpoint: record.checkpoint, exitUnlocked: record.exitUnlocked, reachedExit: [...record.reachedExit], completed: record.completed } as unknown as SharedRoom<L>;
