@@ -181,8 +181,15 @@ it('rejects malformed/oversized messages and impersonation, cleans closed socket
     const big = await connect(app.url, a.cookie); const bigClosed = once(big.ws, 'close'); big.ws.send('x'.repeat(4096)); expect((await bigClosed)[0]).toBe(1009);
     const bad = await connect(app.url, a.cookie); bad.ws.send('{'); expect((await bad.wait('error')).code).toBe('INVALID_MESSAGE');
     const fast = await connect(app.url, a.cookie); fast.send({ type: 'join', code }); await fast.wait('snapshot');
-    for (let seq = 0; seq < 120; seq++) fast.send({ type: 'avatar', seq, avatar });
+    // The 120-token bucket refills at 90/s: the join token may already be back
+    // by the time CI receives its snapshot. Exercise a full bucket, then exceed
+    // its burst capacity rather than depending on sub-11ms socket scheduling.
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const rateClosed = once(fast.ws, 'close');
+    for (let seq = 0; seq < 240; seq++) fast.send({ type: 'avatar', seq, avatar });
     expect((await fast.wait('error')).code).toBe('RATE_LIMITED');
+    expect((await rateClosed)[0]).toBe(1008);
+    expect((await p2.wait('room', m => !m.room.connected[0])).room.connected).toEqual([false, true]);
     const impostor = await connect(app.url, a.cookie); impostor.send({ type: 'join', code }); await impostor.wait('snapshot');
     impostor.send({ type: 'exit', seq: 1, slot: 2 }); expect((await impostor.wait('error')).code).toBe('INVALID_MESSAGE');
     const unjoined = await connect(app.url, a.cookie); unjoined.send({ type: 'exit', seq: 1 });
