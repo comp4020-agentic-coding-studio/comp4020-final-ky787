@@ -320,3 +320,28 @@ it('prediction/denial for A never pauses or rewinds B, and a B relay marker only
     world!.syncAuthority(); expect(world!.cubes.cubeB!.x).toBe(3290); expect(world!.cubes.cubeA).toEqual(beforeA);
     expect(client.cubeReplica('cubeB').lastDiscontinuity?.kind).toBe('relay'); expect(client.cubeReplica('cubeA').lastDiscontinuity).toBeNull();
 });
+
+it('CROSSFEED toggles predict presentation once, reconcile denial and clear on a same-socket replay', async () => {
+    Socket.instances = []; vi.stubGlobal('WebSocket', Socket);
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ id: 'visitor' }) })));
+    vi.stubGlobal('location', { href: 'http://localhost/' });
+    const record = newRecord('ABCD', 'visitor', 'crossfeed-vault');
+    const client = new CoopClient(() => {}, () => {}); cleanups.push(() => client.leave()); client.start();
+    await vi.waitFor(() => expect(Socket.instances).toHaveLength(1));
+    const ws = Socket.instances[0]; ws.onopen(); ws.receive({ type: 'snapshot', slot: 1, room: sharedRoom(record, [true, true], [null, null]) });
+    const authority = createCoopAuthority(client.room!, client);
+    expect(client.control('switchB')).toBe(true); expect(authority.frame.signals!.bridge).toBe(true);
+    expect(authority.frame.outputs.bridge).toBe(false); // Collision still awaits acceptance.
+    const seq = client.pendingRouting.get('switchB')!.seq;
+    record.levelState.switchB = true; record.revision++;
+    ws.receive({ type: 'room', room: sharedRoom(record, [true, true], [null, null]) }); authority.room = client.room!;
+    expect(authority.frame.signals!.bridge).toBe(true); // Confirmation cannot invert the prediction twice.
+    ws.receive({ type: 'action-result', seq, accepted: true, room: client.room! });
+    expect(client.pendingRouting.size).toBe(0); expect(authority.frame.signals!.bridge).toBe(true);
+    expect(client.control('routeMode')).toBe(true); expect(authority.frame.controls!.routeMode).toBe(true);
+    ws.receive({ type: 'action-result', seq: client.pendingRouting.get('routeMode')!.seq, accepted: false, room: client.room! });
+    expect(authority.frame.controls!.routeMode).toBe(false);
+    client.control('routeMode'); record.levelInstance++; record.revision++;
+    ws.receive({ type: 'room', room: sharedRoom(record, [true, true], [null, null]) });
+    expect(client.pendingRouting.size).toBe(0); expect(client.control('routeMode')).toBe(true);
+});

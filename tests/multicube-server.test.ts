@@ -69,10 +69,10 @@ it.each([false, true])('final pads accept swapped=%s assignment; distinct cubes 
     const dock = (id: CubeId, placement: string) => f.act(1, { type: 'cube-occupancy', cubeId: id, epoch: f.room.cubes[id]!.epoch, placement });
     await dock(left, 'finalLeft');
     const one = await dock(left, 'finalRight');
-    expect(one.room.levelState.outputs.codePlatformB).toBe(false);
+    expect(one.room.levelState.outputs.vaultPower).toBe(false);
     expect((await dock(right, 'finalRight')).accepted).toBe(false); // single capacity
     await dock(left, 'finalLeft'); const pair = await dock(right, 'finalRight');
-    expect(pair.room.levelState.outputs.codePlatformB).toBe(true); expect(pair.room.exitUnlocked).toBe(false);
+    expect(pair.room.levelState.outputs.vaultPower).toBe(true); expect(pair.room.exitUnlocked).toBe(false);
     await f.act(1, { type: 'occupancy', plate: 'finalLeft' });
     expect((await f.act(1, { type: 'occupancy', plate: 'finalRight' })).room.exitUnlocked).toBe(false);
     await dock(left, 'spawn'); await f.act(2, { type: 'occupancy', plate: 'finalLeft' });
@@ -91,7 +91,7 @@ it('two durable cube placements survive restart without ephemeral ownership or t
     await kill(f.app.child); const restarted = await launch(f.dir), p = await connect<'crossfeed-vault'>(restarted.url, f.identities[1].cookie);
     p.send({ type: 'join', code: f.room.code }); const restored = (await p.wait('snapshot')).room;
     expect(restored.cubePlacements).toEqual({ cubeA: 'finalRight', cubeB: 'finalLeft' });
-    expect(restored.checkpoint).toBe('upper'); expect(restored.levelState.outputs.codePlatformB).toBe(true);
+    expect(restored.checkpoint).toBe('upper'); expect(restored.levelState.outputs.vaultPower).toBe(true);
     for (const c of Object.values(restored.cubes)) expect(c).toMatchObject({ physicsAuthority: 2, holder: null, pulling: false, transform: null, seq: -1 });
 });
 

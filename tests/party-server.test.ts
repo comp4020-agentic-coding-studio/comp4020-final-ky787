@@ -127,7 +127,7 @@ it.each(['crossfeed-vault', 'race-condition', 'boost-lab'] as const)('version-5 
     const dir = await directory(), app = await launch(dir), host = await identity(app.url), guest = await identity(app.url);
     const record = newRecord('ABCD', host.id, level); record.visitors[1] = guest.id;
     record.exitUnlocked = true; record.reachedExit = [true, true]; record.completed = true;
-    if (record.level === 'crossfeed-vault') { record.levelState = { switchB: true, switchC: true, switchD: true }; record.checkpoint = 'upper'; record.cubePlacements = { cubeA: 'finalRight', cubeB: 'finalLeft' }; }
+    if (record.level === 'crossfeed-vault') { record.levelState = { ...record.levelState, switchB: true, switchC: true, switchD: true }; record.checkpoint = 'upper'; record.cubePlacements = { cubeA: 'finalRight', cubeB: 'finalLeft' }; }
     if (record.level === 'race-condition') { record.levelState.finalControl = true; record.checkpoint = 'reunion'; record.cubePlacements.cubeA = 'receiver'; }
     if (record.level === 'boost-lab') record.levelState.routeLatched = true;
     const { party: _party, levelInstance: _instance, ...old } = record;

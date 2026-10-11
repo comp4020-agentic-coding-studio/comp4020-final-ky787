@@ -630,7 +630,9 @@ async function main() {
         // Land and aim on the near bank; a timed coast after jumping the cube can pass the lip.
         await jumpTo(cdp, 440, 'near');
         await cross(cdp, 780);
-        await walkTo(cdp, 1050);
+        // Brake at the lever: a reverse walk can coast just beyond its 72-unit
+        // interaction radius after the far-bank landing.
+        await alignTo(cdp, 1080, 'far');
         await tap(cdp, 'KeyE');
         s = await snap(cdp);
         check('bridge locks but exit still requires Plate B', s.outputs.bridge && !s.outputs.exitDoor && s.checkpoint === 'relay');

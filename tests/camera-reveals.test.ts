@@ -2,6 +2,7 @@ import { expect, it } from 'vitest';
 import { Camera } from '../src/render/camera.ts';
 import { ContextualCamera, revealFrame } from '../src/slice/camera-reveals.ts';
 import { raceCondition } from '../src/coop/race-condition.ts';
+import { crossfeedVault } from '../src/coop/crossfeed-vault.ts';
 import { createPlayer, playerBox } from '../src/engine/physics.ts';
 import type { PuzzleWorld } from '../src/slice/world.ts';
 
@@ -123,4 +124,22 @@ it('platform-ID targets include ghost/fake blocks and clamp oversized authored r
     expect(revealFrame(w.room, { bounds: { x: -100, y: -100, w: 10000, h: 10000 } }, playerBox(w.player)))
         .toMatchObject({ x: 0, y: 0, w: 4180, h: 1420 });
     expect(revealFrame(w.room, { platformIds: ['missing'] }, playerBox(w.player))).toBeNull();
+});
+
+it('CROSSFEED authored plate views frame entry or both cargo routes and suppress selector camera churn', () => {
+    const w = { room: crossfeedVault(1), player: createPlayer(1870, 1483), deaths: 0, localControl: null as PuzzleWorld['localControl'] };
+    w.player.grounded = true; const view = new ContextualCamera(); view.reset(w);
+    expect(view.update(w, .016, false)).toMatchObject({ kind: 'plate', id: 'entry' });
+    Object.assign(w.player, { x: 1330, y: 733 }); const frame = view.update(w, .016, false);
+    for (const p of w.room.platforms.filter(p => p.signal === 'leftRoute' || p.signal === 'rightRoute')) {
+        expect(frame.frame!.x).toBeLessThanOrEqual(p.x); expect(frame.frame!.x + frame.frame!.w).toBeGreaterThanOrEqual(p.x + p.w);
+        expect(frame.frame!.y).toBeLessThanOrEqual(p.y); expect(frame.frame!.y + frame.frame!.h).toBeGreaterThanOrEqual(p.y + p.h);
+    }
+    for (let sequence = 1; sequence < 8; sequence++) {
+        w.localControl = { id: 'routeMode', sequence }; expect(view.update(w, .8, false)).toEqual(frame);
+    }
+    expect(view.update(w, .016, true).kind).toBe('overview');
+    w.player.x = 1190; expect(view.update(w, .016, false).kind).toBe('follow');
+    w.localControl = { id: 'switchB', sequence: 9 }; expect(view.update(w, .016, false).kind).toBe('control');
+    w.deaths++; expect(view.update(w, .016, false).kind).toBe('follow');
 });

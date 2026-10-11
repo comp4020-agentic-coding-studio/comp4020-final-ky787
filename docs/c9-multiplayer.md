@@ -8,6 +8,16 @@ victory, replay and v5 compatibility are defined in
 fixtures (`?labs=1`). The historical descriptions below retain their original
 fixed-room scope unless superseded by that ADR. C8 remains independent.
 
+CROSSFEED VAULT now uses **chamber revision 2**: visible cubes have no B/C
+pickup permission; B is reversible transfer mode, C is the system terminal,
+ROUTE POWER/SELECT drive complementary cargo grapple routes, and two unstable
+supports use shared fuses. Distinct payload sockets and biometric scanners
+remain distinct from universal ordinary plates. See the [v2 design](crossfeed-vault.md)
+for the provisional contract, contextual views and safe regroup route. Old
+unfinished CROSSFEED sessions restart deliberately with party identity/badges
+retained; completed v1 victories remain archived victories. This is an explicit
+chamber migration within party schema 6, not a reinterpretation of old latches.
+
 RACE CONDITION (`race-condition`) is the second provisional chamber. Human testing
 found CROSSFEED mechanically successful but too easy and sequential; the new
 chamber explores reversible cargo/trace/return state. See its [design contract](race-condition.md)
@@ -18,8 +28,8 @@ The named-cube authority and v5 persistence model are retained. RACE adds an
 epoch-qualified buffer contact report, transient server deadlines for cargo and
 phase/return handover, and locally predicted toggle presentation. No coordinates
 or player physics move to the server. New ordinary plates accept players or
-resting cubes; CROSSFEED's specialized sensors are visibly scanners/sockets and
-its one-shot controls are terminals. New chamber wires show resolved destination
+resting cubes; specialized sensors are visibly scanners/sockets and
+one-shot controls are terminals. New chamber wires show resolved destination
 power; controlled ghosts remain visible at 25%. Grounded running increases from
 380 to 426; air/jump/grapple tuning and C8 controller contracts stay unchanged.
 

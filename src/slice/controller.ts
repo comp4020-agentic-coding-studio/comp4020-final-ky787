@@ -1,5 +1,5 @@
 /** Coordinate-free physical controller contract. Evidence belongs to the selected adapter. */
-import { isCoopLevel, type RaceOutputs, type CoopLevelId } from '../coop/protocol.ts';
+import { isCoopLevel, type RaceOutputs, type CrossfeedOutputs, type CoopLevelId } from '../coop/protocol.ts';
 export const ROOM_IDS = ["pressure", "switch", "relay", "uplink"] as const;
 export type RoomId = typeof ROOM_IDS[number];
 /** Campaign IDs deliberately exclude the separate co-op session. */
@@ -23,11 +23,16 @@ export interface ControllerOutputs {
     relayGates: boolean;
     liftField: boolean;
 }
-export type MachineSignal = keyof ControllerOutputs | keyof RaceOutputs;
+export type MachineSignal = keyof ControllerOutputs | keyof RaceOutputs | keyof CrossfeedOutputs;
 export interface ControllerFrame {
+    /** Optional authored device presentation, separate from validated C8 inputs. */
+    controls?: Partial<Record<string, boolean>>;
+    plates?: Partial<Record<string, boolean>>;
     /** Additional authored mock machinery; the validated C8 seven-output contract is unchanged. */
     timer?: { phase: string; seconds: number; fraction: number };
     signals?: Partial<Record<MachineSignal, boolean>>;
+    /** Presentation-only fade toward a ghost during accepted deactivation grace. */
+    fading?: Partial<Record<MachineSignal, number>>;
     source: "mock-greybox" | "validated-trace" | "mock-multiplayer";
     outputs: ControllerOutputs;
     evidence?: { stateId: number; traceId: string; specimenId: string; binarySha256: string };

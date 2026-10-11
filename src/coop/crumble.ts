@@ -8,14 +8,14 @@ export class SharedCrumbleAuthority implements CrumbleAuthority {
     constructor(private client: CoopClient) {}
     sync(w: PuzzleWorld): void {
         const room = this.client.room;
-        if (room?.level !== 'crumble-lab' && room?.level !== 'race-condition') return;
+        if (room?.level !== 'crumble-lab' && room?.level !== 'race-condition' && room?.level !== 'crossfeed-vault') return;
         const now = performance.now(), age = Math.max(0, now - this.client.roomReceivedAt);
         for (const p of w.platforms) {
             if (p.def.id !== 'crumbleA' && p.def.id !== 'crumbleB') continue;
             const id = p.def.id, state = room.levelState.platforms[id], pending = this.client.pendingCrumble.get(id);
             const phase = state.phase, previous = this.phases.get(id);
             const remaining = Math.max(0, state.remainingMs - age) / 1000;
-            p.fuseDuration = (state.durationMs || (room.level === 'race-condition' ? 1550 : pending?.trigger === 'hook' ? 1650 : 600)) / 1000;
+            p.fuseDuration = (state.durationMs || (room.level === 'race-condition' ? 1550 : room.level === 'crossfeed-vault' ? 1650 : pending?.trigger === 'hook' ? 1650 : 600)) / 1000;
             p.fuse = phase === 'warning' ? remaining : phase === 'stable' && pending ? Math.max(0, p.fuseDuration - (now - pending.at) / 1000) : -1;
             p.respawn = phase === 'broken' ? Math.max(.001, remaining) : 0;
             p.solid.enabled = phase !== 'broken' && (!p.def.signal || w.physicalPower(p.def.signal)); p.solid.grappleable = p.solid.enabled;
@@ -30,7 +30,7 @@ export class SharedCrumbleAuthority implements CrumbleAuthority {
     }
     sample(w: PuzzleWorld): void {
         const room = this.client.room;
-        if (room?.level !== 'crumble-lab' && room?.level !== 'race-condition') return;
+        if (room?.level !== 'crumble-lab' && room?.level !== 'race-condition' && room?.level !== 'crossfeed-vault') return;
         for (const id of ['crumbleA', 'crumbleB'] as CrumbleId[]) {
             if (room.levelState.platforms[id].phase !== 'stable') continue;
             if (w.player.grounded && w.player.groundId === id) this.client.triggerCrumble(id, 'foot');

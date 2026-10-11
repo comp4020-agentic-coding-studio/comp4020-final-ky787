@@ -3,6 +3,13 @@
 2026-10-11. Implemented; two-computer acceptance pending.
 Starting HEAD: `e9d81a0510da374e0bec8f2a70e14adf1d0c1df0`.
 
+Follow-up: CROSSFEED v2 adds a level-specific `chamberRevision: 2` within the
+same party schema. Valid old incomplete CROSSFEED attempts restart with a new
+instance; identity and completion badges persist. Completed v1 victories retain
+an explicit archival marker until replay. Migration is persisted before join
+even when the outer record remains version 6. Other chambers are unaffected.
+See [the v2 contract and migration](../crossfeed-vault.md).
+
 ## Identity and progression
 
 A public room code now names a persistent two-visitor party. The existing first

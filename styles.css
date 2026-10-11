@@ -305,6 +305,10 @@ p {
 #coop-hud pre { line-height:1.8; margin:2px 0; white-space:pre-wrap; }
 #coop-hud b { color:#b59bff; line-height:1.5; }
 #coop-hud button { pointer-events:auto; }
+/* Keep high machinery visible during local contextual/overview framing. */
+#coop-hud.camera-reveal { padding:8px 12px; gap:4px; }
+#coop-hud.camera-reveal > small:first-child, #coop-hud.camera-reveal > span, #coop-hud.camera-reveal > pre { display:none; }
+#coop-hud.camera-reveal strong { font-size:18px; letter-spacing:4px; }
 .room-code-row { display:flex; align-items:center; gap:12px; }
 #room-code { pointer-events:auto; user-select:all; }
 #copy-room-code { white-space:nowrap; }

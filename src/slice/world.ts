@@ -70,7 +70,7 @@ export class PuzzleWorld {
     cubeIsResetting(id: CubeId) { return this.cubeAuthority(id)?.resetting ?? false; }
     cubeSpawn(id: CubeId = 'cube'): Vec2 | undefined { return id === 'cube' ? this.room.cube : this.room.cubes?.find(c => c.id === id)?.spawn; }
     cubePlacementPosition(id: CubeId, placement: CubePlacement = 'spawn'): Vec2 {
-        const at = placement === 'cargoPlate' ? this.room.cargoPlate : (this.room.cubePads ?? this.room.plates)?.find(p => p.id === placement)?.at;
+        const at = placement === 'cargoPlate' ? this.room.cargoPlate : [...(this.room.cubePads ?? []), ...(this.room.plates ?? [])].find(p => p.id === placement)?.at;
         return at ? { x: at.x, y: at.y - CUBE_SIZE / 2 } : this.cubeSpawn(id)!;
     }
     setCubePulling(id: CubeId, on: boolean) { if (on) this.pullingCubeId = id; else if (this.pullingCubeId === id) this.pullingCubeId = null; }
@@ -201,7 +201,7 @@ export class PuzzleWorld {
             this.checkpoint = this.authority.checkpoint;
         }
         this.frame = this.authority?.frame ?? this.controller.evaluate(this.room.id, { ...this.inputs });
-        for (const p of this.platforms) if (p.def.openWhen) p.solid.enabled = !this.frame.outputs[p.def.openWhen];
+        for (const p of this.platforms) if (p.def.openWhen) p.solid.enabled = !this.power(p.def.openWhen);
         for (const p of this.platforms) {
             if (p.def.kind !== 'code' && !p.def.signal)
                 continue;

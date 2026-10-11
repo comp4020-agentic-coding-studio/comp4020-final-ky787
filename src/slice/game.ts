@@ -143,12 +143,10 @@ export class SliceGame {
             const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
             const events = this.world.events.splice(0);
-            if (room.level !== 'race-condition' && !switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
+            if (room.level !== 'race-condition' && room.level !== 'crossfeed-vault' && !switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
             if (previous.checkpoint !== room.checkpoint) events.push({ kind: 'checkpoint', at: this.world.checkpointPosition() });
             if (previous.level === 'lift-lab' && room.level === 'lift-lab' && !previous.levelState.liftLatched && room.levelState.liftLatched)
                 events.push({ kind: 'lift-latch', at: this.world.room.upperLever! });
-            if (previous.level === 'crossfeed-vault' && room.level === 'crossfeed-vault') for (const id of ['switchC', 'switchD'] as const)
-                if (!previous.levelState.inputs[id] && room.levelState.inputs[id]) events.push({ kind: 'switch', at: this.world.room.controls!.find(c => c.id === id)!.at });
             this.sound.observe(this.world, events);
             for (const event of events) {
                 if (event.kind === 'crumble') this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
@@ -520,6 +518,7 @@ export class SliceGame {
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, connected: this.coop.connected, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
                 remotePullingCubes: cubeEntries(this.coop.room?.cubes ?? {}).filter(([id, c]) => c.pulling && !this.coop.ownsCubeFor(id)).map(([id]) => id) } : undefined);
+        this.coopHud.classList.toggle('camera-reveal', this.coopMode && this.renderer.cameraReveals.selection.kind !== 'follow');
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;
         if (replay.trace) {

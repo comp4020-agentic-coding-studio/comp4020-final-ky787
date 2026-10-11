@@ -1,3 +1,4 @@
+import { advanceCrossfeed, crossfeedDue, freshCrossfeed, syncCrossfeed, type CrossfeedRuntime } from './crossfeed-state.ts';
 import { newParty, selectChamber, completeParty } from './party-state.ts';
 import type { Server } from 'node:http';
 import { randomInt } from 'node:crypto';
@@ -20,7 +21,7 @@ interface Peer {
 }
 interface Room {
     record: RoomRecord; peers: [Peer | null, Peer | null]; plates: [Plate, Plate];
-    cubes: CubeMap<SharedCube>; crumble: CrumbleRuntime; race: RaceRuntime; revision: number; needsPersist: boolean;
+    cubes: CubeMap<SharedCube>; crumble: CrumbleRuntime; race: RaceRuntime; crossfeed: CrossfeedRuntime; revision: number; needsPersist: boolean;
     idleSince: number; failed: boolean; transitioning?: boolean;
 }
 export interface ActionTiming { action: string; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
@@ -54,7 +55,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         peer.ws.send(JSON.stringify(message));
     }
     const error = (peer: Peer, code: string, message = code.replaceAll('_', ' ')) => send(peer, { type: 'error', code, message });
-    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cubes, room.crumble, Date.now(), room.race), revision: room.revision });
+    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cubes, room.crumble, Date.now(), room.race, room.crossfeed), revision: room.revision });
     // Explicit durable projection. Live occupancy, owners, streams and transforms are absent.
     const durable = (room: Room) => JSON.stringify([room.record.levelState, room.record.checkpoint, room.record.cubePlacements,
         room.record.exitUnlocked, room.record.reachedExit, room.record.completed, room.record.party, room.record.level, room.record.levelInstance]);
@@ -80,7 +81,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         const record = readRoomRecord(value, code);
         if (!record) throw new Error('Invalid room record');
         if (rooms.size >= 64) throw new Error('Room capacity');
-        const room: Room = { record, revision: record.revision, needsPersist: (value as { version?: number }).version !== 6, cubes: freshCubes(record.level), crumble: freshCrumble(), race: freshRace(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
+        const room: Room = { record, revision: record.revision, needsPersist: record !== value, cubes: freshCubes(record.level), crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
         rooms.set(code, room);
         return room;
     }
@@ -92,7 +93,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const remaining = room.peers.findIndex(Boolean);
             assignCube(cube, remaining < 0 ? null : (remaining + 1) as Slot);
         }
-        if (room.record.level === 'race-condition') syncRace(context(room));
+        syncRace(context(room)); syncCrossfeed(context(room));
         room.revision++;
         broadcast(room);
         Object.assign(peer, { room: undefined, slot: undefined });
@@ -113,7 +114,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const record = message.type === 'create-party' ? newParty(code, peer.visitor) : newRecord(code, peer.visitor, message.level ?? 'pairing-bay');
             const level = record.level;
             room = { record, revision: 0, needsPersist: true,
-                cubes: freshCubes(level), crumble: freshCrumble(), race: freshRace(),
+                cubes: freshCubes(level), crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(),
                 peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
             rooms.set(code, room);
         } else {
@@ -145,7 +146,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         } else if (cube.physicsAuthority === null) {
             assignCube(cube, room.peers[0] ? 1 : 2);
         }
-        if (room.record.level === 'race-condition') syncRace(context(room));
+        syncRace(context(room)); syncCrossfeed(context(room));
         if (room.needsPersist) {
             room.record.revision = room.revision;
             await persist(room); room.needsPersist = false;
@@ -169,7 +170,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             if (!selected) { result(false); return; }
             room.transitioning = true;
             room.record = selected; room.plates = [null, null];
-            room.cubes = freshCubes(selected.level); room.crumble = freshCrumble(); room.race = freshRace();
+            room.cubes = freshCubes(selected.level); room.crumble = freshCrumble(); room.race = freshRace(); room.crossfeed = freshCrossfeed();
             const simulator = room.peers[0] ? 1 : 2;
             for (const cube of Object.values(room.cubes)) assignCube(cube, simulator);
             for (const member of room.peers) if (member) member.stream = ++stream;
@@ -196,7 +197,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                 if (message.epoch !== cube.epoch || cube.physicsAuthority !== peer.slot
                     || placement !== 'spawn' && (!def.cubeEnabled(room.record, message.cubeId) || cube.holder !== null || cube.pulling
                         || !def.acceptsPlacement?.(room.record, placement)
-                        || room.record.level !== 'race-condition' && Object.entries(room.record.cubePlacements).some(([id, p]) => id !== message.cubeId && p === placement))) { denied(); return; }
+                        || !['entry', 'routePower'].includes(placement) && room.record.level !== 'race-condition' && Object.entries(room.record.cubePlacements).some(([id, p]) => id !== message.cubeId && p === placement))) { denied(); return; }
                 if (room.record.cubePlacements[message.cubeId] === placement) { result(true); return; }
                 room.record.cubePlacements[message.cubeId] = placement;
             } else {
@@ -235,10 +236,10 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         result(true); broadcast(room);
     }
     function context(room: Room) {
-        return { record: room.record, held: room.plates.map((p, i) => room.peers[i] ? p : null) as [Plate, Plate], crumble: room.crumble, race: room.race, now: Date.now() };
+        return { record: room.record, held: room.plates.map((p, i) => room.peers[i] ? p : null) as [Plate, Plate], crumble: room.crumble, race: room.race, crossfeed: room.crossfeed, now: Date.now() };
     }
     async function commitAction(room: Room, before: string, timing: ActionTiming) {
-        if (room.record.level === 'race-condition') syncRace(context(room));
+        syncRace(context(room)); syncCrossfeed(context(room));
         if (definition(room.record.level).unlock(context(room))) room.record.exitUnlocked = true;
         room.record.completed = room.record.reachedExit.every(Boolean);
         completeParty(room.record);
@@ -324,14 +325,15 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     // A single bounded clock wakes only due rooms; phase changes share the semantic queue.
     let timerQueued = false;
     const machineryClock = setInterval(() => {
-        if (timerQueued || ![...rooms.values()].some(r => crumbleDue(r.crumble, Date.now()) || r.record.level === 'race-condition' && raceDue(r.race, Date.now()))) return;
+        if (timerQueued || ![...rooms.values()].some(r => crumbleDue(r.crumble, Date.now()) || r.record.level === 'race-condition' && raceDue(r.race, Date.now()) || r.record.level === 'crossfeed-vault' && crossfeedDue(r.crossfeed, Date.now()))) return;
         timerQueued = true;
         serial(async () => {
             try {
                 for (const room of rooms.values()) if (!room.failed) {
                     const crumbleChanged = advanceCrumble(room.crumble, Date.now());
                     const raceChanged = room.record.level === 'race-condition' && advanceRace(room.race, Date.now());
-                    if (crumbleChanged || raceChanged) { room.revision++; broadcast(room); }
+                    const crossfeedChanged = room.record.level === 'crossfeed-vault' && advanceCrossfeed(room.crossfeed, Date.now());
+                    if (crumbleChanged || raceChanged || crossfeedChanged) { room.revision++; broadcast(room); }
                 }
             } finally { timerQueued = false; }
         });

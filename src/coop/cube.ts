@@ -163,13 +163,13 @@ export class SharedCubeAuthority implements CubeAuthority {
     }
     sample(w: PuzzleWorld): void {
         if (this.resetting) { this.cargoVisual = undefined; return; }
-        const pads = w.room.plates ?? w.room.cubePads ?? (w.room.cargoPlate ? [{ id: 'cargoPlate' as const, at: w.room.cargoPlate }] : []);
+        const pads = [...(w.room.plates ?? []), ...(w.room.cubePads ?? []), ...(w.room.cargoPlate ? [{ id: 'cargoPlate' as const, at: w.room.cargoPlate }] : [])];
         if (!pads.length) return;
         if (!this.owns || this.pending && this.pending.kind !== 'cube-drop') { this.cargoVisual = undefined; return; }
         const c = w.cubes[this.id], state = this.client.room?.cubes[this.id];
         const pad = c && !c.carried && !state?.pulling && c.grounded ? pads.find(({ id, at }) =>
             Math.abs(c.x - at.x) < 45 + CUBE_SIZE / 2 - 8 && Math.abs(c.y + CUBE_SIZE / 2 - at.y) < 5
-            && (w.room.plates || !Object.entries(this.client.room!.cubePlacements).some(([other, placement]) => other !== this.id && placement === id))) : undefined;
+            && (w.room.plates?.some(p => p.id === id) || !Object.entries(this.client.room!.cubePlacements).some(([other, placement]) => other !== this.id && placement === id))) : undefined;
         this.cargoVisual = !!pad;
         this.client.cubeOccupancy(pad?.id ?? 'spawn', this.id);
     }

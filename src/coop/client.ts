@@ -33,6 +33,7 @@ export class CoopClient {
     private deadline?: ReturnType<typeof setTimeout>;
     private generation = 0;
     private actionSeq = 0;
+    pendingRouting = new Map<'switchB' | 'routeMode', { seq: number; value: boolean }>();
     pendingPhase: { seq: number; value: boolean } | null = null;
     private bufferEpoch = -1;
     private moveSeq = 0;
@@ -74,7 +75,7 @@ export class CoopClient {
     }
     private clearLevel(): void {
         this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear();
-        this.pendingPhase = null; this.bufferEpoch = -1; this.remote.clear(); this.replicas = {};
+        this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1; this.remote.clear(); this.replicas = {};
         this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; this.cubeLastAt = 0;
         this.plate = null; this.exitSent = false; this.lastSentAt = 0;
         this.playerDiscontinuity = undefined; this.cubeDiscontinuities = {}; this.lastLocalDiscontinuity = null;
@@ -138,6 +139,7 @@ export class CoopClient {
                     }
                     this.pendingControls.delete(message.seq);
                     if (this.pendingPhase?.seq === message.seq) this.pendingPhase = null;
+                    for (const [id, pending] of this.pendingRouting) if (pending.seq === message.seq) this.pendingRouting.delete(id);
                     for (const [id, pending] of this.pendingCrumble) if (pending.seq === message.seq) this.pendingCrumble.delete(id);
                     const resolved = this.prediction.resolve(message.seq, generation, message.accepted, this.room!, this.slot, performance.now());
                     if (!message.accepted) this.placements = {};
@@ -164,7 +166,7 @@ export class CoopClient {
             ws.onclose = () => {
                 if (generation !== this.generation) return;
                 clearInterval(this.heartbeat); clearTimeout(this.deadline);
-                this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.bufferEpoch = -1;
+                this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1;
                 this.remote.clear(); this.reconnect();
             };
             ws.onerror = () => {}; // close supplies the retry; no duplicate timers.
@@ -208,6 +210,8 @@ export class CoopClient {
         const seq = ++this.actionSeq;
         if (this.send({ type: 'control', seq, control })) {
             this.pendingControls.set(seq, control);
+            if ((control === 'switchB' || control === 'routeMode') && this.room?.level === 'crossfeed-vault')
+                this.pendingRouting.set(control, { seq, value: !this.room.levelState.inputs[control] });
             if (control === 'phase' && this.room?.level === 'race-condition') this.pendingPhase = { seq, value: !this.room.levelState.inputs.phase };
             return true;
         }
@@ -264,7 +268,7 @@ export class CoopClient {
         if (this.send({ type: 'avatar', seq: ++this.moveSeq, avatar, ...(this.playerDiscontinuity ? { discontinuity: this.playerDiscontinuity } : {}) })) this.playerDiscontinuity = undefined;
     }
     leave(forget = true): void {
-        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.bufferEpoch = -1;
+        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1;
         this.machineryEvents = [];
         this.active = false; this.generation++;
         clearTimeout(this.retry); clearInterval(this.heartbeat); clearTimeout(this.deadline);
@@ -281,7 +285,7 @@ export class CoopClient {
             pendingControls: [...this.pendingControls.values()], pendingCrumble: [...this.pendingCrumble.keys()],
             pendingPhase: this.pendingPhase,
             buffer: this.room?.level === 'race-condition' ? { ...this.room.levelState.buffer, remainingMs: Math.max(0, this.room.levelState.buffer.remainingMs - (now - this.roomReceivedAt)) } : undefined,
-            crumblePhases: this.room?.level === 'crumble-lab' || this.room?.level === 'race-condition' ? Object.fromEntries(Object.entries(this.room.levelState.platforms)
+            crumblePhases: this.room?.level === 'crumble-lab' || this.room?.level === 'race-condition' || this.room?.level === 'crossfeed-vault' ? Object.fromEntries(Object.entries(this.room.levelState.platforms)
                 .map(([id, p]) => [id, { ...p, remainingMs: Math.round(Math.max(0, p.remainingMs - (now - this.roomReceivedAt))) }])) : undefined,
             exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
             cubes: this.room?.cubes, cubePlacements: this.room?.cubePlacements,

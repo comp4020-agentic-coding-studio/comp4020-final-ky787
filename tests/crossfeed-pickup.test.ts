@@ -25,7 +25,7 @@ it.each([1, 2] as const)('P%s offers, predicts and retains accessible A/B pickup
                 prediction.begin(kind, ++seq, cubes[id]!.epoch, 1, performance.now(), id)) };
         const authorities = { cubeA: new SharedCubeAuthority(client, 'cubeA'), cubeB: new SharedCubeAuthority(client, 'cubeB') };
         const w = new PuzzleWorld(crossfeedVault(slot), { checkpoint: 'entry', switchB: false, cubeOnPlate: false, cubeOnPlateB: false }, undefined,
-            { cubes: authorities, get frame() { return { source: 'mock-multiplayer' as const, outputs: client.room.levelState.outputs }; },
+            { cubes: authorities, get frame() { return { source: 'mock-multiplayer' as const, outputs: { ...client.room.levelState.outputs, codePlatformA: false, codePlatformB: false } }; },
                 inputs: { plateA: false, plateB: false, plateC: false, cubeOnPlate: false, cubeOnPlateB: false, cubeOnPlateC: false, switchB: false, switchC: false },
                 checkpoint: 'entry', sample() {}, interact() {}, hint() { return ''; } });
         const sync = () => {

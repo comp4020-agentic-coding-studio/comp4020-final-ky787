@@ -7,7 +7,9 @@ export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab
 export type CoopLevelId = typeof COOP_LEVELS[number];
 export const isCoopLevel = (v: unknown): v is CoopLevelId => COOP_LEVELS.includes(v as CoopLevelId);
 export const PRESSURE_PLATES = ['dropA', 'dropB', 'receiver', 'trace', 'return'] as const;
-export type PressurePlateId = typeof PRESSURE_PLATES[number];
+export const CROSSFEED_PLATES = ['entry', 'routePower'] as const;
+export const CROSSFEED_HANDOVER_MS = 325;
+export type PressurePlateId = typeof PRESSURE_PLATES[number] | typeof CROSSFEED_PLATES[number];
 export type Plate = 'plateA' | 'finalLeft' | 'finalRight' | 'liftControl' | PressurePlateId | null;
 export type Discontinuity = 'relay' | 'respawn' | 'recovery';
 export type CrumbleId = 'crumbleA' | 'crumbleB';
@@ -41,6 +43,10 @@ export interface RaceOutputs {
     topBridge: boolean; bufferBridge: boolean; safetyFirewall: boolean; raceFirewall: boolean;
     spanMaster: boolean; phaseA: boolean; phaseB: boolean; returnBridge: boolean; exitDoor: boolean;
 }
+export interface CrossfeedOutputs {
+    grappleAnchor: boolean; bridge: boolean; liftField: boolean; relayGates: boolean; serviceAccess: boolean;
+    leftRoute: boolean; rightRoute: boolean; galleryAccess: boolean; vaultPower: boolean; vaultReturn: boolean; exitDoor: boolean;
+}
 export interface LevelStateMap {
     'race-condition': {
         inputs: RaceInputs; outputs: RaceOutputs;
@@ -50,9 +56,11 @@ export interface LevelStateMap {
         platforms: Record<CrumbleId, CrumblePhase>;
     };
     'crossfeed-vault': {
-        inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnLiftCargo: boolean; switchC: boolean; switchD: boolean;
+        inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnLiftCargo: boolean; switchC: boolean; switchD: boolean; routePowerOccupied: boolean; routeMode: boolean;
             cubeOnFinalLeft: boolean; cubeOnFinalRight: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
-        outputs: { grappleAnchor: boolean; bridge: boolean; liftField: boolean; relayGates: boolean; codePlatformA: boolean; codePlatformB: boolean; exitDoor: boolean };
+        outputs: CrossfeedOutputs;
+        physical: { leftRoute: boolean; rightRoute: boolean };
+        handoverMs: number; platforms: Record<CrumbleId, CrumblePhase>;
     };
     'pairing-bay': {
         inputs: { plateAOccupied: boolean; switchB: boolean; cubeOnCargoPlate: boolean; finalPlateLeftOccupied: boolean; finalPlateRightOccupied: boolean };
@@ -96,7 +104,7 @@ type ClientPayload =
     | { type: 'cube-contact'; cubeId: CubeId; seq: number; epoch: number; sensor: 'buffer' }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
-    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' | 'firewallCheckpoint' | 'switchB' | 'switchC' | 'switchD' | 'phase' | 'commit' }
+    | { type: 'control'; seq: number; control: 'relayPower' | 'liftLatch' | 'boostRoute' | 'firewallCheckpoint' | 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit' }
     | { type: 'crumble-trigger'; seq: number; platform: CrumbleId; trigger: CrumbleTrigger }
     | { type: 'local-reset'; seq: number }
     | { type: 'exit'; seq: number }
@@ -161,14 +169,14 @@ function parsePayload(v: Record<string, unknown>): ClientMessage | null {
     if (v.type === 'cube-reset' && keys(v, ['type', 'cubeId', 'seq', 'epoch', 'cause']) && ['firewall', 'recovery'].includes(v.cause as string)
         && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
     if (v.type === 'cube-occupancy' && keys(v, ['type', 'cubeId', 'seq', 'epoch', 'placement'])
-        && sequence(v.seq) && sequence(v.epoch) && ['spawn', 'cargoPlate', 'liftCargo', 'finalLeft', 'finalRight', ...PRESSURE_PLATES].includes(v.placement as string)) return v as ClientMessage;
+        && sequence(v.seq) && sequence(v.epoch) && ['spawn', 'cargoPlate', 'liftCargo', 'finalLeft', 'finalRight', ...PRESSURE_PLATES, ...CROSSFEED_PLATES].includes(v.placement as string)) return v as ClientMessage;
     if (v.type === 'cube-contact' && keys(v, ['type', 'cubeId', 'seq', 'epoch', 'sensor']) && v.sensor === 'buffer'
         && sequence(v.seq) && sequence(v.epoch)) return v as ClientMessage;
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
-        && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl', ...PRESSURE_PLATES].includes(v.plate as Plate)) return v as ClientMessage;
+        && [null, 'plateA', 'finalLeft', 'finalRight', 'liftControl', ...PRESSURE_PLATES, ...CROSSFEED_PLATES].includes(v.plate as Plate)) return v as ClientMessage;
     if (['switch', 'exit', 'local-reset'].includes(v.type as string) && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
     if (v.type === 'control' && keys(v, ['type', 'seq', 'control']) && sequence(v.seq)
-        && ['relayPower', 'liftLatch', 'boostRoute', 'firewallCheckpoint', 'switchB', 'switchC', 'switchD', 'phase', 'commit'].includes(v.control as string)) return v as ClientMessage;
+        && ['relayPower', 'liftLatch', 'boostRoute', 'firewallCheckpoint', 'switchB', 'switchC', 'switchD', 'routeMode', 'phase', 'commit'].includes(v.control as string)) return v as ClientMessage;
     if (v.type === 'crumble-trigger' && keys(v, ['type', 'seq', 'platform', 'trigger']) && sequence(v.seq)
         && ['crumbleA', 'crumbleB'].includes(v.platform as string) && ['foot', 'hook'].includes(v.trigger as string)) return v as ClientMessage;
     return null;

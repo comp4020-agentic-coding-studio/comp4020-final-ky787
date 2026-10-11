@@ -2,6 +2,15 @@
 
 2026-10-11. Implemented for provisional RACE CONDITION; puzzle acceptance pending.
 
+CROSSFEED v2 now applies these conventions to whole cargo routes: independent
+service access, universal entry/route plates alongside distinct payload sockets,
+reversible B/route selection, 325 ms server-owned route deactivation grace and
+1650 ms shared unstable fuses. Room-owned wires and camera targets show the
+resolved branches. Optional frame device maps render new plates/controls without
+reusing unrelated legacy inputs. The cube sampler/reconstruction handles a room
+containing both ordinary plates and payload sockets. See
+[CROSSFEED v2](../crossfeed-vault.md); the RACE timing/contract below is unchanged.
+
 RACE needs live inverse branches rather than a succession of permanent unlocks.
 Keep the accepted local player physics, named-cube grants, semantic queue and
 ephemeral transform streams. Extend the level-specific mock projection, not the

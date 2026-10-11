@@ -1,7 +1,7 @@
 import type { CubeId, CubePlacement, PressurePlateId } from '../coop/protocol.ts';
 import { CUBE_SIZE } from './tuning.ts';
 import type { Box, Vec2 } from "../engine/geometry.ts";
-import type { MachineSignal, ControllerOutputs, RoomId, WorldRoomId } from "./controller.ts";
+import type { MachineSignal, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 import type { FirewallDef } from './firewall.ts';
 /** Local presentation only. Targets include inactive/ghost manifestations. */
@@ -24,7 +24,7 @@ export interface Platform extends Box {
     hookCrumbleDelay?: number;
     signal?: MachineSignal;
     /** Authored solid service door; an accepted output opens it permanently. */
-    openWhen?: keyof ControllerOutputs;
+    openWhen?: MachineSignal;
     anchor?: boolean;
     hookable?: boolean;
     /** A visible sealed enclosure prevents reaching/pulling a payload through its walls. */
@@ -42,7 +42,7 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     cube?: Vec2;
     cubes?: { id: CubeId; spawn: Vec2; mark: string }[];
     cubePads?: { id: Exclude<CubePlacement, 'spawn'>; at: Vec2; label: string }[];
-    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'phase' | 'commit'; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; cameraReveal?: CameraReveal }[];
+    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit'; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; cameraReveal?: CameraReveal }[];
     plates?: { id: PressurePlateId; at: Vec2; label: string; cameraReveal?: CameraReveal }[];
     wires?: import('./connections.ts').MachineConnection[];
     regions?: { at: Vec2; label: string }[];

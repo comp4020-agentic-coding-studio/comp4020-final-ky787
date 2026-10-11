@@ -1,42 +1,79 @@
+import { CROSSFEED_HANDOVER_MS, CROSSFEED_PLATES, type CrossfeedOutputs } from '../src/coop/protocol.ts';
 import type { LevelContext, LevelDefinition } from './coop-state.ts';
+import { crumbleView, triggerCrumble } from './crumble-state.ts';
 
-/** PROVISIONAL UNTIL HUMAN PLAYTEST ACCEPTANCE. Authored mock; no binary evidence. */
-function inputs({ record: r, held }: LevelContext<'crossfeed-vault'>) {
+/** Provisional authored mechanics, never binary timing/evidence. */
+export const CROSSFEED_TIMING = { handover: CROSSFEED_HANDOVER_MS, toggleInterval: 650, fake: 1650 } as const;
+export const freshCrossfeed = () => ({ leftRoute: false, rightRoute: false, leftUntil: 0, rightUntil: 0, toggleAfter: 0 });
+export type CrossfeedRuntime = ReturnType<typeof freshCrossfeed>;
+export function crossfeedInputs({ record: r, held }: Pick<LevelContext<'crossfeed-vault'>, 'record' | 'held'>) {
     const placements = Object.values(r.cubePlacements);
-    return { ...r.levelState, plateAOccupied: held.includes('plateA'), cubeOnLiftCargo: placements.includes('liftCargo'),
-        cubeOnFinalLeft: placements.includes('finalLeft'), cubeOnFinalRight: placements.includes('finalRight'),
+    return { switchB: r.levelState.switchB, switchC: r.levelState.switchC, switchD: r.levelState.switchD, routeMode: r.levelState.routeMode,
+        plateAOccupied: held.includes('entry') || placements.includes('entry'),
+        routePowerOccupied: held.includes('routePower') || placements.includes('routePower'),
+        cubeOnLiftCargo: placements.includes('liftCargo'), cubeOnFinalLeft: placements.includes('finalLeft'), cubeOnFinalRight: placements.includes('finalRight'),
         finalPlateLeftOccupied: held.includes('finalLeft'), finalPlateRightOccupied: held.includes('finalRight') };
 }
-function ready(ctx: LevelContext<'crossfeed-vault'>) {
-    const i = inputs(ctx);
-    return i.cubeOnFinalLeft && i.cubeOnFinalRight && i.finalPlateLeftOccupied && i.finalPlateRightOccupied;
+export function crossfeedOutputs(ctx: Pick<LevelContext<'crossfeed-vault'>, 'record' | 'held'>): CrossfeedOutputs {
+    const i = crossfeedInputs(ctx), master = i.switchC && i.routePowerOccupied, vault = i.cubeOnFinalLeft && i.cubeOnFinalRight;
+    return { grappleAnchor: i.plateAOccupied && !i.switchB, bridge: i.switchB,
+        liftField: i.cubeOnLiftCargo || i.switchC, serviceAccess: i.switchC, relayGates: i.switchC && !i.switchB,
+        leftRoute: master && !i.routeMode, rightRoute: master && i.routeMode, galleryAccess: i.switchD,
+        vaultPower: vault, vaultReturn: vault, exitDoor: ctx.record.exitUnlocked };
+}
+/** Start grace only on a real falling edge; snapshots never extend its deadline. */
+export function syncCrossfeed(ctx: LevelContext) {
+    if (ctx.record.level !== 'crossfeed-vault' || !ctx.crossfeed) return;
+    const o = crossfeedOutputs(ctx as LevelContext<'crossfeed-vault'>), r = ctx.crossfeed;
+    for (const [signal, until] of [['leftRoute', 'leftUntil'], ['rightRoute', 'rightUntil']] as const) {
+        if (r[signal] && !o[signal]) r[until] = ctx.now + CROSSFEED_TIMING.handover;
+        if (o[signal]) r[until] = 0;
+        r[signal] = o[signal];
+    }
+}
+export const crossfeedDue = (r: CrossfeedRuntime, now: number) => r.leftUntil > 0 && now >= r.leftUntil || r.rightUntil > 0 && now >= r.rightUntil;
+export function advanceCrossfeed(r: CrossfeedRuntime, now: number) {
+    const changed = crossfeedDue(r, now);
+    if (r.leftUntil && now >= r.leftUntil) r.leftUntil = 0;
+    if (r.rightUntil && now >= r.rightUntil) r.rightUntil = 0;
+    return changed;
 }
 export const crossfeedDefinition: LevelDefinition<'crossfeed-vault'> = {
-    cubeIds: ['cubeA', 'cubeB'], defaults: () => ({ switchB: false, switchC: false, switchD: false }),
-    valid: r => Object.keys(r.levelState).length === 3 && (['switchB', 'switchC', 'switchD'] as const).every(key => typeof r.levelState[key] === 'boolean')
-        && (!r.levelState.switchC || r.levelState.switchB) && (!r.levelState.switchD || r.levelState.switchC)
+    cubeIds: ['cubeA', 'cubeB'], defaults: () => ({ chamberRevision: 2, switchB: false, switchC: false, switchD: false, routeMode: false }),
+    valid: r => r.levelState.chamberRevision === 2
+        && Object.keys(r.levelState).length === (r.levelState.legacyVictory ? 6 : 5)
+        && (['switchB', 'switchC', 'switchD', 'routeMode'] as const).every(key => typeof r.levelState[key] === 'boolean')
+        && (r.levelState.legacyVictory === undefined || r.levelState.legacyVictory === true && r.completed)
         && r.checkpoint === (r.levelState.switchC ? 'upper' : 'entry')
-        && (!r.exitUnlocked || r.levelState.switchD && r.visitors[1] !== null)
+        && (!r.exitUnlocked || r.visitors[1] !== null)
         && ['liftCargo', 'finalLeft', 'finalRight'].every(p => Object.values(r.cubePlacements).filter(v => v === p).length <= 1),
-    acceptsPlacement: (r, p) => p === 'liftCargo' && r.levelState.switchB
-        || (p === 'finalLeft' || p === 'finalRight') && r.levelState.switchD,
-    acceptsPlate: (p, r) => p === null || p === 'plateA' || (p === 'finalLeft' || p === 'finalRight') && r.levelState.switchD,
-    action: ({ record: r }, m) => {
+    acceptsPlacement: (_, p) => ['liftCargo', 'finalLeft', 'finalRight', ...CROSSFEED_PLATES].includes(p),
+    acceptsPlate: p => p === null || ['finalLeft', 'finalRight', ...CROSSFEED_PLATES].includes(p),
+    action: (ctx, m) => {
+        if (m.type === 'crumble-trigger') {
+            const route = m.platform === 'crumbleA' ? 'leftRoute' : 'rightRoute';
+            const until = m.platform === 'crumbleA' ? 'leftUntil' : 'rightUntil';
+            if (!crossfeedOutputs(ctx)[route] && ctx.now >= (ctx.crossfeed?.[until] ?? 0)) return false;
+            return triggerCrumble(ctx.crumble, m.platform, m.trigger, ctx.now, CROSSFEED_TIMING.fake);
+        }
         if (m.type !== 'control') return false;
-        if (m.control === 'switchB') r.levelState.switchB = true;
-        else if (m.control === 'switchC' && r.levelState.switchB) { r.levelState.switchC = true; r.checkpoint = 'upper'; }
-        else if (m.control === 'switchD' && r.levelState.switchC) r.levelState.switchD = true;
-        else return false;
+        const r = ctx.record;
+        if (m.control === 'switchB') r.levelState.switchB = !r.levelState.switchB;
+        else if (m.control === 'switchC') { r.levelState.switchC = true; r.checkpoint = 'upper'; }
+        else if (m.control === 'switchD') r.levelState.switchD = true;
+        else if (m.control === 'routeMode') {
+            if (ctx.crossfeed && ctx.now < ctx.crossfeed.toggleAfter) return false;
+            r.levelState.routeMode = !r.levelState.routeMode;
+            if (ctx.crossfeed) ctx.crossfeed.toggleAfter = ctx.now + CROSSFEED_TIMING.toggleInterval;
+        } else return false;
         return true;
     },
     project: ctx => {
-        const i = inputs(ctx);
-        return { inputs: i, outputs: { grappleAnchor: i.plateAOccupied, bridge: i.switchB,
-            liftField: i.cubeOnLiftCargo || i.switchC, relayGates: i.switchC, codePlatformA: i.switchD,
-            codePlatformB: i.cubeOnFinalLeft && i.cubeOnFinalRight, exitDoor: ctx.record.exitUnlocked } };
+        const outputs = crossfeedOutputs(ctx), r = ctx.crossfeed ?? freshCrossfeed();
+        return { inputs: crossfeedInputs(ctx), outputs,
+            physical: { leftRoute: outputs.leftRoute || ctx.now < r.leftUntil, rightRoute: outputs.rightRoute || ctx.now < r.rightUntil },
+            handoverMs: Math.max(0, r.leftUntil - ctx.now, r.rightUntil - ctx.now), platforms: crumbleView(ctx.crumble, ctx.now) };
     },
-    unlock: ctx => ctx.record.levelState.switchD && ready(ctx),
-    // Physical access is authored in the room. A reachable payload has no
-    // unrelated progression permission; identity/holder/epoch checks still apply.
+    unlock: ctx => { const i = crossfeedInputs(ctx); return i.cubeOnFinalLeft && i.cubeOnFinalRight && i.finalPlateLeftOccupied && i.finalPlateRightOccupied; },
     cubeEnabled: () => true,
 };

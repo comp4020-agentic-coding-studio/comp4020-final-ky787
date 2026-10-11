@@ -1,223 +1,254 @@
-# CROSSFEED VAULT
+# CROSSFEED VAULT v2
 
 **PROVISIONAL UNTIL HUMAN PLAYTEST ACCEPTANCE**
 
-## Pickup correction — 2026-10-11
+Room ID `crossfeed-vault`; objective **ROUTE BOTH PAYLOADS TO THE VAULT**.
+Starting HEAD for this revision: `c51f2215d8c55300e23e56229fb7aa8b102c0265`.
+Pickup correction: `01f93060ce2252fa6a1794bcbbe23956fcba9cc9`.
 
-The reported inaccessible interaction was reproduced at the client and server
-boundaries before changing geometry. `cubeAvailable` hid pickup/pull for A until
-B and B until C; the server's `cubeEnabled` independently rejected those same
-requests. Reach, holder and epoch were valid. Thus normal input was not offered;
-a directly submitted request was rejected rather than accepted and regenerated.
+Human testing found v1 mechanically successful but too linear and dependent on
+permanent unlocks. V2 retains its two payloads, lift, service firewall, relay,
+boost and final assembly. Reversible transfer configuration and two separate
+cargo swing routes replace the continuous upper bridge. Unlike RACE CONDITION,
+one route is selected for an entire traversal: the puzzle is configuring and
+transporting resources while keeping the partner mobile, rather than rapid
+alternation at every hook.
 
-Both CROSSFEED payloads now behave normally whenever physically reachable.
-Geometry controls access. Per-cube arbitration, one carried/pulled object per
-player, prediction and reset epochs remain unchanged. Focused tests cover both
-slots/payloads, retained accepted prediction, drop/pull, independent firewall
-reset, party selection/replay, reconnect and process restart. The real-input
-browser route additionally picks up and retains A before operating B. No
-post-acceptance reset/placement overwrite was reproduced in these checks.
+The controller is **mock-multiplayer / binary integration pending**. The firewall
+and required unstable blocks are authored gameplay, not binary/obfuscator
+evidence. No addresses, assembly, OLLVM provenance or proven bogus-block claims
+are attached to this chamber. Human acceptance must precede contract freezing
+and any matching binary generation.
 
-2026-10-11 follow-up: human playtesting confirmed mechanical feasibility but found
-the puzzle too easy, staged and dependent on permanent unlocks. RACE CONDITION
-explores a different design; CROSSFEED's logical contract is not frozen for binary
-generation. Its specialized body/cube sensors now render as biometric scanners
-and payload sockets, B/C/D as one-shot terminals, and wires show resolved
-destination power. The accepted puzzle rules and geometry are unchanged.
+## Pickup diagnosis
 
-Room ID: `crossfeed-vault`. Starting implementation HEAD:
-`33e632878594bd4de75568ed00dd7f9028856e07`.
+Before geometry changes, focused tests reproduced two independent failures:
 
-This is the first full cooperative chamber after the mechanics were manually
-accepted on two physical computers. Its objective is **ROUTE BOTH PAYLOADS TO
-THE VAULT**. It is one interconnected, hand-authored 4320 × 1780 room, with
-visible later destinations and permanent routes that make returning easier.
-Automated completion establishes mechanical feasibility, not puzzle quality.
+- `cubeAvailable` suppressed the local pickup/pull action for A until B and B
+  until C, despite a clear physical reach check and an unheld payload.
+- The server's `cubeEnabled` rejected the corresponding epoch-qualified request.
 
-![CROSSFEED VAULT whole-room overview](playtest/crossfeed-vault-overview.png)
+Normal input was therefore not offered; bypassing that client guard produced a
+server denial. There was no accepted pickup followed by an unexplained reset in
+these reproductions. Both hidden CROSSFEED progression permissions were removed.
+Physical geometry governs access. Holder/epoch arbitration, one held or pulled
+cube per player, prediction, per-cube resets and the trusted-browser physics
+model remain unchanged. PAIRING BAY retains its legacy behavior.
 
-The controller is `mock-multiplayer` / **binary integration pending**. The
-contract below may change after human playtesting. No binary, addresses,
-assembly, OLLVM provenance or bogus-block evidence is generated or claimed.
-The firewall is a game-authored hazard and is not binary/obfuscator evidence.
+The pickup commit's tests cover both slots and both payloads, accepted prediction
+retention, pickup/drop/pull, competing requests, reset isolation, party selection,
+Race-to-Crossfeed replay, reconnect and process restart. Its real-input two-browser
+route picked up A **before B**, then completed v1 with the corrected interaction.
 
-## Regions and intended solve
+## One interconnected machine
 
-| Region | Authored role |
+The authored world remains 4320 × 1780. Several destinations are visible before
+access. The first-entry and Tab overview give a map; local plate/control reveals
+show affected machinery without solution text.
+
+| Region | Physical role |
 | --- | --- |
-| Central floor, y=1500 | Slot-separated entry, body Plate A, cube-only Lift Cargo C |
-| Right access balcony | 420-unit first gap, powered grapple anchor, B, Cube A |
-| Central lift shaft | Temporary cargo power; permanent power after C |
-| Upper-left control catwalk, y=750 | C and the upper shared checkpoint |
-| Lower-left service bay | Cube B, R1, initially closed service door |
-| Service passage | Long horizontal firewall beneath an industrial roof |
-| Upper-right gallery, y=940 | R2, 190-unit boost ledge, D at y=750 |
-| Vault cargo deck, y=560 | Interchangeable cube pads E and F |
-| Vault crown, y=260 | Two opposite body plates and the shared exit |
+| Central floor, y=1500 | Universal A, distinct lift payload socket, first gap |
+| Access balcony | Cube A and reversible TRANSFER MODE B |
+| Central lift | Temporary cargo power, permanent supply after SYSTEM ONLINE |
+| Upper-left catwalk, y=750 | SYSTEM ONLINE, ROUTE POWER, ROUTE SELECT, safe checkpoint |
+| Lower service bay | Cube B, R1, independently opened service door |
+| Service passage | Walking body fits under a static horizontal cube-filter firewall |
+| Upper-right gallery, y=940 | R2; partner boost reaches D at y=750 |
+| Left/right upper routes | Three hook slabs each, including one required unstable block |
+| Lower recovery deck, y=1120 | Safe falls, lift return, short stairs to the gallery |
+| Vault cargo deck, y=650 | Interchangeable payload sockets E/F |
+| Vault crown, y=350 | Two biometric scanners and physical two-player exit |
 
-1. Either player holds A. Only a player body powers the anchor. Their partner
-   grapples the gap and latches B, making the return bridge permanent.
-2. Retrieve Cube A from the balcony and put it on Lift Cargo C. A player body
-   does not power the lift. Either player rides to the control catwalk.
-3. Latch C: lift power becomes permanent, the relay powers up, the service door
-   opens, and the shared checkpoint changes to upper. The other living player
-   stays where they are. Cube A can now be released for the final assembly.
-4. Retrieve Cube B from the service bay. A walking body fits under the beam;
-   the actual overhead or resting payload overlaps it. Below the beam there are 36 units of clearance (body 34, payload 44);
-   between the beam and roof there are only 42. The long roofed passage
-   prevents simply jumping or pulling cargo across. Destruction returns only B to its
-   service spawn. This creates the relay logistics realization.
-5. Transport B through R1 to R2, carried or loose, and regroup in the gallery.
-   Destination cargo leaves a bounded safe relay egress lane for later players.
-6. One grounded player holds B while the partner jumps onto it and jumps again
-   to D. Latching D manifests permanent return steps and the upper crossfeed
-   route. Either slot may hold or climb; either accepted payload supports boost.
-7. Recover A, ride the permanent lift with it, and use the upper route into the
-   vault. S/down drops through code routes for a quick return to the lower
-   floor; the lift and permanent bridges avoid repeating the initial crossing.
-8. Put two distinct cubes on E/F in either assignment. Both final approach
-   structures appear. They disappear if a cube leaves a pad; safe decks remain
-   underneath. No cube is consumed.
-9. Two distinct players occupy opposite final body plates while both cube pads
-   remain occupied. This permanently unlocks the exit. Leave the plates and
-   physically enter: one arrival is insufficient, and repeating one slot's
-   arrival cannot substitute for the other.
+### Lower configuration and logistics
 
-The first-entry overview and held Tab overview reuse the existing camera.
-Region silhouettes, payload A/B glyphs and authored machinery wires provide
-orientation. Wires represent causal game signals, not CFG edges or CPU timing.
-The UI gives an objective and short control labels, not the solution sequence.
+Initially B is off. A accepts either body or a resting cube, but both cubes begin
+beyond the initial accessible area. A powers the first grapple anchor; a partner
+swings to B. Turning B on creates the return bridge and disables the anchor and
+relay. It is a reversible lever, not a permanent unlock.
 
-## Provisional coordinate-free logical contract
+A cube in the visibly distinct lift socket temporarily powers the lift. The upper
+SYSTEM ONLINE terminal (C) permanently powers it, opens the service bay and saves
+the upper checkpoint. It never moves a living partner. **Service access does not
+follow relay power**, so changing B cannot seal a player inside the service bay.
 
-The nine inputs are accepted body occupancy, three durable latches and per-cube
-semantic contacts. The server has no coordinates or physical collision model.
+Configure B off for relay transfer. The entry anchor can also help return across
+the first gap; after retrieving A, using it on the universal entry plate is a
+legitimate alternative to keeping a body there.
 
-| Output | Logical rule |
+Cube B cannot fit through the service passage: the walking body is 34 high, the
+loose payload is 44, and the space under the beam is 36. The long roof leaves
+only 42 above the beam, preventing a simple cargo jump/pull over it. A carrier
+whose body stays below the beam survives while only the payload resets. B resets
+to its own service spawn; A and the partner are unaffected. Powered R1/R2 is the
+natural transport solution. Carried/loose transit, individual relay cooldowns and
+safe egress around resting shared cubes reuse the accepted implementation.
+
+### Gallery and cargo routes
+
+Either partner holds B overhead while grounded; the other lands on it and makes
+a second normal jump to D. A normal or resting-cube jump is too low. Even a
+powered right route begins above grapple reach from a floor or resting-cube
+jump. D is a one-shot terminal providing **local gallery launch/regroup steps
+only**, including a short raised launch step that keeps the first high anchor
+visible in the normal follow camera.
+
+ROUTE POWER is universal. ROUTE SELECT is a reversible lever within reach of
+its operator. The selected branch can be changed before power exists; no
+progression boolean refuses an ordinary lever operation.
+
+The left route has wider lateral transfers and a descending final catch. The
+right starts with a higher launch jump from the gallery, then descends toward
+the vault. Each has three real hooks, with `crumbleA` / `crumbleB` as its middle
+unstable support. Payload remains accepted and overhead while swinging; there
+is no separate cargo traversal implementation. Fixed-step feasibility checks
+exercise each route alone and carrying either A or B.
+
+Both unstable blocks use a shared **1650 ms** hook/foot fuse, **2400 ms** collapse,
+and normal respawn. Switching routes neither restarts nor cancels the fuse.
+Broken state cancels attached ropes on both clients. Required use is game design,
+not claimed native bogusness.
+
+Accepted route power falls retain the previous physical route for **325 ms**.
+Resolved wires and ghost appearance change immediately, with a brief fade toward
+the inactive outline; the server owns physical expiry.
+New power is immediate. A **650 ms** selector interval prevents repeated toggles
+from sustaining both branches indefinitely. Local lever/branch presentation
+predicts through the existing action-result reconciliation; collision follows
+accepted state. Body release/disconnect also gets the bounded grace.
+
+### Final assembly and regrouping
+
+One player normally powers/selects routes while the other transports A and B.
+Transport order and roles are interchangeable. The permanent lift, gallery
+steps and low recovery deck make the second journey shorter. A failed route
+has safe recovery; local R returns to the shared upper checkpoint and releases
+only that player's controlled payload.
+
+Two distinct cubes in opposite payload sockets power both final approaches and
+**VAULT RETURN**, a safe bridge/step connection for the operator to leave the
+catwalk and regroup. Either A-left/B-right or B-left/A-right works. One cube has
+one placement; each payload socket has single capacity. Held/pulled cubes count
+for no socket. Removing either payload removes momentary vault power. Safe decks
+remain below; cubes are not consumed.
+
+A visible bulkhead separates the two cargo bays beneath the crown. Without it,
+the low recovery route allowed both payloads to use the left path, making the
+right-hand contraption optional. The bulkhead blocks walking, ordinary jumps,
+through-wall pickup/pull and drops across the bays. It opens with the permanent
+exit latch for subsequent free recovery. Either payload may still use either
+approach; no cube-ID permission decides its destination.
+
+Two distinct players must then occupy opposite biometric scanners while both
+payloads remain docked. This permanently unlocks the exit. Both must subsequently
+physically enter; one player arriving twice is insufficient. The existing shared
+campaign victory, host NEXT/CHOOSE controls and same-code transitions are reused.
+
+## Provisional coordinate-free contract
+
+Wire identifiers B/C/D are retained as `switchB/C/D` to keep device identity
+stable; they now mean transfer mode, system-online terminal and gallery terminal.
+V2 has its own explicit chamber revision, so old saves are never interpreted
+under these changed semantics.
+
+| Output | Rule |
 | --- | --- |
-| `grappleAnchor` | `plateAOccupied` |
+| `grappleAnchor` | `entryOccupied AND NOT switchB` |
 | `bridge` | `switchB` |
 | `liftField` | `cubeOnLiftCargo OR switchC` |
-| `relayGates` | `switchC` |
-| `codePlatformA` | `switchD` |
-| `codePlatformB` | `cubeOnFinalLeft AND cubeOnFinalRight` |
-| exit unlock candidate | Both cube-pad inputs AND both final body-plate inputs |
+| `serviceAccess` | `switchC` |
+| `relayGates` | `switchC AND NOT switchB` |
+| `leftRoute` | `switchC AND routePowerOccupied AND NOT routeMode` |
+| `rightRoute` | `switchC AND routePowerOccupied AND routeMode` |
+| `galleryAccess` | `switchD` |
+| `vaultPower`, `vaultReturn` | `cubeOnFinalLeft AND cubeOnFinalRight` |
+| Exit candidate | `vaultPower AND finalScannerLeft AND finalScannerRight` |
 
-`exitDoor` presents the server's durable `exitUnlocked` latch once that candidate
-is accepted. B precedes C and C precedes D. Each player reports at most one body
-plate at a time. Each cube has one placement; each sensor has single capacity.
-Held/pulled cubes never count as resting sensor cargo. Consequently alternating
-one cube or one body between final sensors cannot create simultaneous readiness.
+The server latches `exitUnlocked` from the candidate. `exitDoor` presents it.
+Distinct authored signals live in `ControllerFrame.signals`; no unrelated
+machinery is forced into the validated seven-output C8 contract. Compatibility
+frame outputs `codePlatformA/B` present gallery/vault state to existing audio/HUD
+code, without representing the two main routes as permanently unlocked.
 
-`relayGates` also opens the authored service door. `codePlatformA` drives several
-return/bridge/stair pieces, and `codePlatformB` drives both final approaches.
-These are multiple physical manifestations of an output, not separate native
-basic blocks. The eventual binary contract is deliberately not frozen here.
+## Presentation conventions
 
-## Two named shared cubes
+Inactive controlled slabs remain 25% ghosts, unhookable/non-solid after grace.
+Wires show resolved destination power; inverse relay/left-route branches have
+NOT markers. Ordinary plates look alike and accept either kind of occupant.
+Payload sockets have enclosing frames; biometric scanners have body-height rails.
+Toggle levers and one-shot terminals have visibly different drawings.
 
-[ADR 0007](adr/0007-named-shared-cubes.md) extends the existing primitive per
-entity. CROSSFEED defines `cubeA` and `cubeB`; accepted labs retain `cube`, and
-CRUMBLE LAB has no cubes. Every cube action, transform, occupancy and denial
-carries `cubeId`, checked against the room's server definition.
-
-Each cube has an independent holder, physics authority, pull flag, epoch,
-sequence, accepted transform, replica buffer, reset marker and relay cooldown.
-P1 can carry A while P2 carries B. One player cannot carry/pull two cubes, although
-one connected browser may simulate both loose bodies. A single local pending
-action includes its cube ID. Prediction, denial, snap and destruction of A never
-rewind or pause B. There is no new server-side physics or player authority.
-
-The same generic physics handles gravity, resting support, carry/drop, grapple
-pull, lift, relay, firewall reset and partner support for both payloads. Cubes
-remain individual resting supports for players; loose cube-on-cube stacking is
-not introduced. Only the partner's specific accepted held cube offers a local
-one-way top surface. The carrier cannot collide with it, and it cannot hook,
-press plates or block relay destinations. Grounded/fresh carrier requirements
-and the accepted interpolation/support limitations remain unchanged.
-
-The server keeps an explicit bounded budget of 90 messages/second with a 120
-message burst, accommodating avatar + two cube streams at 20 Hz plus semantic
-inputs. Existing payload, connection, queue and backpressure limits remain.
+Room-owned `cameraReveal` metadata gives A the entry gap/anchor, B a brief transfer
+view, and ROUTE POWER both upper paths plus the vault. Repeated ROUTE SELECT
+operations under a held plate retain the same camera target. Only a local body
+or local interaction edge requests a reveal. Remote occupancy and stationary
+cubes do not move the camera. Tab/initial overview takes priority; step-off,
+death, disconnect and level transition release/reset contextual framing. During
+a reveal/overview the party HUD compacts to code/copy and connection status,
+so it does not obscure the high route anchors; normal follow restores details.
 
 ## Persistence and recovery
 
-Co-op record version 5 stores `cubePlacements`, with one entry per defined cube:
-`spawn`, `liftCargo`, `finalLeft` or `finalRight`. Version-4 labs migrate their
-single placement to `{ cube: previousPlacement }`; CRUMBLE LAB migrates to `{}`.
-Versions 1–3 retain their existing progression migration. Migration is written
-atomically on accepted join. The C8 save schema/files are untouched.
+Party schema remains **version 6**. CROSSFEED's `levelState.chamberRevision = 2`
+marks this contract. Durables are B, C, D, route selection, per-cube semantic
+placements, checkpoint, unlock and two arrivals. New placements `entry` and
+`routePower` represent universal plates alongside spawn/liftCargo/finalLeft/
+finalRight. Each spawn remains individual. Body occupancy, grace/crumble clocks,
+holders, transforms, velocities and epochs remain transient.
 
-`spawn` resolves to that cube's own authored spawn: A on the access balcony,
-B in the service bay. A semantic dock restores at its specific sensor. Arbitrary
-loose/carried positions return to the individual spawn after process restart.
-Holders, velocities, transforms, pull state, epochs and sequences never persist.
+A validated v1 CROSSFEED record (v5 or v6) migrates deliberately: preserve code,
+reserved visitors/host and existing campaign badges; restart an unfinished
+attempt with clean v2 switches, individual spawns and entry checkpoint. Advance
+the level-instance generation, revoking old gameplay traffic. An untouched lobby
+remains a lobby. A completed v1 victory remains victory with its badge and an
+explicit `legacyVictory` marker; it does not invent solved v2 controls. Replay
+creates clean v2 state and removes that archival marker. Migration fsyncs before
+join acknowledgment, including migrations within schema 6.
 
-Firewall and death-zone recovery name one cube. The confirmed simulator requests
-reset, the server clears that cube's placement/holder/pull, advances its epoch,
-clears its transform and retains a connected simulator. The replica resolves its
-original spawn. Old transforms cannot resurrect it. The other cube is untouched.
-No player-facing global reset-both affordance is added.
+RACE records, hidden labs, older lab migrations and personal C8 progress are
+unchanged. Named-cube arbitration/epochs and party identity remain as described
+in [ADR 0007](adr/0007-named-shared-cubes.md) and
+[ADR 0009](adr/0009-persistent-coop-parties.md).
 
-Death/R affects only the local body and releases only its controlled payload.
-After C, that body returns to a safe slot-separated upper checkpoint. Disconnect
-releases held/pulled payloads and transfers each affected loose authority through
-the existing rules. The partner and durable switches/checkpoint/arrivals persist.
+## Validation and human acceptance
 
-## Validation and known limits
+Focused pickup, routing, world, migration, camera and swing tests accompany the
+real-input `pnpm check:crossfeed` route. It starts through CREATE PARTY and host
+selection, exercises lower reconfiguration, B's firewall/relay transport, actual
+boost, both three-hook cargo paths and shared unstable fuses, operator regroup,
+scanners, two arrivals and victory. Server tests cover both socket assignments;
+physics tests carry either payload over either route. The reversed
+scenario swaps roles. `pnpm check:campaign` additionally protects replay,
+transition generations, reconnect/restart and RACE completion. Browsers are muted
+and diagnostic snapshots are read-only. Milestone results are recorded in the
+dated handoff; automated feasibility is not human puzzle acceptance.
 
-Focused tests cover independent grants and contested pickup, transform epochs,
-reset isolation, authority-only contacts, invalid IDs, two-cube traffic, migration
-and restart, both final-pad assignments, distinct final bodies, client prediction
-isolation, gravity/support, lift/relay recovery, firewall passage and named boost.
-The real-input browser route exercises the complete solve and exchanges both
-final payload assignments, then runs a shorter reversed-role scenario through D.
-It reads diagnostics but never mutates world/controller state. Browsers are muted.
+Known limits and playtest questions:
 
-Run `pnpm check:crossfeed` for that route. The milestone results and manual
-acceptance status belong in `docs/playtest/crossfeed-vault-regression.txt`.
+- Contact reports retain the trusted-browser model, not server physics/anti-cheat.
+  Remote boost still uses accepted holder state plus fresh interpolated grounded
+  avatar presentation, with no airborne carrier elevator or momentum transfer.
+- This is not an exhaustive movement solver. Creative rope jumps, extra boosts,
+  alternate payload order and cube-held ROUTE POWER should be explored. Keep
+  cooperative alternatives that preserve the logistics instead of forbidding
+  them with invisible permissions.
+- Is configuring B clear and useful, or does returning to it feel tedious?
+- Does the filter communicate that walking bodies fit but overhead cargo does not?
+- Do the two routes feel different and substantial with cargo? Are 1650 ms fuses
+  forgiving enough, and does 325 ms grace behave comfortably on real networks?
+- Can the operator see the runner and understand branch changes? Are labels,
+  ghosts and wires legible without adding solution text?
+- Is retrieving the second payload thoughtful positioning or dull backtracking?
+- Is both-payload regrouping discoverable? Try removing a socket cube mid-approach.
+- Look for cargo traps, bypasses, disconnect/recovery problems and safe checkpoint
+  behavior in either mode. Does each player have enough to do?
 
-Known limits / questions before acceptance:
+Manual checklist: create/select/join; swap entry roles; pick up/drop/pull both
+payloads; change B repeatedly; lift temporarily then commit C; walk the filter,
+try carried/loose/pulled B, relay both ways leaving B at an exit; boost with either
+holder; operate/preselect/release routes; use and overstay each unstable hook;
+fall/recover with cargo; deliver sockets in both assignments; regroup and use
+opposite scanners; leave scanners and enter separately; replay, reconnect and
+restart; disconnect a holder/operator while the partner is on a route.
 
-- Contact reports follow the existing trusted-browser model, not anti-cheat.
-  A suspended simulator can pause its loose cubes until transfer/recovery.
-- Partner boost uses the existing 100 ms presentation buffer and 250 ms freshness
-  cutoff. There is no carrier velocity transfer or airborne elevator.
-- This is a provisional authored puzzle. Automated anti-shortcut checks are not
-  an exhaustive solver search. Test creative cooperative bypasses, especially
-  using both payloads together. Either cube may be used for a boost by design.
-- The final crown is 300 units above cargo, beyond a normal jump, resting-cube
-  jump or held cube boosted from the other resting payload (about 256 total).
-- The service beam has a deliberately tight **vertical** body/payload distinction,
-  with no timing requirement: walk underneath; jumping into it is lethal.
-- Connected visitors must refresh older clients after this coordinated wire
-  upgrade. Durable room progress migrates; old JavaScript is not protocol-negotiated.
-- No manual acceptance or binary integration is implied by automated completion.
-
-## Manual two-computer playtest
-
-Start a fresh room from CO-OP CHAMBERS and join on the other computer by code.
-Do a complete blind solve before consulting the intended sequence above.
-
-- Can both players read the room from the overview and recognize later regions?
-- Is A discoverable, genuinely cooperative, and freed clearly by B? Swap roles.
-- Does cargo-only lift power make sense, and does C visibly free Cube A?
-- Does C save the upper checkpoint without moving the lower player? Die/reset
-  independently and check the partner, both payloads and latches.
-- Carry, drop and pull B toward the service beam. Walk underneath without a
-  payload. Each payload contact must reset only B to the service bay.
-- Is the relay realization satisfying? Send B loose, leave it at R2, and have
-  both players relay repeatedly in both directions. Check identity and count.
-- Perform the gallery boost in both role arrangements. Move the holder slightly,
-  drop, reset and disconnect while supporting; the rider should fall naturally.
-- Does D make regrouping and recovering A faster? Is the return clever or tedious?
-- Deliver both payloads, swap E/F assignment, remove one again, and recover safely.
-- Try one cube alternating pads and one player alternating body plates. Neither
-  may unlock the exit. Unlock properly, leave the plates, and arrive separately.
-- Reconnect and restart with payloads docked; verify each restores to its own pad.
-- Look for cargo traps, alternate boosts, grapple bypasses and excessive waits.
-- Is there enough thinking, a satisfying final assembly and balanced engagement?
-  Is the chamber too long? Record discoveries rather than adding solution text.
-
-Stop here for human acceptance or revision. Generate a matching binary only in
-a later, explicitly accepted contract-freezing task.
+Stop for two-computer acceptance. No next chamber or binary generation in this pass.
