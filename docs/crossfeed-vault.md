@@ -2,6 +2,22 @@
 
 **PROVISIONAL UNTIL HUMAN PLAYTEST ACCEPTANCE**
 
+## Pickup correction — 2026-10-11
+
+The reported inaccessible interaction was reproduced at the client and server
+boundaries before changing geometry. `cubeAvailable` hid pickup/pull for A until
+B and B until C; the server's `cubeEnabled` independently rejected those same
+requests. Reach, holder and epoch were valid. Thus normal input was not offered;
+a directly submitted request was rejected rather than accepted and regenerated.
+
+Both CROSSFEED payloads now behave normally whenever physically reachable.
+Geometry controls access. Per-cube arbitration, one carried/pulled object per
+player, prediction and reset epochs remain unchanged. Focused tests cover both
+slots/payloads, retained accepted prediction, drop/pull, independent firewall
+reset, party selection/replay, reconnect and process restart. The real-input
+browser route additionally picks up and retains A before operating B. No
+post-acceptance reset/placement overwrite was reproduced in these checks.
+
 2026-10-11 follow-up: human playtesting confirmed mechanical feasibility but found
 the puzzle too easy, staged and dependent on permanent unlocks. RACE CONDITION
 explores a different design; CROSSFEED's logical contract is not frozen for binary

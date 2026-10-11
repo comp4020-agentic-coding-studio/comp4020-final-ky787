@@ -36,5 +36,7 @@ export const crossfeedDefinition: LevelDefinition<'crossfeed-vault'> = {
             codePlatformB: i.cubeOnFinalLeft && i.cubeOnFinalRight, exitDoor: ctx.record.exitUnlocked } };
     },
     unlock: ctx => ctx.record.levelState.switchD && ready(ctx),
-    cubeEnabled: (r, id) => id === 'cubeA' ? r.levelState.switchB : id === 'cubeB' && r.levelState.switchC,
+    // Physical access is authored in the room. A reachable payload has no
+    // unrelated progression permission; identity/holder/epoch checks still apply.
+    cubeEnabled: () => true,
 };

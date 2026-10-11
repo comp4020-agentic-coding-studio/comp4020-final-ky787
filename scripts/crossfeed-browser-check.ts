@@ -93,6 +93,9 @@ async function vault(p: Cdp) {
         await mouse(runner, 2300, 1166, false);
         await wait(runner, 'right balcony landing', s => s.player.x > 2440 && s.player.groundId === 'access-balcony');
     } finally { await key(runner, 'KeyD', false); await mouse(runner, 2300, 1166, false); }
+    await pickup(runner, 'cubeA'); await sleep(500);
+    check('reachable A pickup accepted and retained before B', !state(await snapshot(runner)).levelState.inputs.switchB && (await snapshot(runner)).cubes.cubeA!.carried);
+    await place(runner, 'cubeA', 2760);
     await align(runner, 2560); await tap(runner, 'KeyE'); await wait(holder, 'B return bridge', s => s.outputs.bridge);
     await walk(holder, 1780); check('B releases the body holder permanently', !(await snapshot(holder)).outputs.grappleAnchor && (await snapshot(holder)).outputs.bridge);
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1750, 'liftCargo');

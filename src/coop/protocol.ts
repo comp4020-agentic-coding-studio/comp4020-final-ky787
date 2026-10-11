@@ -81,8 +81,7 @@ interface SharedSession {
 export type SharedRoom<L extends CoopLevelId = CoopLevelId> = { [K in L]: SharedSession & { level: K; levelState: LevelStateMap[K] }
     & (K extends 'crumble-lab' | 'crossfeed-vault' | 'race-condition' ? { cube: null; cubePlacement: null } : { cube: SharedCube; cubePlacement: CubePlacement }) }[L];
 export const cubeAvailable = (room: SharedRoom | null, id: CubeId = 'cube'): boolean => !!room?.cubes[id]
-    && (room.level !== 'pairing-bay' || room.levelState.inputs.switchB)
-    && (room.level !== 'crossfeed-vault' || (id === 'cubeA' ? room.levelState.inputs.switchB : room.levelState.inputs.switchC));
+    && (room.level !== 'pairing-bay' || room.levelState.inputs.switchB);
 type ClientPayload =
     | { type: 'create-party' }
     | { type: 'select-level'; seq: number; level: CampaignLevel }
