@@ -101,6 +101,18 @@ async function route(url: string, debug: string, reverse: boolean) {
     const spanFrame = JSON.stringify((await snapshot(operator)).camera.frame);
     check('TRACE stays framed beyond the lever timeout', (await snapshot(operator)).camera.kind === 'plate');
     await shot(operator, 'trace-camera');
+    const operatorBeforeFall = await snapshot(operator), runnerBeforeFall = await snapshot(runner);
+    // Deliberately miss the first hook: the beam must give a fast local retry.
+    await key(runner, 'KeyD', true);
+    try { await wait(runner, 'failed swing hits span firewall', s => s.deaths === runnerBeforeFall.deaths + 1); }
+    finally { await key(runner, 'KeyD', false); }
+    const afterFall = await snapshot(runner), operatorAfterFall = await snapshot(operator);
+    check('span firewall respawns only the runner at launch', afterFall.lastDeath?.firewallId === 'span-firewall'
+        && afterFall.player.x >= 560 && afterFall.player.x < 725 && afterFall.player.y < 720
+        && operatorAfterFall.deaths === operatorBeforeFall.deaths && operatorAfterFall.player.x === operatorBeforeFall.player.x);
+    check('failed swing preserves delivered cargo and trace power', state(afterFall).cubePlacements.cubeA === 'receiver' && state(afterFall).levelState.outputs.phaseA);
+    await align(runner, 705);
+    const traversalDeaths = (await snapshot(runner)).deaths;
     await key(runner, 'KeyD', true); await mouse(runner, 1005, 365, true);
     await wait(runner, 'hook 1', s => s.player.rope.anchorId === 'span1');
     check('first substantial grapple attached', true);
@@ -125,7 +137,7 @@ async function route(url: string, debug: string, reverse: boolean) {
     await tap(runner, 'Space'); await mouse(runner, 3005,365,false);
     await wait(runner, 'right deck landing', s => s.player.groundId === 'right-deck', 4000);
     await key(runner,'KeyD',false); await sleep(160); await shot(runner,'right-deck');
-    check('runner crossed all five blocks, no floor or death shortcut', (await snapshot(runner)).deaths === 0);
+    check('runner crossed all five blocks, no floor or death shortcut', (await snapshot(runner)).deaths === traversalDeaths);
     await pickup(runner,'cubeB'); await place(runner,'cubeB',3470,'return');
     await wait(runner, 'local body on RETURN reveals the bridge', s => s.camera.id === 'return');
     await sleep(700); await shot(runner, 'return-camera');

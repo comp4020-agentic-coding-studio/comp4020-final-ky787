@@ -17,10 +17,11 @@ continue to depend on current input occupancy.
 
 The 4180 × 1420 room is one continuous space. Its first-entry overview and held Tab
 view show the cargo frame at the left, two widely separated floor controls, launch
-stairs/operator deck, five overhead traversal slabs, safe catch floor, right deck
+stairs/operator deck, five overhead traversal slabs, a long fall firewall, right deck
 and high final control. The cargo enclosure sits beside the swing volume so it
 does not interrupt the runner's arcs. DROP B faces the same visible machine from
-the central floor. The code return bridge ghosts across the whole span.
+the central floor. The code return bridge ghosts across the whole span, above an
+always-active firewall. Powering the bridge provides safe passage over the beam.
 
 Local body contact with DROP A/B, TRACE ENABLE and RETURN now selects a sustained
 camera view of the affected machinery. PHASE off TRACE briefly reveals the span;
@@ -34,7 +35,7 @@ presentation and do not change accepted machinery or the partner's camera.
 | DROP controls | A at (180,1240); B at (1880,1240) |
 | Launch/trace | Five 104-unit rises up the left stairs; deck y720; TRACE x615, PHASE x655 |
 | Alternating span | Five 150-wide slabs starting at x930/1430/1930/2430/2930; y350/290/350/290/350 |
-| Catch/recovery | Continuous safe floor y1240; stairs at the left; saved launch respawn after delivery |
+| Fall/recovery | Always-active horizontal firewall x725–3230 at y900, below the return bridge and swing arcs; saved launch respawn after delivery. Lower floor y1240 remains safe for DROP controls. |
 | Right deck | x3230–4180, y720; RETURN x3470, Cube B x3570 |
 | Finish | Ungrappleable ledge at x3820, y530; COMMIT x4000; exit on the deck below |
 
@@ -111,9 +112,11 @@ current phase/grace. The clients render the same warning/collapse and release a
 rope whose anchor becomes invalid. Required use is authored puzzle design, not
 proof that a native block is bogus.
 
-Falling reaches a safe lower floor. Players can run back to the stairs or use
-normal local R respawn at the saved launch checkpoint. Neither option resets
-the delivered payload or moves the partner. No additional checkpoint enables a
+Falling through the inactive return bridge hits the always-active span firewall
+and immediately respawns only that player at the saved launch checkpoint. The
+delivered payload and partner stay in place. The beam lies below the successful
+swing arcs and the powered bridge; the lower DROP-control floor remains usable.
+Normal local R respawn is also available. No additional checkpoint enables a
 route or overrides a momentary signal.
 
 ## Return and finish
@@ -171,7 +174,7 @@ or obfuscated binary generation.
   This applies to the current C8/co-op world. The retained pre-C8 prototype keeps
   its 380 cap because its 340-unit CONNECT gap was bypassable at 426 (and 420).
   Its original reachability assertion remains unchanged.
-- Firewalls default to always-on; this chamber explicitly authors a power signal.
+- Firewalls default to always-on; only the two Cargo Clock beams have power signals.
   They remain stationary lethal rectangles, not solids or an autonomous timed
   firewall state machine. No Crit 5 moving/open-close cycle was imported.
 - Visible enclosed walls can block cube pickup/pull rays. The cargo frame and
@@ -191,9 +194,11 @@ authority using the existing named-cube rules. The server has no room coordinate
 `pnpm check:race` uses muted real keyboard/mouse input in two separate browser
 contexts. It checks timed delivery, all five catches, both shared 1550 ms fuses,
 Cube B on RETURN, actual held-cube landing/second jump, commit, and two arrivals.
-It reverses the cargo operator, trace operator/runner and holder/climber roles in
-a second fresh room, including a solo cargo attempt that times out on the way
-to B. `BN_RACE_FORWARD_ONLY=1` and `BN_RACE_REVERSE_ONLY=1` narrow iteration.
+It also deliberately misses a hook to verify firewall death, local launch respawn,
+and preserved delivery before completing the five-hook route. It reverses the
+cargo operator, trace operator/runner and holder/climber roles in a second fresh
+room, including a solo cargo attempt that times out on the way to B.
+`BN_RACE_FORWARD_ONLY=1` and `BN_RACE_REVERSE_ONLY=1` narrow iteration.
 Focused world/server tests cover timeout and overlap destruction, inversion,
 universal contacts, authority/epoch rejection, grace, restart, prediction and
 the boost/range/enclosure boundaries. Automated movement is feasibility evidence,
@@ -209,8 +214,9 @@ Known limits and possible alternatives to evaluate:
   and range constraints, not absence of every creative shortcut.
 - Once B is legitimately recovered, using it on TRACE is an allowed alternative.
   It cannot operate the remote PHASE lever itself. A in the receiver is enclosed.
-- Dropping B onto the lower catch floor is recoverable by carrying it up the
-  stairs and traversing again; human testing should judge the recovery cost.
+- Dropping B into the span firewall resets only B to its right-deck spawn. The
+  delivered A remains on the receiver. Dropping B elsewhere on the lower floor
+  still requires manual recovery via the stairs and span.
 - The 650 ms lever interval, 350 ms grace and 1550 ms fuse need real network
   playtesting. A denied very rapid toggle visibly reconciles. No rollback exists.
 - Audio uses existing bounded one-shots, not a new hum/music track. Browser routes
@@ -222,7 +228,9 @@ Known limits and possible alternatives to evaluate:
 2. Try A+B overlap and a missed buffer window. Watch A reset, B and players remain.
 3. Solve delivery with A released before B. Swap cargo roles in another room.
 4. Operate TRACE/PHASE while the partner swings through all five blocks. Swap.
-5. Hold each fake hook too long, fall to the catch deck, retry using the checkpoint.
+5. Hold each fake hook too long, fall into the span firewall, and retry at launch.
+   Confirm the partner and delivered A are unaffected; check successful swing arcs
+   and the cube-powered return bridge clear the beam safely.
 6. Toggle near the transfer boundary under real latency; try rapid toggles and
    briefly leaving TRACE. Judge the grace, ghost clarity and shared collapse.
 7. Stand on RETURN, leave it, then substitute B. Bring the operator across.

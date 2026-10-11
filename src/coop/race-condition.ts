@@ -57,6 +57,8 @@ export function raceCondition(slot: Slot): RoomDef<'race-condition'> {
             { id: 'commit-ledge', kind: 'static', x: 3820, y: 530, w: 360, h: 28 },
         ],
         firewalls: [
+            // Below the swing arcs and powered return crossing; failed attempts respawn at launch.
+            { id: 'span-firewall', x: 725, y: 900, length: 2505, orientation: 'horizontal' },
             { id: 'race-beam', x: 120, y: 800, length: 170, orientation: 'horizontal', signal: 'raceFirewall' },
             { id: 'safety-beam', x: 120, y: 860, length: 170, orientation: 'horizontal', signal: 'safetyFirewall' },
         ],

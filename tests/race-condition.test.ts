@@ -119,6 +119,34 @@ it('visible enclosure walls prevent pulling payloads through cargo or the unsolv
     w.player = createPlayer(3520, 703); expect(w.cubeReachable('cubeB')).toBe(true);
 });
 
+it('failed swings hit the active span firewall and respawn at launch without losing delivery', () => {
+    const f = setup(), w = f.w;
+    f.record.checkpoint = 'reunion'; f.record.cubePlacements.cubeA = 'receiver'; f.sync();
+    const beam = w.firewalls.find(f => f.def.id === 'span-firewall')!;
+    expect(beam.enabled).toBe(true);
+    expect(w.solids.some(s => s.id === beam.def.id)).toBe(false);
+    for (const platform of w.room.platforms.filter(p => p.signal === 'phaseA' || p.signal === 'phaseB')) {
+        w.player = createPlayer(platform.x + platform.w / 2, 703);
+        const deaths = w.deaths;
+        for (let i = 0; i < 120 && w.deaths === deaths; i++) step(w, 1);
+        expect(w.deaths).toBe(deaths + 1);
+        expect(w.lastDeath).toMatchObject({ cause: 'firewall', firewallId: 'span-firewall' });
+        expect(w.player).toMatchObject({ ...w.room.checkpoint, rope: { phase: 'idle' } });
+        expect(f.record.cubePlacements.cubeA).toBe('receiver');
+    }
+    expect(f.reset).not.toHaveBeenCalled();
+});
+
+it('the powered return bridge stays safe above the always-active firewall', () => {
+    const f = setup(), w = f.w;
+    f.record.cubePlacements.cubeA = 'receiver'; f.record.cubePlacements.cubeB = 'return'; f.sync();
+    w.player = createPlayer(700, 703);
+    step(w, 760, { ...emptyInput(), right: true });
+    expect(w.player.x).toBeGreaterThan(3230);
+    expect(w.player.groundId).toBe('right-deck'); expect(w.deaths).toBe(0);
+    expect(w.firewalls.find(f => f.def.id === 'span-firewall')!.enabled).toBe(true);
+});
+
 it('COMMIT cannot be reached by pressing E through the underside of its ledge', () => {
     const f = setup(), control = vi.spyOn(f.client, 'control').mockReturnValue(true);
     for (const y of [575, 550]) {
