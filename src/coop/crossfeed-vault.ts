@@ -14,6 +14,9 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
         width: 4320, height: 1780,
         spawn: { x: slot === 1 ? 1660 : 1760, y: 1483 }, checkpoint: { x: slot === 1 ? 1660 : 1760, y: 1483 },
         upperCheckpoint: { x: slot === 1 ? 1120 : 1220, y: 733 },
+        entryPoints: [{ x: 1660, y: 1483 }, { x: 1760, y: 1483 }],
+        breakpoints: [{ id: 'system-online', at: { x: 1210, y: 750 }, checkpoint: 'upper',
+            label: 'SYSTEM ONLINE', activationControl: 'switchC' }],
         cubes: [{ id: 'cubeA', spawn: { x: 2760, y: 1478 }, mark: 'A' }, { id: 'cubeB', spawn: { x: 510, y: 1478 }, mark: 'B' }],
         plateB: { x: 2620, y: 350 }, plateC: { x: 2910, y: 350 },
         plates: [{ id: 'entry', at: { x: 1870, y: 1500 }, label: 'A', cameraReveal: { platformIds: ['crossing-anchor', 'return-bridge'], padding: 100 } },
@@ -67,8 +70,8 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
         // payload intersects it. The long roofed passage prevents jumping cargo over.
         firewalls: [{ id: 'service-filter', x: 850, y: 1452, orientation: 'horizontal', length: 400, thickness: 12 }],
         hazards: [{ x: 0, y: 1710, w: 4320, h: 70 }],
-        regions: [{ at: { x: 1600, y: 1390 }, label: 'CROSSFEED' }, { at: { x: 2510, y: 1390 }, label: 'ACCESS' },
-            { at: { x: 360, y: 1270 }, label: 'SERVICE' }, { at: { x: 1080, y: 650 }, label: 'CONTROL' },
+        regions: [{ at: { x: 1600, y: 1300 }, label: 'CROSSFEED' }, { at: { x: 2510, y: 1390 }, label: 'ACCESS' },
+            { at: { x: 360, y: 1270 }, label: 'SERVICE' }, { at: { x: 1080, y: 500 }, label: 'CONTROL' },
             { at: { x: 3690, y: 690 }, label: 'GALLERY' }, { at: { x: 2690, y: 105 }, label: 'VAULT' }],
     };
     const elbow = (from: { x: number; y: number }, to: { x: number; y: number }, y: number) => [from, { x: from.x, y }, { x: to.x, y }, to];

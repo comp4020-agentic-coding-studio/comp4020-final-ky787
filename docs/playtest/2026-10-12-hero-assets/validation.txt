@@ -1,0 +1,33 @@
+Debugger hero assets — 2026-10-12
+
+PASS pnpm typecheck
+PASS pnpm test:unit — 40 files, 424 passed, 2 skipped
+PASS pnpm test — 2 files, 3 HTTP acceptance tests (isolated local server)
+PASS pnpm build — retained UPLINK bundle validation and production build
+PASS pnpm check:heroes — 13 Canvas/browser checks, desktop and 800x600 review captures
+PASS pnpm check:browser — 118 real-input solo checks across all four rooms
+PASS BN_HERO_REVIEW=1 BN_CROSSFEED_FORWARD_ONLY=1 pnpm check:crossfeed — 29 real-input checks
+PASS BN_HERO_REVIEW=1 BN_HERO_CHECKPOINT_ONLY=1 BN_CROSSFEED_FORWARD_ONLY=1 pnpm check:crossfeed — 12 real-input reset/reload/compact-view checks
+PASS BN_RACE_FORWARD_ONLY=1 pnpm check:race — 27 real-input checks
+PASS git diff --check
+
+Detailed browser logs: gallery-checks.txt, c8-checks.txt, race-checks.txt,
+live/checks.txt, checkpoint/checks.txt.
+Gallery and sequence images are explicit rendering fixtures; checkpoint/ and
+live/ captures use real input with accepted state, without world-state injection.
+All automated browsers were muted. Listening balance awaits human review.
+
+Iteration notes:
+- Corrected a new camera round-trip test to use floating-point tolerance.
+- The first HTTP suite invocation lacked a running server; it passed once an
+  isolated server was started.
+- Inserting reload into the middle of the full Crossfeed route altered its player
+  setup and later hit the service firewall. Reset/reload was moved into a dedicated
+  checkpoint-only route; the original complete route then passed with zero deaths.
+- Browser review corrected local label collisions, compact HUD overlap, Race's
+  receiver/entry caption overlap, and far-right exit caption clipping.
+- The production build retains its existing large-chunk advisory; no new framework
+  or dependencies were introduced.
+
+Final label-only refinements were checked with typecheck, production build and the
+focused Canvas/live-room browser harness; physics routes were not repeated for them.

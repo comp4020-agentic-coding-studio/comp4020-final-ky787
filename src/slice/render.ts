@@ -15,6 +15,8 @@ import { drawMachinery } from './machinery-render.ts';
 import { drawFirewalls } from './firewall-render.ts';
 import { drawConnections, roomConnections, type MachineConnection } from './connections.ts';
 import { ContextualCamera } from './camera-reveals.ts';
+import { HeroPresentation, type HeroCue } from './hero-presentation.ts';
+import { drawBreakpoint, drawEntryGateways, drawEntryProjection, drawExitGate, drawRespawnMarker } from './hero-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     replay = new TracePlayback();
@@ -26,6 +28,7 @@ export class PuzzleRenderer {
     connections: MachineConnection[] = [];
     camera = new Camera();
     particles = new Particles();
+    heroes = new HeroPresentation();
     private ctx: CanvasRenderingContext2D;
     constructor(readonly canvas: HTMLCanvasElement, private presentation: MachinePresentation = authoredPresentation) { this.ctx = canvas.getContext('2d')!; }
     resize(): void {
@@ -37,7 +40,7 @@ export class PuzzleRenderer {
         this.camera.viewW = rect.width;
         this.camera.viewH = rect.height;
     }
-    room(world: PuzzleWorld): void {
+    room(world: PuzzleWorld, completed = false): void {
         this.connections = roomConnections(world.room);
         this.resize();
         this.camera.setWorld(world.room.width, world.room.height, 740);
@@ -47,6 +50,7 @@ export class PuzzleRenderer {
         this.cameraDeaths = world.deaths;
         this.cameraReveals.reset(world);
         this.exitWasOpen = world.frame.outputs.exitDoor;
+        this.heroes.reset(world.room, { checkpoint: world.checkpoint, exitReady: world.frame.outputs.exitDoor, completed });
         this.replay = new TracePlayback();
         this.replay.update(world.frame, 0);
     }
@@ -72,10 +76,12 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; connected?: boolean; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }): void {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; connected?: boolean; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }, running = true): HeroCue[] {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
+        const heroCues = this.heroes.update(r, { checkpoint: w.checkpoint, exitReady: w.frame.outputs.exitDoor,
+            completed: players?.completed ?? w.exited }, dt, running && players?.connected !== false);
         if (w.deaths !== this.cameraDeaths || players?.connected === false) this.returnReveal = 0;
         this.cameraDeaths = w.deaths;
         // Authored reveal of the final physical route; outputs and controls never wait for it.
@@ -172,6 +178,7 @@ export class PuzzleRenderer {
         }
         for (const region of r.regions ?? []) this.text(region.label, region.at.x, region.at.y, 24, C.dim);
         drawMachinery(c, w, this.presentation);
+        drawEntryGateways(c, r, this.heroes, cam.zoom);
         drawFirewalls(c, w.firewalls, w.elapsed);
         if (r.id === 'race-condition') {
             const timer = w.frame.timer!;
@@ -215,11 +222,11 @@ export class PuzzleRenderer {
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
         for (const lever of [
-            { at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
-            { at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
-            ...(r.controls ?? []).map(s => ({ at: s.at, active: w.frame.controls?.[s.id] ?? (s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id as 'switchB' | 'switchC']), name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle' })),
+            { id: 'lever', at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
+            { id: 'upperLever', at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
+            ...(r.controls ?? []).map(s => ({ id: s.id, at: s.at, active: w.frame.controls?.[s.id] ?? (s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id as 'switchB' | 'switchC']), name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle' })),
         ]) {
-            if (!lever.at) continue;
+            if (!lever.at || r.breakpoints?.some(b => b.activationControl === lever.id)) continue;
             const { x, y } = lever.at;
             c.fillStyle = C.wall;
             c.fillRect(x - 24, y - 36, 48, 36);
@@ -244,24 +251,13 @@ export class PuzzleRenderer {
             const display = message.split('').map((ch, i) => i < decoded ? ch : ((i * 17 + Math.floor(w.elapsed * 8)) % 16).toString(16).toUpperCase()).join('');
             this.text(display, r.display.x + 16, r.display.y + 51, 17, displayOn ? C.cyan : C.dim);
         }
-        const e = r.exit;
-        c.fillStyle = '#12312f';
-        c.fillRect(e.x, e.y, e.w, e.h);
-        c.strokeStyle = w.frame.outputs.exitDoor ? C.cyan : C.line;
-        c.lineWidth = 3;
-        c.strokeRect(e.x, e.y, e.w, e.h);
-        c.fillStyle = '#52616a';
-        c.fillRect(e.x, e.y, e.w, e.h * (1 - w.doorOpen));
-        this.text(r.id === 'uplink' ? '← EXIT' : 'EXIT →', e.x - 6, e.y - 18, 15, C.cyan);
-        if (isCoopLevel(r.id)) {
-            this.text(players?.completed ? r.id === 'race-condition' ? 'TRACE COMPLETE' : r.id === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.id === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE' : 'BOTH PLAYERS REQUIRED', e.x - 65, e.y - 46, 12, C.cyan);
-            if (w.frame.outputs.exitDoor) this.text(`${players?.reachedExit.filter(Boolean).length ?? 0} / 2 ARRIVED`, e.x + 8, e.y + 38, 12, C.cyan);
-        }
+        drawExitGate(c, r.exit, w.frame.outputs.exitDoor, this.heroes, cam.zoom, isCoopLevel(r.id) ? players?.reachedExit.filter(Boolean).length ?? 0 : undefined);
         drawMachineListings(c, w, this.replay, this.presentation);
-        const checkpoint = w.checkpointPosition();
-        this.line(checkpoint.x, checkpoint.y + 17, checkpoint.x, checkpoint.y - 47, C.cyan);
-        c.fillStyle = C.cyan;
-        c.fillRect(checkpoint.x, checkpoint.y - 47, 20, 10);
+        for (const def of r.breakpoints ?? []) {
+            const state = this.heroes.breakpoints.get(def.id)!;
+            drawBreakpoint(c, def, state.active, state.age, this.heroes.time, cam.zoom);
+        }
+        if (w.checkpoint !== 'entry' && !r.breakpoints?.some(b => b.checkpoint === w.checkpoint)) drawRespawnMarker(c, w.checkpointPosition());
         for (const [id, cube] of cubeEntries(w.cubes)) if (!w.cubeIsResetting(id)) {
             c.fillStyle = '#393b32';
             c.fillRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
@@ -294,10 +290,14 @@ export class PuzzleRenderer {
             this.text(`PLAYER ${players.localSlot === 1 ? 2 : 1}`, other.x - 32, other.y - 30, 10, accent);
         }
         drawNinja(c, p, w.elapsed, localAccent);
+        drawEntryProjection(c, r, this.heroes);
         if (players) this.text(`YOU / P${players.localSlot}`, p.x - 26, p.y - 30, 10, localAccent);
         const hint = w.interactionHint();
-        if (hint)
-            this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
+        if (hint) {
+            const station = r.breakpoints?.find(b => Math.hypot(p.x - b.at.x, p.y - (b.at.y - 25)) < 90);
+            if (station) this.text(hint, station.at.x - hint.length * 3.6, station.at.y + 78, 12, C.ink);
+            else this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
+        }
         const target = w.target(aim);
         if (target) {
             this.ring(target.point.x, target.point.y, 21, C.ink);
@@ -329,7 +329,7 @@ export class PuzzleRenderer {
                 this.text('JUMP INTO B TO RETURN', 1045, 590, 12, C.dim);
             } else if (r.id === 'lift-lab') {
                 this.text('E · LATCH + SHARED CHECKPOINT', 760, 235, 12, C.cyan);
-                this.text('HOLD HERE FOR YOUR PARTNER', 220, 740, 14, C.cyan);
+                this.text('HOLD HERE FOR YOUR PARTNER', 330, 740, 14, C.cyan);
                 this.text('R · RESET ONLY YOUR BODY', 805, 455, 12, C.dim);
             } else if (r.id === 'boost-lab') {
                 this.text('BOOST HERE', 430, 570, 13, C.cyan);
@@ -353,6 +353,7 @@ export class PuzzleRenderer {
             c.fillStyle = `rgba(250,129,126,${w.deathFlash * .4})`;
             c.fillRect(0, 0, cam.viewW, cam.viewH);
         }
+        return heroCues;
     }
 }
 function ropeOn(id: string, w: PuzzleWorld): boolean { return w.player.rope.phase === 'attached' && w.player.rope.anchorId === id; }

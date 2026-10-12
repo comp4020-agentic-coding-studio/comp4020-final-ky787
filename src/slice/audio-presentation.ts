@@ -56,6 +56,10 @@ export class AudioPresentation {
             play('crumbleWarn', { x: p.x + p.w / 2, y: p.y });
         }
         for (const e of events) {
+            // Authored checkpoint machines own a deployment/confirmation pair on their local clock.
+            if (e.kind === 'checkpoint' && w.room.breakpoints?.some(b => b.checkpoint === w.checkpoint)) continue;
+            if ((e.kind === 'terminal' || e.kind === 'lift-latch') && w.room.breakpoints?.some(b => b.activationControl
+                && Math.hypot(b.at.x - e.at.x, b.at.y - e.at.y) < 1)) continue;
             if (e.kind === 'switch' && !events.some(e => e.kind === 'lift-latch')) play('switch', e.at);
             if (e.kind === 'terminal') play('latch', e.at);
             if (e.kind === 'lift-latch') play('latch', e.at);

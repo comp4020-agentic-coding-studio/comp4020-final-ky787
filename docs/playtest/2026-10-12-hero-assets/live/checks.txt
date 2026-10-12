@@ -1,0 +1,29 @@
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] attach sequence runs after overview then settles
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] authored breakpoint starts retracted
+PASS [full chamber] mast and flag stay deployed through repeated snapshots
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] unlock leaves party victory pending with zero arrivals
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] reconnect baselines deployed flag with no attach, deployment, or completion replay
+PASS [full chamber] browser has no runtime errors
+PASS [full chamber] browser has no runtime errors

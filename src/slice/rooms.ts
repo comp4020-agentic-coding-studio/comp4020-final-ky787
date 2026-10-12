@@ -4,6 +4,17 @@ import type { Box, Vec2 } from "../engine/geometry.ts";
 import type { MachineSignal, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 import type { FirewallDef } from './firewall.ts';
+import type { RoomMemory } from './progress.ts';
+/** Presentation only: observes an existing milestone, never adds an interaction. */
+export interface BreakpointDef {
+    id: string;
+    /** Floor contact, independent of either player's respawn position. */
+    at: Vec2;
+    checkpoint: Exclude<RoomMemory['checkpoint'], 'entry'>;
+    label?: string;
+    /** Replaces this control's drawing; its existing interaction remains authoritative. */
+    activationControl?: 'lever' | 'upperLever' | NonNullable<RoomDef['controls']>[number]['id'];
+}
 /** Local presentation only. Targets include inactive/ghost manifestations. */
 export interface CameraReveal {
     platformIds?: readonly string[];
@@ -38,6 +49,9 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     width: number;
     height: number;
     spawn: Vec2;
+    /** Same authored spawn infrastructure for both clients. Defaults to spawn in solo rooms. */
+    entryPoints?: readonly Vec2[];
+    breakpoints?: readonly BreakpointDef[];
     checkpoint: Vec2;
     cube?: Vec2;
     cubes?: { id: CubeId; spawn: Vec2; mark: string }[];

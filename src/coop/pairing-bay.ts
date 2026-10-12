@@ -7,6 +7,7 @@ export function pairingBay(slot: Slot): RoomDef<'pairing-bay'> {
         id: 'pairing-bay', title: 'PAIRING BAY', instruction: 'HOLD FOR YOUR PARTNER. CROSS TOGETHER.',
         width: 2200, height: 780,
         spawn: { x: slot === 1 ? 150 : 405, y: 543 },
+        entryPoints: [{ x: 150, y: 543 }, { x: 405, y: 543 }],
         checkpoint: { x: slot === 1 ? 1050 : 1150, y: 543 },
         plate: { x: 250, y: 560 }, lever: { x: 1060, y: 560 },
         cube: { x: 1190, y: 538 }, cargoPlate: { x: 1310, y: 560 },

@@ -30,6 +30,7 @@ export function raceCondition(slot: Slot): RoomDef<'race-condition'> {
         id: 'race-condition', title: 'RACE CONDITION', instruction: 'DELIVER THE PAYLOAD. KEEP THE TRACE ALIVE.',
         width: 4180, height: 1420,
         spawn: { x: slot === 1 ? 120 : 250, y: 1223 }, checkpoint: { x: slot === 1 ? 585 : 695, y: 703 },
+        entryPoints: [{ x: 120, y: 1223 }, { x: 250, y: 1223 }],
         cubes: [{ id: 'cubeA', mark: 'A', spawn: { x: 205, y: 478 } }, { id: 'cubeB', mark: 'B', spawn: { x: 3570, y: 698 } }],
         plates: [
             { id: 'dropA', at: { x: 180, y: 1240 }, label: 'DROP A', cameraReveal: cargoView },
@@ -63,7 +64,7 @@ export function raceCondition(slot: Slot): RoomDef<'race-condition'> {
             { id: 'safety-beam', x: 120, y: 860, length: 170, orientation: 'horizontal', signal: 'safetyFirewall' },
         ],
         wires, hazards: [], display: { x: 1320, y: 820 }, exit: { x: 4020, y: 580, w: 110, h: 140 },
-        regions: [{ at: { x: 80, y: 1115 }, label: 'CARGO CLOCK' }, { at: { x: 1600, y: 130 }, label: 'ALTERNATING TRACE' },
+        regions: [{ at: { x: 80, y: 1090 }, label: 'CARGO CLOCK' }, { at: { x: 1600, y: 130 }, label: 'ALTERNATING TRACE' },
             { at: { x: 3530, y: 860 }, label: 'RETURN / COMMIT' }, { at: { x: 2520, y: 1330 }, label: '← RECOVERY' }],
     };
 }

@@ -1,0 +1,62 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Binary Ninja · hero asset visual fixture</title>
+<style>
+  * { box-sizing: border-box; } body { margin: 0; padding: 32px; background: #0c131a; color: #c5d4da; font: 13px monospace; }
+  h1 { font-size: 21px; letter-spacing: 2px; font-weight: 500; margin: 0 0 8px; } p { color: #8399a5; margin: 0 0 24px; }
+  section { display: flex; gap: 14px; margin-bottom: 22px; } figure { margin: 0; border: 1px solid #293942; background: #0d171f; }
+  figcaption { padding: 12px 16px; border-bottom: 1px solid #293942; font-size: 11px; color: #9fb4bf; }
+  canvas { display: block; } h2 { font-size: 12px; font-weight: 500; color: #8399a5; letter-spacing: 1px; }
+</style>
+<h1>BINARY NINJA / DEBUGGER INFRASTRUCTURE</h1>
+<p>Canvas asset review · presentation fixtures · gameplay is checked separately through real input</p>
+<section id="assets"></section>
+<h2>BREAKPOINT / TERMINAL → MAST → FLAG → CONFIRMATION → RETAINED</h2>
+<section id="sequence"></section>
+<h2>OVERVIEW / ANCHORED IDENTIFICATION AT 0.28×</h2>
+<section id="zoom"></section>
+<script type="module">
+import { drawEntryGateways, drawEntryProjection, drawBreakpoint, drawExitGate } from '../src/slice/hero-render.ts';
+import { HeroPresentation } from '../src/slice/hero-presentation.ts';
+import { crossfeedVault } from '../src/coop/crossfeed-vault.ts';
+const room = crossfeedVault(1), heroes = new HeroPresentation();
+heroes.reset(room, { checkpoint: 'entry', exitReady: false, completed: false });
+heroes.time = 1.5;
+window.heroInk = [];
+const fill = CanvasRenderingContext2D.prototype.fillText;
+CanvasRenderingContext2D.prototype.fillText = function(s, ...args) { window.heroInk.push({ text: s, colour: this.fillStyle }); return fill.call(this, s, ...args); };
+function card(parent, id, title, kind, active, age = Infinity, zoom = 1.18) {
+  const figure = document.createElement('figure'); figure.id = id;
+  const label = document.createElement('figcaption'); label.textContent = title;
+  const canvas = document.createElement('canvas'); canvas.width = 290; canvas.height = parent === 'sequence' ? 230 : parent === 'zoom' ? 160 : 275;
+  figure.append(label, canvas); document.querySelector('#' + parent).append(figure);
+  const c = canvas.getContext('2d');
+  c.strokeStyle = '#15232c'; c.lineWidth = .7;
+  for (let x = 0; x < canvas.width; x += 25) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, canvas.height); c.stroke(); }
+  for (let y = 0; y < canvas.height; y += 25) { c.beginPath(); c.moveTo(0, y); c.lineTo(canvas.width, y); c.stroke(); }
+  const floor = canvas.height - (parent === 'zoom' ? 60 : 28);
+  c.fillStyle = '#21303a'; c.fillRect(0, floor, canvas.width, canvas.height - floor); c.fillStyle = '#43545d'; c.fillRect(0, floor, canvas.width, 1);
+  c.translate(canvas.width / 2, floor); c.scale(zoom, zoom);
+  if (kind === 'entry') {
+    c.translate(-1710, -1500); heroes.entryAge = age;
+    drawEntryGateways(c, room, heroes, zoom); drawEntryProjection(c, room, heroes);
+  } else if (kind === 'breakpoint') {
+    c.translate(-1210, -750); drawBreakpoint(c, room.breakpoints[0], active, age, heroes.time, zoom);
+  } else {
+    c.translate(-2770, -350); heroes.exitAge = age;
+    drawExitGate(c, room.exit, active, heroes, zoom, 0);
+  }
+}
+card('assets', 'entry', '01 / ENTRY POINT', 'entry', true, .35);
+card('assets', 'offline', '02 / BREAKPOINT OFFLINE', 'breakpoint', false);
+card('assets', 'active', '03 / BREAKPOINT ACTIVE', 'breakpoint', true);
+card('assets', 'locked', '04 / TRAVEL INCOMPLETE', 'exit', false);
+card('assets', 'unlocked', '05 / TRAVEL COMPLETE', 'exit', true);
+for (const [i, age] of [.1, .5, 1, 1.35, 1.8].entries()) card('sequence', 'phase-' + i, age.toFixed(2) + ' s', 'breakpoint', true, age, 1.05);
+card('zoom', 'zoom-entry', 'ENTRY / 0.28×', 'entry', true, Infinity, .28);
+card('zoom', 'zoom-offline', 'OFFLINE / 0.28×', 'breakpoint', false, Infinity, .28);
+card('zoom', 'zoom-active', 'ACTIVE / 0.28×', 'breakpoint', true, Infinity, .28);
+card('zoom', 'zoom-locked', 'LOCKED / 0.28×', 'exit', false, Infinity, .28);
+card('zoom', 'zoom-unlocked', 'READY / 0.28×', 'exit', true, Infinity, .28);
+window.heroGalleryReady = true;
+</script>

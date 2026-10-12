@@ -72,6 +72,12 @@ SYSTEM ONLINE terminal (C) permanently powers it, opens the service bay and save
 the upper checkpoint. It never moves a living partner. **Service access does not
 follow relay power**, so changing B cannot seal a player inside the service bay.
 
+SYSTEM ONLINE is presented as the authored mechanical breakpoint pedestal. Its
+red `BREAKPOINT ACTIVE` screen and deployed mast observe the existing upper
+checkpoint; there is no second control. Entry and exit infrastructure follow the
+[debugger hero asset conventions](debugger-hero-assets.md). Green `TRAVEL COMPLETE`
+means the exit is ready; both physical arrivals are still required for victory.
+
 Configure B off for relay transfer. The entry anchor can also help return across
 the first gap; after retrieving A, using it on the universal entry plate is a
 legitimate alternative to keeping a body there.

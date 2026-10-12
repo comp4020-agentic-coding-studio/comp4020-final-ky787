@@ -121,6 +121,10 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     await sleep(1500); await shot(a, 'overview');
     check('one large chamber, two named cubes, honest mock source', Object.keys(created.cubes).join(',') === 'cubeA,cubeB' && created.source === 'mock-multiplayer' && !created.evidence);
     for (const p of [a, b]) { await tap(p, 'Space'); await wait(p, 'overview dismissed', s => s.started && !s.overviewVisible); }
+    if (process.env.BN_HERO_REVIEW) {
+        await sleep(1000); await shot(a, 'entry-point');
+        check('attach sequence runs after overview then settles', (await snapshot(a)).heroAssets.entryAge! >= .85);
+    }
     await align(holder, 1870); await wait(runner, 'A powers partner anchor', s => s.outputs.grappleAnchor);
     await walk(runner, 1950);
     await key(runner, 'KeyD', true); await mouse(runner, 2300, 1166, true);
@@ -138,8 +142,46 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     await walk(holder, 1780); check('B bridge lets the entry holder leave A', !(await snapshot(holder)).outputs.grappleAnchor && (await snapshot(holder)).outputs.bridge);
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1750, 'liftCargo');
     await wait(holder, 'cargo powers lift', s => s.outputs.liftField); check('Cube A temporarily powers lift', !state(await snapshot(holder)).levelState.inputs.switchC);
-    await lift(holder); await align(holder, 1210); await tap(holder, 'KeyE');
+    await lift(holder); await align(holder, 1210);
+    if (process.env.BN_HERO_REVIEW) {
+        await shot(holder, 'breakpoint-offline');
+        check('authored breakpoint starts retracted', (await snapshot(holder)).heroAssets.breakpoints[0].mast === 0);
+    }
+    await tap(holder, 'KeyE');
     await wait(runner, 'C powers lift/checkpoint independently of transfer mode', s => s.checkpoint === 'upper' && s.outputs.liftField && !s.outputs.relayGates);
+    if (process.env.BN_HERO_REVIEW) {
+        for (const age of [.1, .5, 1, 1.35, 1.8]) {
+            await wait(holder, `breakpoint deployment ${age}s`, s => (s.heroAssets.breakpoints[0].age ?? -1) >= age);
+            await shot(holder, `breakpoint-${age}`);
+        }
+        const deployed = (await snapshot(holder)).heroAssets.breakpoints[0];
+        check('mast and flag stay deployed through repeated snapshots', deployed.mast === 1 && deployed.flag === 1 && deployed.age! >= 1.6);
+        await wait(runner, 'partner observes deployed checkpoint', s => s.heroAssets.breakpoints[0].flag === 1);
+        if (process.env.BN_HERO_CHECKPOINT_ONLY) {
+            const before = await snapshot(holder);
+            await tap(holder, 'KeyR');
+            await wait(holder, 'local respawn at upper milestone', s => s.deaths > before.deaths && s.player.y < 760);
+            const respawned = (await snapshot(holder)).heroAssets;
+            check('physical respawn does not redeploy or reattach', respawned.breakpoints[0].age! >= deployed.age!
+                && respawned.breakpoints[0].flag === 1 && respawned.entryAge! >= before.heroAssets.entryAge!);
+            await shot(holder, 'breakpoint-respawn');
+            await holder.send('Page.reload');
+            await wait(holder, 'reconnect restores upper breakpoint', s => s.started && s.checkpoint === 'upper' && s.heroAssets.breakpoints[0]?.active);
+            const restored = (await snapshot(holder)).heroAssets;
+            check('reconnect baselines deployed flag with no attach or deployment replay', restored.breakpoints[0].age === null
+                && restored.breakpoints[0].flag === 1 && restored.entryAge === null);
+            await sleep(500); await shot(holder, 'breakpoint-restored');
+            await holder.send('Emulation.setDeviceMetricsOverride', { width: 800, height: 600, deviceScaleFactor: 1, mobile: false });
+            await sleep(800); await shot(holder, 'breakpoint-compact');
+            await key(holder, 'Tab', true); await sleep(1200); await shot(holder, 'overview-compact'); await key(holder, 'Tab', false);
+            check('small viewport overview keeps camera aiming invertible', await holder.read(`(()=>{
+                const c=binaryNinja.renderer.camera, target={x:1540,y:356};
+                const back=c.screenToWorld((target.x-c.originX())*c.zoom,(target.y-c.originY())*c.zoom);
+                return Math.abs(back.x-target.x)<1e-6 && Math.abs(back.y-target.y)<1e-6;
+            })()`));
+            return;
+        }
+    }
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1840);
     check('C leaves lift on after cargo removal without moving partner', (await snapshot(runner)).outputs.liftField && (await snapshot(runner)).player.y > 1400);
     // Reconfigure B live: the upper player returns to A while the partner
@@ -212,6 +254,10 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     await walk(holder, 2670); await hop(holder,2540,'final-left-low'); await hop(holder,2490,'final-left-high'); await hop(holder, 2600, 'vault-crown'); await align(holder, 2620);
     await hop(runner, 3020, 'final-right-low'); await hop(runner, 3080, 'final-right-high'); await align(runner, 3080); await hop(runner, 2940, 'vault-crown'); await align(runner, 2910);
     await wait(holder, 'opposite bodies latch vault exit', s => s.outputs.exitDoor);
+    if (process.env.BN_HERO_REVIEW) {
+        check('unlock leaves party victory pending with zero arrivals', !state(await snapshot(holder)).completed && !state(await snapshot(holder)).reachedExit.some(Boolean));
+        await sleep(1100);
+    }
     await shot(holder, 'vault-unlocked');
     await align(holder,2670); await align(runner,2968);
     check('exit stays open after both players leave final plates', (await snapshot(runner)).outputs.exitDoor);
@@ -222,6 +268,14 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     try { await wait(holder, 'two physical arrivals complete vault', s => state(s).completed); } finally { await key(runner, 'KeyA', false); }
     await shot(runner, 'complete');
     check('CROSSFEED completed through real controls', state(await snapshot(holder)).completed && (await snapshot(holder)).deaths === 0 && (await snapshot(runner)).deaths === 0);
+    if (process.env.BN_HERO_REVIEW) {
+        await holder.send('Page.reload');
+        await wait(holder, 'reconnect restores completed party and upper breakpoint', s => !!s.multiplayer?.shared?.completed && s.checkpoint === 'upper' && s.heroAssets.breakpoints[0]?.active);
+        const restored = (await snapshot(holder)).heroAssets;
+        check('reconnect baselines deployed flag with no attach, deployment, or completion replay', restored.breakpoints[0].age === null
+            && restored.breakpoints[0].flag === 1 && restored.entryAge === null && restored.completionAge === null);
+        await shot(holder, 'breakpoint-restored');
+    }
 }
 
 async function main() {

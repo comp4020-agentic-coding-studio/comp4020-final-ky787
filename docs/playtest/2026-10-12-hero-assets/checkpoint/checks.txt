@@ -1,0 +1,12 @@
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] attach sequence runs after overview then settles
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] authored breakpoint starts retracted
+PASS [full chamber] mast and flag stay deployed through repeated snapshots
+PASS [full chamber] physical respawn does not redeploy or reattach
+PASS [full chamber] reconnect baselines deployed flag with no attach or deployment replay
+PASS [full chamber] small viewport overview keeps camera aiming invertible
+PASS [full chamber] browser has no runtime errors
+PASS [full chamber] browser has no runtime errors

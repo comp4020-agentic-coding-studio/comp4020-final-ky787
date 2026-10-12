@@ -130,14 +130,13 @@ export class SliceGame {
             this.authority = createCoopAuthority(room, this.coop);
             this.world = new PuzzleWorld(COOP_LABS[room.level].room(this.coop.slot), { switchB: false, cubeOnPlate: false, cubeOnPlateB: false,
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
-            this.renderer.room(this.world); this.sound.reset(this.world);
+            this.renderer.room(this.world, room.completed); this.sound.reset(this.world);
             this.input.releaseAll(); this.accumulated = 0;
             this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
             this.overviewVisible = (room.level === 'crossfeed-vault' || room.level === 'race-condition') && initial && room.checkpoint === 'entry';
             this.overviewPending = this.overviewVisible; this.startButton.hidden = !this.overviewVisible;
             this.started = this.coop.playing && !this.coopPaused && !this.overviewVisible; this.canvas.focus();
             this.audio.setActive(this.started && !document.hidden && document.hasFocus());
-            this.audio.play('latch', .45);
         } else if (this.authority) {
             const previous = this.authority.room;
             const switchWasVisible = this.world.inputs.switchB;
@@ -440,6 +439,7 @@ export class SliceGame {
             connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             audio: this.audio.snapshot(),
+            heroAssets: this.renderer.heroes.snapshot(),
             camera: { ...this.renderer.cameraReveals.selection, x: this.renderer.camera.x, y: this.renderer.camera.y, zoom: this.renderer.camera.zoom },
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
@@ -514,10 +514,11 @@ export class SliceGame {
             this.coop.publish(this.world.player, now);
             for (const [id, cube] of cubeEntries(this.world.cubes)) if (!this.world.cubeIsResetting(id)) this.coop.publishCube(cube, now, id);
         }
-        this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
+        const heroCues = this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, connected: this.coop.connected, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
-                remotePullingCubes: cubeEntries(this.coop.room?.cubes ?? {}).filter(([id, c]) => c.pulling && !this.coop.ownsCubeFor(id)).map(([id]) => id) } : undefined);
+                remotePullingCubes: cubeEntries(this.coop.room?.cubes ?? {}).filter(([id, c]) => c.pulling && !this.coop.ownsCubeFor(id)).map(([id]) => id) } : undefined, this.started);
+        for (const { cue, at } of heroCues) this.audio.play(cue, Math.max(0, 1 - Math.hypot(at.x - this.world.player.x, at.y - this.world.player.y) / 1100));
         this.coopHud.classList.toggle('camera-reveal', this.coopMode && this.renderer.cameraReveals.selection.kind !== 'follow');
         this.inspector.update(this.renderer.replay);
         const replay = this.renderer.replay;

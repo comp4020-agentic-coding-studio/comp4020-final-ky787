@@ -1,0 +1,13 @@
+PASS gallery loaded actual Canvas modules
+PASS ENTRY POINT uses its semantic status colour
+PASS BREAKPOINT OFFLINE uses its semantic status colour
+PASS BREAKPOINT ACTIVE uses its semantic status colour
+PASS TRAVEL INCOMPLETE uses its semantic status colour
+PASS TRAVEL COMPLETE uses its semantic status colour
+PASS ready gate still shows zero physical arrivals
+PASS Canvas rendering has no browser errors
+PASS race entry waits through initial overview
+PASS compact edge captions fit inside the canvas
+PASS caption clamping does not bring an offscreen exit into view
+PASS live room rendering has no browser errors
+PASS live room rendering has no browser errors
