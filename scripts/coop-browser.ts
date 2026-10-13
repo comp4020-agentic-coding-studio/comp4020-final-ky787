@@ -41,7 +41,7 @@ export class Cdp {
         return result.result.value;
     }
 }
-export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options: { shots?: string; internalLabs?: boolean } = {}) {
+export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options: { shots?: string; internalLabs?: boolean; readyExpression?: string } = {}) {
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const checks: string[] = [];
     const shots = options.shots ?? join(tmpdir(), 'bn-coop-shots');
@@ -118,7 +118,14 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         const target = new URL(url);
         if (options.internalLabs !== false) target.searchParams.set('labs', '1');
         await client.send('Page.navigate', { url: target.href });
-        await wait(client, 'campaign loaded', s => s.persistence.visitor !== '');
+        if (options.readyExpression) {
+            const deadline = Date.now() + 20000;
+            while (!await client.read<boolean>(options.readyExpression)) {
+                if (client.errors.length) throw new Error(client.errors.join('\n'));
+                if (Date.now() > deadline) throw new Error('Browser initialization timed out');
+                await sleep(30);
+            }
+        } else await wait(client, 'campaign loaded', s => s.persistence.visitor !== '');
         return client;
     }
     const snapshot = (p: Cdp) => p.read<S>('binaryNinja.snapshot()');

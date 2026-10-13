@@ -1,12 +1,12 @@
 import { boxesOverlap, clamp, type Box } from '../engine/geometry.ts';
 import type { Body, LooseBody, Solid, VerticalMotion } from '../engine/physics.ts';
-import type { ControllerOutputs } from './controller.ts';
+import type { MachineSignal } from './controller.ts';
 
-export interface LiftFieldDef extends Box { id: string; signal: keyof ControllerOutputs }
+export interface LiftFieldDef extends Box { id: string; signal: MachineSignal }
 export interface RelayGateDef extends Box { id: string; exitSide: -1 | 1 }
 export interface RelayGatePairDef {
     id: string;
-    signal: keyof ControllerOutputs;
+    signal: MachineSignal;
     gates: readonly [RelayGateDef, RelayGateDef];
 }
 

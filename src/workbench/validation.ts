@@ -1,3 +1,4 @@
+import { importDraft } from './imports.ts';
 import { boxesOverlap } from '../engine/geometry.ts';
 import { DRAFT_ID, DRAFT_LIMITS, objectBounds, objectPort, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftValidation } from './model.ts';
 export type Diagnostic = DraftDiagnostic;
@@ -11,6 +12,8 @@ export const BUILTIN_OUTPUTS: Record<string, string[]> = {
 const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v) && [Object.prototype, null].includes(Object.getPrototypeOf(v));
 export function validateDraft(value: unknown): DraftValidation {
     const diagnostics: DraftDiagnostic[] = [];
+    try { const json = JSON.stringify(value); if (json && new TextEncoder().encode(json).byteLength > DRAFT_LIMITS.bytes) return { document: null, diagnostics: [{ code: 'resource.bytes', severity: 'error', message: `Draft exceeds the ${DRAFT_LIMITS.bytes}-byte document limit.` }], structural: false, playable: false }; }
+    catch { return { document: null, diagnostics: [{ code: 'schema.serializable', severity: 'error', message: 'Draft must be acyclic JSON data; executable objects and non-JSON values are unsupported.' }], structural: false, playable: false }; }
     const error = (code: string, message: string, objectId?: string) => diagnostics.push({ code, severity: 'error', message, ...(objectId ? { objectId } : {}) });
     const warn = (code: string, message: string, objectId?: string) => diagnostics.push({ code, severity: 'warning', message, ...(objectId ? { objectId } : {}) });
     const record = (v: unknown, path: string, keys?: string[]): v is Record<string, unknown> => {
@@ -132,6 +135,21 @@ export function validateDraft(value: unknown): DraftValidation {
         if (o.type === 'relay') { const b = { x: o.exitSide > 0 ? o.x + o.w + 18 : o.x - 40, y: o.y + o.h - 34, w: 22, h: 34 }; if (architecture.some(p => boxesOverlap(b, objectBounds(p))) || b.x < 0 || b.x + b.w > document.geometry.width) warn('relay.obstructed', 'Relay destination is potentially obstructed by static geometry or room bounds; test actual transit.', o.id); }
     }
     if (document.controller.kind === 'builtin') {
+        const template = importDraft(document.controller.id), retained = template.geometry.objects;
+        const controlled = (o: typeof objects[number]) => o.type === 'device' || o.type === 'cube' || o.type === 'platform' && (o.kind === 'unstable' || o.id === 'cargo-buffer');
+        for (const original of retained.filter(controlled)) {
+            const edited = byId.get(original.id);
+            if (!edited || edited.type !== original.type || original.type === 'device' && (edited.type !== 'device' || edited.kind !== original.kind || edited.legacy !== original.legacy)
+                || original.type === 'platform' && (edited.type !== 'platform' || edited.kind !== original.kind)) error('controller.required-role', `Built-in ${document.controller.id} v1 requires the retained type and device role of '${original.id}'. Geometry and labels are editable; controller internals remain code-owned.`, original.id);
+        }
+        for (const object of objects.filter(controlled)) if (!retained.some(o => o.id === object.id && controlled(o))) error('controller.extra-role', `The trusted controller does not own additional ${object.type} '${object.id}'. Use declarative logic for new controls/cubes.`, object.id);
+        for (const object of objects) if (object.type === 'platform' && object.kind === 'unstable') {
+            const original = retained.find(o => o.id === object.id);
+            if (original?.type === 'platform' && (object.hookCrumbleDelay !== original.hookCrumbleDelay || object.crumbleDelay !== original.crumbleDelay || object.respawnDelay !== original.respawnDelay)) error('controller.timing', 'Built-in unstable timing is code-owned. Keep the imported timing or create a declarative draft.', object.id);
+        }
+        for (const object of objects) if (object.type === 'device' && (object.initial || object.checkpoint)) error('controller.initial-state', 'Built-in initial state and checkpoint effects are code-owned; imported defaults must be preserved.', object.id);
+        const exit = objects.find(o => o.type === 'exit'), unlock = document.bindings.find(b => b.target === exit?.id && b.property === 'unlock');
+        if (!unlock || unlock.output !== 'exitDoor' || unlock.invert || exit?.type === 'exit' && (!exit.latch || exit.arrivals !== 2)) error('controller.exit', 'Built-in exit requires the retained latched exitDoor output and two physical arrivals.', exit?.id);
         const required: Record<string, string[]> = { 'race-condition': ['cubeA', 'cubeB', 'dropA', 'dropB', 'receiver', 'trace', 'return', 'phase', 'commit', 'crumbleA', 'crumbleB', 'cargo-buffer'], 'crossfeed-vault': ['cubeA', 'cubeB', 'entry', 'routePower', 'switchB', 'switchC', 'switchD', 'routeMode', 'crumbleA', 'crumbleB'], 'crumble-lab': ['crumbleA', 'crumbleB'] };
         for (const id of required[document.controller.id] ?? []) if (!byId.has(id)) error('controller.required-id', `Built-in ${document.controller.id} v1 requires retained object ID '${id}'.`, id);
         for (const message of document.imported?.warnings ?? []) warn('import.unsupported', message);

@@ -123,6 +123,7 @@ export class SliceGame {
     }
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
+        if (room.draft || room.level === 'workbench') { this.coop.leave(); return; }
         const wasVictory = this.authority?.room.party?.phase === 'victory';
         if (initial) {
             this.started = false; this.coopPaused = false; this.menu.hidden = true; this.partyMenuKey = ''; this.partyView = 'pause';
@@ -173,7 +174,7 @@ export class SliceGame {
             : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();
-        const label = document.createElement('small'); label.textContent = `${r ? COOP_LABS[r.level].title : 'CO-OP CAMPAIGN'} / PARTY CODE`;
+        const label = document.createElement('small'); label.textContent = `${r && isCoopLevel(r.level) ? COOP_LABS[r.level].title : 'CO-OP CAMPAIGN'} / PARTY CODE`;
         const code = document.createElement('strong'); code.id = 'room-code'; code.textContent = r?.code ?? '····';
         const codeRow = document.createElement('div'); codeRow.className = 'room-code-row';
         const copy = document.createElement('button'); copy.id = 'copy-room-code'; copy.type = 'button';
@@ -327,7 +328,7 @@ export class SliceGame {
                 if (!room) return;
                 if (room.id !== this.world.room.id) {
                     // Save logical state before switching. Merely visiting never completes a room.
-                    if (!isCoopLevel(this.world.room.id)) p.rooms[this.world.room.id] = this.world.memory();
+                    if (!(isCoopLevel(this.world.room.id) || this.world.room.id === 'workbench')) p.rooms[this.world.room.id] = this.world.memory();
                     p.currentRoom = room.id;
                     this.store.save(p);
                     this.ended = false;
@@ -401,7 +402,7 @@ export class SliceGame {
     }
     private save(events: string[]): void {
         const p = this.store.progress, id = this.world.room.id;
-        if (isCoopLevel(id)) return;
+        if (isCoopLevel(id) || id === 'workbench') return;
         p.rooms[id] = this.world.memory();
         for (const event of events) {
             if (!p.mechanics.includes(event) && event !== 'death')
@@ -413,7 +414,7 @@ export class SliceGame {
     }
     private advance(): void {
         const p = this.store.progress, id = this.world.room.id, index = ROOMS.findIndex(r => r.id === id);
-        if (isCoopLevel(id)) return;
+        if (isCoopLevel(id) || id === 'workbench') return;
         if (!p.completedRooms.includes(id))
             p.completedRooms.push(id);
         if (index < ROOMS.length - 1) {

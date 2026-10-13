@@ -3,7 +3,7 @@ import { isCoopLevel, type RaceOutputs, type CrossfeedOutputs, type CoopLevelId 
 export const ROOM_IDS = ["pressure", "switch", "relay", "uplink"] as const;
 export type RoomId = typeof ROOM_IDS[number];
 /** Campaign IDs deliberately exclude the separate co-op session. */
-export type WorldRoomId = RoomId | CoopLevelId;
+export type WorldRoomId = RoomId | CoopLevelId | 'workbench';
 export interface ControllerInputs {
     plateA: boolean;
     plateB: boolean;
@@ -23,7 +23,7 @@ export interface ControllerOutputs {
     relayGates: boolean;
     liftField: boolean;
 }
-export type MachineSignal = keyof ControllerOutputs | keyof RaceOutputs | keyof CrossfeedOutputs;
+export type MachineSignal = keyof ControllerOutputs | keyof RaceOutputs | keyof CrossfeedOutputs | `draft:${string}`;
 export interface ControllerFrame {
     /** Optional authored device presentation, separate from validated C8 inputs. */
     controls?: Partial<Record<string, boolean>>;

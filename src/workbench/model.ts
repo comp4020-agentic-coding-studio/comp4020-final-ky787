@@ -1,6 +1,8 @@
+import { PLAYER } from '../engine/constants.ts';
+import { CUBE_SIZE } from '../slice/tuning.ts';
 import type { Vec2, Box } from '../engine/geometry.ts';
 
-/** v1 world units are game pixels: +x right, +y down. Array order is drawing order. */
+/** v1 world units are game pixels: +x right, +y down. Array order is preserved within the existing renderer layers. */
 export const DRAFT_VERSION = 1;
 export const DRAFT_LIMITS = { bytes: 1_000_000, objects: 384, cubes: 8, devices: 48, relayPairs: 8, outputs: 64, bindings: 192, wires: 192, wirePoints: 64, expressionNodes: 256, expressionDepth: 16, dimension: 9000, coordinate: 10000 } as const;
 export const DRAFT_ID = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
@@ -47,8 +49,8 @@ export const objectPort = (object: DraftDevice) => `${object.id}.${object.kind =
 export function objectBounds(object: DraftObject): Box {
     if ('w' in object) return { x: object.x, y: object.y, w: object.w, h: object.h };
     if (object.type === 'firewall') return { x: object.x, y: object.y, w: object.orientation === 'horizontal' ? object.length : object.thickness, h: object.orientation === 'vertical' ? object.length : object.thickness };
-    if (object.type === 'cube') return { x: object.x - 22, y: object.y - 22, w: 44, h: 44 };
-    if (object.type === 'spawn' || object.type === 'checkpoint') return { x: object.x - 11, y: object.y - 17, w: 22, h: 34 };
+    if (object.type === 'cube') return { x: object.x - CUBE_SIZE / 2, y: object.y - CUBE_SIZE / 2, w: CUBE_SIZE, h: CUBE_SIZE };
+    if (object.type === 'spawn' || object.type === 'checkpoint') return { x: object.x - PLAYER.width / 2, y: object.y - PLAYER.height / 2, w: PLAYER.width, h: PLAYER.height };
     return { x: object.x - 45, y: object.y - 55, w: 90, h: 55 };
 }
 export function cloneDraft(document: DraftDocument): DraftDocument { return structuredClone(document); }

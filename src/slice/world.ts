@@ -49,6 +49,8 @@ export interface WorldAuthority {
     cubes?: CubeMap<CubeAuthority>;
     crumble?: CrumbleAuthority;
     reset?(): void;
+    /** Local authored draft controller reset notification; network authorities arbitrate their own cubes. */
+    cubeReset?(id: CubeId, cause: CubeResetCause): void;
     discontinuity?(entity: 'player' | 'cube', reason: Discontinuity, cubeId?: CubeId): void;
     physicalPower?(signal: MachineSignal): boolean;
     frame: ControllerFrame;
@@ -127,7 +129,7 @@ export class PuzzleWorld {
         for (const [id] of cubeEntries(this.cubes)) this.cubeSolids[id] = { id: id === 'cube' ? 'cube-body' : `cube-body:${id}`,
             x: 0, y: 0, w: CUBE_SIZE, h: CUBE_SIZE, enabled: false, oneWay: false, grappleable: false };
         this.platforms = room.platforms.map(def => ({ def, pulse: 0, fuse: -1, fuseDuration: .6, respawn: 0,
-            solid: { ...def, oneWay: def.kind !== 'static', enabled: def.kind !== 'code', grappleable: def.kind !== 'static' && def.kind !== 'code', grappleHeight: Math.min(CODE_SLAB_HEIGHT, def.h), grapplePoint: def.anchor ? { x: def.x + def.w / 2, y: def.y + 6 } : undefined } }));
+            solid: { ...def, oneWay: def.kind !== 'static', enabled: def.kind !== 'code', grappleable: def.kind !== 'static' && def.kind !== 'code' && def.hookable !== false, grappleHeight: Math.min(CODE_SLAB_HEIGHT, def.h), grapplePoint: def.anchor ? { x: def.x + def.w / 2, y: def.y + 6 } : undefined } }));
         this.door = { ...room.exit, id: 'exit-door', oneWay: false, enabled: true, grappleable: false };
         this.solids = [...this.platforms.map(p => p.solid), this.door,
             { id: 'left-wall', x: -40, y: -800, w: 40, h: room.height + 840, enabled: true, oneWay: false, grappleable: false },
@@ -218,8 +220,8 @@ export class PuzzleWorld {
         if (!old.bridge && this.frame.outputs.bridge)
             this.emit('bridge');
         for (const f of this.firewalls) f.enabled = !f.def.signal || this.power(f.def.signal);
-        for (const field of this.lifts) field.power(this.frame.outputs[field.def.signal]);
-        for (const pair of this.gates) pair.power(this.frame.outputs[pair.def.signal]);
+        for (const field of this.lifts) field.power(this.physicalPower(field.def.signal));
+        for (const pair of this.gates) pair.power(this.physicalPower(pair.def.signal));
         if (!old.relayGates && this.frame.outputs.relayGates) this.emit('relay-power');
         if (!old.liftField && this.frame.outputs.liftField) this.emit('lift');
         this.door.enabled = !this.frame.outputs.exitDoor;
@@ -306,6 +308,7 @@ export class PuzzleWorld {
         } else {
             Object.assign(c, this.cubeSpawn(id), { vx: 0, vy: 0, carried: false, grounded: false, groundId: null });
             this.setCubePulling(id, false);
+            this.authority?.cubeReset?.(id, 'firewall');
         }
         this.events.push({ kind: 'cube-firewall', at, cause: 'firewall', firewallId: hit.def.id });
         return true;
@@ -325,6 +328,7 @@ export class PuzzleWorld {
         if (authority) { authority.firewall?.(this, 'recovery'); return; }
         Object.assign(c, id === 'cube' ? this.cubeHome() : this.cubeSpawn(id), { vx: 0, vy: 0, carried: false, grounded: false });
         this.authority?.discontinuity?.('cube', 'recovery', id);
+        this.authority?.cubeReset?.(id, 'recovery');
         this.setCubePulling(id, false);
         this.emit('cube-return');
     }
@@ -487,7 +491,7 @@ export class PuzzleWorld {
                 const hooked = this.player.rope.phase === 'attached' && this.player.rope.anchorId === platform.def.id;
                 const hookDelay = hooked ? platform.def.hookCrumbleDelay : undefined;
                 if (this.player.groundId === platform.def.id || hookDelay !== undefined) {
-                    platform.fuseDuration = hookDelay ?? .6;
+                    platform.fuseDuration = hookDelay ?? platform.def.crumbleDelay ?? .6;
                     platform.fuse = platform.fuseDuration;
                 }
             }
@@ -495,7 +499,7 @@ export class PuzzleWorld {
                 platform.fuse -= dt;
                 if (platform.fuse <= 0) {
                     platform.fuse = -1;
-                    platform.respawn = 2.4;
+                    platform.respawn = platform.def.respawnDelay ?? 2.4;
                     platform.solid.enabled = false;
                     if (this.player.rope.anchorId === platform.def.id) this.cancelGrapple();
                     this.emit('crumble', { x: platform.def.x, y: platform.def.y });
@@ -504,9 +508,9 @@ export class PuzzleWorld {
             else if (platform.respawn > 0) {
                 platform.respawn = Math.max(0, platform.respawn - dt);
                 if (platform.respawn === 0)
-                    platform.solid.enabled = true;
+                    platform.solid.enabled = !platform.def.signal || this.physicalPower(platform.def.signal);
             }
-            platform.solid.grappleable = platform.solid.enabled;
+            platform.solid.grappleable = platform.solid.enabled && platform.def.hookable !== false;
         }
         this.plateDepth += ((this.inputs.plateA ? 1 : 0) - this.plateDepth) * Math.min(1, dt * 16);
         this.plateDepthB += ((this.inputs.plateB ? 1 : 0) - this.plateDepthB) * Math.min(1, dt * 16);

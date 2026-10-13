@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "id": "blank-physics",
+  "scope": "diagnostic",
+  "mode": "single",
+  "timeoutMs": 25000,
+  "actors": [
+    {
+      "id": "designer",
+      "slot": 1
+    }
+  ],
+  "steps": [
+    {
+      "label": "walk to payload using real controls",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "designer",
+          "x": 260
+        }
+      ],
+      "waitMs": 180,
+      "assert": [
+        {
+          "actor": "designer",
+          "condition": {
+            "path": "player.grounded",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "pick up the named cube",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "designer",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "designer",
+        "condition": {
+          "path": "cubes.draft:payload.carried",
+          "equals": true
+        },
+        "timeoutMs": 2000
+      }
+    },
+    {
+      "label": "carry the cube to the plate",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "designer",
+          "x": 370
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "drop a real cube on the ordinary plate",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "designer",
+          "code": "KeyE"
+        }
+      ],
+      "waitMs": 650,
+      "wait": {
+        "actor": "designer",
+        "condition": {
+          "path": "signals.draft:routePower",
+          "equals": true
+        },
+        "timeoutMs": 2000
+      }
+    },
+    {
+      "label": "cube continues to power the route after the player leaves",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "designer",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "designer",
+          "x": 570
+        },
+        {
+          "type": "key",
+          "actor": "designer",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 450,
+      "assert": [
+        {
+          "actor": "designer",
+          "condition": {
+            "path": "signals.draft:routePower",
+            "equals": true
+          }
+        },
+        {
+          "actor": "designer",
+          "condition": {
+            "path": "cubes.draft:payload.carried",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "toggle route lever and resolve AND NOT",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "designer",
+          "code": "KeyE"
+        }
+      ],
+      "waitMs": 200,
+      "assert": [
+        {
+          "actor": "designer",
+          "condition": {
+            "path": "signals.draft:routePower",
+            "equals": false
+          }
+        },
+        {
+          "actor": "designer",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": true
+          }
+        },
+        {
+          "actor": "designer",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ]
+    }
+  ]
+}

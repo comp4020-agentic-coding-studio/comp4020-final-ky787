@@ -33,6 +33,8 @@ export interface Platform extends Box {
     listingOffsetX?: number;
     /** Authored load tolerance; proof classifies code, not this physical timer. */
     hookCrumbleDelay?: number;
+    crumbleDelay?: number;
+    respawnDelay?: number;
     signal?: MachineSignal;
     /** Authored solid service door; an accepted output opens it permanently. */
     openWhen?: MachineSignal;
@@ -56,8 +58,8 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     cube?: Vec2;
     cubes?: { id: CubeId; spawn: Vec2; mark: string }[];
     cubePads?: { id: Exclude<CubePlacement, 'spawn'>; at: Vec2; label: string }[];
-    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit'; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; cameraReveal?: CameraReveal }[];
-    plates?: { id: PressurePlateId; at: Vec2; label: string; cameraReveal?: CameraReveal }[];
+    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit' | `draft:${string}`; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; cameraReveal?: CameraReveal }[];
+    plates?: { id: PressurePlateId | `draft:${string}`; kind?: 'plate' | 'socket' | 'scanner'; at: Vec2; label: string; cameraReveal?: CameraReveal }[];
     wires?: import('./connections.ts').MachineConnection[];
     regions?: { at: Vec2; label: string }[];
     plate?: Vec2;

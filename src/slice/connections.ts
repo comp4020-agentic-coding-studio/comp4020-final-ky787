@@ -6,7 +6,7 @@ import type { PuzzleWorld } from './world.ts';
 /** Authored physical wiring, NEVER native control-flow edges or trace timing. */
 export interface MachineConnection {
     id: string;
-    input: keyof ControllerInputs | 'switchD';
+    input: keyof ControllerInputs | 'switchD' | `draft:${string}`;
     /** Resolved output by default; false preserves legacy source-wire presentation. */
     resolved?: boolean;
     inverted?: boolean;
@@ -76,7 +76,7 @@ export function roomConnections(r: RoomDef): MachineConnection[] {
 /** Show the source signal even while the destination waits for other inputs. */
 export function connectionPowered(link: MachineConnection, w: Pick<PuzzleWorld, 'inputs'> & Partial<Pick<PuzzleWorld, 'frame'>>): boolean {
     if (link.resolved !== false) return !!(w.frame?.signals?.[link.output] ?? w.frame?.outputs[link.output as keyof NonNullable<typeof w.frame>['outputs']]);
-    return link.input === 'switchD' ? !!w.frame?.outputs.codePlatformA : w.inputs[link.input];
+    return link.input === 'switchD' ? !!w.frame?.outputs.codePlatformA : link.input.startsWith('draft:') ? !!(w.frame?.controls?.[link.input] ?? w.frame?.plates?.[link.input]) : w.inputs[link.input as keyof ControllerInputs];
 }
 /** Constant-speed motion along the authored wire, not a simulated CPU signal delay. */
 export function connectionPulse(points: readonly Vec2[], seconds: number): Vec2 {
