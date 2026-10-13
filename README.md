@@ -1,109 +1,201 @@
 # Binary Ninja
 
-**Binary Ninja is a cooperative puzzle-platformer where real obfuscated programs control the level around you.**
+**A browser-based, two-player cooperative puzzle-platformer built around a debugger-inspired world.** Work together to redirect power, carry shared payloads, activate platforms and grapple across changing terrain. The puzzles come first; reverse engineering gives their machinery its identity.
 
-My definition of a good version of this project is first and foremost a **fun two-player puzzle game**. Movement should feel satisfying, rooms should be deliberately designed rather than procedurally generated, and cooperation should be necessary to progress. Players should be carrying cubes, holding pressure plates for each other, flipping switches, grappling across gaps, powering lifts, activating portals and changing the structure of the room together.
+**[Play Binary Ninja](https://comp4020-final-ky787.fly.dev/)** · **[View the deployed README](https://comp4020-final-ky787.fly.dev/readme/)** · **[Development process](PROCESS.md)**
 
-Reverse engineering is the flavour and underlying machinery!
+![RACE CONDITION chamber overview, including its grapple route and control machinery](docs/playtest/2026-10-12-hero-assets/race-overview-compact.png)
 
-## What I am trying to build
+Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. This is an evolving final project: the public co-op campaign is playable, the level designer is available locally, and binary-backed gameplay is implemented in the single-player CONTROL SPINE showcase. The co-op chambers currently use authored controllers, **not** generated binaries.
 
-The final game is intended to be two-player only game inspired by portal (apart from tutorial and test chambers). A typical room might require one player to hold a pressure plate while the other uses an activated grapple block to cross a gap. The second player can then enable a bridge or relay so the first can follow. Cubes act as movable substitutes for players and can be carried, pulled with the grapple, placed on switches or routed through machinery.
+## Play the game
 
-Different program-controlled objects provide different movement and puzzle possibilities:
+The game has two main modes:
 
-- grapple blocks provide horizontal traversal;
-- lift fields provide vertical traversal;
-- relay gates teleport players and payloads between fixed locations;
-- code platforms can become solid or disappear depending on program state;
-- proven bogus-code blocks can appear stable before collapsing;
-- switches, pressure plates and cubes act as inputs to the room controller.
+| Mode | Chambers | Purpose |
+| --- | --- | --- |
+| **Tutorial** (single player) | **PRESSURE**, **SWITCH**, **RELAY**, **CONTROL SPINE** | Learn plates, switches, cubes, grappling and machinery. CONTROL SPINE introduces verified binary-backed behavior. |
+| **Co-op Campaign** (two players) | **CROSSFEED VAULT**, **RACE CONDITION** | Coordinate reversible routes, shared cubes, relays, timed machinery, grapple traversal and a two-person finish. |
 
-A good level should be understandable through its physical design without needing an assembly lesson. The reverse-engineering layer should reward players who look deeper.
+To play co-op:
 
-## Gameplay first, binaries second
+1. On one browser, choose **CO-OP CAMPAIGN → CREATE PARTY**.
+2. Share the four-character party code with another person. They choose **JOIN PARTY** from a **different device or browser profile**.
+3. The creator is the party's host and chooses the chamber. Both players can operate the puzzle; neither has a fixed gameplay role.
+4. Solve the machinery together, then **both physically enter the unlocked exit** to finish. The host can choose the next chamber, replay, or select another chamber.
 
-An important change in my process has been to **design the puzzle before designing the binary**.
+Party membership, checkpoints and meaningful puzzle progress survive reconnects and server restarts. The same party code works across campaign chambers. Selecting or replaying a chamber starts that chamber fresh while preserving its completion badge. There is no matchmaking, account system or public spectator mode.
 
-The level is first greyboxed as a normal game. Once its mechanics and state transitions work, the room is annotated with logical inputs and outputs. For example:
+The optional mechanics laboratories used during development are preserved behind `?labs=1` for local regression and experimentation, but are not part of the public campaign.
 
-`Plate A → Grapple Anchor`
+### Controls
 
-`Relay Switch → Relay Gates`
+| Input | Action |
+| --- | --- |
+| **A / D** or **Left / Right arrows** | Move left / right |
+| **Space**, **W**, or **Up arrow** | Jump |
+| **Space while airborne** | Attempt to hook an available grapple anchor |
+| **Space while attached** | Jump off / release the grapple |
+| **Hold left mouse button** | Aim and hold a grapple; release to let go |
+| **E** | Interact with a switch, terminal or cube; pick up / put down payloads |
+| **S / Down arrow** | Down / drop through supported surfaces |
+| **R** | Reset your own player to the current checkpoint |
+| **Hold Tab** | Show the room overview |
+| **Esc** | Pause or return to the menu |
 
-`Payload on Node C → Final Route + Exit`
+Some controls are contextual. In co-op, resetting or dying affects your own player rather than restarting your partner's progress. The room overview and contextual camera reveals help show what a distant control changes.
 
-A separate agent then builds a small C program implementing that accepted state machine, compiles and obfuscates it, and exhaustively tests its supported input states.
+### What makes a Binary Ninja puzzle?
 
-The resulting binary is disassembled and traced. Its real assembly, addresses, execution order and validated outputs are then brought back into the playable room.
+- **Physical cooperation:** one player powers a route, moves a payload or operates a switch so the other can cross—and later has to regroup.
+- **Reversible machinery:** changing a control can make one platform solid while another becomes a non-solid ghost. Players must communicate about the current state.
+- **Shared payloads:** named cubes can be carried, grapple-pulled, used on pressure plates or sockets, relayed and handed between players.
+- **Platforming:** grapple anchors, jump paths, partner-held cube boosts, lifts, hazards and unstable blocks make the spatial layout part of the puzzle rather than decoration.
+- **Readable infrastructure:** illuminated connections, entry-point gates, breakpoint pedestals and exit status displays explain the state of the chamber.
 
-This means the stage is not shaped around whatever CFG a compiler happened to produce. Instead, a carefully designed game level gains an authentic binary underneath it.
+![CROSSFEED VAULT overview](docs/playtest/crossfeed-vault-overview.png)
 
-## Current Crit 8 build
+The current co-op chambers are still being refined through human playtesting. Their authored mechanics are documented in [CROSSFEED VAULT](docs/crossfeed-vault.md) and [RACE CONDITION](docs/race-condition.md).
 
-The current build contains introductory rooms for pressure plates, switches, grappling and payload routing, followed by a larger puzzle combining these mechanics.
+## Real binaries and reverse-engineering evidence
 
-The fourth level is already driven by a validated OLLVM-16 bogus-control-flow controller. Its real machine instructions appear on the floating code machinery, and the displayed execution follows retained traces from the actual obfuscated binary.
+The design deliberately separates **hand-authored level geometry**, **coordinate-free controller logic** and **verified binary evidence**.
 
-One optional unstable platform uses assembly from a real OLLVM BCF clone whose incoming bogus paths were independently proved infeasible. The crumble behaviour is a game metaphor; the underlying bogus-code classification is real.
+The fourth tutorial chamber, **CONTROL SPINE** (internally `uplink`), uses a validated Windows x64 controller built with **O-LLVM-16 bogus control flow**. Its retained evidence includes disassembly, execution traces, checked logical outputs and binary identities. The game can display real machine instructions and inspect trace-associated behavior.
 
-Other visual effects, including decoded machine messages, remain authored presentation and are labelled accordingly.
+One optional unstable region is associated with a separately supported bogus-code classification: a cloned block with proven infeasible incoming paths. The block's physical collapse timing remains an **authored gameplay metaphor**, not literal processor behavior. Displayed authored string effects and the other tutorial controllers are likewise not presented as native binary evidence.
 
-## What good means
+**Current evidence boundary:** CROSSFEED VAULT, RACE CONDITION and workbench drafts use authored/mock controllers. Their signal changes are real game behavior, but they are **not yet backed by newly compiled, obfuscated binaries**. The intended longer-term workflow is to accept a fun puzzle first, freeze its logical contract, and only then generate and validate a matching binary. Unobserved execution alone is never treated as proof that a block is bogus.
 
-For the final project, I want:
+See [CONTROL SPINE's design and evidence notes](docs/c8-vertical-slice.md) and the checked data in `game_data/`.
 
-- genuinely enjoyable two-player cooperation;
-- responsive movement and a restrained but satisfying grapple;
-- strong sound, visual feedback and environmental presentation;
-- hand-crafted levels with clear sightlines and deliberate puzzle progression;
-- persistence so players can leave and continue later;
-- real obfuscated binaries underneath important room machinery;
-- optional inspection depth for experienced reverse engineers without excluding beginners.
+## Real-time multiplayer design
 
-Previous experiments with OLLVM, Hikari, Polaris, Tigress and several deobfuscation techniques provide a pool of real evidence that can be used to give later rooms different obfuscation flavours.
+Binary Ninja uses a hybrid authority model to keep movement responsive while giving the puzzle a single consistent state:
 
-The goal is not to disguise an obfuscation study as a game.
+```text
+Player 1 browser                  Player 2 browser
+Local movement + grapple         Local movement + grapple
+Local presentation               Local presentation
+          \                      /
+           \    HTTPS / WSS      /
+            Node game server
+      Party / checkpoint / progress
+      Controls / puzzle outputs
+      Shared-cube authority
+                  |
+        Durable state in /data
+```
 
-The goal is to make a good cooperative game whose strange machinery genuinely comes from the reverse-engineering work behind it.
+Each browser simulates its own player movement. The Node server decides which interactions are accepted, computes shared machinery state, arbitrates who simulates or carries each shared cube, and records meaningful progress. Remote players are interpolated for display; the game does not attempt fully server-authoritative physics or anti-cheat movement verification.
 
-## Tutorial and co-op campaign
+Each cube has one accepted simulation authority at a time, with epoch/sequence checks to reject stale updates. Controls and relevant interactions are reconciled against the shared state. Reconnecting players recover their identity and checkpoint without duplicating cubes or losing earned exit progress.
 
-The public menu has **TUTORIAL** (PRESSURE, SWITCH, RELAY, CONTROL SPINE) and
-**CO-OP CAMPAIGN**. Tutorial progress and CONTROL SPINE's validated evidence keep
-their existing single-player saves and contracts.
+These choices and their alternatives are documented in [ADR 0001 — Multiplayer authority](docs/adr/0001-multiplayer-authority.md), [ADR 0002 — Shared cubes](docs/adr/0002-shared-cube-authority.md), [ADR 0009 — Persistent parties](docs/adr/0009-persistent-coop-parties.md), and the [multiplayer implementation record](docs/c9-multiplayer.md).
 
-Choose **CREATE PARTY**, share the four-character code, and have a partner use
-**JOIN PARTY** from another computer/profile. The creator is the durable host and
-selects a chamber for both players. Campaign order is **CROSSFEED VAULT**, then
-**RACE CONDITION**. Both are available for playtesting. The code and membership
-stay the same across selections, refreshes and restarts.
+## Level Workbench — for people and coding agents
 
-Both players must physically finish. A shared victory screen then lets the host
-choose **NEXT CHAMBER** or **CHOOSE CHAMBER**; guests wait for the host. Selecting
-or replaying a chamber starts its puzzle fresh but preserves completion badges.
-The host can also choose another chamber from the pause menu. Host disconnect
-never transfers navigation control to the guest.
+The **Level Workbench** is a local-only editor for prototyping new chambers. It is intentionally **not hosted in the public Fly.io game**.
 
-Mechanics labs remain internal regression fixtures, available via `?labs=1` and
-the existing browser harnesses. They are hidden from the public menu, not deleted.
-`pnpm check:campaign` exercises both full chamber solves in one persistent party.
-See [the party architecture](docs/adr/0009-persistent-coop-parties.md),
-[the multiplayer contract](docs/c9-multiplayer.md), and the provisional chamber
-contracts for [CROSSFEED](docs/crossfeed-vault.md) and [RACE](docs/race-condition.md).
-Co-op controllers remain honestly mock; this milestone generates no binaries.
+It has two interfaces to the **same versioned JSON draft**:
+
+- **For people:** a grid-based canvas, drag-and-drop objects, resize handles, a property inspector, functional connections, a logic editor, saved signal-state previews, undo/redo, and WASD camera panning.
+- **For coding agents:** readable `levels/drafts/*.json` documents plus CLI commands to validate, render and playtest a draft without GUI clicking.
+
+Both routes use the existing `PuzzleRenderer` and `PuzzleWorld` physics. A physics preview records actual movement and grapple trajectories rather than guessing which jumps are possible. Local two-browser draft sessions reuse the real multiplayer system; they do not award campaign progress. Draft editing does not alter accepted campaign chambers.
+
+The declarative controller supports Boolean **AND / OR / NOT**, device inputs and named output bindings. More complex imported chambers retain their existing trusted controller implementations. Decorative wire paths are not executable logic.
+
+**Editing note:** in the current workbench version, a newly placed code platform requires an explicit output binding before Playtest is enabled. Use **Connect** from a control to the platform or select the platform and **Apply binding + visible wire**. The diagnostics panel identifies missing bindings.
+
+Read the [Level Workbench guide](docs/level-workbench.md) for the full GUI workflow and [agent authoring guide](docs/level-authoring-for-agents.md) for the schema and command-line workflow.
 
 ## Run locally
 
-Run `pnpm install`, then `pnpm dev`. This starts Vite on `http://localhost:5173`,
-the real HTTP/API/WebSocket server on port 8080 and the local Level Builder.
-Choose **LEVEL BUILDER** on the game menu to author drafts; focus its canvas and
-hold **WASD** to pan in Edit or State Preview. See the
-[workbench guide](docs/level-workbench.md) for authoring and playtesting.
-No separate backend command or production build is needed for development.
-Local game saves persist in the ignored `.local-data/` directory; `DATA_DIR` can
-select another directory. Builder recovery and sessions stay in `.workbench/`.
-Ctrl+C stops all three listeners. Use separate browser profiles or a private
-window for the two players. The builder is local development only.
+The repository pins **Node.js 24.21.0** and **pnpm 11.9.0** in `mise.toml`. With [mise](https://mise.jdx.dev/) installed:
 
-For separate terminals, use `pnpm dev:server` and `pnpm dev:client` instead.
+```bash
+mise install
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+Open the development URL printed in the terminal (normally **http://localhost:5173**). `pnpm dev` starts the Vite client, the Node HTTP/WebSocket server (normally port 8080), and a loopback-only Level Workbench service. Select **LEVEL BUILDER** from the local game menu. Stop all three with **Ctrl+C**.
+
+To launch the editor independently:
+
+```bash
+pnpm workbench
+```
+
+Open the workbench URL printed in the terminal. Draft files live in `levels/drafts/`; temporary workbench state and reports live in `.workbench/`. Local game saves use `.local-data/` unless `DATA_DIR` is configured.
+
+### CLI level authoring
+
+```bash
+# Start a machine-readable draft
+pnpm level:new levels/drafts/my-chamber.json
+
+# Import a safe copy of an existing chamber
+pnpm level:import race-condition --out levels/drafts/race-copy.json
+
+# Validate an agent- or human-edited draft
+pnpm level:validate levels/drafts/my-chamber.json --json
+
+# Render the actual game's view of a draft
+pnpm level:render levels/drafts/my-chamber.json \
+  --out .workbench/reports/my-chamber.png
+
+# Run a bounded real-input physics scenario
+pnpm level:playtest levels/drafts/blank-room.json \
+  --scenario levels/scenarios/blank-physics.json \
+  --report .workbench/reports/blank-physics
+```
+
+The rendering and browser scenario tools require a locally available Chromium-family browser. The [workbench documentation](docs/level-workbench.md) describes browser selection, preview modes, test limitations and co-op draft sessions. **Successful scripted traversal is evidence that a particular route works, not proof that a level is fun or contains no shortcuts.**
+
+## Test and deploy
+
+```bash
+# Type checking and automated tests
+pnpm check
+
+# Production client build, including CONTROL SPINE bundle validation
+pnpm build
+
+# Real-input two-player campaign regression
+pnpm check:campaign
+
+# Local editor browser workflow
+pnpm check:workbench
+pnpm check:workbench-menu
+
+# Validate the retained process/evidence references
+pnpm check:evidence
+```
+
+`pnpm check` is also the main course CI command. The GitHub workflow builds the deployment image, checks the running HTTP app and `/readme/` page, validates process evidence and scans for secrets. On successful pushes to the public `main` branch, it deploys to **Fly.io** and checks that the public site responds. Browser/end-to-end checks beyond that core CI gate are available through the separate scripts above; they are not a substitute for two-person playtesting.
+
+## Repository guide
+
+| Path | Contents |
+| --- | --- |
+| `src/slice/`, `src/engine/`, `src/render/` | Game loop, physics, camera, rendering and tutorial controllers |
+| `src/coop/`, `server/` | Multiplayer clients, shared authority, party state and chamber logic |
+| `src/workbench/`, `scripts/level-tools/` | Level editor, JSON schema, validation, local draft sessions and agent-facing CLI |
+| `levels/drafts/`, `levels/scenarios/` | Editable level definitions and bounded playtest scenarios |
+| `game_data/` | Retained CONTROL SPINE controller evidence bundle |
+| `docs/`, `docs/adr/` | Puzzle contracts, architecture decisions and testing notes |
+| `spec/`, `tests/`, `scripts/` | Course checks, unit tests and browser/end-to-end harnesses |
+| `PROCESS.md`, `reflections/` | Development process, commit evidence and personal crit reflections |
+| `CLAUDE.md`, `AGENTS.md` | Instructions and constraints for coding agents |
+
+## Development approach and current limits
+
+Binary Ninja has been built iteratively with coding agents and human playtesting. Early experiments showed that generating a physical level directly from an obfuscated control-flow graph—or asking a model to invent all spatial geometry at once—did not reliably produce enjoyable puzzles. The project moved to **gameplay-first, evidence-second** design: author and test a readable cooperative challenge, then attach verified reverse-engineering evidence where it genuinely matches.
+
+The current challenges are improving puzzle spatial design and playtesting, expanding the campaign, and eventually making binary generation more repeatable for accepted co-op controllers. The workbench is intended to make the first two problems easier for both human designers and agents; it is **not** an automatic puzzle-quality evaluator or a binary compiler.
+
+For the development history and decisions, see [PROCESS.md](PROCESS.md), the [crit reflections](reflections/), and the [architecture decision records](docs/adr/).
+
+**Project goal:** make a compelling cooperative platform puzzler first—and give its unusual machinery authentic reverse-engineering depth without requiring players to understand assembly to have fun.
