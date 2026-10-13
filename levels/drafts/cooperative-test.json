@@ -1,0 +1,353 @@
+{
+  "bindings": [
+    {
+      "id": "feed-launch",
+      "output": "traversal",
+      "property": "active",
+      "target": "launch"
+    },
+    {
+      "id": "feed-swingAnchor",
+      "output": "traversal",
+      "property": "active",
+      "target": "swingAnchor"
+    },
+    {
+      "id": "feed-catch",
+      "output": "traversal",
+      "property": "active",
+      "target": "catch"
+    },
+    {
+      "id": "returnFeed",
+      "output": "returnPower",
+      "property": "active",
+      "target": "returnBridge"
+    },
+    {
+      "id": "exitFeed",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "exitReady": {
+        "id": "routeLever.value",
+        "op": "ref"
+      },
+      "returnPower": {
+        "id": "routeLever.value",
+        "op": "ref"
+      },
+      "traversal": {
+        "args": [
+          {
+            "id": "powerPlate.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "routeLever.value",
+            "op": "ref"
+          }
+        ],
+        "op": "or"
+      }
+    }
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 850,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 120,
+        "y": 663
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 200,
+        "y": 663
+      },
+      {
+        "h": 170,
+        "id": "startFloor",
+        "kind": "static",
+        "type": "platform",
+        "w": 560,
+        "x": 0,
+        "y": 680
+      },
+      {
+        "h": 170,
+        "id": "exitFloor",
+        "kind": "static",
+        "type": "platform",
+        "w": 460,
+        "x": 1040,
+        "y": 680
+      },
+      {
+        "id": "payload",
+        "mark": "A",
+        "type": "cube",
+        "x": 310,
+        "y": 658
+      },
+      {
+        "id": "powerPlate",
+        "kind": "plate",
+        "label": "TRAVERSAL POWER",
+        "type": "device",
+        "x": 440,
+        "y": 680
+      },
+      {
+        "id": "routeLever",
+        "kind": "terminal",
+        "label": "LATCH RETURN / EXIT",
+        "type": "device",
+        "x": 1240,
+        "y": 680
+      },
+      {
+        "h": 28,
+        "hookable": true,
+        "id": "launch",
+        "kind": "code",
+        "label": "LAUNCH",
+        "type": "platform",
+        "w": 180,
+        "x": 560,
+        "y": 600
+      },
+      {
+        "h": 28,
+        "hookable": true,
+        "id": "swingAnchor",
+        "kind": "code",
+        "label": "HOOK / RANGE 500",
+        "type": "platform",
+        "w": 230,
+        "x": 780,
+        "y": 335
+      },
+      {
+        "h": 28,
+        "hookable": true,
+        "id": "catch",
+        "kind": "code",
+        "label": "CATCH",
+        "type": "platform",
+        "w": 150,
+        "x": 890,
+        "y": 580
+      },
+      {
+        "crumbleDelay": 0.8,
+        "h": 28,
+        "hookCrumbleDelay": 1.65,
+        "hookable": true,
+        "id": "unstable",
+        "kind": "unstable",
+        "label": "UNSTABLE",
+        "respawnDelay": 2.4,
+        "type": "platform",
+        "w": 140,
+        "x": 1060,
+        "y": 550
+      },
+      {
+        "h": 28,
+        "hookable": true,
+        "id": "returnBridge",
+        "kind": "code",
+        "label": "RETURN",
+        "type": "platform",
+        "w": 480,
+        "x": 560,
+        "y": 680
+      },
+      {
+        "h": 65,
+        "id": "resetPit",
+        "type": "hazard",
+        "w": 480,
+        "x": 560,
+        "y": 785
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 80,
+        "x": 1380,
+        "y": 540
+      }
+    ],
+    "width": 1500
+  },
+  "id": "cooperative-test",
+  "instruction": "POWER THE ROUTE. TRANSFER THE CUBE. REGROUP AT THE EXIT.",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "bounds": {
+          "h": 450,
+          "w": 820,
+          "x": 360,
+          "y": 270
+        },
+        "id": "traversalView",
+        "padding": 50,
+        "platformIds": [
+          "launch",
+          "swingAnchor",
+          "catch"
+        ],
+        "source": "powerPlate"
+      }
+    ],
+    "display": {
+      "x": 900,
+      "y": 300
+    },
+    "labels": [],
+    "wires": [
+      {
+        "binding": "feed-launch",
+        "id": "wire-launch",
+        "points": [
+          {
+            "x": 440,
+            "y": 668
+          },
+          {
+            "x": 440,
+            "y": 245
+          },
+          {
+            "x": 600,
+            "y": 245
+          },
+          {
+            "x": 600,
+            "y": 600
+          }
+        ]
+      },
+      {
+        "binding": "feed-swingAnchor",
+        "id": "wire-swingAnchor",
+        "points": [
+          {
+            "x": 440,
+            "y": 668
+          },
+          {
+            "x": 440,
+            "y": 230
+          },
+          {
+            "x": 820,
+            "y": 230
+          },
+          {
+            "x": 820,
+            "y": 335
+          }
+        ]
+      },
+      {
+        "binding": "feed-catch",
+        "id": "wire-catch",
+        "points": [
+          {
+            "x": 440,
+            "y": 668
+          },
+          {
+            "x": 440,
+            "y": 215
+          },
+          {
+            "x": 930,
+            "y": 215
+          },
+          {
+            "x": 930,
+            "y": 580
+          }
+        ]
+      },
+      {
+        "binding": "returnFeed",
+        "id": "wire-returnBridge",
+        "points": [
+          {
+            "x": 1240,
+            "y": 668
+          },
+          {
+            "x": 1240,
+            "y": 200
+          },
+          {
+            "x": 600,
+            "y": 200
+          },
+          {
+            "x": 600,
+            "y": 680
+          }
+        ]
+      },
+      {
+        "binding": "exitFeed",
+        "id": "wire-exit",
+        "points": [
+          {
+            "x": 1240,
+            "y": 668
+          },
+          {
+            "x": 1240,
+            "y": 185
+          },
+          {
+            "x": 1420,
+            "y": 185
+          },
+          {
+            "x": 1420,
+            "y": 540
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "idle": {},
+    "partner-holds": {
+      "powerPlate.occupied": true
+    },
+    "return-ready": {
+      "routeLever.value": true
+    }
+  },
+  "title": "COOPERATIVE TEST / AUTHORING ACCEPTANCE",
+  "version": 1
+}

@@ -1,0 +1,212 @@
+{
+  "bindings": [
+    {
+      "id": "binding-lab-relay-A",
+      "output": "relayGates",
+      "property": "power",
+      "target": "lab-relay-A"
+    },
+    {
+      "id": "binding-lab-relay-B",
+      "output": "relayGates",
+      "property": "power",
+      "target": "lab-relay-B"
+    },
+    {
+      "id": "binding-exit",
+      "output": "exitDoor",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "id": "relay-lab",
+    "kind": "builtin",
+    "version": 1
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 760,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 110,
+        "y": 543
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 110,
+        "y": 543
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 200,
+        "y": 543
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 200,
+        "y": 543
+      },
+      {
+        "h": 200,
+        "id": "start",
+        "kind": "static",
+        "type": "platform",
+        "w": 570,
+        "x": 0,
+        "y": 560
+      },
+      {
+        "h": 120,
+        "id": "target",
+        "kind": "static",
+        "type": "platform",
+        "w": 560,
+        "x": 940,
+        "y": 640
+      },
+      {
+        "id": "cube",
+        "mark": "C",
+        "type": "cube",
+        "x": 280,
+        "y": 538
+      },
+      {
+        "id": "lever",
+        "kind": "terminal",
+        "label": "lever",
+        "legacy": "lever",
+        "type": "device",
+        "x": 380,
+        "y": 560
+      },
+      {
+        "exitSide": -1,
+        "h": 110,
+        "id": "lab-relay-A",
+        "nativeId": "A",
+        "pair": "lab-relay",
+        "type": "relay",
+        "w": 56,
+        "x": 470,
+        "y": 450
+      },
+      {
+        "exitSide": 1,
+        "h": 110,
+        "id": "lab-relay-B",
+        "nativeId": "B",
+        "pair": "lab-relay",
+        "type": "relay",
+        "w": 56,
+        "x": 980,
+        "y": 450
+      },
+      {
+        "h": 85,
+        "id": "hazard-1",
+        "type": "hazard",
+        "w": 370,
+        "x": 570,
+        "y": 675
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 130,
+        "x": 1320,
+        "y": 500
+      }
+    ],
+    "width": 1500
+  },
+  "id": "relay-lab-copy",
+  "imported": {
+    "factory": "relay-lab",
+    "warnings": []
+  },
+  "instruction": "POWER THE RELAY. TAKE YOUR PARTNER AND CUBE THROUGH.",
+  "presentation": {
+    "cameraReveals": [],
+    "display": {
+      "x": 750,
+      "y": 245
+    },
+    "labels": [],
+    "wires": [
+      {
+        "id": "wire-relay-A",
+        "legacyInput": "switchB",
+        "output": "relayGates",
+        "points": [
+          {
+            "x": 380,
+            "y": 548
+          },
+          {
+            "x": 380,
+            "y": 385
+          },
+          {
+            "x": 498,
+            "y": 385
+          },
+          {
+            "x": 498,
+            "y": 450
+          }
+        ],
+        "sourcePowered": true
+      },
+      {
+        "id": "wire-relay-B",
+        "legacyInput": "switchB",
+        "output": "relayGates",
+        "points": [
+          {
+            "x": 380,
+            "y": 548
+          },
+          {
+            "x": 380,
+            "y": 385
+          },
+          {
+            "x": 1008,
+            "y": 385
+          },
+          {
+            "x": 1008,
+            "y": 450
+          }
+        ],
+        "sourcePowered": true
+      }
+    ]
+  },
+  "previewStates": {
+    "idle": {}
+  },
+  "title": "RELAY LAB / DRAFT",
+  "version": 1
+}

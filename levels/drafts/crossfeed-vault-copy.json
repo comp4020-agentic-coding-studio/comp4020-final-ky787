@@ -1,0 +1,1282 @@
+{
+  "bindings": [
+    {
+      "id": "binding-service-door",
+      "output": "serviceAccess",
+      "property": "open",
+      "target": "service-door"
+    },
+    {
+      "id": "binding-vault-divider",
+      "output": "exitDoor",
+      "property": "open",
+      "target": "vault-divider"
+    },
+    {
+      "id": "binding-crossing-anchor",
+      "output": "grappleAnchor",
+      "property": "active",
+      "target": "crossing-anchor"
+    },
+    {
+      "id": "binding-return-bridge",
+      "output": "bridge",
+      "property": "active",
+      "target": "return-bridge"
+    },
+    {
+      "id": "binding-gallery-return-low",
+      "output": "galleryAccess",
+      "property": "active",
+      "target": "gallery-return-low"
+    },
+    {
+      "id": "binding-gallery-return-high",
+      "output": "galleryAccess",
+      "property": "active",
+      "target": "gallery-return-high"
+    },
+    {
+      "id": "binding-gallery-launch",
+      "output": "galleryAccess",
+      "property": "active",
+      "target": "gallery-launch"
+    },
+    {
+      "id": "binding-left1",
+      "output": "leftRoute",
+      "property": "active",
+      "target": "left1"
+    },
+    {
+      "id": "binding-crumbleA",
+      "output": "leftRoute",
+      "property": "active",
+      "target": "crumbleA"
+    },
+    {
+      "id": "binding-left3",
+      "output": "leftRoute",
+      "property": "active",
+      "target": "left3"
+    },
+    {
+      "id": "binding-right1",
+      "output": "rightRoute",
+      "property": "active",
+      "target": "right1"
+    },
+    {
+      "id": "binding-crumbleB",
+      "output": "rightRoute",
+      "property": "active",
+      "target": "crumbleB"
+    },
+    {
+      "id": "binding-right3",
+      "output": "rightRoute",
+      "property": "active",
+      "target": "right3"
+    },
+    {
+      "id": "binding-vault-return",
+      "output": "vaultReturn",
+      "property": "active",
+      "target": "vault-return"
+    },
+    {
+      "id": "binding-vault-return-step",
+      "output": "vaultReturn",
+      "property": "active",
+      "target": "vault-return-step"
+    },
+    {
+      "id": "binding-final-left-low",
+      "output": "vaultPower",
+      "property": "active",
+      "target": "final-left-low"
+    },
+    {
+      "id": "binding-final-left-high",
+      "output": "vaultPower",
+      "property": "active",
+      "target": "final-left-high"
+    },
+    {
+      "id": "binding-final-right-low",
+      "output": "vaultPower",
+      "property": "active",
+      "target": "final-right-low"
+    },
+    {
+      "id": "binding-final-right-high",
+      "output": "vaultPower",
+      "property": "active",
+      "target": "final-right-high"
+    },
+    {
+      "id": "binding-central-lift",
+      "output": "liftField",
+      "property": "power",
+      "target": "central-lift"
+    },
+    {
+      "id": "binding-transfer-R1",
+      "output": "relayGates",
+      "property": "power",
+      "target": "transfer-R1"
+    },
+    {
+      "id": "binding-transfer-R2",
+      "output": "relayGates",
+      "property": "power",
+      "target": "transfer-R2"
+    },
+    {
+      "id": "binding-exit",
+      "output": "exitDoor",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "id": "crossfeed-vault",
+    "kind": "builtin",
+    "version": 1
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 1780,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 1660,
+        "y": 1483
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 1660,
+        "y": 1483
+      },
+      {
+        "checkpoint": "upper",
+        "id": "upperCheckpoint1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 1120,
+        "y": 733
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 1760,
+        "y": 1483
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 1760,
+        "y": 1483
+      },
+      {
+        "checkpoint": "upper",
+        "id": "upperCheckpoint2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 1220,
+        "y": 733
+      },
+      {
+        "h": 280,
+        "id": "central-floor",
+        "kind": "static",
+        "type": "platform",
+        "w": 1800,
+        "x": 200,
+        "y": 1500
+      },
+      {
+        "h": 280,
+        "id": "access-balcony",
+        "kind": "static",
+        "type": "platform",
+        "w": 1900,
+        "x": 2420,
+        "y": 1500
+      },
+      {
+        "h": 310,
+        "id": "service-roof",
+        "kind": "static",
+        "type": "platform",
+        "w": 400,
+        "x": 850,
+        "y": 1100
+      },
+      {
+        "h": 380,
+        "id": "service-door",
+        "kind": "static",
+        "label": "SERVICE",
+        "type": "platform",
+        "w": 36,
+        "x": 1300,
+        "y": 1120
+      },
+      {
+        "h": 32,
+        "id": "control-catwalk",
+        "kind": "static",
+        "type": "platform",
+        "w": 430,
+        "x": 1010,
+        "y": 750
+      },
+      {
+        "h": 32,
+        "id": "boost-gallery",
+        "kind": "static",
+        "type": "platform",
+        "w": 720,
+        "x": 3600,
+        "y": 940
+      },
+      {
+        "h": 32,
+        "id": "control-ledge",
+        "kind": "static",
+        "type": "platform",
+        "w": 270,
+        "x": 4050,
+        "y": 750
+      },
+      {
+        "h": 32,
+        "id": "vault-cargo-deck",
+        "kind": "static",
+        "type": "platform",
+        "w": 430,
+        "x": 2550,
+        "y": 650
+      },
+      {
+        "h": 32,
+        "id": "vault-crown",
+        "kind": "static",
+        "type": "platform",
+        "w": 430,
+        "x": 2550,
+        "y": 350
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 300,
+        "id": "vault-divider",
+        "kind": "static",
+        "type": "platform",
+        "w": 40,
+        "x": 2744,
+        "y": 382
+      },
+      {
+        "h": 32,
+        "id": "route-recovery",
+        "kind": "static",
+        "type": "platform",
+        "w": 1940,
+        "x": 1660,
+        "y": 1120
+      },
+      {
+        "h": 32,
+        "id": "gallery-recovery-step",
+        "kind": "static",
+        "type": "platform",
+        "w": 160,
+        "x": 3450,
+        "y": 1030
+      },
+      {
+        "anchor": true,
+        "h": 60,
+        "id": "crossing-anchor",
+        "kind": "code",
+        "label": "A",
+        "type": "platform",
+        "w": 160,
+        "x": 2220,
+        "y": 1160
+      },
+      {
+        "h": 24,
+        "id": "return-bridge",
+        "kind": "code",
+        "label": "B",
+        "type": "platform",
+        "w": 420,
+        "x": 2000,
+        "y": 1500
+      },
+      {
+        "h": 24,
+        "id": "gallery-return-low",
+        "kind": "code",
+        "label": "D",
+        "type": "platform",
+        "w": 170,
+        "x": 3800,
+        "y": 850
+      },
+      {
+        "h": 24,
+        "id": "gallery-return-high",
+        "kind": "code",
+        "label": "D",
+        "type": "platform",
+        "w": 180,
+        "x": 3920,
+        "y": 770
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "gallery-launch",
+        "kind": "code",
+        "label": "D / LAUNCH",
+        "type": "platform",
+        "w": 110,
+        "x": 4210,
+        "y": 650
+      },
+      {
+        "anchor": true,
+        "h": 32,
+        "id": "left1",
+        "kind": "code",
+        "label": "LEFT / 1",
+        "type": "platform",
+        "w": 150,
+        "x": 1465,
+        "y": 350
+      },
+      {
+        "anchor": true,
+        "h": 32,
+        "hookCrumbleDelay": 1.65,
+        "id": "crumbleA",
+        "kind": "unstable",
+        "label": "LEFT / UNSTABLE",
+        "type": "platform",
+        "w": 150,
+        "x": 1915,
+        "y": 270
+      },
+      {
+        "anchor": true,
+        "h": 32,
+        "id": "left3",
+        "kind": "code",
+        "label": "LEFT / 3",
+        "type": "platform",
+        "w": 150,
+        "x": 2365,
+        "y": 350
+      },
+      {
+        "anchor": true,
+        "h": 32,
+        "id": "right1",
+        "kind": "code",
+        "label": "RIGHT / 1",
+        "type": "platform",
+        "w": 150,
+        "x": 4025,
+        "y": 180
+      },
+      {
+        "anchor": true,
+        "h": 32,
+        "hookCrumbleDelay": 1.65,
+        "id": "crumbleB",
+        "kind": "unstable",
+        "label": "RIGHT / UNSTABLE",
+        "type": "platform",
+        "w": 150,
+        "x": 3565,
+        "y": 150
+      },
+      {
+        "anchor": true,
+        "h": 32,
+        "id": "right3",
+        "kind": "code",
+        "label": "RIGHT / 3",
+        "type": "platform",
+        "w": 150,
+        "x": 3105,
+        "y": 300
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "vault-return",
+        "kind": "code",
+        "label": "E + F / REGROUP",
+        "type": "platform",
+        "w": 1000,
+        "x": 1440,
+        "y": 750
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "vault-return-step",
+        "kind": "code",
+        "label": "E + F",
+        "type": "platform",
+        "w": 180,
+        "x": 2380,
+        "y": 690
+      },
+      {
+        "h": 24,
+        "id": "final-left-low",
+        "kind": "code",
+        "label": "E + F",
+        "type": "platform",
+        "w": 150,
+        "x": 2400,
+        "y": 560
+      },
+      {
+        "h": 24,
+        "id": "final-left-high",
+        "kind": "code",
+        "label": "E + F",
+        "type": "platform",
+        "w": 160,
+        "x": 2380,
+        "y": 460
+      },
+      {
+        "h": 24,
+        "id": "final-right-low",
+        "kind": "code",
+        "label": "E + F",
+        "type": "platform",
+        "w": 160,
+        "x": 2980,
+        "y": 560
+      },
+      {
+        "h": 24,
+        "id": "final-right-high",
+        "kind": "code",
+        "label": "E + F",
+        "type": "platform",
+        "w": 160,
+        "x": 3000,
+        "y": 460
+      },
+      {
+        "id": "cubeA",
+        "mark": "A",
+        "type": "cube",
+        "x": 2760,
+        "y": 1478
+      },
+      {
+        "id": "cubeB",
+        "mark": "B",
+        "type": "cube",
+        "x": 510,
+        "y": 1478
+      },
+      {
+        "id": "finalLeftScanner",
+        "kind": "scanner",
+        "label": "finalLeftScanner",
+        "legacy": "plateB",
+        "type": "device",
+        "x": 2620,
+        "y": 350
+      },
+      {
+        "id": "finalRightScanner",
+        "kind": "scanner",
+        "label": "finalRightScanner",
+        "legacy": "plateC",
+        "type": "device",
+        "x": 2910,
+        "y": 350
+      },
+      {
+        "id": "entry",
+        "kind": "plate",
+        "label": "A",
+        "type": "device",
+        "x": 1870,
+        "y": 1500
+      },
+      {
+        "id": "routePower",
+        "kind": "plate",
+        "label": "ROUTE POWER",
+        "type": "device",
+        "x": 1330,
+        "y": 750
+      },
+      {
+        "id": "liftCargo",
+        "kind": "socket",
+        "label": "PAYLOAD / LIFT",
+        "legacy": "cubePad",
+        "type": "device",
+        "x": 1750,
+        "y": 1500
+      },
+      {
+        "id": "finalLeft",
+        "kind": "socket",
+        "label": "E",
+        "legacy": "cubePad",
+        "type": "device",
+        "x": 2620,
+        "y": 650
+      },
+      {
+        "id": "finalRight",
+        "kind": "socket",
+        "label": "F",
+        "legacy": "cubePad",
+        "type": "device",
+        "x": 2910,
+        "y": 650
+      },
+      {
+        "id": "switchB",
+        "kind": "toggle",
+        "label": "TRANSFER MODE",
+        "type": "device",
+        "x": 2560,
+        "y": 1500
+      },
+      {
+        "id": "switchC",
+        "kind": "terminal",
+        "label": "SYSTEM ONLINE",
+        "type": "device",
+        "x": 1210,
+        "y": 750
+      },
+      {
+        "id": "routeMode",
+        "kind": "toggle",
+        "label": "ROUTE SELECT",
+        "type": "device",
+        "x": 1385,
+        "y": 750
+      },
+      {
+        "id": "switchD",
+        "kind": "terminal",
+        "label": "D / GALLERY ACCESS",
+        "type": "device",
+        "x": 4200,
+        "y": 750
+      },
+      {
+        "h": 790,
+        "id": "central-lift",
+        "type": "lift",
+        "w": 220,
+        "x": 1440,
+        "y": 710
+      },
+      {
+        "exitSide": 1,
+        "h": 110,
+        "id": "transfer-R1",
+        "nativeId": "R1",
+        "pair": "transfer",
+        "type": "relay",
+        "w": 56,
+        "x": 280,
+        "y": 1390
+      },
+      {
+        "exitSide": 1,
+        "h": 85,
+        "id": "transfer-R2",
+        "nativeId": "R2",
+        "pair": "transfer",
+        "type": "relay",
+        "w": 56,
+        "x": 3680,
+        "y": 855
+      },
+      {
+        "id": "service-filter",
+        "length": 400,
+        "orientation": "horizontal",
+        "thickness": 12,
+        "type": "firewall",
+        "x": 850,
+        "y": 1452
+      },
+      {
+        "h": 70,
+        "id": "hazard-1",
+        "type": "hazard",
+        "w": 4320,
+        "x": 0,
+        "y": 1710
+      },
+      {
+        "activationControl": "switchC",
+        "checkpoint": "upper",
+        "id": "system-online",
+        "label": "SYSTEM ONLINE",
+        "type": "breakpoint",
+        "x": 1210,
+        "y": 750
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 140,
+        "x": 2700,
+        "y": 210
+      }
+    ],
+    "width": 4320
+  },
+  "id": "crossfeed-vault-copy",
+  "imported": {
+    "factory": "crossfeed-vault",
+    "warnings": []
+  },
+  "instruction": "ROUTE BOTH PAYLOADS TO THE VAULT",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "id": "camera-entry",
+        "padding": 100,
+        "platformIds": [
+          "crossing-anchor",
+          "return-bridge"
+        ],
+        "source": "entry"
+      },
+      {
+        "bounds": {
+          "h": 700,
+          "w": 3260,
+          "x": 1060,
+          "y": 110
+        },
+        "id": "camera-routePower",
+        "padding": 45,
+        "source": "routePower"
+      },
+      {
+        "bounds": {
+          "h": 720,
+          "w": 2220,
+          "x": 1950,
+          "y": 800
+        },
+        "id": "camera-switchB",
+        "padding": 45,
+        "source": "switchB"
+      },
+      {
+        "bounds": {
+          "h": 700,
+          "w": 3260,
+          "x": 1060,
+          "y": 110
+        },
+        "id": "camera-routeMode",
+        "padding": 45,
+        "source": "routeMode"
+      }
+    ],
+    "display": {
+      "x": 1680,
+      "y": 1040
+    },
+    "labels": [
+      {
+        "id": "label-1",
+        "text": "CROSSFEED",
+        "x": 1600,
+        "y": 1300
+      },
+      {
+        "id": "label-2",
+        "text": "ACCESS",
+        "x": 2510,
+        "y": 1390
+      },
+      {
+        "id": "label-3",
+        "text": "SERVICE",
+        "x": 360,
+        "y": 1270
+      },
+      {
+        "id": "label-4",
+        "text": "CONTROL",
+        "x": 1080,
+        "y": 500
+      },
+      {
+        "id": "label-5",
+        "text": "GALLERY",
+        "x": 3690,
+        "y": 690
+      },
+      {
+        "id": "label-6",
+        "text": "VAULT",
+        "x": 2690,
+        "y": 105
+      }
+    ],
+    "wires": [
+      {
+        "id": "wire-entry-anchor",
+        "legacyInput": "plateA",
+        "output": "grappleAnchor",
+        "points": [
+          {
+            "x": 1870,
+            "y": 1488
+          },
+          {
+            "x": 1870,
+            "y": 1350
+          },
+          {
+            "x": 2300,
+            "y": 1350
+          },
+          {
+            "x": 2300,
+            "y": 1160
+          }
+        ]
+      },
+      {
+        "id": "wire-transfer-bridge",
+        "legacyInput": "switchB",
+        "output": "bridge",
+        "points": [
+          {
+            "x": 2560,
+            "y": 1464
+          },
+          {
+            "x": 2560,
+            "y": 1400
+          },
+          {
+            "x": 2220,
+            "y": 1400
+          },
+          {
+            "x": 2220,
+            "y": 1500
+          }
+        ]
+      },
+      {
+        "id": "wire-transfer-R1",
+        "invertedLabel": true,
+        "legacyInput": "switchB",
+        "output": "relayGates",
+        "points": [
+          {
+            "x": 2560,
+            "y": 1464
+          },
+          {
+            "x": 2560,
+            "y": 1070
+          },
+          {
+            "x": 280,
+            "y": 1070
+          },
+          {
+            "x": 280,
+            "y": 1390
+          }
+        ]
+      },
+      {
+        "id": "wire-transfer-R2",
+        "invertedLabel": true,
+        "legacyInput": "switchB",
+        "output": "relayGates",
+        "points": [
+          {
+            "x": 2560,
+            "y": 1464
+          },
+          {
+            "x": 2560,
+            "y": 1070
+          },
+          {
+            "x": 3680,
+            "y": 1070
+          },
+          {
+            "x": 3680,
+            "y": 855
+          }
+        ]
+      },
+      {
+        "id": "wire-cargo-lift",
+        "legacyInput": "cubeOnPlate",
+        "output": "liftField",
+        "points": [
+          {
+            "x": 1750,
+            "y": 1488
+          },
+          {
+            "x": 1750,
+            "y": 1410
+          },
+          {
+            "x": 1550,
+            "y": 1410
+          },
+          {
+            "x": 1550,
+            "y": 1460
+          }
+        ]
+      },
+      {
+        "id": "wire-system-lift",
+        "legacyInput": "switchC",
+        "output": "liftField",
+        "points": [
+          {
+            "x": 1210,
+            "y": 714
+          },
+          {
+            "x": 1210,
+            "y": 670
+          },
+          {
+            "x": 1550,
+            "y": 670
+          },
+          {
+            "x": 1550,
+            "y": 710
+          }
+        ]
+      },
+      {
+        "id": "wire-system-service",
+        "legacyInput": "switchC",
+        "output": "serviceAccess",
+        "points": [
+          {
+            "x": 1210,
+            "y": 714
+          },
+          {
+            "x": 1210,
+            "y": 1060
+          },
+          {
+            "x": 1318,
+            "y": 1060
+          },
+          {
+            "x": 1318,
+            "y": 1120
+          }
+        ]
+      },
+      {
+        "id": "wire-route-left1",
+        "invertedLabel": true,
+        "legacyInput": "switchC",
+        "output": "leftRoute",
+        "points": [
+          {
+            "x": 1385,
+            "y": 714
+          },
+          {
+            "x": 1385,
+            "y": 80
+          },
+          {
+            "x": 1540,
+            "y": 80
+          },
+          {
+            "x": 1540,
+            "y": 350
+          }
+        ]
+      },
+      {
+        "id": "wire-route-crumbleA",
+        "invertedLabel": true,
+        "legacyInput": "switchC",
+        "output": "leftRoute",
+        "points": [
+          {
+            "x": 1385,
+            "y": 714
+          },
+          {
+            "x": 1385,
+            "y": 80
+          },
+          {
+            "x": 1990,
+            "y": 80
+          },
+          {
+            "x": 1990,
+            "y": 270
+          }
+        ]
+      },
+      {
+        "id": "wire-route-left3",
+        "invertedLabel": true,
+        "legacyInput": "switchC",
+        "output": "leftRoute",
+        "points": [
+          {
+            "x": 1385,
+            "y": 714
+          },
+          {
+            "x": 1385,
+            "y": 80
+          },
+          {
+            "x": 2440,
+            "y": 80
+          },
+          {
+            "x": 2440,
+            "y": 350
+          }
+        ]
+      },
+      {
+        "id": "wire-route-right1",
+        "legacyInput": "switchC",
+        "output": "rightRoute",
+        "points": [
+          {
+            "x": 1385,
+            "y": 714
+          },
+          {
+            "x": 1385,
+            "y": 45
+          },
+          {
+            "x": 4100,
+            "y": 45
+          },
+          {
+            "x": 4100,
+            "y": 180
+          }
+        ]
+      },
+      {
+        "id": "wire-route-crumbleB",
+        "legacyInput": "switchC",
+        "output": "rightRoute",
+        "points": [
+          {
+            "x": 1385,
+            "y": 714
+          },
+          {
+            "x": 1385,
+            "y": 45
+          },
+          {
+            "x": 3640,
+            "y": 45
+          },
+          {
+            "x": 3640,
+            "y": 150
+          }
+        ]
+      },
+      {
+        "id": "wire-route-right3",
+        "legacyInput": "switchC",
+        "output": "rightRoute",
+        "points": [
+          {
+            "x": 1385,
+            "y": 714
+          },
+          {
+            "x": 1385,
+            "y": 45
+          },
+          {
+            "x": 3180,
+            "y": 45
+          },
+          {
+            "x": 3180,
+            "y": 300
+          }
+        ]
+      },
+      {
+        "id": "wire-gallery-access",
+        "legacyInput": "switchD",
+        "output": "galleryAccess",
+        "points": [
+          {
+            "x": 4200,
+            "y": 714
+          },
+          {
+            "x": 4200,
+            "y": 690
+          },
+          {
+            "x": 3880,
+            "y": 690
+          },
+          {
+            "x": 3880,
+            "y": 850
+          }
+        ]
+      },
+      {
+        "id": "wire-vault-vault-return",
+        "legacyInput": "cubeOnPlateB",
+        "output": "vaultReturn",
+        "points": [
+          {
+            "x": 2770,
+            "y": 638
+          },
+          {
+            "x": 2770,
+            "y": 610
+          },
+          {
+            "x": 1940,
+            "y": 610
+          },
+          {
+            "x": 1940,
+            "y": 750
+          }
+        ]
+      },
+      {
+        "id": "wire-vault-vault-return-step",
+        "legacyInput": "cubeOnPlateB",
+        "output": "vaultReturn",
+        "points": [
+          {
+            "x": 2770,
+            "y": 638
+          },
+          {
+            "x": 2770,
+            "y": 610
+          },
+          {
+            "x": 2470,
+            "y": 610
+          },
+          {
+            "x": 2470,
+            "y": 690
+          }
+        ]
+      },
+      {
+        "id": "wire-vault-final-left-low",
+        "legacyInput": "cubeOnPlateB",
+        "output": "vaultPower",
+        "points": [
+          {
+            "x": 2770,
+            "y": 638
+          },
+          {
+            "x": 2770,
+            "y": 610
+          },
+          {
+            "x": 2475,
+            "y": 610
+          },
+          {
+            "x": 2475,
+            "y": 560
+          }
+        ]
+      },
+      {
+        "id": "wire-vault-final-left-high",
+        "legacyInput": "cubeOnPlateB",
+        "output": "vaultPower",
+        "points": [
+          {
+            "x": 2770,
+            "y": 638
+          },
+          {
+            "x": 2770,
+            "y": 610
+          },
+          {
+            "x": 2460,
+            "y": 610
+          },
+          {
+            "x": 2460,
+            "y": 460
+          }
+        ]
+      },
+      {
+        "id": "wire-vault-final-right-low",
+        "legacyInput": "cubeOnPlateB",
+        "output": "vaultPower",
+        "points": [
+          {
+            "x": 2770,
+            "y": 638
+          },
+          {
+            "x": 2770,
+            "y": 610
+          },
+          {
+            "x": 3060,
+            "y": 610
+          },
+          {
+            "x": 3060,
+            "y": 560
+          }
+        ]
+      },
+      {
+        "id": "wire-vault-final-right-high",
+        "legacyInput": "cubeOnPlateB",
+        "output": "vaultPower",
+        "points": [
+          {
+            "x": 2770,
+            "y": 638
+          },
+          {
+            "x": 2770,
+            "y": 610
+          },
+          {
+            "x": 3080,
+            "y": 610
+          },
+          {
+            "x": 3080,
+            "y": 460
+          }
+        ]
+      },
+      {
+        "id": "wire-exit-plateB",
+        "legacyInput": "plateB",
+        "output": "exitDoor",
+        "points": [
+          {
+            "x": 2620,
+            "y": 338
+          },
+          {
+            "x": 2620,
+            "y": 160
+          },
+          {
+            "x": 2770,
+            "y": 160
+          },
+          {
+            "x": 2770,
+            "y": 210
+          }
+        ]
+      },
+      {
+        "id": "wire-exit-plateC",
+        "legacyInput": "plateC",
+        "output": "exitDoor",
+        "points": [
+          {
+            "x": 2910,
+            "y": 338
+          },
+          {
+            "x": 2910,
+            "y": 160
+          },
+          {
+            "x": 2770,
+            "y": 160
+          },
+          {
+            "x": 2770,
+            "y": 210
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "idle": {}
+  },
+  "title": "CROSSFEED VAULT / DRAFT",
+  "version": 1
+}

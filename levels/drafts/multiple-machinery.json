@@ -1,0 +1,273 @@
+{
+  "bindings": [
+    {
+      "id": "routeBinding",
+      "output": "routePower",
+      "property": "active",
+      "target": "route"
+    },
+    {
+      "id": "exitBinding",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit"
+    },
+    {
+      "id": "feed-westA",
+      "output": "pairOne",
+      "property": "power",
+      "target": "westA"
+    },
+    {
+      "id": "feed-westB",
+      "output": "pairOne",
+      "property": "power",
+      "target": "westB"
+    },
+    {
+      "id": "feed-eastA",
+      "output": "pairTwo",
+      "property": "power",
+      "target": "eastA"
+    },
+    {
+      "id": "feed-eastB",
+      "output": "pairTwo",
+      "property": "power",
+      "target": "eastB"
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "exitReady": {
+        "id": "routeLever.value",
+        "op": "ref"
+      },
+      "pairOne": {
+        "id": "routeLever.value",
+        "op": "ref"
+      },
+      "pairTwo": {
+        "id": "secondLever.value",
+        "op": "ref"
+      },
+      "routePower": {
+        "args": [
+          {
+            "id": "powerPlate.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "routeLever.value",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      }
+    }
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 850,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 120,
+        "y": 663
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 200,
+        "y": 663
+      },
+      {
+        "h": 170,
+        "id": "floor",
+        "kind": "static",
+        "type": "platform",
+        "w": 2400,
+        "x": 0,
+        "y": 680
+      },
+      {
+        "id": "powerPlate",
+        "kind": "plate",
+        "label": "POWER",
+        "type": "device",
+        "x": 440,
+        "y": 680
+      },
+      {
+        "id": "routeLever",
+        "kind": "toggle",
+        "label": "ROUTE",
+        "type": "device",
+        "x": 610,
+        "y": 680
+      },
+      {
+        "h": 30,
+        "hookable": true,
+        "id": "route",
+        "kind": "code",
+        "label": "CONTROLLED ROUTE",
+        "type": "platform",
+        "w": 240,
+        "x": 820,
+        "y": 440
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 80,
+        "x": 1360,
+        "y": 540
+      },
+      {
+        "id": "amber",
+        "mark": "A",
+        "type": "cube",
+        "x": 280,
+        "y": 658
+      },
+      {
+        "id": "blue",
+        "mark": "B",
+        "type": "cube",
+        "x": 400,
+        "y": 658
+      },
+      {
+        "id": "cyan",
+        "mark": "C",
+        "type": "cube",
+        "x": 520,
+        "y": 658
+      },
+      {
+        "id": "delta",
+        "mark": "D",
+        "type": "cube",
+        "x": 640,
+        "y": 658
+      },
+      {
+        "id": "secondLever",
+        "kind": "toggle",
+        "label": "PAIR TWO",
+        "type": "device",
+        "x": 1500,
+        "y": 680
+      },
+      {
+        "exitSide": -1,
+        "h": 110,
+        "id": "westA",
+        "pair": "westPair",
+        "type": "relay",
+        "w": 56,
+        "x": 850,
+        "y": 570
+      },
+      {
+        "exitSide": 1,
+        "h": 110,
+        "id": "westB",
+        "pair": "westPair",
+        "type": "relay",
+        "w": 56,
+        "x": 1200,
+        "y": 570
+      },
+      {
+        "exitSide": -1,
+        "h": 110,
+        "id": "eastA",
+        "pair": "eastPair",
+        "type": "relay",
+        "w": 56,
+        "x": 1600,
+        "y": 570
+      },
+      {
+        "exitSide": 1,
+        "h": 110,
+        "id": "eastB",
+        "pair": "eastPair",
+        "type": "relay",
+        "w": 56,
+        "x": 2100,
+        "y": 570
+      },
+      {
+        "id": "resetBeam",
+        "length": 100,
+        "orientation": "vertical",
+        "thickness": 12,
+        "type": "firewall",
+        "x": 1900,
+        "y": 580
+      }
+    ],
+    "width": 2400
+  },
+  "id": "multiple-machinery",
+  "instruction": "HOLD THE PLATE. ROUTE THE POWER.",
+  "presentation": {
+    "cameraReveals": [],
+    "display": {
+      "x": 900,
+      "y": 300
+    },
+    "labels": [],
+    "wires": [
+      {
+        "binding": "routeBinding",
+        "id": "routeWire",
+        "points": [
+          {
+            "x": 440,
+            "y": 668
+          },
+          {
+            "x": 440,
+            "y": 380
+          },
+          {
+            "x": 940,
+            "y": 380
+          },
+          {
+            "x": 940,
+            "y": 440
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "idle": {},
+    "left-powered": {
+      "powerPlate.occupied": true,
+      "routeLever.value": false
+    }
+  },
+  "title": "MULTIPLE MACHINERY / REGISTRY DIAGNOSTIC",
+  "version": 1
+}

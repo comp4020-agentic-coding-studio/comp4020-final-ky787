@@ -26,3 +26,6 @@ mise.local.toml
 Workspace/
 
 .local-data/
+
+# Local authoring recovery, frozen sessions and diagnostic reports
+.workbench/

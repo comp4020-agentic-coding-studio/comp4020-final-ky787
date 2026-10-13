@@ -1,0 +1,163 @@
+{
+  "bindings": [
+    {
+      "id": "routeBinding",
+      "output": "routePower",
+      "property": "active",
+      "target": "route"
+    },
+    {
+      "id": "exitBinding",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "exitReady": {
+        "id": "routeLever.value",
+        "op": "ref"
+      },
+      "routePower": {
+        "args": [
+          {
+            "id": "powerPlate.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "routeLever.value",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      }
+    }
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 850,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 120,
+        "y": 663
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 200,
+        "y": 663
+      },
+      {
+        "h": 170,
+        "id": "floor",
+        "kind": "static",
+        "type": "platform",
+        "w": 1500,
+        "x": 0,
+        "y": 680
+      },
+      {
+        "id": "payload",
+        "mark": "A",
+        "type": "cube",
+        "x": 310,
+        "y": 658
+      },
+      {
+        "id": "powerPlate",
+        "kind": "plate",
+        "label": "POWER",
+        "type": "device",
+        "x": 440,
+        "y": 680
+      },
+      {
+        "id": "routeLever",
+        "kind": "toggle",
+        "label": "ROUTE",
+        "type": "device",
+        "x": 610,
+        "y": 680
+      },
+      {
+        "h": 30,
+        "hookable": true,
+        "id": "route",
+        "kind": "code",
+        "label": "CONTROLLED ROUTE",
+        "type": "platform",
+        "w": 240,
+        "x": 820,
+        "y": 440
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 80,
+        "x": 1360,
+        "y": 540
+      }
+    ],
+    "width": 1500
+  },
+  "id": "blank-room",
+  "instruction": "HOLD THE PLATE. ROUTE THE POWER.",
+  "presentation": {
+    "cameraReveals": [],
+    "display": {
+      "x": 900,
+      "y": 300
+    },
+    "labels": [],
+    "wires": [
+      {
+        "binding": "routeBinding",
+        "id": "routeWire",
+        "points": [
+          {
+            "x": 440,
+            "y": 668
+          },
+          {
+            "x": 440,
+            "y": 380
+          },
+          {
+            "x": 940,
+            "y": 380
+          },
+          {
+            "x": 940,
+            "y": 440
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "idle": {},
+    "left-powered": {
+      "powerPlate.occupied": true,
+      "routeLever.value": false
+    }
+  },
+  "title": "BLANK ROOM / AUTHORING TEMPLATE",
+  "version": 1
+}

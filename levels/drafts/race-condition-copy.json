@@ -1,0 +1,820 @@
+{
+  "bindings": [
+    {
+      "id": "binding-cargo-top",
+      "output": "topBridge",
+      "property": "active",
+      "target": "cargo-top"
+    },
+    {
+      "id": "binding-cargo-buffer",
+      "output": "bufferBridge",
+      "property": "active",
+      "target": "cargo-buffer"
+    },
+    {
+      "id": "binding-span1",
+      "output": "phaseA",
+      "property": "active",
+      "target": "span1"
+    },
+    {
+      "id": "binding-crumbleA",
+      "output": "phaseB",
+      "property": "active",
+      "target": "crumbleA"
+    },
+    {
+      "id": "binding-span3",
+      "output": "phaseA",
+      "property": "active",
+      "target": "span3"
+    },
+    {
+      "id": "binding-crumbleB",
+      "output": "phaseB",
+      "property": "active",
+      "target": "crumbleB"
+    },
+    {
+      "id": "binding-span5",
+      "output": "phaseA",
+      "property": "active",
+      "target": "span5"
+    },
+    {
+      "id": "binding-return-bridge",
+      "output": "returnBridge",
+      "property": "active",
+      "target": "return-bridge"
+    },
+    {
+      "id": "binding-race-beam",
+      "output": "raceFirewall",
+      "property": "active",
+      "target": "race-beam"
+    },
+    {
+      "id": "binding-safety-beam",
+      "output": "safetyFirewall",
+      "property": "active",
+      "target": "safety-beam"
+    },
+    {
+      "id": "binding-exit",
+      "output": "exitDoor",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "id": "race-condition",
+    "kind": "builtin",
+    "version": 1
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 1420,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 120,
+        "y": 1223
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 585,
+        "y": 703
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 250,
+        "y": 1223
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 695,
+        "y": 703
+      },
+      {
+        "h": 180,
+        "id": "floor",
+        "kind": "static",
+        "type": "platform",
+        "w": 4180,
+        "x": 0,
+        "y": 1240
+      },
+      {
+        "h": 22,
+        "id": "launch-step-0",
+        "kind": "static",
+        "type": "platform",
+        "w": 140,
+        "x": 300,
+        "y": 1136
+      },
+      {
+        "h": 22,
+        "id": "launch-step-1",
+        "kind": "static",
+        "type": "platform",
+        "w": 140,
+        "x": 365,
+        "y": 1032
+      },
+      {
+        "h": 22,
+        "id": "launch-step-2",
+        "kind": "static",
+        "type": "platform",
+        "w": 140,
+        "x": 430,
+        "y": 928
+      },
+      {
+        "h": 22,
+        "id": "launch-step-3",
+        "kind": "static",
+        "type": "platform",
+        "w": 140,
+        "x": 495,
+        "y": 824
+      },
+      {
+        "h": 28,
+        "id": "launch",
+        "kind": "static",
+        "type": "platform",
+        "w": 165,
+        "x": 560,
+        "y": 720
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 652,
+        "id": "chute-left",
+        "kind": "static",
+        "type": "platform",
+        "w": 30,
+        "x": 90,
+        "y": 420
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 652,
+        "id": "chute-right",
+        "kind": "static",
+        "type": "platform",
+        "w": 30,
+        "x": 290,
+        "y": 420
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 24,
+        "id": "chute-roof",
+        "kind": "static",
+        "type": "platform",
+        "w": 230,
+        "x": 90,
+        "y": 420
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 32,
+        "id": "receiver-floor",
+        "kind": "static",
+        "type": "platform",
+        "w": 230,
+        "x": 90,
+        "y": 1040
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "cargo-top",
+        "kind": "code",
+        "label": "TOP",
+        "type": "platform",
+        "w": 170,
+        "x": 120,
+        "y": 500
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "cargo-buffer",
+        "kind": "code",
+        "label": "BUFFER",
+        "type": "platform",
+        "w": 170,
+        "x": 120,
+        "y": 680
+      },
+      {
+        "h": 30,
+        "id": "span1",
+        "kind": "code",
+        "label": "01 / A",
+        "type": "platform",
+        "w": 150,
+        "x": 930,
+        "y": 350
+      },
+      {
+        "h": 30,
+        "hookCrumbleDelay": 1.55,
+        "id": "crumbleA",
+        "kind": "unstable",
+        "label": "02 / B",
+        "type": "platform",
+        "w": 150,
+        "x": 1430,
+        "y": 290
+      },
+      {
+        "h": 30,
+        "id": "span3",
+        "kind": "code",
+        "label": "03 / A",
+        "type": "platform",
+        "w": 150,
+        "x": 1930,
+        "y": 350
+      },
+      {
+        "h": 30,
+        "hookCrumbleDelay": 1.55,
+        "id": "crumbleB",
+        "kind": "unstable",
+        "label": "04 / B",
+        "type": "platform",
+        "w": 150,
+        "x": 2430,
+        "y": 290
+      },
+      {
+        "h": 30,
+        "id": "span5",
+        "kind": "code",
+        "label": "05 / A",
+        "type": "platform",
+        "w": 150,
+        "x": 2930,
+        "y": 350
+      },
+      {
+        "h": 24,
+        "id": "return-bridge",
+        "kind": "code",
+        "label": "RETURN",
+        "type": "platform",
+        "w": 2505,
+        "x": 725,
+        "y": 720
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 32,
+        "id": "right-deck",
+        "kind": "static",
+        "type": "platform",
+        "w": 950,
+        "x": 3230,
+        "y": 720
+      },
+      {
+        "h": 28,
+        "id": "commit-ledge",
+        "kind": "static",
+        "type": "platform",
+        "w": 360,
+        "x": 3820,
+        "y": 530
+      },
+      {
+        "id": "cubeA",
+        "mark": "A",
+        "type": "cube",
+        "x": 205,
+        "y": 478
+      },
+      {
+        "id": "cubeB",
+        "mark": "B",
+        "type": "cube",
+        "x": 3570,
+        "y": 698
+      },
+      {
+        "id": "dropA",
+        "kind": "plate",
+        "label": "DROP A",
+        "type": "device",
+        "x": 180,
+        "y": 1240
+      },
+      {
+        "id": "dropB",
+        "kind": "plate",
+        "label": "DROP B",
+        "type": "device",
+        "x": 1880,
+        "y": 1240
+      },
+      {
+        "id": "receiver",
+        "kind": "plate",
+        "label": "RECEIVER",
+        "type": "device",
+        "x": 205,
+        "y": 1040
+      },
+      {
+        "id": "trace",
+        "kind": "plate",
+        "label": "TRACE ENABLE",
+        "type": "device",
+        "x": 615,
+        "y": 720
+      },
+      {
+        "id": "return",
+        "kind": "plate",
+        "label": "RETURN",
+        "type": "device",
+        "x": 3470,
+        "y": 720
+      },
+      {
+        "id": "phase",
+        "kind": "toggle",
+        "label": "PHASE",
+        "type": "device",
+        "x": 655,
+        "y": 720
+      },
+      {
+        "id": "commit",
+        "kind": "terminal",
+        "label": "COMMIT",
+        "type": "device",
+        "x": 4000,
+        "y": 530
+      },
+      {
+        "id": "span-firewall",
+        "length": 2505,
+        "orientation": "horizontal",
+        "thickness": 12,
+        "type": "firewall",
+        "x": 725,
+        "y": 900
+      },
+      {
+        "id": "race-beam",
+        "length": 170,
+        "orientation": "horizontal",
+        "thickness": 12,
+        "type": "firewall",
+        "x": 120,
+        "y": 800
+      },
+      {
+        "id": "safety-beam",
+        "length": 170,
+        "orientation": "horizontal",
+        "thickness": 12,
+        "type": "firewall",
+        "x": 120,
+        "y": 860
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 110,
+        "x": 4020,
+        "y": 580
+      }
+    ],
+    "width": 4180
+  },
+  "id": "race-condition-copy",
+  "imported": {
+    "factory": "race-condition",
+    "warnings": []
+  },
+  "instruction": "DELIVER THE PAYLOAD. KEEP THE TRACE ALIVE.",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "bounds": {
+          "h": 715,
+          "w": 280,
+          "x": 70,
+          "y": 390
+        },
+        "id": "camera-dropA",
+        "padding": 64,
+        "source": "dropA"
+      },
+      {
+        "bounds": {
+          "h": 715,
+          "w": 280,
+          "x": 70,
+          "y": 390
+        },
+        "id": "camera-dropB",
+        "padding": 64,
+        "source": "dropB"
+      },
+      {
+        "bounds": {
+          "h": 760,
+          "w": 2820,
+          "x": 540,
+          "y": 150
+        },
+        "id": "camera-trace",
+        "padding": 70,
+        "platformIds": [
+          "span1",
+          "crumbleA",
+          "span3",
+          "crumbleB",
+          "span5"
+        ],
+        "source": "trace"
+      },
+      {
+        "bounds": {
+          "h": 150,
+          "w": 3000,
+          "x": 560,
+          "y": 640
+        },
+        "id": "camera-return",
+        "padding": 70,
+        "platformIds": [
+          "return-bridge"
+        ],
+        "source": "return"
+      },
+      {
+        "bounds": {
+          "h": 760,
+          "w": 2820,
+          "x": 540,
+          "y": 150
+        },
+        "id": "camera-phase",
+        "padding": 70,
+        "platformIds": [
+          "span1",
+          "crumbleA",
+          "span3",
+          "crumbleB",
+          "span5"
+        ],
+        "source": "phase"
+      }
+    ],
+    "display": {
+      "x": 1320,
+      "y": 820
+    },
+    "labels": [
+      {
+        "id": "label-1",
+        "text": "CARGO CLOCK",
+        "x": 80,
+        "y": 1090
+      },
+      {
+        "id": "label-2",
+        "text": "ALTERNATING TRACE",
+        "x": 1600,
+        "y": 130
+      },
+      {
+        "id": "label-3",
+        "text": "RETURN / COMMIT",
+        "x": 3530,
+        "y": 860
+      },
+      {
+        "id": "label-4",
+        "text": "← RECOVERY",
+        "x": 2520,
+        "y": 1330
+      }
+    ],
+    "wires": [
+      {
+        "id": "wire-drop-top",
+        "invertedLabel": true,
+        "legacyInput": "plateA",
+        "output": "topBridge",
+        "points": [
+          {
+            "x": 180,
+            "y": 1228
+          },
+          {
+            "x": 180,
+            "y": 1160
+          },
+          {
+            "x": 120,
+            "y": 1160
+          },
+          {
+            "x": 120,
+            "y": 500
+          }
+        ]
+      },
+      {
+        "id": "wire-drop-buffer",
+        "invertedLabel": true,
+        "legacyInput": "plateA",
+        "output": "bufferBridge",
+        "points": [
+          {
+            "x": 1880,
+            "y": 1228
+          },
+          {
+            "x": 1880,
+            "y": 1120
+          },
+          {
+            "x": 290,
+            "y": 1120
+          },
+          {
+            "x": 290,
+            "y": 680
+          }
+        ]
+      },
+      {
+        "id": "wire-safety",
+        "invertedLabel": true,
+        "legacyInput": "plateA",
+        "output": "safetyFirewall",
+        "points": [
+          {
+            "x": 1880,
+            "y": 1228
+          },
+          {
+            "x": 1880,
+            "y": 1140
+          },
+          {
+            "x": 290,
+            "y": 1140
+          },
+          {
+            "x": 290,
+            "y": 860
+          }
+        ]
+      },
+      {
+        "id": "wire-race",
+        "legacyInput": "plateA",
+        "output": "raceFirewall",
+        "points": [
+          {
+            "x": 180,
+            "y": 1228
+          },
+          {
+            "x": 180,
+            "y": 1180
+          },
+          {
+            "x": 120,
+            "y": 1180
+          },
+          {
+            "x": 120,
+            "y": 800
+          }
+        ]
+      },
+      {
+        "id": "wire-receiver-master",
+        "legacyInput": "plateA",
+        "output": "spanMaster",
+        "points": [
+          {
+            "x": 205,
+            "y": 1030
+          },
+          {
+            "x": 205,
+            "y": 1080
+          },
+          {
+            "x": 615,
+            "y": 1080
+          },
+          {
+            "x": 615,
+            "y": 705
+          }
+        ]
+      },
+      {
+        "id": "wire-phase-span1",
+        "invertedLabel": true,
+        "legacyInput": "plateA",
+        "output": "phaseA",
+        "points": [
+          {
+            "x": 655,
+            "y": 688
+          },
+          {
+            "x": 655,
+            "y": 205
+          },
+          {
+            "x": 1005,
+            "y": 205
+          },
+          {
+            "x": 1005,
+            "y": 350
+          }
+        ]
+      },
+      {
+        "id": "wire-phase-crumbleA",
+        "legacyInput": "plateA",
+        "output": "phaseB",
+        "points": [
+          {
+            "x": 655,
+            "y": 688
+          },
+          {
+            "x": 655,
+            "y": 235
+          },
+          {
+            "x": 1505,
+            "y": 235
+          },
+          {
+            "x": 1505,
+            "y": 290
+          }
+        ]
+      },
+      {
+        "id": "wire-phase-span3",
+        "legacyInput": "plateA",
+        "output": "phaseA",
+        "points": [
+          {
+            "x": 655,
+            "y": 688
+          },
+          {
+            "x": 655,
+            "y": 205
+          },
+          {
+            "x": 2005,
+            "y": 205
+          },
+          {
+            "x": 2005,
+            "y": 350
+          }
+        ]
+      },
+      {
+        "id": "wire-phase-crumbleB",
+        "legacyInput": "plateA",
+        "output": "phaseB",
+        "points": [
+          {
+            "x": 655,
+            "y": 688
+          },
+          {
+            "x": 655,
+            "y": 235
+          },
+          {
+            "x": 2505,
+            "y": 235
+          },
+          {
+            "x": 2505,
+            "y": 290
+          }
+        ]
+      },
+      {
+        "id": "wire-phase-span5",
+        "legacyInput": "plateA",
+        "output": "phaseA",
+        "points": [
+          {
+            "x": 655,
+            "y": 688
+          },
+          {
+            "x": 655,
+            "y": 205
+          },
+          {
+            "x": 3005,
+            "y": 205
+          },
+          {
+            "x": 3005,
+            "y": 350
+          }
+        ]
+      },
+      {
+        "id": "wire-return",
+        "legacyInput": "plateA",
+        "output": "returnBridge",
+        "points": [
+          {
+            "x": 3470,
+            "y": 708
+          },
+          {
+            "x": 3470,
+            "y": 845
+          },
+          {
+            "x": 3240,
+            "y": 845
+          },
+          {
+            "x": 3240,
+            "y": 720
+          }
+        ]
+      },
+      {
+        "id": "wire-commit-exit",
+        "legacyInput": "plateA",
+        "output": "exitDoor",
+        "points": [
+          {
+            "x": 4000,
+            "y": 518
+          },
+          {
+            "x": 4000,
+            "y": 475
+          },
+          {
+            "x": 4045,
+            "y": 475
+          },
+          {
+            "x": 4045,
+            "y": 600
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "idle": {}
+  },
+  "title": "RACE CONDITION / DRAFT",
+  "version": 1
+}
