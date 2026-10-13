@@ -6,12 +6,23 @@ command-line tools. Drafts are authored/mock content. They do not replace campai
 rooms, award campaign badges, or inherit verified binary evidence.
 
 ```sh
+pnpm dev
+# Open the printed game URL, then choose LEVEL BUILDER on the main menu.
+# The editor has a Back to game link.
+
+# Standalone editor:
 pnpm workbench
 # optional: pnpm workbench --port 4175
 ```
 
-Open the printed `http://127.0.0.1:4174/` URL. The process prints the canonical draft
-root and local data directory. Stop with Ctrl+C. Node 24 and the repository's pnpm
+`pnpm dev` starts the game's API, Vite frontend and isolated loopback builder in one
+process. It prints both URLs; the builder uses an available port by default
+(`DEV_WORKBENCH_PORT` can select one). Ctrl+C stops all three listeners. Game saves
+remain in `DATA_DIR` or `.local-data`; builder recovery/sessions stay in `.workbench`
+(`WORKBENCH_DATA_DIR` can override that directory).
+
+For the standalone editor, open the printed `http://127.0.0.1:4174/` URL. The process
+prints the canonical draft root and local data directory. Stop with Ctrl+C. Node 24 and the repository's pnpm
 dependencies are required. CLI screenshots and scenarios also need Chromium (the
 existing browser harness searches installed Chromium/Chrome/Brave; `BROWSER_BIN`
 can name an executable). No LLM service or subscription is involved.
@@ -19,8 +30,10 @@ can name an executable). No LLM service or subscription is involved.
 ## First use
 
 1. Open `blank-room.json` from the toolbar. Use **Fit room**, then zoom with the
-   wheel around the pointer. Middle-button drag pans. Select a palette item and
-   click or drag it into the canvas. The inspector shows position/size and
+   wheel around the pointer. In Edit and State preview, focus the canvas and hold
+   WASD to pan at a constant screen speed; middle-button or Space+drag also pans.
+   Typing in controls does not move the camera. Playtest keeps its gameplay keys.
+   Select a palette item and click or drag it into the canvas. The inspector shows position/size and
    attributes; device positions are floor contacts, not rectangle corners.
 2. Place a pressure plate and a code platform. Use **Connect**, select the device,
    then the target. Inspect the output expression and binding property. The logic
@@ -188,6 +201,7 @@ pnpm level:playtest levels/drafts/cooperative-test.json \
   --scenario levels/scenarios/cooperative-test.json \
   --report .workbench/reports/cooperative-test
 pnpm check:workbench
+pnpm check:workbench-menu
 node scripts/level-tools/coop-browser-check.ts
 ```
 
@@ -260,6 +274,10 @@ positions for both player slots. Built-in imports retain their required IDs/cube
 sets; arbitrary added control semantics belong in declarative drafts. Playable drafts
 need both spawns and an exit even for local preview. The editor is one-user local
 file editing, with conflict detection rather than collaborative cursor sharing.
+
+The Level Builder menu option is available on the local development game. It is
+absent from the production build and from development pages opened over LAN.
+`pnpm dev:client` alone expects a separately started `pnpm workbench` at port 4174.
 
 The server binds loopback only. Writes require the exact printed origin and a random
 local capability. Filenames are flat `.json` names under the draft root; traversal,

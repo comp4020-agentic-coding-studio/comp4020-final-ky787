@@ -35,7 +35,8 @@
     "level:validate": "node scripts/level-tools/cli.ts validate",
     "level:render": "node scripts/level-tools/cli.ts render",
     "level:playtest": "node scripts/level-tools/cli.ts playtest",
-    "check:workbench": "node scripts/level-tools/browser-check.ts"
+    "check:workbench": "node scripts/level-tools/browser-check.ts",
+    "check:workbench-menu": "node scripts/level-tools/menu-browser-check.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

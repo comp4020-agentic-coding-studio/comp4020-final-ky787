@@ -31,11 +31,25 @@ async function modifiedClick(selector: string, modifiers: number) {
     await mouse('mousePressed', at, 1, 'left', modifiers); await mouse('mouseReleased', at, 0, 'left', modifiers); await h.sleep(80);
 }
 async function dialogClick(selector: string, accept: boolean) { const clicked = h.click(p!, selector); await h.sleep(80); await p!.send('Page.handleJavaScriptDialog', { accept }); await clicked; }
+const camera = () => p!.read<{ x: number; y: number; zoom: number }>('workbench.snapshot().camera');
+async function cameraKey(code: 'KeyW' | 'KeyA' | 'KeyS' | 'KeyD', down: boolean, modifiers = 0, repeat = false) {
+    await p!.send('Input.dispatchKeyEvent', { type: down ? 'rawKeyDown' : 'keyUp', code, key: code.slice(3).toLowerCase(), windowsVirtualKeyCode: code.charCodeAt(3), modifiers, autoRepeat: repeat });
+}
+async function keyboardPan(codes: ('KeyW' | 'KeyA' | 'KeyS' | 'KeyD')[]) {
+    await p!.read("document.querySelector('#world').focus()");
+    const before = await camera(), start = await p!.read<number>('performance.now()');
+    for (const code of codes) await cameraKey(code, true);
+    await h.sleep(400);
+    for (const code of codes) await cameraKey(code, false);
+    const end = await p!.read<number>('performance.now()'), after = await camera();
+    return { dx: (after.x - before.x) * before.zoom, dy: (after.y - before.y) * before.zoom, seconds: (end - start) / 1000 };
+}
 
 try {
     const browser = await h.launch(); p = await h.page(app.origin, browser);
     check('CLI/JSON-created draft opens from canonical file', (await doc()).id === 'gui-fixture');
     check('actual engine preview built without errors', await p.read('!workbench.snapshot().runtimeError && workbench.snapshot().playable'));
+    check('standalone editor does not invent a game navigation URL', await p.read("document.querySelector('#back-to-game').hidden"));
     await screenshot('01-overview');
     await h.click(p, '[data-palette="code"]'); await clickWorld(700, 520);
     let current = await doc(), added = current.geometry.objects.find(o => !newDraft().geometry.objects.some(base => base.id === o.id));
@@ -113,6 +127,37 @@ try {
     const wheelBefore = await worldAtPointer(); await p.send('Input.dispatchMouseEvent', { type: 'mouseWheel', ...stage, deltaX: 0, deltaY: -180 }); await until(`workbench.snapshot().camera.zoom>${wheelBefore.zoom}`, 'wheel zoom input'); const wheelAfter = await worldAtPointer();
     check('wheel zoom keeps cursor world point anchored', wheelAfter.zoom > wheelBefore.zoom && Math.hypot(wheelAfter.x - wheelBefore.x, wheelAfter.y - wheelBefore.y) < .01);
     await h.click(p, '#fit');
+    const beforeKeys = serializeDraft(await doc()), historyBeforeKeys = await p.read("JSON.stringify({undo:document.querySelector('#undo').disabled,redo:document.querySelector('#redo').disabled,dirty:workbench.snapshot().dirty})");
+    const straightPan = await keyboardPan(['KeyD']);
+    check('held D pans Edit camera at the documented screen speed', straightPan.dx / straightPan.seconds > 450 && straightPan.dx / straightPan.seconds < 750 && straightPan.dy === 0);
+    const diagonalPan = await keyboardPan(['KeyW', 'KeyD']), diagonalSpeed = Math.hypot(diagonalPan.dx, diagonalPan.dy) / diagonalPan.seconds;
+    check('diagonal WASD pan is normalized and moves up/right', diagonalPan.dx > 0 && diagonalPan.dy < 0 && Math.abs(diagonalPan.dx + diagonalPan.dy) < 25 && diagonalSpeed > 450 && diagonalSpeed < 750);
+    const zoomBeforePan = (await camera()).zoom; await p.send('Input.dispatchMouseEvent', { type: 'mouseWheel', ...stage, deltaX: 0, deltaY: -462.1 });
+    await until(`workbench.snapshot().camera.zoom>${zoomBeforePan * 1.5}`, 'keyboard zoom check');
+    const zoomedPan = await keyboardPan(['KeyA']);
+    check('keyboard pan screen speed stays consistent when zoomed', -zoomedPan.dx / zoomedPan.seconds > 450 && -zoomedPan.dx / zoomedPan.seconds < 750 && zoomedPan.dy === 0);
+    check('camera keys preserve authored data, dirty status and undo history', serializeDraft(await doc()) === beforeKeys && await p.read("JSON.stringify({undo:document.querySelector('#undo').disabled,redo:document.querySelector('#redo').disabled,dirty:workbench.snapshot().dirty})") === historyBeforeKeys);
+    const releasedCamera = await camera(); await h.sleep(120);
+    check('releasing WASD stops camera movement', JSON.stringify(await camera()) === JSON.stringify(releasedCamera));
+    await h.click(p, '#search'); const formCamera = await camera(); await cameraKey('KeyD', true); await p.send('Input.insertText', { text: 'wasd' }); await h.sleep(120); await cameraKey('KeyD', false);
+    check('typing WASD into a form preserves camera and accepts text', JSON.stringify(await camera()) === JSON.stringify(formCamera) && await p.read("document.querySelector('#search').value==='wasd'"));
+    await inputText('#search', '');
+    // A nested editable element checks keyboard ownership beyond the ordinary inspector fields.
+    await p.read("(()=>{const e=document.createElement('div');e.id='editable-keyboard-fixture';e.contentEditable='true';e.style.position='fixed';e.style.bottom='0';e.innerHTML='<span>Editable keyboard focus</span>';document.body.append(e);e.focus()})()");
+    const editableCamera = await camera(); await cameraKey('KeyW', true); await h.sleep(120); await cameraKey('KeyW', false);
+    check('contenteditable focus owns WASD input', JSON.stringify(await camera()) === JSON.stringify(editableCamera));
+    await p.read("document.querySelector('#editable-keyboard-fixture').remove();document.querySelector('#world').focus()");
+    await cameraKey('KeyD', true); await h.sleep(70); await h.click(p, '#import-room'); const modalCamera = await camera();
+    await cameraKey('KeyW', true); await h.sleep(120); await cameraKey('KeyW', false);
+    await h.click(p, '[data-close]'); await p.read("document.querySelector('#world').focus()"); await h.sleep(120); await cameraKey('KeyD', false);
+    check('opening a modal clears held movement and closing it does not resume it', JSON.stringify(await camera()) === JSON.stringify(modalCamera));
+    // Browser lifecycle events must retire held keys, including subsequent repeat events.
+    await cameraKey('KeyD', true); await h.sleep(70); await p.read("window.dispatchEvent(new Event('blur'))"); const blurCamera = await camera();
+    await cameraKey('KeyD', true, 0, true); await h.sleep(120); await cameraKey('KeyD', false);
+    check('window blur clears held camera keys and ignores stale repeats', JSON.stringify(await camera()) === JSON.stringify(blurCamera));
+    await cameraKey('KeyS', true); await h.sleep(70); await p.read("document.dispatchEvent(new Event('visibilitychange'))"); const visibilityCamera = await camera(); await h.sleep(120); await cameraKey('KeyS', false);
+    check('visibility changes clear held camera movement', JSON.stringify(await camera()) === JSON.stringify(visibilityCamera));
+    await h.click(p, '#fit');
     const dirtyBefore = serializeDraft(await doc()); await dialogClick('#new', false);
     check('declining dirty replacement preserves document', serializeDraft(await doc()) === dirtyBefore);
     await h.sleep(750); const recovery = await p.read<{document:DraftDocument}|null>("fetch('/api/workbench/recovery').then(r=>r.json())");
@@ -127,6 +172,12 @@ try {
     check('CLI process validates the exact GUI-saved file', JSON.parse(cli.stdout).playable === true);
     await h.click(p, '#preview-mode'); await value('#preview-state', 'left-powered');
     check('State Preview actual evaluator powers left route', await p.read('workbench.observe().outputs.routePower===true && workbench.observe().outputs.rightRoute===false'));
+    const previewDocument = serializeDraft(await doc()), previewObserved = await p.read('JSON.stringify(workbench.observe())');
+    const previewPan = await keyboardPan(['KeyS']);
+    check('State Preview WASD pans without advancing physics or changing inputs', previewPan.dy > 100 && previewPan.dx === 0 && serializeDraft(await doc()) === previewDocument && await p.read('JSON.stringify(workbench.observe())') === previewObserved);
+    await cameraKey('KeyD', true); await h.sleep(70); await h.click(p, '#edit-mode'); await p.read("document.querySelector('#world').focus()"); const modeCamera = await camera(); await h.sleep(120); await cameraKey('KeyD', false);
+    check('mode changes clear held camera movement', JSON.stringify(await camera()) === JSON.stringify(modeCamera));
+    await h.click(p, '#preview-mode'); await value('#preview-state', 'left-powered'); await h.click(p, '#fit');
     await screenshot('02-left-powered');
     await h.click(p, '[data-preview-input="routeLever.value"]'); check('GUI input toggle swaps actual outputs', await p.read('workbench.observe().outputs.routePower===false && workbench.observe().outputs.rightRoute===true'));
     await screenshot('03-right-powered');
@@ -135,9 +186,25 @@ try {
     const beforeTest = serializeDraft(await doc()), beforeCamera = await p.read('workbench.snapshot().camera');
     await h.click(p, '#play'); await until("workbench.snapshot().mode==='play'", 'play mode'); await h.key(p, 'KeyD', true); await h.sleep(280); await h.key(p, 'KeyD', false);
     check('physical movement precedes reset', await p.read('workbench.observe().player.x>120'));
+    check('playtest WASD moves the avatar without panning the authored editor camera', JSON.stringify(await camera()) === JSON.stringify(beforeCamera));
     await h.key(p, 'KeyR', true); await h.key(p, 'KeyR', false);
     await until('workbench.observe().deaths===1 && Math.abs(workbench.observe().player.x-120)<.1', 'R respawn at authored entry');
     check('R resets through engine and records the actual death event', await p.read("workbench.exportRecording().events.some(e=>e.kind==='death' && e.detail.cause==='reset')"));
+    await h.key(p, 'KeyD', true); await until('workbench.observe().player.vx>100', 'held playtest movement');
+    await h.click(p, '#search'); await h.key(p, 'KeyD', false); await p.send('Input.insertText', { text: 'typed during play' });
+    await until('Math.abs(workbench.observe().player.vx)<.1', 'movement released on input focus');
+    const focusedPlayerX = await p.read<number>('workbench.observe().player.x'); await h.sleep(160);
+    check('held playtest movement stops when focus enters a field before keyup', await p.read(`Math.abs(workbench.observe().player.x-${focusedPlayerX})<.1 && document.querySelector('#search').value==='typed during play'`));
+    await inputText('#search', '');
+    // Standalone service hides this real anchor. Reveal only its DOM presentation to test key ownership.
+    await p.read("(()=>{const a=document.querySelector('#back-to-game');a.hidden=false;a.href='#keyboard-focus-fixture';a.focus()})()");
+    const linkPlayer = await p.read<{ x: number; y: number; deaths: number }>('({...workbench.observe().player,deaths:workbench.observe().deaths})');
+    await cameraKey('KeyD', true); await cameraKey('KeyW', true); await h.key(p, 'KeyE', true); await h.key(p, 'KeyR', true); await h.sleep(170);
+    await cameraKey('KeyD', false); await cameraKey('KeyW', false); await h.key(p, 'KeyE', false); await h.key(p, 'KeyR', false);
+    check('focused Back to game link does not send movement, jump or reset to physics', await p.read(`Math.abs(workbench.observe().player.x-${linkPlayer.x})<.1 && Math.abs(workbench.observe().player.y-${linkPlayer.y})<.1 && workbench.observe().deaths===${linkPlayer.deaths}`));
+    await h.key(p, 'Tab', true); await h.key(p, 'Tab', false);
+    check('playtest control guard retains native link Tab navigation', await p.read("document.activeElement!==document.querySelector('#back-to-game')"));
+    await p.read("(()=>{const a=document.querySelector('#back-to-game');a.hidden=true;a.removeAttribute('href');document.querySelector('#world').focus()})()");
     await h.click(p, '#stop');
     check('real physics stop preserves authored document', serializeDraft(await doc()) === beforeTest);
     check('stop restores editor camera', JSON.stringify(await p.read('workbench.snapshot().camera')) === JSON.stringify(beforeCamera));

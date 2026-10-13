@@ -280,12 +280,15 @@ export class SliceGame {
         this.input.releaseAll();
         this.menu.hidden = false;
         const p = this.store.progress, saved = this.store.updatedAt;
+        const builderUrl = import.meta.env.DEV && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
+            ? import.meta.env.VITE_WORKBENCH_URL ?? 'http://127.0.0.1:4174/' : null;
         this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA</span>
       <h2>${this.ended ? 'Control Spine complete.' : 'Play together.'}</h2>
       <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Learn the tools. Then tackle the co-op campaign.'}</p>
       <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${roomById(p.currentRoom).title} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${roomById(p.currentRoom).title}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
+      ${builderUrl ? '<button id="level-builder" title="Create and playtest local level drafts">LEVEL BUILDER</button>' : ''}
       <nav class="level-select" aria-label="Level select">
         <span class="eyebrow">TUTORIAL</span>
         <div class="level-grid">${ROOMS.map((room, index) => `<button data-room="${room.id}" ${room.id === p.currentRoom ? 'aria-current="true"' : ''}><strong>0${index + 1} / ${room.title}</strong><small>${room.id === p.currentRoom ? 'CURRENT' : p.completedRooms.includes(room.id) ? 'COMPLETE' : 'PLAY'}</small></button>`).join('')}</div>
@@ -312,6 +315,19 @@ export class SliceGame {
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
+        const builderButton = this.menu.querySelector<HTMLButtonElement>('#level-builder');
+        builderButton?.addEventListener('click', async () => {
+            if (!builderUrl || builderButton.disabled) return;
+            builderButton.disabled = true;
+            builderButton.textContent = 'SAVING PROGRESS…';
+            try {
+                const saved = await this.store.flush();
+                if (saved || confirm(`${this.store.status}. Open Level Builder and leave this unsaved progress?`)) location.assign(builderUrl);
+            } finally {
+                builderButton.disabled = false;
+                builderButton.textContent = 'LEVEL BUILDER';
+            }
+        });
         this.menu.querySelector('#create-party')!.addEventListener('click', () => this.enterCoop());
         for (const button of this.menu.querySelectorAll<HTMLButtonElement>('[data-create-lab]')) button.addEventListener('click', () => this.enterCoop(undefined, button.dataset.createLab as CoopLevelId));
         this.menu.querySelector('#join-room-form')!.addEventListener('submit', event => {

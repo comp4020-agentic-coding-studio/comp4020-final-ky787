@@ -13,7 +13,8 @@ pnpm level:render levels/drafts/experiment.json --out .workbench/reports/experim
 pnpm level:playtest levels/drafts/blank-room.json \
   --scenario levels/scenarios/blank-physics.json \
   --report .workbench/reports/blank-physics
-pnpm workbench
+pnpm dev # game menu → LEVEL BUILDER; Ctrl+C stops game and builder
+pnpm workbench # standalone editor
 ```
 
 No GUI operation is required for agent authoring, rendering or testing. The human

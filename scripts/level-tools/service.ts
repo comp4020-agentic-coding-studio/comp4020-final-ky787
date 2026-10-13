@@ -13,7 +13,7 @@ import { validateDraft } from '../../src/workbench/validation.ts';
 import { DraftStorage, StorageError, draftRecord, MAX_DOCUMENT_BYTES } from './storage.ts';
 import { DraftSessionRegistry } from './session-registry.ts';
 
-export async function startWorkbench(options: { port?: number; draftRoot?: string; dataDir?: string; frontend?: boolean } = {}) {
+export async function startWorkbench(options: { port?: number; draftRoot?: string; dataDir?: string; frontend?: boolean; gameUrl?: () => string | undefined } = {}) {
     const storage = new DraftStorage(options.draftRoot);
     await storage.ready();
     const dataDir = resolve(options.dataDir ?? '.workbench');
@@ -44,18 +44,35 @@ export async function startWorkbench(options: { port?: number; draftRoot?: strin
     let vite: ViteDevServer | undefined;
     const server = createServer(async (req, res) => {
         try {
-            // Reject DNS rebinding and all cross-origin requests, including read/token requests.
-            if (!origin || req.headers.host !== new URL(origin).host || (req.headers.origin && req.headers.origin !== origin)
-                || req.headers['sec-fetch-site'] === 'cross-site') { json(res, 403, { error: 'Workbench requires its printed loopback origin' }); return; }
+            // A clicked game-menu link may cross localhost -> 127.0.0.1. Only the
+            // initial top-level document navigation gets that exception, never APIs.
+            if (!origin || req.headers.host !== new URL(origin).host || (req.headers.origin && req.headers.origin !== origin)) {
+                json(res, 403, { error: 'Workbench requires its printed loopback origin' }); return;
+            }
             const url = new URL(req.url ?? '/', origin);
             const method = req.method ?? 'GET';
+            // Saving the game before leaving can outlast transient user activation.
+            // Trust only the exact configured loopback game origin, including its port.
+            const fromGame = () => {
+                try {
+                    const game = new URL(options.gameUrl?.() ?? ''), referer = new URL(req.headers.referer ?? '');
+                    return game.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(game.hostname)
+                        && !game.username && !game.password && referer.origin === game.origin;
+                } catch { return false; }
+            };
+            const allowedDocument = method === 'GET' && (url.pathname === '/' || url.pathname === '/workbench.html')
+                && req.headers['sec-fetch-mode'] === 'navigate' && req.headers['sec-fetch-dest'] === 'document'
+                && (req.headers['sec-fetch-user'] === '?1' || fromGame());
+            if (req.headers['sec-fetch-site'] === 'cross-site' && !allowedDocument) {
+                json(res, 403, { error: 'Workbench requires its printed loopback origin' }); return;
+            }
             if (url.pathname.startsWith('/api/workbench/')) {
                 if (!['GET', 'HEAD'].includes(method) && (req.headers.origin !== origin || req.headers['x-workbench-token'] !== token)) {
                     json(res, 403, { error: 'Local write authorization and same-origin request required' }); return;
                 }
                 if (url.pathname === '/api/workbench/bootstrap' && method === 'GET') {
                     ensureVisitor(req, res);
-                    json(res, 200, { token, draftRoot: storage.root, dataDir, engineRevision, files: await storage.list() }); return;
+                    json(res, 200, { token, draftRoot: storage.root, dataDir, engineRevision, files: await storage.list(), gameUrl: options.gameUrl?.() }); return;
                 }
                 if (url.pathname === '/api/workbench/files' && method === 'GET') { json(res, 200, { files: await storage.list() }); return; }
                 if (url.pathname === '/api/workbench/drafts') {

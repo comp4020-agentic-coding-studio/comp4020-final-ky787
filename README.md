@@ -95,11 +95,15 @@ Co-op controllers remain honestly mock; this milestone generates no binaries.
 
 ## Run locally
 
-Run `pnpm install`, then `pnpm dev`. This starts Vite on `http://localhost:5173`
-and the real HTTP/API/WebSocket server on port 8080 together. No separate backend
-command or production build is needed for development. Local saves persist in
-the ignored `.local-data/` directory; `DATA_DIR` can select another directory.
-Ctrl+C stops both listeners. Use separate browser profiles or a private window
-for the two players.
+Run `pnpm install`, then `pnpm dev`. This starts Vite on `http://localhost:5173`,
+the real HTTP/API/WebSocket server on port 8080 and the local Level Builder.
+Choose **LEVEL BUILDER** on the game menu to author drafts; focus its canvas and
+hold **WASD** to pan in Edit or State Preview. See the
+[workbench guide](docs/level-workbench.md) for authoring and playtesting.
+No separate backend command or production build is needed for development.
+Local game saves persist in the ignored `.local-data/` directory; `DATA_DIR` can
+select another directory. Builder recovery and sessions stay in `.workbench/`.
+Ctrl+C stops all three listeners. Use separate browser profiles or a private
+window for the two players. The builder is local development only.
 
 For separate terminals, use `pnpm dev:server` and `pnpm dev:client` instead.

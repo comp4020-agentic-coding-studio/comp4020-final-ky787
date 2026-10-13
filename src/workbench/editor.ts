@@ -13,7 +13,9 @@ import type { Box, Vec2 } from '../engine/geometry.ts';
 const $ = <T extends HTMLElement = HTMLElement>(selector: string): T => { const value = document.querySelector<T>(selector); if (!value) throw new Error(`Missing editor element: ${selector}`); return value; };
 const html = (value: unknown) => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
 const option = (value: string, label = value, selected = false) => `<option value="${html(value)}"${selected ? ' selected' : ''}>${html(label)}</option>`;
-const editableTarget = (target: EventTarget | null) => target instanceof HTMLElement && (!!target.closest('input,textarea,select,button') || target.isContentEditable);
+const editableTarget = (target: EventTarget | null) => target instanceof HTMLElement && (!!target.closest('input,textarea,select,button,a,[contenteditable]:not([contenteditable="false"])') || target.isContentEditable);
+const CAMERA_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD']);
+const CAMERA_SPEED = 600; // CSS pixels per second, independent of zoom.
 const overlaps = (a: Box, b: Box) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 const PALETTE: { kind: PaletteKind; label: string; hint: string }[] = [
     { kind: 'static', label: 'Architecture', hint: 'Always solid' }, { kind: 'code', label: 'Code platform', hint: 'Powered / ghost' },
@@ -84,13 +86,14 @@ class WorkbenchEditor {
     private lastTime = performance.now();
     private hashSequence = 0;
     private testRequest = 0;
+    private heldCameraKeys = new Set<string>();
 
     constructor() {
         $('#workbench').innerHTML = `<main class="wb-app">
-          <header class="wb-brand"><div class="identity"><h1>BINARY NINJA</h1><span class="badge">LEVEL WORKBENCH / V1</span></div><div class="meta"><span>LOCAL AUTHORING</span><span>MOCK DRAFTS · CAMPAIGN ISOLATED</span></div></header>
+          <header class="wb-brand"><div class="identity"><h1>BINARY NINJA</h1><span class="badge">LEVEL WORKBENCH / V1</span><a id="back-to-game" hidden style="color:var(--cyan)">Back to game</a></div><div class="meta"><span>LOCAL AUTHORING</span><span>MOCK DRAFTS · CAMPAIGN ISOLATED</span></div></header>
           <nav class="wb-toolbar" aria-label="Editor toolbar"><button id="new">New</button><select id="files" aria-label="Open draft"><option value="">Open draft…</option></select><button id="import-room">Import room</button><button id="save" class="primary">Save</button><button id="save-copy">Save copy</button><button id="export">Export JSON</button><button id="import-json">Open JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden><span class="separator"></span><button id="undo" title="Undo (Ctrl+Z)">Undo</button><button id="redo" title="Redo (Ctrl+Shift+Z)">Redo</button><span class="separator"></span><button id="edit-mode" class="active">Edit</button><button id="preview-mode">State preview</button><button id="play" class="primary">Play from spawn</button><button id="stop" hidden>Stop test</button><button id="coop">Test co-op draft</button></nav>
           <div class="wb-layout"><aside class="wb-sidebar left" aria-label="Object palette and hierarchy"><h2>Object palette</h2><div class="wb-palette">${PALETTE.map(p => `<button draggable="true" data-palette="${p.kind}" title="${p.hint}">${p.label}<span>${p.hint}</span></button>`).join('')}</div><h2>Room hierarchy</h2><input id="search" class="wb-search" aria-label="Search objects" placeholder="Search ID, type or label"><div id="hierarchy" class="wb-hierarchy"></div></aside>
-          <section class="wb-stage" aria-label="World viewport"><canvas id="world" tabindex="0" aria-label="Level canvas. Click to select; drag to move. Shift adds selection. Middle drag pans."></canvas><canvas id="overlay" class="overlay" aria-hidden="true"></canvas><div class="canvas-tools"><button id="fit" title="Fit whole room (F)">Fit room</button><button id="frame" title="Frame selection">Frame selection</button><button id="test-point" title="Test from selected marker or last clicked point">Test here</button><label class="check"><input id="grid" type="checkbox" checked>Grid</label><label class="check"><input id="snap" type="checkbox" checked>Snap</label><label><span class="wb-visually-hidden">Grid size</span><input id="grid-size" type="number" value="20" min="1" max="256" aria-label="Grid size"></label><button id="connect">Connect</button><button id="hitboxes">Hitboxes</button><button id="range">Range</button></div><div id="mode-banner" class="wb-mode-banner"></div></section>
+          <section class="wb-stage" aria-label="World viewport"><canvas id="world" tabindex="0" aria-label="Level canvas. Click to select; drag to move. Shift adds selection. WASD or middle drag pans."></canvas><canvas id="overlay" class="overlay" aria-hidden="true"></canvas><div class="canvas-tools"><button id="fit" title="Fit whole room (F)">Fit room</button><button id="frame" title="Frame selection">Frame selection</button><button id="test-point" title="Test from selected marker or last clicked point">Test here</button><label class="check"><input id="grid" type="checkbox" checked>Grid</label><label class="check"><input id="snap" type="checkbox" checked>Snap</label><label><span class="wb-visually-hidden">Grid size</span><input id="grid-size" type="number" value="20" min="1" max="256" aria-label="Grid size"></label><button id="connect">Connect</button><button id="hitboxes">Hitboxes</button><button id="range">Range</button></div><div id="mode-banner" class="wb-mode-banner"></div></section>
           <aside class="wb-sidebar right" aria-label="Properties and validation"><div id="conflict"></div><div id="inspector"></div><div id="logic"></div><details class="wb-diagnostics" id="diagnostics-panel"><summary id="diagnostic-summary">Validation</summary><div id="diagnostics"></div></details></aside></div>
           <footer class="wb-footer"><span id="status" role="status" aria-live="polite">Connecting to local draft service…</span><span id="document-state"></span></footer></main>`;
         this.canvas = $('#world'); this.overlay = $('#overlay'); this.renderer = new PuzzleRenderer(this.canvas);
@@ -111,8 +114,16 @@ class WorkbenchEditor {
     }
     async bootstrap() {
         try {
-            const boot = await this.request<{ token: string; draftRoot: string; engineRevision: string; files: string[] }>('bootstrap');
+            const boot = await this.request<{ token: string; draftRoot: string; engineRevision: string; files: string[]; gameUrl?: string | null }>('bootstrap');
             this.token = boot.token; this.engineRevision = boot.engineRevision; this.dataDirectory = boot.draftRoot; this.files = boot.files; this.refreshFiles();
+            if (boot.gameUrl) {
+                try {
+                    const url = new URL(boot.gameUrl);
+                    if (url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname) && !url.username && !url.password) {
+                        const link = $<HTMLAnchorElement>('#back-to-game'); link.href = url.href; link.hidden = false;
+                    }
+                } catch { /* Standalone or invalid launch metadata provides no game navigation. */ }
+            }
             const recovery = await this.request<{ document: DraftDocument; name: string; expectedHash: string | null } | null>('recovery');
             if (recovery && confirm(`Recover unsaved work for ${recovery.name}? The canonical draft file will remain unchanged until Save.`)) {
                 this.history.replace(recovery.document); this.name = recovery.name; this.hash = recovery.expectedHash; this.saved = ''; this.refresh(); this.fit(); this.status('Recovered unsaved work. Review before saving.');
@@ -176,7 +187,7 @@ class WorkbenchEditor {
         $<HTMLButtonElement>('#play').disabled = !this.playable; $<HTMLButtonElement>('#coop').disabled = !this.playable || this.mode === 'play';
         $('#document-state').textContent = `${this.dirty ? 'UNSAVED · ' : ''}${this.name} · ${this.currentHash.slice(0, 8) || 'hashing'} · ${Math.round(this.camera.zoom * 100)}%`;
         const recorded = this.recording ? ` Measured path ${this.recording.samples.length} samples${this.recording.draftHash !== this.currentHash ? ' · STALE after document edits' : ''}.` : '';
-        $('#mode-banner').innerHTML = this.mode === 'play' ? `<strong>PHYSICS PREVIEW${this.paused ? ' / PAUSED' : ''}</strong> · Local player ${this.testSlot}; not a two-player validation. A/D move · W/Space jump · E use/carry · hold pointer to grapple.${this.testAt ? ' Section-only start.' : ''}` : this.mode === 'preview' ? `<strong>${this.forcedMode ? 'FORCED OUTPUT DIAGNOSTIC' : 'EVALUATED INPUT STATE'}</strong> · ${this.forcedMode ? 'Arbitrary geometry inspection; this is not a reachable state or a solved puzzle.' : 'Saved input values use the actual controller. Physics is stopped.'}${recorded}` : `<strong>${this.palette ? `PLACE ${PALETTE.find(p => p.kind === this.palette)?.label.toUpperCase()}` : this.connection ? this.connectionSource ? `CONNECT ${html(this.connectionSource)} → select destination` : 'CONNECT / select a source device' : 'EDIT'}</strong> · ${this.runtimeError ? html(this.runtimeError) : !this.playable ? 'Incomplete draft: outline preview. Resolve blocking diagnostics for game rendering and play.' : 'Click/drag objects · Shift multi-select · middle drag or Space+drag pans · wheel zooms · F fits.'}${recorded}`;
+        $('#mode-banner').innerHTML = this.mode === 'play' ? `<strong>PHYSICS PREVIEW${this.paused ? ' / PAUSED' : ''}</strong> · Local player ${this.testSlot}; not a two-player validation. A/D move · W/Space jump · E use/carry · hold pointer to grapple.${this.testAt ? ' Section-only start.' : ''}` : this.mode === 'preview' ? `<strong>${this.forcedMode ? 'FORCED OUTPUT DIAGNOSTIC' : 'EVALUATED INPUT STATE'}</strong> · ${this.forcedMode ? 'Arbitrary geometry inspection; this is not a reachable state or a solved puzzle.' : 'Saved input values use the actual controller. Physics is stopped.'} WASD pans · wheel zooms.${recorded}` : `<strong>${this.palette ? `PLACE ${PALETTE.find(p => p.kind === this.palette)?.label.toUpperCase()}` : this.connection ? this.connectionSource ? `CONNECT ${html(this.connectionSource)} → select destination` : 'CONNECT / select a source device' : 'EDIT'}</strong> · ${this.runtimeError ? html(this.runtimeError) : !this.playable ? 'Incomplete draft: outline preview. Resolve blocking diagnostics for play. WASD or Space+drag pans · wheel zooms.' : 'Click/drag objects · Shift multi-select · WASD, middle drag or Space+drag pans · wheel zooms · F fits.'}${recorded}`;
         for (const button of document.querySelectorAll<HTMLButtonElement>('[data-palette]')) button.classList.toggle('active', button.dataset.palette === this.palette);
         $('#connect').classList.toggle('active', this.connection); $('#hitboxes').classList.toggle('active', this.hitboxes); $('#range').classList.toggle('active', this.range);
         $<HTMLInputElement>('#snap').checked = this.document.editor.snap; $<HTMLInputElement>('#grid-size').value = String(this.document.editor.grid);
@@ -347,10 +358,20 @@ class WorkbenchEditor {
         this.canvas.addEventListener('pointerdown', this.pointerDown); this.canvas.addEventListener('pointermove', this.pointerMove); this.canvas.addEventListener('pointerup', this.pointerUp); this.canvas.addEventListener('pointercancel', () => { if (this.drag) { this.history.document = this.drag.before; this.drag = null; this.refresh(); } });
         this.canvas.addEventListener('contextmenu', event => event.preventDefault());
         this.canvas.addEventListener('wheel', event => { if (this.mode === 'play') return; event.preventDefault(); const before = this.worldPoint(event); this.camera.zoom = Math.max(.06, Math.min(4, this.camera.zoom * Math.exp(-event.deltaY * .0015))); const after = this.worldPoint(event); this.camera.x += before.x - after.x; this.camera.y += before.y - after.y; this.updateToolbar(); }, { passive: false });
+        const retainControlKeys = (event: KeyboardEvent) => {
+            if (this.mode !== 'play' || !editableTarget(event.target) && !this.editorModalOpen()) return;
+            this.clearEditorMovement(); this.releaseGameplayInput();
+            // Stop the engine's global handlers, retaining native typing, Tab and link activation.
+            event.stopPropagation();
+        };
+        window.addEventListener('keydown', retainControlKeys, true);
+        window.addEventListener('keyup', retainControlKeys, true);
         window.addEventListener('keydown', event => {
-            if (editableTarget(event.target)) return;
+            if (editableTarget(event.target) || this.editorModalOpen()) { this.clearEditorMovement(); return; }
             if (event.code === 'Space' && this.mode !== 'play') { this.heldSpace = true; event.preventDefault(); }
             if (this.mode === 'play') { if (event.code === 'Escape') this.stopTest(); return; }
+            if (event.ctrlKey || event.metaKey || event.altKey) this.heldCameraKeys.clear();
+            else if (CAMERA_KEYS.has(event.code)) { if (!event.repeat) this.heldCameraKeys.add(event.code); event.preventDefault(); return; }
             if (event.code === 'Escape') { this.palette = null; this.connection = false; this.connectionSource = null; this.selection.clear(); this.renderInspector(); this.renderHierarchy(); this.renderLogic(); this.updateToolbar(); }
             if ((event.ctrlKey || event.metaKey) && event.code === 'KeyS') { event.preventDefault(); void this.save(); }
             if (this.mode !== 'edit') return;
@@ -363,9 +384,15 @@ class WorkbenchEditor {
             const delta = event.code === 'ArrowLeft' ? [-1, 0] : event.code === 'ArrowRight' ? [1, 0] : event.code === 'ArrowUp' ? [0, -1] : event.code === 'ArrowDown' ? [0, 1] : null;
             if (delta && this.selection.size) { event.preventDefault(); const step = event.shiftKey ? this.document.editor.grid : 1; this.mutate(d => translateEntities(d, this.movableSelection(), { x: delta[0] * step, y: delta[1] * step })); }
         });
-        window.addEventListener('keyup', event => { if (event.code === 'Space') this.heldSpace = false; }); window.addEventListener('blur', () => { this.heldSpace = false; this.input?.releaseAll(); });
+        window.addEventListener('keyup', event => { this.heldCameraKeys.delete(event.code); if (event.code === 'Space') this.heldSpace = false; });
+        window.addEventListener('blur', () => { this.clearEditorMovement(); this.input?.releaseAll(); });
+        document.addEventListener('visibilitychange', () => { this.clearEditorMovement(); this.input?.releaseAll(); });
+        document.addEventListener('focusin', event => { if (editableTarget(event.target)) { this.clearEditorMovement(); this.releaseGameplayInput(); } });
         window.addEventListener('beforeunload', event => { if (this.dirty) { event.preventDefault(); event.returnValue = ''; } });
     }
+    clearEditorMovement() { this.heldCameraKeys.clear(); this.heldSpace = false; }
+    releaseGameplayInput() { this.input?.releaseAll(); this.input?.clearActions(); }
+    editorModalOpen() { return !!document.querySelector('.wb-modal,dialog[open],[role="dialog"][aria-modal="true"]'); }
     movableSelection() { return new Set([...this.selection].filter(id => !this.document.editor.locked.includes(id))); }
     duplicate() { if (!this.selection.size || this.mode !== 'edit') return; this.mutate(d => { this.selection = new Set(duplicateEntities(d, this.movableSelection())); }); }
     deleteSelection() { if (!this.selection.size || this.mode !== 'edit') return; const ids = this.movableSelection(); const connected = this.document.bindings.filter(b => ids.has(b.target)); const sources = this.document.geometry.objects.filter(o => ids.has(o.id) && o.type === 'device'); if ((connected.length || sources.length) && !confirm(`Delete ${ids.size} object(s)? ${connected.length} target binding(s) will be removed. Logic referencing deleted controls remains visible as unresolved diagnostics.`)) return; this.mutate(d => deleteEntities(d, ids)); this.selection.clear(); this.renderInspector(); this.renderHierarchy(); this.renderLogic(); }
@@ -440,13 +467,14 @@ class WorkbenchEditor {
         this.refresh();
     }
     async startTest(options: { slot?: 1 | 2; at?: Vec2; scenario?: string } = {}) {
+        this.clearEditorMovement();
         if (!this.playable) throw new Error('Blocking validation diagnostics prevent playtesting.');
         if (this.mode === 'play') this.stopTest();
         try {
             const request = ++this.testRequest, snapshot = cloneDraft(this.document), slot = options.slot ?? 1, runtime = createRuntime(snapshot, slot, options.at ? { start: options.at } : {});
             const hash = await draftHash(snapshot);
             if (request !== this.testRequest || serializeDraft(snapshot) !== serializeDraft(this.document)) throw new Error('Draft changed while starting the test; start again from the current document.');
-            this.testSlot = slot; this.testAt = options.at; this.runtime = runtime; this.mode = 'play'; this.paused = false; this.accumulator = 0;
+            this.clearEditorMovement(); this.testSlot = slot; this.testAt = options.at; this.runtime = runtime; this.mode = 'play'; this.paused = false; this.accumulator = 0;
             this.palette = null; this.connection = false; this.renderer.room(runtime.world);
             this.recording = { version: 1, draftHash: hash, engineRevision: this.engineRevision, scenario: options.scenario ?? (options.at ? 'editor-test-from-here' : 'editor-play-from-spawn'), sectionOnly: !!options.at, samples: [], events: [] }; this.recordedFrames = 0; this.recordingElapsed = 0;
             this.input = new InputManager(true); this.input.attach(this.canvas, $('.wb-stage')); this.canvas.focus(); this.renderInspector(); this.renderLogic(); this.updateToolbar(); this.status('Physics test running in an isolated runtime. Escape or Stop returns to authored geometry.');
@@ -459,6 +487,7 @@ class WorkbenchEditor {
         await this.startTest({ slot: this.testSlot, at }).catch(() => {});
     }
     stopTest() {
+        this.clearEditorMovement();
         this.testRequest++;
         if (this.mode !== 'play') return;
         this.input?.dispose(); this.input = null; this.mode = 'edit'; this.paused = false; this.accumulator = 0;
@@ -490,7 +519,7 @@ class WorkbenchEditor {
         try { const snapshot = await this.request<{ hash: string }>('snapshots', { document: this.document }); const url = `/workbench-runner.html?coopHash=${encodeURIComponent(snapshot.hash)}`; const child = window.open(url, '_blank'); this.status(`Frozen draft ${snapshot.hash.slice(0, 12)}. Co-op host opens separately; partner must use a private window or another browser identity.`); if (!child) this.modal('Co-op draft ready', `<p>A validated snapshot is frozen at <code>${html(snapshot.hash)}</code>.</p><p><a href="${url}" target="_blank" rel="noopener">Open co-op host</a>. The partner joins its room code in a private window. Ordinary tabs share an identity.</p>`); }
         catch (e) { this.status(`Co-op snapshot failed: ${String(e)}`); }
     }
-    modal(title: string, content: string) { const overlay = document.createElement('div'); overlay.className = 'wb-modal'; overlay.innerHTML = `<section class="wb-dialog" role="dialog" aria-modal="true" aria-label="${html(title)}"><h2>${html(title)}</h2>${content}<div class="wb-actions"><button data-close>Close</button></div></section>`; document.body.append(overlay); overlay.querySelector<HTMLButtonElement>('[data-close]')!.onclick = () => overlay.remove(); overlay.querySelector<HTMLButtonElement>('button')?.focus(); return overlay; }
+    modal(title: string, content: string) { this.clearEditorMovement(); const overlay = document.createElement('div'); overlay.className = 'wb-modal'; overlay.innerHTML = `<section class="wb-dialog" role="dialog" aria-modal="true" aria-label="${html(title)}"><h2>${html(title)}</h2>${content}<div class="wb-actions"><button data-close>Close</button></div></section>`; document.body.append(overlay); overlay.querySelector<HTMLButtonElement>('[data-close]')!.onclick = () => overlay.remove(); overlay.querySelector<HTMLButtonElement>('button')?.focus(); return overlay; }
     importDialog() {
         const modal = this.modal('Import a trusted room copy', '<p>Retain geometry, both player slots and the allowlisted controller. Copies are authored drafts. Campaign files and evidence remain unchanged.</p><div class="wb-actions"><button data-import="race-condition">RACE CONDITION</button><button data-import="crossfeed-vault">CROSSFEED VAULT</button><button data-import="relay-lab">RELAY LAB</button></div>');
         for (const button of modal.querySelectorAll<HTMLButtonElement>('[data-import]')) button.onclick = async () => { if (this.dirty && !confirm('Discard unsaved editor changes and open the imported copy?')) return; try { const factory = button.dataset.import!, record = await this.request<StoredDraft>('import', { controller: factory }); this.loadDocument(record.document); this.name = `${factory}-copy.json`; this.saved = ''; modal.remove(); this.status(`Imported ${factory}. Save the copy to exchange edits with CLI tools.`); } catch (e) { this.status(String(e)); } };
@@ -576,6 +605,15 @@ class WorkbenchEditor {
     }
     animate = (time: number) => {
         const elapsed = Math.min(.1, (time - this.lastTime) / 1000); this.lastTime = time;
+        if (this.mode !== 'play' && this.heldCameraKeys.size) {
+            if (document.hidden || editableTarget(document.activeElement) || this.editorModalOpen() || this.drag) this.clearEditorMovement();
+            else {
+                const x = Number(this.heldCameraKeys.has('KeyD')) - Number(this.heldCameraKeys.has('KeyA'));
+                const y = Number(this.heldCameraKeys.has('KeyS')) - Number(this.heldCameraKeys.has('KeyW'));
+                const distance = CAMERA_SPEED * elapsed / (this.camera.zoom * (Math.hypot(x, y) || 1));
+                this.camera.x += x * distance; this.camera.y += y * distance;
+            }
+        }
         if (this.mode === 'play' && this.input && this.runtime && !this.paused) {
             if (this.input.takeAction('reset')) {
                 const world = this.runtime.world, before = world.events.length; world.respawn();
