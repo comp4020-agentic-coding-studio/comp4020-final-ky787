@@ -1,4 +1,4 @@
-import type { CubeId, CubeAction, SharedRoom, Slot } from './protocol.ts';
+import type { CubeId, CubeAction, SessionRoom, Slot } from './protocol.ts';
 
 export type PredictedAction = CubeAction | 'cube-drop' | 'switch';
 export interface PendingAction {
@@ -9,7 +9,7 @@ export interface ActionResult extends PendingAction {
     accepted: boolean; receivedAt: number; rttMs: number;
 }
 
-/** Local feedback ledger. Never merged into SharedRoom or written to persistence. */
+/** Local feedback ledger. Never merged into SessionRoom or written to persistence. */
 export class LocalPrediction {
     cube: PendingAction | null = null;
     switch: PendingAction | null = null;
@@ -21,7 +21,7 @@ export class LocalPrediction {
         this[key] = { kind, cubeId, seq, epoch, generation, predictedAt: now, sentAt: now };
         return true;
     }
-    resolve(seq: number, generation: number, accepted: boolean, room: SharedRoom, slot: Slot, now: number): boolean {
+    resolve(seq: number, generation: number, accepted: boolean, room: SessionRoom, slot: Slot, now: number): boolean {
         const key = this.cube?.seq === seq ? 'cube' : this.switch?.seq === seq ? 'switch' : null;
         const pending = key && this[key];
         if (!key || !pending || pending.generation !== generation) return false;

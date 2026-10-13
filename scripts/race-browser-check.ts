@@ -143,6 +143,10 @@ async function launchDeck(p: Cdp) {
     await key(runner,'KeyD',false); await sleep(160); await shot(runner,'right-deck');
     check('runner crossed all five blocks, no floor or death shortcut', (await snapshot(runner)).deaths === traversalDeaths);
     await pickup(runner,'cubeB'); await place(runner,'cubeB',3470,'return');
+    // A valid drop can leave the body just outside the plate: align() accepts
+    // +/-7 around 3470-43, but body occupancy requires a strict <48 distance.
+    // Step onto RETURN with real input before asserting its local camera reveal.
+    await align(runner,3435);
     await wait(runner, 'local body on RETURN reveals the bridge', s => s.camera.id === 'return');
     await sleep(700); await shot(runner, 'return-camera');
     await hop(runner,3580); await wait(operator,'cube holds return', s => state(s).levelState.inputs.returnOccupied);

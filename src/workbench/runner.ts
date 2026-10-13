@@ -15,9 +15,22 @@ const query = new URL(location.href).searchParams;
 const input = new InputManager(true), renderer = new PuzzleRenderer(canvas);
 const bootstrap = await fetch('/api/workbench/bootstrap').then(r => r.json()) as { token: string; engineRevision: string; files: string[] };
 const latest = document.querySelector<HTMLSelectElement>('#latest')!;
+const restartButton = document.querySelector<HTMLButtonElement>('#restart')!;
+latest.add(new Option('Choose saved draft', ''));
 for (const file of bootstrap.files) latest.add(new Option(file, file));
+restartButton.disabled = true;
+latest.addEventListener('change', () => { restartButton.disabled = !latest.value || !session?.client.isHost; });
+latest.addEventListener('focus', () => { void (async () => {
+    const response = await fetch('/api/workbench/files');
+    if (!response.ok) throw new Error('Could not refresh saved drafts');
+    const { files } = await response.json() as { files: string[] }, selected = latest.value;
+    latest.replaceChildren(new Option('Choose saved draft', ''));
+    for (const file of files) latest.add(new Option(file, file));
+    latest.value = files.includes(selected) ? selected : '';
+    restartButton.disabled = !latest.value || !session?.client.isHost;
+})().catch(showError); });
 let runtime: DraftRuntime | null = null, session: DraftSession | null = null, draftDoc: DraftDocument | null = null;
-let hash = '', scenario = 'manual', running = false, ready = false, failed = '', lastWorld: PuzzleWorld | null = null, overview = false;
+let hash = '', scenario = query.get('scenario') ?? 'manual', running = false, ready = false, failed = '', lastWorld: PuzzleWorld | null = null, overview = false;
 let elapsed = 0, frames = 0, last = 0, accumulated = 0;
 const trajectory: { time: number; player: Vec2; grounded: boolean; groundId: string | null; rope: string; cubes: unknown; signals: unknown }[] = [];
 const events: { time: number; kind: string; value: unknown }[] = [];
@@ -60,7 +73,7 @@ function connect(hashToStart?: string, code?: string) {
     session = new DraftSession(() => {
         if (!session) return;
         if (session.world) { draftDoc = session.document; ready = true; }
-        const c = session.client; status.textContent = `${c.status} · CODE ${c.room?.code ?? '…'} · PLAYER ${c.slot ?? '?'} · ${c.room?.completed ? 'COMPLETE' : c.room?.exitUnlocked ? 'EXIT READY' : 'DRAFT CO-OP'} · ${c.room?.draft?.hash.slice(0, 10) ?? ''} / generation ${c.room?.levelInstance ?? '?'}`;
+        const c = session.client; restartButton.disabled = !latest.value || !c.isHost; status.textContent = `${c.status} · CODE ${c.room?.code ?? '…'} · PLAYER ${c.slot ?? '?'} · ${c.room?.completed ? 'COMPLETE' : c.room?.exitUnlocked ? 'EXIT READY' : 'DRAFT CO-OP'} · ${c.room?.draft?.hash.slice(0, 10) ?? ''} / generation ${c.room?.levelInstance ?? '?'}`;
     }, showError);
     if (code) session.join(code); else if (hashToStart) session.start(hashToStart);
     input.releaseAll(); canvas.focus();
@@ -92,7 +105,10 @@ window.document.querySelector('#overview')!.addEventListener('click', () => { ov
 window.document.querySelector('#recording')!.addEventListener('click', () => download(recording(), `draft-recording-${hash.slice(0, 10)}.json`));
 window.document.querySelector('#restart')!.addEventListener('click', () => { void (async () => {
     if (!session?.client.isHost) throw new Error('Only the draft host can restart');
-    const saved = await fetch(`/api/workbench/drafts?name=${encodeURIComponent(latest.value)}`).then(r => r.json());
+    if (!latest.value) throw new Error('Choose the saved draft to restart');
+    const savedResponse = await fetch(`/api/workbench/drafts?name=${encodeURIComponent(latest.value)}`);
+    const saved = await savedResponse.json();
+    if (!savedResponse.ok) throw new Error(saved.error ?? 'Could not load saved draft');
     const response = await fetch('/api/workbench/snapshots', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Workbench-Token': bootstrap.token }, body: JSON.stringify({ document: saved.document }) });
     const frozen = await response.json(); if (!response.ok) throw new Error(frozen.error);
     session.restart(frozen.hash);

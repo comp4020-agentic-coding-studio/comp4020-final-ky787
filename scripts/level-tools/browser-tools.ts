@@ -8,7 +8,9 @@ import type { Box } from '../../src/engine/geometry.ts';
 
 async function environment(document: DraftDocument, reports: string) {
     const harness = await coopBrowser({ shots: reports, internalLabs: false, readyExpression: '!!globalThis.draftRunner?.ready' });
-    const app = await startWorkbench({ port: 0, dataDir: join(harness.temporary, 'workbench') });
+    let app: Awaited<ReturnType<typeof startWorkbench>>;
+    try { app = await startWorkbench({ port: 0, dataDir: join(harness.temporary, 'workbench') }); }
+    catch (error) { await harness.cleanup(); throw error; }
     let closing: Promise<void> | undefined;
     const close = () => closing ??= (async () => { await harness.cleanup(); await app.close(); })();
     const signal = () => { void close().finally(() => { process.exitCode = 130; }); };
@@ -68,7 +70,7 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
         let code: string | undefined;
         for (const actor of [...scenario.actors].sort((a, b) => a.slot - b.slot)) {
             const query = scenario.mode === 'single' ? `hash=${env.frozen.hash}&slot=${actor.slot}` : actor.slot === 1 ? `coopHash=${env.frozen.hash}` : `code=${code}`;
-            const page = await env.harness.page(`${env.app.origin}/workbench-runner.html?${query}`, env.debuggerUrl); actors.set(actor.id, page);
+            const page = await env.harness.page(`${env.app.origin}/workbench-runner.html?${query}&scenario=${encodeURIComponent(scenario.id)}`, env.debuggerUrl); actors.set(actor.id, page);
             if (scenario.mode === 'single') await page.read(`draftRunner.start(${JSON.stringify({ ...actor.start, scenario: scenario.id })})`);
             else if (actor.slot === 1) code = await page.read<string>('draftRunner.observe().session.code');
         }
@@ -81,7 +83,7 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
             failedStep = step.label; checkDeadline();
             // Actions in one step may hold controls for both actors concurrently.
             for (const a of step.actions ?? []) await action(a);
-            if (step.waitMs) await env.harness.sleep(step.waitMs);
+            if (step.waitMs) { await env.harness.sleep(step.waitMs); checkDeadline(); }
             if (step.wait) await wait(actors.get(step.wait.actor)!, step.wait.condition, step.wait.timeoutMs);
             const observed = Object.fromEntries(await Promise.all([...actors].map(async ([id, p]) => [id, await observe(p)])));
             for (const assertion of step.assert ?? []) if (!conditionMatches(observed[assertion.actor], assertion.condition)) throw new Error(`Assertion failed: ${JSON.stringify(assertion)}; observed ${JSON.stringify(observed[assertion.actor])}`);
@@ -92,8 +94,15 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
             for (const [id, page] of actors) if (!conditionMatches(await observe(page), { path: 'completed', equals: true }))
                 throw new Error(`Full-room scope requires physical completion for ${id}; partial assertions cannot certify a full room`);
         }
-        browserErrors([...actors.values()]); pass = true; failedStep = null;
-    } catch (caught) { error = caught instanceof Error ? caught.message : String(caught); results.push({ label: failedStep ?? 'startup', pass: false, error }); }
+        checkDeadline(); pass = true; failedStep = null;
+    } catch (caught) {
+        error = caught instanceof Error ? caught.message : String(caught);
+        const observed = Object.fromEntries(await Promise.all([...actors].map(async ([id, page]) => {
+            try { return [id, await observe(page)]; }
+            catch (failure) { return [id, { observationError: String(failure) }]; }
+        })));
+        results.push({ label: failedStep ?? 'startup', pass: false, error, observed });
+    }
     finally {
         for (const [id, p] of actors) {
             try { await screenshot(p, join(directory, `${pass ? 'final' : 'failure'}-${id}.png`)); await writeFile(join(directory, `trajectory-${id}.json`), JSON.stringify(await p.read('draftRunner.recording()'), null, 2) + '\n'); }

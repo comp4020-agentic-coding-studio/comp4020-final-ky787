@@ -78,6 +78,7 @@ const factories = {
     'crumble-lab': (r: SharedRoom<'crumble-lab'>, c: CoopClient) => new CrumbleLabAuthority(r, c),
 };
 export function createCoopAuthority(room: SharedRoom, client: CoopClient): CoopAuthority {
+    if (room.level === 'workbench') throw new Error('Use the registered draft authority for workbench sessions');
     const factory = factories[room.level] as (room: SharedRoom, client: CoopClient) => CoopAuthority;
     const authority = factory(room, client);
     authority.reset = () => client.localReset();

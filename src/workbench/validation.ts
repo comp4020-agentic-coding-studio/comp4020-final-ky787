@@ -1,4 +1,5 @@
 import { importDraft } from './imports.ts';
+import { draftFrame, draftSignal, evaluateDraft, initialDeviceValues } from './evaluate.ts';
 import { boxesOverlap } from '../engine/geometry.ts';
 import { DRAFT_ID, DRAFT_LIMITS, objectBounds, objectPort, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftValidation } from './model.ts';
 export type Diagnostic = DraftDiagnostic;
@@ -119,19 +120,40 @@ export function validateDraft(value: unknown): DraftValidation {
     for (const [name, gates] of pairs) { if (gates.length !== 2) error('relay.pair', `Relay pair '${name}' requires exactly two gates.`, gates[0]?.id); else { const feeds = gates.map(g => document.bindings.find(b => b.target === g.id)); if (feeds[0] && feeds[1] && (feeds[0].output !== feeds[1].output || !!feeds[0].invert !== !!feeds[1].invert)) error('relay.power', `Both ends of relay pair '${name}' must share the same power binding.`, gates[0].id); } }
     for (const r of document.presentation.cameraReveals) { if (byId.get(r.source)?.type !== 'device') error('camera.source', `Camera reveal source '${r.source}' must be a device.`, r.source); for (const p of r.platformIds ?? []) if (byId.get(p)?.type !== 'platform') error('camera.target', `Camera target '${p}' is not a platform.`, r.source); if (!r.bounds && !r.platformIds?.length) error('camera.empty', 'Camera reveal requires target platforms or bounds.', r.source); }
     for (const o of objects) {
+        if (o.type === 'device' && o.kind !== 'toggle' && o.kind !== 'terminal' && (o.initial !== undefined || o.checkpoint !== undefined)) error('device.stateful-role', 'Initial values and checkpoint commitments belong to toggle/terminal controls, not occupancy sensors.', o.id);
+        if (o.type === 'breakpoint' && document.controller.kind === 'declarative' && o.activationControl) {
+            const control = byId.get(o.activationControl);
+            if (control?.type !== 'device' || (control.kind !== 'toggle' && control.kind !== 'terminal') || control.checkpoint !== o.checkpoint) error('checkpoint.association', 'Breakpoint activation must reference a toggle/terminal that commits the same checkpoint.', o.id);
+        }
         if (o.type === 'checkpoint') { if (objects.filter(c => c.type === 'checkpoint' && c.slot === o.slot && c.checkpoint === o.checkpoint).length > 1) error('checkpoint.duplicate', `Player ${o.slot} has duplicate '${o.checkpoint}' checkpoint positions.`, o.id); }
         if ((o.type === 'breakpoint' || o.type === 'device') && o.checkpoint) for (const slot of [1, 2]) if (!objects.some(c => c.type === 'checkpoint' && c.slot === slot && c.checkpoint === o.checkpoint)) error('checkpoint.reference', `Checkpoint '${o.checkpoint}' needs a Player ${slot} respawn centre.`, o.id);
         if (o.type === 'breakpoint' && o.activationControl && byId.get(o.activationControl)?.type !== 'device') error('checkpoint.control', `Breakpoint activation control '${o.activationControl}' is missing.`, o.id);
         if (o.type === 'platform' && o.kind === 'static' && o.hookable) warn('platform.static-hook', 'Static architecture remains unhookable; use a controlled code platform for hooks.', o.id);
     }
     for (const id of [...document.editor.hidden, ...document.editor.locked]) if (!ids.has(id)) error('editor.reference', `Editor metadata references missing ID '${id}'.`, id);
+    // Geometry diagnostics use the same initial values, evaluator and resolved
+    // binding inversion as runtime. Unknown/cyclic logic is never guessed here.
+    const canEvaluateDefaults = document.controller.kind === 'declarative' && !diagnostics.some(d => d.severity === 'error'
+        && (d.code.startsWith('logic.') || d.code.startsWith('binding.') || d.code === 'id.duplicate' || d.code === 'device.stateful-role'));
+    const initialValues = canEvaluateDefaults ? initialDeviceValues(document) : undefined;
+    const initialSignals = initialValues ? draftFrame(document, initialValues, evaluateDraft(document, initialValues)).signals : undefined;
+    const defaultActivation = (objectId: string, unbound: boolean): boolean | undefined => {
+        const binding = document.bindings.find(b => b.target === objectId && b.property === 'active');
+        return binding ? initialSignals?.[draftSignal(binding.id)] : unbound;
+    };
     const architecture = objects.filter(o => o.type === 'platform' && o.kind === 'static');
+    const initialCode = objects.filter(o => o.type === 'platform' && o.kind === 'code' && defaultActivation(o.id, false) === true);
     for (const o of objects) {
         if (o.type === 'spawn' || o.type === 'checkpoint') {
             const b = objectBounds(o); if (b.x < 0 || b.y < 0 || b.x + b.w > document.geometry.width || b.y + b.h > document.geometry.height) error('spawn.bounds', 'Player centre is outside safe room bounds.', o.id);
             if (architecture.some(p => boxesOverlap(b, objectBounds(p)))) error('spawn.intersection', 'Player body intersects static architecture. Move the centre clear of the floor/wall.', o.id);
+            const powered = initialCode.find(p => boxesOverlap(b, objectBounds(p)));
+            if (powered) error('spawn.powered-intersection', `Player body intersects code platform '${powered.id}', powered by the default input configuration. Move the centre or change the initial controls.`, o.id);
         }
-        if (o.type === 'cube' && objects.some(h => (h.type === 'hazard' || h.type === 'firewall' && !document.bindings.some(b => b.target === h.id)) && boxesOverlap(objectBounds(o), objectBounds(h)))) warn('cube.hazard', 'Cube home intersects an always-active reset hazard.', o.id);
+        if (o.type === 'cube') {
+            const hazard = objects.find(h => (h.type === 'hazard' || h.type === 'firewall' && defaultActivation(h.id, true) === true) && boxesOverlap(objectBounds(o), objectBounds(h)));
+            if (hazard) warn('cube.hazard', `Cube home intersects reset hazard '${hazard.id}', ${document.bindings.some(b => b.target === hazard.id && b.property === 'active') ? 'powered by the default input configuration' : 'always active'}. Test the resulting reset behavior.`, o.id);
+        }
         if (o.type === 'relay') { const b = { x: o.exitSide > 0 ? o.x + o.w + 18 : o.x - 40, y: o.y + o.h - 34, w: 22, h: 34 }; if (architecture.some(p => boxesOverlap(b, objectBounds(p))) || b.x < 0 || b.x + b.w > document.geometry.width) warn('relay.obstructed', 'Relay destination is potentially obstructed by static geometry or room bounds; test actual transit.', o.id); }
     }
     if (document.controller.kind === 'builtin') {

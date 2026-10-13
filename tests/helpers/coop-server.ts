@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { once } from 'node:events';
 import { WebSocket } from 'ws';
 import { afterEach } from 'vitest';
-import type { CoopLevelId, ServerMessage } from '../../src/coop/protocol.ts';
+import type { SessionLevelId, ServerMessage } from '../../src/coop/protocol.ts';
 
 export const cleanups: (() => Promise<unknown>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
@@ -26,7 +26,7 @@ export async function identity(url: string) {
     const res = await fetch(`${url}/api/identity`);
     return { cookie: res.headers.get('set-cookie')!.split(';')[0], id: (await res.json()).id as string };
 }
-export async function connect<L extends CoopLevelId = 'pairing-bay'>(url: string, cookie: string) {
+export async function connect<L extends SessionLevelId = 'pairing-bay'>(url: string, cookie: string) {
     const ws = new WebSocket(url.replace('http', 'ws') + '/ws', { headers: { Cookie: cookie, Origin: url } });
     const messages: ServerMessage<L>[] = [];
     let levelInstance: number | undefined;

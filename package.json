@@ -28,7 +28,14 @@
     "check:multiplayer-boost": "node scripts/labs-browser-check.ts boost-lab",
     "check:multiplayer-firewall": "node scripts/labs-browser-check.ts firewall-lab",
     "check:race": "node scripts/race-browser-check.ts",
-    "check:campaign": "node scripts/campaign-browser-check.ts"
+    "check:campaign": "node scripts/campaign-browser-check.ts",
+    "workbench": "node scripts/level-tools/workbench.ts",
+    "level:new": "node scripts/level-tools/cli.ts new",
+    "level:import": "node scripts/level-tools/cli.ts import",
+    "level:validate": "node scripts/level-tools/cli.ts validate",
+    "level:render": "node scripts/level-tools/cli.ts render",
+    "level:playtest": "node scripts/level-tools/cli.ts playtest",
+    "check:workbench": "node scripts/level-tools/browser-check.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

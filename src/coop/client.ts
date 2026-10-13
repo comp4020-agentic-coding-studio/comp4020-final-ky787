@@ -1,10 +1,10 @@
 import { isCampaignLevel, type CampaignLevel } from './campaign.ts';
 import type { PlayerState } from '../engine/physics.ts';
-import { cubeEntries, newerRoom, normalizeCode, websocketUrl, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SharedRoom, type Slot } from './protocol.ts';
+import { cubeEntries, newerRoom, normalizeCode, websocketUrl, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SessionRoom, type Slot, type DraftId } from './protocol.ts';
 import { RemoteAvatar, RemoteCube } from './remote.ts';
 import { LocalPrediction, type PredictedAction } from './prediction.ts';
 export class CoopClient {
-    room: SharedRoom | null = null;
+    room: SessionRoom | null = null;
     roomReceivedAt = 0;
     private playerDiscontinuity?: Discontinuity;
     private cubeDiscontinuities: CubeMap<Discontinuity> = {};
@@ -27,7 +27,7 @@ export class CoopClient {
     private cubeSentAt: CubeMap<number> = {};
     private placements: CubeMap<CubePlacement> = {};
     private socket: WebSocket | null = null;
-    private intent: Extract<ClientMessage, { type: 'create' | 'create-party' | 'join' }> = { type: 'create-party' };
+    private intent: Extract<ClientMessage, { type: 'create' | 'create-party' | 'create-draft' | 'join' }> = { type: 'create-party' };
     private retry?: ReturnType<typeof setTimeout>;
     private heartbeat?: ReturnType<typeof setInterval>;
     private deadline?: ReturnType<typeof setTimeout>;
@@ -39,14 +39,16 @@ export class CoopClient {
     private moveSeq = 0;
     private lastSentAt = 0;
     private plate: Plate = null;
+    private draftDevices = '';
+    private draftCubeDevices = new Map<DraftId, string>();
     private exitSent = false;
-    constructor(private onRoom: (room: SharedRoom, initial: boolean) => void, private onStatus: () => void) {}
+    constructor(private onRoom: (room: SessionRoom, initial: boolean) => void, private onStatus: () => void, private storageKey = 'bn_coop_room') {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
-    get isHost(): boolean { return !!this.room?.party && this.slot === 1; }
+    get isHost(): boolean { return !!(this.room?.party || this.room?.draft) && this.slot === 1; }
     get playing(): boolean { return this.connected && (!this.room!.party || this.room!.party.phase === 'playing'); }
     get ownsCube(): boolean { return this.ownsCubeFor('cube'); }
     ownsCubeFor(id: CubeId): boolean { return this.playing && this.room!.cubes[id]?.physicsAuthority === this.slot; }
-    private acceptCubeRoom(room: SharedRoom, initial = false): void {
+    private acceptCubeRoom(room: SessionRoom, initial = false): void {
         if (initial) { this.replicas = {}; this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; }
         for (const [id, cube] of cubeEntries(room.cubes)) {
             const old = this.room?.cubes[id], replica = this.cubeReplica(id);
@@ -57,14 +59,14 @@ export class CoopClient {
             }
             if (initial || cube.epoch !== old?.epoch) {
                 replica.reset(cube, performance.now());
-                this.cubeSeq[id] = 0; this.cubeSentAt[id] = 0; delete this.placements[id];
+                this.cubeSeq[id] = 0; this.cubeSentAt[id] = 0; delete this.placements[id]; if (id.startsWith('draft:')) this.draftCubeDevices.delete(id as DraftId);
                 this.cubeLastAt = cube.transform ? performance.now() : 0;
             } else if (cube.transform) replica.push(cube.transform, cube.epoch, cube.seq, performance.now());
         }
     }
-    remembered(): string | null { try { return normalizeCode(sessionStorage.getItem('bn_coop_room') ?? ''); } catch { return null; } }
+    remembered(): string | null { try { return normalizeCode(sessionStorage.getItem(this.storageKey) ?? ''); } catch { return null; } }
     private remember(code: string | null): void {
-        try { if (code) sessionStorage.setItem('bn_coop_room', code); else sessionStorage.removeItem('bn_coop_room'); } catch { /* Manual room codes still work. */ }
+        try { if (code) sessionStorage.setItem(this.storageKey, code); else sessionStorage.removeItem(this.storageKey); } catch { /* Manual room codes still work. */ }
     }
     start(code?: string, level?: CoopLevelId): void {
         this.leave(false);
@@ -73,15 +75,27 @@ export class CoopClient {
         this.intent = code ? { type: 'join', code: normalizeCode(code)! } : level ? { type: 'create', level } : { type: 'create-party' };
         void this.connect();
     }
+    startDraft(hash: string): void {
+        this.leave(false); this.active = true; this.reconnectAttempts = 0; this.room = null; this.slot = null;
+        this.intent = { type: 'create-draft', hash }; void this.connect();
+    }
+    restartDraft(hash: string): boolean {
+        return this.connected && this.isHost && !!this.room?.draft && this.send({ type: 'restart-draft', seq: ++this.actionSeq, hash });
+    }
+    occupyDraft(devices: DraftId[]): void {
+        const key = [...devices].sort().join(',');
+        if (this.room?.level !== 'workbench' || this.draftDevices === key) return;
+        if (this.send({ type: 'draft-occupancy', seq: ++this.actionSeq, devices })) this.draftDevices = key;
+    }
     private clearLevel(): void {
         this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear();
         this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1; this.remote.clear(); this.replicas = {};
         this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; this.cubeLastAt = 0;
-        this.plate = null; this.exitSent = false; this.lastSentAt = 0;
+        this.plate = null; this.draftDevices = ''; this.draftCubeDevices.clear(); this.exitSent = false; this.lastSentAt = 0;
         this.playerDiscontinuity = undefined; this.cubeDiscontinuities = {}; this.lastLocalDiscontinuity = null;
         this.machineryEvents = [];
     }
-    private adoptRoom(room: SharedRoom, initial = false): boolean {
+    private adoptRoom(room: SessionRoom, initial = false): boolean {
         const rebuild = initial || !this.room || room.levelInstance !== this.room.levelInstance || room.level !== this.room.level;
         if (rebuild) this.clearLevel();
         this.acceptCubeRoom(room, rebuild); this.room = room; this.roomReceivedAt = performance.now();
@@ -105,7 +119,7 @@ export class CoopClient {
             this.deadline = setTimeout(() => ws.close(), 8000);
             ws.onopen = () => {
                 if (generation !== this.generation) { ws.close(); return; }
-                this.lastMessageAt = performance.now(); this.actionSeq = 0; this.moveSeq = 0; this.plate = null; this.exitSent = false; this.lastSentAt = 0; this.playerDiscontinuity = undefined; this.cubeDiscontinuities = {};
+                this.lastMessageAt = performance.now(); this.actionSeq = 0; this.moveSeq = 0; this.plate = null; this.draftDevices = ''; this.draftCubeDevices.clear(); this.exitSent = false; this.lastSentAt = 0; this.playerDiscontinuity = undefined; this.cubeDiscontinuities = {};
                 this.send(this.intent);
                 this.heartbeat = setInterval(() => {
                     if (performance.now() - this.lastMessageAt > 10000) ws.close();
@@ -180,7 +194,7 @@ export class CoopClient {
     }
     private streamMatches(message: { levelInstance?: number }): boolean {
         return !!this.room && (message.levelInstance === this.room.levelInstance
-            || !this.room.party && message.levelInstance === undefined);
+            || !this.room.party && !this.room.draft && message.levelInstance === undefined);
     }
     private send(message: ClientMessage): boolean {
         if ('seq' in message) {
@@ -228,7 +242,7 @@ export class CoopClient {
         if (this.send({ type: 'crumble-trigger', seq, platform, trigger })) this.pendingCrumble.set(platform, { seq, trigger, at: performance.now() });
     }
     localReset(): void {
-        if (this.connected && this.send({ type: 'local-reset', seq: ++this.actionSeq })) this.plate = null;
+        if (this.connected && this.send({ type: 'local-reset', seq: ++this.actionSeq })) { this.plate = null; this.draftDevices = ''; }
     }
     markDiscontinuity(entity: 'player' | 'cube', kind: Discontinuity, cubeId: CubeId = 'cube'): void {
         if (entity === 'player') this.playerDiscontinuity = kind; else this.cubeDiscontinuities[cubeId] = kind;
@@ -249,6 +263,11 @@ export class CoopClient {
         const placement = typeof value === 'boolean' ? value ? 'cargoPlate' : 'spawn' : value;
         if (!this.ownsCubeFor(id) || this.prediction.cube?.cubeId === id || this.placements[id] === placement) return;
         if (this.send({ type: 'cube-occupancy', cubeId: id, seq: ++this.actionSeq, epoch: this.room!.cubes[id]!.epoch, placement })) this.placements[id] = placement;
+    }
+    cubeOccupancyDraft(devices: DraftId[], id: DraftId): void {
+        const key = [...devices].sort().join(',');
+        if (!this.ownsCubeFor(id) || this.prediction.cube?.cubeId === id || this.draftCubeDevices.get(id) === key) return;
+        if (this.send({ type: 'draft-cube-occupancy', cubeId: id, seq: ++this.actionSeq, epoch: this.room!.cubes[id]!.epoch, devices })) this.draftCubeDevices.set(id, key);
     }
     publishCube(cube: CubeTransform, now: number, id: CubeId = 'cube'): void {
         const discontinuity = this.cubeDiscontinuities[id];

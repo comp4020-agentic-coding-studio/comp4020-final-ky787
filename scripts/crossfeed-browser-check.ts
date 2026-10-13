@@ -201,13 +201,16 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     await walk(holder, 900);
     await wait(holder, 'service filter resets B', s => (state(s).cubes.cubeB!.lastReset?.epoch ?? 0) > epochB && Math.abs(s.cubes.cubeB!.x - 510) < 2);
     check('B firewall reset preserves A and walking carrier', Math.abs((await snapshot(runner)).cubes.cubeA!.x - untouchedA.x) < 1 && (await snapshot(holder)).deaths === 0);
-    await pickup(holder, 'cubeB'); await walk(holder, 370);
+    // R1 triggers below body x347. A walk-to370 polling window is only 23px:
+    // a delayed snapshot can miss it after teleport and keep A held in R2.
+    // Settle clear of the gate, then observe the actual relay arrival below.
+    await pickup(holder, 'cubeB'); await align(holder, 420);
     await key(holder, 'KeyA', true);
     try { await wait(holder, 'carried B emerges from R2', s => s.player.x > 3736 && s.cubes.cubeB!.carried && s.player.y < 950); }
     finally { await key(holder, 'KeyA', false); }
     await align(holder, 3890); await place(holder, 'cubeB', 3870);
     await walk(runner,1370); await wait(runner,'land before low service filter',s=>s.player.groundId==='central-floor');
-    await walk(runner, 370); await key(runner, 'KeyA', true);
+    await align(runner, 420); await key(runner, 'KeyA', true);
     try { await wait(runner, 'partner joins through relay', s => s.player.x > 3736 && s.player.y < 950); }
     finally { await key(runner, 'KeyA', false); }
     check('relay leaves one B in gallery and A below', Object.keys((await snapshot(runner)).cubes).length === 2 && (await snapshot(runner)).cubes.cubeA!.y > 1400);

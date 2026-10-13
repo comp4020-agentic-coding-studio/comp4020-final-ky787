@@ -1,0 +1,473 @@
+{
+  "version": 1,
+  "id": "cooperative-test",
+  "scope": "full-room",
+  "mode": "coop",
+  "timeoutMs": 65000,
+  "actors": [
+    {
+      "id": "host",
+      "slot": 1
+    },
+    {
+      "id": "partner",
+      "slot": 2
+    }
+  ],
+  "steps": [
+    {
+      "label": "partner approaches the physical cube",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 260
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "partner picks up cube under server arbitration",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "partner",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "session.sharedCubes.draft:payload.holder",
+          "equals": 2
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "host stands on the ordinary pressure plate",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 400
+        }
+      ],
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "signals.draft:traversal",
+            "equals": true
+          }
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "partner brings cube to the host",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 330
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "partner drops cube for a physical handoff",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "partner",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "cubes.draft:payload.grounded",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "host picks up the released shared cube",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.sharedCubes.draft:payload.holder",
+          "equals": 1
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner approaches launch while host powers it",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 480
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "partner jumps onto the powered launch slab",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "launch"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner waits on launch, still powered by host",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": false
+        },
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.groundId",
+            "equals": "launch"
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "plates.draft:powerPlate",
+            "equals": true
+          }
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "host drops cube onto plate to take over occupancy",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "cubes.draft:payload.grounded",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "waitMs": 250
+    },
+    {
+      "label": "host leaves plate while resting cube holds the route",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 310
+        }
+      ],
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "signals.draft:traversal",
+            "equals": true
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "session.sharedCubes.draft:payload.holder",
+            "equals": null
+          }
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "partner fires a real grapple into anchor address bar",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "grapple",
+          "actor": "partner",
+          "target": "swingAnchor",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.rope.phase",
+          "equals": "attached"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner swings across gap with real physics",
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.x",
+          "min": 965
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner performs rope jump and releases hook",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "partner",
+          "code": "Space"
+        },
+        {
+          "type": "grapple",
+          "actor": "partner",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.x",
+          "min": 1100
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner brakes onto the far side",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ],
+      "waitMs": 750
+    },
+    {
+      "label": "shared unstable block breaks after the partner lands",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:unstable.phase",
+          "equals": "broken"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner lands on the far floor after crumble",
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "exitFloor"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "partner approaches one-shot exit terminal",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1240
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "partner commits return bridge and latched exit",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "partner",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "exitUnlocked",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "host approaches resting cube before crossing",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 400
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "host crosses the return bridge",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1310
+        },
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "partner makes first physical exit arrival",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1400
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.reachedExit.1",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "host makes distinct second physical arrival",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1400
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "completed",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "completed",
+            "equals": true
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ]
+    }
+  ]
+}

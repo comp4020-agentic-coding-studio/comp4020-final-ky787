@@ -29,3 +29,7 @@
 - Put durable design/contracts in project documentation; handoffs are not
   authoritative evidence. Stop for manual playtesting before expanding the
   accepted puzzle or its validated binary contract.
+- Level authoring: use the local draft workbench and shared JSON/CLI contracts in
+  `docs/level-authoring-for-agents.md` and `docs/level-workbench.md`. Keep drafts in
+  `levels/drafts` and reports/recovery in ignored `.workbench`; never publish into
+  the campaign or infer binary evidence from a draft.

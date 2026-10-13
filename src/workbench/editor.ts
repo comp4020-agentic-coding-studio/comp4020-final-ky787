@@ -78,10 +78,12 @@ class WorkbenchEditor {
     forcedMode = false;
     stateName = 'idle';
     private recoveryTimer: ReturnType<typeof setTimeout> | undefined;
+    private recoveryWrite: Promise<unknown> = Promise.resolve();
     private propertyError = '';
     private accumulator = 0;
     private lastTime = performance.now();
     private hashSequence = 0;
+    private testRequest = 0;
 
     constructor() {
         $('#workbench').innerHTML = `<main class="wb-app">
@@ -122,7 +124,7 @@ class WorkbenchEditor {
     refreshFiles() { $('#files').innerHTML = option('', 'Open draft…') + this.files.map(name => option(name, name, name === this.name)).join(''); }
     async open(name: string, checkDirty = true) {
         if (checkDirty && this.dirty && !confirm('This draft has unsaved edits. Discard them and open another file? Recovery remains available until your next edit.')) { this.refreshFiles(); return; }
-        try { const record = await this.request<StoredDraft>(`drafts?name=${encodeURIComponent(name)}`); this.stopTest(); this.name = name; this.history.replace(record.document); this.hash = record.hash; this.saved = serializeDraft(record.document); this.externalConflict = null; this.selection.clear(); this.mode = 'edit'; this.refresh(); this.fit(); this.status(`Opened ${name} · ${record.hash.slice(0, 12)}`); } catch (e) { this.status(String(e)); }
+        try { const record = await this.request<StoredDraft>(`drafts?name=${encodeURIComponent(name)}`); this.stopTest(); this.name = name; this.history.replace(record.document); this.hash = record.hash; this.saved = serializeDraft(record.document); this.externalConflict = null; this.refreshFiles(); this.selection.clear(); this.mode = 'edit'; this.refresh(); this.fit(); this.status(`Opened ${name} · ${record.hash.slice(0, 12)}`); } catch (e) { this.status(String(e)); }
     }
     async save(copy = false) {
         if (this.mode === 'play') { this.status('Stop the physics test before saving authored data.'); return; }
@@ -134,6 +136,11 @@ class WorkbenchEditor {
             this.name = name; this.hash = record.hash; this.saved = serialized; this.externalConflict = null;
             if (!this.files.includes(name)) { this.files.push(name); this.files.sort(); } this.refreshFiles(); this.showConflict(); this.updateToolbar();
             this.status(`Saved ${name} · ${record.hash.slice(0, 12)}${this.diagnostics.some(d => d.severity === 'error') ? ' · incomplete draft, playtest blocked' : ''}`);
+            if (serializeDraft(this.document) === serialized) {
+                clearTimeout(this.recoveryTimer);
+                this.recoveryWrite = this.recoveryWrite.catch(() => {}).then(async () => { if (serializeDraft(this.document) === serialized) await this.request('recovery', {}, 'DELETE'); });
+                await this.recoveryWrite.catch(e => this.status(`Draft saved; recovery cleanup failed: ${String(e)}`));
+            }
         } catch (e) { this.status(`Save failed: ${e instanceof Error ? e.message : String(e)}`); }
     }
     async checkExternal() {
@@ -147,7 +154,7 @@ class WorkbenchEditor {
     }
     changed() {
         this.propertyError = ''; this.refresh();
-        clearTimeout(this.recoveryTimer); this.recoveryTimer = setTimeout(() => { if (this.token) void this.request('recovery', { document: this.document, name: this.name, expectedHash: this.hash }, 'PUT').catch(e => this.status(`Recovery failed: ${String(e)}`)); }, 650);
+        clearTimeout(this.recoveryTimer); this.recoveryTimer = setTimeout(() => { if (this.token) { const payload = { document: cloneDraft(this.document), name: this.name, expectedHash: this.hash }; this.recoveryWrite = this.recoveryWrite.catch(() => {}).then(() => this.request('recovery', payload, 'PUT')).catch(e => this.status(`Recovery failed: ${String(e)}`)); } }, 650);
     }
     mutate(edit: (draft: DraftDocument) => void) { if (this.mode !== 'edit') return; try { const next = cloneDraft(this.document); edit(next); const validation = validateDraft(next); if (!validation.structural) throw new Error(validation.diagnostics.filter(d => d.severity === 'error').map(d => d.message).join(' ')); if (this.history.commit(next)) this.changed(); } catch (e) { this.propertyError = e instanceof Error ? e.message : String(e); this.status(this.propertyError); this.renderInspector(); } }
     refresh() {
@@ -216,13 +223,13 @@ class WorkbenchEditor {
                 }
                 if (object.type === 'cube') body += field('Cube mark', object.mark, v => patch({ mark: String(v) }), { wide: true });
                 if (object.type === 'device') {
-                    body += field('Device semantics', object.kind, v => patch({ kind: String(v) as 'plate' | 'socket' | 'scanner' | 'toggle' | 'terminal' }), { values: ['plate', 'socket', 'scanner', 'toggle', 'terminal'], wide: true });
+                    body += field('Device semantics', object.kind, v => this.mutate(d => { const target = d.geometry.objects.find(o => o.id === ids[0]); if (target?.type === 'device' && (v === 'plate' || v === 'socket' || v === 'scanner' || v === 'toggle' || v === 'terminal')) { target.kind = v; if (v !== 'toggle' && v !== 'terminal') { delete target.initial; delete target.checkpoint; } } }), { values: ['plate', 'socket', 'scanner', 'toggle', 'terminal'], wide: true });
                     if (object.kind === 'toggle' || object.kind === 'terminal') body += field('Initial value', object.initial ?? false, v => patch({ initial: Boolean(v) }), { wide: true });
-                    body += field('Checkpoint', object.checkpoint ?? '', v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'device') { if (v === 'relay' || v === 'upper') o.checkpoint = v; else delete o.checkpoint; } }), { values: ['', 'relay', 'upper'], wide: true });
+                    if (object.kind === 'toggle' || object.kind === 'terminal') body += field('Checkpoint', object.checkpoint ?? '', v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'device') { if (v === 'relay' || v === 'upper') o.checkpoint = v; else delete o.checkpoint; } }), { values: ['', 'relay', 'upper'], wide: true });
                 }
                 if (object.type === 'spawn' || object.type === 'checkpoint') body += field('Player slot', object.slot, v => patch({ slot: Number(v) === 2 ? 2 : 1 }), { values: ['1', '2'], wide: true });
                 if (object.type === 'checkpoint' || object.type === 'breakpoint') body += field('Checkpoint', object.checkpoint, v => patch({ checkpoint: v === 'upper' ? 'upper' : 'relay' }), { values: ['relay', 'upper'], wide: true });
-                if (object.type === 'breakpoint') body += field('Activation control', object.activationControl ?? '', v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'breakpoint') { if (v) o.activationControl = String(v); else delete o.activationControl; } }), { values: ['', ...this.document.geometry.objects.filter(o => o.type === 'device').map(o => o.id)], wide: true });
+                if (object.type === 'breakpoint') body += field('Activation control', object.activationControl ?? '', v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'breakpoint') { if (v) o.activationControl = String(v); else delete o.activationControl; } }), { values: ['', ...this.document.geometry.objects.filter(o => o.type === 'device' && (o.kind === 'toggle' || o.kind === 'terminal')).map(o => o.id)], wide: true });
                 if (object.type === 'relay') { body += field('Pair ID', object.pair, v => patch({ pair: String(v) }), { wide: true }); body += field('Exit direction', object.exitSide, v => patch({ exitSide: Number(v) === -1 ? -1 : 1 }), { values: ['-1', '1'], wide: true }); }
                 if (object.type === 'firewall') { body += field('Orientation', object.orientation, v => patch({ orientation: v === 'horizontal' ? 'horizontal' : 'vertical' }), { values: ['horizontal', 'vertical'], wide: true }); body += field('Length', object.length, v => patch({ length: Number(v) }), { min: 1 }); body += field('Thickness', object.thickness, v => patch({ thickness: Number(v) }), { min: 1 }); }
                 if (object.type === 'exit') { body += field('Latch unlock', object.latch, v => patch({ latch: Boolean(v) }), { wide: true }); body += field('Physical arrivals', object.arrivals, v => patch({ arrivals: Number(v) === 2 ? 2 : 1 }), { values: ['1', '2'], wide: true }); }
@@ -274,7 +281,7 @@ class WorkbenchEditor {
                 const op = document.createElement('select'); op.setAttribute('aria-label', 'Expression operator'); op.innerHTML = ['const', 'ref', 'and', 'or', 'not'].map(v => option(v, v.toUpperCase(), v === expression.op)).join(''); row.append(op);
                 op.onchange = () => { const type = op.value; replace(type === 'const' ? { op: 'const', value: false } : type === 'ref' ? { op: 'ref', id: ports[0] ?? '' } : type === 'not' ? { op: 'not', arg: { op: 'const', value: false } } : { op: type === 'and' ? 'and' : 'or', args: [{ op: 'const', value: false }, { op: 'const', value: false }] }); };
                 if (expression.op === 'const') { const select = document.createElement('select'); select.setAttribute('aria-label', 'Boolean constant'); select.innerHTML = option('false', 'FALSE', !expression.value) + option('true', 'TRUE', expression.value); select.onchange = () => replace({ op: 'const', value: select.value === 'true' }); row.append(select); }
-                else if (expression.op === 'ref') { const select = document.createElement('select'); select.setAttribute('aria-label', 'Device port or output reference'); const refs = [...new Set([...ports, ...outputIds, expression.id])]; select.innerHTML = refs.map(v => option(v, v, v === expression.id)).join(''); select.onchange = () => replace({ op: 'ref', id: select.value }); row.append(select); }
+                else if (expression.op === 'ref') { const select = document.createElement('select'); select.setAttribute('aria-label', 'Device port or output reference'); select.title = expression.id; const refs = [...new Set([...ports, ...outputIds, expression.id])]; select.innerHTML = refs.map(v => option(v, v, v === expression.id)).join(''); select.onchange = () => replace({ op: 'ref', id: select.value }); row.append(select); }
                 else if (expression.op === 'not') container.append(expressionEditor(expression.arg, arg => replace({ op: 'not', arg })));
                 else {
                     expression.args.forEach((arg, i) => { const child = expressionEditor(arg, value => replace({ op: expression.op, args: expression.args.map((e, j) => i === j ? value : e) })); const remove = document.createElement('button'); remove.textContent = '−'; remove.title = 'Remove operand'; remove.setAttribute('aria-label', 'Remove operand'); remove.disabled = expression.args.length <= 1; remove.onclick = () => replace({ op: expression.op, args: expression.args.filter((_, j) => i !== j) }); child.querySelector('.row')!.append(remove); container.append(child); });
@@ -368,7 +375,8 @@ class WorkbenchEditor {
     frameSelection() { const b = boundsUnion([...this.selection].map(id => entityBounds(this.document, id)).filter((b): b is Box => !!b)); if (b) this.fit({ x: b.x - 100, y: b.y - 100, w: b.w + 200, h: b.h + 200 }); }
     entityAt(point: Vec2): string | undefined {
         const hidden = new Set(this.document.editor.hidden), locked = new Set(this.document.editor.locked), tolerance = 7 / this.camera.zoom;
-        const ids = [...this.document.geometry.objects.map(o => o.id), ...this.document.presentation.labels.map(o => o.id), ...this.document.presentation.cameraReveals.map(o => o.id), ...this.document.presentation.wires.map(o => o.id)].reverse();
+        const geometryIds = this.document.geometry.objects.map(o => o.id);
+        const ids = (this.connection ? geometryIds : [...geometryIds, ...this.document.presentation.labels.map(o => o.id), ...this.document.presentation.cameraReveals.map(o => o.id), ...this.document.presentation.wires.map(o => o.id)]).reverse();
         return ids.find(id => {
             if (hidden.has(id) || locked.has(id)) return false;
             const wire = this.document.presentation.wires.find(w => w.id === id);
@@ -395,7 +403,7 @@ class WorkbenchEditor {
             if (!id) return;
             if (!this.connectionSource) { const o = this.document.geometry.objects.find(o => o.id === id); if (o?.type !== 'device') { this.status('Choose a control device as the source port.'); return; } this.connectionSource = id; this.selection = new Set([id]); }
             else { const source = this.connectionSource; this.mutate(d => connectDevice(d, source, id)); this.connectionSource = null; this.selection = new Set([id]); }
-            this.renderInspector(); this.updateToolbar(); return;
+            this.renderInspector(); this.renderLogic(); this.updateToolbar(); return;
         }
         if (id) { if (event.shiftKey && this.selection.has(id)) this.selection.delete(id); else { if (!event.shiftKey && !this.selection.has(id)) this.selection.clear(); this.selection.add(id); } this.drag = { ...start, kind: 'move', id }; }
         else { if (!event.shiftKey) this.selection.clear(); this.drag = { ...start, kind: 'marquee', additive: event.shiftKey }; }
@@ -435,8 +443,10 @@ class WorkbenchEditor {
         if (!this.playable) throw new Error('Blocking validation diagnostics prevent playtesting.');
         if (this.mode === 'play') this.stopTest();
         try {
-            const slot = options.slot ?? 1, runtime = createRuntime(cloneDraft(this.document), slot, options.at ? { start: options.at } : {});
-            const hash = await draftHash(this.document); this.testSlot = slot; this.testAt = options.at; this.runtime = runtime; this.mode = 'play'; this.paused = false; this.accumulator = 0;
+            const request = ++this.testRequest, snapshot = cloneDraft(this.document), slot = options.slot ?? 1, runtime = createRuntime(snapshot, slot, options.at ? { start: options.at } : {});
+            const hash = await draftHash(snapshot);
+            if (request !== this.testRequest || serializeDraft(snapshot) !== serializeDraft(this.document)) throw new Error('Draft changed while starting the test; start again from the current document.');
+            this.testSlot = slot; this.testAt = options.at; this.runtime = runtime; this.mode = 'play'; this.paused = false; this.accumulator = 0;
             this.palette = null; this.connection = false; this.renderer.room(runtime.world);
             this.recording = { version: 1, draftHash: hash, engineRevision: this.engineRevision, scenario: options.scenario ?? (options.at ? 'editor-test-from-here' : 'editor-play-from-spawn'), sectionOnly: !!options.at, samples: [], events: [] }; this.recordedFrames = 0; this.recordingElapsed = 0;
             this.input = new InputManager(true); this.input.attach(this.canvas, $('.wb-stage')); this.canvas.focus(); this.renderInspector(); this.renderLogic(); this.updateToolbar(); this.status('Physics test running in an isolated runtime. Escape or Stop returns to authored geometry.');
@@ -449,6 +459,7 @@ class WorkbenchEditor {
         await this.startTest({ slot: this.testSlot, at }).catch(() => {});
     }
     stopTest() {
+        this.testRequest++;
         if (this.mode !== 'play') return;
         this.input?.dispose(); this.input = null; this.mode = 'edit'; this.paused = false; this.accumulator = 0;
         this.refresh(); this.status(`Stopped. Authored document, selection and editor camera restored. ${this.recording?.samples.length ?? 0} measured trajectory samples recorded.`);
@@ -542,6 +553,18 @@ class WorkbenchEditor {
             for (const wire of this.document.presentation.wires) { if (hidden.has(wire.id) || !this.selection.has(wire.id) && wire.binding) continue; c.strokeStyle = this.selection.has(wire.id) ? '#f6ce8a' : '#718790'; c.lineWidth = 2 / zoom; c.beginPath(); wire.points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); c.stroke(); if (this.selection.has(wire.id)) { c.fillStyle = '#f6ce8a'; for (const p of wire.points) c.fillRect(p.x - 4 / zoom, p.y - 4 / zoom, 8 / zoom, 8 / zoom); } }
             if (this.selection.size === 1) { const id = [...this.selection][0], b = entityBounds(this.document, id), object = this.document.geometry.objects.find(o => o.id === id); if (b && !hidden.has(id) && (object && ('w' in object || object.type === 'firewall') || this.document.presentation.cameraReveals.some(r => r.id === id))) { c.fillStyle = '#90ffe0'; c.fillRect(b.x + b.w - 5 / zoom, b.y + b.h - 5 / zoom, 10 / zoom, 10 / zoom); } }
         }
+        if (this.mode === 'edit' && this.connection) {
+            for (const object of this.document.geometry.objects) {
+                if (hidden.has(object.id) || this.document.editor.locked.includes(object.id)) continue;
+                const source = object.type === 'device', property = bindingProperty(object);
+                if (!source && !property) continue;
+                const b = objectBounds(object), x = b.x + b.w / 2, y = b.y;
+                c.fillStyle = source ? '#f3bf7a' : '#7debd2'; c.strokeStyle = '#0b131a'; c.lineWidth = 2 / zoom;
+                c.beginPath(); c.arc(x, y, 6 / zoom, 0, Math.PI * 2); c.fill(); c.stroke();
+                c.font = `${10 / zoom}px ui-monospace,monospace`; c.fillText(source && object.type === 'device' ? objectPort(object) : String(property), x + 10 / zoom, y - 9 / zoom);
+                if (object.id === this.connectionSource) { c.strokeStyle = '#f3bf7a'; c.lineWidth = 1 / zoom; c.setLineDash([6 / zoom, 5 / zoom]); c.beginPath(); c.moveTo(x, y); c.lineTo(this.pointer.x, this.pointer.y); c.stroke(); c.setLineDash([]); }
+            }
+        }
         if (this.hitboxes && this.runtime) { c.strokeStyle = '#ffbb68'; c.lineWidth = 1 / zoom; for (const s of this.runtime.world.solids) if (s.enabled) c.strokeRect(s.x, s.y, s.w, s.h); const p = this.runtime.world.player; c.strokeRect(p.x - PLAYER.width / 2, p.y - PLAYER.height / 2, PLAYER.width, PLAYER.height); }
         if (this.range) { const marker = this.document.geometry.objects.find(o => this.selection.has(o.id)), at = this.mode === 'play' ? this.runtime?.world.player : marker ? { x: marker.x, y: marker.y } : this.lastPoint; if (at) { c.strokeStyle = '#e4c97d99'; c.setLineDash([8 / zoom, 5 / zoom]); c.beginPath(); c.arc(at.x, at.y, GRAPPLE.maxRange, 0, Math.PI * 2); c.stroke(); c.setLineDash([]); c.fillStyle = '#e4c97d'; c.font = `${11 / zoom}px ui-monospace,monospace`; c.fillText(`${GRAPPLE.maxRange}u range hint · swing not proven`, at.x - 130 / zoom, at.y - GRAPPLE.maxRange - 8 / zoom); } }
         if (this.recording && this.recording.samples.length > 1) {
@@ -554,6 +577,10 @@ class WorkbenchEditor {
     animate = (time: number) => {
         const elapsed = Math.min(.1, (time - this.lastTime) / 1000); this.lastTime = time;
         if (this.mode === 'play' && this.input && this.runtime && !this.paused) {
+            if (this.input.takeAction('reset')) {
+                const world = this.runtime.world, before = world.events.length; world.respawn();
+                for (const event of world.events.slice(before)) if (this.runtime.recording.events.length < 10000) this.runtime.recording.events.push({ time: world.elapsed, kind: event.kind, at: { ...event.at }, details: event });
+            }
             this.accumulator += elapsed;
             while (this.accumulator >= FIXED_DT) { this.input.sync(this.renderer.camera.screenToWorld(this.input.screenAim.x, this.input.screenAim.y)); const edges = this.input.takeEdges(); this.input.state.jumpPressed = edges.jump; this.input.state.airGrapplePressed = edges.airGrapple; this.input.state.grapplePressed = edges.grapple; this.advance(this.input.state, edges.interact); this.accumulator -= FIXED_DT; }
         }

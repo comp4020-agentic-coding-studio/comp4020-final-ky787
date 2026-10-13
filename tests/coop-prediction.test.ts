@@ -299,6 +299,7 @@ it('prediction/denial for A never pauses or rewinds B, and a B relay marker only
     const view = () => sharedRoom(record, [true, true], [null, null], cubes);
     let world: PuzzleWorld, authority: ReturnType<typeof createCoopAuthority>;
     const client = new CoopClient((room, initial) => {
+        if (room.level === 'workbench') throw new Error('This fixture is a campaign client');
         if (initial) { authority = createCoopAuthority(room, client); world = new PuzzleWorld(COOP_LABS[room.level].room(1), freshProgress().rooms.relay, undefined, authority); }
         else { authority.room = room; world.syncAuthority(); }
     }, () => {});

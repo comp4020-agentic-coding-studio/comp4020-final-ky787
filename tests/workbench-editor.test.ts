@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newDraft, serializeDraft } from '../src/workbench/model.ts';
-import { DraftHistory, connectDevice, createEntity, deleteEntities, duplicateEntities, renameEntity, translateEntities } from '../src/workbench/editor-operations.ts';
+import { DraftHistory, connectDevice, connectOutput, createEntity, deleteEntities, duplicateEntities, renameEntity, translateEntities } from '../src/workbench/editor-operations.ts';
 import { evaluateDraft } from '../src/workbench/evaluate.ts';
 import { validateDraft } from '../src/workbench/validation.ts';
 
@@ -53,6 +53,21 @@ describe('workbench editor document operations', () => {
         deleteEntities(draft, new Set(['cargoPlate']));
         expect(validateDraft(draft).playable).toBe(false);
         expect(validateDraft(draft).diagnostics.some(d => d.severity === 'error' && d.message.includes('cargoPlate'))).toBe(true);
+    });
+
+    it('wires relay partners consistently and removes hidden metadata for deleted attached wires', () => {
+        const draft = newDraft('paired-binding');
+        const relay = createEntity(draft, 'relay', { x: 700, y: 550 });
+        connectOutput(draft, 'routePower', relay, true, 'powerPlate');
+        const gates = draft.geometry.objects.filter(o => o.type === 'relay');
+        expect(gates).toHaveLength(2);
+        expect(draft.bindings.filter(b => gates.some(g => g.id === b.target))).toHaveLength(2);
+        expect(draft.bindings.filter(b => gates.some(g => g.id === b.target)).every(b => b.output === 'routePower' && b.invert)).toBe(true);
+        const wire = draft.presentation.wires.find(w => w.binding === draft.bindings.find(b => b.target === 'route')?.id)!;
+        draft.editor.hidden.push(wire.id); draft.editor.locked.push(wire.id);
+        deleteEntities(draft, new Set(['route']));
+        expect(draft.editor.hidden).not.toContain(wire.id); expect(draft.editor.locked).not.toContain(wire.id);
+        expect(validateDraft(draft).diagnostics.some(d => d.code === 'editor.reference')).toBe(false);
     });
     it('numeric draft mutations preserve drawing order and keep history snapshots independent', () => {
         const history = new DraftHistory(newDraft('order')), before = serializeDraft(history.document);
