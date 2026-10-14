@@ -17,6 +17,12 @@ pnpm dev # game menu → LEVEL BUILDER; Ctrl+C stops game and builder
 pnpm workbench # standalone editor
 ```
 
+Public Stage 1 at `/workbench.html` uses the same format, evaluator, adapter and engine, with IndexedDB saving and local single-player physics. `pnpm dev` still selects the filesystem workbench via its dedicated loopback service. Do not use the campaign visitor-progress API or `/data` as a draft database. No online custom-level multiplayer is implemented.
+
+To receive a public draft, copy its Export JSON file to a fresh `levels/drafts/name.json` (or Import JSON then Save in the local GUI), validate it, and edit it directly. Imported JSON is untrusted: do not infer evidence from titles, metadata or a claimed identity. The strict validator rejects unknown fields and executable expressions. Independent copies may retain the same authored document ID; browser record IDs/revisions are separate metadata and are never exported. Preserve all supported presentation/editor/preview fields.
+
+New code-platform objects should use `activation: "always-powered"` for geometry-only work, `"signal"` for a controlled `active` binding, or `"always-inactive"` for an intentional ghost. Version-1 omission means `"signal"`, even without a binding. Never repair a missing controlled binding by silently powering the platform. Constant modes must not also have a binding. Connect switches a code platform to signal mode. Warnings such as unused outputs permit physics testing; malformed or missing gameplay references remain blocking errors.
+
 No GUI operation is required for agent authoring, rendering or testing. The human
 opens/saves exactly these files through the local editor. Both use canonical sorted
 keys/ordered arrays and SHA-256. Preserve drawing order, stable IDs and unknown

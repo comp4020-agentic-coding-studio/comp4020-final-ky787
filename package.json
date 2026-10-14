@@ -36,6 +36,7 @@
     "level:render": "node scripts/level-tools/cli.ts render",
     "level:playtest": "node scripts/level-tools/cli.ts playtest",
     "check:workbench": "node scripts/level-tools/browser-check.ts",
+    "check:public-builder": "node scripts/level-tools/public-browser-check.ts",
     "check:workbench-menu": "node scripts/level-tools/menu-browser-check.ts"
   },
   "devDependencies": {

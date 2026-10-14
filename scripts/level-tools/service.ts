@@ -140,6 +140,7 @@ export async function startWorkbench(options: { port?: number; draftRoot?: strin
     let multiplayer: Awaited<ReturnType<typeof attachMultiplayer>> | undefined;
     try {
     vite = options.frontend === false ? undefined : await createViteServer({
+        define: { __WORKBENCH_LOCAL__: 'true' },
         configFile: false, root: resolve('.'), appType: 'mpa', base: '/',
         server: { middlewareMode: true, hmr: false, ws: { server, path: '/__workbench-vite' }, watch: { ignored: ['**/Workspace/**', '**/.workbench/**', '**/levels/**'] },
             fs: { strict: true, allow: [resolve('.')], deny: ['**/.git/**', '**/.aws/**', '**/.codex/**', '**/.agents/**', '**/.claude/**', '**/Workspace/**', '**/.env*', '**/*.pem', '**/.workbench/**', '**/levels/**'] } },

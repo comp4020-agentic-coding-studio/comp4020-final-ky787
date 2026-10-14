@@ -281,14 +281,14 @@ export class SliceGame {
         this.menu.hidden = false;
         const p = this.store.progress, saved = this.store.updatedAt;
         const builderUrl = import.meta.env.DEV && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
-            ? import.meta.env.VITE_WORKBENCH_URL ?? 'http://127.0.0.1:4174/' : null;
+            ? import.meta.env.VITE_WORKBENCH_URL ?? '/workbench.html' : '/workbench.html';
         this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">BINARY NINJA</span>
       <h2>${this.ended ? 'Control Spine complete.' : 'Play together.'}</h2>
       <p>${this.ended ? p.completedRooms.length === ROOMS.length ? 'Four rooms explored. Ready for a human playtest.' : 'Choose another room, or revisit this chamber.' : 'Learn the tools. Then tackle the co-op campaign.'}</p>
       <div class="save-summary"><span>${saved ? 'RETURNING VISITOR' : 'YOUR PROGRESS'}</span><strong>${roomById(p.currentRoom).title} · ${p.completedRooms.length} / ${ROOMS.length} rooms complete</strong><small>${saved ? `Server save · ${new Date(saved).toLocaleString()}` : this.store.status}</small></div>
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${roomById(p.currentRoom).title}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
-      ${builderUrl ? '<button id="level-builder" title="Create and playtest local level drafts">LEVEL BUILDER</button>' : ''}
+      ${builderUrl ? '<button id="level-builder" title="Create, save and playtest level drafts">LEVEL BUILDER</button>' : ''}
       <nav class="level-select" aria-label="Level select">
         <span class="eyebrow">TUTORIAL</span>
         <div class="level-grid">${ROOMS.map((room, index) => `<button data-room="${room.id}" ${room.id === p.currentRoom ? 'aria-current="true"' : ''}><strong>0${index + 1} / ${room.title}</strong><small>${room.id === p.currentRoom ? 'CURRENT' : p.completedRooms.includes(room.id) ? 'COMPLETE' : 'PLAY'}</small></button>`).join('')}</div>

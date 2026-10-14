@@ -1,7 +1,7 @@
 import { importDraft } from './imports.ts';
 import { draftFrame, draftSignal, evaluateDraft, initialDeviceValues } from './evaluate.ts';
 import { boxesOverlap } from '../engine/geometry.ts';
-import { DRAFT_ID, DRAFT_LIMITS, objectBounds, objectPort, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftValidation } from './model.ts';
+import { DRAFT_ID, DRAFT_LIMITS, codeActivation, serializeDraft, objectBounds, objectPort, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftValidation } from './model.ts';
 export type Diagnostic = DraftDiagnostic;
 const BUILTINS = ['race-condition', 'crossfeed-vault', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab', 'pairing-bay'];
 export const BUILTIN_OUTPUTS: Record<string, string[]> = {
@@ -50,13 +50,13 @@ export function validateDraft(value: unknown): DraftValidation {
         if (array(value.geometry.objects, 'geometry.objects', DRAFT_LIMITS.objects)) value.geometry.objects.forEach((o, i) => {
             const path = `geometry.objects[${i}]`; if (!record(o, path)) return;
             const common = ['id', 'type', 'x', 'y', 'label'];
-            const fields: Record<string, string[]> = { platform: ['w', 'h', 'kind', 'hookable', 'anchor', 'blocksCubeInteraction', 'hookCrumbleDelay', 'crumbleDelay', 'respawnDelay', 'listingOffsetX', 'assemblyBinding'], spawn: ['slot'], checkpoint: ['slot', 'checkpoint'], breakpoint: ['checkpoint', 'activationControl'], cube: ['mark'], device: ['kind', 'initial', 'checkpoint', 'legacy'], lift: ['w', 'h'], relay: ['w', 'h', 'pair', 'exitSide', 'nativeId'], firewall: ['orientation', 'length', 'thickness'], hazard: ['w', 'h'], exit: ['w', 'h', 'latch', 'arrivals'], marker: ['role'] };
+            const fields: Record<string, string[]> = { platform: ['w', 'h', 'kind', 'hookable', 'anchor', 'blocksCubeInteraction', 'hookCrumbleDelay', 'crumbleDelay', 'respawnDelay', 'listingOffsetX', 'assemblyBinding', 'activation'], spawn: ['slot'], checkpoint: ['slot', 'checkpoint'], breakpoint: ['checkpoint', 'activationControl'], cube: ['mark'], device: ['kind', 'initial', 'checkpoint', 'legacy'], lift: ['w', 'h'], relay: ['w', 'h', 'pair', 'exitSide', 'nativeId'], firewall: ['orientation', 'length', 'thickness'], hazard: ['w', 'h'], exit: ['w', 'h', 'latch', 'arrivals'], marker: ['role'] };
             if (typeof o.type !== 'string' || !Object.hasOwn(fields, o.type)) { error('schema.object-type', `${path}: unsupported object type.`); return; }
             record(o, path, [...common, ...fields[o.type]]); id(o.id, `${path}.id`); number(o.x, `${path}.x`); number(o.y, `${path}.y`); if (o.label !== undefined) text(o.label, `${path}.label`);
             if (['platform', 'lift', 'relay', 'hazard', 'exit'].includes(o.type)) { number(o.w, `${path}.w`, .1); number(o.h, `${path}.h`, .1); }
             if (o.type === 'spawn' || o.type === 'checkpoint') oneOf(o.slot, [1, 2], `${path}.slot`);
             if (o.type === 'checkpoint' || o.type === 'breakpoint' || o.checkpoint !== undefined) oneOf(o.checkpoint, ['relay', 'upper'], `${path}.checkpoint`);
-            if (o.type === 'platform') { oneOf(o.kind, ['static', 'code', 'unstable'], `${path}.kind`); for (const k of ['hookable', 'anchor', 'blocksCubeInteraction']) if (o[k] !== undefined) bool(o[k], `${path}.${k}`); for (const k of ['hookCrumbleDelay', 'crumbleDelay', 'respawnDelay']) if (o[k] !== undefined) number(o[k], `${path}.${k}`, .05, 60); if (o.listingOffsetX !== undefined) number(o.listingOffsetX, `${path}.listingOffsetX`); if (o.assemblyBinding !== undefined) text(o.assemblyBinding, `${path}.assemblyBinding`); }
+            if (o.type === 'platform') { if (o.activation !== undefined) { oneOf(o.activation, ['always-powered', 'signal', 'always-inactive'], `${path}.activation`); if (o.kind !== 'code') error('platform.activation-kind', 'Activation modes apply only to code platforms.'); } oneOf(o.kind, ['static', 'code', 'unstable'], `${path}.kind`); for (const k of ['hookable', 'anchor', 'blocksCubeInteraction']) if (o[k] !== undefined) bool(o[k], `${path}.${k}`); for (const k of ['hookCrumbleDelay', 'crumbleDelay', 'respawnDelay']) if (o[k] !== undefined) number(o[k], `${path}.${k}`, .05, 60); if (o.listingOffsetX !== undefined) number(o.listingOffsetX, `${path}.listingOffsetX`); if (o.assemblyBinding !== undefined) text(o.assemblyBinding, `${path}.assemblyBinding`); }
             if (o.type === 'cube') text(o.mark, `${path}.mark`, 16);
             if (o.type === 'device') { oneOf(o.kind, ['plate', 'socket', 'scanner', 'toggle', 'terminal'], `${path}.kind`); if (o.initial !== undefined) bool(o.initial, `${path}.initial`); if (o.legacy !== undefined) oneOf(o.legacy, ['plate', 'plateB', 'plateC', 'cargoPlate', 'lever', 'upperLever', 'cubePad'], `${path}.legacy`); }
             if (o.type === 'relay') { id(o.pair, `${path}.pair`); oneOf(o.exitSide, [-1, 1], `${path}.exitSide`); if (o.nativeId !== undefined) id(o.nativeId, `${path}.nativeId`); }
@@ -82,6 +82,7 @@ export function validateDraft(value: unknown): DraftValidation {
     if (record(value.editor, 'editor', ['hidden', 'locked', 'grid', 'snap'])) { for (const k of ['hidden', 'locked']) if (array(value.editor[k], `editor.${k}`, DRAFT_LIMITS.objects)) (value.editor[k] as unknown[]).forEach((v, i) => id(v, `editor.${k}[${i}]`)); number(value.editor.grid, 'editor.grid', 1, 256); bool(value.editor.snap, 'editor.snap'); }
     if (value.imported !== undefined && record(value.imported, 'imported', ['factory', 'warnings'])) { oneOf(value.imported.factory, BUILTINS, 'imported.factory'); if (array(value.imported.warnings, 'imported.warnings', 128)) value.imported.warnings.forEach((v, i) => text(v, `imported.warnings[${i}]`, 1024)); }
     if (diagnostics.length) return { document: null, diagnostics, structural: false, playable: false };
+    if (new TextEncoder().encode(serializeDraft(value as unknown as DraftDocument)).byteLength > DRAFT_LIMITS.bytes) return { document: null, diagnostics: [{ code: 'resource.bytes', severity: 'error', message: 'Canonical draft exceeds the 1,000,000-byte limit.' }], structural: false, playable: false };
     // All structural branches above have checked every supported property.
     const document = value as unknown as DraftDocument, objects = document.geometry.objects;
     const ids = new Set<string>();
@@ -107,10 +108,11 @@ export function validateDraft(value: unknown): DraftValidation {
         const o = byId.get(b.target);
         if (!o) { error('binding.target', `Binding references missing object '${b.target}'.`, b.target); continue; }
         const valid = b.property === 'unlock' ? o.type === 'exit' : b.property === 'power' ? o.type === 'relay' || o.type === 'lift' : b.property === 'open' ? o.type === 'platform' && o.kind === 'static' : o.type === 'firewall' || o.type === 'platform' && o.kind !== 'static';
+        if (o.type === 'platform' && o.kind === 'code' && codeActivation(o) !== 'signal') error('binding.activation', 'A bound code platform must use Controlled by Signal. Remove its binding to use a constant activation mode.', o.id);
         if (!valid) error('binding.port', `${o.type} '${o.id}' does not support '${b.property}'.`, o.id);
         const key = `${b.target}.${b.property}`; if (boundProperties.has(key)) error('binding.duplicate', `More than one binding drives ${key}.`, o.id); boundProperties.add(key);
     }
-    for (const o of objects) if (o.type === 'exit' || o.type === 'platform' && o.kind === 'code' || o.type === 'lift' || o.type === 'relay') {
+    for (const o of objects) if (o.type === 'exit' || o.type === 'platform' && o.kind === 'code' && codeActivation(o) === 'signal' || o.type === 'lift' || o.type === 'relay') {
         if (!document.bindings.some(b => b.target === o.id)) error('binding.required', `${o.type} '${o.id}' needs an explicit binding before playtesting.`, o.id);
     }
     for (const output of outputs) if (!document.bindings.some(b => b.output === output)) warn('output.unused', `Output '${output}' has no machinery target.`, output);
@@ -142,7 +144,7 @@ export function validateDraft(value: unknown): DraftValidation {
         return binding ? initialSignals?.[draftSignal(binding.id)] : unbound;
     };
     const architecture = objects.filter(o => o.type === 'platform' && o.kind === 'static');
-    const initialCode = objects.filter(o => o.type === 'platform' && o.kind === 'code' && defaultActivation(o.id, false) === true);
+    const initialCode = objects.filter(o => o.type === 'platform' && o.kind === 'code' && (codeActivation(o) === 'always-powered' || codeActivation(o) === 'signal' && defaultActivation(o.id, false) === true));
     for (const o of objects) {
         if (o.type === 'spawn' || o.type === 'checkpoint') {
             const b = objectBounds(o); if (b.x < 0 || b.y < 0 || b.x + b.w > document.geometry.width || b.y + b.h > document.geometry.height) error('spawn.bounds', 'Player centre is outside safe room bounds.', o.id);

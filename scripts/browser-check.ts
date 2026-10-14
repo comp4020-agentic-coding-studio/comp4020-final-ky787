@@ -569,7 +569,9 @@ async function main() {
         check('new visitor starts at pressure', (await snap(cdp)).room === 'pressure');
         check('audio waits for the first real gesture', (await snap(cdp)).audio.state === 'locked' && (await snap(cdp)).audio.voices === 0);
         check('all four rooms available from the menu', await evaluate(cdp, 'document.querySelectorAll(".level-select button").length === 4'));
-        // Native keyboard navigation reaches the last room without completing tutorials.
+        // Native keyboard navigation includes the public builder before the four rooms.
+        await tap(cdp, 'Tab');
+        check('Level Builder is keyboard accessible from the main menu', await evaluate(cdp, 'document.activeElement.id === "level-builder"'));
         for (let i = 0; i < 4; i++) await tap(cdp, 'Tab');
         check('level select supports keyboard navigation', await evaluate(cdp, 'document.activeElement.dataset.room === "uplink"'));
         await waitFor(cdp, 'sound assets decode after a gesture', s => s.audio.loaded === 14);

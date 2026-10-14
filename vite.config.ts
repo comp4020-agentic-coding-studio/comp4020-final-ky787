@@ -9,6 +9,22 @@ const WORKSPACE = "**/Workspace/**";
 export default defineConfig({
   // Relative asset URLs, so the build works from any path.
   base: "./",
+  define: { __WORKBENCH_LOCAL__: "false" },
+  plugins: [{
+    name: "production-browser-boundary",
+    apply: "build",
+    generateBundle(_options, bundle) {
+      const forbidden = /(?:node:|__vite-browser-external|\/scripts\/|\/workbench\/(?:local-storage|runner|coop-session|coop-authority)\.ts|\/server\/(?:app|multiplayer|identity|atomic-json|persistence)\.ts)/;
+      const modules = new Set<string>();
+      for (const chunk of Object.values(bundle)) if (chunk.type === "chunk") {
+        for (const id of Object.keys(chunk.modules)) {
+          if (forbidden.test(id)) this.error(`Development/server module reached production browser bundle: ${id}`);
+          modules.add(id);
+        }
+      }
+      console.log(`Audited ${modules.size} production browser modules: no Node services, local storage adapter or draft multiplayer runner.`);
+    },
+  }],
   server: {
     // Preserve Host for the backend's Origin check, including campaign PUTs.
     proxy: {
@@ -23,7 +39,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      input: "index.html",
+      input: ["index.html", "workbench.html"],
     },
   },
 });

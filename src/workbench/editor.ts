@@ -1,5 +1,5 @@
 import './editor.css';
-import { cloneDraft, draftHash, newDraft, objectBounds, objectPort, serializeDraft, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftObject } from './model.ts';
+import { cloneDraft, codeActivation, draftHash, newDraft, objectBounds, objectPort, serializeDraft, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftObject } from './model.ts';
 import { BUILTIN_OUTPUTS, validateDraft } from './validation.ts';
 import { createRuntime } from './runtime.ts';
 import { evaluateDraft, initialDeviceValues } from './evaluate.ts';
@@ -9,6 +9,9 @@ import { InputManager } from '../ui/input.ts';
 import { emptyInput, createPlayer, type InputState } from '../engine/physics.ts';
 import { FIXED_DT, GRAPPLE, PLAYER } from '../engine/constants.ts';
 import type { Box, Vec2 } from '../engine/geometry.ts';
+
+import { DraftConflict, portableName, storageMessage, type DraftStorageBackend, type DraftEntry, type RecoveryDraft, type StoredDraft } from './storage.ts';
+import { PUBLIC_TEMPLATES, publicTemplate } from './templates.ts';
 
 const $ = <T extends HTMLElement = HTMLElement>(selector: string): T => { const value = document.querySelector<T>(selector); if (!value) throw new Error(`Missing editor element: ${selector}`); return value; };
 const html = (value: unknown) => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
@@ -32,12 +35,11 @@ const PALETTE: { kind: PaletteKind; label: string; hint: string }[] = [
 ];
 type Mode = 'edit' | 'preview' | 'play';
 type Runtime = ReturnType<typeof createRuntime>;
-interface StoredDraft { document: DraftDocument; hash: string; diagnostics: DraftDiagnostic[] }
 interface Sample { time: number; player: { x: number; y: number; grounded: boolean; groundId: string | null; rope: string; ropeTarget: string | null }; cubes: Record<string, { x: number; y: number; carried: boolean }>; signals: unknown; deaths: number }
 interface Recording { version: 1; draftHash: string; engineRevision: string; scenario: string; sectionOnly: boolean; samples: Sample[]; events: { time: number; kind: string; detail: unknown }[] }
 interface Drag { kind: 'move' | 'resize' | 'pan' | 'marquee' | 'bend'; start: Vec2; screen: Vec2; before: DraftDocument; camera: { x: number; y: number; zoom: number }; id?: string; point?: number; additive?: boolean }
 
-class WorkbenchEditor {
+export class WorkbenchEditor {
     history = new DraftHistory(newDraft());
     selection = new Set<string>();
     mode: Mode = 'edit';
@@ -45,10 +47,16 @@ class WorkbenchEditor {
     hash: string | null = null;
     saved = '';
     currentHash = '';
-    token = '';
+    ready = false;
+    storageReady = false;
+    draftId: string | null = null;
+    revision: string | null = null;
+    recoveryId = crypto.randomUUID();
+    recoveredFrom: { id: string; updatedAt: number } | null = null;
+    busy = false;
     engineRevision = 'unknown';
     dataDirectory = '';
-    files: string[] = [];
+    files: DraftEntry[] = [];
     runtime: Runtime | null = null;
     renderer: PuzzleRenderer;
     input: InputManager | null = null;
@@ -69,7 +77,7 @@ class WorkbenchEditor {
     range = false;
     showGrid = true;
     paused = false;
-    externalConflict: StoredDraft | null = null;
+    externalConflict: string | null = null;
     recording: Recording | null = null;
     recordedFrames = 0;
     recordingElapsed = 0;
@@ -88,84 +96,143 @@ class WorkbenchEditor {
     private testRequest = 0;
     private heldCameraKeys = new Set<string>();
 
-    constructor() {
+    constructor(readonly storage: DraftStorageBackend) {
         $('#workbench').innerHTML = `<main class="wb-app">
-          <header class="wb-brand"><div class="identity"><h1>BINARY NINJA</h1><span class="badge">LEVEL WORKBENCH / V1</span><a id="back-to-game" hidden style="color:var(--cyan)">Back to game</a></div><div class="meta"><span>LOCAL AUTHORING</span><span>MOCK DRAFTS · CAMPAIGN ISOLATED</span></div></header>
-          <nav class="wb-toolbar" aria-label="Editor toolbar"><button id="new">New</button><select id="files" aria-label="Open draft"><option value="">Open draft…</option></select><button id="import-room">Import room</button><button id="save" class="primary">Save</button><button id="save-copy">Save copy</button><button id="export">Export JSON</button><button id="import-json">Open JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden><span class="separator"></span><button id="undo" title="Undo (Ctrl+Z)">Undo</button><button id="redo" title="Redo (Ctrl+Shift+Z)">Redo</button><span class="separator"></span><button id="edit-mode" class="active">Edit</button><button id="preview-mode">State preview</button><button id="play" class="primary">Play from spawn</button><button id="stop" hidden>Stop test</button><button id="coop">Test co-op draft</button></nav>
+          <header class="wb-brand"><div class="identity"><h1>BINARY NINJA</h1><span class="badge">${storage.kind === 'browser' ? 'PUBLIC LEVEL BUILDER' : 'LEVEL WORKBENCH / V1'}</span><a id="back-to-game" hidden style="color:var(--cyan)">Back to game</a></div><div class="meta"><span>${storage.kind === 'browser' ? 'SAVED ON THIS DEVICE' : 'LOCAL AUTHORING'}</span><span>MOCK DRAFTS · CAMPAIGN ISOLATED</span></div></header>
+          <nav class="wb-toolbar" aria-label="Editor toolbar"><button id="new">New</button><select id="files" aria-label="Open draft"><option value="">Open draft…</option></select><button id="examples">Examples</button><button id="import-room">Import room</button><button id="save" class="primary">Save</button><button id="save-copy">Save copy</button><button id="rename-draft">Rename</button><button id="delete-draft">Delete draft</button><button id="recover">Recovery</button><button id="export">Export JSON</button><button id="import-json">Import JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden><span class="separator"></span><button id="undo" title="Undo (Ctrl+Z)">Undo</button><button id="redo" title="Redo (Ctrl+Shift+Z)">Redo</button><span class="separator"></span><button id="edit-mode" class="active">Edit</button><button id="preview-mode">State preview</button><button id="play" class="primary">Play from spawn</button><button id="stop" hidden>Stop test</button><button id="coop">Test co-op draft</button></nav>
           <div class="wb-layout"><aside class="wb-sidebar left" aria-label="Object palette and hierarchy"><h2>Object palette</h2><div class="wb-palette">${PALETTE.map(p => `<button draggable="true" data-palette="${p.kind}" title="${p.hint}">${p.label}<span>${p.hint}</span></button>`).join('')}</div><h2>Room hierarchy</h2><input id="search" class="wb-search" aria-label="Search objects" placeholder="Search ID, type or label"><div id="hierarchy" class="wb-hierarchy"></div></aside>
           <section class="wb-stage" aria-label="World viewport"><canvas id="world" tabindex="0" aria-label="Level canvas. Click to select; drag to move. Shift adds selection. WASD or middle drag pans."></canvas><canvas id="overlay" class="overlay" aria-hidden="true"></canvas><div class="canvas-tools"><button id="fit" title="Fit whole room (F)">Fit room</button><button id="frame" title="Frame selection">Frame selection</button><button id="test-point" title="Test from selected marker or last clicked point">Test here</button><label class="check"><input id="grid" type="checkbox" checked>Grid</label><label class="check"><input id="snap" type="checkbox" checked>Snap</label><label><span class="wb-visually-hidden">Grid size</span><input id="grid-size" type="number" value="20" min="1" max="256" aria-label="Grid size"></label><button id="connect">Connect</button><button id="hitboxes">Hitboxes</button><button id="range">Range</button></div><div id="mode-banner" class="wb-mode-banner"></div></section>
           <aside class="wb-sidebar right" aria-label="Properties and validation"><div id="conflict"></div><div id="inspector"></div><div id="logic"></div><details class="wb-diagnostics" id="diagnostics-panel"><summary id="diagnostic-summary">Validation</summary><div id="diagnostics"></div></details></aside></div>
-          <footer class="wb-footer"><span id="status" role="status" aria-live="polite">Connecting to local draft service…</span><span id="document-state"></span></footer></main>`;
+          <footer class="wb-footer"><span id="status" role="status" aria-live="polite">Opening draft storage…</span><span id="document-state"></span></footer></main>`;
+        $('#import-room').hidden = !storage.capabilities.trustedImports;
+        $('#rename-draft').hidden = $('#delete-draft').hidden = !storage.capabilities.manage;
+        if (!storage.capabilities.coop) { $('#coop').hidden = true; }
+        if (storage.kind === 'browser') {
+            const notice = document.createElement('div'); notice.className = 'wb-storage-notice';
+            notice.textContent = 'Levels are saved in this browser. Export JSON to back up or share your work. Clearing browser data or using private browsing can remove drafts. Online custom-level multiplayer is not available yet.';
+            $('.wb-brand').append(notice);
+            const link = $<HTMLAnchorElement>('#back-to-game'); link.href = '/'; link.hidden = false; link.textContent = 'BACK TO GAME';
+        }
         this.canvas = $('#world'); this.overlay = $('#overlay'); this.renderer = new PuzzleRenderer(this.canvas);
         this.attach(); this.refresh(); requestAnimationFrame(this.animate);
+        this.exposeHarness();
         void this.bootstrap();
     }
     get document() { return this.history.document; }
     get dirty() { return serializeDraft(this.document) !== this.saved; }
     status(message: string) { $('#status').textContent = message; }
-    async request<T>(path: string, body?: unknown, method = 'POST'): Promise<T> {
-        const response = await fetch(`/api/workbench/${path}`, body === undefined ? undefined : { method, headers: { 'Content-Type': 'application/json', 'X-Workbench-Token': this.token }, body: JSON.stringify(body) });
-        const value: unknown = await response.json();
-        if (!response.ok) {
-            if (response.status === 409 && value && typeof value === 'object' && 'record' in value) { this.externalConflict = value.record as StoredDraft; this.showConflict(); }
-            throw new Error(value && typeof value === 'object' && 'error' in value ? String(value.error) : `Request failed (${response.status})`);
-        }
-        return value as T;
-    }
     async bootstrap() {
         try {
-            const boot = await this.request<{ token: string; draftRoot: string; engineRevision: string; files: string[]; gameUrl?: string | null }>('bootstrap');
-            this.token = boot.token; this.engineRevision = boot.engineRevision; this.dataDirectory = boot.draftRoot; this.files = boot.files; this.refreshFiles();
-            if (boot.gameUrl) {
-                try {
-                    const url = new URL(boot.gameUrl);
-                    if (url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname) && !url.username && !url.password) {
-                        const link = $<HTMLAnchorElement>('#back-to-game'); link.href = url.href; link.hidden = false;
-                    }
-                } catch { /* Standalone or invalid launch metadata provides no game navigation. */ }
-            }
-            const recovery = await this.request<{ document: DraftDocument; name: string; expectedHash: string | null } | null>('recovery');
-            if (recovery && confirm(`Recover unsaved work for ${recovery.name}? The canonical draft file will remain unchanged until Save.`)) {
-                this.history.replace(recovery.document); this.name = recovery.name; this.hash = recovery.expectedHash; this.saved = ''; this.refresh(); this.fit(); this.status('Recovered unsaved work. Review before saving.');
-            } else if (boot.files.length) await this.open(boot.files.find(n => n.includes('blank')) ?? boot.files[0], false);
-            else { this.saved = ''; this.fit(); this.status(`New draft. Save writes to ${this.dataDirectory}`); }
+            const boot = await this.storage.initialize(); this.storageReady = true;
+            this.engineRevision = boot.engineRevision; this.dataDirectory = boot.location;
+            this.files = await this.storage.list(); this.refreshFiles();
+            if (boot.gameUrl) { const link = $<HTMLAnchorElement>('#back-to-game'); link.href = boot.gameUrl; link.hidden = false; }
+            const recovery = (await this.storage.recoveries())[0];
+            if (recovery && confirm(`Recover unsaved work for ${recovery.name}? Saved drafts remain unchanged until Save.`)) await this.restoreRecovery(recovery);
+            else if (this.files.length) await this.open((this.storage.kind === 'filesystem' ? this.files.find(f => f.name.includes('blank')) ?? this.files[0] : this.files[0]).id, false);
+            else { this.history.replace(this.storage.kind === 'browser' ? publicTemplate() : newDraft()); this.saved = serializeDraft(this.document); this.refresh(); this.fit(); this.status('Ready. Edit this example or choose New, My drafts, or Import JSON. Save keeps a draft on this device.'); }
             setInterval(() => void this.checkExternal(), 4000);
-        } catch (error) { this.status(`Local service unavailable: ${error instanceof Error ? error.message : String(error)}`); }
+        } catch (error) {
+            this.history.replace(publicTemplate()); this.saved = serializeDraft(this.document); this.refresh(); this.fit();
+            this.storageFailure(error);
+        } finally { this.ready = true; this.updateToolbar(); }
     }
-    refreshFiles() { $('#files').innerHTML = option('', 'Open draft…') + this.files.map(name => option(name, name, name === this.name)).join(''); }
-    async open(name: string, checkDirty = true) {
-        if (checkDirty && this.dirty && !confirm('This draft has unsaved edits. Discard them and open another file? Recovery remains available until your next edit.')) { this.refreshFiles(); return; }
-        try { const record = await this.request<StoredDraft>(`drafts?name=${encodeURIComponent(name)}`); this.stopTest(); this.name = name; this.history.replace(record.document); this.hash = record.hash; this.saved = serializeDraft(record.document); this.externalConflict = null; this.refreshFiles(); this.selection.clear(); this.mode = 'edit'; this.refresh(); this.fit(); this.status(`Opened ${name} · ${record.hash.slice(0, 12)}`); } catch (e) { this.status(String(e)); }
+    storageFailure(error: unknown) {
+        if (error instanceof DraftConflict) { this.externalConflict = error.message; this.showConflict(); }
+        const message = storageMessage(error); this.status(message);
+        let notice = document.querySelector('#storage-error');
+        if (!notice) { notice = document.createElement('div'); notice.id = 'storage-error'; notice.className = 'wb-storage-error'; $('.wb-brand').append(notice); }
+        notice.textContent = `${message} Your current document remains available for Export JSON.`;
+    }
+    refreshFiles() { $('#files').innerHTML = option('', this.storage.kind === 'browser' ? 'My drafts…' : 'Open draft…') + this.files.map(f => option(f.id, f.name, f.id === this.draftId)).join(''); }
+    async refreshFileList() { this.files = await this.storage.list(); this.refreshFiles(); }
+    recoveryRecord(): RecoveryDraft { return { id: this.recoveryId, draftId: this.draftId, name: this.name, document: cloneDraft(this.document), expectedHash: this.hash, revision: this.revision, updatedAt: Date.now() }; }
+    async flushRecovery() {
+        clearTimeout(this.recoveryTimer);
+        if (!this.dirty) return;
+        const record = this.recoveryRecord();
+        this.recoveryWrite = this.recoveryWrite.catch(() => {}).then(() => this.storage.recover(record));
+        await this.recoveryWrite;
+    }
+    async beforeReplace(): Promise<boolean> {
+        if (this.busy) return false;
+        if (!this.dirty) return true;
+        if (!confirm('This draft has unsaved edits. Keep a recovery copy and open another draft? Cancel to return and Save or Export JSON.')) return false;
+        const before = serializeDraft(this.document);
+        try { await this.flushRecovery(); if (serializeDraft(this.document) !== before) { this.status('New edits arrived while preserving recovery. Switch cancelled; your edits remain open.'); return false; } return true; }
+        catch (error) { this.storageFailure(error); return confirm('Recovery could not be saved. Discard these unsaved edits anyway? Cancel to Export JSON first.'); }
+    }
+    adopt(record: StoredDraft) {
+        this.loadDocument(record.document, record.hash); this.draftId = record.id; this.name = record.name; this.revision = record.revision;
+        this.recoveryId = crypto.randomUUID(); this.refreshFiles(); this.updateToolbar();
+    }
+    async open(id: string, checkDirty = true) {
+        try { const record = await this.storage.load(id); if (checkDirty && !await this.beforeReplace()) { this.refreshFiles(); return; } this.adopt(record); this.status(`Opened ${this.name} · ${this.hash!.slice(0, 12)}`); }
+        catch (e) { this.storageFailure(e); }
     }
     async save(copy = false) {
+        if (this.busy) return;
         if (this.mode === 'play') { this.status('Stop the physics test before saving authored data.'); return; }
         let name = this.name;
-        if (copy || !this.hash) { const entered = prompt('Draft filename inside levels/drafts (ends in .json)', copy ? this.name.replace(/\.json$/, '-copy.json') : name); if (!entered) return; name = entered.endsWith('.json') ? entered : `${entered}.json`; }
+        if (copy || !this.hash) {
+            const entered = prompt(this.storage.kind === 'browser' ? 'Draft name (saved in this browser)' : 'Draft filename inside levels/drafts (ends in .json)', copy ? this.name.replace(/\.json$/, '-copy.json') : name);
+            if (!entered) return; name = entered.endsWith('.json') ? entered : `${entered}.json`;
+        }
+        this.busy = true; this.updateToolbar();
         try {
-            const submitted = cloneDraft(this.document), serialized = serializeDraft(submitted);
-            const record = await this.request<StoredDraft>(`drafts?name=${encodeURIComponent(name)}`, { document: submitted, expectedHash: name === this.name && !copy ? this.hash : null }, 'PUT');
-            this.name = name; this.hash = record.hash; this.saved = serialized; this.externalConflict = null;
-            if (!this.files.includes(name)) { this.files.push(name); this.files.sort(); } this.refreshFiles(); this.showConflict(); this.updateToolbar();
-            this.status(`Saved ${name} · ${record.hash.slice(0, 12)}${this.diagnostics.some(d => d.severity === 'error') ? ' · incomplete draft, playtest blocked' : ''}`);
-            if (serializeDraft(this.document) === serialized) {
-                clearTimeout(this.recoveryTimer);
-                this.recoveryWrite = this.recoveryWrite.catch(() => {}).then(async () => { if (serializeDraft(this.document) === serialized) await this.request('recovery', {}, 'DELETE'); });
-                await this.recoveryWrite.catch(e => this.status(`Draft saved; recovery cleanup failed: ${String(e)}`));
-            }
-        } catch (e) { this.status(`Save failed: ${e instanceof Error ? e.message : String(e)}`); }
+            const submitted = cloneDraft(this.document), serialized = serializeDraft(submitted), recoveryId = this.recoveryId;
+            const record = await this.storage.save({ id: copy ? null : this.draftId, name, document: submitted, expectedHash: copy ? null : this.hash, revision: copy ? null : this.revision });
+            this.name = record.name; this.draftId = record.id; this.hash = record.hash; this.revision = record.revision; this.saved = serialized; this.externalConflict = null;
+            document.querySelector('#storage-error')?.remove();
+            await this.refreshFileList(); this.showConflict(); this.updateToolbar();
+            this.status(`Saved ${record.name} in ${this.dataDirectory} · ${record.hash.slice(0, 12)}${this.diagnostics.some(d => d.severity === 'error') ? ' · incomplete draft, playtest blocked' : ''}`);
+            clearTimeout(this.recoveryTimer);
+            await this.recoveryWrite.catch(() => {});
+            await this.storage.clearRecovery(recoveryId);
+            if (this.recoveredFrom) { await this.storage.clearRecovery(this.recoveredFrom.id, this.recoveredFrom.updatedAt); this.recoveredFrom = null; }
+            if (this.dirty) await this.flushRecovery();
+        } catch (e) { this.storageFailure(e); }
+        finally { this.busy = false; this.updateToolbar(); }
+    }
+    async renameDraft() {
+        if (!this.draftId || !this.revision || this.busy) return;
+        const name = prompt('Rename saved draft (level title and document ID are unchanged)', this.name); if (!name) return;
+        this.busy = true;
+        try { const record = await this.storage.rename(this.draftId, name, this.revision); this.name = record.name; this.revision = record.revision; await this.refreshFileList(); if (this.dirty) await this.flushRecovery(); this.status(`Renamed to ${record.name}`); }
+        catch (e) { this.storageFailure(e); } finally { this.busy = false; this.updateToolbar(); }
+    }
+    async deleteDraft() {
+        if (!this.draftId || !this.revision || this.busy || !confirm(`Delete saved draft ${this.name}? Export JSON first for a backup. Current editor content will remain open as an unsaved copy.`)) return;
+        this.busy = true;
+        try { await this.storage.delete(this.draftId, this.revision); this.draftId = null; this.hash = null; this.revision = null; this.saved = ''; this.externalConflict = null; await this.flushRecovery(); await this.refreshFileList(); this.showConflict(); this.status('Saved draft deleted. Current content remains open as an unsaved copy.'); }
+        catch (e) { this.storageFailure(e); } finally { this.busy = false; this.updateToolbar(); }
     }
     async checkExternal() {
-        if (!this.hash || this.mode === 'play') return;
-        try { const record = await this.request<StoredDraft>(`drafts?name=${encodeURIComponent(this.name)}`); if (record.hash !== this.hash) { this.externalConflict = record; this.showConflict(); } } catch { /* A failed poll never replaces the local document. */ }
+        if (!this.draftId || this.busy || this.mode === 'play') return;
+        try { const record = await this.storage.load(this.draftId); if (record.hash !== this.hash || record.revision !== this.revision) { this.externalConflict = 'Draft changed outside this editor. Your edits are preserved; reload or Save copy.'; this.showConflict(); } await this.refreshFileList(); }
+        catch (e) { if (e instanceof DraftConflict) { this.externalConflict = e.message; this.showConflict(); } }
     }
     showConflict() {
-        const node = $('#conflict'); node.innerHTML = this.externalConflict ? `<div class="wb-conflict"><strong>File changed outside the editor</strong><p>Your current edits are preserved. Saving with the old hash is blocked.</p><button id="reload-conflict">Reload file</button><button id="copy-conflict">Save my copy</button></div>` : '';
-        node.querySelector('#reload-conflict')?.addEventListener('click', () => void this.open(this.name));
+        const node = $('#conflict'); node.innerHTML = this.externalConflict ? `<div class="wb-conflict"><strong>Draft changed outside the editor</strong><p>${html(this.externalConflict)}</p><button id="reload-conflict">Reload draft</button><button id="copy-conflict">Save my copy</button></div>` : '';
+        node.querySelector('#reload-conflict')?.addEventListener('click', () => { if (this.draftId) void this.open(this.draftId); });
         node.querySelector('#copy-conflict')?.addEventListener('click', () => void this.save(true));
+    }
+    async restoreRecovery(record: RecoveryDraft) {
+        this.loadDocument(record.document); this.name = record.name; this.draftId = record.draftId; this.hash = record.expectedHash; this.revision = record.revision;
+        // Copy into this session's independent recovery key; another open tab may own the original.
+        this.recoveryId = crypto.randomUUID(); this.recoveredFrom = { id: record.id, updatedAt: record.updatedAt }; this.saved = ''; this.refreshFiles(); this.updateToolbar(); this.status('Recovered unsaved work. Review before saving.');
+    }
+    async recoveryDialog() {
+        try {
+            const records = await this.storage.recoveries();
+            const modal = this.modal('Unsaved recovery copies', `<p>Recovery is kept on this device and is not a durable backup. Export JSON to keep important work.</p>${records.length ? records.map((r, i) => `<div class="wb-actions"><button data-recover="${i}">${html(r.name)}</button><button data-remove-recovery="${i}">Delete recovery</button></div>`).join('') : '<p>No recovery copies.</p>'}`);
+            for (const button of modal.querySelectorAll<HTMLButtonElement>('[data-recover]')) button.onclick = async () => { if (!await this.beforeReplace()) return; await this.restoreRecovery(records[Number(button.dataset.recover)]); modal.remove(); };
+            for (const button of modal.querySelectorAll<HTMLButtonElement>('[data-remove-recovery]')) button.onclick = async () => { if (!confirm('Delete this unsaved recovery copy?')) return; try { await this.storage.clearRecovery(records[Number(button.dataset.removeRecovery)].id); modal.remove(); await this.recoveryDialog(); } catch (e) { this.storageFailure(e); } };
+        } catch (e) { this.storageFailure(e); }
     }
     changed() {
         this.propertyError = ''; this.refresh();
-        clearTimeout(this.recoveryTimer); this.recoveryTimer = setTimeout(() => { if (this.token) { const payload = { document: cloneDraft(this.document), name: this.name, expectedHash: this.hash }; this.recoveryWrite = this.recoveryWrite.catch(() => {}).then(() => this.request('recovery', payload, 'PUT')).catch(e => this.status(`Recovery failed: ${String(e)}`)); } }, 650);
+        clearTimeout(this.recoveryTimer); this.recoveryTimer = setTimeout(() => { void this.flushRecovery().catch(e => this.storageFailure(e)); }, 650);
     }
     mutate(edit: (draft: DraftDocument) => void) { if (this.mode !== 'edit') return; try { const next = cloneDraft(this.document); edit(next); const validation = validateDraft(next); if (!validation.structural) throw new Error(validation.diagnostics.filter(d => d.severity === 'error').map(d => d.message).join(' ')); if (this.history.commit(next)) this.changed(); } catch (e) { this.propertyError = e instanceof Error ? e.message : String(e); this.status(this.propertyError); this.renderInspector(); } }
     refresh() {
@@ -185,6 +252,8 @@ class WorkbenchEditor {
         $('#edit-mode').classList.toggle('active', this.mode === 'edit'); $('#preview-mode').classList.toggle('active', this.mode === 'preview');
         $('#play').hidden = this.mode === 'play'; $('#stop').hidden = this.mode !== 'play';
         $<HTMLButtonElement>('#play').disabled = !this.playable; $<HTMLButtonElement>('#coop').disabled = !this.playable || this.mode === 'play';
+        for (const id of ['save', 'save-copy', 'new', 'files', 'import-json', 'examples', 'import-room']) $<HTMLButtonElement>(`#${id}`).disabled = this.busy || !this.ready;
+        for (const id of ['rename-draft', 'delete-draft']) $<HTMLButtonElement>(`#${id}`).disabled = this.busy || !this.draftId;
         $('#document-state').textContent = `${this.dirty ? 'UNSAVED · ' : ''}${this.name} · ${this.currentHash.slice(0, 8) || 'hashing'} · ${Math.round(this.camera.zoom * 100)}%`;
         const recorded = this.recording ? ` Measured path ${this.recording.samples.length} samples${this.recording.draftHash !== this.currentHash ? ' · STALE after document edits' : ''}.` : '';
         $('#mode-banner').innerHTML = this.mode === 'play' ? `<strong>PHYSICS PREVIEW${this.paused ? ' / PAUSED' : ''}</strong> · Local player ${this.testSlot}; not a two-player validation. A/D move · W/Space jump · E use/carry · hold pointer to grapple.${this.testAt ? ' Section-only start.' : ''}` : this.mode === 'preview' ? `<strong>${this.forcedMode ? 'FORCED OUTPUT DIAGNOSTIC' : 'EVALUATED INPUT STATE'}</strong> · ${this.forcedMode ? 'Arbitrary geometry inspection; this is not a reachable state or a solved puzzle.' : 'Saved input values use the actual controller. Physics is stopped.'} WASD pans · wheel zooms.${recorded}` : `<strong>${this.palette ? `PLACE ${PALETTE.find(p => p.kind === this.palette)?.label.toUpperCase()}` : this.connection ? this.connectionSource ? `CONNECT ${html(this.connectionSource)} → select destination` : 'CONNECT / select a source device' : 'EDIT'}</strong> · ${this.runtimeError ? html(this.runtimeError) : !this.playable ? 'Incomplete draft: outline preview. Resolve blocking diagnostics for play. WASD or Space+drag pans · wheel zooms.' : 'Click/drag objects · Shift multi-select · WASD, middle drag or Space+drag pans · wheel zooms · F fits.'}${recorded}`;
@@ -206,7 +275,7 @@ class WorkbenchEditor {
     renderInspector() {
         const panel = $('#inspector');
         if (this.mode === 'preview') { this.renderPreview(panel); return; }
-        if (this.mode === 'play') { panel.innerHTML = `<h2>Real engine physics test</h2><p class="wb-help">The authored document is frozen. Simulation never writes cube or player positions into the level file.</p><div class="wb-actions"><button id="restart">Restart test</button><button id="pause">${this.paused ? 'Resume' : 'Pause'}</button><button id="step">Frame step</button></div><h3>Live observation</h3><pre id="observation" class="wb-help"></pre><div class="wb-notice">Single local player. Test co-op draft opens the actual two-player authority session.</div>`; $('#restart').onclick = () => void this.startTest({ slot: this.testSlot, at: this.testAt }).catch(() => {}); $('#pause').onclick = () => { this.paused = !this.paused; this.input?.releaseAll(); this.renderInspector(); this.updateToolbar(); }; $('#step').onclick = () => { this.paused = true; this.advance(emptyInput()); this.updateToolbar(); }; return; }
+        if (this.mode === 'play') { panel.innerHTML = `<h2>Real engine physics test</h2><p class="wb-help">The authored document is frozen. Simulation never writes cube or player positions into the level file.</p><div class="wb-actions"><button id="restart">Restart test</button><button id="pause">${this.paused ? 'Resume' : 'Pause'}</button><button id="step">Frame step</button></div><h3>Live observation</h3><pre id="observation" class="wb-help"></pre><div class="wb-notice">Single local player. ${this.storage.capabilities.coop ? 'Test co-op draft opens the actual two-player authority session.' : 'Online custom-level multiplayer is reserved for Stage 2.'}</div>`; $('#restart').onclick = () => void this.startTest({ slot: this.testSlot, at: this.testAt }).catch(() => {}); $('#pause').onclick = () => { this.paused = !this.paused; this.input?.releaseAll(); this.renderInspector(); this.updateToolbar(); }; $('#step').onclick = () => { this.paused = true; this.advance(emptyInput()); this.updateToolbar(); }; return; }
         const setters = new Map<string, (value: string | number | boolean) => void>(); let index = 0;
         const field = (label: string, value: string | number | boolean, setter: (v: string | number | boolean) => void, options?: { values?: string[]; min?: number; step?: number; wide?: boolean }) => {
             const id = `property-${index++}`; setters.set(id, setter);
@@ -226,7 +295,15 @@ class WorkbenchEditor {
                 body += field('Label', object.label ?? '', v => patch({ label: String(v) }), { wide: true });
                 if ('w' in object) { body += field('Width', object.w, v => patch({ w: Number(v) }), { min: 1 }); body += field('Height', object.h, v => patch({ h: Number(v) }), { min: 1 }); }
                 if (object.type === 'platform') {
-                    body += field('Platform kind', object.kind, v => patch({ kind: String(v) as 'static' | 'code' | 'unstable' }), { values: ['static', 'code', 'unstable'], wide: true });
+                    body += field('Platform kind', object.kind, v => this.mutate(d => { const p = d.geometry.objects.find(o => o.id === object.id); if (p?.type === 'platform') { p.kind = String(v) as 'static' | 'code' | 'unstable'; if (p.kind !== 'code') delete p.activation; else p.activation = d.bindings.some(b => b.target === p.id) ? 'signal' : 'always-powered'; } }), { values: ['static', 'code', 'unstable'], wide: true });
+                    if (object.kind === 'code') {
+                        const modes = { 'Always Powered': 'always-powered', 'Controlled by Signal': 'signal', 'Always Inactive': 'always-inactive' } as const;
+                        body += field('Activation', Object.keys(modes).find(k => modes[k as keyof typeof modes] === codeActivation(object))!, v => this.mutate(d => {
+                            const p = d.geometry.objects.find(o => o.id === object.id); if (p?.type !== 'platform') return;
+                            p.activation = modes[v as keyof typeof modes];
+                            if (p.activation !== 'signal') { const removed = new Set(d.bindings.filter(b => b.target === p.id).map(b => b.id)); d.bindings = d.bindings.filter(b => !removed.has(b.id)); d.presentation.wires = d.presentation.wires.filter(w => !w.binding || !removed.has(w.binding)); }
+                        }), { values: Object.keys(modes), wide: true });
+                    }
                     body += field('Accept grapples', object.hookable ?? object.kind !== 'static', v => patch({ hookable: Boolean(v) }), { wide: true });
                     body += field('Anchor hint', object.anchor ?? false, v => patch({ anchor: Boolean(v) }), { wide: true });
                     body += field('Blocks cube interaction', object.blocksCubeInteraction ?? false, v => patch({ blocksCubeInteraction: Boolean(v) }), { wide: true });
@@ -327,7 +404,7 @@ class WorkbenchEditor {
         for (const checkbox of panel.querySelectorAll<HTMLInputElement>('[data-preview-input]')) checkbox.onchange = () => { this.previewValues[checkbox.dataset.previewInput!] = checkbox.checked; this.rebuildRuntime(); this.renderPreview(panel); };
         for (const checkbox of panel.querySelectorAll<HTMLInputElement>('[data-forced]')) checkbox.onchange = () => { this.forced[checkbox.dataset.forced!] = checkbox.checked; this.rebuildRuntime(); this.renderPreview(panel); };
         panel.querySelector('#forced-mode')!.addEventListener('change', event => { this.forcedMode = (event.target as HTMLInputElement).checked; this.forced = Object.fromEntries(this.outputIds().map(id => [id, false])); this.rebuildRuntime(); this.renderPreview(panel); this.updateToolbar(); });
-        panel.querySelector('#save-state')!.addEventListener('click', () => { const name = prompt('Saved input configuration name', 'state'); if (!name) return; if (!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(name) || ['__proto__', 'constructor', 'prototype'].includes(name)) { this.status('Choose a state name starting with a letter, using letters, digits, _ or -.'); return; } this.history.change(d => { d.previewStates[name] = { ...this.previewValues }; }); this.stateName = name; this.changed(); });
+        panel.querySelector('#save-state')!.addEventListener('click', () => { const name = prompt('Saved input configuration name', 'state'); if (!name) return; if (!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(name) || ['__proto__', 'constructor', 'prototype'].includes(name)) { this.status('Choose a state name starting with a letter, using letters, digits, _ or -.'); return; } const next = cloneDraft(this.document); next.previewStates[name] = { ...this.previewValues }; const result = validateDraft(next); if (!result.structural) { this.status(result.diagnostics.map(d => d.message).join(' ')); return; } this.history.commit(next); this.stateName = name; this.changed(); });
     }
     renderDiagnostics() {
         const errors = this.diagnostics.filter(d => d.severity === 'error').length, warnings = this.diagnostics.filter(d => d.severity === 'warning').length;
@@ -336,12 +413,33 @@ class WorkbenchEditor {
         for (const button of document.querySelectorAll<HTMLButtonElement>('[data-diagnostic]')) button.onclick = () => { const id = this.diagnostics[Number(button.dataset.diagnostic)].objectId; if (id) { this.selection = new Set([id]); this.frameSelection(); this.renderHierarchy(); this.renderInspector(); this.renderLogic(); } };
     }
     attach() {
-        $('#new').onclick = () => { if (this.dirty && !confirm('Discard unsaved edits and create a new draft?')) return; this.stopTest(); this.history.replace(newDraft()); this.name = 'untitled.json'; this.hash = null; this.saved = ''; this.selection.clear(); this.mode = 'edit'; this.changed(); this.fit(); };
-        $<HTMLSelectElement>('#files').onchange = event => { const name = (event.target as HTMLSelectElement).value; if (name) void this.open(name); };
+        $('#new').onclick = async () => { if (!await this.beforeReplace()) return; this.loadDocument(this.storage.kind === 'browser' ? publicTemplate() : newDraft()); this.name = 'untitled.json'; this.changed(); };
+        $<HTMLSelectElement>('#files').onchange = event => { const id = (event.target as HTMLSelectElement).value; if (id) void this.open(id); };
+        $('#files').onfocus = () => { if (this.storageReady) void this.refreshFileList().catch(e => this.storageFailure(e)); };
         $('#save').onclick = () => void this.save(); $('#save-copy').onclick = () => void this.save(true);
-        $('#export').onclick = () => this.download(this.name, serializeDraft(this.document));
+        $('#rename-draft').onclick = () => void this.renameDraft(); $('#delete-draft').onclick = () => void this.deleteDraft(); $('#recover').onclick = () => void this.recoveryDialog();
+        $('#export').onclick = () => {
+            const result = validateDraft(this.document);
+            if (!result.structural) { this.status('Export blocked: malformed document. Resolve structural errors first.'); return; }
+            this.download(portableName(this.name.replace(/\.json$/, result.playable ? '.json' : '-incomplete.json')), serializeDraft(this.document));
+            this.status(result.playable ? 'Exported canonical JSON. Keep this file as a backup or share it.' : 'Exported INCOMPLETE draft. Blocking diagnostics must be resolved before Playtest.');
+        };
         $('#import-json').onclick = () => $<HTMLInputElement>('#json-file').click();
-        $<HTMLInputElement>('#json-file').onchange = async event => { const file = (event.target as HTMLInputElement).files?.[0]; if (!file) return; try { if (file.size > 1_000_000) throw new Error('Draft exceeds 1 MB limit.'); const value: unknown = JSON.parse(await file.text()), result = validateDraft(value); if (!result.structural || !result.document) throw new Error(result.diagnostics.map(d => `${d.code}: ${d.message}`).join('\n')); if (this.dirty && !confirm('Discard unsaved edits and open this JSON draft?')) return; this.loadDocument(result.document); this.name = file.name; this.status('Portable JSON opened. Save writes a canonical project draft.'); } catch (e) { this.status(`JSON rejected: ${String(e)}`); } (event.target as HTMLInputElement).value = ''; };
+        $<HTMLInputElement>('#json-file').onchange = async event => {
+            const input = event.target as HTMLInputElement, file = input.files?.[0]; if (!file) return;
+            try {
+                if (file.size > 1_000_000) throw new Error('Draft exceeds 1 MB limit.');
+                const value: unknown = JSON.parse(await file.text()), result = validateDraft(value);
+                if (!result.structural || !result.document) throw new Error(result.diagnostics.map(d => `${d.code}: ${d.message}`).join('\n'));
+                if (!await this.beforeReplace()) return;
+                this.loadDocument(result.document); this.name = portableName(file.name); this.updateToolbar();
+                try { const record = await this.storage.importJSON(result.document, this.name); if (record) { this.adopt(record); await this.refreshFileList(); } this.status('JSON imported as an independent authored/mock draft. Nothing was uploaded. Existing drafts were not overwritten.'); }
+                catch (e) { this.storageFailure(e); } // Keep the imported document editable/exportable if storage failed.
+                if (this.dirty) this.changed();
+            } catch (e) { this.status(`JSON rejected: ${storageMessage(e)}`); }
+            finally { input.value = ''; }
+        };
+        $('#examples').onclick = () => this.examplesDialog();
         $('#import-room').onclick = () => this.importDialog(); $('#undo').onclick = () => { if (this.history.undo()) this.changed(); }; $('#redo').onclick = () => { if (this.history.redo()) this.changed(); };
         $('#edit-mode').onclick = () => { this.stopTest(); this.mode = 'edit'; this.refresh(); }; $('#preview-mode').onclick = () => this.preview(this.stateName);
         $('#play').onclick = () => void this.startTest({ slot: this.testSlot }).catch(() => {}); $('#stop').onclick = () => this.stopTest(); $('#coop').onclick = () => void this.startCoop();
@@ -386,7 +484,7 @@ class WorkbenchEditor {
         });
         window.addEventListener('keyup', event => { this.heldCameraKeys.delete(event.code); if (event.code === 'Space') this.heldSpace = false; });
         window.addEventListener('blur', () => { this.clearEditorMovement(); this.input?.releaseAll(); });
-        document.addEventListener('visibilitychange', () => { this.clearEditorMovement(); this.input?.releaseAll(); });
+        document.addEventListener('visibilitychange', () => { this.clearEditorMovement(); this.input?.releaseAll(); if (document.hidden && this.dirty) void this.flushRecovery().catch(e => this.storageFailure(e)); });
         document.addEventListener('focusin', event => { if (editableTarget(event.target)) { this.clearEditorMovement(); this.releaseGameplayInput(); } });
         window.addEventListener('beforeunload', event => { if (this.dirty) { event.preventDefault(); event.returnValue = ''; } });
     }
@@ -509,6 +607,7 @@ class WorkbenchEditor {
     }
     loadDocument(document: DraftDocument, hash?: string) {
         const result = validateDraft(document); if (!result.structural || !result.document) throw new Error(result.diagnostics.map(d => `${d.code}: ${d.message}`).join('; '));
+        clearTimeout(this.recoveryTimer); this.recoveredFrom = null; this.draftId = null; this.revision = null; this.recoveryId = crypto.randomUUID();
         this.stopTest(); this.history.replace(result.document); this.hash = hash ?? null; this.saved = hash ? serializeDraft(result.document) : ''; this.externalConflict = null; this.selection.clear(); this.mode = 'edit'; this.refresh(); this.fit();
     }
     async render(options: { viewport?: Box; wholeRoom?: boolean; state?: string } = {}) {
@@ -516,13 +615,19 @@ class WorkbenchEditor {
         this.draw(0); await new Promise<void>(resolve => requestAnimationFrame(() => resolve())); return { hash: await draftHash(this.document), state: options.state ?? this.mode, viewport: { ...this.camera } };
     }
     async startCoop() {
-        try { const snapshot = await this.request<{ hash: string }>('snapshots', { document: this.document }); const url = `/workbench-runner.html?coopHash=${encodeURIComponent(snapshot.hash)}`; const child = window.open(url, '_blank'); this.status(`Frozen draft ${snapshot.hash.slice(0, 12)}. Co-op host opens separately; partner must use a private window or another browser identity.`); if (!child) this.modal('Co-op draft ready', `<p>A validated snapshot is frozen at <code>${html(snapshot.hash)}</code>.</p><p><a href="${url}" target="_blank" rel="noopener">Open co-op host</a>. The partner joins its room code in a private window. Ordinary tabs share an identity.</p>`); }
+        if (!this.storage.freeze) { this.status('Online custom-level multiplayer is not available yet.'); return; }
+        try { const snapshot = { hash: await this.storage.freeze(this.document) }; const url = `/workbench-runner.html?coopHash=${encodeURIComponent(snapshot.hash)}`; const child = window.open(url, '_blank'); this.status(`Frozen draft ${snapshot.hash.slice(0, 12)}. Co-op host opens separately; partner must use a private window or another browser identity.`); if (!child) this.modal('Co-op draft ready', `<p>A validated snapshot is frozen at <code>${html(snapshot.hash)}</code>.</p><p><a href="${url}" target="_blank" rel="noopener">Open co-op host</a>. The partner joins its room code in a private window. Ordinary tabs share an identity.</p>`); }
         catch (e) { this.status(`Co-op snapshot failed: ${String(e)}`); }
     }
     modal(title: string, content: string) { this.clearEditorMovement(); const overlay = document.createElement('div'); overlay.className = 'wb-modal'; overlay.innerHTML = `<section class="wb-dialog" role="dialog" aria-modal="true" aria-label="${html(title)}"><h2>${html(title)}</h2>${content}<div class="wb-actions"><button data-close>Close</button></div></section>`; document.body.append(overlay); overlay.querySelector<HTMLButtonElement>('[data-close]')!.onclick = () => overlay.remove(); overlay.querySelector<HTMLButtonElement>('button')?.focus(); return overlay; }
     importDialog() {
+        if (!this.storage.importRoom) return;
         const modal = this.modal('Import a trusted room copy', '<p>Retain geometry, both player slots and the allowlisted controller. Copies are authored drafts. Campaign files and evidence remain unchanged.</p><div class="wb-actions"><button data-import="race-condition">RACE CONDITION</button><button data-import="crossfeed-vault">CROSSFEED VAULT</button><button data-import="relay-lab">RELAY LAB</button></div>');
-        for (const button of modal.querySelectorAll<HTMLButtonElement>('[data-import]')) button.onclick = async () => { if (this.dirty && !confirm('Discard unsaved editor changes and open the imported copy?')) return; try { const factory = button.dataset.import!, record = await this.request<StoredDraft>('import', { controller: factory }); this.loadDocument(record.document); this.name = `${factory}-copy.json`; this.saved = ''; modal.remove(); this.status(`Imported ${factory}. Save the copy to exchange edits with CLI tools.`); } catch (e) { this.status(String(e)); } };
+        for (const button of modal.querySelectorAll<HTMLButtonElement>('[data-import]')) button.onclick = async () => { if (!await this.beforeReplace()) return; try { const factory = button.dataset.import!, document = await this.storage.importRoom!(factory); this.loadDocument(document); this.name = `${factory}-copy.json`; this.saved = ''; modal.remove(); this.status(`Imported ${factory}. Save the copy to exchange edits with CLI tools.`); } catch (e) { this.status(String(e)); } };
+    }
+    examplesDialog() {
+        const modal = this.modal('Authored example levels', `<p>Open an independent editable copy. These templates carry no binary evidence claims.</p>${PUBLIC_TEMPLATES.map(t => `<div class="wb-actions"><button data-template="${t.id}">${html(t.title)}</button><p>${html(t.description)}</p></div>`).join('')}`);
+        for (const button of modal.querySelectorAll<HTMLButtonElement>('[data-template]')) button.onclick = async () => { if (!await this.beforeReplace()) return; const draft = publicTemplate(button.dataset.template); this.loadDocument(draft); this.name = `${draft.id}.json`; this.changed(); modal.remove(); };
     }
     download(name: string, text: string) { const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })), link = document.createElement('a'); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
     /** Stopped editor visibility changes only this synchronous rendering call. */
@@ -624,18 +729,19 @@ class WorkbenchEditor {
         }
         this.draw(elapsed); requestAnimationFrame(this.animate);
     };
+    exposeHarness() {
+        const editor = this;
+        const api = {
+            get ready() { return editor.ready; },
+            snapshot: () => ({ document: cloneDraft(editor.document), hash: editor.currentHash, mode: editor.mode, selection: [...editor.selection], dirty: editor.dirty, diagnostics: editor.diagnostics, file: editor.name, camera: { ...editor.camera }, playable: editor.playable, runtimeError: editor.runtimeError, renderCamera: { x: editor.renderer.camera.x, y: editor.renderer.camera.y, zoom: editor.renderer.camera.zoom }, storage: editor.storage.kind, draftId: editor.draftId, revision: editor.revision }),
+            loadDocument: (document: DraftDocument, hash?: string) => editor.loadDocument(document, hash),
+            preview: (state: Parameters<WorkbenchEditor['preview']>[0]) => editor.preview(state),
+            startTest: (options?: Parameters<WorkbenchEditor['startTest']>[0]) => editor.startTest(options),
+            stopTest: () => editor.stopTest(), stepTest: (options: Parameters<WorkbenchEditor['stepTest']>[0]) => editor.stepTest(options),
+            observe: () => editor.runtime?.snapshot(), render: (options?: Parameters<WorkbenchEditor['render']>[0]) => editor.render(options),
+            exportRecording: () => structuredClone(editor.recording),
+        };
+        Object.defineProperty(window, 'workbench', { value: Object.freeze(api), configurable: false });
+    }
+
 }
-const editor = new WorkbenchEditor();
-/** Internal browser harness only. This entry is excluded from the production build. */
-const api = {
-    get ready() { return !!editor.token; },
-    snapshot: () => ({ document: cloneDraft(editor.document), hash: editor.currentHash, mode: editor.mode, selection: [...editor.selection], dirty: editor.dirty, diagnostics: editor.diagnostics, file: editor.name, camera: { ...editor.camera }, playable: editor.playable, runtimeError: editor.runtimeError }),
-    loadDocument: (document: DraftDocument, hash?: string) => editor.loadDocument(document, hash),
-    preview: (state: Parameters<WorkbenchEditor['preview']>[0]) => editor.preview(state),
-    startTest: (options?: Parameters<WorkbenchEditor['startTest']>[0]) => editor.startTest(options),
-    stopTest: () => editor.stopTest(), stepTest: (options: Parameters<WorkbenchEditor['stepTest']>[0]) => editor.stepTest(options),
-    observe: () => editor.runtime?.snapshot(), render: (options?: Parameters<WorkbenchEditor['render']>[0]) => editor.render(options),
-    exportRecording: () => structuredClone(editor.recording),
-};
-Object.defineProperty(window, 'workbench', { value: Object.freeze(api), configurable: false });
-declare global { interface Window { workbench: typeof api } }

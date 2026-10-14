@@ -30,7 +30,7 @@ export function uniqueId(draft: DraftDocument, stem: string, reserved = new Set<
 export function entityBounds(draft: DraftDocument, id: string): Box | undefined {
     const o = draft.geometry.objects.find(v => v.id === id); if (o) return objectBounds(o);
     const label = draft.presentation.labels.find(v => v.id === id); if (label) return { x: label.x, y: label.y - 24, w: Math.max(80, label.text.length * 14), h: 30 };
-    const reveal = draft.presentation.cameraReveals.find(v => v.id === id); if (reveal) return reveal.bounds ?? boundsUnion((reveal.platformIds ?? []).map(i => entityBounds(draft, i)).filter((b): b is Box => !!b));
+    const reveal = draft.presentation.cameraReveals.find(v => v.id === id); if (reveal) return reveal.bounds ?? boundsUnion((reveal.platformIds ?? []).map(i => { const p = draft.geometry.objects.find(o => o.id === i && o.type === 'platform'); return p ? objectBounds(p) : undefined; }).filter((b): b is Box => !!b));
     const wire = draft.presentation.wires.find(v => v.id === id); if (wire) return boundsUnion(wire.points.map(p => ({ ...p, w: 0, h: 0 })));
 }
 export function boundsUnion(boxes: Box[]): Box | undefined {
@@ -48,7 +48,7 @@ export function createEntity(draft: DraftDocument, kind: PaletteKind, at: Vec2):
     const id = uniqueId(draft, kind); const base = { id, ...at };
     let object: DraftObject;
     switch (kind) {
-        case 'static': case 'code': case 'door': case 'unstable': object = { ...base, type: 'platform', kind: kind === 'door' ? 'static' : kind, w: kind === 'door' ? 50 : 200, h: kind === 'static' ? 80 : kind === 'door' ? 160 : 30, hookable: kind === 'code' || kind === 'unstable', label: kind.toUpperCase(), ...(kind === 'unstable' ? { hookCrumbleDelay: .6, crumbleDelay: .6, respawnDelay: 3 } : {}) }; break;
+        case 'static': case 'code': case 'door': case 'unstable': object = { ...base, type: 'platform', kind: kind === 'door' ? 'static' : kind, w: kind === 'door' ? 50 : 200, h: kind === 'static' ? 80 : kind === 'door' ? 160 : 30, hookable: kind === 'code' || kind === 'unstable', label: kind.toUpperCase(), ...(kind === 'code' ? { activation: 'always-powered' as const } : {}), ...(kind === 'unstable' ? { hookCrumbleDelay: .6, crumbleDelay: .6, respawnDelay: 3 } : {}) }; break;
         case 'cube': object = { ...base, type: 'cube', mark: 'C' }; break;
         case 'plate': case 'socket': case 'scanner': case 'toggle': case 'terminal': object = { ...base, type: 'device', kind, label: kind.toUpperCase(), ...(kind === 'toggle' || kind === 'terminal' ? { initial: false } : {}) }; break;
         case 'spawn': object = { ...base, type: 'spawn', slot: draft.geometry.objects.some(o => o.type === 'spawn' && o.slot === 1) ? 2 : 1 }; break;
@@ -136,6 +136,7 @@ export function bindingProperty(target: DraftObject): DraftBinding['property'] |
 export function connectOutput(draft: DraftDocument, output: string, targetId: string, invert = false, sourceId?: string, pairMate = true): string {
     const target = draft.geometry.objects.find(o => o.id === targetId), property = target && bindingProperty(target);
     if (!target || !property) throw new Error('Select a platform, door, lift, relay, firewall or exit as the destination.');
+    if (target.type === 'platform' && target.kind === 'code') target.activation = 'signal';
     const existing = draft.bindings.find(b => b.target === targetId && b.property === property);
     const connectMate = () => { if (pairMate && target.type === 'relay') for (const mate of draft.geometry.objects) if (mate.type === 'relay' && mate.pair === target.pair && mate.id !== target.id) connectOutput(draft, output, mate.id, invert, sourceId, false); };
     if (existing) { existing.output = output; existing.invert = invert; connectMate(); return existing.id; }

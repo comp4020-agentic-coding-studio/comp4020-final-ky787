@@ -13,7 +13,7 @@ import type { RoomMemory } from '../slice/progress.ts';
 import { CUBE_SIZE } from '../slice/tuning.ts';
 import type { PuzzleWorld, CrumbleAuthority } from '../slice/world.ts';
 import { nativeSignal } from './room-adapter.ts';
-import { emptyOutputs, draftSignal } from './evaluate.ts';
+import { CONSTANT_POWER, emptyOutputs, draftSignal } from './evaluate.ts';
 import { objectPort, type BuiltinControllerId, type DraftDocument, type DraftDevice } from './model.ts';
 import { bodyOnDraftDevice, interactWithLocalCube, nearDraftControl, type LocalDraftAuthority } from './runtime.ts';
 const registry: { [K in BuiltinControllerId]: LevelDefinition<K> } = { 'race-condition': raceDefinition, 'crossfeed-vault': crossfeedDefinition, 'pairing-bay': pairingDefinition, ...LAB_DEFINITIONS };
@@ -36,7 +36,9 @@ class BuiltinAuthority implements LocalDraftAuthority {
         this.project();
     }
     get checkpoint(): RoomMemory['checkpoint'] { return this.ctx.record.checkpoint === 'reunion' ? 'relay' : this.ctx.record.checkpoint; }
-    physicalPower(signal: MachineSignal): boolean { const binding = this.document.bindings.find(b => b.invert && draftSignal(b.id) === signal), native = binding ? nativeSignal(binding.output) : signal; const powered = this.forced && Object.hasOwn(this.forced, native) ? this.forced[native] : this.physical[native] ?? !!(this.frame.signals?.[native] ?? this.frame.outputs[native as keyof typeof this.frame.outputs]); return binding ? !powered : powered; }
+    physicalPower(signal: MachineSignal): boolean {
+        if (signal === 'draft:activation:on' || signal === 'draft:activation:off') return CONSTANT_POWER[signal];
+        const binding = this.document.bindings.find(b => b.invert && draftSignal(b.id) === signal), native = binding ? nativeSignal(binding.output) : signal; const powered = this.forced && Object.hasOwn(this.forced, native) ? this.forced[native] : this.physical[native] ?? !!(this.frame.signals?.[native] ?? this.frame.outputs[native as keyof typeof this.frame.outputs]); return binding ? !powered : powered; }
     private syncCrumble(w: PuzzleWorld) {
         for (const p of w.platforms) { if (p.def.id !== 'crumbleA' && p.def.id !== 'crumbleB') continue; const state = this.ctx.crumble[p.def.id]; if (!state) continue; const broken = state.phase === 'broken'; p.fuseDuration = state.durationMs / 1000 || .6; p.fuse = state.phase === 'warning' ? Math.max(0, state.deadline - this.ctx.now) / 1000 : -1; p.respawn = broken ? Math.max(.001, (state.deadline - this.ctx.now) / 1000) : 0; p.solid.enabled = !broken && (!p.def.signal || this.physicalPower(p.def.signal)); p.solid.grappleable = p.solid.enabled && p.def.hookable !== false; if (broken && w.player.rope.anchorId === p.def.id) w.cancelGrapple(); }
     }
@@ -78,7 +80,7 @@ class BuiltinAuthority implements LocalDraftAuthority {
         if (this.forced) Object.assign(this.outputs, this.forced);
         const signals: Partial<Record<MachineSignal, boolean>> = {};
         for (const b of this.document.bindings) { const value = !!this.outputs[b.output] !== !!b.invert; if (b.invert) signals[draftSignal(b.id)] = value; }
-        this.frame = { source: 'mock-greybox', outputs: base, signals: { ...this.outputs, ...signals }, controls, plates, ...(timer ? { timer } : {}), ...(fading ? { fading } : {}) };
+        this.frame = { source: 'mock-greybox', outputs: base, signals: { ...CONSTANT_POWER, ...this.outputs, ...signals }, controls, plates, ...(timer ? { timer } : {}), ...(fading ? { fading } : {}) };
         if (this.forced?.exitDoor !== undefined) this.frame.outputs.exitDoor = this.forced.exitDoor;
         for (const d of this.document.geometry.objects) if (d.type === 'device') { let v = d.kind === 'toggle' || d.kind === 'terminal' ? controls[d.id] : plates[d.id]; if (d.legacy) { const map = { plate: 'plateA', plateB: 'plateB', plateC: 'plateC', cargoPlate: 'cubeOnPlate', lever: 'switchB', upperLever: 'switchC' } as const; if (d.legacy !== 'cubePad') v = this.inputs[map[d.legacy]]; } this.values[objectPort(d)] = !!v; }
     }

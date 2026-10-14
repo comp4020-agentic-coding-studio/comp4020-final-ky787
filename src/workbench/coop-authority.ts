@@ -8,7 +8,7 @@ import { bodyOnPlate, sampleExit } from '../coop/authority.ts';
 import { createCoopAuthority } from '../coop/lab-authority.ts';
 import type { CoopClient } from '../coop/client.ts';
 import { cubeEntries, type CubeMap, type SharedRoom, type SessionRoom } from '../coop/protocol.ts';
-import { draftFrame, draftSignal } from './evaluate.ts';
+import { CONSTANT_POWER, draftFrame, draftSignal } from './evaluate.ts';
 import { nativeSignal } from './room-adapter.ts';
 import { objectPort, type DraftDocument, type DraftDevice } from './model.ts';
 
@@ -77,11 +77,12 @@ class BoundBuiltinAuthority implements DraftCoopAuthority {
     get checkpoint() { return this.base.checkpoint; }
     get frame() {
         const frame = this.base.frame, values: Record<string, boolean> = { ...frame.outputs, ...frame.signals };
-        const signals = { ...frame.signals };
+        const signals: Partial<Record<MachineSignal, boolean>> = { ...CONSTANT_POWER, ...frame.signals };
         for (const binding of this.document.bindings) if (binding.invert) signals[draftSignal(binding.id)] = !values[binding.output];
         return { ...frame, signals };
     }
     physicalPower(signal: MachineSignal): boolean {
+        if (signal === 'draft:activation:on' || signal === 'draft:activation:off') return CONSTANT_POWER[signal];
         const binding = this.document.bindings.find(b => b.invert && draftSignal(b.id) === signal);
         const native = binding ? nativeSignal(binding.output) : signal;
         const values: Partial<Record<MachineSignal, boolean>> = { ...this.base.frame.outputs, ...this.base.frame.signals };

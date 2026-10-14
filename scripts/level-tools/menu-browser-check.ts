@@ -80,8 +80,9 @@ try {
     if (page.errors.length) throw new Error(page.errors.join('\n'));
     const production = await harness.startServer();
     const published = await harness.page(production, browser);
-    check('production menu has no local builder link', await published.read("!document.querySelector('#level-builder')"));
-    for (const path of ['workbench.html', 'api/workbench/bootstrap']) check(`production ${path} unavailable`, (await fetch(production + path)).status === 404);
+    check('production menu exposes public Level Builder', await published.read("!!document.querySelector('#level-builder')"));
+    check('production public builder exists', (await fetch(production + 'workbench.html')).status === 200);
+    for (const path of ['workbench-runner.html', 'api/workbench/bootstrap']) check(`production ${path} unavailable`, (await fetch(production + path)).status === 404);
     if (published.errors.length) throw new Error(published.errors.join('\n'));
     await writeFile(join(reports, 'checks.json'), JSON.stringify({ pass: true, checks }, null, 2) + '\n');
     console.log(checks.map(label => `PASS ${label}`).join('\n'));

@@ -10,7 +10,10 @@ export type DraftExpression = { op: 'const'; value: boolean } | { op: 'ref'; id:
 export type BuiltinControllerId = 'race-condition' | 'crossfeed-vault' | 'relay-lab' | 'lift-lab' | 'crumble-lab' | 'boost-lab' | 'firewall-lab' | 'pairing-bay';
 export type DraftController = { kind: 'declarative'; outputs: Record<string, DraftExpression> } | { kind: 'builtin'; id: BuiltinControllerId; version: 1 };
 interface ObjectBase extends Vec2 { id: string; label?: string }
-export interface DraftPlatform extends ObjectBase { type: 'platform'; w: number; h: number; kind: 'static' | 'code' | 'unstable'; hookable?: boolean; anchor?: boolean; blocksCubeInteraction?: boolean; hookCrumbleDelay?: number; crumbleDelay?: number; respawnDelay?: number; listingOffsetX?: number; assemblyBinding?: string }
+export type CodeActivation = 'always-powered' | 'signal' | 'always-inactive';
+/** Version-1 omission retains the old controlled semantics, even when a binding is missing. */
+export const codeActivation = (platform: DraftPlatform): CodeActivation => platform.activation ?? 'signal';
+export interface DraftPlatform extends ObjectBase { type: 'platform'; w: number; h: number; kind: 'static' | 'code' | 'unstable'; activation?: CodeActivation; hookable?: boolean; anchor?: boolean; blocksCubeInteraction?: boolean; hookCrumbleDelay?: number; crumbleDelay?: number; respawnDelay?: number; listingOffsetX?: number; assemblyBinding?: string }
 export interface DraftSpawn extends ObjectBase { type: 'spawn'; slot: 1 | 2 }
 /** Player centre; pedestal has a separate floor-contact breakpoint object. */
 export interface DraftCheckpoint extends ObjectBase { type: 'checkpoint'; slot: 1 | 2; checkpoint: 'relay' | 'upper' }

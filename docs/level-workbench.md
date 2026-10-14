@@ -1,9 +1,35 @@
-# Binary Ninja Level Workbench v1
+# Binary Ninja Level Workbench — public Stage 1 and local development
 
-This is a local draft authoring tool. Its JSON files, validator, controller evaluator,
+One editor provides a public browser backend and a local developer backend. Its canonical JSON, validator, controller evaluator,
 `PuzzleWorld` physics and `PuzzleRenderer` are shared by the graphical editor and
 command-line tools. Drafts are authored/mock content. They do not replace campaign
 rooms, award campaign badges, or inherit verified binary evidence.
+
+## Public Level Builder
+
+Open [the public builder](https://comp4020-final-ky787.fly.dev/workbench.html) or select **LEVEL BUILDER** in the game menu. No account, developer token or local service is needed. **BACK TO GAME** returns on the same origin; visitor identity, tutorial progress and persistent party membership are preserved. The builder never reads or writes the campaign progress API.
+
+1. **New** opens a beginner draft; **Examples** offers a beginner room and a multi-signal room. Every copy is independent and authored/mock.
+2. Place, drag, resize and configure objects using the existing palette and inspector. New code platforms are Always Powered, so a new slab needs no controller work to playtest. **Connect** selects Controlled by Signal and creates a functional binding plus a decorative wire.
+3. **State preview** shows evaluated inputs or explicitly labelled forced-output diagnostics. **Play from spawn** runs the actual single-player engine; stop restores the document, selection and editor camera. Recordings can be exported but are never saved in IndexedDB.
+4. **Save** creates or updates a browser draft. **My drafts** lists saved levels. **Save copy** creates a fresh stable storage ID, even when the document ID is the same. Duplicate filenames receive numbered suffixes. **Rename** changes the library filename, preserving the document title and authored ID. **Delete draft** requires confirmation and leaves current editor content available for export as an unsaved copy.
+5. **Export JSON** downloads the canonical document. Incomplete drafts use an `-incomplete.json` filename and a visible warning; malformed documents are rejected. **Import JSON** uses a local file picker, never uploads the file, and creates an independent draft. Remote URL imports are unsupported.
+
+IndexedDB records belong to the exact site origin and browser profile. Ordinary refresh/reopen retains saved drafts. Private browsing, clearing site data, storage eviction, changing origin or using another device can make drafts unavailable. **Export JSON is the durable backup and sharing path.** Browser saving is not a cloud service.
+
+Recovery snapshots are debounced after edits and flushed before switching documents. Confirming a switch preserves an independent recovery copy; **Recovery** lists and removes these copies. Startup offers the latest unsaved recovery. Sudden process termination before a recovery write completes may lose recent edits. Save/Export before closing. Recovery contains canonical documents only, never gameplay recordings.
+
+Two tabs use transactional revision and SHA-256 comparisons: stale Save, Rename and Delete operations fail and preserve both the newer saved draft and current edits. Reload or Save copy resolves conflicts. A storage-full, unavailable, blocked or upgraded-database error is visible; it never marks unsaved edits saved. Current work remains editable, playable where valid, and exportable. Close other builder tabs and reload for a blocked upgrade; export before clearing any site data.
+
+### Exchange with the local developer workbench
+
+Send the downloaded JSON file to another person. Locally, choose **Import JSON** and **Save** with a new filename in `levels/drafts/`. Codex can edit that exact JSON and run `pnpm level:validate levels/drafts/name.json --json`. Alternatively copy the file into `levels/drafts/` and open it from the local toolbar. Use Export JSON in either mode to send it back. Canonical coordinates, metadata, Boolean expressions, wires, bindings and preview states are preserved; the separate browser storage ID/revision is not part of the level format. Document IDs may legitimately repeat across independent copies.
+
+Public physics preview has one real player. Two-arrival exits and allowlisted imported co-op chambers cannot be certified completed by this preview. No simulated input is a second networked player. Online **Test co-op draft** is unavailable in Stage 1; campaign multiplayer is unchanged.
+
+![Public editor and browser-local saving](playtest/2026-10-14-public-builder/beginner-editor.png)
+
+## Local Developer Workbench
 
 ```sh
 pnpm dev
@@ -70,7 +96,7 @@ continuous concurrent writers can race the final hash check and atomic rename.
 - `scripts/level-tools/`: CLI, file service and browser orchestration.
 - `.workbench/`: ignored recovery, ephemeral sessions and diagnostic reports.
 
-Version 1 is defined by `src/workbench/model.ts`; runtime validation is
+Version 1 (including optional code activation modes) is defined by `src/workbench/model.ts`; runtime validation is
 `src/workbench/validation.ts`. Unknown fields/versions and malformed structures are
 rejected with a diagnostic instead of silently discarded. Structurally valid but
 incomplete drafts can be saved. Gameplay errors block Play and frozen sessions.
@@ -102,7 +128,17 @@ connections remain explicit. Unsupported imported factory fields block import.
 ## Objects, logic and connections
 
 Platforms are `static`, `code`, or authored `unstable`. Static architecture is always
-solid and unhookable. Controlled code is a ghost while disabled; enabled floating
+solid and unhookable. Code platform `activation` modes are:
+
+| JSON value | Inspector | Semantics |
+| --- | --- | --- |
+| `always-powered` | Always Powered | Solid and hookable where permitted; no binding |
+| `signal` | Controlled by Signal | Valid `active` binding required; resolved output controls solidity/hooks |
+| `always-inactive` | Always Inactive | Ghosted and unhookable; no binding |
+
+New palette code defaults to `always-powered`. Version-1 omission explicitly defaults to `signal`, preserving old behavior even when the old binding is missing. Saving a legacy document need not rewrite its missing field or hash. Unknown values, activation fields on other platform kinds, conflicting constant-mode bindings, invalid references and malformed bindings are rejected. Selecting a constant mode in the inspector removes that target's binding and associated wire in one undoable edit; applying a connection selects `signal`. Unused outputs are warnings and do not block Playtest. Missing controlled bindings remain errors.
+
+Controlled code is a ghost while disabled; enabled floating
 slabs accept hooks across the address bar. Unstable blocks expose foot/hook warning
 and respawn timing. They are prototypes, never proof of bogus binary code.
 
@@ -167,7 +203,7 @@ marker or point checks active geometry and hazards before starting. Local physic
 preview is one player; simulated partner inputs are diagnostics. It cannot certify
 a two-person exit. Pause/frame stepping is local only.
 
-Recordings identify the draft hash, engine revision and scenario. Edits make old
+Recordings identify the draft hash, engine revision and scenario. Public recordings identify the hashed compiled editor module (including its versioned engine imports); local recordings use the Git revision. Edits make old
 paths stale. Range/clearance guides are hints; measured paths are shown separately.
 Static validation cannot prove reachability, absence of softlocks or puzzle quality.
 A passing scenario proves its stated assertions in its tested configuration only.
@@ -200,8 +236,10 @@ pnpm level:playtest levels/drafts/blank-room.json \
 pnpm level:playtest levels/drafts/cooperative-test.json \
   --scenario levels/scenarios/cooperative-test.json \
   --report .workbench/reports/cooperative-test
+pnpm build && pnpm check:public-builder
 pnpm check:workbench
 pnpm check:workbench-menu
+node scripts/level-tools/sharing-browser-check.ts # after check:public-builder
 node scripts/level-tools/coop-browser-check.ts
 ```
 
@@ -259,6 +297,14 @@ folder is a full-room physical route; completion is required on both identities.
 The separate frozen-session check tests save/restart/stale-message behavior and is
 explicitly a session diagnostic, not route-completion evidence.
 
+## Production boundary and future integration
+
+Vite builds `index.html` and `workbench.html`. The production server serves static editor assets and its existing game APIs only. The public entry selects IndexedDB at compile time; only the loopback workbench's own Vite configuration enables the local adapter. URL parameters, draft metadata and API responses cannot enable it. Production excludes the local service, filesystem adapter and developer multiplayer runner; the build audits emitted modules. Pure allowlisted controller functions are reused for imported room previews, without their server transports or persistence.
+
+Strict schema/size/complexity limits apply equally to both editors and CLI. Expressions are typed Boolean trees, never evaluated JavaScript. User text is escaped in DOM markup and drawn as canvas text. Unknown evidence fields and unallowlisted controllers are rejected; every draft runtime is mock and cannot obtain the CONTROL SPINE room/evidence identity from its document ID, title or labels.
+
+Stage 2 could consume this same validator, canonical hash, evaluator and room adapter through a separately designed frozen-snapshot transfer service. It will need server validation, bounded lifetimes, quotas, isolation, abuse controls and explicit two-player sessions. No transfer API, public custom-level WebSocket room, publishing, matchmaking or server-side draft database exists in Stage 1. Do not expose the development registry to implement it.
+
 ## Boundaries and current limits
 
 Version 1 bounds: 1,000,000 document bytes; 384 objects; 8 named cubes; 48 devices;
@@ -272,19 +318,21 @@ Version 1 supports one exit and up to 32 saved preview states.
 Checkpoint milestones reuse the engine's `relay` and `upper` stages, with separate
 positions for both player slots. Built-in imports retain their required IDs/cube
 sets; arbitrary added control semantics belong in declarative drafts. Playable drafts
-need both spawns and an exit even for local preview. The editor is one-user local
-file editing, with conflict detection rather than collaborative cursor sharing.
+need both spawns and an exit even for local preview. The editor is single-author,
+with conflict detection rather than collaborative cursor sharing.
 
-The Level Builder menu option is available on the local development game. It is
-absent from the production build and from development pages opened over LAN.
-`pnpm dev:client` alone expects a separately started `pnpm workbench` at port 4174.
+The Level Builder menu option is available in production and development. `pnpm dev`
+links to the dedicated filesystem workbench. `pnpm dev:client` alone uses the
+browser-storage editor; start `pnpm workbench` separately and open its printed URL
+when filesystem authoring is needed.
 
-The server binds loopback only. Writes require the exact printed origin and a random
-local capability. Filenames are flat `.json` names under the draft root; traversal,
-absolute paths, symlink escapes and oversized requests are rejected. The standard
-`pnpm start` production process and `pnpm build` output have no workbench entry or
-write/diagnostic endpoints. No Fly configuration changes or public hosting are
-included. The tool does not execute uploaded code, build binaries or publish levels.
+The developer service binds loopback only. Writes require the exact printed origin
+and a random local capability. Filenames are flat `.json` names under the draft
+root; traversal, absolute paths, symlink escapes and oversized requests are rejected.
+The standard `pnpm start` production process serves the static public editor and has
+no workbench write/diagnostic endpoints. No Fly configuration changes are needed.
+Neither editor executes uploaded code, builds binaries or publishes levels.
 
-Human editor usability and two-player playtesting are the release acceptance gate.
-Automated diagnostic results are not a claim of human puzzle acceptance.
+Human editor feedback and puzzle/two-player acceptance remain necessary before
+promoting drafts into the campaign. Automated diagnostic results are not a claim
+of human puzzle acceptance.

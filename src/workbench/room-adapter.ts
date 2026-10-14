@@ -4,7 +4,7 @@ import type { MachineSignal } from '../slice/controller.ts';
 import type { MachineConnection } from '../slice/connections.ts';
 import type { RoomDef, CameraReveal } from '../slice/rooms.ts';
 import { draftSignal } from './evaluate.ts';
-import type { DraftDocument, DraftDevice, DraftBinding } from './model.ts';
+import { codeActivation, type DraftDocument, type DraftDevice, type DraftBinding } from './model.ts';
 import { requirePlayable } from './validation.ts';
 const nativeSignals = ['exitDoor', 'grappleAnchor', 'bridge', 'codePlatformA', 'codePlatformB', 'relayGates', 'liftField', 'topBridge', 'bufferBridge', 'safetyFirewall', 'raceFirewall', 'spanMaster', 'phaseA', 'phaseB', 'returnBridge', 'serviceAccess', 'leftRoute', 'rightRoute', 'galleryAccess', 'vaultPower', 'vaultReturn'] as const;
 export function nativeSignal(id: string): MachineSignal { const found = nativeSignals.find(s => s === id); if (!found) throw new Error(`Unknown built-in signal '${id}'`); return found; }
@@ -27,7 +27,7 @@ export function draftRoom(document: DraftDocument, slot: Slot = 1): RoomDef {
     const feed = (id: string, property: DraftBinding['property']) => { const b = draft.bindings.find(b => b.target === id && b.property === property); return b ? bindingSignal(b) : undefined; };
     const reveal = (device: DraftDevice): CameraReveal | undefined => { const r = draft.presentation.cameraReveals.find(r => r.source === device.id); if (!r) return; const { id: _id, source: _source, ...camera } = r; return structuredClone(camera); };
     for (const o of objects) {
-        if (o.type === 'platform') { const { type: _type, kind, ...p } = o; room.platforms.push({ ...p, kind: kind === 'unstable' ? 'crumble-prototype' : kind, ...(kind === 'unstable' && !builtin ? { hookCrumbleDelay: o.hookCrumbleDelay ?? 1.65 } : {}), ...(feed(o.id, 'active') ? { signal: feed(o.id, 'active') } : {}), ...(feed(o.id, 'open') ? { openWhen: feed(o.id, 'open') } : {}) }); }
+        if (o.type === 'platform') { const { type: _type, activation: _activation, kind, ...p } = o; room.platforms.push({ ...p, kind: kind === 'unstable' ? 'crumble-prototype' : kind, ...(kind === 'unstable' && !builtin ? { hookCrumbleDelay: o.hookCrumbleDelay ?? 1.65 } : {}), ...(kind === 'code' && codeActivation(o) !== 'signal' ? { signal: codeActivation(o) === 'always-powered' ? 'draft:activation:on' as const : 'draft:activation:off' as const } : feed(o.id, 'active') ? { signal: feed(o.id, 'active') } : {}), ...(feed(o.id, 'open') ? { openWhen: feed(o.id, 'open') } : {}) }); }
         else if (o.type === 'cube') { const id = cubeRuntimeId(draft, o.id); if (id === 'cube') room.cube = at(o); else (room.cubes ??= []).push({ id, spawn: at(o), mark: o.mark }); }
         else if (o.type === 'device') {
             if (o.legacy && o.legacy !== 'cubePad') room[o.legacy] = at(o);

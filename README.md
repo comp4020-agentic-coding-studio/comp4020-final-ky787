@@ -2,11 +2,11 @@
 
 **A browser-based, two-player cooperative puzzle-platformer built around a debugger-inspired world.** Work together to redirect power, carry shared payloads, activate platforms and grapple across changing terrain. The puzzles come first; reverse engineering gives their machinery its identity.
 
-**[Play Binary Ninja](https://comp4020-final-ky787.fly.dev/)** · **[View the deployed README](https://comp4020-final-ky787.fly.dev/readme/)** · **[Development process](PROCESS.md)**
+**[Play Binary Ninja](https://comp4020-final-ky787.fly.dev/)** · **[Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html)** · **[View the deployed README](https://comp4020-final-ky787.fly.dev/readme/)** · **[Development process](PROCESS.md)**
 
 ![RACE CONDITION chamber overview, including its grapple route and control machinery](docs/playtest/2026-10-12-hero-assets/race-overview-compact.png)
 
-Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. This is an evolving final project: the public co-op campaign is playable, the level designer is available locally, and binary-backed gameplay is implemented in the single-player CONTROL SPINE showcase. The co-op chambers currently use authored controllers, **not** generated binaries.
+Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. This is an evolving final project: the public co-op campaign is playable, the public level builder saves drafts in your browser, and binary-backed gameplay is implemented in the single-player CONTROL SPINE showcase. The co-op chambers currently use authored controllers, **not** generated binaries.
 
 ## Play the game
 
@@ -95,7 +95,16 @@ These choices and their alternatives are documented in [ADR 0001 — Multiplayer
 
 ## Level Workbench — for people and coding agents
 
-The **Level Workbench** is a local-only editor for prototyping new chambers. It is intentionally **not hosted in the public Fly.io game**.
+Choose **LEVEL BUILDER** from the game menu, or open the [Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html) directly. Stage 1 reuses the existing editor and game engine for single-player physics playtesting.
+
+| Mode | Saving | Playtesting |
+| --- | --- | --- |
+| **Public Level Builder** | IndexedDB on this browser and website origin; JSON import/export | Actual engine, one local player; no online custom-level multiplayer |
+| **Local Developer Workbench** | Canonical files in `levels/drafts/`, shared with Codex and CLI | Local physics plus isolated local two-player draft sessions |
+
+Start with **New** or **Examples**, place objects from the palette, and choose **Play from spawn**. **Stop test** restores your authored document and editor camera. **Save** keeps the complete draft in this browser; **My drafts** reopens it later. Save copy, Rename and Delete draft manage browser copies. **BACK TO GAME** returns to the campaign without changing your progress or party membership.
+
+Browser drafts are **not uploaded to Fly.io** and do not sync between devices or browser profiles. Clearing site data, private browsing or browser storage eviction can remove them. **Export JSON** regularly for durable backups and sharing. **Import JSON** accepts a local file, validates it and creates an independent browser draft without overwriting an existing one. To edit a friend's export with Codex, use Import JSON in the local workbench, then Save into `levels/drafts/` (or copy the JSON there directly and validate it). Local exports import into the public builder in the same way.
 
 It has two interfaces to the **same versioned JSON draft**:
 
@@ -106,7 +115,9 @@ Both routes use the existing `PuzzleRenderer` and `PuzzleWorld` physics. A physi
 
 The declarative controller supports Boolean **AND / OR / NOT**, device inputs and named output bindings. More complex imported chambers retain their existing trusted controller implementations. Decorative wire paths are not executable logic.
 
-**Editing note:** in the current workbench version, a newly placed code platform requires an explicit output binding before Playtest is enabled. Use **Connect** from a control to the platform or select the platform and **Apply binding + visible wire**. The diagnostics panel identifies missing bindings.
+New code platforms default to **Always Powered**, so geometry can be playtested immediately. The inspector also offers **Controlled by Signal** (a valid binding is required) and **Always Inactive** (ghosted). Connect selects controlled mode. Older version-1 files without an activation field keep their original controlled behavior, including errors for missing bindings.
+
+Public custom-level multiplayer, publishing and server-side draft storage are reserved for Stage 2. The existing **Test co-op draft** remains available only in the local developer workbench.
 
 Read the [Level Workbench guide](docs/level-workbench.md) for the full GUI workflow and [agent authoring guide](docs/level-authoring-for-agents.md) for the schema and command-line workflow.
 
@@ -165,6 +176,9 @@ pnpm build
 
 # Real-input two-player campaign regression
 pnpm check:campaign
+
+# Production public builder (run pnpm build first)
+pnpm check:public-builder
 
 # Local editor browser workflow
 pnpm check:workbench
