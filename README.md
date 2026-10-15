@@ -2,7 +2,7 @@
 
 **A browser-based, two-player cooperative puzzle-platformer built around a debugger-inspired world.** Work together to redirect power, carry shared payloads, activate platforms and grapple across changing terrain. The puzzles come first; reverse engineering gives their machinery its identity.
 
-**[Play Binary Ninja](https://comp4020-final-ky787.fly.dev/)** · **[Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html)** · **[View the deployed README](https://comp4020-final-ky787.fly.dev/readme/)** · **[Development process](PROCESS.md)**
+**[Play Binary Ninja](https://comp4020-final-ky787.fly.dev/)** · **[Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html)** · **[My Levels](https://comp4020-final-ky787.fly.dev/my-levels.html)** · **[View the deployed README](https://comp4020-final-ky787.fly.dev/readme/)** · **[Development process](PROCESS.md)**
 
 ![RACE CONDITION chamber overview, including its grapple route and control machinery](docs/playtest/2026-10-12-hero-assets/race-overview-compact.png)
 
@@ -95,29 +95,37 @@ These choices and their alternatives are documented in [ADR 0001 — Multiplayer
 
 ## Level Workbench — for people and coding agents
 
-Choose **LEVEL BUILDER** from the game menu, or open the [Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html) directly. Stage 1 reuses the existing editor and game engine for single-player physics playtesting.
+Choose **LEVEL BUILDER** from the game menu, or open the [Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html) directly. Author levels on your own, then test or play them with a friend using the existing cooperative game engine.
 
 | Mode | Saving | Playtesting |
 | --- | --- | --- |
-| **Public Level Builder** | IndexedDB on this browser and website origin; JSON import/export | Actual engine, one local player; no online custom-level multiplayer |
+| **Public Level Builder** | IndexedDB on this browser and website origin; JSON import/export | Solo physics preview, TEST WITH FRIEND, and saved-level PLAY WITH FRIEND |
 | **Local Developer Workbench** | Canonical files in `levels/drafts/`, shared with Codex and CLI | Local physics plus isolated local two-player draft sessions |
 
 Start with **New** or **Examples**, place objects from the palette, and choose **Play from spawn**. **Stop test** restores your authored document and editor camera. **Save** keeps the complete draft in this browser; **My drafts** reopens it later. Save copy, Rename and Delete draft manage browser copies. **BACK TO GAME** returns to the campaign without changing your progress or party membership.
 
-Browser drafts are **not uploaded to Fly.io** and do not sync between devices or browser profiles. Clearing site data, private browsing or browser storage eviction can remove them. **Export JSON** regularly for durable backups and sharing. **Import JSON** accepts a local file, validates it and creates an independent browser draft without overwriting an existing one. To edit a friend's export with Codex, use Import JSON in the local workbench, then Save into `levels/drafts/` (or copy the JSON there directly and validate it). Local exports import into the public builder in the same way.
+Canonical drafts stay in **IndexedDB in your browser** and do not sync between devices or profiles. Starting TEST WITH FRIEND or PLAY WITH FRIEND uploads only a validated frozen copy to a temporary, memory-backed room on Fly.io. Clearing site data, private browsing or browser storage eviction can remove them. **Export JSON** regularly for durable backups and sharing. **Import JSON** accepts a local file, validates it and creates an independent browser draft without overwriting an existing one. To edit a friend's export with Codex, use Import JSON in the local workbench, then Save into `levels/drafts/` (or copy the JSON there directly and validate it). Local exports import into the public builder in the same way.
 
 It has two interfaces to the **same versioned JSON draft**:
 
 - **For people:** a grid-based canvas, drag-and-drop objects, resize handles, a property inspector, functional connections, a logic editor, saved signal-state previews, undo/redo, and WASD camera panning.
 - **For coding agents:** readable `levels/drafts/*.json` documents plus CLI commands to validate, render and playtest a draft without GUI clicking.
 
-Both routes use the existing `PuzzleRenderer` and `PuzzleWorld` physics. A physics preview records actual movement and grapple trajectories rather than guessing which jumps are possible. Local two-browser draft sessions reuse the real multiplayer system; they do not award campaign progress. Draft editing does not alter accepted campaign chambers.
+Both routes use the existing `PuzzleRenderer` and `PuzzleWorld` physics. A physics preview records actual movement and grapple trajectories rather than guessing which jumps are possible. Public and local two-browser draft sessions reuse the real multiplayer system; they do not award campaign progress. Draft editing does not alter accepted campaign chambers.
 
 The declarative controller supports Boolean **AND / OR / NOT**, device inputs and named output bindings. More complex imported chambers retain their existing trusted controller implementations. Decorative wire paths are not executable logic.
 
 New code platforms default to **Always Powered**, so geometry can be playtested immediately. The inspector also offers **Controlled by Signal** (a valid binding is required) and **Always Inactive** (ghosted). Connect selects controlled mode. Older version-1 files without an activation field keep their original controlled behavior, including errors for missing bindings.
 
-Public custom-level multiplayer, publishing and server-side draft storage are reserved for Stage 2. The existing **Test co-op draft** remains available only in the local developer workbench.
+**TEST WITH FRIEND** opens a separate game tab with a four-character code and invitation link. Unsaved editor work stays in the original tab. The invited friend needs no JSON file or editor. Two tabs sharing a visitor cookie are one player; use separate browser profiles or devices. Test information is optional and read-only.
+
+**MY LEVELS** opens the browser-local collection directly from the game menu. Choose **EDIT**, **PLAY WITH FRIEND**, **EXPORT JSON**, or confirmed **DELETE**. Normal custom play hides diagnostics and editing controls. Both players reach the exit to finish; the host can **REPLAY LEVEL** with a new session generation. Saved maps remain intact. To revise a test, return to the editor, edit/save, and start a new room; running snapshots never change.
+
+Public rooms expire after two hours, or five minutes after both players disconnect. Unlaunched uploads expire after two minutes. Server restarts end these rooms. No custom draft or custom room is written to `/data`, published in a gallery, or added to campaign saves/badges. Limits include eight active rooms, 256 KB per snapshot, 2 MB total canonical snapshot bytes, and three staged/active sessions per visitor. Save/Export is how you keep the original.
+
+Placing a **Breakpoint** also creates missing Player 1 and Player 2 respawn markers on nearby clear static ground in one undo step. The inspector links to each independently movable marker. Existing markers are reused. If no safe position is found, move the pedestal or add the missing markers manually. Assign a terminal/checkpoint control to the same milestone: the server must accept activation before respawn, the flag displays BREAKPOINT ACTIVE, and activation does not teleport anyone. A cooperative exit requires latched unlock and two arrivals.
+
+Editing remains single-user. No shared cursors, remote editing permissions, cloud draft synchronization, permanent publishing or accounts are involved. Custom controllers and prototype crumble remain authored/mock.
 
 Read the [Level Workbench guide](docs/level-workbench.md) for the full GUI workflow and [agent authoring guide](docs/level-authoring-for-agents.md) for the schema and command-line workflow.
 
@@ -179,6 +187,7 @@ pnpm check:campaign
 
 # Production public builder (run pnpm build first)
 pnpm check:public-builder
+pnpm check:public-coop
 
 # Local editor browser workflow
 pnpm check:workbench

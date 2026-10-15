@@ -1,4 +1,4 @@
-# Binary Ninja Level Workbench — public Stage 1 and local development
+# Binary Ninja Level Workbench — custom multiplayer and local development
 
 One editor provides a public browser backend and a local developer backend. Its canonical JSON, validator, controller evaluator,
 `PuzzleWorld` physics and `PuzzleRenderer` are shared by the graphical editor and
@@ -21,11 +21,33 @@ Recovery snapshots are debounced after edits and flushed before switching docume
 
 Two tabs use transactional revision and SHA-256 comparisons: stale Save, Rename and Delete operations fail and preserve both the newer saved draft and current edits. Reload or Save copy resolves conflicts. A storage-full, unavailable, blocked or upgraded-database error is visible; it never marks unsaved edits saved. Current work remains editable, playable where valid, and exportable. Close other builder tabs and reload for a blocked upgrade; export before clearing any site data.
 
+### Test with a friend and play saved levels
+
+**TEST WITH FRIEND** validates the current document and uploads a frozen canonical snapshot, including unsaved edits. Its separate `/custom-level.html` game tab uses the actual multiplayer engine. The original editor and undo history stay open. Copy its invitation link (`/custom-level.html?code=K7MD&mode=test`) or share the four-character code; the friend opens that link or **MY LEVELS → JOIN CUSTOM ROOM**. Different players need different visitor cookies (separate devices, profiles or private contexts). Joining the same cookie replaces that player's connection, never allocates Player 2.
+
+The host is Player 1, guest Player 2. Both load the same SHA-256-verified document after joining. Shared logical state, cubes, checkpoints and unstable platforms use the existing server authority, while each client simulates its character. **TEST INFORMATION** optionally displays read-only observations; it cannot force outputs, move objects or modify the session. Return to the editor to revise and save, then launch a fresh room. Changes do not alter the previous room.
+
+**MY LEVELS** (`/my-levels.html`) lists this browser's saved collection without opening the editor. Each entry has **EDIT**, **PLAY WITH FRIEND**, **EXPORT JSON** and confirmed **DELETE**. EDIT opens that precise storage record. PLAY WITH FRIEND freezes the saved version and opens normal gameplay; no grid, editing handles, diagnostic controls or forced-input panel appears. Both players must reach the exit. The victory screen lets the host replay; the guest waits. Replay resets shared puzzle state with a new generation and rejects old messages. It never unlocks an official chamber or awards a campaign badge.
+
+Public rooms are temporary: maximum two hours, or five minutes after the last participant disconnects. An uploaded snapshot not launched within two minutes is released. A server restart ends every public custom room; return to the saved browser map and create another. Reconnection within retention preserves the participant slot and authoritative state. Maximum limits are eight rooms, 256 KB per uploaded/canonical snapshot, 2 MB total canonical snapshot bytes, three staged/active sessions per visitor, three registration attempts per visitor/minute and twelve globally/minute. Staging and room expiry release unreferenced snapshots. Error messages explain full, missing, expired, invalid or interrupted sessions. There is no permanent server publishing or online draft list.
+
+![Browser-local saved collection](playtest/2026-10-16-custom-levels/my-levels.png)
+
+![Normal custom play after accepted checkpoint activation](playtest/2026-10-16-custom-levels/play-checkpoint.png)
+
+### Breakpoint markers
+
+A Breakpoint pedestal is presentation, not a respawn position. Placing it creates each missing `checkpoint` marker for the same milestone and slots 1/2, in the same undo operation. The search uses permanent static footing within 320 horizontal and 200 vertical units, clear of collision geometry, hazards, firewalls, cubes, gates, lifts and the other marker. It conservatively avoids conditional platforms even if currently ghosted. Existing markers are never moved or duplicated.
+
+The inspector shows linked marker coordinates and **Select / frame** controls. Drag markers independently. Duplicating pedestals reuses the milestone markers (selected checkpoint markers are not duplicated); deleting a pedestal does not cascade into markers. Changing the pedestal milestone creates missing markers for the new milestone without deleting the old ones. If clear footing is unavailable, missing markers remain blocking diagnostics: move the pedestal near clear architecture and choose **Create missing respawn markers**, or place/configure them manually. Static placement checks are not a proof of puzzle reachability.
+
+Configure a terminal or supported toggle with the same **Checkpoint**, then choose that device as the pedestal's **Activation control**. Existing activation semantics apply: server-accepted activation raises the flag and shows BREAKPOINT ACTIVE, does not teleport players, and each later respawn uses that slot's marker. Walking over a pedestal alone does not activate a checkpoint.
+
 ### Exchange with the local developer workbench
 
 Send the downloaded JSON file to another person. Locally, choose **Import JSON** and **Save** with a new filename in `levels/drafts/`. Codex can edit that exact JSON and run `pnpm level:validate levels/drafts/name.json --json`. Alternatively copy the file into `levels/drafts/` and open it from the local toolbar. Use Export JSON in either mode to send it back. Canonical coordinates, metadata, Boolean expressions, wires, bindings and preview states are preserved; the separate browser storage ID/revision is not part of the level format. Document IDs may legitimately repeat across independent copies.
 
-Public physics preview has one real player. Two-arrival exits and allowlisted imported co-op chambers cannot be certified completed by this preview. No simulated input is a second networked player. Online **Test co-op draft** is unavailable in Stage 1; campaign multiplayer is unchanged.
+Public physics preview has one real player. Two-arrival exits and allowlisted imported co-op chambers cannot be certified completed by this preview. No simulated input is a second networked player. Use **TEST WITH FRIEND** for actual cooperative testing; campaign multiplayer remains independent. New public templates use two-arrival exits. Older one-arrival drafts must explicitly change the exit inspector to Physical arrivals: 2 and enable Latch unlock before cooperative play.
 
 ![Public editor and browser-local saving](playtest/2026-10-14-public-builder/beginner-editor.png)
 
@@ -71,7 +93,7 @@ can name an executable). No LLM service or subscription is involved.
 4. **Play from spawn** runs the actual engine. A/D or arrows move, Space jumps,
    click holds a grapple, E carries/uses, and R resets. Stop restores the authored
    document, selection and editor camera. Inspect/export the measured path.
-5. Save directly to `levels/drafts`. To test together, choose **Test co-op draft**.
+5. Save directly to `levels/drafts`. To test together, choose **TEST WITH FRIEND**.
    Share its four-character room code with a separate browser profile or private
    window on the same computer. Open `/workbench-runner.html?code=CODE` there.
    Two ordinary tabs with the same cookie are the same player.
@@ -237,6 +259,7 @@ pnpm level:playtest levels/drafts/cooperative-test.json \
   --scenario levels/scenarios/cooperative-test.json \
   --report .workbench/reports/cooperative-test
 pnpm build && pnpm check:public-builder
+pnpm check:public-coop
 pnpm check:workbench
 pnpm check:workbench-menu
 node scripts/level-tools/sharing-browser-check.ts # after check:public-builder
@@ -297,20 +320,20 @@ folder is a full-room physical route; completion is required on both identities.
 The separate frozen-session check tests save/restart/stale-message behavior and is
 explicitly a session diagnostic, not route-completion evidence.
 
-## Production boundary and future integration
+## Production boundary
 
-Vite builds `index.html` and `workbench.html`. The production server serves static editor assets and its existing game APIs only. The public entry selects IndexedDB at compile time; only the loopback workbench's own Vite configuration enables the local adapter. URL parameters, draft metadata and API responses cannot enable it. Production excludes the local service, filesystem adapter and developer multiplayer runner; the build audits emitted modules. Pure allowlisted controller functions are reused for imported room previews, without their server transports or persistence.
+Vite builds `index.html`, `workbench.html`, `my-levels.html` and `custom-level.html`. The production server serves those assets, existing game APIs and the bounded custom snapshot/member APIs. The public entry selects IndexedDB at compile time; only the loopback workbench's own Vite configuration enables the local adapter. URL parameters, draft metadata and API responses cannot enable it. Production excludes the local service, filesystem adapter and developer multiplayer runner; the build audits emitted modules. Pure allowlisted controller functions are reused for imported room previews, without their server transports or persistence.
 
 Strict schema/size/complexity limits apply equally to both editors and CLI. Expressions are typed Boolean trees, never evaluated JavaScript. User text is escaped in DOM markup and drawn as canvas text. Unknown evidence fields and unallowlisted controllers are rejected; every draft runtime is mock and cannot obtain the CONTROL SPINE room/evidence identity from its document ID, title or labels.
 
-Stage 2 could consume this same validator, canonical hash, evaluator and room adapter through a separately designed frozen-snapshot transfer service. It will need server validation, bounded lifetimes, quotas, isolation, abuse controls and explicit two-player sessions. No transfer API, public custom-level WebSocket room, publishing, matchmaking or server-side draft database exists in Stage 1. Do not expose the development registry to implement it.
+Public custom rooms use the same validator, canonical hash, evaluator and room adapter through an authenticated temporary snapshot boundary. No filesystem service, permanent publishing, matchmaking or server-side draft database is exposed. See the architecture document for membership, lifecycle, rate and memory limits.
 
 ## Boundaries and current limits
 
 Version 1 bounds: 1,000,000 document bytes; 384 objects; 8 named cubes; 48 devices;
 8 relay pairs; 64 outputs; 192 bindings and 192 wires; 64 points per wire; 256 total
 expression nodes at depth 16; room dimensions up to 9000 units. This is bounded
-capacity, not arbitrary capacity. There are 32 frozen snapshots per service run.
+capacity, not arbitrary capacity. The local developer registry permits 32 frozen snapshots per service run; public sessions use the stricter temporary quotas described above.
 Network limits scale with legitimate cube traffic while retaining rate limiting.
 
 Version 1 supports one exit and up to 32 saved preview states.
