@@ -123,7 +123,7 @@ export class SliceGame {
     }
     private applyCoop(room: SharedRoom, initial: boolean): void {
         if (!this.coopMode || !this.coop.slot) return;
-        if (room.draft || room.level === 'workbench') { this.coop.leave(); return; }
+        if (room.draft || room.level === 'workbench') { this.coop.leave(false); location.assign(`/custom-level.html?code=${room.code}`); return; }
         const wasVictory = this.authority?.room.party?.phase === 'victory';
         if (initial) {
             this.started = false; this.coopPaused = false; this.menu.hidden = true; this.partyMenuKey = ''; this.partyView = 'pause';
@@ -289,6 +289,7 @@ export class SliceGame {
       <button id="continue" class="primary">${!this.store.ready ? 'PLAY UNSAVED —' : this.ended ? 'REVISIT' : saved || this.world.elapsed > 0 ? 'CONTINUE —' : 'START —'} ${roomById(p.currentRoom).title}</button>
       ${!this.store.ready ? '<button id="retry-save">Retry save connection</button>' : ''}
       ${builderUrl ? '<button id="level-builder" title="Create, save and playtest level drafts">LEVEL BUILDER</button>' : ''}
+      <button id="my-levels">MY LEVELS</button>
       <nav class="level-select" aria-label="Level select">
         <span class="eyebrow">TUTORIAL</span>
         <div class="level-grid">${ROOMS.map((room, index) => `<button data-room="${room.id}" ${room.id === p.currentRoom ? 'aria-current="true"' : ''}><strong>0${index + 1} / ${room.title}</strong><small>${room.id === p.currentRoom ? 'CURRENT' : p.completedRooms.includes(room.id) ? 'COMPLETE' : 'PLAY'}</small></button>`).join('')}</div>
@@ -315,6 +316,7 @@ export class SliceGame {
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
+        this.menu.querySelector('#my-levels')!.addEventListener('click', async () => { if (await this.store.flush() || confirm(`${this.store.status}. Open My Levels and leave this unsaved progress?`)) location.assign('/my-levels.html'); });
         const builderButton = this.menu.querySelector<HTMLButtonElement>('#level-builder');
         builderButton?.addEventListener('click', async () => {
             if (!builderUrl || builderButton.disabled) return;

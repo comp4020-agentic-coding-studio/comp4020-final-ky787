@@ -14,7 +14,7 @@ export default defineConfig({
     name: "production-browser-boundary",
     apply: "build",
     generateBundle(_options, bundle) {
-      const forbidden = /(?:node:|__vite-browser-external|\/scripts\/|\/workbench\/(?:local-storage|runner|coop-session|coop-authority)\.ts|\/server\/(?:app|multiplayer|identity|atomic-json|persistence)\.ts)/;
+      const forbidden = /(?:node:|__vite-browser-external|\/scripts\/|\/workbench\/(?:local-storage|runner)\.ts|\/server\/(?:app|multiplayer|identity|atomic-json|persistence)\.ts)/;
       const modules = new Set<string>();
       for (const chunk of Object.values(bundle)) if (chunk.type === "chunk") {
         for (const id of Object.keys(chunk.modules)) {
@@ -22,7 +22,7 @@ export default defineConfig({
           modules.add(id);
         }
       }
-      console.log(`Audited ${modules.size} production browser modules: no Node services, local storage adapter or draft multiplayer runner.`);
+      console.log(`Audited ${modules.size} production browser modules: no Node services, local storage adapter or privileged local runner.`);
     },
   }],
   server: {
@@ -39,7 +39,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      input: ["index.html", "workbench.html"],
+      input: ["index.html", "workbench.html", "custom-level.html", "my-levels.html"],
     },
   },
 });

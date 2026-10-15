@@ -17,8 +17,8 @@ export class DraftSession {
     error = '';
     private loading = '';
     private generation = 0;
-    constructor(private onUpdate: () => void = () => {}, private onError: (message: string) => void = () => {}) {
-        this.client = new CoopClient((room, initial) => { void this.accept(room, initial); }, onUpdate, 'bn_workbench_room');
+    constructor(private onUpdate: () => void, private onError: (message: string) => void, private snapshotUrl: (room: SessionRoom) => string, publicRoom = false) {
+        this.client = new CoopClient((room, initial) => { void this.accept(room, initial); }, onUpdate, publicRoom ? 'bn_custom_room' : 'bn_workbench_room', publicRoom);
     }
     start(hash: string) { this.error = ''; this.client.startDraft(hash); }
     join(code: string) { this.error = ''; this.client.start(code); }
@@ -32,8 +32,11 @@ export class DraftSession {
             if (initial || !this.world || this.document === null || this.authority?.room.levelInstance !== room.levelInstance) {
                 this.loading = key; const generation = ++this.generation;
                 this.world = null; this.authority = null;
-                const response = await fetch(`/api/workbench/snapshots/${room.draft.hash}`, { signal: AbortSignal.timeout(8000) });
-                if (!response.ok) throw new Error('Frozen draft snapshot is unavailable.');
+                const response = await fetch(this.snapshotUrl(room), { signal: AbortSignal.timeout(8000) });
+                if (!response.ok) {
+                    const error = await response.json().catch(() => null);
+                    throw new Error(error?.error ?? 'Frozen draft snapshot is unavailable. Rejoin the room or ask the host to start a new session.');
+                }
                 const body: unknown = await response.json();
                 if (!body || typeof body !== 'object' || !('document' in body)) throw new Error('Malformed frozen draft response.');
                 const document = requirePlayable(body.document);

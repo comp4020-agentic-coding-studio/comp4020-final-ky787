@@ -42,7 +42,7 @@ export class CoopClient {
     private draftDevices = '';
     private draftCubeDevices = new Map<DraftId, string>();
     private exitSent = false;
-    constructor(private onRoom: (room: SessionRoom, initial: boolean) => void, private onStatus: () => void, private storageKey = 'bn_coop_room') {}
+    constructor(private onRoom: (room: SessionRoom, initial: boolean) => void, private onStatus: () => void, private storageKey = 'bn_coop_room', private customTransport = false) {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
     get isHost(): boolean { return !!(this.room?.party || this.room?.draft) && this.slot === 1; }
     get playing(): boolean { return this.connected && (!this.room!.party || this.room!.party.phase === 'playing'); }
@@ -115,7 +115,7 @@ export class CoopClient {
             const identity = await response.json();
             if (!this.active || generation !== this.generation) return;
             this.visitor = identity.id;
-            const ws = new WebSocket(websocketUrl(location.href)); this.socket = ws;
+            const ws = new WebSocket(websocketUrl(location.href) + (this.customTransport ? '?custom=1' : '')); this.socket = ws;
             this.deadline = setTimeout(() => ws.close(), 8000);
             ws.onopen = () => {
                 if (generation !== this.generation) { ws.close(); return; }
@@ -136,7 +136,8 @@ export class CoopClient {
                 if (message.type === 'snapshot') {
                     clearTimeout(this.deadline);
                     this.adoptRoom(message.room, true); this.slot = message.slot;
-                    this.intent = { type: 'join', code: message.room.code }; this.remember(message.room.code);
+                    this.intent = { type: 'join', code: message.room.code };
+                    if (!message.room.draft || this.storageKey !== 'bn_coop_room') this.remember(message.room.code);
                     this.status = 'CONNECTED'; this.reconnectAttempts = 0;
                     this.onRoom(message.room, true); this.onStatus();
                 } else if (message.type === 'room' && newerRoom(this.room, message.room)) {

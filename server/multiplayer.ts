@@ -13,15 +13,24 @@ import { definition, newRecord, sharedRoom, freshCubes, readRoomRecord, type Roo
 import { advanceCrumble, crumbleDue, freshCrumble, type CrumbleRuntime } from './crumble-state.ts';
 
 import { advanceRace, freshRace, raceDue, syncRace, RACE_TIMING, type RaceRuntime } from './race-state.ts';
+import { PUBLIC_DRAFT_LIMITS } from './public-drafts.ts';
 
 interface Peer {
     ws: WebSocket; visitor: string; room?: Room; slot?: Slot;
+    custom: boolean;
     actionSeq: number; avatarSeq: number; stream: number; alive: boolean; joinedAt: number;
     tokens: number; refilled: number; pending: number;
 }
 export type FrozenDraftSession = { metadata: DraftSessionMetadata; coopError?: string } & (
     { level: Exclude<SessionLevelId, 'workbench'> } | { level: 'workbench'; definition: LevelDefinition<'workbench'> });
-export interface FrozenDraftRegistry { get(hash: string): FrozenDraftSession | undefined }
+export interface FrozenDraftRegistry {
+    get(hash: string): FrozenDraftSession | undefined;
+    temporary?: boolean;
+    canCreate?(hash: string, visitor: string): boolean;
+    retain?(hash: string, visitor: string, code: string): void;
+    release?(code: string): void;
+    sweep?(): void;
+}
 interface Room {
     draft?: FrozenDraftSession; draftHeld: [DraftId[], DraftId[]]; draftCubeContacts: CubeMap<DraftId[]>;
     record: RoomRecord; peers: [Peer | null, Peer | null]; plates: [Plate, Plate];
@@ -30,7 +39,7 @@ interface Room {
 }
 export interface ActionTiming { action: string; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
 export interface MultiplayerOptions {
-    /** Only the separate loopback workbench service supplies this registry. */
+    /** Local snapshots or the bounded, temporary public registry. */
     drafts?: FrozenDraftRegistry;
     /** Local services can enforce their bound origin as well as ordinary same-origin checks. */
     acceptsUpgrade?: (request: IncomingMessage) => boolean;
@@ -50,6 +59,16 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     await mkdir(directory, { recursive: true });
     const rooms = new Map<string, Room>();
     const peers = new Set<Peer>();
+    const expired = new Set<string>();
+    const temporary = (room: Room) => !!room.draft && !!options.drafts?.temporary;
+    function expire(room: Room) {
+        room.failed = true;
+        for (const peer of room.peers) if (peer) { error(peer, 'ROOM_EXPIRED', 'This temporary custom room expired. Ask the host to start a new room from their saved level.'); peer.ws.close(1000, 'Room expired'); }
+        rooms.delete(room.record.code); options.drafts?.release?.(room.record.code);
+        expired.add(room.record.code); if (expired.size > 64) expired.delete(expired.values().next().value!);
+    }
+    const elapsed = (room: Room) => Date.now() - Date.parse(room.record.createdAt) >= PUBLIC_DRAFT_LIMITS.lifetimeMs
+        || room.peers.every(p => !p) && Date.now() - room.idleSince >= PUBLIC_DRAFT_LIMITS.abandonedMs;
     const wss = new WebSocketServer({ noServer: true, maxPayload: options.drafts ? 8192 : 2048, perMessageDeflate: false });
     let queue = Promise.resolve();
     let queued = 0;
@@ -75,6 +94,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     const ownsSlot = (p: Peer): p is Peer & { room: Room; slot: Slot } => !!p.room && !!p.slot && p.room.peers[p.slot - 1] === p && !p.room.failed;
     async function persist(room: Room) {
         room.record.updatedAt = new Date().toISOString();
+        if (temporary(room)) return;
         try { await atomicJson(join(directory, `${room.record.code}.json`), room.record); }
         catch {
             // Fail closed. Never keep accepting changes that cannot be acknowledged durably.
@@ -86,7 +106,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         }
     }
     async function load(code: string): Promise<Room | null> {
-        if (rooms.has(code)) return rooms.get(code)!;
+        const current = rooms.get(code);
+        if (current) { if (temporary(current) && elapsed(current)) { expire(current); return null; } return current; }
         let value: unknown;
         try { value = JSON.parse(await readFile(join(directory, `${code}.json`), 'utf8')); }
         catch (e) { if ((e as NodeJS.ErrnoException).code === 'ENOENT') return null; throw e; }
@@ -119,13 +140,21 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     }
     async function enter(peer: Peer, message: Extract<ClientMessage, { type: 'create' | 'create-party' | 'create-draft' | 'join' }>) {
         if (peer.room) { error(peer, 'ALREADY_JOINED'); return; }
+        const custom = !!options.drafts?.temporary && (message.type === 'create-draft' || message.type === 'join' && !!rooms.get(normalizeCode(message.code) ?? '')?.draft);
+        if (custom && !peer.custom) {
+            if ([...peers].filter(p => p.custom).length >= 24 || peers.size >= 96) { error(peer, 'SERVER_BUSY', 'Custom rooms are busy. Please try again later.'); return; }
+            peer.custom = true;
+        }
         let room: Room | null = null;
         if (message.type === 'create' || message.type === 'create-party' || message.type === 'create-draft') {
-            if (rooms.size >= 64) { error(peer, 'SERVER_BUSY'); return; }
+            if (rooms.size >= (message.type === 'create-draft' && options.drafts?.temporary ? 56 : 64)) { error(peer, 'SERVER_BUSY'); return; }
+            if (message.type === 'create-draft' && options.drafts?.canCreate && !options.drafts.canCreate(message.hash, peer.visitor)) {
+                error(peer, 'DRAFT_UNAVAILABLE', 'This upload expired or belongs to another visitor. Start a new session from your level.'); return;
+            }
             let code = '';
             for (let i = 0; i < 100; i++) {
                 const candidate = (options.generateCode ?? generateCode)();
-                if (!normalizeCode(candidate) || rooms.has(candidate)) continue;
+                if (!normalizeCode(candidate) || rooms.has(candidate) || expired.has(candidate)) continue;
                 try { await stat(join(directory, `${candidate}.json`)); }
                 catch (e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; code = candidate; break; }
             }
@@ -139,11 +168,12 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                 cubes: freshCubes(level, frozen?.level === 'workbench' ? frozen.definition as LevelDefinition<SessionLevelId> : definition(level)), crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(),
                 peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
             rooms.set(code, room);
+            if (frozen) options.drafts?.retain?.(frozen.metadata.hash, peer.visitor, code);
         } else {
             const code = normalizeCode(message.code);
             if (!code) { error(peer, 'INVALID_CODE', 'ENTER A FOUR-CHARACTER ROOM CODE'); return; }
             room = await load(code);
-            if (!room) { error(peer, 'ROOM_NOT_FOUND'); return; }
+            if (!room) { error(peer, expired.has(code) ? 'ROOM_EXPIRED' : 'ROOM_NOT_FOUND', expired.has(code) ? 'This temporary room expired. Ask the host to create a new room.' : 'Room not found. Check the code; temporary rooms are lost after a server restart.'); return; }
         }
         if (peer.ws.readyState !== WebSocket.OPEN) return;
         let index = room.record.visitors.indexOf(peer.visitor);
@@ -190,7 +220,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         if (message.type === 'crumble-trigger' && room.record.level !== 'workbench' && message.platform !== 'crumbleA' && message.platform !== 'crumbleB') { result(false); return; }
         if (message.type === 'restart-draft') {
             const frozen = options.drafts?.get(message.hash);
-            if (!room.record.draft || peer.slot !== 1 || !frozen || frozen.coopError || room.record.levelInstance >= Number.MAX_SAFE_INTEGER) { result(false); return; }
+            if (!room.record.draft || peer.slot !== 1 || !frozen || frozen.coopError || temporary(room) && message.hash !== room.record.draft.hash || room.record.levelInstance >= Number.MAX_SAFE_INTEGER) { result(false); return; }
             const previous = room.record, fresh = draftRecord(previous.code, previous.visitors[0], frozen);
             fresh.visitors = [...previous.visitors]; fresh.levelInstance = previous.levelInstance + 1; fresh.createdAt = previous.createdAt;
             room.transitioning = true; room.record = fresh; room.draft = frozen; room.plates = [null, null]; room.draftHeld = [[], []]; room.draftCubeContacts = {};
@@ -311,23 +341,29 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         const reject = (status: number) => { socket.end(`HTTP/1.1 ${status} Rejected\r\nConnection: close\r\n\r\n`); };
         if (options.acceptsUpgrade && !options.acceptsUpgrade(req)) { reject(403); return; }
         if (options.ignoredUpgradePath && req.url?.split('?')[0] === options.ignoredUpgradePath) return;
-        if (req.url !== '/ws') { reject(404); return; }
+        const custom = req.url === '/ws?custom=1' && !!options.drafts?.temporary;
+        if (req.url !== '/ws' && !custom) { reject(404); return; }
         if (!sameOrigin(req)) { reject(403); return; }
         if (!visitor) { reject(401); return; }
         if (peers.size >= 128) { reject(503); return; }
+        if (custom && ([...peers].filter(p => p.custom).length >= 24 || peers.size >= 96)) { reject(503); return; }
         wss.handleUpgrade(req, socket, head, ws => {
-            const peer: Peer = { ws, visitor, actionSeq: -1, avatarSeq: -1, stream: ++stream, alive: true, joinedAt: Date.now(), tokens: 120, refilled: Date.now(), pending: 0 };
+            const peer: Peer = { ws, visitor, custom, actionSeq: -1, avatarSeq: -1, stream: ++stream, alive: true, joinedAt: Date.now(), tokens: 120, refilled: Date.now(), pending: 0 };
             peers.add(peer);
             ws.on('error', () => {}); // Protocol violations close this socket, never the process.
             ws.on('pong', () => { peer.alive = true; });
             ws.on('close', () => { peers.delete(peer); serial(() => disconnect(peer)); });
             ws.on('message', (bytes, binary) => {
+                // Public draft support must not enlarge the campaign payload budget.
+                const limit = options.drafts && (!options.drafts.temporary || peer.custom || peer.room?.draft) ? 8192 : 2048;
+                const length = Array.isArray(bytes) ? bytes.reduce((n, b) => n + b.byteLength, 0) : bytes.byteLength;
+                if (length > limit) { ws.close(1009, 'Message too large'); return; }
                 const now = Date.now();
                 // Avatar + two independent cube streams = 60 Hz; retain bounded input headroom.
                 const cubeCount = peer.room?.record.draft ? Math.min(8, Object.keys(peer.room.cubes).length) : 2;
                 const rate = Math.max(90, 30 + cubeCount * 20);
                 peer.tokens = Math.min(Math.max(120, rate * 1.5), peer.tokens + (now - peer.refilled) * rate / 1000); peer.refilled = now;
-                if (--peer.tokens < 0 || peer.pending >= (peer.room?.record.draft ? 20 : 8) || queued >= 256) { error(peer, 'RATE_LIMITED'); ws.close(1008, 'Too many messages'); return; }
+                if (--peer.tokens < 0 || peer.pending >= (peer.custom ? 8 : peer.room?.record.draft ? 20 : 8) || queued >= (peer.custom ? 64 : 256)) { error(peer, 'RATE_LIMITED'); ws.close(1008, 'Too many messages'); return; }
                 const message = binary ? null : parseClientMessage(bytes.toString(), !!options.drafts);
                 if (!message) { error(peer, 'INVALID_MESSAGE'); ws.close(1008, 'Invalid message'); return; }
                 if (message.type === 'ping') { send(peer, { type: 'pong' }); return; }
@@ -370,7 +406,11 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         }
     }, 5000);
     const sweep = setInterval(() => {
-        for (const [code, room] of rooms) if (room.peers.every(p => !p) && Date.now() - room.idleSince > (options.idleMs ?? 300000)) rooms.delete(code);
+        for (const [code, room] of rooms) {
+            if (temporary(room)) { if (elapsed(room)) expire(room); }
+            else if (room.peers.every(p => !p) && Date.now() - room.idleSince > (options.idleMs ?? 300000)) rooms.delete(code);
+        }
+        options.drafts?.sweep?.();
     }, options.sweepMs ?? 30000);
     // A single bounded clock wakes only due rooms; phase changes share the semantic queue.
     let timerQueued = false;
@@ -392,5 +432,12 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     const shutdown = () => { clearInterval(heartbeat); clearInterval(sweep); clearInterval(machineryClock); for (const p of peers) p.ws.terminate(); wss.close(); };
     server.on('close', shutdown);
     server.on('shutdown', shutdown);
-    return { rooms, shutdown, drained: () => queue };
+    return { rooms, shutdown, drained: () => queue,
+        snapshotFor(code: string, visitor: string) {
+            const room = rooms.get(code);
+            if (!room || !temporary(room)) return undefined;
+            if (elapsed(room)) { expire(room); return undefined; }
+            return room.record.visitors.includes(visitor) ? room.record.draft?.hash : undefined;
+        },
+    };
 }

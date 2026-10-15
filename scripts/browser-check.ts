@@ -572,6 +572,8 @@ async function main() {
         // Native keyboard navigation includes the public builder before the four rooms.
         await tap(cdp, 'Tab');
         check('Level Builder is keyboard accessible from the main menu', await evaluate(cdp, 'document.activeElement.id === "level-builder"'));
+        await tap(cdp, 'Tab');
+        check('My Levels is keyboard accessible from the main menu', await evaluate(cdp, 'document.activeElement.id === "my-levels"'));
         for (let i = 0; i < 4; i++) await tap(cdp, 'Tab');
         check('level select supports keyboard navigation', await evaluate(cdp, 'document.activeElement.dataset.room === "uplink"'));
         await waitFor(cdp, 'sound assets decode after a gesture', s => s.audio.loaded === 14);

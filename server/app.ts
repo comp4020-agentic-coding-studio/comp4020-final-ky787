@@ -6,6 +6,7 @@ import { freshProgress, validProgress, readProgress, type Progress } from '../sr
 import { atomicJson } from './atomic-json.ts';
 import { ensureVisitor, sameOrigin } from './identity.ts';
 import { attachMultiplayer } from './multiplayer.ts';
+import { PublicDraftRegistry, PublicDraftError, PUBLIC_DRAFT_LIMITS } from './public-drafts.ts';
 interface RecordData {
     id: string;
     revision: number;
@@ -16,6 +17,8 @@ interface RecordData {
 export async function createApp(dataDir: string, siteDir = resolve('dist')) {
     await mkdir(dataDir, { recursive: true });
     const queues = new Map<string, Promise<unknown>>();
+    const drafts = new PublicDraftRegistry();
+    let uploads = 0;
     async function serial<T>(id: string, work: () => Promise<T>): Promise<T> {
         const previous = queues.get(id) ?? Promise.resolve();
         const next = previous.catch(() => { }).then(work);
@@ -50,6 +53,36 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
         const json = (code: number, value: unknown) => { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); };
         try {
             const url = new URL(req.url ?? '/', 'http://localhost');
+            if (url.pathname.startsWith('/api/custom/')) {
+                if (!sameOrigin(req)) { json(403, { error: 'Origin mismatch' }); return; }
+                const visitor = ensureVisitor(req, res);
+                if (url.pathname === '/api/custom/snapshots' && req.method === 'POST') {
+                    if (uploads >= 2) { json(429, { error: 'Custom uploads are busy. Please retry shortly.' }); return; }
+                    uploads++;
+                    const deadline = setTimeout(() => req.destroy(), 10_000);
+                    try {
+                        let size = 0; const chunks: Buffer[] = [];
+                        for await (const chunk of req) {
+                            size += chunk.length;
+                            if (size > PUBLIC_DRAFT_LIMITS.bytes) { json(413, { error: 'Custom multiplayer drafts must be at most 256 KB.' }); return; }
+                            chunks.push(Buffer.from(chunk));
+                        }
+                        const payload = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+                        json(201, await drafts.registerFor(visitor, payload?.document));
+                    } catch (error) { json(error instanceof PublicDraftError ? error.status : 400, { error: error instanceof Error ? error.message : 'Invalid draft' }); }
+                    finally { uploads--; clearTimeout(deadline); }
+                    return;
+                }
+                const match = /^\/api\/custom\/rooms\/([A-Z2-9]{4})\/snapshot$/.exec(url.pathname);
+                if (match && req.method === 'GET') {
+                    const hash = multiplayer.snapshotFor(match[1], visitor);
+                    if (!hash) { json(404, { error: 'Room unavailable or you have not joined. Temporary rooms may expire or be interrupted by a server restart.' }); return; }
+                    if (!drafts.allowRead(visitor)) { json(429, { error: 'Too many snapshot downloads. Wait a minute, then rejoin this room.' }); return; }
+                    const document = drafts.document(hash);
+                    json(200, { hash, document }); return;
+                }
+                json(404, { error: 'Custom endpoint not found' }); return;
+            }
             if (url.pathname === '/api/identity') {
                 if (req.method !== 'GET') { json(405, { error: 'Method not allowed' }); return; }
                 if (!sameOrigin(req)) { json(403, { error: 'Origin mismatch' }); return; }
@@ -149,9 +182,9 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
                 res.end();
         }
     });
-    await attachMultiplayer(server, dataDir, process.env.NODE_ENV === 'test' ? {
+    const multiplayer = await attachMultiplayer(server, dataDir, { drafts, ...(process.env.NODE_ENV === 'test' ? {
         semanticDelayMs: Number(process.env.BN_TEST_SEMANTIC_DELAY_MS) || 0,
-    } : {});
+    } : {}) });
     return server;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

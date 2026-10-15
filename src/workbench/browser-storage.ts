@@ -1,5 +1,6 @@
 import { canonicalRecord, DraftConflict, portableName, type DraftEntry, type DraftStorageBackend, type RecoveryDraft, type StoredDraft } from './storage.ts';
 import type { DraftDocument } from './model.ts';
+import { freezePublicDraft } from './public-session.ts';
 
 export const BROWSER_DATABASE = 'binary-ninja-level-builder';
 export const BROWSER_DATABASE_VERSION = 1;
@@ -10,10 +11,11 @@ const complete = (tx: IDBTransaction) => {
     // A failed request may throw before callers reach await done; still observe abort.
     void done.catch(() => {}); return done;
 };
-/** Only browser primitives; no network, visitor progress, filesystem or local-service fallback. */
+/** Canonical storage is browser-only; explicit co-op launch uploads a temporary copy. */
 export class BrowserDraftStorage implements DraftStorageBackend {
+    freeze = freezePublicDraft;
     readonly kind = 'browser' as const;
-    readonly capabilities = { manage: true, coop: false, trustedImports: false };
+    readonly capabilities = { manage: true, coop: true, trustedImports: false };
     private db: IDBDatabase | null = null;
     async initialize() {
         if (!globalThis.indexedDB) throw new Error('IndexedDB is unavailable in this browser. You can still edit, playtest and Export JSON.');

@@ -3,7 +3,7 @@ import { cloneDraft, codeActivation, draftHash, newDraft, objectBounds, objectPo
 import { BUILTIN_OUTPUTS, validateDraft } from './validation.ts';
 import { createRuntime } from './runtime.ts';
 import { evaluateDraft, initialDeviceValues } from './evaluate.ts';
-import { DraftHistory, allIds, boundsUnion, connectDevice, connectOutput, createEntity, deleteEntities, duplicateEntities, entityBounds, renameEntity, translateEntities, uniqueId, bindingProperty, type PaletteKind } from './editor-operations.ts';
+import { DraftHistory, ensureCheckpointMarkers, allIds, boundsUnion, connectDevice, connectOutput, createEntity, deleteEntities, duplicateEntities, entityBounds, renameEntity, translateEntities, uniqueId, bindingProperty, type PaletteKind } from './editor-operations.ts';
 import { PuzzleRenderer } from '../slice/render.ts';
 import { InputManager } from '../ui/input.ts';
 import { emptyInput, createPlayer, type InputState } from '../engine/physics.ts';
@@ -99,7 +99,7 @@ export class WorkbenchEditor {
     constructor(readonly storage: DraftStorageBackend) {
         $('#workbench').innerHTML = `<main class="wb-app">
           <header class="wb-brand"><div class="identity"><h1>BINARY NINJA</h1><span class="badge">${storage.kind === 'browser' ? 'PUBLIC LEVEL BUILDER' : 'LEVEL WORKBENCH / V1'}</span><a id="back-to-game" hidden style="color:var(--cyan)">Back to game</a></div><div class="meta"><span>${storage.kind === 'browser' ? 'SAVED ON THIS DEVICE' : 'LOCAL AUTHORING'}</span><span>MOCK DRAFTS · CAMPAIGN ISOLATED</span></div></header>
-          <nav class="wb-toolbar" aria-label="Editor toolbar"><button id="new">New</button><select id="files" aria-label="Open draft"><option value="">Open draft…</option></select><button id="examples">Examples</button><button id="import-room">Import room</button><button id="save" class="primary">Save</button><button id="save-copy">Save copy</button><button id="rename-draft">Rename</button><button id="delete-draft">Delete draft</button><button id="recover">Recovery</button><button id="export">Export JSON</button><button id="import-json">Import JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden><span class="separator"></span><button id="undo" title="Undo (Ctrl+Z)">Undo</button><button id="redo" title="Redo (Ctrl+Shift+Z)">Redo</button><span class="separator"></span><button id="edit-mode" class="active">Edit</button><button id="preview-mode">State preview</button><button id="play" class="primary">Play from spawn</button><button id="stop" hidden>Stop test</button><button id="coop">Test co-op draft</button></nav>
+          <nav class="wb-toolbar" aria-label="Editor toolbar"><button id="new">New</button><select id="files" aria-label="Open draft"><option value="">Open draft…</option></select><button id="examples">Examples</button><button id="import-room">Import room</button><button id="save" class="primary">Save</button><button id="save-copy">Save copy</button><button id="rename-draft">Rename</button><button id="delete-draft">Delete draft</button><button id="recover">Recovery</button><button id="export">Export JSON</button><button id="import-json">Import JSON</button><input id="json-file" type="file" accept=".json,application/json" hidden><span class="separator"></span><button id="undo" title="Undo (Ctrl+Z)">Undo</button><button id="redo" title="Redo (Ctrl+Shift+Z)">Redo</button><span class="separator"></span><button id="edit-mode" class="active">Edit</button><button id="preview-mode">State preview</button><button id="play" class="primary">Play from spawn</button><button id="stop" hidden>Stop test</button><button id="coop">TEST WITH FRIEND</button></nav>
           <div class="wb-layout"><aside class="wb-sidebar left" aria-label="Object palette and hierarchy"><h2>Object palette</h2><div class="wb-palette">${PALETTE.map(p => `<button draggable="true" data-palette="${p.kind}" title="${p.hint}">${p.label}<span>${p.hint}</span></button>`).join('')}</div><h2>Room hierarchy</h2><input id="search" class="wb-search" aria-label="Search objects" placeholder="Search ID, type or label"><div id="hierarchy" class="wb-hierarchy"></div></aside>
           <section class="wb-stage" aria-label="World viewport"><canvas id="world" tabindex="0" aria-label="Level canvas. Click to select; drag to move. Shift adds selection. WASD or middle drag pans."></canvas><canvas id="overlay" class="overlay" aria-hidden="true"></canvas><div class="canvas-tools"><button id="fit" title="Fit whole room (F)">Fit room</button><button id="frame" title="Frame selection">Frame selection</button><button id="test-point" title="Test from selected marker or last clicked point">Test here</button><label class="check"><input id="grid" type="checkbox" checked>Grid</label><label class="check"><input id="snap" type="checkbox" checked>Snap</label><label><span class="wb-visually-hidden">Grid size</span><input id="grid-size" type="number" value="20" min="1" max="256" aria-label="Grid size"></label><button id="connect">Connect</button><button id="hitboxes">Hitboxes</button><button id="range">Range</button></div><div id="mode-banner" class="wb-mode-banner"></div></section>
           <aside class="wb-sidebar right" aria-label="Properties and validation"><div id="conflict"></div><div id="inspector"></div><div id="logic"></div><details class="wb-diagnostics" id="diagnostics-panel"><summary id="diagnostic-summary">Validation</summary><div id="diagnostics"></div></details></aside></div>
@@ -109,7 +109,7 @@ export class WorkbenchEditor {
         if (!storage.capabilities.coop) { $('#coop').hidden = true; }
         if (storage.kind === 'browser') {
             const notice = document.createElement('div'); notice.className = 'wb-storage-notice';
-            notice.textContent = 'Levels are saved in this browser. Export JSON to back up or share your work. Clearing browser data or using private browsing can remove drafts. Online custom-level multiplayer is not available yet.';
+            notice.textContent = 'Levels are saved in this browser. Export JSON to back up or share your work. Clearing browser data or using private browsing can remove drafts. Test with a friend uses a temporary frozen copy. Editing stays on this device.';
             $('.wb-brand').append(notice);
             const link = $<HTMLAnchorElement>('#back-to-game'); link.href = '/'; link.hidden = false; link.textContent = 'BACK TO GAME';
         }
@@ -127,8 +127,10 @@ export class WorkbenchEditor {
             this.engineRevision = boot.engineRevision; this.dataDirectory = boot.location;
             this.files = await this.storage.list(); this.refreshFiles();
             if (boot.gameUrl) { const link = $<HTMLAnchorElement>('#back-to-game'); link.href = boot.gameUrl; link.hidden = false; }
+            const requested = this.storage.kind === 'browser' ? new URL(location.href).searchParams.get('draft') : null;
             const recovery = (await this.storage.recoveries())[0];
-            if (recovery && confirm(`Recover unsaved work for ${recovery.name}? Saved drafts remain unchanged until Save.`)) await this.restoreRecovery(recovery);
+            if (requested && this.files.some(f => f.id === requested)) await this.open(requested, false);
+            else if (recovery && confirm(`Recover unsaved work for ${recovery.name}? Saved drafts remain unchanged until Save.`)) await this.restoreRecovery(recovery);
             else if (this.files.length) await this.open((this.storage.kind === 'filesystem' ? this.files.find(f => f.name.includes('blank')) ?? this.files[0] : this.files[0]).id, false);
             else { this.history.replace(this.storage.kind === 'browser' ? publicTemplate() : newDraft()); this.saved = serializeDraft(this.document); this.refresh(); this.fit(); this.status('Ready. Edit this example or choose New, My drafts, or Import JSON. Save keeps a draft on this device.'); }
             setInterval(() => void this.checkExternal(), 4000);
@@ -275,7 +277,7 @@ export class WorkbenchEditor {
     renderInspector() {
         const panel = $('#inspector');
         if (this.mode === 'preview') { this.renderPreview(panel); return; }
-        if (this.mode === 'play') { panel.innerHTML = `<h2>Real engine physics test</h2><p class="wb-help">The authored document is frozen. Simulation never writes cube or player positions into the level file.</p><div class="wb-actions"><button id="restart">Restart test</button><button id="pause">${this.paused ? 'Resume' : 'Pause'}</button><button id="step">Frame step</button></div><h3>Live observation</h3><pre id="observation" class="wb-help"></pre><div class="wb-notice">Single local player. ${this.storage.capabilities.coop ? 'Test co-op draft opens the actual two-player authority session.' : 'Online custom-level multiplayer is reserved for Stage 2.'}</div>`; $('#restart').onclick = () => void this.startTest({ slot: this.testSlot, at: this.testAt }).catch(() => {}); $('#pause').onclick = () => { this.paused = !this.paused; this.input?.releaseAll(); this.renderInspector(); this.updateToolbar(); }; $('#step').onclick = () => { this.paused = true; this.advance(emptyInput()); this.updateToolbar(); }; return; }
+        if (this.mode === 'play') { panel.innerHTML = `<h2>Real engine physics test</h2><p class="wb-help">The authored document is frozen. Simulation never writes cube or player positions into the level file.</p><div class="wb-actions"><button id="restart">Restart test</button><button id="pause">${this.paused ? 'Resume' : 'Pause'}</button><button id="step">Frame step</button></div><h3>Live observation</h3><pre id="observation" class="wb-help"></pre><div class="wb-notice">Single local player. ${this.storage.capabilities.coop ? 'TEST WITH FRIEND opens the actual two-player authority session.' : 'Online custom-level multiplayer is reserved for Stage 2.'}</div>`; $('#restart').onclick = () => void this.startTest({ slot: this.testSlot, at: this.testAt }).catch(() => {}); $('#pause').onclick = () => { this.paused = !this.paused; this.input?.releaseAll(); this.renderInspector(); this.updateToolbar(); }; $('#step').onclick = () => { this.paused = true; this.advance(emptyInput()); this.updateToolbar(); }; return; }
         const setters = new Map<string, (value: string | number | boolean) => void>(); let index = 0;
         const field = (label: string, value: string | number | boolean, setter: (v: string | number | boolean) => void, options?: { values?: string[]; min?: number; step?: number; wide?: boolean }) => {
             const id = `property-${index++}`; setters.set(id, setter);
@@ -316,7 +318,7 @@ export class WorkbenchEditor {
                     if (object.kind === 'toggle' || object.kind === 'terminal') body += field('Checkpoint', object.checkpoint ?? '', v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'device') { if (v === 'relay' || v === 'upper') o.checkpoint = v; else delete o.checkpoint; } }), { values: ['', 'relay', 'upper'], wide: true });
                 }
                 if (object.type === 'spawn' || object.type === 'checkpoint') body += field('Player slot', object.slot, v => patch({ slot: Number(v) === 2 ? 2 : 1 }), { values: ['1', '2'], wide: true });
-                if (object.type === 'checkpoint' || object.type === 'breakpoint') body += field('Checkpoint', object.checkpoint, v => patch({ checkpoint: v === 'upper' ? 'upper' : 'relay' }), { values: ['relay', 'upper'], wide: true });
+                if (object.type === 'checkpoint' || object.type === 'breakpoint') body += field('Checkpoint', object.checkpoint, v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === object.id); if (o?.type === 'checkpoint' || o?.type === 'breakpoint') { o.checkpoint = v === 'upper' ? 'upper' : 'relay'; if (o.type === 'breakpoint') ensureCheckpointMarkers(d, o); } }), { values: ['relay', 'upper'], wide: true });
                 if (object.type === 'breakpoint') body += field('Activation control', object.activationControl ?? '', v => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'breakpoint') { if (v) o.activationControl = String(v); else delete o.activationControl; } }), { values: ['', ...this.document.geometry.objects.filter(o => o.type === 'device' && (o.kind === 'toggle' || o.kind === 'terminal')).map(o => o.id)], wide: true });
                 if (object.type === 'relay') { body += field('Pair ID', object.pair, v => patch({ pair: String(v) }), { wide: true }); body += field('Exit direction', object.exitSide, v => patch({ exitSide: Number(v) === -1 ? -1 : 1 }), { values: ['-1', '1'], wide: true }); }
                 if (object.type === 'firewall') { body += field('Orientation', object.orientation, v => patch({ orientation: v === 'horizontal' ? 'horizontal' : 'vertical' }), { values: ['horizontal', 'vertical'], wide: true }); body += field('Length', object.length, v => patch({ length: Number(v) }), { min: 1 }); body += field('Thickness', object.thickness, v => patch({ thickness: Number(v) }), { min: 1 }); }
@@ -340,10 +342,21 @@ export class WorkbenchEditor {
             body += '</div>';
             if (object) body += `<p class="wb-help">Coordinates: ${object.type === 'spawn' || object.type === 'checkpoint' || object.type === 'cube' ? 'body centre' : object.type === 'device' || object.type === 'breakpoint' ? 'centre X / floor contact Y' : 'top-left rectangle'}. ${object.type === 'device' ? 'Plate: bodies or resting cubes. Socket: cubes. Scanner: players. Toggle: repeatable. Terminal: latched.' : ''}</p>`;
         }
+        if (ids.length === 1 && object?.type === 'breakpoint') {
+            body += '<h3>Linked respawn centres</h3><p class="wb-help">The terminal activates this milestone. Activation never teleports players. Markers move independently.</p>';
+            for (const slot of [1, 2]) {
+                const marker = this.document.geometry.objects.find(o => o.type === 'checkpoint' && o.checkpoint === object.checkpoint && o.slot === slot);
+                body += marker ? `<p>Player ${slot}: (${marker.x}, ${marker.y}) <button data-frame-marker="${html(marker.id)}">Select / frame</button></p>` : `<p class="wb-field-error">Player ${slot}: no safe ground found. Move the pedestal near clear static ground, then retry; or place a Respawn marker manually.</p>`;
+            }
+            body += '<button id="repair-markers">Create missing respawn markers</button>';
+        }
         if (ids.length) body += `<div class="wb-actions"><button id="duplicate">Duplicate</button><button id="delete" class="danger">Delete</button><button id="test-here"${!this.playable ? ' disabled' : ''}>Test from here</button></div>`;
         body += `<div class="wb-section"><label>Physics player<select id="test-slot">${option('1', 'Player 1', this.testSlot === 1)}${option('2', 'Player 2', this.testSlot === 2)}</select></label>${this.recording ? `<p class="wb-help wb-recording">Measured trajectory · ${this.recording.samples.length} samples${this.recording.draftHash !== this.currentHash ? ' · stale after edits' : ''}${this.recording.sectionOnly ? ' · section-only' : ''}</p><button id="export-recording">Export recording</button><button id="clear-recording">Clear path</button>` : ''}</div>`;
         if (this.propertyError) body += `<p class="wb-field-error">${html(this.propertyError)}</p>`;
         panel.innerHTML = body;
+        panel.querySelector('#repair-markers')?.addEventListener('click', () => this.mutate(d => { const o = d.geometry.objects.find(o => o.id === ids[0]); if (o?.type === 'breakpoint') ensureCheckpointMarkers(d, o); }));
+        for (const button of panel.querySelectorAll<HTMLButtonElement>('[data-frame-marker]')) button.onclick = () => { this.selection = new Set([button.dataset.frameMarker!]); this.fit(entityBounds(this.document, button.dataset.frameMarker!)); this.renderHierarchy(); this.renderInspector(); };
+
         for (const [id, setter] of setters) $<HTMLInputElement | HTMLSelectElement>(`#${id}`).addEventListener('change', event => {
             const input = event.target as HTMLInputElement; input.setCustomValidity(''); if (input.type === 'number' && (input.value === '' || !Number.isFinite(Number(input.value)) || !input.checkValidity())) { input.setCustomValidity('Enter a valid number within the displayed bounds.'); input.reportValidity(); return; }
             input.setCustomValidity(''); setter(input.type === 'checkbox' ? input.checked : input.type === 'number' ? Number(input.value) : input.value);
@@ -615,9 +628,21 @@ export class WorkbenchEditor {
         this.draw(0); await new Promise<void>(resolve => requestAnimationFrame(() => resolve())); return { hash: await draftHash(this.document), state: options.state ?? this.mode, viewport: { ...this.camera } };
     }
     async startCoop() {
-        if (!this.storage.freeze) { this.status('Online custom-level multiplayer is not available yet.'); return; }
-        try { const snapshot = { hash: await this.storage.freeze(this.document) }; const url = `/workbench-runner.html?coopHash=${encodeURIComponent(snapshot.hash)}`; const child = window.open(url, '_blank'); this.status(`Frozen draft ${snapshot.hash.slice(0, 12)}. Co-op host opens separately; partner must use a private window or another browser identity.`); if (!child) this.modal('Co-op draft ready', `<p>A validated snapshot is frozen at <code>${html(snapshot.hash)}</code>.</p><p><a href="${url}" target="_blank" rel="noopener">Open co-op host</a>. The partner joins its room code in a private window. Ordinary tabs share an identity.</p>`); }
-        catch (e) { this.status(`Co-op snapshot failed: ${String(e)}`); }
+        if (!this.storage.freeze || this.busy) return;
+        const frozen = cloneDraft(this.document);
+        // Open during the user gesture; the original editor (including undo/unsaved work) stays intact.
+        const child = window.open('about:blank', '_blank');
+        this.busy = true; this.updateToolbar();
+        try {
+            const hash = await this.storage.freeze(frozen);
+            const url = this.storage.kind === 'browser'
+                ? `/custom-level.html?host=${hash}&mode=test&return=editor`
+                : `/workbench-runner.html?coopHash=${hash}`;
+            if (child) child.location.replace(url);
+            else this.modal('Test with friend', `<p><a href="${url}" target="_blank">Open frozen test session</a>. Your unsaved editor work stays here.</p>`);
+            this.status('Test session opens separately. Share its invitation link with your friend. Your editor work remains intact.');
+        } catch (e) { child?.close(); this.status(`Co-op snapshot failed: ${String(e)}`); }
+        finally { this.busy = false; this.updateToolbar(); }
     }
     modal(title: string, content: string) { this.clearEditorMovement(); const overlay = document.createElement('div'); overlay.className = 'wb-modal'; overlay.innerHTML = `<section class="wb-dialog" role="dialog" aria-modal="true" aria-label="${html(title)}"><h2>${html(title)}</h2>${content}<div class="wb-actions"><button data-close>Close</button></div></section>`; document.body.append(overlay); overlay.querySelector<HTMLButtonElement>('[data-close]')!.onclick = () => overlay.remove(); overlay.querySelector<HTMLButtonElement>('button')?.focus(); return overlay; }
     importDialog() {

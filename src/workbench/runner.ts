@@ -74,7 +74,7 @@ function connect(hashToStart?: string, code?: string) {
         if (!session) return;
         if (session.world) { draftDoc = session.document; ready = true; }
         const c = session.client; restartButton.disabled = !latest.value || !c.isHost; status.textContent = `${c.status} · CODE ${c.room?.code ?? '…'} · PLAYER ${c.slot ?? '?'} · ${c.room?.completed ? 'COMPLETE' : c.room?.exitUnlocked ? 'EXIT READY' : 'DRAFT CO-OP'} · ${c.room?.draft?.hash.slice(0, 10) ?? ''} / generation ${c.room?.levelInstance ?? '?'}`;
-    }, showError);
+    }, showError, room => `/api/workbench/snapshots/${room.draft!.hash}`);
     if (code) session.join(code); else if (hashToStart) session.start(hashToStart);
     input.releaseAll(); canvas.focus();
 }

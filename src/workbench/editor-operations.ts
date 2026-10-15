@@ -1,4 +1,6 @@
-import { cloneDraft, DRAFT_ID, objectBounds, objectPort, serializeDraft, type DraftBinding, type DraftDocument, type DraftExpression, type DraftObject } from './model.ts';
+import { cloneDraft, DRAFT_ID, objectBounds, objectPort, serializeDraft, type DraftBinding, type DraftDocument, type DraftExpression, type DraftObject, type DraftBreakpoint } from './model.ts';
+import { PLAYER } from '../engine/constants.ts';
+import { boxesOverlap } from '../engine/geometry.ts';
 import type { Box, Vec2 } from '../engine/geometry.ts';
 
 /** A gesture is a transaction: push its starting document once, at pointer-up. */
@@ -67,7 +69,33 @@ export function createEntity(draft: DraftDocument, kind: PaletteKind, at: Vec2):
         case 'reveal': draft.presentation.cameraReveals.push({ id, source: draft.geometry.objects.find(o => o.type === 'device')?.id ?? 'unassignedControl', bounds: { ...at, w: 400, h: 260 }, padding: 64, duration: 2.5 }); return id;
         case 'wire': draft.presentation.wires.push({ id, points: [{ ...at }, { x: at.x + 100, y: at.y }, { x: at.x + 100, y: at.y + 100 }] }); return id;
     }
-    draft.geometry.objects.push(object); return id;
+    draft.geometry.objects.push(object);
+    if (object.type === 'breakpoint') ensureCheckpointMarkers(draft, object);
+    return id;
+}
+/** Reuse authored markers. Search conservative, permanent footing, never active machinery. */
+export function ensureCheckpointMarkers(draft: DraftDocument, pedestal: DraftBreakpoint) {
+    const objects = draft.geometry.objects;
+    for (const slot of [1, 2] as const) {
+        if (objects.some(o => o.type === 'checkpoint' && o.checkpoint === pedestal.checkpoint && o.slot === slot)) continue;
+        const candidates: Vec2[] = [];
+        for (const floor of objects) if (floor.type === 'platform' && floor.kind === 'static' && floor.w >= PLAYER.width + 4 && !draft.bindings.some(b => b.target === floor.id)) {
+            for (let offset = -320; offset <= 320; offset += 20) {
+                const x = Math.max(floor.x + PLAYER.width / 2 + 2, Math.min(floor.x + floor.w - PLAYER.width / 2 - 2, pedestal.x + offset));
+                const p = { x, y: floor.y - PLAYER.height / 2 - .1 };
+                if (Math.abs(p.x - pedestal.x) > 320 || Math.abs(floor.y - pedestal.y) > 200) continue;
+                const box = { x: p.x - PLAYER.width / 2, y: p.y - PLAYER.height / 2, w: PLAYER.width, h: PLAYER.height };
+                if (box.x < 0 || box.y < 0 || box.x + box.w > draft.geometry.width || box.y + box.h > draft.geometry.height) continue;
+                if (objects.some(o => ['platform', 'hazard', 'firewall', 'cube', 'relay', 'lift', 'checkpoint'].includes(o.type) && boxesOverlap(box, objectBounds(o)))) continue;
+                candidates.push(p);
+            }
+        }
+        const preferredX = pedestal.x + (slot === 1 ? -40 : 40);
+        candidates.sort((a, b) => Math.hypot(a.x - preferredX, a.y + PLAYER.height / 2 - pedestal.y) - Math.hypot(b.x - preferredX, b.y + PLAYER.height / 2 - pedestal.y));
+        const position = candidates[0];
+        // Missing markers remain explicit validation errors; no guessed unsafe coordinates.
+        if (position) objects.push({ id: uniqueId(draft, `${pedestal.checkpoint}Player${slot}`), type: 'checkpoint', checkpoint: pedestal.checkpoint, slot, ...position });
+    }
 }
 function mapExpression(expression: DraftExpression, remap: Map<string, string>): DraftExpression {
     if (expression.op === 'ref') { const [id, ...port] = expression.id.split('.'); return { op: 'ref', id: `${remap.get(id) ?? id}${port.length ? '.' + port.join('.') : ''}` }; }
@@ -76,6 +104,8 @@ function mapExpression(expression: DraftExpression, remap: Map<string, string>):
     return { ...expression };
 }
 export function duplicateEntities(draft: DraftDocument, selection: Set<string>, offset = { x: 40, y: 40 }): string[] {
+    // A milestone owns one marker per slot, even when its pedestal is duplicated.
+    selection = new Set([...selection].filter(id => !draft.geometry.objects.some(o => o.id === id && o.type === 'checkpoint')));
     const reserved = new Set<string>(), remap = new Map<string, string>();
     for (const id of selection) remap.set(id, uniqueId(draft, `${id}_copy`, reserved));
     const remapId = (id: string) => remap.get(id) ?? id;

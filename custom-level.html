@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Binary Ninja · Custom chamber</title></head>
+<body class="custom-game"><header><a href="/">BINARY NINJA</a><strong id="title">CUSTOM CHAMBER</strong><span id="status" role="status">Connecting…</span><button id="replay-current" hidden>REPLAY LEVEL</button><button id="sound">Sound on</button><button id="return">RETURN TO MENU</button></header>
+<section id="invitation"><label>ROOM <input id="code" maxlength="4" size="5" autocomplete="off" aria-label="Room code"></label><button id="join">JOIN ROOM</button><input id="invite" readonly aria-label="Invitation link"><button id="copy">COPY INVITE</button><span id="expiry">Temporary room · 2 hours maximum · expires 5 minutes after everyone leaves</span></section>
+<canvas id="stage" tabindex="0" aria-label="Custom cooperative chamber"></canvas>
+<footer>A / D move · Space jump / airborne hook · Click hook · E carry / use · R respawn · Tab overview <button id="diagnostics-toggle" hidden>TEST INFORMATION</button></footer>
+<pre id="diagnostics" hidden></pre>
+<div id="victory" class="custom-overlay" hidden><section class="custom-card"><span class="eyebrow">CHAMBER COMPLETE</span><h1>Exit secured.</h1><p>You both made it. This custom level stays separate from campaign progress.</p><button id="replay">REPLAY LEVEL</button><p id="guest-wait" hidden>Waiting for the host to replay.</p><button id="victory-return">RETURN TO MENU</button></section></div>
+<script type="module" src="/src/workbench/public-runner.ts"></script></body></html>

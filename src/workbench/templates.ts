@@ -1,7 +1,7 @@
 import { newDraft, type DraftDocument } from './model.ts';
 
 export const PUBLIC_TEMPLATES = [
-    { id: 'beginner', title: 'Beginner room', description: 'Cube, pressure plate, always-powered grapple slab and a single-player exit.' },
+    { id: 'beginner', title: 'Beginner room', description: 'Cube, pressure plate, always-powered grapple slab and a two-player exit.' },
     { id: 'signals', title: 'Signal routes', description: 'Two controlled platforms, a plate, a switch and visible functional connections.' },
 ] as const;
 /** Compiled authored/mock templates. Each call returns independent editable data. */
@@ -9,7 +9,7 @@ export function publicTemplate(id = 'beginner'): DraftDocument {
     const d = newDraft(id === 'signals' ? 'signal-routes' : 'beginner-room');
     const platform = d.geometry.objects.find(o => o.id === 'route')!;
     const exit = d.geometry.objects.find(o => o.type === 'exit')!;
-    if (exit.type === 'exit') exit.arrivals = 1;
+    if (exit.type === 'exit') exit.arrivals = 2;
     if (d.controller.kind !== 'declarative' || platform.type !== 'platform') throw new Error('Invalid template');
     if (id === 'signals') {
         d.title = 'SIGNAL ROUTES / AUTHORED EXAMPLE';
