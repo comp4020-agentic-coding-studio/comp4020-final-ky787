@@ -12,14 +12,17 @@ const state = (on: boolean, label: string, capture: string): ScenarioStep => ({ 
 const scenario: DraftScenario = { version: 1, id: 'receiver-local-contact', scope: 'diagnostic', mode: 'coop', timeoutMs: 45000,
     actors: [{ id: 'host', slot: 1 }, { id: 'partner', slot: 2 }], steps: [
         { label: 'Authored fixture start', waitMs: 300 }, walk(800), state(false, 'Player cannot occupy receiver', 'empty'),
-        walk(1210), use('Pick up cargo'), walk(875), use('Put down cargo'), state(true, 'Accepted cube contact', 'scan'),
+        walk(1210), use('Pick up cargo'), walk(920), use('Put down cargo'), state(true, 'Accepted cube contact', 'connected'),
         { label: 'Settled powered dock', waitMs: 1200, capture: 'powered' },
-        use('Remove cargo'), state(false, 'Accepted removal', 'release'),
+        walk(855), use('Remove cargo'), state(false, 'Accepted removal', 'release'),
     ] };
-const report = await runScenario(receiverReview(), scenario, join(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-receivers', 'local'));
+const report = await runScenario(receiverReview(), scenario, join(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-interface', 'local'));
 if (!report.pass) throw new Error(report.error ?? 'Local receiver scenario failed');
 for (const [label, active] of [['Player cannot occupy receiver', false], ['Accepted cube contact', true], ['Accepted removal', false]] as const) {
-    const observed = report.results.find(r => r.label === label)!.observed as Record<string, { heroAssets: { receivers: { active: boolean }[] } }>;
+    const observed = report.results.find(r => r.label === label)!.observed as Record<string, { cubes: Record<string, { x: number; y: number }>; heroAssets: { receivers: { active: boolean; dock: { cube: string; x: number; y: number } | null }[] } }>;
     if (!Object.values(observed).every(s => s.heroAssets.receivers[0].active === active)) throw new Error(`Local receiver rendering disagrees: ${label}`);
+    if (active && !Object.values(observed).every(s => s.heroAssets.receivers[0].dock?.cube === 'draft:cargoA'
+        && s.heroAssets.receivers[0].dock?.x === 800 && s.cubes['draft:cargoA'].x === 800 && s.cubes['draft:cargoA'].y === 598))
+        throw new Error('Local developer clients must share the centred body and visible pose');
 }
-console.log('PASS local CLI two-player contact: player exclusion, accepted cube, live removal and matching receiver visuals on both clients');
+console.log('PASS local CLI two-player contact: player exclusion, accepted cube, live removal and matching centred bodies/receiver visuals on both clients');

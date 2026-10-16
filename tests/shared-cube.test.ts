@@ -108,6 +108,24 @@ function setup(slot: Slot = 1) {
     return { world, state, record, client, cube, update };
 }
 
+it.each([1, 2] as const)('slot %s docks only accepted resting cargo and revokes alignment during removal prediction', slot => {
+    const { world, state, record, client, cube, update } = setup(slot);
+    const at = world.room.cargoPlate!;
+    state.transform = { x: at.x + 40, y: at.y - 22, vx: 0, vy: 0, grounded: true };
+    Object.assign(world.cube!, state.transform); // Owner advances its local body before publishing.
+    update(); expect(world.payloadDocks).toEqual([]);
+    record.cubePlacements.cube = 'cargoPlate'; update();
+    expect(cube.acceptedPlacement).toBe('cargoPlate');
+    expect(world.cube!.x).toBe(at.x); expect(world.payloadDocks[0].cube).toBe('cube');
+    for (let i = 0; i < 10; i++) { world.syncAuthority(); expect(world.cube!.x).toBe(at.x); }
+    client.prediction.begin('cube-pickup', 1, state.epoch, 1, performance.now());
+    world.syncAuthority(); expect(cube.acceptedPlacement).toBeNull(); expect(world.payloadDocks).toEqual([]);
+    client.prediction.clear(performance.now());
+    state.pulling = true; update(); expect(world.payloadDocks).toEqual([]);
+    state.pulling = false; update(true); expect(world.payloadDocks).toHaveLength(1);
+    client.connected = false; world.syncAuthority(); expect(world.payloadDocks).toEqual([]);
+});
+
 it('only the authority integrates loose physics; remote carried geometry follows the interpolated holder', () => {
     const { world, state, client, update } = setup(2);
     state.transform = { x: 1200, y: 430, vx: 100, vy: 300, grounded: false }; update();

@@ -3,7 +3,7 @@ import { isCampaignLevel, isAuthoredCampaignLevel } from '../coop/campaign.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
-import { CUBE_SIZE, CODE_SLAB_HEIGHT } from './tuning.ts';
+import { CODE_SLAB_HEIGHT } from './tuning.ts';
 import { Camera } from '../render/camera.ts';
 import { Particles } from '../render/fx.ts';
 import type { Vec2 } from '../engine/geometry.ts';
@@ -20,6 +20,7 @@ import { HeroPresentation, type HeroCue } from './hero-presentation.ts';
 import { drawBreakpoint, drawEntryGateways, drawEntryProjection, drawExitGate, drawRespawnMarker } from './hero-render.ts';
 import { payloadReceivers } from './receiver-presentation.ts';
 import { drawReceivers, drawReceiverLabels } from './receiver-render.ts';
+import { drawPayload } from './payload-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     replay = new TracePlayback();
@@ -274,13 +275,7 @@ export class PuzzleRenderer {
         if (w.checkpoint !== 'entry' && !r.breakpoints?.some(b => b.checkpoint === w.checkpoint)) drawRespawnMarker(c, w.checkpointPosition());
         drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'rear');
         for (const [id, cube] of cubeEntries(w.cubes)) if (!w.cubeIsResetting(id)) {
-            c.fillStyle = '#393b32';
-            c.fillRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
-            c.strokeStyle = C.amber;
-            c.lineWidth = 3;
-            c.strokeRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
-            const mark = r.cubes?.find(c => c.id === id)?.mark;
-            if (mark) this.text(mark, cube.x - 6, cube.y + 6, 18, C.amber); else this.ring(cube.x, cube.y, 8, C.amber);
+            drawPayload(c, cube, r.cubes?.find(c => c.id === id)?.mark, this.heroes.time, w.payloadDocks.some(d => d.cube === id));
             if (w.pullingCubeId === id) {
                 c.setLineDash([6, 5]);
                 this.line(w.player.x, w.player.y, cube.x, cube.y, C.amber);

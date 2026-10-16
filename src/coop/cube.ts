@@ -31,6 +31,15 @@ export class SharedCubeAuthority implements CubeAuthority {
     private get replica() { return this.id === 'cube' ? this.client.remoteCube : this.client.cubeReplica(this.id); }
     private action(type: Parameters<CubeTransport['cubeAction']>[0], transform?: CubeTransform) { return this.client.cubeAction(type, transform, this.id, this.resetCause); }
     get resetting() { return this.client.connected && (this.firewallContact || this.pending?.kind === 'cube-reset'); }
+    get acceptedPlacement(): string | null {
+        const state = this.client.room?.cubes[this.id];
+        return this.client.connected && state && !state.holder && !state.pulling && !this.pending && !this.resetting
+            ? this.client.room!.cubePlacements[this.id] ?? null : null;
+    }
+    get dockingObstacle() {
+        return this.client.connected && this.client.slot && this.client.room?.connected[this.client.slot === 1 ? 1 : 0]
+            ? this.client.remote.latest() : null;
+    }
     get simulates() { return this.client.connected && !this.resetting && (this.owns || !!this.pending); }
     get heldLocally() {
         const pending = this.pending;

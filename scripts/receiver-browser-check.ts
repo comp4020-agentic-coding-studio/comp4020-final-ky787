@@ -11,7 +11,7 @@ import { requirePlayable } from '../src/workbench/validation.ts';
 
 const modes = process.argv.slice(2).length ? process.argv.slice(2) : ['public', 'editor', 'campaign'];
 if (modes.some(m => !['public', 'editor', 'campaign'].includes(m))) throw new Error('Modes: public editor campaign');
-const reports = resolve(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-receivers');
+const reports = resolve(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-interface');
 await mkdir(reports, { recursive: true });
 const h = await coopBrowser({ shots: reports, internalLabs: false, readyExpression:
     '!!(globalThis.binaryNinja?.store.ready || globalThis.workbench?.ready || globalThis.customLevel?.observe().ready)' });
@@ -45,12 +45,12 @@ async function ink(p: Cdp) {
           return old.call(this,s,x,y,...rest)};
         requestAnimationFrame(()=>requestAnimationFrame(()=>{proto.fillText=old;resolve(seen)}));})`);
 }
-async function capture(p: Cdp, name: string, centre = { x: 800, y: 620 }, width = 420, height = 270) {
+async function capture(p: Cdp, name: string, centre = { x: 800, y: 620 }, width = 420, height = 270, scale = 1) {
     const s = await observe(p); captured.push({ name, state: s });
     await h.shot(p, name);
     const clip = await p.read(`(()=>{const r=document.querySelector('canvas').getBoundingClientRect(),c=customLevel.observe().camera;
         const x=(${centre.x}-c.x)*c.zoom+r.x,y=(${centre.y}-c.y)*c.zoom+r.y;
-        return {x:Math.max(0,Math.min(innerWidth-${width},x-${width}/2)),y:Math.max(0,Math.min(innerHeight-${height},y-${height}*.6)),width:${width},height:${height},scale:1};})()`);
+        return {x:Math.max(0,Math.min(innerWidth-${width},x-${width}/2)),y:Math.max(0,Math.min(innerHeight-${height},y-${height}*.6)),width:${width},height:${height},scale:${scale}};})()`);
     const shot = await p.send('Page.captureScreenshot', { format: 'png', clip });
     await writeFile(join(reports, `${name}-detail.png`), Buffer.from(shot.data, 'base64'));
 }
@@ -92,17 +92,24 @@ try {
         await walk(host, 1210); await h.tap(host, 'KeyE');
         await until(host, 'cube pickup accepted', 'customLevel.observe().session.sharedCubes["draft:cargoA"].holder===1');
         await walk(host, 1000); await capture(host, '02-approaching', { x: 900, y: 600 }, 500, 300);
-        await walk(host, 875); await h.tap(host, 'KeyE');
+        await walk(host, 920); await h.tap(host, 'KeyE');
         for (const p of pages) await until(p, 'accepted payload detection', `${active(1)}.active`);
         await h.sleep(180); await capture(host, '03-detection');
         h.check('accepted placement emits exactly one distinct confirmation on each client', (await counts()).every((n, i) => n === baseline[i] + 1));
         await h.sleep(1100); await capture(host, '04-powered');
+        for (const p of pages) {
+            const s = await observe(p), dock = s.heroAssets.receivers[0].dock;
+            h.check('an off-centre accepted delivery snaps body and art to the same canonical pose', dock?.cube === 'draft:cargoA' && dock.x === 800 && dock.y === 598
+                && s.cubes['draft:cargoA'].x === 800 && s.cubes['draft:cargoA'].y === 598);
+        }
+        await capture(host, '04-docked-closeup', { x: 800, y: 600 }, 240, 190, 2);
         const stable = await counts(), age = (await observe(host)).heroAssets.receivers[0].age;
         await h.sleep(800);
         h.check('repeated shared snapshots do not restart the animation or sound', (await counts()).every((n, i) => n === stable[i]) && (await observe(host)).heroAssets.receivers[0].age > age);
-        await h.tap(host, 'KeyE');
+        await walk(host, 855); await h.tap(host, 'KeyE');
         for (const p of pages) await until(p, 'pickup releases receiver', `!${active(1)}.active`);
         await capture(host, '05-removed');
+        h.check('removal immediately clears the dock identity', (await observe(host)).heroAssets.receivers[0].dock === null);
         h.check('release immediately reports awaiting payload without another confirmation', (await counts()).every((n, i) => n === stable[i]));
         await h.sleep(450); await h.tap(host, 'KeyE');
         for (const p of pages) await until(p, 'same cube can be delivered again', `${active(1)}.active`);
@@ -126,8 +133,8 @@ try {
         await until(guest, 'reconnected occupied receiver baseline', '!!globalThis.customLevel?.observe().ready && customLevel.observe().session.peers.every(Boolean)');
         await h.sleep(600);
         const restored = await observe(guest);
-        h.check('reconnect displays powered idle with no detection replay', restored.heroAssets.receivers.every((r: any) => r.active && r.age === null && r.scan === null)
-            && !(restored.audio.played.payloadConfirm ?? 0));
+        h.check('reconnect displays powered idle with no detection replay', restored.heroAssets.receivers.every((r: any) => r.active && r.age === null && r.connection === 1)
+            && restored.heroAssets.receivers.every((r: any) => r.dock) && !(restored.audio.played.payloadConfirm ?? 0));
         await host.send('Emulation.setDeviceMetricsOverride', { width: 800, height: 600, deviceScaleFactor: 1, mobile: false });
         await h.sleep(500); await h.shot(host, '08-compact-follow');
         await h.key(host, 'Tab', true); await h.sleep(1100); await h.shot(host, '09-low-zoom');
@@ -162,6 +169,7 @@ try {
             if (name === 'deadlock-stage-06-three-payloads-operator') {
                 const s = await h.snapshot(p); captured.push({ name: 'deadlock-three', state: s });
                 h.check('DEADLOCK shows three independently occupied receivers', s.heroAssets.receivers.length === 3 && s.heroAssets.receivers.every(r => r.active));
+                h.check('all three DEADLOCK payloads have distinct fixed dock poses', s.heroAssets.receivers.every(r => !!r.dock) && new Set(s.heroAssets.receivers.map(r => r.dock!.cube)).size === 3);
                 const clip = await p.read(`(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();return {x:(930-c.originX())*c.zoom+r.x,y:(915-c.originY())*c.zoom+r.y,width:640*c.zoom,height:190*c.zoom,scale:1}})()`);
                 const image = await p.send('Page.captureScreenshot', { format: 'png', clip });
                 await writeFile(join(reports, '06-deadlock-three-detail.png'), Buffer.from(image.data, 'base64'));

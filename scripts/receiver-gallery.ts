@@ -4,16 +4,16 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { coopBrowser } from './coop-browser.ts';
 
-const source = resolve(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-receivers');
-const target = resolve('docs/playtest/2026-10-16-receivers');
+const source = resolve(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-interface');
+const target = resolve('docs/playtest/2026-10-16-payload-interface');
 const cards = [
     ['01-empty-detail', '01 / AWAITING PAYLOAD', 'A grounded player leaves the receiver amber.'],
     ['02-approaching-detail', '02 / CUBE APPROACHING', 'Carried cargo has not activated the receiver.'],
-    ['03-detection-detail', '03 / ACCEPTED DETECTION', 'A thin scan crosses the cargo after accepted contact.'],
-    ['04-powered-detail', '04 / POWERED IDLE', 'Steady cyan circuitry; the cube stays visible and removable.'],
+    ['03-detection-detail', '03 / ACCEPTED DETECTION', 'Circuit traces connect to the centred payload frame.'],
+    ['04-docked-closeup-detail', '04 / DOCKED ENERGY CORE', 'Steady cyan circuitry; the cube stays visible and removable.'],
     ['05-removed-detail', '05 / PAYLOAD REMOVED', 'Release begins immediately; status returns to amber.'],
     ['07-receiver-versus-plate-detail', '06 / DISTINCT SENSOR TYPES', 'The low pressure plate accepts the standing player.'],
-    ['06-deadlock-three-detail', '07 / DEADLOCK — THREE DELIVERIES', 'Actual authored-start solve. Off-centre placements remain valid.'],
+    ['06-deadlock-three-detail', '07 / DEADLOCK — THREE DELIVERIES', 'Actual authored-start solve. Three independent centred payloads.'],
     ['08-compact-follow', '08 / COMPACT VIEWPORT', '800 × 600 client; readable anchored status.'],
     ['deadlock-three-compact', '09 / SHAFT OVERVIEW', 'Individual status badges use separate lanes at low zoom.'],
     ['10-builder', '10 / LEVEL BUILDER', 'The same Canvas renderer draws editable socket objects.'],
@@ -28,9 +28,9 @@ figure:nth-child(7){grid-column:span 6}figure:nth-child(n+8){grid-column:span 3}
 img{display:block;width:100%;height:240px;object-fit:contain;background:#0c131a}figure:nth-child(7) img{height:240px}figure:nth-child(n+8) img{height:390px}figure:last-child img{height:490px}
 figcaption{padding:12px 14px;border-top:1px solid #344954;line-height:1.5}strong{font-size:11px;letter-spacing:.5px;color:#8cece5}p{margin:5px 0 0;color:#9bb0ba;font-size:11px}
 a{color:inherit;text-decoration:none}footer{margin-top:20px;color:#9bb0ba;font-size:11px}</style>
-<header><h1>PAYLOAD RECEIVER</h1><p>BINARY NINJA / INDUSTRIAL CARGO DOCK · 16 OCTOBER 2026<br>Actual production-mode browser captures. Public custom multiplayer + full DEADLOCK physical solve. No gameplay-state injection.</p></header>
+<header><h1>PAYLOAD RECEIVER</h1><p>BINARY NINJA / COMPACT PAYLOAD INTERFACE + ENERGY CUBE · 16 OCTOBER 2026<br>Actual production-mode browser captures. Public custom multiplayer + full DEADLOCK physical solve. No gameplay-state injection.</p></header>
 <main>${cards.map(([file, title, description]) => `<figure><a href="${file}.png"><img src="${file}.png" alt="${title}"></a><figcaption><strong>${title}</strong><p>${description}</p></figcaption></figure>`).join('')}</main>
-<footer>Amber = awaiting cargo · Cyan = accepted cube occupancy · Open guides are cosmetic · Collision, sensor footprint and controller timing are unchanged.</footer>`;
+<footer>Amber = awaiting cargo · Cyan = accepted cube occupancy · Open guides are cosmetic · The 44-unit body centres with its art; sensor footprint and controller timing are unchanged.</footer>`;
 await writeFile(join(target, 'index.html'), html);
 const h = await coopBrowser({ shots: target });
 try {

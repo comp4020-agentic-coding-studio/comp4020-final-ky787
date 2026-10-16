@@ -1,44 +1,65 @@
-# PAYLOAD RECEIVER — visual design
+# PAYLOAD RECEIVER and energy payload — visual design
 
-The receiver is an open cargo dock with a layered bevelled base, exposed guide
-arms, structural ribs, fasteners, a recessed status display and illuminated
-power channels. It shares materials with ENTRY POINT, BREAKPOINT and the exit
-gate, but has a low, open silhouette. It is original Canvas artwork and an
-authored machinery metaphor, not binary evidence.
+The receiver is a compact debugger interface: one shallow dark base, short
+registration brackets, a cube-sized open bay and thin illuminated circuit traces.
+Its outer width is 94 world units, down from the previous industrial arms' 188;
+the solid guides rise 16 units instead of 55. The original 90-unit contact strip
+remains visible. The larger arms, ribs, fasteners and scanner beam are removed.
 
-See the [browser gallery](playtest/2026-10-16-receivers/index.html) or its
-[single-image version](playtest/2026-10-16-receivers/gallery.png). Captures use
-actual rendering and real input in public custom multiplayer, the Level Builder
-and a complete DEADLOCK solve. The flat asset-review fixture is a test scene,
-not an additional chamber. Diagnostic State Preview is labelled separately in
-the full ignored report directory.
+The movable payload keeps its 44-unit square containment frame. Four bright
+corners surround a softly pulsing cyan energy core, internal circuit channels
+and a clear A/B/C mark where authored. Loose/carried frames use amber terminals;
+docked frames use cyan. The receiver draws behind the cube, then adds small
+front connections at its edge terminals, leaving the core and mark visible.
+This is original Canvas artwork and an authored metaphor, not binary evidence.
 
-## Motion and feedback
+See the [revised browser gallery](playtest/2026-10-16-payload-interface/index.html)
+or [single-image gallery](playtest/2026-10-16-payload-interface/gallery.png).
+These are actual production browser captures with physical input. The flat
+review fixture is a test scene, not another chamber. The
+[previous industrial version](playtest/2026-10-16-receivers/index.html) is retained
+for comparison.
 
-| State | Presentation | Timing |
-| --- | --- | --- |
-| Empty | Amber pilot, AWAITING PAYLOAD, faint electrical sweep across the open bay | Subtle idle |
-| Accepted cube | Cyan pilot and PAYLOAD DETECTED immediately; guides settle, scan crosses cargo, a pulse follows the base circuitry | Engagement 0–240 ms; scan 120–740 ms; transfer 480–900 ms |
-| Occupied | Quiet cyan circuit pulse and stationary open guides | Steady idle |
-| Removed | Amber status immediately; cyan illumination retracts and guide shoes release | 400 ms |
+## States and alignment
 
-Nothing closes over or locks the cube. Rear components draw before cargo;
-shallow front shoes and the scan draw after cargo but before players and ropes.
-The cube face, letter and silhouette remain visible. A later delivery can
-legitimately trigger another detection; repeated accepted snapshots cannot.
+| State | Presentation |
+| --- | --- |
+| Awaiting | Amber status, AWAITING PAYLOAD, faint registration marks and idle base traces |
+| Accepted | PAYLOAD DETECTED immediately; corner guides brighten over 180 ms, connecting traces energize over 400 ms, a base pulse spreads from 160–660 ms |
+| Powered | Fixed centred cube, cyan terminals, quiet core pulse and tiny moving highlights on the connecting traces |
+| Removed | Connections shut off immediately, amber status returns, base illumination retracts over 280 ms |
 
-The original 90-unit sensor tread and 44-unit cube dimensions remain unchanged.
-The existing sensor permits a cube centre within 59 units of the pad centre
-while resting at its floor height. Initial browser review exposed valid
-off-centre cargo overhanging narrow guides. The final upper guide opening and
-scan span accommodate those placements; the base and illuminated tread remain
-centred on the actual sensor. Decorative arms add no colliders or grapple targets.
-No visual snapping, delayed power or additional interaction was introduced.
+No beam sweeps across the payload. No part closes over it or suggests a lock.
+Each receiver tracks its own accepted occupancy edge and local animation clock.
+Repeated snapshots do not restart effects. Restored occupied receivers and
+stopped State Preview settle silently, including when cube replicas arrive later.
+The existing quiet credited confirmation sound, cooldown, mute and gesture unlock
+behaviour are unchanged. Local developer/editor previews remain silent.
 
-Below 0.72 camera zoom, anchored status badges retain screen-sized text. Nearby
-receivers use separate label lanes so DEADLOCK's three statuses do not obscure
-one another in the shaft overview. At normal zoom, the inset display and a
-small machine/name caption suffice. The camera and aiming transform are unchanged.
+`payload-docking.ts` centres **accepted, resting** cargo at the receiver's x and
+floor y minus 22. It moves the existing cube body with the visible frame, so E
+reach, grappling and standing support target the same place. Multiplayer uses
+the accepted cube-placement identity and existing owner/transform stream. There
+is no docking network action, persistent state, constraint force or timer.
+Carry, pull, reset, falling and loss of occupancy release alignment immediately.
+The ephemeral `payloadDocks` observation identifies which cube is connected.
+
+A just-dropped cube waits if either player still occupies the canonical bay;
+it centres as soon as the space clears. **Live socket power and confirmation do
+not wait for that cosmetic alignment.** Connecting traces then engage without
+a second sound. This prevents snapping a cube into a player or pushing them into
+a wall. The body is never rendered in a fictitious position.
+
+For unusual imported layouts, alignment also refuses a path through architecture,
+hazards or other cubes, an unsupported destination, or a move that changes
+simultaneous neighbouring sensor contacts. Those cubes keep ordinary physics
+and valid live occupancy. Authors should leave a clear supported canonical bay.
+These guards do not alter the sensor's existing 59-unit centre tolerance or
+five-unit floor-contact tolerance. Ordinary plates never centre their cargo.
+
+Below 0.72 zoom, status badges retain screen-sized text with separate lanes for
+nearby receivers. Normal zoom uses the inset screen and small captions. Camera
+framing and aiming transforms are unchanged.
 
 ## Semantic audit
 
@@ -54,47 +75,30 @@ Workbench's palette says Payload receiver; canonical JSON continues to use
 `kind: "socket"`. No level, schema, persistence, server or controller changes
 are required. Imported built-in rooms retain the same semantic distinction.
 
-`receiver-presentation.ts` selects the genuine cube-only inputs and owns a
-disposable per-ID clock. `HeroPresentation.reset` baselines loading/reconnection
-to active idle without sound or scan replay. Stopped editor State Preview also
-settles immediately. `receiver-render.ts` consumes those values through the
-shared `PuzzleRenderer` used by campaign, custom sessions and local previews.
-Animation poses are exposed as read-only `heroAssets.receivers` diagnostics.
+`receiver-presentation.ts` audits cube-only inputs and observes accepted edges;
+`receiver-render.ts` draws the compact base and connections; `payload-render.ts`
+draws the containment frame/core in every room. All run through the shared
+`PuzzleRenderer` in campaign, public custom sessions, developer multiplayer and
+local physics preview. No level JSON, controller expressions, server occupancy
+rules, movement constants, evidence, checkpoint or persistence contracts changed.
 
-The confirmation reuses credited `relay-on.ogg`: gain .28, playback rate 1.3 and
-180 ms cooldown. It uses the existing gesture unlock, mute, volume, distance
-attenuation and bounded voice pool. Receiver edges do not also play the generic
-plate click. Simultaneous nearby confirmations may coalesce under the existing
-audio cooldown; each receiver's visual transition remains independent. Local
-developer/editor previews remain silent, as before; multiplayer uses game audio.
-
-## Checks and review limits
+## Validation
 
 ```sh
 pnpm typecheck
-pnpm test:unit tests/receiver-presentation.test.ts tests/hero-presentation.test.ts tests/audio.test.ts tests/payload-socket.test.ts
+pnpm test:unit tests/payload-docking.test.ts tests/receiver-presentation.test.ts tests/shared-cube.test.ts tests/payload-socket.test.ts tests/deadlock-physics.test.ts
 pnpm build
 pnpm check:receivers
 node scripts/receiver-local-check.ts
 node scripts/receiver-gallery.ts
 pnpm check:campaign
-pnpm check:public-coop
 ```
 
-Receiver tests cover physical player exclusion, carrying, accepted placement,
-removal, redelivery, two-client agreement, independent clocks, no repeated
-confirmation, and silent reconnection. Browser captures include the local
-physics preview and the stopped editor State Preview. DEADLOCK's canonical
-71-step route still includes the manual final hatch catch, all three live
-payloads and both physical exit arrivals.
-
-On 2026-10-16, validation passed: typecheck/build; 571 unit tests (2 existing
-skips) and 3 HTTP tests; 22 dedicated receiver browser checks; the 11-step
-local CLI two-player contact test; 78 full campaign checks; 49 public custom
-multiplayer checks; 56 workbench checks; and the retained evidence checks.
-
-Reports and full captures are in `.workbench/reports/2026-10-16-receivers/`;
-selected original browser crops and compact views are retained with the gallery.
-Human art/audio acceptance remains useful; automated browser checks are not a
-claim of human playtesting. Other machinery, checkpoint behaviour, native binary
-evidence, movement and payload sensor semantics remain unchanged.
+Tests cover off-centre placements, repeatable body/visual alignment, cube support,
+E pickup, grapple removal, loss of flooring, obstruction/overlapping-sensor guards,
+player exclusion, independent receivers, two-client agreement, one sound per
+delivery, and silent reconnection. DEADLOCK's authored-start solve includes the
+physical final FEED-to-relay hatch catch, three live deliveries and both arrivals.
+Reports are under `.workbench/reports/2026-10-16-payload-interface/`; selected
+browser captures are retained in the gallery. Automated review is not human art
+or two-player acceptance. Broader machinery redesign remains outside this pass.

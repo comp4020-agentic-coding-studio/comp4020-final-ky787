@@ -11,9 +11,21 @@ import { freshProgress } from '../src/slice/progress.ts';
 import { emptyInput } from '../src/engine/physics.ts';
 
 const receiver = (id = 'a', active = false) => ({ id, active, at: { x: 800, y: 620 }, label: 'PAYLOAD' });
+const dock = { receiver: 'a', cube: 'draft:cargoA' as const, at: { x: 800, y: 598 } };
+it('connects once when a carrier clears the bay, without replaying confirmation or reconnect effects', () => {
+    const p = new ReceiverPresentation(), waiting = receiver('a', true), connected = { ...waiting, dock };
+    p.reset([receiver()]); expect(p.update([waiting], .1, true)).toHaveLength(1);
+    p.update([waiting], 1, true);
+    expect(p.update([connected], .1, true)).toEqual([]);
+    expect(p.snapshot()[0]).toMatchObject({ age: 0, dock: { cube: 'draft:cargoA', x: 800, y: 598 } });
+    p.update([connected], .2, true); expect(p.snapshot()[0].age).toBe(.2);
+    p.update([receiver()], .1, true); expect(p.snapshot()[0].dock).toBeNull();
+    p.reset([waiting]); p.update([connected], .1, true);
+    expect(p.snapshot()[0]).toMatchObject({ age: null, connection: 1, transfer: null });
+});
 it('baselines existing cargo silently and ignores repeated accepted snapshots', () => {
     const p = new ReceiverPresentation(), active = [receiver('a', true)]; p.reset(active);
-    expect(p.snapshot()[0]).toMatchObject({ active: true, age: null, engagement: 1, scan: null, transfer: null });
+    expect(p.snapshot()[0]).toMatchObject({ active: true, age: null, engagement: 1, connection: 1, transfer: null });
     for (let i = 0; i < 100; i++) expect(p.update(structuredClone(active), .02, true)).toEqual([]);
     p.reset(active); expect(p.update(active, .1, true)).toEqual([]);
 });
@@ -22,7 +34,7 @@ it('confirms once on accepted contact, releases without latching, and can detect
     expect(p.update([receiver('a', true)], .016, true)).toEqual([{ cue: 'payloadConfirm', at: receiver().at }]);
     expect(p.snapshot()[0]).toMatchObject({ active: true, age: 0, status: 'PAYLOAD DETECTED' });
     expect(p.update([receiver('a', true)], .35, true)).toEqual([]);
-    expect(p.snapshot()[0].scan).toBeGreaterThan(0);
+    expect(p.snapshot()[0].connection).toBeGreaterThan(0);
     p.update([receiver('a', true)], .23, true); expect(p.snapshot()[0].transfer).toBeGreaterThan(0);
     expect(p.update([receiver()], .01, true)).toEqual([]);
     expect(p.snapshot()[0]).toMatchObject({ active: false, release: 1, status: 'AWAITING PAYLOAD' });
@@ -38,8 +50,8 @@ it('tracks multiple receivers independently and settles stopped editor previews'
     p.update([receiver('a'), receiver('b', true), receiver('c', true)], .1, true);
     expect(p.snapshot().map(r => r.active)).toEqual([false, true, true]);
     expect(p.update([receiver('a', true), receiver('b', true), receiver('c', true)], 0, false)).toEqual([]);
-    expect(p.snapshot().every(r => r.age === null && r.scan === null && r.engagement === 1)).toBe(true);
-    expect(receiverPose(false, Infinity)).toEqual({ engagement: 0, scan: null, transfer: null, release: 0 });
+    expect(p.snapshot().every(r => r.age === null && r.connection === 1 && r.engagement === 1)).toBe(true);
+    expect(receiverPose(false, Infinity)).toEqual({ engagement: 0, connection: 0, transfer: null, release: 0 });
 });
 it('audits genuine receiver semantics: generic and legacy universal plates do not become cargo docks', () => {
     const base = new PuzzleWorld(roomById('uplink'), freshProgress().rooms.uplink);

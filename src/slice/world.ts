@@ -10,6 +10,7 @@ import { LiftField, RelayGatePair } from './machinery.ts';
 import { cubeEntries, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type Discontinuity, type Slot } from '../coop/protocol.ts';
 import { firewallBox, touchingFirewall, type Firewall } from './firewall.ts';
 import { checkpointReached, touchesBreakpoint } from './checkpoints.ts';
+import { alignPayloads, type PayloadDock } from './payload-docking.ts';
 export type DeathCause = 'reset' | 'hazard' | 'fall' | 'firewall';
 export interface Cube extends LooseBody {
     carried: boolean;
@@ -34,6 +35,10 @@ export interface CubeAuthority {
     readonly heldLocally: boolean;
     readonly cargoVisual?: boolean;
     readonly resetting?: boolean;
+    /** Accepted contact identity, excluding pending carry/pull/reset actions. */
+    readonly acceptedPlacement?: string | null;
+    /** Connected partner body, only for avoiding alignment into either avatar. */
+    readonly dockingObstacle?: Vec2 | null;
     firewall?(world: PuzzleWorld, cause?: CubeResetCause): boolean;
     /** Local avatar movement only: never architecture, a cube body, sensor or anchor. */
     readonly partnerSupport?: { cubeId?: CubeId; carrier: Slot; surface: Solid } | null;
@@ -67,6 +72,7 @@ export interface WorldAuthority {
 export class PuzzleWorld {
     player = createPlayer(0, 0);
     cubes: CubeMap<Cube> = {};
+    payloadDocks: PayloadDock[] = [];
     /** Legacy single-cube view; C8 and accepted one-cube labs retain their API. */
     get cube(): Cube | null { return this.cubes.cube ?? null; }
     cubeAuthority(id: CubeId = 'cube') { return this.authority?.cubes?.[id] ?? (id === 'cube' ? this.authority?.cube : undefined); }
@@ -141,6 +147,7 @@ export class PuzzleWorld {
         this.samplePlate();
         this.evaluate();
         this.authority?.crumble?.sync(this);
+        this.alignPayloads();
         this.events = [];
     }
     private spawnPoint(): [
@@ -188,6 +195,7 @@ export class PuzzleWorld {
         ];
         return controls.find(s => s.at && Math.hypot(this.player.x - s.at.x, this.player.y - (s.at.y - 25)) < 72);
     }
+    private alignPayloads(): void { this.payloadDocks = alignPayloads(this); this.updateCubeSolid(); }
     private updateCubeSolid(): void {
         for (const [id, c] of cubeEntries(this.cubes)) {
             const solid = this.cubeSolids[id]!;
@@ -495,6 +503,7 @@ export class PuzzleWorld {
             && touchesBreakpoint(this, station)) this.authority?.activateBreakpoint?.(station.id);
         this.samplePlate();
         this.evaluate();
+        this.alignPayloads();
         this.authority?.crumble?.sample(this);
         for (const platform of this.platforms) {
             platform.pulse = Math.max(0, platform.pulse - dt * 1.8);
@@ -541,5 +550,5 @@ export class PuzzleWorld {
     }
     target(aim: Vec2) { return this.room.id === 'pressure' ? null : findGrappleTarget(this.player, aim, this.solids, this.player.groundId); }
     /** Apply accepted state even while menus or a reconnect pause local simulation. */
-    syncAuthority(): void { if (this.authority) { this.syncCubes(); this.authority.crumble?.sync(this); this.evaluate(); } }
+    syncAuthority(): void { if (this.authority) { this.syncCubes(); this.authority.crumble?.sync(this); this.evaluate(); this.alignPayloads(); } }
 }
