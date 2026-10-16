@@ -10,7 +10,7 @@ literal instructions, binary addresses, native blocks, or obfuscator evidence.
 | BREAKPOINT ACTIVE | Saved checkpoint/respawn milestone | Red screen, circular breakpoint emblem, extended mechanical mast and banner; body stays neutral |
 | TRAVEL INCOMPLETE | Exit route is unavailable | Heavy portal frame, grey status, dim field |
 | TRAVEL COMPLETE | Exit route is available | Green status and illuminated frame/field |
-| PAYLOAD RECEIVER | Live cube-only occupancy | Compact guides, centred energy cube, thin circuit traces and amber/cyan status |
+| PAYLOAD RECEIVER | Live cube-only occupancy | Compact guides, centred energy cube, thin circuit traces and amber/green status |
 
 Exit readiness is separate from arrival. Co-op gates retain their physical
 `0 / 2 ARRIVED`, `1 / 2 ARRIVED`, and `2 / 2 ARRIVED` display. The accepted party
@@ -18,8 +18,9 @@ completion event still controls victory and host navigation. Turning the gate
 green never completes a party by itself.
 
 Toggle levers retain their pivoting handles. Genuine cube-only sockets use the
-[PAYLOAD RECEIVER](payload-receiver.md): amber while awaiting cargo, cyan after
-accepted occupancy, with illuminated connecting traces and a centred energy payload.
+[PAYLOAD RECEIVER](payload-receiver.md): amber while awaiting cargo, green after
+accepted occupancy, with green circuit traces and a centred energy payload. Free/carried cargo pulses
+purple; connected cargo breathes green. Reduced motion settles both palettes.
 Pressure plates retain their low, compressible footprints. RACE CONDITION's
 universal receiver sensor remains a pressure plate despite its cargo location.
 Neither asset uses checkpoint masts or breakpoint terminology.
@@ -152,7 +153,7 @@ of the short completion flare; it deliberately does not wait for cosmetic timing
 Co-op projection clocks are local, so clients need not show identical animation
 frames. Any further expansion or art tuning should follow manual inspection.
 
-The [receiver gallery](playtest/2026-10-16-payload-interface/index.html) contains actual
+The [receiver gallery](playtest/2026-10-16-payload-energy/index.html) contains actual
 production-mode public custom, editor and full DEADLOCK solve captures, including
 removal, centred cargo and compact overviews. Run `pnpm check:receivers` after
 building, then `node scripts/receiver-gallery.ts` to refresh it.

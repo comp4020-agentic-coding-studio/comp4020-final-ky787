@@ -16,7 +16,7 @@ const scenario: DraftScenario = { version: 1, id: 'receiver-local-contact', scop
         { label: 'Settled powered dock', waitMs: 1200, capture: 'powered' },
         walk(855), use('Remove cargo'), state(false, 'Accepted removal', 'release'),
     ] };
-const report = await runScenario(receiverReview(), scenario, join(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-interface', 'local'));
+const report = await runScenario(receiverReview(), scenario, join(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-energy', 'local'));
 if (!report.pass) throw new Error(report.error ?? 'Local receiver scenario failed');
 for (const [label, active] of [['Player cannot occupy receiver', false], ['Accepted cube contact', true], ['Accepted removal', false]] as const) {
     const observed = report.results.find(r => r.label === label)!.observed as Record<string, { cubes: Record<string, { x: number; y: number }>; heroAssets: { receivers: { active: boolean; dock: { cube: string; x: number; y: number } | null }[] } }>;

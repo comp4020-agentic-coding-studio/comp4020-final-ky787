@@ -36,6 +36,7 @@ export class PuzzleRenderer {
     editorCamera?: { x: number; y: number; zoom: number };
     particles = new Particles();
     heroes = new HeroPresentation();
+    private readonly energyMotionPreference = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
     private ctx: CanvasRenderingContext2D;
     constructor(readonly canvas: HTMLCanvasElement, private presentation: MachinePresentation = authoredPresentation) { this.ctx = canvas.getContext('2d')!; }
     resize(): void {
@@ -88,6 +89,7 @@ export class PuzzleRenderer {
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
         const receivers = payloadReceivers(w);
+        const energyMotion = running && players?.connected !== false && !this.energyMotionPreference?.matches;
         const heroCues = this.heroes.update(r, { checkpoint: w.checkpoint, exitReady: w.frame.outputs.exitDoor,
             completed: players?.completed ?? w.exited, receivers }, dt, running && players?.connected !== false);
         if (w.deaths !== this.cameraDeaths || players?.connected === false) this.returnReveal = 0;
@@ -273,9 +275,10 @@ export class PuzzleRenderer {
             drawBreakpoint(c, def, state.active, state.age, this.heroes.time, cam.zoom);
         }
         if (w.checkpoint !== 'entry' && !r.breakpoints?.some(b => b.checkpoint === w.checkpoint)) drawRespawnMarker(c, w.checkpointPosition());
-        drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'rear');
+        drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'rear', energyMotion);
         for (const [id, cube] of cubeEntries(w.cubes)) if (!w.cubeIsResetting(id)) {
-            drawPayload(c, cube, r.cubes?.find(c => c.id === id)?.mark, this.heroes.time, w.payloadDocks.some(d => d.cube === id));
+            drawPayload(c, cube, r.cubes?.find(c => c.id === id)?.mark, this.heroes.time, id,
+                cube.carried || w.pullingCubeId === id ? null : this.heroes.receivers.payloadAge(id), energyMotion);
             if (w.pullingCubeId === id) {
                 c.setLineDash([6, 5]);
                 this.line(w.player.x, w.player.y, cube.x, cube.y, C.amber);
@@ -287,7 +290,7 @@ export class PuzzleRenderer {
                 c.setLineDash([]);
             }
         }
-        drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'front');
+        drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'front', energyMotion);
         drawReceiverLabels(c, receivers, cam.zoom);
         const p = w.player, rope = p.rope;
         if (rope.phase !== 'idle') {

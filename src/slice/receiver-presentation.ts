@@ -1,6 +1,7 @@
 import type { Vec2 } from '../engine/geometry.ts';
 import type { PuzzleWorld } from './world.ts';
 import type { PayloadDock } from './payload-docking.ts';
+import type { CubeId } from '../coop/protocol.ts';
 
 export interface PayloadReceiver { id: string; at: Vec2; label: string; active: boolean; dock?: PayloadDock }
 export const RECEIVER_TIMING = { engage: .18, connect: .4, transferStart: .16, transfer: .5, release: .28 } as const;
@@ -43,13 +44,18 @@ export class ReceiverPresentation {
         const cues: { cue: 'payloadConfirm'; at: Vec2 }[] = [];
         for (const r of receivers) {
             const old = this.states.get(r.id), changed = old && old.active !== r.active;
-            const connected = r.dock && !old?.dock && Number.isFinite(old?.age);
+            const connected = r.dock && old?.dock?.cube !== r.dock.cube && Number.isFinite(old?.age);
             const age = !old || !animate ? Infinity : changed || connected ? 0 : old.age + Math.max(0, Number.isFinite(dt) ? dt : 0);
             if (changed && r.active && animate) cues.push({ cue: 'payloadConfirm', at: r.at });
             this.states.set(r.id, { active: r.active, age, dock: r.active ? r.dock : undefined });
         }
         for (const id of this.states.keys()) if (!receivers.some(r => r.id === id)) this.states.delete(id);
         return cues;
+    }
+    /** Accepted occupancy alone never colours a still-unconnected cube green. */
+    payloadAge(id: CubeId): number | null {
+        for (const state of this.states.values()) if (state.active && state.dock?.cube === id) return state.age;
+        return null;
     }
     snapshot() {
         return [...this.states].map(([id, s]) => ({ id, active: s.active, age: Number.isFinite(s.age) ? s.age : null,

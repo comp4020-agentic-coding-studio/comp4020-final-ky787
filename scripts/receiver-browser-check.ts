@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 /** Production-rendered receiver review. Inputs move real bodies; only labelled editor
  * State Preview uses diagnostic values. No multiplayer occupancy/state injection. */
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { Cdp, coopBrowser } from './coop-browser.ts';
 import { campaignDraftRoute } from './campaign-draft-route.ts';
 import { receiverReview } from './fixtures/receiver-review.ts';
 import { serializeDraft } from '../src/workbench/model.ts';
 import { requirePlayable } from '../src/workbench/validation.ts';
+import { sampleEnergyCycle, startEnergyRecording, stopEnergyRecording } from './energy-browser-review.ts';
 
 const modes = process.argv.slice(2).length ? process.argv.slice(2) : ['public', 'editor', 'campaign'];
 if (modes.some(m => !['public', 'editor', 'campaign'].includes(m))) throw new Error('Modes: public editor campaign');
-const reports = resolve(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-interface');
+const reports = resolve(process.env.BN_SHOTS ?? '.workbench/reports/2026-10-16-payload-energy');
 await mkdir(reports, { recursive: true });
 const h = await coopBrowser({ shots: reports, internalLabs: false, readyExpression:
     '!!(globalThis.binaryNinja?.store.ready || globalThis.workbench?.ready || globalThis.customLevel?.observe().ready)' });
@@ -89,14 +90,23 @@ try {
         await walk(host, 1080);
         h.check('ordinary pressure plate still accepts the player and stays visually distinct', (await observe(host)).plates['draft:pressure'] && !(await observe(host)).plates['draft:receiver1']);
         await capture(host, '07-receiver-versus-plate', { x: 940, y: 620 }, 650, 300);
-        await walk(host, 1210); await h.tap(host, 'KeyE');
+        await walk(host, 1210); await h.sleep(1000);
+        await startEnergyRecording(host);
+        const free = await sampleEnergyCycle(host); captured.push({ name: 'free-energy-cycle', state: free });
+        h.check('stationary free payload is purple and visibly animated across a full heartbeat', free.every(s => s.purple > 50 && s.green === 0) && new Set(free.map(s => s.hash)).size > 10);
+        await capture(host, '00-free-purple', { x: 1250, y: 598 }, 260, 220, 2);
+        await h.tap(host, 'KeyE');
         await until(host, 'cube pickup accepted', 'customLevel.observe().session.sharedCubes["draft:cargoA"].holder===1');
+        const carried = await sampleEnergyCycle(host); captured.push({ name: 'carried-energy-cycle', state: carried });
+        h.check('carried payload retains animated purple energy', carried.every(s => s.purple > 50 && s.green === 0) && new Set(carried.map(s => s.hash)).size > 10);
         await walk(host, 1000); await capture(host, '02-approaching', { x: 900, y: 600 }, 500, 300);
         await walk(host, 920); await h.tap(host, 'KeyE');
         for (const p of pages) await until(p, 'accepted payload detection', `${active(1)}.active`);
         await h.sleep(180); await capture(host, '03-detection');
         h.check('accepted placement emits exactly one distinct confirmation on each client', (await counts()).every((n, i) => n === baseline[i] + 1));
         await h.sleep(1100); await capture(host, '04-powered');
+        const powered = await sampleEnergyCycle(host); captured.push({ name: 'powered-energy-cycle', state: powered });
+        h.check('connected payload stays green and animated across a full heartbeat', powered.every(s => s.green > 50 && s.purple === 0) && new Set(powered.map(s => s.hash)).size > 10);
         for (const p of pages) {
             const s = await observe(p), dock = s.heroAssets.receivers[0].dock;
             h.check('an off-centre accepted delivery snaps body and art to the same canonical pose', dock?.cube === 'draft:cargoA' && dock.x === 800 && dock.y === 598
@@ -109,11 +119,25 @@ try {
         await walk(host, 855); await h.tap(host, 'KeyE');
         for (const p of pages) await until(p, 'pickup releases receiver', `!${active(1)}.active`);
         await capture(host, '05-removed');
+        const removed = await sampleEnergyCycle(host); captured.push({ name: 'removed-energy-cycle', state: removed });
+        h.check('removal returns the carried cube to purple immediately', removed.every(s => s.purple > 50 && s.green === 0));
+        await stopEnergyRecording(host, join(reports, 'energy-cycle.webm'));
         h.check('removal immediately clears the dock identity', (await observe(host)).heroAssets.receivers[0].dock === null);
         h.check('release immediately reports awaiting payload without another confirmation', (await counts()).every((n, i) => n === stable[i]));
         await h.sleep(450); await h.tap(host, 'KeyE');
         for (const p of pages) await until(p, 'same cube can be delivered again', `${active(1)}.active`);
         h.check('a later genuine delivery gets one new confirmation', (await counts()).every((n, i) => n === stable[i] + 1));
+        // Emulate the live OS preference; no reload, gameplay override or animation-state injection.
+        await host.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+        await h.sleep(1200);
+        const reducedGreen = await sampleEnergyCycle(host); captured.push({ name: 'reduced-green', state: reducedGreen });
+        h.check('reduced motion settles green without breathing or travelling cube energy', reducedGreen.every(s => s.green > 50 && s.purple === 0) && new Set(reducedGreen.map(s => s.hash)).size === 1);
+        await capture(host, '13-reduced-motion');
+        await h.tap(host, 'KeyE'); await until(host, 'reduced-motion pickup', `!${active(1)}.active`); await h.sleep(1200);
+        const reducedPurple = await sampleEnergyCycle(host); captured.push({ name: 'reduced-purple', state: reducedPurple });
+        h.check('reduced motion keeps carried purple cargo distinct and still', reducedPurple.every(s => s.purple > 50 && s.green === 0) && new Set(reducedPurple.map(s => s.hash)).size === 1);
+        await h.tap(host, 'KeyE'); for (const p of pages) await until(p, 'redocked after accessibility check', `${active(1)}.active`);
+        await host.send('Emulation.setEmulatedMedia', { features: [] });
         // Partner crosses the empty side of the fixture; the first receiver remains untouched.
         await walk(guest, 700); await h.key(guest, 'KeyD', true); await h.tap(guest, 'Space');
         await until(guest, 'jump over delivered cube', 'customLevel.observe().player.x>880'); await h.key(guest, 'KeyD', false);
@@ -167,9 +191,11 @@ try {
         h.shot = async (p, name) => {
             await shot(p, name);
             if (name === 'deadlock-stage-06-three-payloads-operator') {
+                await h.sleep(750); // Inspect all three settled colours after the last local connection surge.
                 const s = await h.snapshot(p); captured.push({ name: 'deadlock-three', state: s });
                 h.check('DEADLOCK shows three independently occupied receivers', s.heroAssets.receivers.length === 3 && s.heroAssets.receivers.every(r => r.active));
                 h.check('all three DEADLOCK payloads have distinct fixed dock poses', s.heroAssets.receivers.every(r => !!r.dock) && new Set(s.heroAssets.receivers.map(r => r.dock!.cube)).size === 3);
+                h.check('all three DEADLOCK connection transitions have settled to green', s.heroAssets.receivers.every(r => r.age === null || r.age >= .68));
                 const clip = await p.read(`(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();return {x:(930-c.originX())*c.zoom+r.x,y:(915-c.originY())*c.zoom+r.y,width:640*c.zoom,height:190*c.zoom,scale:1}})()`);
                 const image = await p.send('Page.captureScreenshot', { format: 'png', clip });
                 await writeFile(join(reports, '06-deadlock-three-detail.png'), Buffer.from(image.data, 'base64'));
