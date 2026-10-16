@@ -1,0 +1,979 @@
+{
+  "version": 1,
+  "id": "deadlock-cargo",
+  "scope": "diagnostic",
+  "mode": "coop",
+  "timeoutMs": 180000,
+  "actors": [
+    {
+      "id": "operator",
+      "slot": 1
+    },
+    {
+      "id": "carrier",
+      "slot": 2
+    }
+  ],
+  "steps": [
+    {
+      "label": "Authored start for intended loose-cargo allocation",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "controls.draft:hatchToggle",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:shaftFirewall",
+            "equals": true
+          }
+        }
+      ],
+      "waitMs": 200,
+      "capture": "cargo-initial"
+    },
+    {
+      "label": "Commit lower breakpoint",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.room.checkpoint",
+          "equals": "reunion"
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier approaches B for SAFE allocation",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1705
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Pick up SAFE weight B",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeB.holder",
+          "equals": 2
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Position B above SAFE",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1578
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Drop B onto SAFE",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "plates.draft:safe",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Operator hops A and approaches loose cargo C",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 990
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Pick up C for lower shaft staging",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeC.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier hops SAFE weight and approaches A while C is carried clear",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 545
+        },
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Reserve A as the first FEED weight",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeA.holder",
+          "equals": 2
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Place C over the lower shaft floor",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 735
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Stage C loose beneath the closed HATCH",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeC.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Operator hops the staged cargo toward personnel service",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 340
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Bare operator uses service while FEED remains empty",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "max": 1500
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake on upper personnel floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "C rests loose in shaft while A is held away from FEED",
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "cubes.draft:cubeC.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:serviceRelay",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:cargoLift",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeC.carried",
+            "equals": false
+          }
+        }
+      ],
+      "capture": "cargo-staged"
+    },
+    {
+      "label": "Open HATCH from upper gallery for first loose delivery",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Lower carrier allocates A to FEED",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 486
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "A and B become two resting machinery weights",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "signals.draft:cargoLift",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Stand clear so A alone holds FEED during first ascent",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 500
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "First loose cargo rises while upper operator observes",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeC.y",
+          "max": 104
+        },
+        "timeoutMs": 20000
+      },
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeC.carried",
+            "equals": false
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "cubes.draft:cubeA.carried",
+            "equals": false
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "cubes.draft:cubeB.carried",
+            "equals": false
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "cubes.draft:cubeA.grounded",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "player.x",
+            "min": 450
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:cargoLift",
+            "equals": true
+          }
+        }
+      ],
+      "capture": "cargo-first-hover"
+    },
+    {
+      "label": "Manually close HATCH beneath first hovering cargo",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": false
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Return within reach of the resting FEED weight",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 478
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Pick up A after upper operator closes HATCH",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeA.holder",
+          "equals": 2
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carry A clear of FEED to lower C onto the closed HATCH",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 500
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "First loose cargo lands on the manually closed HATCH",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeC.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeC.y",
+            "min": 977
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeC.y",
+            "max": 979
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:cargoLift",
+            "equals": false
+          }
+        }
+      ],
+      "capture": "cargo-first-catch"
+    },
+    {
+      "label": "Approach first caught loose payload",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 710
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Collect C only after its physical HATCH landing",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeC.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carry caught C over the personnel roof",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 950
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Bring caught C to far payload socket",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1440
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Deliver first formerly loose cargo C",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "plates.draft:payloadThree",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "First loose delivery completed with B still holding SAFE",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:safe",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        }
+      ],
+      "capture": "cargo-first-delivered"
+    },
+    {
+      "label": "Return near personnel roof to reopen HATCH",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1000
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Hop over service gate toward HATCH control",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 800
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Settle beside HATCH control on safe gallery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 760
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Reopen HATCH for second loose cargo",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Stage former FEED weight A in lower shaft",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 585
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Release A as the second loose payload",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "cubes.draft:cubeA.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Lower carrier substitutes their body for FEED weight",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 400
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Second loose cargo rises with a player replacing FEED cube",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeA.y",
+          "max": 104
+        },
+        "timeoutMs": 20000
+      },
+      "assert": [
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:feed",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeA.carried",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadThree",
+            "equals": true
+          }
+        }
+      ],
+      "capture": "cargo-second-hover"
+    },
+    {
+      "label": "Manually close HATCH beneath second hovering cargo",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": false
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Step off FEED to lower second cargo onto HATCH",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 340
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Second loose cargo lands on closed HATCH",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeA.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeA.y",
+            "min": 977
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeA.y",
+            "max": 979
+          }
+        }
+      ],
+      "capture": "cargo-second-catch"
+    },
+    {
+      "label": "Approach second caught loose payload",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 710
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Collect A after its physical HATCH landing",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeA.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carry caught A over the personnel roof",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 950
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Bring A to the middle socket",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1220
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Deliver second formerly loose cargo A",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "plates.draft:payloadTwo",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Intended first two loose deliveries complete; final challenge remains",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadThree",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadTwo",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadOne",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:safe",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ],
+      "capture": "cargo-two-delivered"
+    }
+  ]
+}

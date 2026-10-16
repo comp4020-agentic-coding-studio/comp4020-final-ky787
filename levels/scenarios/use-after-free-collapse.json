@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "id": "use-after-free-collapse-proof",
+  "scope": "diagnostic",
+  "mode": "coop",
+  "timeoutMs": 65000,
+  "actors": [
+    {
+      "id": "host",
+      "slot": 1
+    },
+    {
+      "id": "partner",
+      "slot": 2
+    }
+  ],
+  "steps": [
+    {
+      "label": "Activate bottom breakpoint with physical E",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 440
+        },
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.room.checkpoint",
+          "equals": "reunion"
+        },
+        "timeoutMs": 3000
+      }
+    },
+    {
+      "label": "Host holds permanent LAUNCH plate",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1000
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "signals.draft:launchPower",
+          "equals": true
+        },
+        "timeoutMs": 3000
+      }
+    },
+    {
+      "label": "Partner enters powered lower lift",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1670
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.y",
+          "max": 1900
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Partner leaves lift onto adjacent A operator floor",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1345
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "operatorA"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Partner brakes after entering operator A",
+      "waitMs": 250
+    },
+    {
+      "label": "Partner centers ordinary plate A from grounded footing",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1345
+        }
+      ],
+      "waitMs": 250,
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "plates.draft:plateA",
+          "equals": true
+        },
+        "timeoutMs": 3000
+      }
+    },
+    {
+      "label": "Physical grounded occupancy powers chain A on both browsers",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:routeA",
+          "equals": true
+        },
+        "timeoutMs": 3000
+      },
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.grounded",
+            "equals": true
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "session.room.levelState.platforms.draft:operatorA.phase",
+            "equals": "warning"
+          }
+        }
+      ],
+      "capture": "a-occupied"
+    },
+    {
+      "label": "Host starts a real unstable anchor fuse",
+      "actions": [
+        {
+          "type": "grapple",
+          "actor": "host",
+          "target": "a1",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:a1.phase",
+          "equals": "warning"
+        },
+        "timeoutMs": 3000
+      }
+    },
+    {
+      "label": "Operator switches route power off from adjacent refuge",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1500
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:routeA",
+          "equals": false
+        },
+        "timeoutMs": 3000
+      }
+    },
+    {
+      "label": "Operator switches route power on again without resetting fuse",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1345
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:routeA",
+          "equals": true
+        },
+        "timeoutMs": 3000
+      },
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "session.room.levelState.platforms.draft:a1.phase",
+            "equals": "warning"
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "session.room.levelState.platforms.draft:a1.remainingMs",
+            "max": 3000
+          }
+        }
+      ]
+    },
+    {
+      "label": "Original anchor fuse still expires despite power cycle",
+      "actions": [
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:a1.phase",
+          "equals": "broken"
+        },
+        "timeoutMs": 3000
+      },
+      "capture": "anchor-power-cycle"
+    },
+    {
+      "label": "Operator fuse expires under stationary grounded player",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:operatorA.phase",
+          "equals": "broken"
+        },
+        "timeoutMs": 30000
+      }
+    },
+    {
+      "label": "Next physics update clears occupancy and withdraws chain",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:routeA",
+          "equals": false
+        },
+        "timeoutMs": 1000
+      },
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.grounded",
+            "equals": false
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "plates.draft:plateA",
+            "equals": false
+          }
+        }
+      ],
+      "capture": "a-collapsed"
+    },
+    {
+      "label": "Partner recovers onto permanent lower catch instead of dying",
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "catchMiddle"
+        },
+        "timeoutMs": 4000
+      },
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1034 @@
+{
+  "bindings": [
+    {
+      "id": "launchBinding",
+      "output": "launchPower",
+      "property": "power",
+      "target": "lowerLift"
+    },
+    {
+      "id": "a1Binding",
+      "output": "routeA",
+      "property": "active",
+      "target": "a1"
+    },
+    {
+      "id": "a2Binding",
+      "output": "routeA",
+      "property": "active",
+      "target": "a2"
+    },
+    {
+      "id": "a3Binding",
+      "output": "routeA",
+      "property": "active",
+      "target": "a3"
+    },
+    {
+      "id": "b1Binding",
+      "output": "routeB",
+      "property": "active",
+      "target": "b1"
+    },
+    {
+      "id": "b2Binding",
+      "output": "routeB",
+      "property": "active",
+      "target": "b2"
+    },
+    {
+      "id": "b3Binding",
+      "output": "routeB",
+      "property": "active",
+      "target": "b3"
+    },
+    {
+      "id": "c1Binding",
+      "output": "routeC",
+      "property": "active",
+      "target": "c1"
+    },
+    {
+      "id": "c2Binding",
+      "output": "routeC",
+      "property": "active",
+      "target": "c2"
+    },
+    {
+      "id": "c3Binding",
+      "output": "routeC",
+      "property": "active",
+      "target": "c3"
+    },
+    {
+      "id": "assistBinding",
+      "invert": true,
+      "output": "assistBlocked",
+      "property": "power",
+      "target": "finalLift"
+    },
+    {
+      "id": "exitBinding",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit"
+    },
+    {
+      "id": "retryBBinding",
+      "output": "routeB",
+      "property": "open",
+      "target": "retryB",
+      "invert": true
+    },
+    {
+      "id": "retryCBinding",
+      "output": "routeC",
+      "property": "open",
+      "target": "retryC",
+      "invert": true
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "assistBlocked": {
+        "arg": {
+          "args": [
+            {
+              "id": "assist.occupied",
+              "op": "ref"
+            },
+            {
+              "arg": {
+                "id": "plateC.occupied",
+                "op": "ref"
+              },
+              "op": "not"
+            }
+          ],
+          "op": "and"
+        },
+        "op": "not"
+      },
+      "exitReady": {
+        "id": "assist.occupied",
+        "op": "ref"
+      },
+      "launchPower": {
+        "id": "launch.occupied",
+        "op": "ref"
+      },
+      "routeA": {
+        "id": "plateA.occupied",
+        "op": "ref"
+      },
+      "routeB": {
+        "args": [
+          {
+            "id": "plateB.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "plateA.occupied",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      },
+      "routeC": {
+        "args": [
+          {
+            "id": "plateC.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "plateB.occupied",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      }
+    }
+  },
+  "editor": {
+    "grid": 10,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 2550,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 240,
+        "y": 2333
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 340,
+        "y": 2333
+      },
+      {
+        "h": 200,
+        "hookable": false,
+        "id": "bottom",
+        "kind": "static",
+        "type": "platform",
+        "w": 1800,
+        "x": 0,
+        "y": 2350
+      },
+      {
+        "checkpoint": "relay",
+        "id": "bottomP1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 240,
+        "y": 2333
+      },
+      {
+        "checkpoint": "relay",
+        "id": "bottomP2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 340,
+        "y": 2333
+      },
+      {
+        "checkpoint": "relay",
+        "id": "breakpointControl",
+        "kind": "terminal",
+        "label": "SAVE BOTTOM",
+        "type": "device",
+        "x": 440,
+        "y": 2350
+      },
+      {
+        "activationControl": "breakpointControl",
+        "checkpoint": "relay",
+        "id": "bottomBreakpoint",
+        "type": "breakpoint",
+        "x": 550,
+        "y": 2350
+      },
+      {
+        "id": "launch",
+        "kind": "plate",
+        "label": "LAUNCH / HOLD",
+        "type": "device",
+        "x": 1000,
+        "y": 2350
+      },
+      {
+        "h": 490,
+        "id": "lowerLift",
+        "type": "lift",
+        "w": 130,
+        "x": 1610,
+        "y": 1860
+      },
+      {
+        "h": 40,
+        "hookable": false,
+        "id": "refugeA",
+        "kind": "static",
+        "type": "platform",
+        "w": 170,
+        "x": 1410,
+        "y": 1950
+      },
+      {
+        "anchor": false,
+        "crumbleDelay": 24,
+        "h": 24,
+        "hookCrumbleDelay": 24,
+        "hookable": false,
+        "id": "operatorA",
+        "kind": "unstable",
+        "label": "A / 24s",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 130,
+        "x": 1280,
+        "y": 1950
+      },
+      {
+        "id": "plateA",
+        "kind": "plate",
+        "label": "",
+        "type": "device",
+        "x": 1345,
+        "y": 1950
+      },
+      {
+        "h": 40,
+        "hookable": false,
+        "id": "refugeB",
+        "kind": "static",
+        "type": "platform",
+        "w": 380,
+        "x": 50,
+        "y": 1650
+      },
+      {
+        "anchor": false,
+        "crumbleDelay": 24,
+        "h": 24,
+        "hookCrumbleDelay": 24,
+        "hookable": false,
+        "id": "operatorB",
+        "kind": "unstable",
+        "label": "B / 24s",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 130,
+        "x": 430,
+        "y": 1650
+      },
+      {
+        "id": "plateB",
+        "kind": "plate",
+        "label": "",
+        "type": "device",
+        "x": 495,
+        "y": 1650
+      },
+      {
+        "h": 40,
+        "hookable": false,
+        "id": "refugeC",
+        "kind": "static",
+        "type": "platform",
+        "w": 140,
+        "x": 1440,
+        "y": 1300
+      },
+      {
+        "anchor": false,
+        "crumbleDelay": 24,
+        "h": 24,
+        "hookCrumbleDelay": 24,
+        "hookable": false,
+        "id": "operatorC",
+        "kind": "unstable",
+        "label": "C / 24s",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 130,
+        "x": 1310,
+        "y": 1300
+      },
+      {
+        "id": "plateC",
+        "kind": "plate",
+        "label": "",
+        "type": "device",
+        "x": 1375,
+        "y": 1300
+      },
+      {
+        "h": 40,
+        "hookable": false,
+        "id": "summit",
+        "kind": "static",
+        "type": "platform",
+        "w": 190,
+        "x": 1390,
+        "y": 950
+      },
+      {
+        "id": "assist",
+        "kind": "plate",
+        "label": "ASSIST / RELEASE C",
+        "type": "device",
+        "x": 1440,
+        "y": 950
+      },
+      {
+        "h": 440,
+        "id": "finalLift",
+        "type": "lift",
+        "w": 130,
+        "x": 1600,
+        "y": 860
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 80,
+        "x": 1480,
+        "y": 810
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "a1",
+        "kind": "unstable",
+        "label": "A1",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 1060,
+        "y": 1930
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "a2",
+        "kind": "unstable",
+        "label": "A2",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 760,
+        "y": 1720
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "a3",
+        "kind": "unstable",
+        "label": "A3",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 460,
+        "y": 1450
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "b1",
+        "kind": "unstable",
+        "label": "B1",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 1130,
+        "y": 1620
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "b2",
+        "kind": "unstable",
+        "label": "B2",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 850,
+        "y": 1360
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "b3",
+        "kind": "unstable",
+        "label": "B3",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 1160,
+        "y": 1090
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "c1",
+        "kind": "unstable",
+        "label": "C1",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 650,
+        "y": 1330
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "c2",
+        "kind": "unstable",
+        "label": "C2",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 850,
+        "y": 1070
+      },
+      {
+        "anchor": true,
+        "crumbleDelay": 3.6,
+        "h": 24,
+        "hookCrumbleDelay": 3.6,
+        "hookable": true,
+        "id": "c3",
+        "kind": "unstable",
+        "label": "C3",
+        "respawnDelay": 3,
+        "type": "platform",
+        "w": 150,
+        "x": 1100,
+        "y": 700
+      },
+      {
+        "h": 32,
+        "hookable": false,
+        "id": "catchLower",
+        "kind": "static",
+        "type": "platform",
+        "w": 200,
+        "x": 650,
+        "y": 2280
+      },
+      {
+        "h": 32,
+        "hookable": false,
+        "id": "catchMiddle",
+        "kind": "static",
+        "type": "platform",
+        "w": 300,
+        "x": 1280,
+        "y": 2050
+      },
+      {
+        "h": 120,
+        "hookable": false,
+        "id": "summitBaffle",
+        "kind": "static",
+        "label": "ASCENT BAFFLE",
+        "type": "platform",
+        "w": 260,
+        "x": 1130,
+        "y": 950
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "retryB",
+        "kind": "static",
+        "label": "B RETRY → A",
+        "type": "platform",
+        "w": 630,
+        "x": 650,
+        "y": 2050
+      },
+      {
+        "h": 24,
+        "hookable": false,
+        "id": "retryC",
+        "kind": "static",
+        "label": "C RETRY ← B",
+        "type": "platform",
+        "w": 600,
+        "x": 560,
+        "y": 1760
+      }
+    ],
+    "width": 1800
+  },
+  "id": "use-after-free",
+  "instruction": "TRADE THE PLATES. SWING BEFORE THE POINTER EXPIRES.",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "bounds": {
+          "h": 560,
+          "w": 530,
+          "x": 1220,
+          "y": 1790
+        },
+        "duration": 1.2,
+        "id": "launchReveal",
+        "padding": 70,
+        "source": "launch"
+      },
+      {
+        "bounds": {
+          "h": 1000,
+          "w": 1120,
+          "x": 320,
+          "y": 1370
+        },
+        "id": "routeAReveal",
+        "padding": 60,
+        "platformIds": [
+          "a1",
+          "a2",
+          "a3"
+        ],
+        "source": "plateA"
+      },
+      {
+        "bounds": {
+          "h": 1080,
+          "w": 800,
+          "x": 800,
+          "y": 1010
+        },
+        "id": "routeBReveal",
+        "padding": 60,
+        "platformIds": [
+          "b1",
+          "b2",
+          "b3",
+          "retryB"
+        ],
+        "source": "plateB"
+      },
+      {
+        "bounds": {
+          "h": 1180,
+          "w": 1320,
+          "x": 280,
+          "y": 620
+        },
+        "id": "routeCReveal",
+        "padding": 60,
+        "platformIds": [
+          "c1",
+          "c2",
+          "c3",
+          "retryC"
+        ],
+        "source": "plateC"
+      },
+      {
+        "bounds": {
+          "h": 550,
+          "w": 480,
+          "x": 1270,
+          "y": 800
+        },
+        "id": "assistReveal",
+        "padding": 60,
+        "source": "assist"
+      }
+    ],
+    "display": {
+      "x": 330,
+      "y": 2110
+    },
+    "labels": [
+      {
+        "id": "title",
+        "text": "USE AFTER FREE",
+        "x": 70,
+        "y": 180
+      },
+      {
+        "id": "mock",
+        "text": "AUTHORED MOCK / PROTOTYPE CRUMBLE",
+        "x": 70,
+        "y": 230
+      },
+      {
+        "id": "rule",
+        "text": "One climbs. One holds. Release before the next owner.",
+        "x": 70,
+        "y": 290
+      },
+      {
+        "id": "controls",
+        "text": "A/D MOVE    SPACE JUMP / ROPE JUMP    HOLD CLICK TO SWING",
+        "x": 70,
+        "y": 360
+      },
+      {
+        "id": "recovery",
+        "text": "BOTTOM BREAKPOINT / permanent catch floor / R returns here",
+        "x": 90,
+        "y": 2440
+      },
+      {
+        "id": "aInstruction",
+        "text": "A → B / STEP RIGHT TO RELEASE",
+        "x": 1190,
+        "y": 2055
+      },
+      {
+        "id": "bInstruction",
+        "text": "B AND NOT A → C / STEP LEFT TO RELEASE",
+        "x": 55,
+        "y": 1740
+      },
+      {
+        "id": "cInstruction",
+        "text": "C AND NOT B → SUMMIT / STEP RIGHT TO RELEASE",
+        "x": 1130,
+        "y": 1400
+      },
+      {
+        "id": "summitInstruction",
+        "text": "ASSIST AND NOT C → FINAL LIFT",
+        "x": 1120,
+        "y": 520
+      },
+      {
+        "id": "fuse",
+        "text": "ANCHOR FUSE 3.6s / RECOVERY 3s",
+        "x": 80,
+        "y": 2040
+      },
+      {
+        "id": "operatorFuse",
+        "text": "OPERATOR FLOOR 24s / STEP ASIDE TO RELEASE",
+        "x": 80,
+        "y": 2080
+      },
+      {
+        "id": "summitArrival",
+        "text": "BOTH PLAYERS MUST REACH THE EXIT",
+        "x": 1120,
+        "y": 560
+      }
+    ],
+    "wires": [
+      {
+        "binding": "a1Binding",
+        "id": "a1Wire",
+        "points": [
+          {
+            "x": 1345,
+            "y": 1938
+          },
+          {
+            "x": 1345,
+            "y": 1870
+          },
+          {
+            "x": 1135.0,
+            "y": 1870
+          },
+          {
+            "x": 1135.0,
+            "y": 1930
+          }
+        ]
+      },
+      {
+        "binding": "a2Binding",
+        "id": "a2Wire",
+        "points": [
+          {
+            "x": 1345,
+            "y": 1938
+          },
+          {
+            "x": 1345,
+            "y": 1660
+          },
+          {
+            "x": 835.0,
+            "y": 1660
+          },
+          {
+            "x": 835.0,
+            "y": 1720
+          }
+        ]
+      },
+      {
+        "binding": "a3Binding",
+        "id": "a3Wire",
+        "points": [
+          {
+            "x": 1345,
+            "y": 1938
+          },
+          {
+            "x": 1345,
+            "y": 1390
+          },
+          {
+            "x": 535.0,
+            "y": 1390
+          },
+          {
+            "x": 535.0,
+            "y": 1450
+          }
+        ]
+      },
+      {
+        "binding": "b1Binding",
+        "id": "b1Wire",
+        "points": [
+          {
+            "x": 495,
+            "y": 1638
+          },
+          {
+            "x": 495,
+            "y": 1560
+          },
+          {
+            "x": 1205.0,
+            "y": 1560
+          },
+          {
+            "x": 1205.0,
+            "y": 1620
+          }
+        ]
+      },
+      {
+        "binding": "b2Binding",
+        "id": "b2Wire",
+        "points": [
+          {
+            "x": 495,
+            "y": 1638
+          },
+          {
+            "x": 495,
+            "y": 1300
+          },
+          {
+            "x": 925.0,
+            "y": 1300
+          },
+          {
+            "x": 925.0,
+            "y": 1360
+          }
+        ]
+      },
+      {
+        "binding": "b3Binding",
+        "id": "b3Wire",
+        "points": [
+          {
+            "x": 495,
+            "y": 1638
+          },
+          {
+            "x": 495,
+            "y": 1030
+          },
+          {
+            "x": 1235.0,
+            "y": 1030
+          },
+          {
+            "x": 1235.0,
+            "y": 1090
+          }
+        ]
+      },
+      {
+        "binding": "c1Binding",
+        "id": "c1Wire",
+        "points": [
+          {
+            "x": 1375,
+            "y": 1288
+          },
+          {
+            "x": 1375,
+            "y": 1270
+          },
+          {
+            "x": 725.0,
+            "y": 1270
+          },
+          {
+            "x": 725.0,
+            "y": 1330
+          }
+        ]
+      },
+      {
+        "binding": "c2Binding",
+        "id": "c2Wire",
+        "points": [
+          {
+            "x": 1375,
+            "y": 1288
+          },
+          {
+            "x": 1375,
+            "y": 1030
+          },
+          {
+            "x": 925.0,
+            "y": 1030
+          },
+          {
+            "x": 925.0,
+            "y": 1070
+          }
+        ]
+      },
+      {
+        "binding": "c3Binding",
+        "id": "c3Wire",
+        "points": [
+          {
+            "x": 1375,
+            "y": 1288
+          },
+          {
+            "x": 1375,
+            "y": 640
+          },
+          {
+            "x": 1175.0,
+            "y": 640
+          },
+          {
+            "x": 1175.0,
+            "y": 700
+          }
+        ]
+      },
+      {
+        "binding": "launchBinding",
+        "id": "launchWire",
+        "points": [
+          {
+            "x": 1000,
+            "y": 2338
+          },
+          {
+            "x": 1675,
+            "y": 2338
+          },
+          {
+            "x": 1675,
+            "y": 2190
+          }
+        ]
+      },
+      {
+        "binding": "assistBinding",
+        "id": "assistWire",
+        "invertedLabel": true,
+        "points": [
+          {
+            "x": 1440,
+            "y": 938
+          },
+          {
+            "x": 1550,
+            "y": 938
+          },
+          {
+            "x": 1550,
+            "y": 1120
+          },
+          {
+            "x": 1680,
+            "y": 1120
+          }
+        ]
+      },
+      {
+        "id": "retryBWire",
+        "points": [
+          {
+            "x": 495,
+            "y": 1638
+          },
+          {
+            "x": 620,
+            "y": 1638
+          },
+          {
+            "x": 620,
+            "y": 2020
+          },
+          {
+            "x": 680,
+            "y": 2020
+          },
+          {
+            "x": 680,
+            "y": 2050
+          }
+        ],
+        "output": "routeB"
+      },
+      {
+        "id": "retryCWire",
+        "points": [
+          {
+            "x": 1375,
+            "y": 1288
+          },
+          {
+            "x": 1470,
+            "y": 1288
+          },
+          {
+            "x": 1470,
+            "y": 1730
+          },
+          {
+            "x": 1100,
+            "y": 1730
+          },
+          {
+            "x": 1100,
+            "y": 1760
+          }
+        ],
+        "output": "routeC"
+      }
+    ]
+  },
+  "previewStates": {
+    "assist": {
+      "assist.occupied": true
+    },
+    "idle": {},
+    "route-a": {
+      "plateA.occupied": true
+    },
+    "route-b": {
+      "plateB.occupied": true
+    },
+    "route-c": {
+      "plateC.occupied": true
+    }
+  },
+  "title": "USE AFTER FREE",
+  "version": 1
+}

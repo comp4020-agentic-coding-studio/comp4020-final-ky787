@@ -277,6 +277,9 @@ scenario, and 2 for malformed input, blocking validation or tool failure.
 Scenarios use version 1 with `id`, explicit `scope` (`full-room`, `section-only`,
 `diagnostic`), `mode` (`single`/`coop`), total `timeoutMs` and distinct actor IDs/slots.
 Steps have labels, real-control actions, bounded waits and observable assertions.
+An optional `capture` filename slug (letter first, up to 64 letters/digits/underscores/hyphens)
+saves both actors after a successful step as `<capture>-<actor>.png` inside the report
+directory. Captures do not change input, camera or gameplay state.
 A step's `actions` are dispatched in order; held keys persist across steps, so both
 players can act concurrently. Supported actions are key down/up, tap, walk-to-x and
 grapple target/release. A grapple aim helper maps object position through the real
@@ -359,3 +362,16 @@ Neither editor executes uploaded code, builds binaries or publishes levels.
 Human editor feedback and puzzle/two-player acceptance remain necessary before
 promoting drafts into the campaign. Automated diagnostic results are not a claim
 of human puzzle acceptance.
+
+### Carried payload clearance
+
+The shared physical engine checks the normal 22 × 34 avatar and a separate
+44 × 48 overhead payload/gap box against full-solid walls and ceilings (82 units
+overall). Pickup requires the overhead space to be clear immediately. The payload
+does not widen the avatar's feet or push a carrier across a ledge. Normal feet determine
+floor contacts, and one-way slabs retain their ordinary jump-through behavior.
+A static passage 38 units high therefore admits a bare 34-unit player and rejects
+both a loose 44-unit cube and a carried cube. Relay destinations independently
+check the complete payload; `blocksCubeInteraction` on enclosure walls prevents
+pulling or grabbing cargo through them. None of these checks grants a cube-specific
+permission or changes global movement tuning.

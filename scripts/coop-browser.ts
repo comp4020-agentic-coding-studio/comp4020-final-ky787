@@ -173,7 +173,7 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         if (proxy) await new Promise<void>(resolve => proxy!.close(() => resolve()));
         if (app && app.exitCode === null && app.signalCode === null) { const stopped = once(app, 'exit'); app.kill('SIGTERM'); await stopped; }
         if (browser && browser.exitCode === null && browser.signalCode === null) { const stopped = once(browser, 'exit'); browser.kill(); await stopped; }
-        await rm(temporary, { recursive: true, force: true });
+        await rm(temporary, { recursive: true, force: true, maxRetries: 8, retryDelay: 100 });
     }
     const h = { scenario: '', shotPrefix: '', temporary, shots, checks, clients, sleep,
         startServer, tlsOrigin, page, snapshot, wait, check, click, key, tap, walk, mouse, shot, cleanup,

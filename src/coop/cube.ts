@@ -136,7 +136,7 @@ export class SharedCubeAuthority implements CubeAuthority {
             return true;
         }
         if (cubeAvailable(this.client.room, this.id) && this.near(w)) {
-            if (!this.client.room?.cubes[this.id]?.holder && this.action('cube-pickup')) { this.wantsPull = false; this.sync(w); }
+            if (!this.client.room?.cubes[this.id]?.holder && w.canCarryCube() && this.action('cube-pickup')) { this.wantsPull = false; this.sync(w); }
             return true;
         }
         return false;

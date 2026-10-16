@@ -164,7 +164,7 @@ export interface Body {
 const EPS = 0.01;
 
 /** Pushes a body out of solid (non-one-way) boxes along x. */
-function resolveX(b: Body, w: number, h: number, solids: readonly Solid[]): void {
+function resolveX(b: Body, w: number, h: number, solids: readonly Solid[], previousX?: number): void {
   const top = b.y - h / 2;
   const bottom = b.y + h / 2;
   for (const s of solids) {
@@ -178,7 +178,9 @@ function resolveX(b: Body, w: number, h: number, solids: readonly Solid[]): void
     if (Math.min(bottom, s.y + s.h) - Math.max(top, s.y) < 4) continue;
     const pushLeft = right - s.x;
     const pushRight = s.x + s.w - left;
-    if (b.vx > 0 || (b.vx === 0 && pushLeft < pushRight)) b.x -= pushLeft;
+    const existingOverlap = previousX !== undefined &&
+      previousX + w / 2 > s.x && previousX - w / 2 < s.x + s.w;
+    if (existingOverlap ? pushLeft < pushRight : b.vx > 0 || (b.vx === 0 && pushLeft < pushRight)) b.x -= pushLeft;
     else b.x += pushRight;
     b.vx = 0;
   }
@@ -547,6 +549,8 @@ export function stepPlayer(
   field?: VerticalMotion,
   /** Current C8/co-op opts in; retained pre-C8 World keeps its original movement. */
   groundRunLimit: number = PLAYER.maxRunSpeed,
+  /** Overhead payload clearance against full-solid walls/ceilings; feet keep their normal contact footprint. */
+  carried?: { width: number; extraHeight: number },
 ): void {
   p.justLanded = false;
   p.coyote = Math.max(0, p.coyote - dt);
@@ -637,11 +641,32 @@ export function stepPlayer(
   const fallSpeed = p.vy;
 
   // One axis at a time: walls first, then floors and ceilings.
+  const previousX = p.x;
   p.x += p.vx * dt;
+  const clearanceWidth = carried?.width ?? w;
+  const clearanceHeight = h + (carried?.extraHeight ?? 0);
+  const clearanceOffset = (carried?.extraHeight ?? 0) / 2;
   resolveX(p, w, h, solids);
+  // Cargo is wider only ABOVE the avatar. Extending that width to the feet
+  // creates a phantom ledge contact as the narrower avatar walks off an edge.
+  const payloadOffset = h / 2 + (carried?.extraHeight ?? 0) / 2;
+  if (carried) {
+    p.y -= payloadOffset;
+    // A descending payload can overlap a ledge from above while its carrier
+    // clears the edge. Separate toward the near side, never across the floor.
+    resolveX(p, carried.width, carried.extraHeight, solids, previousX);
+    p.y += payloadOffset;
+  }
   p.y += p.vy * dt;
   applyRopeConstraint(p, dt);
-  if (p.rope.phase === "attached") pushOutOfSolids(p, w, h, solids);
+  if (p.rope.phase === "attached") {
+    pushOutOfSolids(p, w, h, solids);
+    if (carried) {
+      p.y -= payloadOffset;
+      pushOutOfSolids(p, carried.width, carried.extraHeight, solids);
+      p.y += payloadOffset;
+    }
+  }
 
   // Constraint/reel corrections also obey the swing cap.
   if (p.rope.phase === "attached") {
@@ -653,7 +678,13 @@ export function stepPlayer(
       p.vy *= GRAPPLE.maxSwingSpeed / speed;
     }
   }
-  const landed = resolveY(p, w, h, prevBottom, prevTop, solids, p.dropThrough > 0 ? p.dropIgnore : null);
+  // Only the avatar's feet can support a carrier. An overhead cube must not
+  // manufacture a floor contact or enlarge one-way platform landing tolerance.
+  const rising = p.vy < 0;
+  if (rising) p.y -= clearanceOffset;
+  const landed = resolveY(p, rising ? clearanceWidth : w, rising ? clearanceHeight : h,
+    prevBottom, prevTop - (rising ? carried?.extraHeight ?? 0 : 0), solids, p.dropThrough > 0 ? p.dropIgnore : null);
+  if (rising) p.y += clearanceOffset;
   p.grounded = landed !== null;
   p.groundId = landed;
   if (p.grounded && !wasGrounded && fallSpeed > 120) {

@@ -50,7 +50,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 400
+          "x": 390
         }
       ],
       "assert": [

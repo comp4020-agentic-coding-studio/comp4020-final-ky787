@@ -10,6 +10,10 @@ describe('bounded workbench scenarios', () => {
         expect(() => parseScenario({ ...base(), steps: [{ label: 'cheat', actions: [{ type: 'teleport', actor: 'p1', x: 99 }] }] })).toThrow('unsupported action');
         expect(() => parseScenario({ ...base(), steps: [{ label: 'script', eval: 'win()' }] })).toThrow('unsupported fields');
     });
+    it('captures named milestones without accepting paths or executable actions', () => {
+        expect(parseScenario({ ...base(), steps: [{ label: 'powered', capture: 'powered-02' }] }).steps[0].capture).toBe('powered-02');
+        for (const capture of ['../escape', '/tmp/image', 'x.png', 'a'.repeat(65)]) expect(() => parseScenario({ ...base(), steps: [{ label: 'invalid', capture }] })).toThrow('capture');
+    });
     it('rejects unbounded waits, unknown actors, duplicate identities and invalid diagnostic setup', () => {
         expect(() => parseScenario({ ...base(), timeoutMs: Infinity })).toThrow();
         expect(() => parseScenario({ ...base(), steps: [{ label: 'wait', wait: { actor: 'ghost', condition: { path: 'completed', equals: true }, timeoutMs: 300 } }] })).toThrow();

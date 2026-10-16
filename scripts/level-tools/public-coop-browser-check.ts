@@ -158,7 +158,7 @@ try {
         const stopped = once(h.app!, 'exit'); h.app!.kill('SIGTERM'); await stopped;
         origin = await h.startServer(Number(new URL(origin).port));
         await guest.send('Page.navigate', { url: `${origin}custom-level.html?code=${code}` });
-        await until(guest, 'document.querySelector("#status").textContent.includes("server restart")');
+        await until(guest, '!!document.querySelector("#status")?.textContent.includes("server restart")');
         check('server restart terminates temporary sessions with an understandable message', true);
     }
     for (const p of pages) if (p.errors.length) throw new Error(p.errors.join('\n'));

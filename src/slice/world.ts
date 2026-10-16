@@ -262,12 +262,19 @@ export class PuzzleWorld {
             }
             this.evaluate();
         }
-        else if (c && Math.hypot(p.x - c.x, p.y - c.y) < CARRY.reach) {
+        else if (c && this.canCarryCube() && Math.hypot(p.x - c.x, p.y - c.y) < CARRY.reach) {
             c.carried = true;
             c.grounded = false;
             this.pullingCube = false;
             this.emit('carry');
         }
+    }
+    /** A pickup must fit immediately; otherwise a roof could eject the carrier sideways. */
+    canCarryCube(): boolean {
+        const box = { x: this.player.x - CUBE_SIZE / 2,
+            y: this.player.y - PLAYER.height / 2 - CARRY.holdGap - CUBE_SIZE,
+            w: CUBE_SIZE, h: CARRY.holdGap + CUBE_SIZE };
+        return !this.solids.some(s => s.enabled && !s.oneWay && boxesOverlap(box, s));
     }
     /** Compute a proposed drop without changing the cube before server acceptance. */
     cubeDropTransform() {
@@ -453,8 +460,10 @@ export class PuzzleWorld {
             this.player.grounded = false;
             this.player.groundId = null;
         }
+        const movementCarrying = cubeEntries(this.cubes).some(([id, c]) => c.carried && (!this.cubeAuthority(id) || this.cubeAuthority(id)!.heldLocally));
         const movementSolids = [...this.solids, ...Object.values(this.cubeSolids).filter(s => s.enabled), ...(support ? [support] : [])];
-        stepPlayer(this.player, input, movementSolids, dt, field, PLAYER.maxGroundRunSpeed);
+        stepPlayer(this.player, input, movementSolids, dt, field, PLAYER.maxGroundRunSpeed,
+            movementCarrying ? { width: CUBE_SIZE, extraHeight: CARRY.holdGap + CUBE_SIZE } : undefined);
         if (!wasAttached && this.player.rope.phase === 'attached') this.emit('grapple');
         if (this.keyboardGrapple && (this.player.grounded || ['idle', 'retracting'].includes(this.player.rope.phase))) {
             this.keyboardGrapple = false;

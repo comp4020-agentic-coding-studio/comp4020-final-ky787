@@ -1,0 +1,1029 @@
+{
+  "version": 1,
+  "id": "handshake",
+  "scope": "full-room",
+  "mode": "coop",
+  "timeoutMs": 180000,
+  "actors": [
+    {
+      "id": "host",
+      "slot": 1
+    },
+    {
+      "id": "partner",
+      "slot": 2
+    }
+  ],
+  "steps": [
+    {
+      "label": "Authored initial state",
+      "capture": "initial",
+      "waitMs": 200
+    },
+    {
+      "label": "Approach central breakpoint",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1340
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Commit central breakpoint without powering machinery",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.room.checkpoint",
+          "equals": "reunion"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Partner holds CROSSING",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1150
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:crossingPower",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "powered-crossing",
+      "waitMs": 200
+    },
+    {
+      "label": "Climber approaches the gap",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1070
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Attach to the near address bar",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyA",
+          "down": true
+        },
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": true,
+          "target": "nearAnchor"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.rope.phase",
+          "equals": "attached"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Swing left across the recovery well",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "max": 900
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Release first rope for transfer",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "Space"
+        },
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "Transfer to far address bar",
+      "actions": [
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": true,
+          "target": "farAnchor"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.rope.anchorId",
+          "equals": "farAnchor"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Carry swing toward alcove",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "max": 560
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Rope jump toward alcove",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "Space"
+        },
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "max": 340
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Brake and land above alcove",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyA",
+          "down": false
+        },
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "cubeAlcove"
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "cube-alcove"
+    },
+    {
+      "label": "Settle on alcove floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 250
+    },
+    {
+      "label": "Approach shared cube",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 135
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Pick up the shared payload",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.sharedCubes.draft:payload.holder",
+          "equals": 1
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Move to return launch",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 345
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Attach far address bar with payload",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": true,
+          "target": "farAnchor"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.rope.anchorId",
+          "equals": "farAnchor"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Swing payload back to central bay",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "min": 680
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Release far rope with payload",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "Space"
+        },
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "Transfer payload swing to near address bar",
+      "actions": [
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": true,
+          "target": "nearAnchor"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.rope.anchorId",
+          "equals": "nearAnchor"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Cross back over bay edge",
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "min": 930
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Rope jump back to bay",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "Space"
+        },
+        {
+          "type": "grapple",
+          "actor": "host",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "min": 1050
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Brake and land with the payload",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "centralBay"
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "payload-return"
+    },
+    {
+      "label": "Clear bay edge before placing payload",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1300
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Set payload beside CROSSING",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1190
+        }
+      ],
+      "waitMs": 250
+    },
+    {
+      "label": "Rest payload on ordinary CROSSING plate",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "cubes.draft:payload.grounded",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Both people leave CROSSING while cube keeps it powered",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1300
+        },
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1320
+        },
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:crossingPower",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "cube-substitution",
+      "waitMs": 250
+    },
+    {
+      "label": "Crossing remains live from the resting cube",
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "signals.draft:crossingPower",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "Recover shared cube for gallery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1160
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Carry cube again",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.sharedCubes.draft:payload.holder",
+          "equals": 1
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Partner powers LIFT after cube recovery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1420
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "signals.draft:liftPower",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "waitMs": 200
+    },
+    {
+      "label": "Enter powered lift",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1180
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.y",
+          "max": 532
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Move from hover onto gallery",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "min": 1340
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Land on permanent gallery",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "serviceGallery"
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "gallery-lift"
+    },
+    {
+      "label": "Bring payload below maintenance ledge",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1700
+        }
+      ],
+      "waitMs": 250
+    },
+    {
+      "label": "Stage payload away from LINK lever",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "cubes.draft:payload.grounded",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Return to LINK",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1480
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Enable reversible service link",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "signals.draft:relayPower",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "relay-linked"
+    },
+    {
+      "label": "Partner leaves lift and enters lower relay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.y",
+          "max": 600
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Partner lands at service gallery",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "serviceGallery"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Holder approaches staged cube",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1710
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Hold payload beneath maintenance access",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "session.sharedCubes.draft:payload.holder",
+          "equals": 1
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Climber stands below held cube",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1700
+        }
+      ],
+      "waitMs": 250
+    },
+    {
+      "label": "Climber jumps onto partner-held cube",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "partner-cube-support:draft:payload"
+        },
+        "timeoutMs": 3500
+      },
+      "capture": "partner-held-boost"
+    },
+    {
+      "label": "Settle on cube before upper jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 150
+    },
+    {
+      "label": "Jump from held cube toward maintenance ledge",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.x",
+          "min": 1820
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Land on maintenance ledge",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "maintenanceLedge"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Approach maintenance terminal",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": false
+        },
+        {
+          "type": "walk",
+          "actor": "partner",
+          "x": 1880
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Commit MAINTENANCE COMPLETE",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "partner",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "controls.draft:maintenance",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "maintenance-complete"
+    },
+    {
+      "label": "Exit still needs payload",
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Holder returns cube through upper relay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.y",
+          "min": 900
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Holder brakes in central bay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "centralBay"
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Climber descends safely from maintenance ledge",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.x",
+          "max": 1660
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Climber uses service relay to regroup",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.y",
+          "min": 900
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Climber lands in bay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "centralBay"
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "near-complete"
+    },
+    {
+      "label": "Place payload beside final socket",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1930
+        }
+      ],
+      "waitMs": 250
+    },
+    {
+      "label": "Drop cube into live PAYLOAD socket",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "exitUnlocked",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "exit-unlocked"
+    },
+    {
+      "label": "First physical exit arrival",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 2200
+        },
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "session.reachedExit.0",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Second physical exit arrival",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "completed",
+          "equals": true
+        },
+        "timeoutMs": 4000
+      },
+      "capture": "completed"
+    }
+  ]
+}

@@ -1,0 +1,1454 @@
+{
+  "version": 1,
+  "id": "deadlock",
+  "scope": "full-room",
+  "mode": "coop",
+  "timeoutMs": 240000,
+  "actors": [
+    {
+      "id": "operator",
+      "slot": 1
+    },
+    {
+      "id": "carrier",
+      "slot": 2
+    }
+  ],
+  "steps": [
+    {
+      "label": "Authored two-player start; HATCH closed and all cubes loose",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "controls.draft:hatchToggle",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:shaftFirewall",
+            "equals": true
+          }
+        }
+      ],
+      "waitMs": 200,
+      "capture": "stage-01-initial"
+    },
+    {
+      "label": "Commit lower breakpoint",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.room.checkpoint",
+          "equals": "reunion"
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier approaches B",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1705
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier picks up B",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeB.holder",
+          "equals": 2
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Allocate B onto SAFE from the right",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1578
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "B becomes SAFE weight",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "plates.draft:safe",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Operator walks through personnel passage while SAFE alone powers service",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "max": 1500
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake on upper personnel floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "Open full-solid HATCH from safe upper floor",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Allow the existing relay transit cooldown to expire",
+      "waitMs": 750
+    },
+    {
+      "label": "Return through service to allocate FEED",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "min": 2900
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake on lower personnel floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 100
+    },
+    {
+      "label": "Operator approaches A",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 455
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Operator picks up A",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeA.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Allocate A onto FEED from the right",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 456
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "A and B power the cargo lift",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "signals.draft:cargoLift",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Two resting cubes power first delivery",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeA.carried",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeB.carried",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:shaftFirewall",
+            "equals": false
+          }
+        }
+      ],
+      "waitMs": 300,
+      "capture": "stage-02-two-weights"
+    },
+    {
+      "label": "Carrier hops over its SAFE weight and approaches unallocated C",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1085
+        },
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Pick up first payload C",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeC.holder",
+          "equals": 2
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "First delivery enters cargo shaft",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 660
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "First delivery rises above the gallery service roof",
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "player.y",
+          "max": 880
+        },
+        "timeoutMs": 18000
+      }
+    },
+    {
+      "label": "First delivery steps onto upper gallery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 950
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "First delivery lands safely",
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "upperGallery"
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Carry C to the far payload socket",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1440
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Deposit first payload C",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "carrier",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "plates.draft:payloadThree",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Pick A back up while still standing on FEED",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeA.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Operator leaves FEED carrying its former weight; service becomes available",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 340
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Removing FEED weight disables lift and enables service",
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "signals.draft:serviceRelay",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Carrier returns from upper service",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "player.y",
+          "min": 2900
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Carrier brakes after returning",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 100
+    },
+    {
+      "label": "Carrier physically substitutes for FEED weight",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 400
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "SAFE cube plus FEED player power second delivery",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "signals.draft:cargoLift",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "capture": "stage-03-player-substitution"
+    },
+    {
+      "label": "Second delivery enters cargo shaft",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 660
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Second delivery rises above the gallery service roof",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "max": 880
+        },
+        "timeoutMs": 18000
+      }
+    },
+    {
+      "label": "Second delivery steps onto upper gallery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 950
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Second delivery lands safely",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "upperGallery"
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Carry A to the middle payload socket",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1220
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Deposit second payload A",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "plates.draft:payloadTwo",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier steps off FEED to restore personnel service",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 340
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Operator returns to lower allocation floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "min": 2900
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Operator brakes at lower service",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 100
+    },
+    {
+      "label": "Carrier holds SAFE with their body before final cube moves",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1455
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Operator approaches B while partner occupies SAFE",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1435
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Remove final cube B while partner keeps SAFE held",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeB.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Stage B at the unpowered shaft floor",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 735
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Release final payload in shaft",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeB.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Operator hops staged cube and holds FEED; both players power final lift",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 400
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Final payload rises alone to geometric hover",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeB.y",
+          "max": 104
+        },
+        "timeoutMs": 20000
+      },
+      "assert": [
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:safe",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "signals.draft:cargoLift",
+            "equals": true
+          }
+        }
+      ],
+      "capture": "stage-04-final-hover"
+    },
+    {
+      "label": "Operator leaves FEED and uses service while SAFE remains held",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "max": 1500
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake on upper personnel floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "Close HATCH before final payload falls through",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": false
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Final loose cube is caught on full-solid HATCH",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeB.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeB.y",
+            "min": 977
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "cubes.draft:cubeB.y",
+            "max": 979
+          }
+        }
+      ],
+      "capture": "stage-05-hatch-catch"
+    },
+    {
+      "label": "Approach caught B from safe gallery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 710
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Pick up the caught final payload",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeB.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carry B over the short upper service roof",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 950
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Carry B to near payload socket",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1000
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Face the near socket before releasing B",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "waitMs": 35
+    },
+    {
+      "label": "Settle before the final socket drop",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 90
+    },
+    {
+      "label": "Three physical payload sockets latch the exit",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "exitUnlocked",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "All three sockets held simultaneously; partner still below",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadOne",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadTwo",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadThree",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        }
+      ],
+      "capture": "stage-06-three-payloads"
+    },
+    {
+      "label": "Hop over service gate to reach HATCH toggle",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 800
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Settle on safe floor beside HATCH control",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 760
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Reopen HATCH for recovery descent",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "controls.draft:hatchToggle",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Clear the roof edge on the enlarged safe gallery",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 760
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Return above the service gate to accessible payload B",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 975
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Retrieve B after exit has latched",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.sharedCubes.draft:cubeB.holder",
+          "equals": 1
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Carry B across roof toward open HATCH",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.x",
+          "max": 660
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake horizontal momentum over the shaft",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": false
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.vx",
+          "min": 0
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Release steering for safe vertical descent",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyD",
+          "down": false
+        }
+      ]
+    },
+    {
+      "label": "Recover B to lower floor through safe unpowered shaft",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "min": 2980
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Bring B back to SAFE while partner holds it",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1470
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "B replaces SAFE operator and frees both players",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "operator",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "cubes.draft:cubeB.grounded",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "waitMs": 180
+    },
+    {
+      "label": "Exit stays latched after recovering a delivered cube",
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:payloadOne",
+            "equals": false
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "plates.draft:safe",
+            "equals": true
+          }
+        }
+      ],
+      "capture": "stage-07-safe-recovery"
+    },
+    {
+      "label": "Operator approaches personnel service for final ascent",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 340
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Operator returns to gallery with SAFE cube holding service",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "player.y",
+          "max": 1500
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake on upper personnel floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "Operator clears service corridor and approaches remaining cubes",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1160
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Operator jumps the middle payload cube",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1370
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Operator jumps the far payload cube to first exit arrival",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 1690
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "First arrival cannot complete alone",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "session.reachedExit.0",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "assert": [
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Carrier leaves SAFE; B preserves service power",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 340
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier makes final personnel ascent",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "carrier",
+        "condition": {
+          "path": "player.y",
+          "max": 1500
+        },
+        "timeoutMs": 6000
+      }
+    },
+    {
+      "label": "Brake on upper personnel floor",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "waitMs": 80
+    },
+    {
+      "label": "Carrier clears service corridor",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1160
+        }
+      ],
+      "waitMs": 180
+    },
+    {
+      "label": "Carrier jumps the middle payload cube",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1370
+        },
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Carrier reaches second physical exit arrival",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1690
+        },
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
+    },
+    {
+      "label": "Both players complete DEADLOCK",
+      "wait": {
+        "actor": "operator",
+        "condition": {
+          "path": "completed",
+          "equals": true
+        },
+        "timeoutMs": 6000
+      },
+      "assert": [
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "completed",
+            "equals": true
+          }
+        },
+        {
+          "actor": "operator",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ],
+      "capture": "stage-08-complete"
+    }
+  ]
+}

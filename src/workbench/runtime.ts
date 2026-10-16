@@ -33,7 +33,7 @@ export function interactWithLocalCube(world: PuzzleWorld): boolean {
     if (carried) { Object.assign(carried[1], world.cubeDropTransform(), { carried: false }); return true; }
     const nearest = cubeEntries(world.cubes).filter(([id, c]) => !world.cubeIsResetting(id) && world.cubeReachable(id) && Math.hypot(world.player.x - c.x, world.player.y - c.y) < CARRY.reach)
         .sort(([, a], [, b]) => Math.hypot(a.x - world.player.x, a.y - world.player.y) - Math.hypot(b.x - world.player.x, b.y - world.player.y))[0];
-    if (!nearest) return false;
+    if (!nearest || !world.canCarryCube()) return false;
     nearest[1].carried = true; nearest[1].grounded = false; world.cancelGrapple(); world.events.push({ kind: 'carry', at: { x: world.player.x, y: world.player.y } }); return true;
 }
 export function nearDraftControl(world: PuzzleWorld, document: DraftDocument): DraftDevice | undefined {

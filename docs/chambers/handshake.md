@@ -1,0 +1,138 @@
+# HANDSHAKE — cooperative draft
+
+Canonical source: [`levels/drafts/handshake.json`](../../levels/drafts/handshake.json).
+This is an authored/mock workbench draft, not campaign content or binary evidence.
+The intended first-time experience is a forgiving 5–8 minute introduction; that
+estimate has **not** been measured with inexperienced human players.
+
+## Experience and topology
+
+One shared payload connects the room's two discoveries: a cube can replace a
+person on a pressure plate, and a cube held by a person is a higher step than a
+loose cube. Two broad powered grapple bars connect the central bay to a side
+alcove across a 600-unit gap. Permanent recovery flooring lies below, with two
+ordinary jumps back to the bay. It cannot reach the alcove without powered hooks.
+
+A separate plate operates the lift beside the upper service gallery. LINK opens
+both fixed relay gates, allowing the other player and the cube to regroup without
+repeating the lift. The gallery's 190-unit maintenance ledge requires the held
+cube. The final socket and two-arrival gate are back in the central bay. The room
+is 2290 × 1300; the additional bay width separates ENTRY POINT, BREAKPOINT, the
+relay, socket and exit instead of stacking their silhouettes.
+
+## Controller and objects
+
+- `crossingPower = crossing.occupied`: both grapple slabs; ordinary player/cube plate.
+- `liftPower = liftPlate.occupied`: vertical service lift; ordinary player/cube plate.
+- `relayPower = link.value`: reversible LINK toggle, both relay gates.
+- `exitReady = maintenance.value AND exitSocket.occupied`: latched two-arrival exit.
+
+MAINTENANCE COMPLETE is the only puzzle progression commitment. The central
+BREAKPOINT terminal commits the existing `relay` checkpoint milestone (the shared
+server names it `reunion`); its two markers remain on the starting floor. It powers
+no route. Wires observe destination bindings, not a second controller. Camera
+reveals frame the affected crossing, lift, link and exit; Tab retains manual overview.
+
+## Intended two-player solution
+
+1. One player holds CROSSING while the other jumps/hooks/swings to the alcove,
+   picks up the payload and returns through the same powered route.
+2. Put the cube on CROSSING and let both players leave: it preserves the power.
+   Recover it, then let the partner hold LIFT while its carrier rides upstairs.
+3. Stage the cube in the gallery and toggle LINK. The lower player leaves LIFT
+   and uses the relay to join the carrier. LINK can be turned off again; either
+   player can descend from the gallery's left side if necessary.
+4. One player holds the cube beneath the maintenance ledge. The other jumps
+   vertically onto it, then jumps sideways onto the ledge and commits maintenance.
+5. Return the cube and both players through the relay. Rest the cube in PAYLOAD.
+   Jump over it and physically enter the unlocked exit with both players.
+
+The carriers and climbers are interchangeable. A cube on LIFT instead of a player
+is also legitimate: enable LINK upstairs, retrieve it downstairs, and return by
+relay. An early gallery visit does not bypass maintenance. CROSSING substitution
+is a useful demonstration, not an extra artificial prerequisite in the controller.
+
+## Measured physical constraints and shortcut review
+
+The existing 120 Hz engine gives a full held jump rise of 127.4, versus 90.8 for a
+short tap. A loose 44-unit cube raises the maximum feet height to 171.4 above the
+floor; a grounded partner's held cube raises it to 209.4. The 190-unit unhookable
+ledge therefore separates these cases. Terminal use requires grounded feet at
+its elevation, so neither jumping beneath it nor pressing E from the held cube
+can commit without landing on the ledge. No grapple slab is within 500 of this
+boost area. An airborne carrier does not supply partner support.
+
+The 600-unit crossing exceeds the measured ordinary/coyote jump envelope (the
+independent sweep crossed up to 296.5 units at equal height). The browser solution
+uses the actual near and far address bars in both directions, including rope
+release and rope jumps. The anchors have no crumble timer: players can pause,
+re-aim and retry. A release-only diagnostic missed the alcove, so the supplied
+route intentionally uses the normal Space rope-jump control; its learnability
+needs human acceptance rather than being described as an effortless walk.
+
+Independent review reproduced a solo cube-pulling exploit through the original
+alcove floor. The final floor uses `blocksCubeInteraction`, and the cube home is
+100 units from the left wall, beyond a coyote-jump extraction ray. Thirteen real
+input launch timings now fail to extract it. This is bounded adversarial evidence,
+not proof against every possible input sequence.
+
+## Failure and recovery
+
+The crossing has no lethal pit. Missing a hook drops the player onto permanent
+recovery flooring; two real jumps return to the bay. A dropped cube can be carried
+back through the same recovery path. The partner can keep CROSSING powered while
+the carrier retries. Gallery descent is safe even with LINK off. Resetting a
+player uses the single central breakpoint after activation; it cannot place them
+upstairs or commit maintenance. The exit stays locked until both required inputs
+are simultaneously true, then preserves the existing latch behavior.
+
+## Automated evidence
+
+`levels/scenarios/handshake.json` is a 59-step, full-room, two-browser scenario from
+the authored spawns. It passed with **both players completed and zero deaths** at
+hash `15538dd03c12048dc7203cc76262ce67b4ca462a916d290791c4a286b82a0797`.
+A second run swaps both actor slots and also completes with zero deaths.
+Both runs use real keyboard/mouse inputs and server cube grants, never state injection.
+It observes cube substitution, lift ascent, relay travel, partner support,
+maintenance, the still-locked exit before payload, live socket unlock and arrivals.
+
+`tests/handshake-physics.test.ts` retains 17 tests: the 13 bounded extraction
+attempts, real recovery, floor/loose-cube boost rejection and held-cube success.
+Boost fixtures are explicitly section-only, and do not substitute for the browser
+solve. Shared carry-clearance tests also cover pickup, ceiling, relay and firewall
+behavior. The public integration check exercises graphical import, every saved
+State Preview, local physics, exact JSON export, IndexedDB reload and two distinct
+public-compatible custom-session identities.
+
+Reports and screenshots: `.workbench/reports/2026-10-16-chambers/handshake/`.
+`final/report.json` is the full solve; `swapped/report.json` tests exchanged roles; `final/trajectory-{host,partner}.json` records
+measured paths; `measured-grapples.json` summarizes launch, attachment, swing
+samples, release and subsequent landing for all four engagements. Named captures include `initial`, `powered-crossing`,
+`cube-substitution`, `gallery-lift`, `relay-linked`, `partner-held-boost`,
+`maintenance-complete`, `near-complete`, `exit-unlocked` and `completed`.
+`overview.png` uses the actual PuzzleRenderer. Earlier iteration failures are
+retained separately and are not presented as successful full-room evidence.
+
+```sh
+pnpm level:validate levels/drafts/handshake.json --json
+pnpm level:render levels/drafts/handshake.json --out .workbench/reports/2026-10-16-chambers/handshake/overview.png
+pnpm level:playtest levels/drafts/handshake.json --scenario levels/scenarios/handshake.json --report .workbench/reports/2026-10-16-chambers/handshake/recheck
+```
+
+## Critical gameplay assessment
+
+| Criterion | Assessment |
+|---|---|
+| Central discovery | The same cube replaces a person, becomes their carried step, then becomes the exit payload. |
+| Cooperation | Initial power and crossing separate the players; held support requires both in the gallery. |
+| Readability | One visible machine, short functional labels and wires; inactive bars ghost. LINK's usefulness should be observed rather than explained verbally. |
+| Physical movement | Two broad hooks and safe recovery are forgiving; the required Space rope jump may still challenge a first-time player. |
+| Recovery | Misses return to the nearby bay, not a room reset. Cube mistakes remain recoverable. |
+| Replayability | Either player can traverse, carry, operate LINK or climb; no identity permissions. |
+| Shortcuts | The reproduced remote-pull bypass is closed. Early gallery visits and cube-powered lift alternatives preserve the held-boost discovery. |
+| Complexity | One cube, two plates, two hooks, one lift, one relay pair and one maintenance commitment; no extra route latches. |
+
+Human two-player acceptance remains required: check first-use grapple teaching,
+the boost hint, camera framing while aiming, controller latency, optional lift
+allocations, role exchange, recovery with a dropped cube, and actual blind solve
+time. No human playtesting or campaign acceptance is claimed.

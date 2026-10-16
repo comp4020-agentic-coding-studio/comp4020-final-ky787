@@ -12,7 +12,7 @@ async function environment(document: DraftDocument, reports: string) {
     try { app = await startWorkbench({ port: 0, dataDir: join(harness.temporary, 'workbench') }); }
     catch (error) { await harness.cleanup(); throw error; }
     let closing: Promise<void> | undefined;
-    const close = () => closing ??= (async () => { await harness.cleanup(); await app.close(); })();
+    const close = () => closing ??= (async () => { try { await harness.cleanup(); } finally { await app.close(); } })();
     const signal = () => { void close().finally(() => { process.exitCode = 130; }); };
     process.once('SIGINT', signal); process.once('SIGTERM', signal);
     try {
@@ -87,6 +87,7 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
             if (step.wait) await wait(actors.get(step.wait.actor)!, step.wait.condition, step.wait.timeoutMs);
             const observed = Object.fromEntries(await Promise.all([...actors].map(async ([id, p]) => [id, await observe(p)])));
             for (const assertion of step.assert ?? []) if (!conditionMatches(observed[assertion.actor], assertion.condition)) throw new Error(`Assertion failed: ${JSON.stringify(assertion)}; observed ${JSON.stringify(observed[assertion.actor])}`);
+            if (step.capture) for (const [id, page] of actors) await screenshot(page, join(directory, `${step.capture}-${id}.png`));
             results.push({ label: step.label, pass: true, observed });
         }
         if (scenario.scope === 'full-room') {
@@ -108,7 +109,7 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
             try { await screenshot(p, join(directory, `${pass ? 'final' : 'failure'}-${id}.png`)); await writeFile(join(directory, `trajectory-${id}.json`), JSON.stringify(await p.read('draftRunner.recording()'), null, 2) + '\n'); }
             catch (caught) { pass = false; error ??= String(caught); }
         }
-        await env.close();
+        try { await env.close(); } catch (caught) { pass = false; error ??= `Cleanup failed: ${String(caught)}`; }
     }
     const output = { version: 1, pass, scope: scenario.scope, mode: scenario.mode, scenario: scenario.id, draftHash: await draftHash(document), engineRevision: env.app.engineRevision, failedStep, error,
         conclusion: pass ? 'The specified route/assertions worked in this tested configuration; reachability and shortcut absence outside this route are not tested.' : 'Scenario failed; inspect observations, screenshots and measured trajectories.', results };

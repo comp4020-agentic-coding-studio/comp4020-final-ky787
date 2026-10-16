@@ -4,7 +4,7 @@ export type ScenarioAction = { type: 'key'; actor: string; code: 'KeyA' | 'KeyD'
     | { type: 'tap'; actor: string; code: 'KeyE' | 'KeyR' | 'Space' }
     | { type: 'walk'; actor: string; x: number; timeoutMs?: number }
     | { type: 'grapple'; actor: string; target?: string; down: boolean };
-export interface ScenarioStep { label: string; actions?: ScenarioAction[]; waitMs?: number; wait?: { actor: string; condition: ScenarioCondition; timeoutMs: number }; assert?: { actor: string; condition: ScenarioCondition }[] }
+export interface ScenarioStep { label: string; capture?: string; actions?: ScenarioAction[]; waitMs?: number; wait?: { actor: string; condition: ScenarioCondition; timeoutMs: number }; assert?: { actor: string; condition: ScenarioCondition }[] }
 export interface DraftScenario { version: 1; id: string; scope: 'full-room' | 'section-only' | 'diagnostic'; mode: 'single' | 'coop'; timeoutMs: number;
     actors: { id: string; slot: 1 | 2; start?: { marker?: string; at?: { x: number; y: number } } }[]; steps: ScenarioStep[] }
 const record = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -39,7 +39,8 @@ export function parseScenario(value: unknown): DraftScenario {
         if (v.min !== undefined) check(finite(v.min), 'finite min required'); if (v.max !== undefined) check(finite(v.max), 'finite max required');
     };
     for (const step of value.steps) {
-        check(record(step), 'step object required'); keys(step, ['label', 'actions', 'waitMs', 'wait', 'assert'], 'step'); check(typeof step.label === 'string' && step.label.length <= 180, 'step label required');
+        check(record(step), 'step object required'); keys(step, ['label', 'capture', 'actions', 'waitMs', 'wait', 'assert'], 'step'); check(typeof step.label === 'string' && step.label.length <= 180, 'step label required');
+        if (step.capture !== undefined) check(typeof step.capture === 'string' && /^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(step.capture), 'capture must be a bounded filename slug');
         if (step.waitMs !== undefined) check(finite(step.waitMs) && step.waitMs >= 0 && step.waitMs <= 10000, 'waitMs must be 0..10000');
         if (step.actions !== undefined) {
             check(Array.isArray(step.actions) && step.actions.length <= 16, 'at most 16 actions per step');
