@@ -1,12 +1,12 @@
 # USE AFTER FREE — authored cooperative chamber
 
-The released chamber is [`levels/campaign/use-after-free.json`](../../levels/campaign/use-after-free.json); the editable source remains [`levels/drafts/use-after-free.json`](../../levels/drafts/use-after-free.json). It joined the campaign unchanged on explicit request, 2026-10-16, using the [shared JSON authority and party persistence](../adr/0010-json-coop-campaign.md). It remains authored/mock with prototype crumble and no binary evidence, new binary or account. The JSON is authoritative; no bespoke TypeScript geometry factory exists.
+The released chamber is [`levels/campaign/use-after-free.json`](../../levels/campaign/use-after-free.json); the editable source remains [`levels/drafts/use-after-free.json`](../../levels/drafts/use-after-free.json). It joined the campaign on explicit request, 2026-10-16, using the [shared JSON authority and party persistence](../adr/0010-json-coop-campaign.md). It remains authored/mock with prototype crumble and no binary evidence, new binary or account. The JSON is authoritative; no bespoke TypeScript geometry factory exists.
 
 This is a vertical ownership exchange. A player keeps an ordinary pressure plate occupied while the partner climbs, then both deliberately release the previous owner before the next route becomes usable. The operator's footing also expires: the player, plate contact and route really fall out of service, rather than playing a cosmetic collapse animation. Both players climb and operate. Swapping browser slots exchanges the complete player roles.
 
 ## Topology and intended solution
 
-The shared shaft is 1800 × 2550 world units. Permanent bottom footing is at y=2350; A's right refuge at y=1950; B's left refuge at y=1650; C's right refuge at y=1300; summit at y=950. There is one bottom breakpoint terminal/pedestal pair and exactly two slot-specific checkpoint markers. No intermediate checkpoint erases the cooperative traversal.
+The shared shaft is 1800 × 2550 world units. Permanent bottom footing is at y=2350; A's right refuge at y=1950; B's left refuge at y=1650; C's right refuge at y=1300; summit at y=950. The bottom is the authored room start and respawn location. There is no visible breakpoint, checkpoint terminal or checkpoint marker in this chamber. No intermediate checkpoint erases the cooperative traversal.
 
 ```text
                     summit / permanent ASSIST ─── EXIT: both players
@@ -21,10 +21,10 @@ The shared shaft is 1800 × 2550 world units. Permanent bottom footing is at y=2
        lower shaft                              A right refuge
                                                unstable A
                                                      ↑ lower lift
-                  bottom / LAUNCH / BREAKPOINT
+                  bottom / LAUNCH / ROOM START
 ```
 
-1. Activate SAVE BOTTOM with E. Player 1 holds permanent LAUNCH; Player 2 rides the clear right-hand lift lane, leaves it onto A's refuge, and walks onto unstable floor A.
+1. Player 1 holds permanent LAUNCH; Player 2 rides the clear right-hand lift lane, leaves it onto A's refuge, and walks onto unstable floor A.
 2. Player 1 hooks a1, swings left, rope-jumps to a2, catches a3 while rising, and rope-jumps onto B's permanent left refuge. The full cooperative replay uses all three; a1 provides a gentler launch, but the alternative jump described below can skip it.
 3. Player 1 stands on B. Player 2 steps right off A onto permanent footing. B's route becomes active only when A is released. Player 2 jumps over A's sensor, hooks b1 leftward, changes direction on b2, and rope-jumps through b3 onto C's permanent refuge.
 4. Player 2 holds C. Player 1 steps left off B, jumps over the released B sensor and catches c1. Let the initial swing descend before steering right; catch c2 while rising, rope-jump to c3, retract around the permanent baffle and rope-jump onto the summit. The baffle's upper surface joins the summit, so a small landing error is recoverable.
@@ -53,7 +53,7 @@ All nine hook anchors use the real address-bar grapple surface, the existing 500
 
 Operator supports have 24-second foot fuses. Anchor foot/hook fuses are 3.6 seconds. Both respawn after 3 seconds. These are per-object authored prototype values. Turning route power off and back on preserves a warning already in progress. The server decides when shared collision actually disappears.
 
-The final normal and slot-swapped two-browser runs measured these ranges of first observed attachment lengths and attached intervals. Length is the first polled attached snapshot; intervals use 50 ms trajectory samples, with about 50 ms sampling uncertainty. These are observed real engine values, not distances inferred from the layout; `measured-grapples.json` retains all nine anchors for both runs:
+The retained normal and slot-swapped two-browser runs before checkpoint removal measured these ranges of first observed attachment lengths and attached intervals. Length is the first polled attached snapshot; intervals use 50 ms trajectory samples, with about 50 ms sampling uncertainty. These are observed real engine values, not distances inferred from the layout; `measured-grapples.json` retains all nine anchors for both runs:
 
 | Chain | Anchor 1 / 2 / 3 attachment length | Attached intervals | Physical route |
 | --- | --- | --- | --- |
@@ -69,7 +69,7 @@ The normal held ground jump is about 127 units; the ascent uses actual rope moti
 
 Every operator has permanent footing immediately adjacent. A's collapse lands on the permanent catch at y=2050, 100 units below A. The lower catch at 2280 retains lower missed swings. While B is powered, a solid unhookable retry shelf spans x=650–1280 at y=2050 and joins A's permanent catch. A missed B traveler can walk right and make an ordinary 100-unit jump back to A's refuge. While C is powered, a second solid unhookable shelf spans x=560–1160 at y=1760; a 110-unit leftward jump returns the traveler to B's refuge. The shelves retract when their owning route is off, so they add no permanent staircase through earlier stages.
 
-The retained recovery scenario deliberately releases b1 and c1 during the real full route, catches each corresponding shelf, physically jumps back to the departure refuge, waits for the used anchor to recover, retries and finishes with both players. This is measured recovery from traveler misses while the operator still holds. It is not a promise that every fall is caught: leaving the covered region, or allowing the operator's own 24-second floor to collapse, can send a player farther down and retract the controlled catch. The operator should leave for the immediately adjacent permanent refuge before expiry. A failed higher operator handover may require both players to return to the bottom checkpoint and restart LAUNCH. R returns to the activated bottom checkpoint without resetting the partner's shared fuse.
+The retained recovery scenario deliberately releases b1 and c1 during the real full route, catches each corresponding shelf, physically jumps back to the departure refuge, waits for the used anchor to recover, retries and finishes with both players. This is measured recovery from traveler misses while the operator still holds. It is not a promise that every fall is caught: leaving the covered region, or allowing the operator's own 24-second floor to collapse, can send a player farther down and retract the controlled catch. The operator should leave for the immediately adjacent permanent refuge before expiry. A failed higher operator handover may require both players to return to the authored bottom start and restart LAUNCH. R returns to that room start without resetting the partner's shared fuse.
 
 A player may switch browser roles, retry an anchor after recovery, or wait on permanent footing before entering an operator floor. Holding both A and B correctly suppresses routeB; holding both B and C correctly suppresses routeC. Running back across a released sensor reasserts that input, so the taught departure jump matters.
 
@@ -105,14 +105,16 @@ The main and failed-then-retry scenarios are `full-room`, `coop`, with both auth
 
 Eight main unit tests cover the truth table, local-only contextual camera, physical operator collapse, two ordinary recovery jumps and three real-engine section routes. The isolated section tests explicitly use initial placement and a partner-contact override and are not two-player evidence. The ninth test retains the exact formerly-successful shortcut input sequence. Browser reports, detached trajectories, staged screenshots and render metadata live in the ignored report directory; they are diagnostics rather than authoritative design or binary evidence.
 
-Final canonical hash: `53d81f2cf3953a6997de93dae9947aacfaf0c4119132c0beff524b92d3851cac`.
+Current draft and campaign hash: `bb55e4cb38d8516af629faad785ee0270818531dd5ab31c09545847b63dfaf3b`. The checkpoint-removal update changes no collision, anchor, plate, catch or route geometry. All three scenario variants now start directly at the authored spawns without a checkpoint interaction.
+
+The following earlier physical reports use hash `53d81f2cf3953a6997de93dae9947aacfaf0c4119132c0beff524b92d3851cac`, which still had the removed bottom checkpoint furniture:
 
 - Validation: playable, zero diagnostics. All nine focused tests and TypeScript pass.
 - `final/report.json`: full two-browser completion, both distinct arrivals, zero deaths; host 29.58 seconds of simulation.
 - `final-swapped/report.json`: same full route with browser slots exchanged, both arrivals, zero deaths; completion in about 29.1 seconds. The swapped scenario is retained beside its report and differs only in actor slots, scenario ID and slot-specific arrival observation.
 - `final-collapse/report.json`: actual grounded A contact, anchor power cycle without reset, server-owned collapse, lost occupancy/route and permanent catch recovery all pass. The a1 warning had 2651–2652 ms remaining after the off/on cycle and broke on its original deadline. At the first broken-floor snapshot, the partner is airborne while still seeing the prior shared plate/output; 16.7 ms later the next observation has both released on both clients. The unit test verifies the exact next-physics-step contact transition separately.
 - `recovery-proof/report.json`: the real full route deliberately misses B and C, lands on each powered static catch, jumps back to the permanent departure refuge and retries, then completes with both arrivals and zero deaths in 43.82 seconds.
-- Staged captures include initial, A powered, first chain/handover, second chain/handover, summit ASSIST, near-complete and completed views for both players. Final initial/powered renders use the same canonical hash.
+- Staged captures include initial, A powered, first chain/handover, second chain/handover, summit ASSIST, near-complete and completed views for both players. Those initial/powered renders use the same earlier hash.
 - Independent final-baffle adversarial search: the known B-only bypass is rejected across a bounded 7.5-second search. This does not prove all shortcuts absent.
 
 Human two-player playtesting remains outstanding despite the separately requested campaign integration.
@@ -125,7 +127,15 @@ Human two-player playtesting remains outstanding despite the separately requeste
 | Cooperation | Both bodies supply inputs, both climb, and the operator/traveler roles exchange A→B→C→ASSIST. Both exit arrivals are required. Slot-swapped completion is tested separately. |
 | Readability | A/B/C, short floor labels, functional wires, local operator camera reveals and permanent side refuges explain ownership. Final image review removed overlapping fuse text and duplicated operator captions. Nine overlapping shaft anchors still demand a useful overview and a human readability pass. |
 | Physical movement | The routes use measured swings, an arc reversal, actual descending/rising motion and bounded rope jumps. C3 is the tightest range catch; broader motor-skill accessibility is not certified. |
-| Recovery | Adjacent permanent releases and two controlled retry shelves make measured B/C misses recoverable by ordinary jumps; both failures and subsequent full completion are tested. If the operator also loses the floor, catch power can disappear and the pair may need the bottom checkpoint. No intermediate checkpoint masks this limitation. |
+| Recovery | Adjacent permanent releases and two controlled retry shelves make measured B/C misses recoverable by ordinary jumps; both failures and subsequent full completion are tested. If the operator also loses the floor, catch power can disappear and the pair may need to restart from the bottom. No intermediate checkpoint masks this limitation. |
 | Replayability | Players can exchange roles, improve swing timing or take the confirmed direct-a2 launch. The Boolean handover solution stays fixed; no random layout or alternate control branch is claimed. |
 | Shortcuts | The demonstrated B-anchor summit skip is closed and retained as a regression. The confirmed a1 skip is a permitted movement alternative preserving all handovers. A bounded negative search is explicitly not exhaustive; further human exploration remains. |
 | Complexity | Six coordinate-free Boolean outputs drive two lifts, nine anchor instances and two retractable recovery shelves. The final lift and the shelves use their documented single binding inversions. No custom controller or runtime machinery was added. The shaft asks for substantial movement skill despite simple logic. |
+
+### Campaign regression after behaviour refinement
+
+The current hash above passed all 43 canonical scenario steps in the five-room
+campaign run, with both physical exit arrivals and zero deaths. Report:
+`.workbench/reports/2026-10-16-checkpoints/campaign/use-after-free-report.json`.
+The same persistent party completed all five rooms and passed reconnect and
+server-restart recovery. USE AFTER FREE started without checkpoint machinery and retained every physical handover, including the pause/contact-release regression.

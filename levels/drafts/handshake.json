@@ -256,16 +256,6 @@
       },
       {
         "checkpoint": "relay",
-        "id": "checkpointControl",
-        "kind": "terminal",
-        "label": "BREAKPOINT",
-        "type": "device",
-        "x": 1350,
-        "y": 950
-      },
-      {
-        "activationControl": "checkpointControl",
-        "checkpoint": "relay",
         "id": "breakpoint",
         "type": "breakpoint",
         "x": 1350,

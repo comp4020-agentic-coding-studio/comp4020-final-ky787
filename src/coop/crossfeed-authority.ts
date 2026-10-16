@@ -38,6 +38,7 @@ export class CrossfeedAuthority implements WorldAuthority {
             cubeOnPlate: i.cubeOnLiftCargo, cubeOnPlateB: i.cubeOnFinalLeft, cubeOnPlateC: i.cubeOnFinalRight, switchB: i.switchB, switchC: i.switchC };
     }
     get checkpoint() { return this.room.checkpoint === 'upper' ? 'upper' as const : 'entry' as const; }
+    activateBreakpoint(id: string) { if (id === 'system-online') this.client.activateBreakpoint(id); }
     sample(w: PuzzleWorld) {
         for (const cube of Object.values(this.cubes)) cube.sample(w);
         this.client.occupy(w.room.plates?.find(p => bodyOnPlate(w, p.at))?.id

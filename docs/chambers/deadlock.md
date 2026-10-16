@@ -13,9 +13,9 @@ this chamber; neither this document nor its physics reports claims binary eviden
 - Authored-start, two-browser loose-cargo diagnostic: `levels/scenarios/deadlock-cargo.json`.
 - Isolated real-engine checks: `tests/deadlock-physics.test.ts`.
 - Reports and screenshots: `.workbench/reports/2026-10-16-chambers/deadlock/`.
-- Status: complete authored-start two-browser route passed, 87 steps with zero
-  deaths for either player and two physical exit arrivals. Human editor and
-  two-player acceptance remain pending.
+- Current route: all 71 authored-start steps passed with both arrivals and zero
+  deaths, retaining all three delivered payloads while the lower player returns
+  through service. Human editor and two-player acceptance remain pending.
 
 ## One connected machine
 
@@ -39,10 +39,8 @@ and the hatch block cube interaction through their solids. The upper roof leaves
 hatch, and is an 80-unit step, allowing carried payloads to hop around it on the gallery without
 using the personnel passage. Architecture remains unhookable.
 
-A lower breakpoint terminal commits the existing relay milestone. Both player
-checkpoint markers are explicitly authored on the lower floor. The server calls
-this milestone `reunion` in its multiplayer snapshot; it remains `relay` in the
-draft checkpoint schema.
+The lower floor is the authored room start and respawn location. There is no
+visible breakpoint, checkpoint terminal or checkpoint marker in this chamber.
 
 ## Coordinate-free contract
 
@@ -50,12 +48,16 @@ draft checkpoint schema.
 | --- | --- | --- |
 | `cargoLift` | FEED AND SAFE | Cargo lift power |
 | `shaftFirewall` | NOT SAFE | Horizontal shaft firewall |
-| `serviceRelay` | SAFE AND NOT FEED | Both personnel relay endpoints |
+| `serviceRelay` | (SAFE AND NOT FEED) OR `payloadReady` | Both personnel relay endpoints |
 | `hatchOpen` | HATCH toggle value | Full-solid hatch opening |
 | `payloadReady` | PAYLOAD 1 AND PAYLOAD 2 AND PAYLOAD 3 | Latched two-arrival exit |
 
-The first three expressions are the coupled machine, not separate puzzles. The
-last two describe the manually operated hatch and completion. Functional wires
+The first three expressions are the coupled machine. All three live payload
+sockets also power service, allowing the lower player to leave SAFE and ascend
+after delivery. This OR observes the current socket AND, not the latched exit:
+removing any delivered cube can withdraw that completion-powered service, while
+the exit remains unlocked. The last two outputs describe the manually operated
+hatch and completion. Functional wires
 observe resolved bindings. The SAFE-to-firewall wire and FEED-to-service wire
 show NOT labels; the Boolean expressions are inverted once, without inverting
 power a second time in presentation. Camera reveals frame related machinery
@@ -66,7 +68,7 @@ floor; HATCH frames the catch and hover headroom.
 
 ## Intended physical solution
 
-1. Commit the lower breakpoint. Put B on SAFE and stage loose C on the shaft
+1. Put B on SAFE and stage loose C on the shaft
    floor. With FEED empty, the bare upper operator takes the personnel passage
    to the gallery and opens HATCH. The lower player keeps A clear of FEED.
 2. Put A on FEED. A and B now power the lift while loose C rises through the open
@@ -84,10 +86,11 @@ floor; HATCH frames the catch and hover headroom.
    through the low passage, arrive on safe gallery floor, and close HATCH before
    B falls to its height. Pick up the caught cube, hop the short service roof,
    and fill the near socket. All three payloads latch the exit.
-6. Reopen HATCH, retrieve the near delivered cube, carry it back down the shaft,
-   and put it on SAFE while the partner continues holding the plate. This frees
-   both players to use service. The exit remains unlocked; both physically
-   arrive. Delivered cubes remain ordinary accessible objects throughout.
+6. Keep all three cubes in their sockets. Their live AND now powers service, so
+   the lower player can leave SAFE and use the personnel relay with both lower
+   plates empty. Both players hop over the delivered cubes and physically arrive
+   at the exit. The payloads remain ordinary accessible objects throughout; none
+   needs to be carried back to SAFE.
 
 The complete recorded route takes a valid alternative for deliveries one and
 two: the cargo handler carries those cubes up the powered lift, while the two
@@ -147,11 +150,13 @@ shortcut absence.
   blocks ascent physically, so open it before the next launch.
 - Releasing SAFE energizes the shaft firewall. Only the contacted named cube
   resets to its own lower home; other delivered cubes are not globally recalled.
-  Player deaths use the committed lower breakpoint. Recover the affected cube
+  Player deaths return to the authored lower room start. Recover the affected cube
   through the same machine.
 - Removing a socket cube before all three are simultaneously filled does not
-  unlock the exit. After the three-way AND has occurred, the latch deliberately
-  permits recovering one cube to free the SAFE operator.
+  unlock the exit. After the three-way AND has occurred, the exit stays latched. Service still
+  observes live payload occupancy: removing any socket cube turns off its
+  completion branch, so retain all three while the lower player ascends. The
+  ordinary SAFE AND NOT FEED branch remains available independently.
 - The lower floor is continuous and safe; there are no unrecoverable pits. All
   three payload sockets are reachable from the gallery. The upper roof provides
   a modest hop around service, including when carrying a payload.
@@ -185,19 +190,29 @@ central concept and was not introduced.
 | Cooperation | SAFE and FEED are widely separated; the final ascent needs both players, then a coordinated SAFE hold during the operator's relay trip. A one-player browser preview cannot certify completion. |
 | Readability | Labelled plates, resolved wires, NOT labels, hatch control and camera reveals expose the machine. The tall shaft is legible in context views but the whole-room overview is dense; human readability review is needed. |
 | Physical movement | Carrying, lift exit, a short roof hop, personnel transfer and the manual catch change the route without adding unrelated challenge rooms. The long ascent and recovery descent may feel slow and need playtesting. |
-| Recovery | Missed catches return cargo to safe lower ground; named firewall resets are independent; a lower checkpoint avoids replaying unrelated content. The final SAFE replacement is an explicit recovery action. |
+| Recovery | Missed catches return cargo to safe lower ground; named firewall resets are independent; the room start remains on safe lower ground. Three delivered payloads free the SAFE operator by powering service directly. |
 | Replayability | Either player can carry, hold SAFE or operate FEED/HATCH. The stored route uses one assignment; a role-swapped human run remains untested. |
 | Shortcuts | There is no hookable geometry bypass, one cube cannot cover two sockets, and the service passages reject cube dimensions. Ordinary plates also permit a player to occupy FEED on the first delivery; that is a valid allocation alternative. An isolated real-engine probe confirmed a falling-cube grapple catch as an alternative to HATCH. It preserves the final two-player plate allocation and FEED-to-service handoff; HATCH is not an exclusive catch method. Human acceptance must judge this alternative. Code review and one solve are not exhaustive shortcut/softlock searches. |
-| Complexity | Five architecture pieces, one lift, one firewall, one relay pair, two plates, one toggle and three sockets support the same allocation problem. The checkpoint is recovery infrastructure; no unrelated gate sequence is added. |
+| Complexity | Five architecture pieces, one lift, one firewall, one relay pair, two plates, one toggle and three sockets support the same allocation problem. The live payload AND also keeps service available at completion; no extra visible checkpoint or unrelated gate sequence is added. |
 
 ## Actual validation and remaining limits
 
-`route-11/report.json` is the successful full-room network proof for canonical
+Current draft and campaign SHA-256: `45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0`.
+The current full scenario removes the checkpoint interaction and obsolete
+payload-return sequence. It asserts that both lower plates are empty while
+service remains powered by all three sockets, then requires the lower player
+to make the real personnel ascent. Final assertions keep every socket occupied
+and require both physical exit arrivals.
+
+
+The historical `route-11/report.json` is a successful full-room network proof for the earlier
 SHA-256 `b72226f19b90fbeb2ea8a8b35915af8de9afe7c3001ea491bdac53cc662d1b29`, on
 engine revision `f90fab59b0b35995ec36455402f8056d651d3a0f-dirty` with the retained
 working-tree collision repairs. It records 87 successful steps, distinct browser
 identities, zero deaths for each actor, both arrivals, all three payload sockets,
-the final manual hatch catch and final SAFE replacement. Its first two cargo
+the final manual hatch catch and the former SAFE replacement ending. That
+postdelivery cube-return ending has been replaced in the current scenario by
+physical personnel ascent with all three payloads left in place. Its first two cargo
 deliveries use the carried alternative described above. Simulation time is approximately
 83.7 seconds. The scenario uses only keyboard actions, walks, waits and detached
 observations, with no starts away from spawn, output forcing or body placement.
@@ -215,14 +230,14 @@ bounded diagnostic: its final state deliberately has two filled sockets, the
 exit still locked, and the final challenge still to do. It supplements the
 complete route without claiming another full solve.
 
-The eight focused tests pass. Current JSON validation reports no diagnostics.
+The earlier eight focused tests passed. The current JSON validates with no diagnostics.
 The independent browser integration report at
 `.workbench/reports/2026-10-16-chambers/integration/report.json` also passes the
-current hash through graphical import, preview, play/stop, export, IndexedDB
+earlier hash through graphical import, preview, play/stop, export, IndexedDB
 reload, public two-player snapshot/spawns and editor isolation. It does not
 substitute for the full physical route.
 
-Representative route captures, each recorded for both actors, are
+Historical route captures, each recorded for both actors, are
 `stage-02-two-weights-operator.png`, `stage-03-player-substitution-operator.png`,
 `stage-04-final-hover-operator.png`, `stage-05-hatch-catch-operator.png`,
 `stage-06-three-payloads-operator.png`, `stage-07-safe-recovery-operator.png` and
@@ -237,7 +252,7 @@ carried-edge ejection defect described above; it was repaired before the final
 successful network run.
 
 Human acceptance is still needed for the long lift travel, reduced overview text
-size, lower breakpoint/entry visual crowding, role-swapped play and comfort of
+size, the revised completion-service route, role-swapped play and comfort of
 the half-second catch margin. One full solve and focused diagnostics do not prove
 all shortcuts, all recovery branches, latency conditions or softlock absence.
 Campaign availability does not resolve these human-playtest questions. No new binary evidence is included.
@@ -255,3 +270,11 @@ pnpm level:playtest levels/drafts/deadlock.json --scenario levels/scenarios/dead
 Further puzzle or binary-contract expansion still needs manual editor and
 two-player acceptance. Reports are evidence of their stated scope, not proof
 of all possible play.
+
+### Campaign regression after behaviour refinement
+
+The current hash above passed all 71 canonical scenario steps in the five-room
+campaign run, with both physical exit arrivals and zero deaths. Report:
+`.workbench/reports/2026-10-16-checkpoints/campaign/deadlock-report.json`.
+The same persistent party completed all five rooms and passed reconnect and
+server-restart recovery. DEADLOCK retained all three socket cubes through the final personnel relay trip and both arrivals.

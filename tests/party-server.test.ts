@@ -113,7 +113,8 @@ it.each(['buffer', 'warning', 'broken'] as const)('restarting RACE during %s cle
 it('SIGKILL during gameplay preserves the current chamber/checkpoint while host reconnects after guest', async () => {
     const f = await party(); await f.act(1, { type: 'select-level', level: 'crossfeed-vault' });
     await f.act(1, { type: 'control', control: 'switchB' });
-    let room = (await f.act(2, { type: 'control', control: 'switchC' })).room;
+    await f.act(2, { type: 'control', control: 'switchC' });
+    let room = (await f.act(2, { type: 'checkpoint', breakpoint: 'system-online' })).room;
     await f.act(1, { type: 'cube-occupancy', cubeId: 'cubeA', epoch: room.cubes.cubeA!.epoch, placement: 'liftCargo' });
     await kill(f.app.child); const restart = await launch(f.dir);
     const guest = await connect<CoopLevelId>(restart.url, f.guest.cookie); guest.send({ type: 'join', code: room.code });

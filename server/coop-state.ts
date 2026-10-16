@@ -29,7 +29,7 @@ export interface SessionRecord {
 export type RoomRecord<L extends SessionLevelId = SessionLevelId> = { [K in L]: SessionRecord & {
     level: K; levelState: DurableStates[K]; cubePlacements: CubeMap<CubePlacement>;
 } }[L];
-export type SemanticAction = Extract<ClientMessage, { type: 'switch' | 'control' | 'crumble-trigger' }>;
+export type SemanticAction = Extract<ClientMessage, { type: 'switch' | 'control' | 'crumble-trigger' | 'checkpoint' }>;
 export interface LevelContext<L extends SessionLevelId = SessionLevelId> {
     draftCubeContacts?: CubeMap<import('../src/coop/protocol.ts').DraftId[]>; draftHeld?: [import('../src/coop/protocol.ts').DraftId[], import('../src/coop/protocol.ts').DraftId[]]; record: RoomRecord<L>; held: [Plate, Plate]; crumble: CrumbleRuntime; race: RaceRuntime; crossfeed?: CrossfeedRuntime; now: number;
 }

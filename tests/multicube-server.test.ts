@@ -86,6 +86,7 @@ it.each([false, true])('final pads accept swapped=%s assignment; distinct cubes 
 
 it('two durable cube placements survive restart without ephemeral ownership or transforms', async () => {
     const f = await setup(); await f.act(1, { type: 'control', control: 'switchD' });
+    await f.act(2, { type: 'checkpoint', breakpoint: 'system-online' });
     for (const [cubeId, placement] of [['cubeA', 'finalRight'], ['cubeB', 'finalLeft']] as const)
         await f.act(1, { type: 'cube-occupancy', cubeId, epoch: f.room.cubes[cubeId]!.epoch, placement });
     await kill(f.app.child); const restarted = await launch(f.dir), p = await connect<'crossfeed-vault'>(restarted.url, f.identities[1].cookie);

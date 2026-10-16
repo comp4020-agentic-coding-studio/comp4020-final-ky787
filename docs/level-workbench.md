@@ -37,11 +37,15 @@ Public rooms are temporary: maximum two hours, or five minutes after the last pa
 
 ### Breakpoint markers
 
-A Breakpoint pedestal is presentation, not a respawn position. Placing it creates each missing `checkpoint` marker for the same milestone and slots 1/2, in the same undo operation. The search uses permanent static footing within 320 horizontal and 200 vertical units, clear of collision geometry, hazards, firewalls, cubes, gates, lifts and the other marker. It conservatively avoids conditional platforms even if currently ghosted. Existing markers are never moved or duplicated.
+A Breakpoint pedestal is an automatic recovery trigger, separate from the respawn positions. Placing it creates each missing `checkpoint` marker for the same milestone and slots 1/2, in the same undo operation. The search uses permanent static footing within 320 horizontal and 200 vertical units, clear of collision geometry, hazards, firewalls, cubes, gates, lifts and the other marker. It conservatively avoids conditional platforms even if currently ghosted. Existing markers are never moved or duplicated.
 
 The inspector shows linked marker coordinates and **Select / frame** controls. Drag markers independently. Duplicating pedestals reuses the milestone markers (selected checkpoint markers are not duplicated); deleting a pedestal does not cascade into markers. Changing the pedestal milestone creates missing markers for the new milestone without deleting the old ones. If clear footing is unavailable, missing markers remain blocking diagnostics: move the pedestal near clear architecture and choose **Create missing respawn markers**, or place/configure them manually. Static placement checks are not a proof of puzzle reachability.
 
-Configure a terminal or supported toggle with the same **Checkpoint**, then choose that device as the pedestal's **Activation control**. Existing activation semantics apply: server-accepted activation raises the flag and shows BREAKPOINT ACTIVE, does not teleport players, and each later respawn uses that slot's marker. Walking over a pedestal alone does not activate a checkpoint.
+Walk through the pedestal at floor level to activate it; **E is not required**. Either player can report contact. The server validates the active chamber's breakpoint ID and session generation, then commits its `relay` or `upper` milestone for both players. Accepted activation raises the existing flag and plays its existing sound once, without teleporting anyone. Re-entry is idempotent; death or R uses each slot's own marker. Detection requires grounded feet within six world units of the pedestal floor and a centre within 54 horizontal units, with no full-solid wall between.
+
+A newly placed declarative Breakpoint needs no activation terminal. Version-1 documents with `activationControl` and terminal checkpoint effects remain readable, but proximity never flips that terminal's puzzle input. The legacy association is inert in declarative rooms: it neither hides the separate control nor prevents deleting an obsolete terminal. The inspector can remove it. Controller-owned single-player checkpoints (including CONTROL SPINE) keep their existing contracts. Imported CROSSFEED uses the new independent automatic checkpoint.
+
+Pressure plates accept grounded players or resting cubes. Payload sockets accept only resting cubes and release when a cube is picked up, pulled away or removed; scanners accept players. Socket occupancy is always live. A latched exit may remain unlocked after occupancy ends; the socket itself does not latch. Terminals still require deliberate E interaction. The payload receiver graphics/animation redesign is a later milestone.
 
 ### Exchange with the local developer workbench
 
@@ -375,3 +379,13 @@ both a loose 44-unit cube and a carried cube. Relay destinations independently
 check the complete payload; `blocksCubeInteraction` on enclosure walls prevents
 pulling or grabbing cargo through them. None of these checks grants a cube-specific
 permission or changes global movement tuning.
+
+### Automatic checkpoint regression
+
+After `pnpm build`, run `pnpm check:checkpoints` for real walking in the official
+campaign, public custom multiplayer, local developer multiplayer and the editor
+physics preview. Optional arguments select `campaign`, `public`, `local` or
+`editor`. `BN_SHOTS` sets the report directory. The check uses two independent
+identities, verifies no E input, single accepted flag/audio feedback, per-slot
+reset markers, idempotence, replay/reconnect and campaign process restart. It
+does not inject player positions or controller state.

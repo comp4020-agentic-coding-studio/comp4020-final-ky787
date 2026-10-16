@@ -16,27 +16,8 @@
   ],
   "steps": [
     {
-      "label": "Activate bottom breakpoint with physical E",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "host",
-          "x": 440
-        },
-        {
-          "type": "tap",
-          "actor": "host",
-          "code": "KeyE"
-        }
-      ],
-      "wait": {
-        "actor": "host",
-        "condition": {
-          "path": "session.room.checkpoint",
-          "equals": "reunion"
-        },
-        "timeoutMs": 3000
-      },
+      "label": "Authored two-player start without checkpoint machinery",
+      "waitMs": 200,
       "capture": "initial"
     },
     {

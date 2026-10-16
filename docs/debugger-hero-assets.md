@@ -57,24 +57,26 @@ Optional `RoomDef.breakpoints` describes actual checkpoint stations:
 ```ts
 breakpoints: [{
     id: 'system-online',
-    at: { x: 1210, y: 750 }, // floor contact, not a respawn position
+    at: { x: 1120, y: 750 }, // floor contact, not a respawn position
     checkpoint: 'upper',
-    label: 'SYSTEM ONLINE',
-    activationControl: 'switchC',
+    label: 'AUTO CHECKPOINT',
+    automatic: true,
 }]
 ```
 
 `activationControl` optionally replaces an existing control's drawing. It does
 not register an interaction or change its reach. It also supports `lever` and
-`upperLever` for the older room definitions. Omitting it makes a passive station
-observing an existing milestone. Checkpoint IDs currently use the existing
+`upperLever` for the older room definitions. Legacy stations without automatic
+contact still observe controller-owned milestones. Declarative workbench stations
+activate by floor-level walking contact; their old `activationControl` association
+is retained for document compatibility but does not hide or trigger that control. Checkpoint IDs currently use the existing
 `relay`/`upper` progress vocabulary; reaching upper retains earlier relay stations.
 
-CROSSFEED VAULT is the first authored pedestal: the existing SYSTEM ONLINE
-interaction still commits permanent lift power, service access and the upper
-checkpoint together. No second interaction is introduced. The existing toggle
-beside it remains ROUTE SELECT. Nearby interaction hints sit below the station
-to keep its screen and flag clear.
+The current campaign displays pedestals in HANDSHAKE and CROSSFEED VAULT only.
+CROSSFEED's automatic pedestal sits beside the separate SYSTEM ONLINE terminal.
+Walking activates the upper checkpoint; E at SYSTEM ONLINE commits permanent lift
+power and service access. Existing flag/audio timing is unchanged. ROUTE SELECT
+remains a toggle. CONTROL SPINE keeps its controller-specific checkpoint contract.
 
 Rooms without an authored station preserve their existing respawn behavior.
 A quiet red floor bracket marks a non-entry checkpoint; there is no invented

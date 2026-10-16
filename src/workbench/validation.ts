@@ -123,13 +123,9 @@ export function validateDraft(value: unknown): DraftValidation {
     for (const r of document.presentation.cameraReveals) { if (byId.get(r.source)?.type !== 'device') error('camera.source', `Camera reveal source '${r.source}' must be a device.`, r.source); for (const p of r.platformIds ?? []) if (byId.get(p)?.type !== 'platform') error('camera.target', `Camera target '${p}' is not a platform.`, r.source); if (!r.bounds && !r.platformIds?.length) error('camera.empty', 'Camera reveal requires target platforms or bounds.', r.source); }
     for (const o of objects) {
         if (o.type === 'device' && o.kind !== 'toggle' && o.kind !== 'terminal' && (o.initial !== undefined || o.checkpoint !== undefined)) error('device.stateful-role', 'Initial values and checkpoint commitments belong to toggle/terminal controls, not occupancy sensors.', o.id);
-        if (o.type === 'breakpoint' && document.controller.kind === 'declarative' && o.activationControl) {
-            const control = byId.get(o.activationControl);
-            if (control?.type !== 'device' || (control.kind !== 'toggle' && control.kind !== 'terminal') || control.checkpoint !== o.checkpoint) error('checkpoint.association', 'Breakpoint activation must reference a toggle/terminal that commits the same checkpoint.', o.id);
-        }
         if (o.type === 'checkpoint') { if (objects.filter(c => c.type === 'checkpoint' && c.slot === o.slot && c.checkpoint === o.checkpoint).length > 1) error('checkpoint.duplicate', `Player ${o.slot} has duplicate '${o.checkpoint}' checkpoint positions.`, o.id); }
         if ((o.type === 'breakpoint' || o.type === 'device') && o.checkpoint) for (const slot of [1, 2]) if (!objects.some(c => c.type === 'checkpoint' && c.slot === slot && c.checkpoint === o.checkpoint)) error('checkpoint.reference', `Checkpoint '${o.checkpoint}' needs a Player ${slot} respawn centre.`, o.id);
-        if (o.type === 'breakpoint' && o.activationControl && byId.get(o.activationControl)?.type !== 'device') error('checkpoint.control', `Breakpoint activation control '${o.activationControl}' is missing.`, o.id);
+        if (o.type === 'breakpoint' && document.controller.kind === 'builtin' && o.activationControl && byId.get(o.activationControl)?.type !== 'device') error('checkpoint.control', `Breakpoint activation control '${o.activationControl}' is missing.`, o.id);
         if (o.type === 'platform' && o.kind === 'static' && o.hookable) warn('platform.static-hook', 'Static architecture remains unhookable; use a controlled code platform for hooks.', o.id);
     }
     for (const id of [...document.editor.hidden, ...document.editor.locked]) if (!ids.has(id)) error('editor.reference', `Editor metadata references missing ID '${id}'.`, id);
@@ -171,6 +167,8 @@ export function validateDraft(value: unknown): DraftValidation {
             const original = retained.find(o => o.id === object.id);
             if (original?.type === 'platform' && (object.hookCrumbleDelay !== original.hookCrumbleDelay || object.crumbleDelay !== original.crumbleDelay || object.respawnDelay !== original.respawnDelay)) error('controller.timing', 'Built-in unstable timing is code-owned. Keep the imported timing or create a declarative draft.', object.id);
         }
+        for (const object of objects) if (object.type === 'breakpoint' && document.controller.id === 'crossfeed-vault'
+            && (object.id !== 'system-online' || object.checkpoint !== 'upper')) error('checkpoint.builtin-role', 'CROSSFEED retains system-online / upper. Use a declarative controller for new checkpoint triggers.', object.id);
         for (const object of objects) if (object.type === 'device' && (object.initial || object.checkpoint)) error('controller.initial-state', 'Built-in initial state and checkpoint effects are code-owned; imported defaults must be preserved.', object.id);
         const exit = objects.find(o => o.type === 'exit'), unlock = document.bindings.find(b => b.target === exit?.id && b.property === 'unlock');
         if (!unlock || unlock.output !== 'exitDoor' || unlock.invert || exit?.type === 'exit' && (!exit.latch || exit.arrivals !== 2)) error('controller.exit', 'Built-in exit requires the retained latched exitDoor output and two physical arrivals.', exit?.id);

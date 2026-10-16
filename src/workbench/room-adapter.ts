@@ -38,7 +38,7 @@ export function draftRoom(document: DraftDocument, slot: Slot = 1): RoomDef {
         else if (o.type === 'lift') (room.lifts ??= []).push({ id: o.id, ...at(o), w: o.w, h: o.h, signal: feed(o.id, 'power')! });
         else if (o.type === 'firewall') (room.firewalls ??= []).push({ id: o.id, ...at(o), orientation: o.orientation, length: o.length, thickness: o.thickness, ...(feed(o.id, 'active') ? { signal: feed(o.id, 'active') } : {}) });
         else if (o.type === 'hazard') room.hazards.push({ ...at(o), w: o.w, h: o.h });
-        else if (o.type === 'breakpoint') room.breakpoints = [...(room.breakpoints ?? []), { id: o.id, at: at(o), checkpoint: o.checkpoint, ...(o.label ? { label: o.label } : {}), ...(o.activationControl ? { activationControl: builtin ? o.activationControl === 'lever' || o.activationControl === 'upperLever' ? o.activationControl : nativeControl(o.activationControl) : draftSignal(o.activationControl) } : {}) }];
+        else if (o.type === 'breakpoint') room.breakpoints = [...(room.breakpoints ?? []), { id: o.id, at: at(o), checkpoint: o.checkpoint, ...(o.label ? { label: o.label } : {}), ...(!builtin || draft.controller.kind === 'builtin' && draft.controller.id === 'crossfeed-vault' ? { automatic: true } : o.activationControl ? { activationControl: o.activationControl === 'lever' || o.activationControl === 'upperLever' ? o.activationControl : nativeControl(o.activationControl) } : {}) }];
         else if (o.type === 'marker') room.cargoRecovery = at(o);
     }
     const pairIds = [...new Set(objects.filter(o => o.type === 'relay').map(o => o.pair))];

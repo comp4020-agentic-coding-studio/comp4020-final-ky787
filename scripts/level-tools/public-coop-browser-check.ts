@@ -49,7 +49,6 @@ async function wait(p: Cdp, condition: ScenarioCondition, timeout = 6000) {
 async function route(mode: string) {
     const actors = { host, partner: guest }, scenario = parseScenario(JSON.parse(await readFile('levels/scenarios/cooperative-test.json', 'utf8')));
     for (const [index, step] of scenario.steps.entries()) {
-        const beforeCommit = index === 18 ? { host: await observation(host), partner: await observation(guest) } : null;
         for (const a of step.actions ?? []) {
             const p = actors[a.actor as keyof typeof actors];
             if (a.type === 'key') await h.key(p, a.code, a.down);
@@ -79,9 +78,10 @@ async function route(mode: string) {
         }
         measured.push({ mode, step: step.label, snapshots });
         if (index === 8) await h.shot(guest, `${mode}-powered-route`);
-        if (index === 18) {
+        if (index === 17) {
             await wait(host, { path: 'checkpoint', equals: 'relay' }); await wait(guest, { path: 'checkpoint', equals: 'relay' });
-            check(`${mode}: accepted checkpoint does not teleport either player`, Math.abs(snapshots.host.player.x - beforeCommit!.host.player.x) < 1 && Math.abs(snapshots.partner.player.x - beforeCommit!.partner.player.x) < 1);
+            check(`${mode}: walking activates the shared checkpoint before E while the puzzle terminal stays off`, !snapshots.host.exitUnlocked && !snapshots.partner.exitUnlocked
+                && snapshots.host.heroAssets.breakpoints.some((b: { active: boolean }) => b.active));
         }
         if (index === 20) {
             for (const [slot, p] of [[1, host], [2, guest]] as const) {
@@ -112,8 +112,7 @@ try {
     check('breakpoint placement creates both slot markers and inspector frame controls', await editor.read('document.querySelectorAll("[data-frame-marker]").length===2'));
     await h.click(editor, '#undo'); check('one undo removes pedestal and both markers', await editor.read('!workbench.snapshot().document.geometry.objects.some(o=>o.type==="checkpoint")'));
     await h.click(editor, '#redo');
-    await h.click(editor, '[data-id="routeLever"] .select-object'); await field(editor, 'Checkpoint', 'relay');
-    await h.click(editor, `[data-id="${pedestal}"] .select-object`); await field(editor, 'Activation control', 'routeLever');
+    check('new breakpoint needs no activation terminal', await editor.read(`!workbench.snapshot().document.geometry.objects.find(o=>o.id===${JSON.stringify(pedestal)}).activationControl`));
     await h.click(editor, '#save'); await until(editor, '!workbench.snapshot().dirty');
     const savedId = await editor.read<string>('workbench.snapshot().draftId');
     await editor.read('document.querySelector("#world").focus()'); await editor.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });

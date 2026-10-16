@@ -23,7 +23,7 @@ interface Peer {
     actionSeq: number; avatarSeq: number; stream: number; alive: boolean; joinedAt: number;
     tokens: number; refilled: number; pending: number;
 }
-export type FrozenDraftSession = { metadata: DraftSessionMetadata; coopError?: string } & (
+export type FrozenDraftSession = { metadata: DraftSessionMetadata; coopError?: string; breakpoints?: readonly string[] } & (
     { level: Exclude<SessionLevelId, 'workbench'> } | { level: 'workbench'; definition: LevelDefinition<'workbench'> });
 export interface FrozenDraftRegistry {
     get(hash: string): FrozenDraftSession | undefined;
@@ -290,6 +290,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             return;
         }
         const def = rules(room);
+        if (message.type === 'checkpoint' && room.draft && !room.draft.breakpoints?.includes(message.breakpoint)) { result(false); return; }
         if (message.type === 'draft-occupancy') {
             if (!isDeclarativeLevel(room.record.level) || message.devices.some(id => !def.acceptsPlate(id, room.record))) { result(false); return; }
             if (JSON.stringify(room.draftHeld[index]) === JSON.stringify(message.devices)) { result(true); return; }
@@ -306,7 +307,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             if (!room.record.exitUnlocked) { result(false); error(peer, 'INVALID_ACTION'); return; }
             if (room.record.reachedExit[index]) { result(true); return; }
             room.record.reachedExit[index] = true;
-        } else if (message.type === 'switch' || message.type === 'control' || message.type === 'crumble-trigger') {
+        } else if (message.type === 'switch' || message.type === 'control' || message.type === 'crumble-trigger' || message.type === 'checkpoint') {
             if (!def.action(context(room), message)) { result(false); return; }
             if (message.type !== 'crumble-trigger' && durable(room) === before) { result(true); return; }
         } else return;

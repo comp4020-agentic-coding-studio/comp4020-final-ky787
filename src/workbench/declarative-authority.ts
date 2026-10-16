@@ -25,6 +25,7 @@ export class DeclarativeAuthority implements WorldAuthority {
     get frame() { return draftFrame(this.document, this.room.levelState.devices, this.room.levelState.outputs, this.room.exitUnlocked); }
     get inputs(): ControllerInputs { return { plateA: false, plateB: false, plateC: false, cubeOnPlate: false, cubeOnPlateB: false, cubeOnPlateC: false, switchB: false, switchC: false }; }
     get checkpoint() { return this.room.checkpoint === 'reunion' ? 'relay' as const : this.room.checkpoint; }
+    activateBreakpoint(id: string) { this.client.activateBreakpoint(draftSignal(id)); }
     sample(w: PuzzleWorld) {
         const sensors = this.devices.filter(o => o.kind !== 'toggle' && o.kind !== 'terminal');
         this.client.occupyDraft(sensors.filter(o => o.kind !== 'socket' && bodyOnPlate(w, o)).map(o => draftSignal(o.id)));

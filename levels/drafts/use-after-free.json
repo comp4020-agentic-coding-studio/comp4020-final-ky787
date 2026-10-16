@@ -75,17 +75,17 @@
     },
     {
       "id": "retryBBinding",
+      "invert": true,
       "output": "routeB",
       "property": "open",
-      "target": "retryB",
-      "invert": true
+      "target": "retryB"
     },
     {
       "id": "retryCBinding",
+      "invert": true,
       "output": "routeC",
       "property": "open",
-      "target": "retryC",
-      "invert": true
+      "target": "retryC"
     }
   ],
   "controller": {
@@ -187,39 +187,6 @@
         "type": "platform",
         "w": 1800,
         "x": 0,
-        "y": 2350
-      },
-      {
-        "checkpoint": "relay",
-        "id": "bottomP1",
-        "slot": 1,
-        "type": "checkpoint",
-        "x": 240,
-        "y": 2333
-      },
-      {
-        "checkpoint": "relay",
-        "id": "bottomP2",
-        "slot": 2,
-        "type": "checkpoint",
-        "x": 340,
-        "y": 2333
-      },
-      {
-        "checkpoint": "relay",
-        "id": "breakpointControl",
-        "kind": "terminal",
-        "label": "SAVE BOTTOM",
-        "type": "device",
-        "x": 440,
-        "y": 2350
-      },
-      {
-        "activationControl": "breakpointControl",
-        "checkpoint": "relay",
-        "id": "bottomBreakpoint",
-        "type": "breakpoint",
-        "x": 550,
         "y": 2350
       },
       {
@@ -673,7 +640,7 @@
       },
       {
         "id": "recovery",
-        "text": "BOTTOM BREAKPOINT / permanent catch floor / R returns here",
+        "text": "PERMANENT BOTTOM CATCH / R returns to start",
         "x": 90,
         "y": 2440
       },
@@ -962,6 +929,7 @@
       },
       {
         "id": "retryBWire",
+        "output": "routeB",
         "points": [
           {
             "x": 495,
@@ -983,11 +951,11 @@
             "x": 680,
             "y": 2050
           }
-        ],
-        "output": "routeB"
+        ]
       },
       {
         "id": "retryCWire",
+        "output": "routeC",
         "points": [
           {
             "x": 1375,
@@ -1009,8 +977,7 @@
             "x": 1100,
             "y": 1760
           }
-        ],
-        "output": "routeC"
+        ]
       }
     ]
   },

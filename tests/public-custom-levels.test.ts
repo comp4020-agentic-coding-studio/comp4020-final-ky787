@@ -19,8 +19,7 @@ async function app() {
 }
 it('public uploads are validated and owner-granted, snapshots require membership, replay is host-only and no custom files persist', async () => {
     const { dir, url } = await app(), host = await identity(url), guest = await identity(url), stranger = await identity(url);
-    const document = newDraft('public'); createEntity(document, 'breakpoint', { x: 700, y: 680 });
-    document.geometry.objects.push({ type: 'device', id: 'commit', kind: 'terminal', checkpoint: 'relay', x: 700, y: 680 });
+    const document = newDraft('public'), station = createEntity(document, 'breakpoint', { x: 700, y: 680 });
     const upload = await fetch(url + '/api/custom/snapshots', { method: 'POST', headers: { Cookie: host.cookie, Origin: url }, body: JSON.stringify({ document }) });
     expect(upload.status).toBe(201); const { hash } = await upload.json(); expect(hash).toBe(await draftHash(document));
     const unknown = await connect<'workbench'>(url, stranger.cookie); unknown.send({ type: 'create-draft', hash }); expect((await unknown.wait('error')).code).toBe('DRAFT_UNAVAILABLE');
@@ -33,10 +32,10 @@ it('public uploads are validated and owner-granted, snapshots require membership
     expect((await (await fetch(path, { headers: { Cookie: guest.cookie } })).json()).document).toEqual(document);
     unknown.send({ type: 'join', code: first.code }); expect((await unknown.wait('error')).code).toBe('ROOM_FULL');
     b.send({ type: 'restart-draft', hash, seq: 1 }); expect((await b.wait('action-result')).accepted).toBe(false);
-    a.send({ type: 'control', control: 'draft:commit', seq: 1 }); const checkpoint = await a.wait('action-result'); expect(checkpoint.room.checkpoint).toBe('reunion');
+    a.send({ type: 'checkpoint', breakpoint: `draft:${station}`, seq: 1 }); const checkpoint = await a.wait('action-result'); expect(checkpoint.room.checkpoint).toBe('reunion');
     a.send({ type: 'select-level', level: 'race-condition', seq: 2 }); expect((await a.wait('action-result')).accepted).toBe(false);
     a.send({ type: 'restart-draft', hash, seq: 3 }); const replay = await a.wait('action-result'); expect(replay.accepted).toBe(true); expect(replay.room.levelInstance).toBe(2); expect(replay.room.checkpoint).toBe('entry'); expect(replay.room.party).toBeNull();
-    a.send({ type: 'control', control: 'draft:commit', seq: 4, levelInstance: 1 }); expect((await a.wait('action-result')).accepted).toBe(false);
+    a.send({ type: 'checkpoint', breakpoint: `draft:${station}`, seq: 4, levelInstance: 1 }); expect((await a.wait('action-result')).accepted).toBe(false);
     a.sendRaw({ type: 'avatar', avatar, seq: 999, levelInstance: 1 });
     const changed = newDraft('replacement'); const registration = await fetch(url + '/api/custom/snapshots', { method: 'POST', headers: { Cookie: host.cookie }, body: JSON.stringify({ document: changed }) });
     a.send({ type: 'restart-draft', hash: (await registration.json()).hash, seq: 5 }); expect((await a.wait('action-result')).accepted).toBe(false);

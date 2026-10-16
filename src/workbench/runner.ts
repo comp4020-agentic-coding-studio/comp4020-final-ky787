@@ -44,6 +44,7 @@ function observe() {
         player: w ? { x: w.player.x, y: w.player.y, vx: w.player.vx, vy: w.player.vy, grounded: w.player.grounded, groundId: w.player.groundId, rope: structuredClone(w.player.rope), deaths: w.deaths } : null,
         cubes: w ? structuredClone(w.cubes) : {}, signals: w ? { ...w.frame.outputs, ...w.frame.signals } : {},
         controls: w?.frame.controls ?? {}, plates: w?.frame.plates ?? {}, exitUnlocked: w?.frame.outputs.exitDoor ?? false,
+        checkpoint: w?.checkpoint, heroAssets: renderer.heroes.snapshot(),
         completed: client?.room?.completed ?? w?.exited ?? false, platforms: w?.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, x: p.def.x, y: p.def.y, w: p.def.w, h: p.def.h })) ?? [],
         session: client ? { code: client.room?.code, slot: client.slot, visitor: client.visitor, connected: client.connected, peers: client.room?.connected,
             generation: client.room?.levelInstance, reachedExit: client.room?.reachedExit, sharedCubes: client.room?.cubes, room: client.room } : null };

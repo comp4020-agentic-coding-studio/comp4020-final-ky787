@@ -17,6 +17,7 @@ export interface DraftPlatform extends ObjectBase { type: 'platform'; w: number;
 export interface DraftSpawn extends ObjectBase { type: 'spawn'; slot: 1 | 2 }
 /** Player centre; pedestal has a separate floor-contact breakpoint object. */
 export interface DraftCheckpoint extends ObjectBase { type: 'checkpoint'; slot: 1 | 2; checkpoint: 'relay' | 'upper' }
+/** Automatic floor-level checkpoint; activationControl is a retained legacy association, never a proximity-triggered puzzle input. */
 export interface DraftBreakpoint extends ObjectBase { type: 'breakpoint'; checkpoint: 'relay' | 'upper'; activationControl?: string }
 /** Cube centre, including imported named cube homes. */
 export interface DraftCube extends ObjectBase { type: 'cube'; mark: string }

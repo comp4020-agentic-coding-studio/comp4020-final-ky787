@@ -8,6 +8,7 @@ import { attachMultiplayer } from '../server/multiplayer.ts';
 import { DraftSessionRegistry } from '../scripts/level-tools/session-registry.ts';
 import { newDraft, serializeDraft } from '../src/workbench/model.ts';
 import { parseClientMessage } from '../src/coop/protocol.ts';
+import { importDraft } from '../src/workbench/imports.ts';
 
 async function fixture(cubeCount = 3) {
     const dir = await directory(), registry = new DraftSessionRegistry(), document = newDraft('network-fixture');
@@ -35,6 +36,26 @@ it('draft message namespace is disabled in the production parser, malformed IDs 
     expect(parseClientMessage(JSON.stringify(action))).toBeNull(); expect(parseClientMessage(JSON.stringify(action), true)).not.toBeNull();
     for (const control of ['draft:../escape', 'draft:__proto__', 'draft:', 'draft:a'.padEnd(80, 'x')])
         expect(parseClientMessage(JSON.stringify({ ...action, control }), true)).toBeNull();
+});
+
+it('checkpoint packets reject malformed fields and namespace IDs outside the active protocol', () => {
+    const message = { type: 'checkpoint', seq: 1, breakpoint: 'draft:station', levelInstance: 2 };
+    expect(parseClientMessage(JSON.stringify(message))).toBeNull();
+    expect(parseClientMessage(JSON.stringify(message), true)).toEqual(message);
+    for (const patch of [{ breakpoint: 'draft:../station' }, { breakpoint: 'draft:__proto__' }, { slot: 2 }, { checkpoint: 'upper' }, { levelInstance: 0 }])
+        expect(parseClientMessage(JSON.stringify({ ...message, ...patch }), true)).toBeNull();
+});
+
+it('a frozen built-in import can activate only a breakpoint still present in its authored geometry', async () => {
+    const f = await fixture(), document = importDraft('crossfeed-vault');
+    const present = await f.registry.register(document);
+    document.geometry.objects = document.geometry.objects.filter(o => o.type !== 'breakpoint');
+    const absent = await f.registry.register(document);
+    await f.act(1, { type: 'restart-draft', hash: absent.hash });
+    expect((await f.act(1, { type: 'checkpoint', breakpoint: 'system-online' })).accepted).toBe(false);
+    await f.act(1, { type: 'restart-draft', hash: present.hash });
+    const accepted = await f.act(1, { type: 'checkpoint', breakpoint: 'system-online' });
+    expect(accepted.accepted).toBe(true); expect(accepted.room.checkpoint).toBe('upper');
 });
 
 it('three independently arbitrated cubes, body/cube power, toggles, and two distinct arrivals share one frozen draft', async () => {

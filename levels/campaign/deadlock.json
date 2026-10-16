@@ -77,18 +77,27 @@
       "serviceRelay": {
         "args": [
           {
-            "id": "safe.occupied",
-            "op": "ref"
+            "args": [
+              {
+                "id": "safe.occupied",
+                "op": "ref"
+              },
+              {
+                "arg": {
+                  "id": "feed.occupied",
+                  "op": "ref"
+                },
+                "op": "not"
+              }
+            ],
+            "op": "and"
           },
           {
-            "arg": {
-              "id": "feed.occupied",
-              "op": "ref"
-            },
-            "op": "not"
+            "id": "payloadReady",
+            "op": "ref"
           }
         ],
-        "op": "and"
+        "op": "or"
       },
       "shaftFirewall": {
         "arg": {
@@ -248,40 +257,6 @@
         "y": 1000
       },
       {
-        "checkpoint": "relay",
-        "id": "lowerCommit",
-        "kind": "terminal",
-        "label": "SET LOWER BREAKPOINT",
-        "type": "device",
-        "x": 340,
-        "y": 3000
-      },
-      {
-        "activationControl": "lowerCommit",
-        "checkpoint": "relay",
-        "id": "lowerBreakpoint",
-        "label": "LOWER BREAKPOINT",
-        "type": "breakpoint",
-        "x": 340,
-        "y": 3000
-      },
-      {
-        "checkpoint": "relay",
-        "id": "lowerCheckpoint1",
-        "slot": 1,
-        "type": "checkpoint",
-        "x": 340,
-        "y": 2983
-      },
-      {
-        "checkpoint": "relay",
-        "id": "lowerCheckpoint2",
-        "slot": 2,
-        "type": "checkpoint",
-        "x": 440,
-        "y": 2983
-      },
-      {
         "h": 2920,
         "id": "cargoField",
         "label": "CARGO LIFT",
@@ -408,13 +383,13 @@
       },
       {
         "id": "lower-rule2",
-        "text": "SAFE AND NOT FEED = SERVICE",
+        "text": "(SAFE AND NOT FEED) OR PAYLOADS = SERVICE",
         "x": 780,
         "y": 2800
       },
       {
         "id": "upper-rule",
-        "text": "THREE PAYLOADS / LATCHED EXIT",
+        "text": "THREE PAYLOADS / EXIT AND SERVICE",
         "x": 1020,
         "y": 650
       },
@@ -450,7 +425,7 @@
       },
       {
         "id": "recovery",
-        "text": "AFTER UNLOCK: RETURN ONE CUBE TO SAFE",
+        "text": "ALL PAYLOADS KEEP SERVICE OPEN",
         "x": 745,
         "y": 1340
       }
@@ -687,6 +662,28 @@
           {
             "x": 1730,
             "y": 860
+          }
+        ]
+      },
+      {
+        "binding": "serviceUpperPower",
+        "id": "payload-service",
+        "points": [
+          {
+            "x": 1250,
+            "y": 988
+          },
+          {
+            "x": 1250,
+            "y": 1180
+          },
+          {
+            "x": 886,
+            "y": 1180
+          },
+          {
+            "x": 886,
+            "y": 1000
           }
         ]
       }

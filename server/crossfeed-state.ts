@@ -44,12 +44,16 @@ export const crossfeedDefinition: LevelDefinition<'crossfeed-vault'> = {
         && Object.keys(r.levelState).length === (r.levelState.legacyVictory ? 6 : 5)
         && (['switchB', 'switchC', 'switchD', 'routeMode'] as const).every(key => typeof r.levelState[key] === 'boolean')
         && (r.levelState.legacyVictory === undefined || r.levelState.legacyVictory === true && r.completed)
-        && r.checkpoint === (r.levelState.switchC ? 'upper' : 'entry')
+        && ['entry', 'upper'].includes(r.checkpoint)
         && (!r.exitUnlocked || r.visitors[1] !== null)
         && ['liftCargo', 'finalLeft', 'finalRight'].every(p => Object.values(r.cubePlacements).filter(v => v === p).length <= 1),
     acceptsPlacement: (_, p) => ['liftCargo', 'finalLeft', 'finalRight', ...CROSSFEED_PLATES].includes(p),
     acceptsPlate: p => p === null || ['finalLeft', 'finalRight', ...CROSSFEED_PLATES].includes(p),
     action: (ctx, m) => {
+        if (m.type === 'checkpoint') {
+            if (m.breakpoint !== 'system-online') return false;
+            ctx.record.checkpoint = 'upper'; return true;
+        }
         if (m.type === 'crumble-trigger') {
             const route = m.platform === 'crumbleA' ? 'leftRoute' : 'rightRoute';
             const until = m.platform === 'crumbleA' ? 'leftUntil' : 'rightUntil';
@@ -59,7 +63,7 @@ export const crossfeedDefinition: LevelDefinition<'crossfeed-vault'> = {
         if (m.type !== 'control') return false;
         const r = ctx.record;
         if (m.control === 'switchB') r.levelState.switchB = !r.levelState.switchB;
-        else if (m.control === 'switchC') { r.levelState.switchC = true; r.checkpoint = 'upper'; }
+        else if (m.control === 'switchC') r.levelState.switchC = true;
         else if (m.control === 'switchD') r.levelState.switchD = true;
         else if (m.control === 'routeMode') {
             if (ctx.crossfeed && ctx.now < ctx.crossfeed.toggleAfter) return false;

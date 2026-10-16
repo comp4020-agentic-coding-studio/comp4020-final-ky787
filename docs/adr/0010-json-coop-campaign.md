@@ -13,7 +13,7 @@ requires all five badges, even when chambers were selected out of order.
 
 The three new releases are canonical Level Workbench JSON snapshots under
 `levels/campaign/`. Their geometry, controllers, camera reveals and metadata are
-identical to the tested drafts at promotion. `levels/drafts/` remains editable
+identical to their matching tested drafts, updated together on each release. `levels/drafts/` remains editable
 without changing the released campaign. A future release updates the campaign
 snapshot deliberately and reruns validation and physical traversal checks.
 The builder/CLI can import these released rooms into independent editable copies.
@@ -89,3 +89,41 @@ and human-playtest limitations. Campaign availability does not establish blind
 solve times, accessibility or freedom from every shortcut. Human checks should
 include two different computers, swapped roles, missed grapples/catches, reconnect
 during a partial delivery, and the host's chamber selection/victory controls.
+
+## Automatic breakpoints and live payload service (2026-10-16 refinement)
+
+Only HANDSHAKE and CROSSFEED VAULT retain visible breakpoint machines. Grounded
+floor-level contact requests `checkpoint` with the authored breakpoint ID; it
+does not synthesize a terminal interaction. The server applies the active
+definition's allowlist after the existing membership, slot and generation checks.
+Duplicate requests return the current accepted state without revision or disk
+writes; clients suppress pending/already-earned requests. Flag deployment and
+audio still observe the accepted milestone edge. Activation never moves either
+body; reset uses the corresponding authored marker. `relay` maps to the existing
+shared `reunion` storage value, and `upper` remains a later milestone.
+
+CROSSFEED's `system-online` pedestal is 90 units left of its retained SYSTEM
+ONLINE terminal. Its checkpoint and switchC are now independent. Old coupled
+version-6 saves remain valid, as do either new ordering of checkpoint/control.
+HANDSHAKE's checkpoint-only terminal was removed; maintenance still requires E.
+DEADLOCK and USE AFTER FREE lost their pedestal, checkpoint-only terminal and
+explicit markers; their entry spawns and recovery geometry remain unchanged.
+RACE CONDITION's internal cargo-delivery recovery is unchanged.
+
+The three removed checkpoint-only boolean keys remain accepted as inert legacy
+save data for their specific campaign IDs. They are not accepted control IDs.
+Existing DEADLOCK/USE AFTER FREE `reunion` saves use the room adapter's entry
+fallback, preserving parties, cube placements, terminal values and badges without
+a progression migration. New/replayed records contain only current controls.
+Custom documents retain their own frozen schema and allowlists.
+
+Payload sockets remain live cube-only contacts, separate from the exit latch.
+DEADLOCK's service output is `(SAFE AND NOT FEED) OR payloadReady`, with
+`payloadReady = payloadOne AND payloadTwo AND payloadThree`. All three cubes stay
+in their sockets for the intended final regroup. Removing one disables the
+payload-derived service power, while normal SAFE/FEED power remains available;
+the already-unlocked exit stays latched. Cargo transport, firewall, personnel
+clearance, manual hatch and final FEED-to-relay catch are unchanged.
+
+No assets, animations, movement constants or binary evidence were redesigned.
+The dedicated payload receiver visual milestone remains pending.

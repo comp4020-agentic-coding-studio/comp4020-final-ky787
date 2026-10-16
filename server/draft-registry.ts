@@ -16,9 +16,10 @@ export class DraftSessionRegistry implements FrozenDraftRegistry {
         const metadata = { hash, controller: { id: copy.controller.kind === 'builtin' ? copy.controller.id : 'declarative', version: 1 } };
         const exit = copy.geometry.objects.find(o => o.type === 'exit');
         const coopError = exit?.type === 'exit' && exit.latch && exit.arrivals === 2 ? undefined : 'Local co-op requires a latched exit with two distinct arrivals. Change the exit configuration before starting co-op.';
+        const breakpoints = copy.geometry.objects.filter(o => o.type === 'breakpoint').map(o => copy.controller.kind === 'declarative' ? `draft:${o.id}` : o.id);
         const session: FrozenDraftSession = copy.controller.kind === 'builtin'
-            ? { metadata, coopError, level: copy.controller.id }
-            : { metadata, coopError, level: 'workbench', definition: declarativeDefinition(copy) };
+            ? { metadata, coopError, breakpoints, level: copy.controller.id }
+            : { metadata, coopError, breakpoints, level: 'workbench', definition: declarativeDefinition(copy) };
         this.snapshots.set(hash, { document: copy, session });
         return { hash, metadata: structuredClone(metadata) };
     }

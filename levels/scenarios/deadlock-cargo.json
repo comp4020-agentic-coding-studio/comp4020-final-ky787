@@ -37,25 +37,6 @@
       "capture": "cargo-initial"
     },
     {
-      "label": "Commit lower breakpoint",
-      "actions": [
-        {
-          "type": "tap",
-          "actor": "operator",
-          "code": "KeyE"
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "session.room.checkpoint",
-          "equals": "reunion"
-        },
-        "timeoutMs": 6000
-      },
-      "waitMs": 180
-    },
-    {
       "label": "Carrier approaches B for SAFE allocation",
       "actions": [
         {

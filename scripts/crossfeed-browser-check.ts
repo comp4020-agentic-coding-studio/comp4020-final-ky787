@@ -113,7 +113,7 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     await click(a, '#create-party');
     const created = await wait(a, 'created CROSSFEED', s => !!s.multiplayer?.code);
     await click(b, '#join-code'); await b.send('Input.insertText', { text: created.multiplayer!.code }); await click(b, '#join-room');
-    await wait(b, 'join discovers chamber', s => s.room === 'crossfeed-vault' && !!s.multiplayer?.shared?.connected.every(Boolean));
+    await wait(b, 'join discovers party lobby', s => !!s.multiplayer?.shared?.connected.every(Boolean));
     await click(a, '[data-select-level="crossfeed-vault"]');
     for (const p of [a,b]) await wait(p, 'host selection loads v2', s => s.room === 'crossfeed-vault' && state(s).party?.phase === 'playing');
     }
@@ -142,13 +142,19 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     await walk(holder, 1780); check('B bridge lets the entry holder leave A', !(await snapshot(holder)).outputs.grappleAnchor && (await snapshot(holder)).outputs.bridge);
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1750, 'liftCargo');
     await wait(holder, 'cargo powers lift', s => s.outputs.liftField); check('Cube A temporarily powers lift', !state(await snapshot(holder)).levelState.inputs.switchC);
-    await lift(holder); await align(holder, 1210);
+    await lift(holder);
+    const beforeBreakpoint = await snapshot(holder), partnerBeforeBreakpoint = await snapshot(runner);
     if (process.env.BN_HERO_REVIEW) {
         await shot(holder, 'breakpoint-offline');
         check('authored breakpoint starts retracted', (await snapshot(holder)).heroAssets.breakpoints[0].mast === 0);
     }
-    await tap(holder, 'KeyE');
-    await wait(runner, 'C powers lift/checkpoint independently of transfer mode', s => s.checkpoint === 'upper' && s.outputs.liftField && !s.outputs.relayGates);
+    await align(holder, 1120);
+    await wait(runner, 'physical breakpoint contact saves both players before SYSTEM ONLINE', s => s.checkpoint === 'upper' && !state(s).levelState.inputs.switchC);
+    check('walking into the breakpoint does not operate SYSTEM ONLINE', !state(await snapshot(holder)).levelState.inputs.switchC
+        && state(await snapshot(holder)).checkpoint === 'upper');
+    const partnerAfterBreakpoint = await snapshot(runner);
+    check('shared checkpoint does not teleport the waiting partner', Math.abs(partnerAfterBreakpoint.player.x - partnerBeforeBreakpoint.player.x) < 1
+        && Math.abs(partnerAfterBreakpoint.player.y - partnerBeforeBreakpoint.player.y) < 1);
     if (process.env.BN_HERO_REVIEW) {
         for (const age of [.1, .5, 1, 1.35, 1.8]) {
             await wait(holder, `breakpoint deployment ${age}s`, s => (s.heroAssets.breakpoints[0].age ?? -1) >= age);
@@ -157,19 +163,36 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
         const deployed = (await snapshot(holder)).heroAssets.breakpoints[0];
         check('mast and flag stay deployed through repeated snapshots', deployed.mast === 1 && deployed.flag === 1 && deployed.age! >= 1.6);
         await wait(runner, 'partner observes deployed checkpoint', s => s.heroAssets.breakpoints[0].flag === 1);
+        const cueCount = (s: Snapshot, cue: 'breakpointDeploy' | 'breakpointConfirm') => s.audio.played[cue] ?? 0;
+        for (const [p, before] of [[holder, beforeBreakpoint], [runner, partnerBeforeBreakpoint]] as const) {
+            const after = await snapshot(p);
+            check(`Player ${after.multiplayer!.slot} hears one deployment and confirmation`, cueCount(after, 'breakpointDeploy') === cueCount(before, 'breakpointDeploy') + 1
+                && cueCount(after, 'breakpointConfirm') === cueCount(before, 'breakpointConfirm') + 1);
+        }
         if (process.env.BN_HERO_CHECKPOINT_ONLY) {
-            const before = await snapshot(holder);
-            await tap(holder, 'KeyR');
-            await wait(holder, 'local respawn at upper milestone', s => s.deaths > before.deaths && s.player.y < 760);
-            const respawned = (await snapshot(holder)).heroAssets;
-            check('physical respawn does not redeploy or reattach', respawned.breakpoints[0].age! >= deployed.age!
-                && respawned.breakpoints[0].flag === 1 && respawned.entryAge! >= before.heroAssets.entryAge!);
+            const revision = state(await snapshot(holder)).revision, cues = (await snapshot(holder)).audio.played;
+            await align(holder, 1020); await align(holder, 1220); await align(holder, 1120); await sleep(600);
+            const repeated = await snapshot(holder);
+            check('repeated physical contact changes neither room revision nor hero sound count', state(repeated).revision === revision
+                && repeated.audio.played.breakpointDeploy === cues.breakpointDeploy && repeated.audio.played.breakpointConfirm === cues.breakpointConfirm
+                && repeated.heroAssets.breakpoints[0].age! >= deployed.age!);
+            for (const p of [a, b]) {
+                const before = await snapshot(p), slot = before.multiplayer!.slot!, x = slot === 1 ? 1120 : 1220;
+                await tap(p, 'KeyR');
+                await wait(p, `Player ${slot} respawns at its shared upper marker`, s => s.deaths === before.deaths + 1
+                    && Math.abs(s.player.x - x) < 1 && Math.abs(s.player.y - 733) < 1);
+                const respawned = (await snapshot(p)).heroAssets;
+                check(`Player ${slot} respawn does not redeploy or reattach`, respawned.breakpoints[0].age! >= deployed.age!
+                    && respawned.breakpoints[0].flag === 1 && respawned.entryAge! >= before.heroAssets.entryAge!);
+            }
             await shot(holder, 'breakpoint-respawn');
-            await holder.send('Page.reload');
-            await wait(holder, 'reconnect restores upper breakpoint', s => s.started && s.checkpoint === 'upper' && s.heroAssets.breakpoints[0]?.active);
-            const restored = (await snapshot(holder)).heroAssets;
-            check('reconnect baselines deployed flag with no attach or deployment replay', restored.breakpoints[0].age === null
-                && restored.breakpoints[0].flag === 1 && restored.entryAge === null);
+            for (const p of [a, b]) {
+                await p.send('Page.reload');
+                await wait(p, 'reconnect restores upper breakpoint', s => s.started && s.checkpoint === 'upper' && s.heroAssets.breakpoints[0]?.active);
+                const restored = (await snapshot(p)).heroAssets;
+                check('reconnect baselines deployed flag with no attach or deployment replay', restored.breakpoints[0].age === null
+                    && restored.breakpoints[0].flag === 1 && restored.entryAge === null && !state(await snapshot(p)).levelState.inputs.switchC);
+            }
             await sleep(500); await shot(holder, 'breakpoint-restored');
             await holder.send('Emulation.setDeviceMetricsOverride', { width: 800, height: 600, deviceScaleFactor: 1, mobile: false });
             await sleep(800); await shot(holder, 'breakpoint-compact');
@@ -182,6 +205,8 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
             return;
         }
     }
+    await align(holder, 1210); await tap(holder, 'KeyE');
+    await wait(runner, 'SYSTEM ONLINE powers lift independently of transfer mode', s => state(s).levelState.inputs.switchC && s.outputs.liftField && !s.outputs.relayGates);
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1840);
     check('C leaves lift on after cargo removal without moving partner', (await snapshot(runner)).outputs.liftField && (await snapshot(runner)).player.y > 1400);
     // Reconfigure B live: the upper player returns to A while the partner

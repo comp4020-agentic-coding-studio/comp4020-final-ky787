@@ -12,9 +12,9 @@ See the [integration contract](../adr/0010-json-coop-campaign.md) for persistenc
 old-party compatibility and full campaign tests. Human playtesting is still outstanding.
 
 The 2026-10-16 campaign check completed all five chambers in one persistent party
-using two independent browser identities and real controls. All 76 campaign checks
-passed, including both exit arrivals, NEXT, badges, pause contact release,
-reconnect and server restart. The new rooms retained all 59/87/43 scenario steps
+using two independent browser identities and real controls. All 78 campaign checks
+passed after the automatic checkpoint and payload-service refinement, including both exit arrivals, NEXT, badges, pause contact release,
+reconnect and server restart. The new rooms retained all 59/71/43 scenario steps
 respectively, with zero deaths in those runs. See the
 [five-chamber selector](../playtest/2026-10-16-campaign/selector.png) and
 [completed campaign](../playtest/2026-10-16-campaign/complete.png).

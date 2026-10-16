@@ -54,6 +54,9 @@ class BuiltinAuthority implements LocalDraftAuthority {
         if (device.id === 'liftCargo' || device.id === 'finalLeft' || device.id === 'finalRight') return device.id;
         const plate = this.plate(device); return plate === 'plateA' || plate === 'liftControl' ? null : plate;
     }
+    activateBreakpoint(id: string) {
+        if (id === 'system-online' && this.rules.action(this.ctx, { type: 'checkpoint', seq: 0, breakpoint: id })) this.project();
+    }
     sample(w: PuzzleWorld) {
         this.world = w; if (this.previewing) return;
         this.ctx.held = [null, null];

@@ -10,6 +10,8 @@ export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'
     const controls = devices.filter(o => o.kind === 'toggle' || o.kind === 'terminal');
     const occupied = devices.filter(o => o.kind !== 'toggle' && o.kind !== 'terminal');
     const unstable = draft.geometry.objects.filter(o => o.type === 'platform' && o.kind === 'unstable');
+    const breakpoints = draft.geometry.objects.filter(o => o.type === 'breakpoint');
+    const legacyControls: Record<string, string> = { handshake: 'checkpointControl.value', deadlock: 'lowerCommit.value', 'use-after-free': 'breakpointControl.value' };
     const cubeIds = draft.geometry.objects.filter(o => o.type === 'cube').map(o => draftSignal(o.id));
     const defaults = () => Object.fromEntries(controls.map(o => [objectPort(o), !!o.initial]));
     function values(ctx: LevelContext<L>) {
@@ -27,13 +29,22 @@ export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'
     return {
         cubeIds, defaults: () => ({ devices: defaults() }),
         valid: r => Object.keys(r.levelState).length === 1 && !!r.levelState.devices
-            && Object.keys(r.levelState.devices).length === controls.length
+            && Object.keys(r.levelState.devices).every(key => controls.some(o => objectPort(o) === key)
+                || key === legacyControls[r.level] && typeof r.levelState.devices[key] === 'boolean')
             && controls.every(o => typeof r.levelState.devices[objectPort(o)] === 'boolean')
-            && ['entry', 'reunion', 'upper'].includes(r.checkpoint),
+            && (r.checkpoint === 'entry' || draft.geometry.objects.some(o => o.type === 'checkpoint'
+                && o.checkpoint === (r.checkpoint === 'reunion' ? 'relay' : r.checkpoint))
+                || r.checkpoint === 'reunion' && (r.level === 'deadlock' || r.level === 'use-after-free')),
         acceptsPlate: p => p === null || occupied.some(o => o.kind !== 'socket' && draftSignal(o.id) === p),
         acceptsPlacement: (_, p) => occupied.some(o => o.kind !== 'scanner' && draftSignal(o.id) === p),
         cubeEnabled: (_, id) => cubeIds.includes(id as `draft:${string}`),
         action: (ctx, message) => {
+            if (message.type === 'checkpoint') {
+                const station = breakpoints.find(o => draftSignal(o.id) === message.breakpoint);
+                if (!station) return false;
+                if (ctx.record.checkpoint !== 'upper') ctx.record.checkpoint = station.checkpoint === 'relay' ? 'reunion' : 'upper';
+                return true;
+            }
             if (message.type === 'crumble-trigger') {
                 const platform = unstable.find(o => draftSignal(o.id) === message.platform);
                 if (!platform || platform.type !== 'platform') return false;
@@ -48,7 +59,7 @@ export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'
             if (!control) return false;
             const port = objectPort(control);
             ctx.record.levelState.devices[port] = control.kind === 'terminal' || !ctx.record.levelState.devices[port];
-            if (control.checkpoint && ctx.record.levelState.devices[port]) ctx.record.checkpoint = control.checkpoint === 'relay' ? 'reunion' : 'upper';
+            if (control.checkpoint && ctx.record.levelState.devices[port] && ctx.record.checkpoint !== 'upper') ctx.record.checkpoint = control.checkpoint === 'relay' ? 'reunion' : 'upper';
             return true;
         },
         project: ctx => {

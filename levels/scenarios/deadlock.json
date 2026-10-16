@@ -37,25 +37,6 @@
       "capture": "stage-01-initial"
     },
     {
-      "label": "Commit lower breakpoint",
-      "actions": [
-        {
-          "type": "tap",
-          "actor": "operator",
-          "code": "KeyE"
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "session.room.checkpoint",
-          "equals": "reunion"
-        },
-        "timeoutMs": 6000
-      },
-      "waitMs": 180
-    },
-    {
       "label": "Carrier approaches B",
       "actions": [
         {
@@ -957,298 +938,91 @@
       "capture": "stage-06-three-payloads"
     },
     {
-      "label": "Hop over service gate to reach HATCH toggle",
-      "actions": [
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "Space",
-          "down": true
-        },
-        {
-          "type": "walk",
-          "actor": "operator",
-          "x": 800
-        },
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "Space",
-          "down": false
-        }
-      ],
-      "waitMs": 400
-    },
-    {
-      "label": "Settle on safe floor beside HATCH control",
+      "label": "Lower carrier leaves SAFE while delivered payloads keep service powered",
       "actions": [
         {
           "type": "walk",
-          "actor": "operator",
-          "x": 760
+          "actor": "carrier",
+          "x": 340
         }
       ],
-      "waitMs": 180
-    },
-    {
-      "label": "Reopen HATCH for recovery descent",
-      "actions": [
-        {
-          "type": "tap",
-          "actor": "operator",
-          "code": "KeyE"
-        }
-      ],
+      "waitMs": 180,
       "wait": {
-        "actor": "operator",
+        "actor": "carrier",
         "condition": {
-          "path": "controls.draft:hatchToggle",
-          "equals": true
+          "path": "plates.draft:safe",
+          "equals": false
         },
         "timeoutMs": 6000
       },
-      "waitMs": 180
-    },
-    {
-      "label": "Clear the roof edge on the enlarged safe gallery",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "operator",
-          "x": 760
-        }
-      ],
-      "waitMs": 180
-    },
-    {
-      "label": "Return above the service gate to accessible payload B",
-      "actions": [
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "Space",
-          "down": true
-        },
-        {
-          "type": "walk",
-          "actor": "operator",
-          "x": 975
-        },
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "Space",
-          "down": false
-        }
-      ],
-      "waitMs": 400
-    },
-    {
-      "label": "Retrieve B after exit has latched",
-      "actions": [
-        {
-          "type": "tap",
-          "actor": "operator",
-          "code": "KeyE"
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "session.sharedCubes.draft:cubeB.holder",
-          "equals": 1
-        },
-        "timeoutMs": 6000
-      },
-      "waitMs": 180
-    },
-    {
-      "label": "Carry B across roof toward open HATCH",
-      "actions": [
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "Space",
-          "down": true
-        },
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "KeyA",
-          "down": true
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "player.x",
-          "max": 660
-        },
-        "timeoutMs": 6000
-      }
-    },
-    {
-      "label": "Brake horizontal momentum over the shaft",
-      "actions": [
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "Space",
-          "down": false
-        },
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "KeyA",
-          "down": false
-        },
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "KeyD",
-          "down": true
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "player.vx",
-          "min": 0
-        },
-        "timeoutMs": 6000
-      }
-    },
-    {
-      "label": "Release steering for safe vertical descent",
-      "actions": [
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "KeyD",
-          "down": false
-        }
-      ]
-    },
-    {
-      "label": "Recover B to lower floor through safe unpowered shaft",
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "player.y",
-          "min": 2980
-        },
-        "timeoutMs": 6000
-      }
-    },
-    {
-      "label": "Bring B back to SAFE while partner holds it",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "operator",
-          "x": 1470
-        }
-      ],
-      "waitMs": 180
-    },
-    {
-      "label": "B replaces SAFE operator and frees both players",
-      "actions": [
-        {
-          "type": "tap",
-          "actor": "operator",
-          "code": "KeyE"
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "cubes.draft:cubeB.grounded",
-          "equals": true
-        },
-        "timeoutMs": 6000
-      },
-      "waitMs": 180
-    },
-    {
-      "label": "Exit stays latched after recovering a delivered cube",
       "assert": [
         {
-          "actor": "operator",
+          "actor": "carrier",
           "condition": {
-            "path": "exitUnlocked",
-            "equals": true
-          }
-        },
-        {
-          "actor": "operator",
-          "condition": {
-            "path": "plates.draft:payloadOne",
+            "path": "plates.draft:feed",
             "equals": false
           }
         },
         {
-          "actor": "operator",
+          "actor": "carrier",
           "condition": {
-            "path": "plates.draft:safe",
+            "path": "signals.draft:cargoLift",
+            "equals": false
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "signals.draft:serviceRelay",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:payloadOne",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:payloadTwo",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:payloadThree",
             "equals": true
           }
         }
       ],
-      "capture": "stage-07-safe-recovery"
+      "capture": "stage-07-payload-service"
     },
     {
-      "label": "Operator approaches personnel service for final ascent",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "operator",
-          "x": 340
-        }
-      ],
-      "waitMs": 180
-    },
-    {
-      "label": "Operator returns to gallery with SAFE cube holding service",
+      "label": "Operator jumps the delivered near payload without removing it",
       "actions": [
         {
           "type": "key",
           "actor": "operator",
-          "code": "KeyA",
+          "code": "Space",
           "down": true
-        }
-      ],
-      "wait": {
-        "actor": "operator",
-        "condition": {
-          "path": "player.y",
-          "max": 1500
         },
-        "timeoutMs": 6000
-      }
-    },
-    {
-      "label": "Brake on upper personnel floor",
-      "actions": [
-        {
-          "type": "key",
-          "actor": "operator",
-          "code": "KeyA",
-          "down": false
-        }
-      ],
-      "waitMs": 80
-    },
-    {
-      "label": "Operator clears service corridor and approaches remaining cubes",
-      "actions": [
         {
           "type": "walk",
           "actor": "operator",
           "x": 1160
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
         }
       ],
-      "waitMs": 180
+      "waitMs": 400
     },
     {
       "label": "Operator jumps the middle payload cube",
@@ -1317,17 +1091,6 @@
       ]
     },
     {
-      "label": "Carrier leaves SAFE; B preserves service power",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "carrier",
-          "x": 340
-        }
-      ],
-      "waitMs": 180
-    },
-    {
       "label": "Carrier makes final personnel ascent",
       "actions": [
         {
@@ -1347,7 +1110,7 @@
       }
     },
     {
-      "label": "Brake on upper personnel floor",
+      "label": "Carrier brakes after payload-powered service ascent",
       "actions": [
         {
           "type": "key",
@@ -1359,15 +1122,38 @@
       "waitMs": 80
     },
     {
-      "label": "Carrier clears service corridor",
+      "label": "Carrier clears service corridor beside the delivered near cube",
       "actions": [
         {
           "type": "walk",
           "actor": "carrier",
-          "x": 1160
+          "x": 940
         }
       ],
       "waitMs": 180
+    },
+    {
+      "label": "Carrier jumps the delivered near payload without removing it",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "carrier",
+          "x": 1160
+        },
+        {
+          "type": "key",
+          "actor": "carrier",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "waitMs": 400
     },
     {
       "label": "Carrier jumps the middle payload cube",
@@ -1445,6 +1231,41 @@
           "condition": {
             "path": "player.deaths",
             "equals": 0
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:payloadOne",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:payloadTwo",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:payloadThree",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "signals.draft:serviceRelay",
+            "equals": true
+          }
+        },
+        {
+          "actor": "carrier",
+          "condition": {
+            "path": "plates.draft:safe",
+            "equals": false
           }
         }
       ],

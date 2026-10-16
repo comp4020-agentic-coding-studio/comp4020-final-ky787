@@ -44,6 +44,10 @@ class DeclarativeAuthority implements LocalDraftAuthority {
     values: Record<string, boolean>; outputs: Record<string, boolean> = {}; inputs = blankInputs(); checkpoint: RoomMemory['checkpoint'] = 'entry'; arrived = false;
     frame: ControllerFrame; private previewing = false; private overrides: Record<string, boolean> = {}; private exitUnlocked = false; private world?: PuzzleWorld;
     constructor(private document: DraftDocument) { this.values = initialDeviceValues(document); this.outputs = evaluateDraft(document, this.values); this.frame = draftFrame(document, this.values, this.outputs); }
+    activateBreakpoint(id: string) {
+        const station = this.document.geometry.objects.find(o => o.type === 'breakpoint' && o.id === id);
+        if (station?.type === 'breakpoint' && this.checkpoint !== 'upper') this.checkpoint = station.checkpoint;
+    }
     sample(world: PuzzleWorld) {
         this.world = world; if (this.previewing) return;
         this.values = { ...this.values, ...sampleDevices(this.document, world), ...this.overrides };
@@ -58,7 +62,7 @@ class DeclarativeAuthority implements LocalDraftAuthority {
         const control = nearDraftControl(world, this.document); if (!control) return;
         const port = objectPort(control), value = control.kind === 'terminal' || !this.values[port];
         if (this.values[port] === value) return;
-        this.values[port] = value; if (control.checkpoint && value) this.checkpoint = control.checkpoint;
+        this.values[port] = value; if (control.checkpoint && value && this.checkpoint !== 'upper') this.checkpoint = control.checkpoint;
         world.events.push({ kind: control.kind === 'terminal' ? 'terminal' : 'switch', at: { x: control.x, y: control.y } }); this.sample(world); return `draft:${control.id}`;
     }
     hint(world: PuzzleWorld) { if (cubeEntries(world.cubes).some(([, c]) => c.carried)) return 'E · put down cube'; const c = nearDraftControl(world, this.document); return c ? c.kind === 'terminal' && this.values[objectPort(c)] ? `${c.label ?? c.id} · COMMITTED` : `E · ${c.label ?? c.id}` : cubeEntries(world.cubes).some(([id, c]) => world.cubeReachable(id) && Math.hypot(c.x - world.player.x, c.y - world.player.y) < CARRY.reach) ? 'E · carry cube' : ''; }

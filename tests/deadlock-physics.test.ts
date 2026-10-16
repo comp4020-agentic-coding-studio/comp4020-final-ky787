@@ -151,7 +151,7 @@ describe('DEADLOCK carry-envelope regressions', () => {
 
 describe('DEADLOCK canonical draft contract and recovery diagnostics', () => {
     const document = JSON.parse(readFileSync('levels/drafts/deadlock.json', 'utf8')) as DraftDocument;
-    it('keeps the mutually exclusive lift/service truth table and independent SAFE firewall inversion', () => {
+    it('keeps the original lift/service allocation before payload completion and independent SAFE firewall inversion', () => {
         for (const [feed, safe, lift, firewall, service] of [
             [false, false, false, true, false], [true, false, false, true, false],
             [false, true, false, false, true], [true, true, true, false, false],
@@ -164,6 +164,62 @@ describe('DEADLOCK canonical draft contract and recovery diagnostics', () => {
         expect(hatch.enabled).toBe(true);
         expect(hatch.oneWay).toBe(false);
         expect(hatch.grappleable).toBe(false);
+    });
+
+    it.each(['levels/drafts/deadlock.json', 'levels/campaign/deadlock.json'])('%s uses all three live sockets as an additional service supply', path => {
+        const d = JSON.parse(readFileSync(path, 'utf8')) as DraftDocument;
+        for (let mask = 0; mask < 32; mask++) {
+            const [feed, safe, one, two, three] = [1, 2, 4, 8, 16].map(bit => !!(mask & bit));
+            const allPayloads = one && two && three;
+            const out = evaluateDraft(d, { 'feed.occupied': feed, 'safe.occupied': safe,
+                'payloadOne.occupied': one, 'payloadTwo.occupied': two, 'payloadThree.occupied': three });
+            expect(out.payloadReady).toBe(allPayloads);
+            expect(out.serviceRelay).toBe(safe && !feed || allPayloads);
+            expect(out.cargoLift).toBe(feed && safe);
+            expect(out.shaftFirewall).toBe(!safe);
+        }
+    });
+
+    it('keeps personnel service powered after SAFE releases, then clears it on real socket pickup while the exit remains latched', () => {
+        const d = JSON.parse(readFileSync('levels/campaign/deadlock.json', 'utf8')) as DraftDocument;
+        const sockets = ['payloadOne', 'payloadTwo', 'payloadThree'].map(id => {
+            const object = d.geometry.objects.find(o => o.id === id);
+            if (object?.type !== 'device' || object.kind !== 'socket') throw new Error(`Missing canonical socket ${id}`);
+            return object;
+        });
+        // Explicit gallery section fixture: delivered cubes are staged at the
+        // authored sockets, then gravity/contact sampling and actual E input run.
+        // This does not claim to deliver cargo or solve the room cooperatively.
+        const r = createRuntime(d, 1, { start: { x: sockets[1].x - 40, y: sockets[1].y - 17 } });
+        ['draft:cubeA', 'draft:cubeB', 'draft:cubeC'].forEach((id, index) => {
+            Object.assign(r.world.cubes[id as `draft:${string}`]!, { x: sockets[index].x, y: sockets[index].y - 22,
+                vx: 0, vy: 0, grounded: false, groundId: null, carried: false });
+        });
+        r.setPartnerInputs({ 'safe.occupied': true });
+        for (let n = 0; n < 6; n++) r.step();
+        expect(r.authority.outputs.payloadReady).toBe(true);
+        expect(r.world.frame.outputs.exitDoor).toBe(true);
+        r.setPartnerInputs({}); // Labelled partner release in this isolated section.
+        r.step();
+        expect(r.authority.values['safe.occupied']).toBe(false);
+        expect(r.authority.outputs.serviceRelay).toBe(true);
+        expect(r.world.gates.every(g => g.enabled)).toBe(true);
+
+        r.step(emptyInput(), true);
+        expect(r.world.cubes['draft:cubeB']!.carried).toBe(true);
+        expect(r.authority.values['payloadTwo.occupied']).toBe(false);
+        expect(r.authority.outputs.payloadReady).toBe(false);
+        expect(r.authority.outputs.serviceRelay).toBe(false);
+        expect(r.world.gates.every(g => !g.enabled)).toBe(true);
+        expect(r.world.frame.outputs.exitDoor).toBe(true);
+
+        r.setPartnerInputs({ 'safe.occupied': true });
+        r.step();
+        expect(r.authority.outputs.serviceRelay).toBe(true);
+        r.setPartnerInputs({ 'safe.occupied': true, 'feed.occupied': true });
+        r.step();
+        expect(r.authority.outputs.serviceRelay).toBe(false);
+        expect(r.world.frame.outputs.exitDoor).toBe(true);
     });
 
     it('resets only the named cube touching the authored shaft firewall', () => {

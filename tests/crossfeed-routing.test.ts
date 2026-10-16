@@ -18,13 +18,27 @@ function setup() {
     const toggle = (control: 'switchB' | 'switchC' | 'switchD' | 'routeMode') => { const accepted = d.action(ctx, { type: 'control', control, seq: 1 }); syncCrossfeed(ctx); return accepted; };
     return { ctx, record, d, view, toggle };
 }
+it('automatic upper checkpoint and SYSTEM ONLINE are independent, with old coupled saves still valid', () => {
+    const f = setup();
+    expect(f.d.action(f.ctx, { type: 'checkpoint', breakpoint: 'draft:missing', seq: 1 })).toBe(false);
+    expect(f.d.action(f.ctx, { type: 'checkpoint', breakpoint: 'system-online', seq: 2 })).toBe(true);
+    expect(f.record.checkpoint).toBe('upper'); expect(f.record.levelState.switchC).toBe(false);
+    expect(f.view().outputs).toMatchObject({ serviceAccess: false, relayGates: false, leftRoute: false, rightRoute: false });
+    expect(readRoomRecord(f.record, 'ABCD')).toEqual(f.record);
+    f.toggle('switchC'); expect(f.view().outputs.serviceAccess).toBe(true);
+    expect(readRoomRecord(f.record, 'ABCD')).toEqual(f.record); // Original coupled state remains readable.
+    f.record.checkpoint = 'entry';
+    expect(readRoomRecord(f.record, 'ABCD')).toEqual(f.record); // Deliberate control before walking through.
+});
 it('universal entry and reversible transfer mode resolve anchor/bridge/relay without closing the service bay', () => {
     const f = setup(); f.ctx.held[0] = 'entry'; expect(f.view().outputs.grappleAnchor).toBe(true);
     f.ctx.held[0] = null; f.record.cubePlacements.cubeA = 'entry'; expect(f.view().outputs.grappleAnchor).toBe(true);
     f.toggle('switchB'); expect(f.view().outputs).toMatchObject({ bridge: true, grappleAnchor: false, relayGates: false });
     f.record.cubePlacements.cubeA = 'liftCargo'; expect(f.view().outputs.liftField).toBe(true);
     f.record.cubePlacements.cubeA = 'spawn'; expect(f.view().outputs.liftField).toBe(false);
-    f.toggle('switchC'); expect(f.record.checkpoint).toBe('upper');
+    f.toggle('switchC'); expect(f.record.checkpoint).toBe('entry');
+    expect(f.d.action(f.ctx, { type: 'checkpoint', breakpoint: 'system-online', seq: 2 })).toBe(true);
+    expect(f.record.checkpoint).toBe('upper');
     expect(f.view().outputs).toMatchObject({ liftField: true, serviceAccess: true, relayGates: false });
     f.toggle('switchB'); expect(f.view().outputs).toMatchObject({ bridge: false, serviceAccess: true, relayGates: true });
     expect(validRecord(f.record, 'ABCD')).toBe(true);

@@ -10,6 +10,7 @@ export class CoopClient {
     private cubeDiscontinuities: CubeMap<Discontinuity> = {};
     lastLocalDiscontinuity: { entity: string; kind: Discontinuity; at: number } | null = null;
     private machineryEvents: { kind: string; at: { x: number; y: number } }[] = [];
+    private pendingCheckpoints = new Map<number, string>();
     private pendingControls = new Map<number, string>();
     pendingCrumble = new Map<CrumbleId, { seq: number; trigger: CrumbleTrigger; at: number }>();
     prediction = new LocalPrediction();
@@ -88,7 +89,7 @@ export class CoopClient {
         if (this.send({ type: 'draft-occupancy', seq: ++this.actionSeq, devices })) this.draftDevices = key;
     }
     private clearLevel(): void {
-        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear();
+        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCheckpoints.clear(); this.pendingCrumble.clear();
         this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1; this.remote.clear(); this.replicas = {};
         this.cubeSeq = {}; this.cubeSentAt = {}; this.placements = {}; this.cubeLastAt = 0;
         this.plate = null; this.draftDevices = ''; this.draftCubeDevices.clear(); this.exitSent = false; this.lastSentAt = 0;
@@ -152,7 +153,7 @@ export class CoopClient {
                         // A denial can carry a fresher transform without a semantic revision.
                         this.acceptCubeRoom(message.room); this.room = message.room; this.roomReceivedAt = performance.now();
                     }
-                    this.pendingControls.delete(message.seq);
+                    this.pendingControls.delete(message.seq); this.pendingCheckpoints.delete(message.seq);
                     if (this.pendingPhase?.seq === message.seq) this.pendingPhase = null;
                     for (const [id, pending] of this.pendingRouting) if (pending.seq === message.seq) this.pendingRouting.delete(id);
                     for (const [id, pending] of this.pendingCrumble) if (pending.seq === message.seq) this.pendingCrumble.delete(id);
@@ -181,7 +182,7 @@ export class CoopClient {
             ws.onclose = () => {
                 if (generation !== this.generation) return;
                 clearInterval(this.heartbeat); clearTimeout(this.deadline);
-                this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1;
+                this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCheckpoints.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1;
                 this.remote.clear(); this.reconnect();
             };
             ws.onerror = () => {}; // close supplies the retry; no duplicate timers.
@@ -223,6 +224,11 @@ export class CoopClient {
         return this.prediction.begin(kind, seq, epoch, this.generation, now, cubeId);
     }
     switchB(): boolean { return this.room?.level === 'pairing-bay' && !this.room.levelState.inputs.switchB && this.predict('switch'); }
+    activateBreakpoint(breakpoint: Extract<ClientMessage, { type: 'checkpoint' }>['breakpoint']): void {
+        if (!this.connected || [...this.pendingCheckpoints.values()].includes(breakpoint)) return;
+        const seq = ++this.actionSeq;
+        if (this.send({ type: 'checkpoint', seq, breakpoint })) this.pendingCheckpoints.set(seq, breakpoint);
+    }
     control(control: Extract<ClientMessage, { type: 'control' }>['control']): boolean {
         if (!this.connected || [...this.pendingControls.values()].includes(control)) return false;
         const seq = ++this.actionSeq;
@@ -291,7 +297,7 @@ export class CoopClient {
         if (this.send({ type: 'avatar', seq: ++this.moveSeq, avatar, ...(this.playerDiscontinuity ? { discontinuity: this.playerDiscontinuity } : {}) })) this.playerDiscontinuity = undefined;
     }
     leave(forget = true): void {
-        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1;
+        this.prediction.clear(performance.now()); this.pendingControls.clear(); this.pendingCheckpoints.clear(); this.pendingCrumble.clear(); this.pendingPhase = null; this.pendingRouting.clear(); this.bufferEpoch = -1;
         this.machineryEvents = [];
         this.active = false; this.generation++;
         clearTimeout(this.retry); clearInterval(this.heartbeat); clearTimeout(this.deadline);
@@ -305,7 +311,7 @@ export class CoopClient {
             url: websocketUrl(location.href), code: this.room?.code, visitor: this.visitor, slot: this.slot,
             party: this.room?.party, host: this.isHost, levelInstance: this.room?.levelInstance, connected: this.room?.connected, revision: this.room?.revision, level: this.room?.level, checkpoint: this.room?.checkpoint, levelState: this.room?.levelState,
             lastLocalDiscontinuity: this.lastLocalDiscontinuity, lastRemoteDiscontinuity: this.remote.lastDiscontinuity, lastCubeDiscontinuity: this.remoteCube.lastDiscontinuity,
-            pendingControls: [...this.pendingControls.values()], pendingCrumble: [...this.pendingCrumble.keys()],
+            pendingCheckpoints: [...this.pendingCheckpoints.values()], pendingControls: [...this.pendingControls.values()], pendingCrumble: [...this.pendingCrumble.keys()],
             pendingPhase: this.pendingPhase,
             buffer: this.room?.level === 'race-condition' ? { ...this.room.levelState.buffer, remainingMs: Math.max(0, this.room.levelState.buffer.remainingMs - (now - this.roomReceivedAt)) } : undefined,
             crumblePhases: this.room && 'platforms' in this.room.levelState ? Object.fromEntries(Object.entries(this.room.levelState.platforms)

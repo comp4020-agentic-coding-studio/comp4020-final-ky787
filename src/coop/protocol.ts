@@ -123,6 +123,7 @@ type ClientPayload =
     | { type: 'draft-occupancy'; seq: number; devices: DraftId[] }
     | { type: 'occupancy'; seq: number; plate: Plate }
     | { type: 'switch'; seq: number }
+    | { type: 'checkpoint'; seq: number; breakpoint: 'system-online' | DraftId }
     | { type: 'control'; seq: number; control: DraftId | 'relayPower' | 'liftLatch' | 'boostRoute' | 'firewallCheckpoint' | 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit' }
     | { type: 'crumble-trigger'; seq: number; platform: CrumbleId; trigger: CrumbleTrigger }
     | { type: 'local-reset'; seq: number }
@@ -198,6 +199,8 @@ function parsePayload(v: Record<string, unknown>, allowDrafts: boolean): ClientM
     if (v.type === 'occupancy' && keys(v, ['type', 'seq', 'plate']) && sequence(v.seq)
         && ([null, 'plateA', 'finalLeft', 'finalRight', 'liftControl', ...PRESSURE_PLATES, ...CROSSFEED_PLATES].some(p => p === v.plate) || allowDrafts && validDraftId(v.plate))) return v as ClientMessage;
     if (['switch', 'exit', 'local-reset'].includes(v.type as string) && keys(v, ['type', 'seq']) && sequence(v.seq)) return v as ClientMessage;
+    if (v.type === 'checkpoint' && keys(v, ['type', 'seq', 'breakpoint']) && sequence(v.seq)
+        && (v.breakpoint === 'system-online' || allowDrafts && validDraftId(v.breakpoint))) return v as ClientMessage;
     if (v.type === 'control' && keys(v, ['type', 'seq', 'control']) && sequence(v.seq)
         && (['relayPower', 'liftLatch', 'boostRoute', 'firewallCheckpoint', 'switchB', 'switchC', 'switchD', 'routeMode', 'phase', 'commit'].includes(v.control as string) || allowDrafts && validDraftId(v.control))) return v as ClientMessage;
     if (v.type === 'crumble-trigger' && keys(v, ['type', 'seq', 'platform', 'trigger']) && sequence(v.seq)

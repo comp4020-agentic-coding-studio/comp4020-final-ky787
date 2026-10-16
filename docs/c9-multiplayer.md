@@ -401,6 +401,7 @@ anti-cheat, new player authority, or general player collision is introduced.
 | cube-occupancy | `cubeId`, semantic `seq`, `epoch`, room-valid `placement`; only that cube’s simulator |
 | occupancy | `seq`, one allowed `plate` or null; lift uses `liftControl` |
 | switch | `seq`; accepted PAIRING BAY B latch |
+| checkpoint | `seq`, active authored `breakpoint` ID; floor-level contact report, idempotent shared checkpoint only |
 | control | `seq`, `relayPower`, `liftLatch`, `boostRoute`, `firewallCheckpoint`, or CROSSFEED `switchB/C/D`, restricted by level |
 | crumble-trigger | `seq`, `platform`, `foot` or `hook`, only CRUMBLE LAB |
 | local-reset | `seq`; release this body only |

@@ -5,13 +5,15 @@ import type { MachineSignal, RoomId, WorldRoomId } from "./controller.ts";
 import type { LiftFieldDef, RelayGatePairDef } from './machinery.ts';
 import type { FirewallDef } from './firewall.ts';
 import type { RoomMemory } from './progress.ts';
-/** Presentation only: observes an existing milestone, never adds an interaction. */
+/** Existing milestone presentation, optionally activated by floor-level contact. */
 export interface BreakpointDef {
     id: string;
     /** Floor contact, independent of either player's respawn position. */
     at: Vec2;
     checkpoint: Exclude<RoomMemory['checkpoint'], 'entry'>;
     label?: string;
+    /** Declarative drafts and supported co-op rooms; legacy C8 remains controller-owned. */
+    automatic?: boolean;
     /** Replaces this control's drawing; its existing interaction remains authoritative. */
     activationControl?: 'lever' | 'upperLever' | NonNullable<RoomDef['controls']>[number]['id'];
 }

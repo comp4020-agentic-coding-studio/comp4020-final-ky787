@@ -9,6 +9,7 @@ import type { Platform, RoomDef } from './rooms.ts';
 import { LiftField, RelayGatePair } from './machinery.ts';
 import { cubeEntries, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type Discontinuity, type Slot } from '../coop/protocol.ts';
 import { firewallBox, touchingFirewall, type Firewall } from './firewall.ts';
+import { checkpointReached, touchesBreakpoint } from './checkpoints.ts';
 export type DeathCause = 'reset' | 'hazard' | 'fall' | 'firewall';
 export interface Cube extends LooseBody {
     carried: boolean;
@@ -56,6 +57,7 @@ export interface WorldAuthority {
     frame: ControllerFrame;
     inputs: ControllerInputs;
     checkpoint: RoomMemory['checkpoint'];
+    activateBreakpoint?(id: string): void;
     sample(world: PuzzleWorld): void;
     /** Optional authored control ID for local presentation, never shared state. */
     interact(world: PuzzleWorld): string | void;
@@ -488,6 +490,9 @@ export class PuzzleWorld {
         }
         this.carriedPose();
         if (this.playerFirewall()) return;
+        for (const station of this.room.breakpoints ?? []) if (station.automatic
+            && !checkpointReached(this.authority?.checkpoint ?? this.checkpoint, station.checkpoint)
+            && touchesBreakpoint(this, station)) this.authority?.activateBreakpoint?.(station.id);
         this.samplePlate();
         this.evaluate();
         this.authority?.crumble?.sample(this);

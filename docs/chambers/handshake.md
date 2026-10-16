@@ -31,9 +31,10 @@ relay, socket and exit instead of stacking their silhouettes.
 - `exitReady = maintenance.value AND exitSocket.occupied`: latched two-arrival exit.
 
 MAINTENANCE COMPLETE is the only puzzle progression commitment. The central
-BREAKPOINT terminal commits the existing `relay` checkpoint milestone (the shared
-server names it `reunion`); its two markers remain on the starting floor. It powers
-no route. Wires observe destination bindings, not a second controller. Camera
+BREAKPOINT pedestal automatically activates the existing `relay` checkpoint milestone
+(the shared server names it `reunion`) when a player walks onto its grounded
+contact area. Its two markers remain on the starting floor. There is no separate
+checkpoint terminal or E interaction, and the checkpoint powers no route. Wires observe destination bindings, not a second controller. Camera
 reveals frame the affected crossing, lift, link and exit; Tab retains manual overview.
 
 ## Intended two-player solution
@@ -92,9 +93,11 @@ are simultaneously true, then preserves the existing latch behavior.
 ## Automated evidence
 
 `levels/scenarios/handshake.json` is a 59-step, full-room, two-browser scenario from
-the authored spawns. It passed with **both players completed and zero deaths** at
+the authored spawns. Its checkpoint step now observes automatic activation after
+walking, without pressing E. The earlier terminal-based revision passed with
+**both players completed and zero deaths** at
 hash `15538dd03c12048dc7203cc76262ce67b4ca462a916d290791c4a286b82a0797`.
-A second run swaps both actor slots and also completes with zero deaths.
+A second run of that earlier revision swaps both actor slots and also completes with zero deaths.
 Both runs use real keyboard/mouse inputs and server cube grants, never state injection.
 It observes cube substitution, lift ascent, relay travel, partner support,
 maintenance, the still-locked exit before payload, live socket unlock and arrivals.
@@ -107,7 +110,11 @@ behavior. The public integration check exercises graphical import, every saved
 State Preview, local physics, exact JSON export, IndexedDB reload and two distinct
 public-compatible custom-session identities.
 
-Reports and screenshots: `.workbench/reports/2026-10-16-chambers/handshake/`.
+Current draft and campaign SHA-256: `e05842d86169d80ec3d1b8f2b9de6a73ca1671fb30d0ec3784ad4f8efcb5cf06`.
+The automatic-checkpoint update removes only the checkpoint control device; the
+physical puzzle layout and its controller outputs are unchanged.
+
+Earlier reports and screenshots: `.workbench/reports/2026-10-16-chambers/handshake/`.
 `final/report.json` is the full solve; `swapped/report.json` tests exchanged roles; `final/trajectory-{host,partner}.json` records
 measured paths; `measured-grapples.json` summarizes launch, attachment, swing
 samples, release and subsequent landing for all four engagements. Named captures include `initial`, `powered-crossing`,
@@ -139,3 +146,11 @@ Human two-player acceptance remains required: check first-use grapple teaching,
 the boost hint, camera framing while aiming, controller latency, optional lift
 allocations, role exchange, recovery with a dropped cube, and actual blind solve
 time. Campaign integration was requested separately; no human playtesting is claimed.
+
+### Campaign regression after behaviour refinement
+
+The current hash above passed all 59 canonical scenario steps in the five-room
+campaign run, with both physical exit arrivals and zero deaths. Report:
+`.workbench/reports/2026-10-16-checkpoints/campaign/handshake-report.json`.
+The same persistent party completed all five rooms and passed reconnect and
+server-restart recovery. The HANDSHAKE checkpoint was earned by walking without E; maintenance remained a deliberate interaction.

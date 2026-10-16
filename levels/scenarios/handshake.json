@@ -32,14 +32,7 @@
       "waitMs": 180
     },
     {
-      "label": "Commit central breakpoint without powering machinery",
-      "actions": [
-        {
-          "type": "tap",
-          "actor": "host",
-          "code": "KeyE"
-        }
-      ],
+      "label": "Central breakpoint activates automatically from grounded walking",
       "wait": {
         "actor": "host",
         "condition": {

@@ -24,6 +24,8 @@ To play co-op:
 3. The creator is the party's host and chooses the chamber. Both players can operate the puzzle; neither has a fixed gameplay role.
 4. Solve the machinery together, then **both physically enter the unlocked exit** to finish. The host can choose the next chamber, replay, or select another chamber.
 
+Only HANDSHAKE and CROSSFEED VAULT currently display BREAKPOINT machines. Walk through one to activate it automatically; CROSSFEED’s SYSTEM ONLINE remains a separate E interaction. RACE CONDITION retains its internal cargo recovery milestone. DEADLOCK and USE AFTER FREE respawn at entry.
+
 Party membership, checkpoints and meaningful puzzle progress survive reconnects and server restarts. The same party code works across campaign chambers. Selecting or replaying a chamber starts that chamber fresh while preserving its completion badge. There is no matchmaking, account system or public spectator mode.
 
 The optional mechanics laboratories used during development are preserved behind `?labs=1` for local regression and experimentation, but are not part of the public campaign.
@@ -49,7 +51,7 @@ Some controls are contextual. In co-op, resetting or dying affects your own play
 
 - **Physical cooperation:** one player powers a route, moves a payload or operates a switch so the other can cross—and later has to regroup.
 - **Reversible machinery:** changing a control can make one platform solid while another becomes a non-solid ghost. Players must communicate about the current state.
-- **Shared payloads:** named cubes can be carried, grapple-pulled, used on pressure plates or sockets, relayed and handed between players.
+- **Shared payloads:** named cubes can be carried, grapple-pulled, used on pressure plates or sockets, relayed and handed between players. Sockets accept resting cubes only and release when cargo leaves; ordinary plates also accept grounded players. DEADLOCK powers its personnel service relay when all three payloads are received, so both players finish with the cubes still upstairs. The socket graphics redesign is pending.
 - **Platforming:** grapple anchors, jump paths, partner-held cube boosts, lifts, hazards and unstable blocks make the spatial layout part of the puzzle rather than decoration.
 - **Readable infrastructure:** illuminated connections, entry-point gates, breakpoint pedestals and exit status displays explain the state of the chamber.
 
@@ -123,7 +125,7 @@ New code platforms default to **Always Powered**, so geometry can be playtested 
 
 Public rooms expire after two hours, or five minutes after both players disconnect. Unlaunched uploads expire after two minutes. Server restarts end these rooms. No custom draft or custom room is written to `/data`, published in a gallery, or added to campaign saves/badges. Limits include eight active rooms, 256 KB per snapshot, 2 MB total canonical snapshot bytes, and three staged/active sessions per visitor. Save/Export is how you keep the original.
 
-Placing a **Breakpoint** also creates missing Player 1 and Player 2 respawn markers on nearby clear static ground in one undo step. The inspector links to each independently movable marker. Existing markers are reused. If no safe position is found, move the pedestal or add the missing markers manually. Assign a terminal/checkpoint control to the same milestone: the server must accept activation before respawn, the flag displays BREAKPOINT ACTIVE, and activation does not teleport anyone. A cooperative exit requires latched unlock and two arrivals.
+Placing a **Breakpoint** also creates missing Player 1 and Player 2 respawn markers on nearby clear static ground in one undo step. The inspector links to each independently movable marker. Existing markers are reused. If no safe position is found, move the pedestal or add the missing markers manually. Walk through the pedestal at floor level: either player activates the shared checkpoint without E. Server acceptance raises the flag and plays its existing audio once, without teleporting anyone. Separate puzzle terminals still require E. A cooperative exit requires latched unlock and two arrivals.
 
 Editing remains single-user. No shared cursors, remote editing permissions, cloud draft synchronization, permanent publishing or accounts are involved. Custom controllers and prototype crumble remain authored/mock.
 
