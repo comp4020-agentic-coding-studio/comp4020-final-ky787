@@ -29,7 +29,8 @@ are unchanged.
 
 Presentation recognizes the named JSON chambers as campaign rooms: it retains
 socket/scanner glyphs and resolved lift labels, omits internal lab instructions,
-and uses the normal vertical follow camera instead of the compact tutorial rail.
+and follows the shaft vertically with upward grapple viewing space instead of
+the compact tutorial's fixed vertical rail.
 Authored control reveals and manual overview retain their existing priority.
 
 ## Authority, persistence and compatibility
@@ -48,6 +49,8 @@ physics-owner checks remain. JSON campaign rooms use the bounded JSON sensor
 message budget (8 KB) and a stream allowance based on the actual cube count;
 older built-in rooms keep their 2 KB message limit. Changing chambers clears
 both per-player and per-cube JSON contact caches alongside other transient state.
+Opening the pause/selection menu releases all of the local body's JSON contacts;
+the partner cannot retain a powered route after the paused operator's floor breaks.
 The trusted client contact/physics model itself has not changed.
 
 Public custom-level sessions retain their separate temporary snapshot lifecycle,

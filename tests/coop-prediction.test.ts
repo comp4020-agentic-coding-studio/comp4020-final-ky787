@@ -30,6 +30,20 @@ class Socket {
 }
 const cleanups: (() => void)[] = [];
 afterEach(() => { for (const fn of cleanups.splice(0)) fn(); vi.unstubAllGlobals(); });
+it('pausing a JSON chamber releases every body contact and allows physical resampling on resume', async () => {
+    Socket.instances = [];
+    vi.stubGlobal('WebSocket', Socket);
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ id: 'visitor' }) })));
+    vi.stubGlobal('location', { href: 'http://localhost/' });
+    const client = new CoopClient(() => {}, () => {}); cleanups.push(() => client.leave()); client.start();
+    await vi.waitFor(() => expect(Socket.instances).toHaveLength(1));
+    const ws = Socket.instances[0]; ws.onopen();
+    ws.receive({ type: 'snapshot', slot: 1, room: sharedRoom(newRecord('ABCD', 'visitor', 'use-after-free'), [true, true], [null, null]) });
+    client.occupyDraft(['draft:plateA']); client.occupy(null); client.occupy(null); client.occupyDraft(['draft:plateA']);
+    expect(ws.sent.filter(m => m.type === 'draft-occupancy').map(m => m.devices)).toEqual([['draft:plateA'], [], ['draft:plateA']]);
+    expect(ws.sent.filter(m => m.type === 'occupancy')).toEqual([]);
+    expect(ws.sent.filter(m => 'seq' in m).every(m => m.levelInstance === 1)).toBe(true);
+});
 it('a new accepted instance reconstructs once on the same socket and clears all old prediction/presentation', async () => {
     Socket.instances = [];
     vi.stubGlobal('WebSocket', Socket);

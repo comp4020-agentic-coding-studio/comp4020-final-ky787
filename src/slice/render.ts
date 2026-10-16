@@ -1,5 +1,5 @@
 import { cubeEntries, isDeclarativeLevel, type CubeId } from '../coop/protocol.ts';
-import { isCampaignLevel } from '../coop/campaign.ts';
+import { isCampaignLevel, isAuthoredCampaignLevel } from '../coop/campaign.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
@@ -94,7 +94,12 @@ export class PuzzleRenderer {
         this.returnReveal = Math.max(0, this.returnReveal - dt);
         const reveal = this.cameraReveals.update(w, dt, overview, players?.connected !== false,
             this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null);
-        if (!editorCamera) cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, reveal.frame, r.id === 'uplink' || r.id === 'lift-lab' || isCampaignLevel(r.id) ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        // JSON shafts need upward hook visibility without the compact tutorial's
+        // fixed vertical rail. The 210-unit bias keeps near-500-unit rising
+        // catches visible even while follow easing lags a rope jump.
+        const rail = isAuthoredCampaignLevel(r.id) ? { offsetY: -210, minY: 0, maxY: r.height }
+            : r.id === 'uplink' || r.id === 'lift-lab' || isCampaignLevel(r.id) ? null : { offsetY: -140, minY: 340, maxY: 390 };
+        if (!editorCamera) cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, reveal.frame, rail);
         if (editorCamera) { cam.x = editorCamera.x; cam.y = editorCamera.y; cam.zoom = editorCamera.zoom; }
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);

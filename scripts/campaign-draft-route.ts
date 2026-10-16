@@ -17,6 +17,7 @@ export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowse
     const observe = (p: Cdp) => p.read<any>(`(()=>{const g=binaryNinja,w=g.world,c=g.coop,r=c.room;return{
         player:{...w.player,deaths:w.deaths},cubes:w.cubes,signals:{...w.frame.outputs,...w.frame.signals},
         controls:w.frame.controls??{},plates:w.frame.plates??{},exitUnlocked:w.frame.outputs.exitDoor,completed:r.completed,
+        camera:{x:g.renderer.camera.x,y:g.renderer.camera.y,zoom:g.renderer.camera.zoom},
         session:{code:r.code,slot:c.slot,visitor:c.visitor,peers:r.connected,generation:r.levelInstance,reachedExit:r.reachedExit,sharedCubes:r.cubes,room:r}
     }})()`);
     async function until(p: Cdp, condition: ScenarioCondition, timeout = 10000, movement = false) {
@@ -54,14 +55,28 @@ export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowse
                     const target = action.down ? document.geometry.objects.find(o => o.id === action.target) : undefined;
                     if (action.down && !target) throw new Error(`Unknown hook target ${action.target}`);
                     const b = target ? objectBounds(target) : { x: 0, y: 0, w: 0 };
+                    if (action.down && !await p.read<boolean>(`(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();
+                        const x=(${b.x + b.w / 2}-c.originX())*c.zoom,y=(${b.y + 12}-c.originY())*c.zoom;
+                        return x>=0&&x<r.width&&y>=0&&y<r.height})()`)) throw new Error(`Hook target ${action.target} is outside the player's viewport`);
                     await h.mouse(p, b.x + b.w / 2, b.y + 12, action.down);
                 }
             }
             if (step.waitMs) await h.sleep(step.waitMs);
             if (step.wait) await until(actors.get(step.wait.actor)!, step.wait.condition, step.wait.timeoutMs,
                 ['player.x', 'player.y', 'player.groundId', 'player.grounded'].includes(step.wait.condition.path));
-            const observed = Object.fromEntries(await Promise.all([...actors].map(async ([id, p]) => [id, await observe(p)])));
+            const observed = Object.fromEntries(await Promise.all([...actors].map(async ([id, p]) => [id, await observe(p)] as const)));
             for (const a of step.assert ?? []) if (!conditionMatches(observed[a.actor], a.condition)) throw new Error(`Assertion ${JSON.stringify(a)}`);
+            if (level === 'use-after-free' && step.capture === 'a-powered') {
+                const operator = actors.get('partner')!, climber = actors.get('host')!;
+                const before = (await observe(climber)).session.room.levelState.platforms['draft:operatorA'];
+                await h.click(operator, '#pause');
+                await until(climber, { path: 'signals.draft:routeA', equals: false }, 3000);
+                await h.click(operator, '#continue');
+                await until(climber, { path: 'signals.draft:routeA', equals: true }, 3000);
+                const after = (await observe(climber)).session.room.levelState.platforms['draft:operatorA'];
+                h.check('pausing the unstable operator releases route power; resume resamples contact without resetting its fuse',
+                    after.phase === 'warning' && after.remainingMs < before.remainingMs && after.durationMs === before.durationMs);
+            }
             if (step.capture) for (const [id, p] of actors) await h.shot(p, `${level}-${step.capture}-${id}`);
             results.push({ label: step.label, pass: true, campaignVictory: Object.values(observed).every(s => s.completed), observed });
         }

@@ -207,6 +207,9 @@ export class CoopClient {
         return true;
     }
     occupy(plate: Plate): void {
+        // Menus release the local body through this shared entry point. JSON
+        // rooms may hold several contacts and do not use the legacy plate cache.
+        if (plate === null && isDeclarativeLevel(this.room?.level)) { this.occupyDraft([]); return; }
         if (!this.connected || this.plate === plate) return;
         if (this.send({ type: 'occupancy', seq: ++this.actionSeq, plate })) this.plate = plate;
     }
