@@ -11,6 +11,14 @@ change the campaign. Single-player tutorials and CONTROL SPINE evidence are unch
 See the [integration contract](../adr/0010-json-coop-campaign.md) for persistence,
 old-party compatibility and full campaign tests. Human playtesting is still outstanding.
 
+The 2026-10-16 campaign check completed all five chambers in one persistent party
+using two independent browser identities and real controls. All 76 campaign checks
+passed, including both exit arrivals, NEXT, badges, pause contact release,
+reconnect and server restart. The new rooms retained all 59/87/43 scenario steps
+respectively, with zero deaths in those runs. See the
+[five-chamber selector](../playtest/2026-10-16-campaign/selector.png) and
+[completed campaign](../playtest/2026-10-16-campaign/complete.png).
+
 | Draft | Central discovery | Design and measured evidence |
 |---|---|---|
 | [HANDSHAKE](../../levels/drafts/handshake.json) | Recover one cube, substitute it for a plate operator, use partner-held support, then deliver it to the exit. | [HANDSHAKE](handshake.md) |
