@@ -18,6 +18,8 @@ import { drawConnections, roomConnections, type MachineConnection } from './conn
 import { ContextualCamera } from './camera-reveals.ts';
 import { HeroPresentation, type HeroCue } from './hero-presentation.ts';
 import { drawBreakpoint, drawEntryGateways, drawEntryProjection, drawExitGate, drawRespawnMarker } from './hero-render.ts';
+import { payloadReceivers } from './receiver-presentation.ts';
+import { drawReceivers, drawReceiverLabels } from './receiver-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     replay = new TracePlayback();
@@ -54,7 +56,7 @@ export class PuzzleRenderer {
         this.cameraDeaths = world.deaths;
         this.cameraReveals.reset(world);
         this.exitWasOpen = world.frame.outputs.exitDoor;
-        this.heroes.reset(world.room, { checkpoint: world.checkpoint, exitReady: world.frame.outputs.exitDoor, completed });
+        this.heroes.reset(world.room, { checkpoint: world.checkpoint, exitReady: world.frame.outputs.exitDoor, completed, receivers: payloadReceivers(world) });
         this.replay = new TracePlayback();
         this.replay.update(world.frame, 0);
     }
@@ -84,8 +86,9 @@ export class PuzzleRenderer {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
+        const receivers = payloadReceivers(w);
         const heroCues = this.heroes.update(r, { checkpoint: w.checkpoint, exitReady: w.frame.outputs.exitDoor,
-            completed: players?.completed ?? w.exited }, dt, running && players?.connected !== false);
+            completed: players?.completed ?? w.exited, receivers }, dt, running && players?.connected !== false);
         if (w.deaths !== this.cameraDeaths || players?.connected === false) this.returnReveal = 0;
         this.cameraDeaths = w.deaths;
         // Authored reveal of the final physical route; outputs and controls never wait for it.
@@ -215,20 +218,17 @@ export class PuzzleRenderer {
             ...(r.cubePads ?? []).map(p => ({ at: p.at, active: p.id === 'liftCargo' ? w.inputs.cubeOnPlate : p.id === 'finalLeft' ? w.inputs.cubeOnPlateB : w.inputs.cubeOnPlateC, depth: 0, label: p.label })),
         ];
         for (const plate of plates) {
-            if (!plate.at) continue;
+            if (!plate.at || receivers.some(receiver => receiver.at === plate.at)) continue;
             const { x, y } = plate.at;
             c.fillStyle = '#101c23';
             c.fillRect(x - 51, y - 3, 102, 13);
             c.fillStyle = plate.active ? C.cyan : C.amber;
             c.fillRect(x - 45, y - 9 + plate.depth * 6, 90, 7);
             if (isDeclarativeLevel(r.id) && 'kind' in plate) {
-                if (plate.kind === 'socket') { c.strokeStyle = plate.active ? C.cyan : C.amber; c.strokeRect(x - 27, y - 52, 54, 49); }
                 if (plate.kind === 'scanner') { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
             }
             if (r.id === 'crossfeed-vault') {
-                const socket = r.cubePads?.some(p => p.at === plate.at);
-                if (socket) { c.strokeStyle = plate.active ? C.cyan : C.amber; c.strokeRect(x - 27, y - 52, 54, 49); }
-                else if (!r.plates?.some(p => p.at === plate.at)) { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
+                if (!r.plates?.some(p => p.at === plate.at)) { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
             }
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
         }
@@ -272,6 +272,7 @@ export class PuzzleRenderer {
             drawBreakpoint(c, def, state.active, state.age, this.heroes.time, cam.zoom);
         }
         if (w.checkpoint !== 'entry' && !r.breakpoints?.some(b => b.checkpoint === w.checkpoint)) drawRespawnMarker(c, w.checkpointPosition());
+        drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'rear');
         for (const [id, cube] of cubeEntries(w.cubes)) if (!w.cubeIsResetting(id)) {
             c.fillStyle = '#393b32';
             c.fillRect(cube.x - CUBE_SIZE / 2, cube.y - CUBE_SIZE / 2, CUBE_SIZE, CUBE_SIZE);
@@ -291,6 +292,8 @@ export class PuzzleRenderer {
                 c.setLineDash([]);
             }
         }
+        drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'front');
+        drawReceiverLabels(c, receivers, cam.zoom);
         const p = w.player, rope = p.rope;
         if (rope.phase !== 'idle') {
             this.line(p.x, p.y, rope.tip.x, rope.tip.y, C.cyan, 2);

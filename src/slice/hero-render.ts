@@ -27,6 +27,8 @@ function dot(c: CanvasRenderingContext2D, x: number, y: number, r: number, colou
 function bolts(c: CanvasRenderingContext2D, x: number, y: number) {
     dot(c, x, y, 2.2, M.dark); line(c, x - 1, y, x + 1, y, M.rim);
 }
+/** Shared Canvas materials; new machinery uses the same metalwork as the gateways. */
+export const heroMaterials = { palette: M, panel, polygon, line, text, dot, bolts };
 /** Only major identification survives a room overview. The badge stays tethered to its machine. */
 function overviewLabel(c: CanvasRenderingContext2D, label: string, x: number, y: number, zoom: number, colour: string, second?: string, below = false) {
     if (zoom >= .68) return;

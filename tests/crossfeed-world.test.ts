@@ -10,6 +10,7 @@ import { FIXED_DT, PLAYER } from '../src/engine/constants.ts';
 import { boxesOverlap } from '../src/engine/geometry.ts';
 import { cubeEntries, type CubeId, type Slot } from '../src/coop/protocol.ts';
 import { AudioPresentation } from '../src/slice/audio-presentation.ts';
+import { ReceiverPresentation, payloadReceivers } from '../src/slice/receiver-presentation.ts';
 
 function setup(slot: Slot = 1) {
     const record = newRecord('ABCD', '11111111-1111-4111-8111-111111111111', 'crossfeed-vault'), cubes = freshCubes(record.level);
@@ -33,11 +34,15 @@ function setup(slot: Slot = 1) {
 function step(w: PuzzleWorld, n = 1, input = emptyInput()) { for (let i = 0; i < n; i++) { w.step(FIXED_DT, input); input.jumpPressed = false; } }
 function unlock(f: ReturnType<typeof setup>) { f.record.levelState.switchC = true; f.record.checkpoint = 'upper'; f.sync(); }
 
-it.each(['entry', 'routePower', 'liftCargo', 'finalLeft', 'finalRight'] as const)('%s contact uses one ordinary plate cue, without replaying confirmations', placement => {
+it.each(['entry', 'routePower', 'liftCargo', 'finalLeft', 'finalRight'] as const)('%s contact uses its semantic cue once, without replaying accepted snapshots', placement => {
     const f = setup(), audio = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, sound = new AudioPresentation(audio);
-    sound.reset(f.world); f.record.cubePlacements.cubeA = placement; f.sync(); sound.observe(f.world, []);
-    f.sync(); sound.observe(f.world, []);
-    expect(audio.play.mock.calls.filter(c => c[0] === 'plate')).toHaveLength(1);
+    const receivers = new ReceiverPresentation(); receivers.reset(payloadReceivers(f.world));
+    const observe = () => { sound.observe(f.world, []); for (const c of receivers.update(payloadReceivers(f.world), .016, true)) audio.play(c.cue); };
+    sound.reset(f.world); f.record.cubePlacements.cubeA = placement; f.sync(); observe();
+    f.sync(); observe();
+    const cargo = placement !== 'entry' && placement !== 'routePower';
+    expect(audio.play.mock.calls.filter(c => c[0] === 'plate')).toHaveLength(cargo ? 0 : 1);
+    expect(audio.play.mock.calls.filter(c => c[0] === 'payloadConfirm')).toHaveLength(cargo ? 1 : 0);
 });
 
 it('both loose cubes simulate and support independently; ordinary plate reports remain separate from local body reports', () => {

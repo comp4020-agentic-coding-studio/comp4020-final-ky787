@@ -126,4 +126,5 @@ the already-unlocked exit stays latched. Cargo transport, firewall, personnel
 clearance, manual hatch and final FEED-to-relay catch are unchanged.
 
 No assets, animations, movement constants or binary evidence were redesigned.
-The dedicated payload receiver visual milestone remains pending.
+The subsequent [payload receiver visual pass](../payload-receiver.md) replaces
+cube-only socket graphics without changing these controller or persistence rules.

@@ -12,6 +12,7 @@ import { emptyInput } from '../src/engine/physics.ts';
 import { FIXED_DT } from '../src/engine/constants.ts';
 import { freshProgress } from '../src/slice/progress.ts';
 import { AudioPresentation } from '../src/slice/audio-presentation.ts';
+import { ReceiverPresentation, payloadReceivers } from '../src/slice/receiver-presentation.ts';
 
 const transform = { x: 1200, y: 538, vx: 0, vy: 0, grounded: true };
 it.each([1, 2] as const)('slot %s can win a pickup race, drop, and hand authority to the partner', slot => {
@@ -220,13 +221,20 @@ it('denied predicted pull stops local forces and snaps to the accepted transform
     expect(world.pullingCube).toBe(false); expect(world.cube!.x).toBe(1260);
 });
 
-it('cargo contact predicts only plate feedback, and durable confirmation does not replay it', () => {
+it('predicted cargo contact cannot confirm a receiver; accepted occupancy confirms exactly once', () => {
     const { world, record, cube, update } = setup();
     const sink = { play: vi.fn(), setLoop: vi.fn(), stopAll: vi.fn() }, audio = new AudioPresentation(sink); audio.reset(world);
-    Object.assign(world.cube!, { x: 1310, y: 538, grounded: true }); cube.sample(world); audio.observe(world, []);
+    const receivers = new ReceiverPresentation(); receivers.reset(payloadReceivers(world));
+    const observe = () => { audio.observe(world, []); for (const c of receivers.update(payloadReceivers(world), .016, true)) sink.play(c.cue); };
+    Object.assign(world.cube!, { x: 1310, y: 538, grounded: true }); cube.sample(world); observe();
     expect(world.cargoPlateActive).toBe(true); expect(world.inputs.cubeOnPlate).toBe(false);
     expect(world.frame.outputs.codePlatformA).toBe(false);
-    record.cubePlacements.cube = 'cargoPlate'; update(); audio.observe(world, []);
+    expect(receivers.snapshot()[0].active).toBe(false);
+    expect(sink.play.mock.calls.filter(c => c[0] === 'plate' || c[0] === 'payloadConfirm')).toHaveLength(0);
+    record.cubePlacements.cube = 'cargoPlate'; update(); observe();
     expect(world.frame.outputs.codePlatformA).toBe(true);
-    expect(sink.play.mock.calls.filter(c => c[0] === 'plate')).toHaveLength(1);
+    expect(receivers.snapshot()[0].active).toBe(true);
+    update(); observe();
+    expect(sink.play.mock.calls.filter(c => c[0] === 'plate')).toHaveLength(0);
+    expect(sink.play.mock.calls.filter(c => c[0] === 'payloadConfirm')).toHaveLength(1);
 });

@@ -25,6 +25,7 @@ export const SOUNDS = {
     entryAttach: { file: 'grapple-attach.ogg', gain: .26, cooldown: .4, rate: .85 },
     breakpointDeploy: { file: 'door-open.ogg', gain: .42, cooldown: .4, rate: .72 },
     breakpointConfirm: { file: 'confirm.ogg', gain: .42, cooldown: .4, rate: 1.05 },
+    payloadConfirm: { file: 'relay-on.ogg', gain: .28, cooldown: .18, rate: 1.3 },
     reel: { file: 'grapple-reel.ogg', gain: .085, cooldown: 0, loop: true },
     liftHum: { file: 'lift-hum.ogg', gain: .22, cooldown: 0, loop: true },
 } as const;

@@ -2,6 +2,7 @@ import { cubeEntries } from '../coop/protocol.ts';
 import { GameAudio, type SoundCue } from '../audio/game-audio.ts';
 import type { Box, Vec2 } from '../engine/geometry.ts';
 import type { MachineEvent, PuzzleWorld } from './world.ts';
+import { payloadReceivers } from './receiver-presentation.ts';
 
 /** Sound observes physical state/output transitions, never retained CPU timing. */
 export function liftProximity(player: Vec2, box: Box): number {
@@ -10,13 +11,15 @@ export function liftProximity(player: Vec2, box: Box): number {
     return Math.max(0, 1 - Math.hypot(dx, dy) / 420);
 }
 function state(w: PuzzleWorld) {
+    const receivers = payloadReceivers(w);
     return { phase: w.player.rope.phase, jumps: w.player.ropeJumpAnchors.length, grounded: w.player.grounded,
-        carried: Object.fromEntries(cubeEntries(w.cubes).map(([id, c]) => [id, c.carried])), plates: w.frame.plates
+        carried: Object.fromEntries(cubeEntries(w.cubes).map(([id, c]) => [id, c.carried])), plates: (w.frame.plates
             ? [...(w.room.plates ?? []).map(p => ({ on: !!w.frame.plates?.[p.id], at: p.at })),
                 { on: w.inputs.plateB, at: w.room.plateB }, { on: w.inputs.plateC, at: w.room.plateC },
                 ...(w.room.cubePads ?? []).map(p => ({ on: p.id === 'liftCargo' ? w.inputs.cubeOnPlate : p.id === 'finalLeft' ? w.inputs.cubeOnPlateB : w.inputs.cubeOnPlateC, at: p.at }))]
             : (w.room.plates ? [w.inputs.plateA, w.inputs.plateB, w.inputs.cubeOnPlate, w.inputs.plateC, w.inputs.cubeOnPlateB] : [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC,
-                !!w.room.cargoPlate && w.cargoPlateActive]).map((on, i) => ({ on, at: w.room.plates?.[i]?.at ?? [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i] })),
+                !!w.room.cargoPlate && w.cargoPlateActive]).map((on, i) => ({ on, at: w.room.plates?.[i]?.at ?? [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i] })))
+            .filter(p => !receivers.some(r => r.at === p.at)),
         outputs: { ...w.frame.outputs }, signals: { ...w.frame.signals }, timer: w.frame.timer?.phase, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
 }
 type AudioSink = Pick<GameAudio, 'play' | 'setLoop' | 'stopAll'>;

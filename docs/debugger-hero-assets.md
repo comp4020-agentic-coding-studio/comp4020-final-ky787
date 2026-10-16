@@ -10,15 +10,19 @@ literal instructions, binary addresses, native blocks, or obfuscator evidence.
 | BREAKPOINT ACTIVE | Saved checkpoint/respawn milestone | Red screen, circular breakpoint emblem, extended mechanical mast and banner; body stays neutral |
 | TRAVEL INCOMPLETE | Exit route is unavailable | Heavy portal frame, grey status, dim field |
 | TRAVEL COMPLETE | Exit route is available | Green status and illuminated frame/field |
+| PAYLOAD RECEIVER | Live cube-only occupancy | Open industrial guide arms, inset amber/cyan status screen, layered metal base |
 
 Exit readiness is separate from arrival. Co-op gates retain their physical
 `0 / 2 ARRIVED`, `1 / 2 ARRIVED`, and `2 / 2 ARRIVED` display. The accepted party
 completion event still controls victory and host navigation. Turning the gate
 green never completes a party by itself.
 
-Toggle levers retain their pivoting handles. Payload sockets retain their amber
-outlined cargo bays. Pressure plates retain their low, compressible footprints.
-None use checkpoint masts or breakpoint terminology.
+Toggle levers retain their pivoting handles. Genuine cube-only sockets use the
+[PAYLOAD RECEIVER](payload-receiver.md): amber while awaiting cargo, cyan after
+accepted occupancy, with a short scan and reversible mechanical engagement.
+Pressure plates retain their low, compressible footprints. RACE CONDITION's
+universal receiver sensor remains a pressure plate despite its cargo location.
+Neither asset uses checkpoint masts or breakpoint terminology.
 
 ## Rendering and state boundaries
 
@@ -28,6 +32,10 @@ None use checkpoint masts or breakpoint terminology.
 - `src/slice/hero-presentation.ts` observes checkpoint, exit readiness and
   completion edges. `reset` baselines a room/reconnect snapshot: retained active
   checkpoints render fully deployed, without replaying deployment or sounds.
+- `src/slice/receiver-presentation.ts` audits cube-only inputs and tracks independent
+  accepted occupancy edges. `src/slice/receiver-render.ts` uses shared hero materials
+  in rear/front passes around the existing cube drawing. Restored occupied docks
+  begin in powered idle, with no scan or sound replay.
 - `PuzzleRenderer` positions these assets in the existing world transform.
   `SliceGame` sends returned cosmetic cues to the existing audio manager.
   Camera updates, screen-to-world aiming, simulation steps and network messages
@@ -104,6 +112,8 @@ Audio reuses credited files in `public/audio/credits.json`: quiet
 and `confirm.ogg` at banner confirmation. Existing exit/party cues remain in use.
 No audio files or licenses were added. Mute, gesture unlock, voice limits and
 distance attenuation remain in the existing framework; browser tests stay muted.
+Receivers use a quieter, faster `relay-on.ogg` confirmation (gain .28, rate 1.3,
+180 ms cooldown); they no longer also emit the generic pressure-plate click.
 
 Below 0.68 camera zoom, small anchored badges preserve major text and exit arrival
 counts in screen pixels. Ornament can disappear, but material mass, semantic
@@ -140,3 +150,8 @@ Human inspection is the next art gate. The immediate party menu may obscure part
 of the short completion flare; it deliberately does not wait for cosmetic timing.
 Co-op projection clocks are local, so clients need not show identical animation
 frames. Any further expansion or art tuning should follow manual inspection.
+
+The [receiver gallery](playtest/2026-10-16-receivers/index.html) contains actual
+production-mode public custom, editor and full DEADLOCK solve captures, including
+removal, off-centre cargo and compact overviews. Run `pnpm check:receivers` after
+building, then `node scripts/receiver-gallery.ts` to refresh it.

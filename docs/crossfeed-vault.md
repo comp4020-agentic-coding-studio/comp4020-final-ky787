@@ -182,7 +182,8 @@ code, without representing the two main routes as permanently unlocked.
 Inactive controlled slabs remain 25% ghosts, unhookable/non-solid after grace.
 Wires show resolved destination power; inverse relay/left-route branches have
 NOT markers. Ordinary plates look alike and accept either kind of occupant.
-Payload sockets have enclosing frames; biometric scanners have body-height rails.
+Payload sockets use open industrial [PAYLOAD RECEIVER docks](payload-receiver.md)
+with amber awaiting/cyan detected status; biometric scanners have body-height rails.
 Toggle levers and one-shot terminals have visibly different drawings.
 
 Room-owned `cameraReveal` metadata gives A the entry gap/anchor, B a brief transfer

@@ -2,12 +2,13 @@ import { PLAYER } from '../engine/constants.ts';
 import type { Box, Vec2 } from '../engine/geometry.ts';
 import type { RoomMemory } from './progress.ts';
 import type { BreakpointDef, RoomDef } from './rooms.ts';
+import { ReceiverPresentation, type PayloadReceiver } from './receiver-presentation.ts';
 
 export const HERO_TIMING = { attach: .85, terminal: .2, mast: .8, flag: 1.2, breakpoint: 1.6, exit: 1, completion: .65 } as const;
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const ease = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * t); };
-export interface HeroState { checkpoint: RoomMemory['checkpoint']; exitReady: boolean; completed: boolean }
-export interface HeroCue { cue: 'entryAttach' | 'breakpointDeploy' | 'breakpointConfirm'; at: Vec2 }
+export interface HeroState { checkpoint: RoomMemory['checkpoint']; exitReady: boolean; completed: boolean; receivers?: readonly PayloadReceiver[] }
+export interface HeroCue { cue: 'entryAttach' | 'breakpointDeploy' | 'breakpointConfirm' | 'payloadConfirm'; at: Vec2 }
 export function breakpointActive(def: BreakpointDef, checkpoint: HeroState['checkpoint']): boolean {
     return checkpoint === def.checkpoint || def.checkpoint === 'relay' && checkpoint === 'upper';
 }
@@ -40,17 +41,19 @@ export class HeroPresentation {
     private pendingEntry = false;
     private previous: HeroState = { checkpoint: 'entry', exitReady: false, completed: false };
     readonly breakpoints = new Map<string, { active: boolean; age: number }>();
+    readonly receivers = new ReceiverPresentation();
     reset(room: RoomDef, state: HeroState): void {
         this.time = 0; this.entryAge = this.exitAge = this.completionAge = Infinity;
         this.pendingEntry = state.checkpoint === 'entry' && !state.completed;
         this.previous = { ...state };
         this.breakpoints.clear();
+        this.receivers.reset(state.receivers ?? []);
         for (const def of room.breakpoints ?? []) this.breakpoints.set(def.id, { active: breakpointActive(def, state.checkpoint), age: Infinity });
     }
     update(room: RoomDef, state: HeroState, dt: number, running: boolean): HeroCue[] {
         dt = Math.max(0, Number.isFinite(dt) ? dt : 0);
         this.time += dt; this.entryAge += dt; this.exitAge += dt; this.completionAge += dt;
-        const cues: HeroCue[] = [];
+        const cues: HeroCue[] = this.receivers.update(state.receivers ?? [], dt, running);
         if (this.pendingEntry && running) {
             this.pendingEntry = false; this.entryAge = 0;
             cues.push({ cue: 'entryAttach', at: room.spawn });
@@ -71,6 +74,7 @@ export class HeroPresentation {
     snapshot() {
         const age = (n: number) => Number.isFinite(n) ? n : null;
         return { entryAge: age(this.entryAge), exitAge: age(this.exitAge), completionAge: age(this.completionAge),
+            receivers: this.receivers.snapshot(),
             breakpoints: [...this.breakpoints].map(([id, s]) => ({ id, active: s.active, age: age(s.age), ...breakpointPose(s.active, s.age) })) };
     }
 }

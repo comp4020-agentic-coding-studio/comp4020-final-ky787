@@ -23,7 +23,7 @@ const overlaps = (a: Box, b: Box) => a.x < b.x + b.w && a.x + a.w > b.x && a.y <
 const PALETTE: { kind: PaletteKind; label: string; hint: string }[] = [
     { kind: 'static', label: 'Architecture', hint: 'Always solid' }, { kind: 'code', label: 'Code platform', hint: 'Powered / ghost' },
     { kind: 'door', label: 'Service door', hint: 'Output opens it' }, { kind: 'unstable', label: 'Unstable block', hint: 'Authored crumble' },
-    { kind: 'plate', label: 'Pressure plate', hint: 'Bodies or cubes' }, { kind: 'socket', label: 'Payload socket', hint: 'Cubes only' },
+    { kind: 'plate', label: 'Pressure plate', hint: 'Bodies or cubes' }, { kind: 'socket', label: 'Payload receiver', hint: 'Cubes only' },
     { kind: 'scanner', label: 'Player scanner', hint: 'Players only' }, { kind: 'toggle', label: 'Toggle lever', hint: 'E toggles' },
     { kind: 'terminal', label: 'Terminal', hint: 'E commits once' }, { kind: 'cube', label: 'Named cube', hint: 'Carry / pull' },
     { kind: 'relay', label: 'Relay pair', hint: 'Two paired gates' }, { kind: 'lift', label: 'Gravity lift', hint: 'Powered field' },
