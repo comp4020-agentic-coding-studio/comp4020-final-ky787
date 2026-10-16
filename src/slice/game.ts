@@ -170,7 +170,7 @@ export class SliceGame {
         const status = !this.coop.connected ? this.coop.status
             : r?.party && this.coop.slot === 2 && !r.connected[0] ? 'HOST DISCONNECTED — WAITING FOR RECONNECT'
             : r && !r.connected[partner] ? r.assigned[partner] ? 'PARTNER DISCONNECTED' : 'WAITING FOR PARTNER'
-            : r?.completed ? r.level === 'race-condition' ? 'TRACE COMPLETE' : r.level === 'crossfeed-vault' ? 'VAULT COMPLETE' : r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
+            : r?.completed ? r.level === 'race-condition' ? 'TRACE COMPLETE' : r.level === 'crossfeed-vault' ? 'VAULT COMPLETE' : isCampaignLevel(r.level) ? 'CHAMBER COMPLETE' : r.level === 'pairing-bay' ? 'PAIRING COMPLETE' : 'LAB COMPLETE'
             : r?.exitUnlocked ? 'EXIT UNLOCKED · REGROUP'
             : 'PARTNER CONNECTED · PLAY TOGETHER';
         this.coopHud.replaceChildren();

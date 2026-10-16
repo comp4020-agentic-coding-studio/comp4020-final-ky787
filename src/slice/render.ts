@@ -1,4 +1,5 @@
-import { cubeEntries, type CubeId } from '../coop/protocol.ts';
+import { cubeEntries, isDeclarativeLevel, type CubeId } from '../coop/protocol.ts';
+import { isCampaignLevel } from '../coop/campaign.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
@@ -93,7 +94,7 @@ export class PuzzleRenderer {
         this.returnReveal = Math.max(0, this.returnReveal - dt);
         const reveal = this.cameraReveals.update(w, dt, overview, players?.connected !== false,
             this.returnReveal > 0 ? { x: 0, y: 0, w: r.width, h: 850 } : null);
-        if (!editorCamera) cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, reveal.frame, r.id === 'uplink' || r.id === 'lift-lab' || r.id === 'crossfeed-vault' || r.id === 'race-condition' ? null : { offsetY: -140, minY: 340, maxY: 390 });
+        if (!editorCamera) cam.update(dt, w.player, { x: w.player.vx, y: w.player.vy }, cam.viewW, cam.viewH, reveal.frame, r.id === 'uplink' || r.id === 'lift-lab' || isCampaignLevel(r.id) ? null : { offsetY: -140, minY: 340, maxY: 390 });
         if (editorCamera) { cam.x = editorCamera.x; cam.y = editorCamera.y; cam.zoom = editorCamera.zoom; }
         const dpr = Math.min(devicePixelRatio || 1, 2);
         c.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -153,7 +154,7 @@ export class PuzzleRenderer {
                 this.text(type, b.x + b.w - type.length * 5.5 - 6, b.y + Math.min(18, b.h - 8), 9, colour);
             }
             if (crumble) {
-                if (!address) this.text(r.id === 'race-condition' || r.id === 'crossfeed-vault' ? 'UNSTABLE' : 'prototype', b.x + 12, b.y + 49, 11, C.amber);
+                if (!address) this.text(isCampaignLevel(r.id) ? 'UNSTABLE' : 'prototype', b.x + 12, b.y + 49, 11, C.amber);
                 if (p.fuse >= 0) {
                     c.fillStyle = C.amber;
                     c.fillRect(b.x, b.y - 5, b.w * p.fuse / p.fuseDuration, 3);
@@ -215,7 +216,7 @@ export class PuzzleRenderer {
             c.fillRect(x - 51, y - 3, 102, 13);
             c.fillStyle = plate.active ? C.cyan : C.amber;
             c.fillRect(x - 45, y - 9 + plate.depth * 6, 90, 7);
-            if (r.id === 'workbench' && 'kind' in plate) {
+            if (isDeclarativeLevel(r.id) && 'kind' in plate) {
                 if (plate.kind === 'socket') { c.strokeStyle = plate.active ? C.cyan : C.amber; c.strokeRect(x - 27, y - 52, 54, 49); }
                 if (plate.kind === 'scanner') { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
             }
@@ -329,7 +330,7 @@ export class PuzzleRenderer {
             this.text('SAFE FLOOR · RETURN TO CARGO', 1200, 660, 12, C.dim);
             this.text(w.frame.outputs.exitDoor ? 'EXIT UNLOCKED · REGROUP →' : 'TWO SIGNALS REQUIRED', 1670, 240, 14, C.ink);
         }
-        if (isCoopLevel(r.id) && r.id !== 'pairing-bay' && r.id !== 'crossfeed-vault' && r.id !== 'race-condition') {
+        if (isCoopLevel(r.id) && r.id !== 'pairing-bay' && !isCampaignLevel(r.id)) {
             this.text('MOCK MECHANICS LAB · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
             if (r.id === 'relay-lab') {
                 this.text('E · POWER CONTROL', 305, 410, 13, C.cyan);

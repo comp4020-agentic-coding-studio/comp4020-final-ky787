@@ -27,6 +27,11 @@ the same implementations. All controllers remain authored/mock. Single-player
 C8, movement constants, existing chamber geometry and CONTROL SPINE evidence
 are unchanged.
 
+Presentation recognizes the named JSON chambers as campaign rooms: it retains
+socket/scanner glyphs and resolved lift labels, omits internal lab instructions,
+and uses the normal vertical follow camera instead of the compact tutorial rail.
+Authored control reveals and manual overview retain their existing priority.
+
 ## Authority, persistence and compatibility
 
 Named JSON campaign rooms use the existing version-6 persistent party schema.
@@ -63,7 +68,10 @@ DEADLOCK with its original code, players and badges.
 browser identities and real movement/interactions. The JSON chamber routes replay
 the existing bounded `levels/scenarios/*.json` with every assertion retained.
 The adapter only reads observations; it never sets controller outputs or body
-positions. This check also covers NEXT, pause/selection, stale packets, completion
+positions. Campaign victory freezes movement on the second exit overlap, so
+accepted two-arrival completion supersedes subsequent walking/landing waits;
+scenario assertions remain strict and each affected step records the victory.
+This check also covers NEXT, pause/selection, stale packets, completion
 badges, host/guest reconnect and SIGKILL recovery. Reports include the released
 document hash and per-step observations/screenshots. Run after `pnpm build`:
 

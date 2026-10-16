@@ -19,11 +19,16 @@ export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowse
         controls:w.frame.controls??{},plates:w.frame.plates??{},exitUnlocked:w.frame.outputs.exitDoor,completed:r.completed,
         session:{code:r.code,slot:c.slot,visitor:c.visitor,peers:r.connected,generation:r.levelInstance,reachedExit:r.reachedExit,sharedCubes:r.cubes,room:r}
     }})()`);
-    async function until(p: Cdp, condition: ScenarioCondition, timeout = 10000) {
+    async function until(p: Cdp, condition: ScenarioCondition, timeout = 10000, movement = false) {
         const end = Math.min(deadline, Date.now() + timeout); let last: unknown;
         do {
             if (pages.some(p => p.errors.length)) throw new Error(pages.flatMap(p => p.errors).join('\n'));
-            last = await observe(p); if (conditionMatches(last, condition)) return;
+            const observed = await observe(p); last = observed;
+            if (conditionMatches(last, condition)) return;
+            // A campaign stops physics on the second exit overlap, sometimes
+            // while still airborne. Further walking/landing is impossible;
+            // accepted completion supersedes only these movement waits.
+            if (movement && observed.completed && observed.session.reachedExit.every(Boolean)) return;
             await h.sleep(25);
         } while (Date.now() < end);
         throw new Error(`Timeout ${JSON.stringify(condition)}: ${JSON.stringify(last)}`);
@@ -37,17 +42,13 @@ export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowse
             if (Date.now() > deadline) throw new Error('Full-room scenario deadline exceeded');
             for (const action of step.actions ?? []) {
                 const p = actors.get(action.actor)!;
+                if ((await observe(p)).completed) continue;
                 if (action.type === 'tap') await h.tap(p, action.code);
                 else if (action.type === 'key') await h.key(p, action.code, action.down);
                 else if (action.type === 'walk') {
                     const right = (await observe(p)).player.x < action.x, key = right ? 'KeyD' : 'KeyA';
                     await h.key(p, key, true);
-                    // Campaign victory freezes both bodies at the first exit overlap.
-                    // A scenario's explicit completion walk must wait for that accepted
-                    // two-arrival state, not a now-unreachable point inside the gate.
-                    const completes = step.wait?.condition.path === 'completed' && step.wait.condition.equals === true;
-                    try { await until(p, completes ? { path: 'completed', equals: true }
-                        : { path: 'player.x', ...(right ? { min: action.x } : { max: action.x }) }, action.timeoutMs ?? 10000); }
+                    try { await until(p, { path: 'player.x', ...(right ? { min: action.x } : { max: action.x }) }, action.timeoutMs ?? 10000, true); }
                     finally { await h.key(p, key, false); }
                 } else {
                     const target = action.down ? document.geometry.objects.find(o => o.id === action.target) : undefined;
@@ -57,11 +58,12 @@ export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowse
                 }
             }
             if (step.waitMs) await h.sleep(step.waitMs);
-            if (step.wait) await until(actors.get(step.wait.actor)!, step.wait.condition, step.wait.timeoutMs);
+            if (step.wait) await until(actors.get(step.wait.actor)!, step.wait.condition, step.wait.timeoutMs,
+                ['player.x', 'player.y', 'player.groundId', 'player.grounded'].includes(step.wait.condition.path));
             const observed = Object.fromEntries(await Promise.all([...actors].map(async ([id, p]) => [id, await observe(p)])));
             for (const a of step.assert ?? []) if (!conditionMatches(observed[a.actor], a.condition)) throw new Error(`Assertion ${JSON.stringify(a)}`);
             if (step.capture) for (const [id, p] of actors) await h.shot(p, `${level}-${step.capture}-${id}`);
-            results.push({ label: step.label, pass: true, observed });
+            results.push({ label: step.label, pass: true, campaignVictory: Object.values(observed).every(s => s.completed), observed });
         }
         for (const p of pages) await until(p, { path: 'completed', equals: true });
         h.check(`${level}: authored-start physical solve with both arrivals`, true);
