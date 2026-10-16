@@ -1,0 +1,717 @@
+{
+  "bindings": [
+    {
+      "id": "cargoPower",
+      "output": "cargoLift",
+      "property": "power",
+      "target": "cargoField"
+    },
+    {
+      "id": "firewallPower",
+      "output": "shaftFirewall",
+      "property": "active",
+      "target": "shaftBeam"
+    },
+    {
+      "id": "serviceLowerPower",
+      "output": "serviceRelay",
+      "property": "power",
+      "target": "serviceLower"
+    },
+    {
+      "id": "serviceUpperPower",
+      "output": "serviceRelay",
+      "property": "power",
+      "target": "serviceUpper"
+    },
+    {
+      "id": "hatchOpening",
+      "output": "hatchOpen",
+      "property": "open",
+      "target": "hatch"
+    },
+    {
+      "id": "exitUnlock",
+      "output": "payloadReady",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "cargoLift": {
+        "args": [
+          {
+            "id": "feed.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "safe.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      },
+      "hatchOpen": {
+        "id": "hatchToggle.value",
+        "op": "ref"
+      },
+      "payloadReady": {
+        "args": [
+          {
+            "id": "payloadOne.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "payloadTwo.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "payloadThree.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      },
+      "serviceRelay": {
+        "args": [
+          {
+            "id": "safe.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "feed.occupied",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      },
+      "shaftFirewall": {
+        "arg": {
+          "id": "safe.occupied",
+          "op": "ref"
+        },
+        "op": "not"
+      }
+    }
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 3100,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 350,
+        "y": 2983
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 1730,
+        "y": 2983
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 100,
+        "id": "lowerFloor",
+        "kind": "static",
+        "label": "LOWER ALLOCATION FLOOR",
+        "type": "platform",
+        "w": 1800,
+        "x": 0,
+        "y": 3000
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 32,
+        "id": "upperGallery",
+        "kind": "static",
+        "label": "PAYLOAD GALLERY",
+        "type": "platform",
+        "w": 1080,
+        "x": 720,
+        "y": 1000
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 28,
+        "id": "hatch",
+        "kind": "static",
+        "label": "HATCH / FULL SOLID",
+        "type": "platform",
+        "w": 120,
+        "x": 600,
+        "y": 1000
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 362,
+        "id": "lowerServiceRoof",
+        "kind": "static",
+        "label": "PERSONNEL / 38 CLEAR",
+        "type": "platform",
+        "w": 315,
+        "x": 0,
+        "y": 2600
+      },
+      {
+        "blocksCubeInteraction": true,
+        "h": 42,
+        "id": "upperServiceRoof",
+        "kind": "static",
+        "label": "PERSONNEL / 38 CLEAR",
+        "type": "platform",
+        "w": 120,
+        "x": 800,
+        "y": 920
+      },
+      {
+        "id": "cubeA",
+        "mark": "A",
+        "type": "cube",
+        "x": 500,
+        "y": 2978
+      },
+      {
+        "id": "cubeB",
+        "mark": "B",
+        "type": "cube",
+        "x": 1660,
+        "y": 2978
+      },
+      {
+        "id": "cubeC",
+        "mark": "C",
+        "type": "cube",
+        "x": 1040,
+        "y": 2978
+      },
+      {
+        "id": "feed",
+        "kind": "plate",
+        "label": "FEED",
+        "type": "device",
+        "x": 400,
+        "y": 3000
+      },
+      {
+        "id": "safe",
+        "kind": "plate",
+        "label": "SAFE",
+        "type": "device",
+        "x": 1500,
+        "y": 3000
+      },
+      {
+        "id": "hatchToggle",
+        "initial": false,
+        "kind": "toggle",
+        "label": "HATCH / OPEN-CLOSE",
+        "type": "device",
+        "x": 785,
+        "y": 1000
+      },
+      {
+        "id": "payloadOne",
+        "kind": "socket",
+        "label": "PAYLOAD 1",
+        "type": "device",
+        "x": 1030,
+        "y": 1000
+      },
+      {
+        "id": "payloadTwo",
+        "kind": "socket",
+        "label": "PAYLOAD 2",
+        "type": "device",
+        "x": 1250,
+        "y": 1000
+      },
+      {
+        "id": "payloadThree",
+        "kind": "socket",
+        "label": "PAYLOAD 3",
+        "type": "device",
+        "x": 1470,
+        "y": 1000
+      },
+      {
+        "checkpoint": "relay",
+        "id": "lowerCommit",
+        "kind": "terminal",
+        "label": "SET LOWER BREAKPOINT",
+        "type": "device",
+        "x": 340,
+        "y": 3000
+      },
+      {
+        "activationControl": "lowerCommit",
+        "checkpoint": "relay",
+        "id": "lowerBreakpoint",
+        "label": "LOWER BREAKPOINT",
+        "type": "breakpoint",
+        "x": 340,
+        "y": 3000
+      },
+      {
+        "checkpoint": "relay",
+        "id": "lowerCheckpoint1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 340,
+        "y": 2983
+      },
+      {
+        "checkpoint": "relay",
+        "id": "lowerCheckpoint2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 440,
+        "y": 2983
+      },
+      {
+        "h": 2920,
+        "id": "cargoField",
+        "label": "CARGO LIFT",
+        "type": "lift",
+        "w": 120,
+        "x": 600,
+        "y": 80
+      },
+      {
+        "id": "shaftBeam",
+        "label": "SHAFT FIREWALL / NOT SAFE",
+        "length": 120,
+        "orientation": "horizontal",
+        "thickness": 14,
+        "type": "firewall",
+        "x": 600,
+        "y": 2500
+      },
+      {
+        "exitSide": 1,
+        "h": 38,
+        "id": "serviceLower",
+        "label": "PERSONNEL SERVICE",
+        "pair": "personnel",
+        "type": "relay",
+        "w": 32,
+        "x": 220,
+        "y": 2962
+      },
+      {
+        "exitSide": -1,
+        "h": 38,
+        "id": "serviceUpper",
+        "label": "PERSONNEL SERVICE",
+        "pair": "personnel",
+        "type": "relay",
+        "w": 32,
+        "x": 870,
+        "y": 962
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "label": "TWO ARRIVALS",
+        "latch": true,
+        "type": "exit",
+        "w": 80,
+        "x": 1690,
+        "y": 860
+      }
+    ],
+    "width": 1800
+  },
+  "id": "deadlock",
+  "instruction": "ALLOCATE THREE CUBES. LIFT THE FINAL LOAD. RELAY TO CLOSE THE HATCH.",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "bounds": {
+          "h": 3000,
+          "w": 480,
+          "x": 330,
+          "y": 40
+        },
+        "duration": 1.6,
+        "id": "feed-context",
+        "padding": 50,
+        "source": "feed"
+      },
+      {
+        "bounds": {
+          "h": 640,
+          "w": 1100,
+          "x": 550,
+          "y": 2400
+        },
+        "duration": 1.6,
+        "id": "safe-context",
+        "padding": 70,
+        "source": "safe"
+      },
+      {
+        "bounds": {
+          "h": 1020,
+          "w": 380,
+          "x": 570,
+          "y": 40
+        },
+        "duration": 1.8,
+        "id": "hatch-context",
+        "padding": 70,
+        "source": "hatchToggle"
+      },
+      {
+        "bounds": {
+          "h": 280,
+          "w": 800,
+          "x": 1000,
+          "y": 760
+        },
+        "duration": 1.5,
+        "id": "payload-context",
+        "padding": 70,
+        "source": "payloadThree"
+      }
+    ],
+    "display": {
+      "x": 1130,
+      "y": 1700
+    },
+    "labels": [
+      {
+        "id": "title",
+        "text": "DEADLOCK / AUTHORED MOCK",
+        "x": 60,
+        "y": 2750
+      },
+      {
+        "id": "lower-rule",
+        "text": "FEED AND SAFE = LIFT",
+        "x": 780,
+        "y": 2760
+      },
+      {
+        "id": "lower-rule2",
+        "text": "SAFE AND NOT FEED = SERVICE",
+        "x": 780,
+        "y": 2800
+      },
+      {
+        "id": "upper-rule",
+        "text": "THREE PAYLOADS / LATCHED EXIT",
+        "x": 1020,
+        "y": 650
+      },
+      {
+        "id": "hatch-hint",
+        "text": "HATCH: OPEN TO RISE / CLOSE TO CATCH",
+        "x": 745,
+        "y": 1120
+      },
+      {
+        "id": "hover",
+        "text": "CARGO HOVER / NO TIMER",
+        "x": 760,
+        "y": 150
+      },
+      {
+        "id": "service-hint",
+        "text": "SERVICE: PERSONNEL ONLY",
+        "x": 45,
+        "y": 2860
+      },
+      {
+        "id": "catch-hint",
+        "text": "FINAL LOAD: HOLD / RELAY / CATCH",
+        "x": 745,
+        "y": 1230
+      },
+      {
+        "id": "safe-label",
+        "text": "KEEP SAFE HELD DURING TRANSFER",
+        "x": 1360,
+        "y": 2690
+      },
+      {
+        "id": "recovery",
+        "text": "AFTER UNLOCK: RETURN ONE CUBE TO SAFE",
+        "x": 745,
+        "y": 1340
+      }
+    ],
+    "wires": [
+      {
+        "binding": "cargoPower",
+        "id": "feed-lift",
+        "points": [
+          {
+            "x": 400,
+            "y": 2988
+          },
+          {
+            "x": 400,
+            "y": 2850
+          },
+          {
+            "x": 620,
+            "y": 2850
+          },
+          {
+            "x": 620,
+            "y": 2810
+          }
+        ]
+      },
+      {
+        "binding": "cargoPower",
+        "id": "safe-lift",
+        "points": [
+          {
+            "x": 1500,
+            "y": 2988
+          },
+          {
+            "x": 1500,
+            "y": 2820
+          },
+          {
+            "x": 700,
+            "y": 2820
+          },
+          {
+            "x": 700,
+            "y": 2810
+          }
+        ]
+      },
+      {
+        "binding": "firewallPower",
+        "id": "safe-not-firewall",
+        "invertedLabel": true,
+        "points": [
+          {
+            "x": 1500,
+            "y": 2988
+          },
+          {
+            "x": 1570,
+            "y": 2988
+          },
+          {
+            "x": 1570,
+            "y": 2480
+          },
+          {
+            "x": 720,
+            "y": 2480
+          },
+          {
+            "x": 720,
+            "y": 2507
+          }
+        ]
+      },
+      {
+        "binding": "serviceLowerPower",
+        "id": "safe-service",
+        "points": [
+          {
+            "x": 1500,
+            "y": 2988
+          },
+          {
+            "x": 1500,
+            "y": 3070
+          },
+          {
+            "x": 236,
+            "y": 3070
+          },
+          {
+            "x": 236,
+            "y": 3000
+          }
+        ]
+      },
+      {
+        "binding": "serviceLowerPower",
+        "id": "feed-not-service",
+        "invertedLabel": true,
+        "points": [
+          {
+            "x": 400,
+            "y": 2988
+          },
+          {
+            "x": 400,
+            "y": 3030
+          },
+          {
+            "x": 260,
+            "y": 3030
+          },
+          {
+            "x": 260,
+            "y": 2980
+          },
+          {
+            "x": 252,
+            "y": 2980
+          }
+        ]
+      },
+      {
+        "binding": "serviceUpperPower",
+        "id": "service-uplink",
+        "points": [
+          {
+            "x": 220,
+            "y": 2980
+          },
+          {
+            "x": 190,
+            "y": 2980
+          },
+          {
+            "x": 190,
+            "y": 1060
+          },
+          {
+            "x": 886,
+            "y": 1060
+          },
+          {
+            "x": 886,
+            "y": 1000
+          }
+        ]
+      },
+      {
+        "binding": "hatchOpening",
+        "id": "hatch-control",
+        "points": [
+          {
+            "x": 785,
+            "y": 988
+          },
+          {
+            "x": 785,
+            "y": 900
+          },
+          {
+            "x": 660,
+            "y": 900
+          },
+          {
+            "x": 660,
+            "y": 1000
+          }
+        ]
+      },
+      {
+        "binding": "exitUnlock",
+        "id": "payload-and-0",
+        "points": [
+          {
+            "x": 1030,
+            "y": 988
+          },
+          {
+            "x": 1030,
+            "y": 780
+          },
+          {
+            "x": 1730,
+            "y": 780
+          },
+          {
+            "x": 1730,
+            "y": 860
+          }
+        ]
+      },
+      {
+        "binding": "exitUnlock",
+        "id": "payload-and-1",
+        "points": [
+          {
+            "x": 1250,
+            "y": 988
+          },
+          {
+            "x": 1250,
+            "y": 780
+          },
+          {
+            "x": 1730,
+            "y": 780
+          },
+          {
+            "x": 1730,
+            "y": 860
+          }
+        ]
+      },
+      {
+        "binding": "exitUnlock",
+        "id": "payload-and-2",
+        "points": [
+          {
+            "x": 1470,
+            "y": 988
+          },
+          {
+            "x": 1470,
+            "y": 780
+          },
+          {
+            "x": 1730,
+            "y": 780
+          },
+          {
+            "x": 1730,
+            "y": 860
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "all-payloads": {
+      "payloadOne.occupied": true,
+      "payloadThree.occupied": true,
+      "payloadTwo.occupied": true
+    },
+    "catch-ready": {
+      "hatchToggle.value": false,
+      "safe.occupied": true
+    },
+    "idle": {},
+    "lift-powered": {
+      "feed.occupied": true,
+      "hatchToggle.value": true,
+      "safe.occupied": true
+    },
+    "safe-only": {
+      "safe.occupied": true
+    }
+  },
+  "title": "DEADLOCK",
+  "version": 1
+}

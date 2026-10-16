@@ -17,8 +17,10 @@ reserved visitor is its host; refresh, connection order and disconnect never
 transfer this role. The server checks the authenticated cookie against that
 reservation before accepting level selection. No new accounts or host migration.
 
-`src/coop/campaign.ts` is the authoritative ordered public list: CROSSFEED VAULT,
-then RACE CONDITION. Menus, numbering, badges and next-chamber lookup use it.
+`src/coop/campaign.ts` is the authoritative ordered public list. It originally
+contained CROSSFEED VAULT and RACE CONDITION; the [JSON chamber release](0010-json-coop-campaign.md)
+expands it to HANDSHAKE, CROSSFEED VAULT, RACE CONDITION, DEADLOCK and USE AFTER FREE.
+Menus, numbering, badges and next-chamber lookup use it.
 The full co-op registry still contains the hidden mechanics fixtures. All public
 campaign chambers remain selectable during playtesting.
 
@@ -57,7 +59,8 @@ the current instance. Party traffic with an absent or different instance is deni
 before it can affect machinery or advance a stream sequence. Server stream messages
 carry that instance too. Per-socket action/avatar sequences and per-cube epoch/seq
 checks remain in force; a new cube epoch alone cannot validate an old chamber action.
-The existing bounded traffic budget is unchanged.
+The bounded traffic budget for these original chambers is unchanged; the JSON
+release describes the allowance for its namespaced sensor messages.
 
 The client reconstructs the world once when a new instance arrives, including from
 an action result. It clears predictions, pending controls, occupancy caches, cube
@@ -91,7 +94,7 @@ clients. Creating a campaign chamber that way starts a playing party directly.
 ## Validation and limits
 
 `pnpm check:campaign` uses two isolated identities and muted real controls to solve
-both chambers in the same party, use NEXT, replay with badges, and test pause,
+all five chambers in the same party, use NEXT, replay with badges, and test pause,
 refresh, host/guest disconnect and SIGKILL recovery in playing/victory phases.
 Focused server tests inject forged/stale wire requests, check queued transitions,
 durable-before-ack completion, generation isolation, migrations and independent codes.
@@ -105,5 +108,5 @@ These chambers remain mock multiplayer controllers / binary integration pending.
 No puzzle mechanics or binary evidence changes are part of this decision.
 
 Manual acceptance: create/join on two computers; select from lobby and pause; finish
-both chambers; compare host/guest victory; replay and inspect badges; refresh each
+the chambers; compare host/guest victory; replay and inspect badges; refresh each
 role; disconnect host while guest waits; verify independent audio/menu controls.

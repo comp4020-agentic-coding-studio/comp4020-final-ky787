@@ -1,4 +1,4 @@
-import { COOP_CAMPAIGN } from '../coop/campaign.ts';
+import { COOP_CAMPAIGN, isCampaignLevel } from '../coop/campaign.ts';
 import { partyMenu, type PartyView } from '../coop/party-menu.ts';
 import { cubeEntries } from '../coop/protocol.ts';
 import { EvidenceInspector } from './evidence-inspector.ts';
@@ -134,7 +134,7 @@ export class SliceGame {
             this.renderer.room(this.world, room.completed); this.sound.reset(this.world);
             this.input.releaseAll(); this.accumulated = 0;
             this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
-            this.overviewVisible = (room.level === 'crossfeed-vault' || room.level === 'race-condition') && initial && room.checkpoint === 'entry';
+            this.overviewVisible = isCampaignLevel(room.level) && initial && room.checkpoint === 'entry';
             this.overviewPending = this.overviewVisible; this.startButton.hidden = !this.overviewVisible;
             this.started = this.coop.playing && !this.coopPaused && !this.overviewVisible; this.canvas.focus();
             this.audio.setActive(this.started && !document.hidden && document.hasFocus());

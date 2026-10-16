@@ -16,6 +16,11 @@ homes use centres, and floor-mounted device/pedestal positions use floor contact
 Both authored player slots and checkpoint positions are retained. Draft IDs map
 through bounded validated registries rather than masquerading as campaign IDs.
 
+The [2026-10-16 campaign release](adr/0010-json-coop-campaign.md) explicitly registers
+three reviewed JSON snapshots from `levels/campaign/` as named persistent chambers.
+They reuse this adapter and the same declarative authority. User drafts remain
+isolated: changing a draft or its ID cannot publish or impersonate a campaign room.
+
 Basic logic uses typed Boolean expression trees (constant, reference, AND, OR,
 NOT). Device state is explicit. References and cycles are checked before play.
 Destination bindings encode activation/open/power and apply inversion once;

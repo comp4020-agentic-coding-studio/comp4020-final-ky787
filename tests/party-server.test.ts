@@ -20,8 +20,9 @@ async function party() {
     return { dir, app, host, guest, a, b, first, act };
 }
 it('one public order supplies numbering/next and strict host requests cannot inject identity or state', () => {
-    expect(COOP_CAMPAIGN.map(l => l.id)).toEqual(['crossfeed-vault', 'race-condition']);
-    expect(nextChamber('crossfeed-vault')).toBe('race-condition'); expect(nextChamber('race-condition')).toBeNull();
+    expect(COOP_CAMPAIGN.map(l => l.id)).toEqual(['handshake', 'crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free']);
+    expect(nextChamber('crossfeed-vault')).toBe('race-condition'); expect(nextChamber('race-condition')).toBe('deadlock');
+    expect(nextChamber('handshake')).toBe('crossfeed-vault'); expect(nextChamber('deadlock')).toBe('use-after-free'); expect(nextChamber('use-after-free')).toBeNull();
     const request = { type: 'select-level', seq: 1, level: 'race-condition', levelInstance: 1 };
     expect(parseClientMessage(JSON.stringify(request))).toEqual(request);
     for (const patch of [{ level: 'boost-lab' }, { levelInstance: 0 }, { levelInstance: 1.5 }, { levelInstance: undefined }, { host: 1 }, { slot: 1 }, { revision: 1 }])
@@ -147,4 +148,23 @@ it('rejects corrupt party records and keeps progress scoped to each code', () =>
         { party: { phase: 'playing', completedLevels: ['boost-lab'] } }, { party: { phase: 'playing', completedLevels: ['race-condition', 'race-condition'] } }])
         expect(readRoomRecord({ ...r, ...patch }, r.code)).toBeNull();
     r.party!.completedLevels.push('race-condition'); expect(newParty('EFGH', host).party!.completedLevels).toEqual([]);
+});
+
+it('existing two-chamber version-6 victories retain their party and badges when continuing into DEADLOCK', async () => {
+    const dir = await directory(), app = await launch(dir), host = await identity(app.url), guest = await identity(app.url);
+    const record = newRecord('ABCD', host.id, 'race-condition'); record.visitors[1] = guest.id;
+    record.levelInstance = 7; record.exitUnlocked = true; record.completed = true; record.reachedExit = [true, true];
+    record.levelState.finalControl = true; record.checkpoint = 'reunion'; record.cubePlacements.cubeA = 'receiver';
+    record.party = { phase: 'victory', completedLevels: ['crossfeed-vault', 'race-condition'] };
+    await mkdir(join(dir, 'rooms'), { recursive: true }); await writeFile(join(dir, 'rooms', 'ABCD.json'), JSON.stringify(record));
+    const a = await connect<CoopLevelId>(app.url, host.cookie); a.send({ type: 'join', code: 'ABCD' });
+    const restored = (await a.wait('snapshot')).room;
+    expect(restored).toMatchObject({ level: 'race-condition', levelInstance: 7, checkpoint: 'reunion', party: record.party });
+    expect(nextChamber('race-condition')).toBe('deadlock');
+    a.send({ type: 'select-level', seq: 1, level: 'deadlock' }); const next = (await a.wait('action-result')).room;
+    expect(next).toMatchObject({ level: 'deadlock', code: 'ABCD', levelInstance: 8, party: { phase: 'playing', completedLevels: record.party.completedLevels } });
+    const b = await connect<CoopLevelId>(app.url, guest.cookie); b.send({ type: 'join', code: 'ABCD' });
+    expect((await b.wait('snapshot')).slot).toBe(2);
+    const saved = JSON.parse(await readFile(join(dir, 'rooms', 'ABCD.json'), 'utf8'));
+    expect(saved.visitors).toEqual(record.visitors); expect(saved.party.completedLevels).toEqual(record.party.completedLevels);
 });

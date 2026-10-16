@@ -1,12 +1,14 @@
 /** Wire contract: shared logic is coordinate-free; avatars are disposable presentation. */
-import { isCampaignLevel, type CampaignLevel, type PartyState } from './campaign.ts';
+import { isCampaignLevel, AUTHORED_CAMPAIGN_LEVELS, isAuthoredCampaignLevel, type AuthoredCampaignLevel, type CampaignLevel, type PartyState } from './campaign.ts';
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
-export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab', 'crossfeed-vault', 'race-condition'] as const;
+export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab', 'crossfeed-vault', 'race-condition', ...AUTHORED_CAMPAIGN_LEVELS] as const;
 export type CoopLevelId = typeof COOP_LEVELS[number];
 export type SessionLevelId = CoopLevelId | 'workbench';
-/** Draft IDs are namespaced; campaign parsers keep their literal allowlists. */
+export type DeclarativeLevelId = AuthoredCampaignLevel | 'workbench';
+export const isDeclarativeLevel = (level: unknown): level is DeclarativeLevelId => level === 'workbench' || isAuthoredCampaignLevel(level);
+/** JSON object IDs are namespaced; older built-in controllers keep literal allowlists. */
 export type DraftId = `draft:${string}`;
 export const validDraftId = (v: unknown): v is DraftId => typeof v === 'string' && /^draft:[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(v);
 export interface DraftSessionMetadata { hash: string; controller: { id: string; version: number } }
@@ -56,8 +58,9 @@ export interface CrossfeedOutputs {
     grappleAnchor: boolean; bridge: boolean; liftField: boolean; relayGates: boolean; serviceAccess: boolean;
     leftRoute: boolean; rightRoute: boolean; galleryAccess: boolean; vaultPower: boolean; vaultReturn: boolean; exitDoor: boolean;
 }
-export interface LevelStateMap {
-    workbench: { devices: Record<string, boolean>; outputs: Record<string, boolean>; platforms: Record<CrumbleId, CrumblePhase> };
+export interface DeclarativeLevelState { devices: Record<string, boolean>; outputs: Record<string, boolean>; platforms: Record<CrumbleId, CrumblePhase> }
+export interface LevelStateMap extends Record<AuthoredCampaignLevel, DeclarativeLevelState> {
+    workbench: DeclarativeLevelState;
     'race-condition': {
         inputs: RaceInputs; outputs: RaceOutputs;
         physical: { phaseA: boolean; phaseB: boolean; returnBridge: boolean };
@@ -98,7 +101,7 @@ interface SharedSession {
     completed: boolean;
 }
 export type SharedRoom<L extends SessionLevelId = SessionLevelId> = { [K in L]: SharedSession & { level: K; levelState: LevelStateMap[K] }
-    & (K extends 'crumble-lab' | 'crossfeed-vault' | 'race-condition' | 'workbench' ? { cube: null; cubePlacement: null } : { cube: SharedCube; cubePlacement: CubePlacement }) }[L];
+    & (K extends 'crumble-lab' | 'crossfeed-vault' | 'race-condition' | DeclarativeLevelId ? { cube: null; cubePlacement: null } : { cube: SharedCube; cubePlacement: CubePlacement }) }[L];
 export type SessionRoom = SharedRoom<SessionLevelId>;
 export const cubeAvailable = (room: SessionRoom | null, id: CubeId = 'cube'): boolean => !!room?.cubes[id]
     && (room.level !== 'pairing-bay' || room.levelState.inputs.switchB);

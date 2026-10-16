@@ -1,11 +1,19 @@
 import type { RoomDef } from '../slice/rooms.ts';
 import type { CoopLevelId, Slot } from './protocol.ts';
+import { CAMPAIGN_DOCUMENTS } from './authored-campaign.ts';
+import { draftRoom } from '../workbench/room-adapter.ts';
+import type { AuthoredCampaignLevel } from './campaign.ts';
 import { pairingBay } from './pairing-bay.ts';
 import { raceCondition } from './race-condition.ts';
 import { crossfeedVault } from './crossfeed-vault.ts';
 
-/** Hand-authored co-op rooms: accepted mechanics labs and the provisional chamber. */
+const authoredRoom = (id: AuthoredCampaignLevel, slot: Slot): RoomDef => ({ ...draftRoom(CAMPAIGN_DOCUMENTS[id], slot), id });
+
+/** Hand-authored co-op campaign and internal mechanics fixtures. */
 export const COOP_LABS: Record<Exclude<CoopLevelId, 'workbench'>, { title: string; description: string; room: (slot: Slot) => RoomDef }> = {
+    handshake: { title: 'HANDSHAKE', description: 'One payload. Two operators.', room: slot => authoredRoom('handshake', slot) },
+    deadlock: { title: 'DEADLOCK', description: 'Deliver the weights that power the machine.', room: slot => authoredRoom('deadlock', slot) },
+    'use-after-free': { title: 'USE AFTER FREE', description: 'Trade the plates. Swing before the pointer expires.', room: slot => authoredRoom('use-after-free', slot) },
     'race-condition': { title: 'RACE CONDITION', description: 'Deliver the payload. Keep the trace alive.', room: raceCondition },
     'crossfeed-vault': { title: 'CROSSFEED VAULT', description: 'First full cooperative puzzle', room: crossfeedVault },
     'pairing-bay': { title: 'PAIRING BAY', description: 'Shared inputs, cube handoff, two-player finish', room: pairingBay },

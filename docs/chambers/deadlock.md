@@ -1,12 +1,14 @@
-# DEADLOCK — draft cooperative chamber
+# DEADLOCK — cooperative chamber
 
-DEADLOCK is an authored/mock Level Builder draft, independent of the campaign and
+DEADLOCK is an authored/mock Level Builder chamber, independent of
 CONTROL SPINE evidence. Its central discovery is that the last cube cannot remain
 as a weight: both players must power its ascent, then the FEED operator changes
 routes and catches it with a manually closed hatch. The JSON is authoritative for
-this draft; neither this document nor its physics reports claims binary evidence.
+this chamber; neither this document nor its physics reports claims binary evidence.
 
 - Editable draft: `levels/drafts/deadlock.json`.
+- Released campaign snapshot: `levels/campaign/deadlock.json`, promoted unchanged
+  on explicit request, 2026-10-16. See the [integration contract](../adr/0010-json-coop-campaign.md).
 - Authored-start, two-browser full route: `levels/scenarios/deadlock.json`.
 - Authored-start, two-browser loose-cargo diagnostic: `levels/scenarios/deadlock-cargo.json`.
 - Isolated real-engine checks: `tests/deadlock-physics.test.ts`.
@@ -238,7 +240,7 @@ Human acceptance is still needed for the long lift travel, reduced overview text
 size, lower breakpoint/entry visual crowding, role-swapped play and comfort of
 the half-second catch margin. One full solve and focused diagnostics do not prove
 all shortcuts, all recovery branches, latency conditions or softlock absence.
-No campaign publication or new binary evidence is included.
+Campaign availability does not resolve these human-playtest questions. No new binary evidence is included.
 
 ## Reproduction
 
@@ -250,6 +252,6 @@ pnpm level:playtest levels/drafts/deadlock.json --scenario levels/scenarios/dead
 pnpm level:playtest levels/drafts/deadlock.json --scenario levels/scenarios/deadlock-cargo.json --report .workbench/reports/2026-10-16-chambers/deadlock/loose-cargo
 ```
 
-Do not publish this draft into the campaign or expand its contract before manual
-editor and two-player acceptance. Reports are evidence of their stated scope,
-not proof of all possible play.
+Further puzzle or binary-contract expansion still needs manual editor and
+two-player acceptance. Reports are evidence of their stated scope, not proof
+of all possible play.

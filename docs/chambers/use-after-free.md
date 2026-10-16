@@ -1,6 +1,6 @@
-# USE AFTER FREE — authored cooperative draft
+# USE AFTER FREE — authored cooperative chamber
 
-The canonical chamber is [`levels/drafts/use-after-free.json`](../../levels/drafts/use-after-free.json). It is an authored/mock workbench draft, with prototype crumble and no binary evidence, campaign entry, new binary, account or campaign persistence. The JSON is authoritative; no TypeScript room factory exists.
+The released chamber is [`levels/campaign/use-after-free.json`](../../levels/campaign/use-after-free.json); the editable source remains [`levels/drafts/use-after-free.json`](../../levels/drafts/use-after-free.json). It joined the campaign unchanged on explicit request, 2026-10-16, using the [shared JSON authority and party persistence](../adr/0010-json-coop-campaign.md). It remains authored/mock with prototype crumble and no binary evidence, new binary or account. The JSON is authoritative; no bespoke TypeScript geometry factory exists.
 
 This is a vertical ownership exchange. A player keeps an ordinary pressure plate occupied while the partner climbs, then both deliberately release the previous owner before the next route becomes usable. The operator's footing also expires: the player, plate contact and route really fall out of service, rather than playing a cosmetic collapse animation. Both players climb and operate. Swapping browser slots exchanges the complete player roles.
 
@@ -115,7 +115,7 @@ Final canonical hash: `53d81f2cf3953a6997de93dae9947aacfaf0c4119132c0beff524b92d
 - Staged captures include initial, A powered, first chain/handover, second chain/handover, summit ASSIST, near-complete and completed views for both players. Final initial/powered renders use the same canonical hash.
 - Independent final-baffle adversarial search: the known B-only bypass is rejected across a bounded 7.5-second search. This does not prove all shortcuts absent.
 
-Human two-player playtesting remains outstanding; this draft is not campaign-approved.
+Human two-player playtesting remains outstanding despite the separately requested campaign integration.
 
 ## Candid quality review
 

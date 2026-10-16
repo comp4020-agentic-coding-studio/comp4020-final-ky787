@@ -15,7 +15,7 @@ The game has two main modes:
 | Mode | Chambers | Purpose |
 | --- | --- | --- |
 | **Tutorial** (single player) | **PRESSURE**, **SWITCH**, **RELAY**, **CONTROL SPINE** | Learn plates, switches, cubes, grappling and machinery. CONTROL SPINE introduces verified binary-backed behavior. |
-| **Co-op Campaign** (two players) | **CROSSFEED VAULT**, **RACE CONDITION** | Coordinate reversible routes, shared cubes, relays, timed machinery, grapple traversal and a two-person finish. |
+| **Co-op Campaign** (two players) | **HANDSHAKE**, **CROSSFEED VAULT**, **RACE CONDITION**, **DEADLOCK**, **USE AFTER FREE** | Coordinate reversible routes, shared cubes, relays, timed machinery, grapple traversal and a two-person finish. |
 
 To play co-op:
 
@@ -55,7 +55,7 @@ Some controls are contextual. In co-op, resetting or dying affects your own play
 
 ![CROSSFEED VAULT overview](docs/playtest/crossfeed-vault-overview.png)
 
-The current co-op chambers are still being refined through human playtesting. Their authored mechanics are documented in [CROSSFEED VAULT](docs/crossfeed-vault.md) and [RACE CONDITION](docs/race-condition.md).
+The co-op chambers remain subject to human playtesting. Their authored mechanics are documented in [HANDSHAKE](docs/chambers/handshake.md), [CROSSFEED VAULT](docs/crossfeed-vault.md), [RACE CONDITION](docs/race-condition.md), [DEADLOCK](docs/chambers/deadlock.md) and [USE AFTER FREE](docs/chambers/use-after-free.md). The three newest chambers have automated two-player traversal evidence; human playtesting is still outstanding.
 
 ## Real binaries and reverse-engineering evidence
 
@@ -65,7 +65,7 @@ The fourth tutorial chamber, **CONTROL SPINE** (internally `uplink`), uses a val
 
 One optional unstable region is associated with a separately supported bogus-code classification: a cloned block with proven infeasible incoming paths. The block's physical collapse timing remains an **authored gameplay metaphor**, not literal processor behavior. Displayed authored string effects and the other tutorial controllers are likewise not presented as native binary evidence.
 
-**Current evidence boundary:** CROSSFEED VAULT, RACE CONDITION and workbench drafts use authored/mock controllers. Their signal changes are real game behavior, but they are **not yet backed by newly compiled, obfuscated binaries**. The intended longer-term workflow is to accept a fun puzzle first, freeze its logical contract, and only then generate and validate a matching binary. Unobserved execution alone is never treated as proof that a block is bogus.
+**Current evidence boundary:** All five co-op campaign chambers and workbench drafts use authored/mock controllers. Their signal changes are real game behavior, but they are **not yet backed by newly compiled, obfuscated binaries**. The intended longer-term workflow is to accept a fun puzzle first, freeze its logical contract, and only then generate and validate a matching binary. Unobserved execution alone is never treated as proof that a block is bogus.
 
 See [CONTROL SPINE's design and evidence notes](docs/c8-vertical-slice.md) and the checked data in `game_data/`.
 

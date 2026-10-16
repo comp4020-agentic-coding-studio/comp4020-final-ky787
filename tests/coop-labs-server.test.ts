@@ -1,3 +1,5 @@
+import { isAuthoredCampaignLevel } from '../src/coop/campaign.ts';
+import { CAMPAIGN_DOCUMENTS } from '../src/coop/authored-campaign.ts';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
@@ -17,8 +19,8 @@ async function pair<L extends CoopLevelId>(level: L) {
 it.each(COOP_LEVELS)('creator selects %s, joiner discovers it, and only that level state is durable', async level => {
     const { dir, code, first, second, app, a } = await pair(level);
     expect(first.room.level).toBe(level); expect(second.room.level).toBe(level);
-    expect(Object.keys(first.room.cubes)).toEqual(level === 'crumble-lab' ? [] : level === 'crossfeed-vault' || level === 'race-condition' ? ['cubeA', 'cubeB'] : ['cube']);
-    expect(first.room.cube === null).toBe(level === 'crumble-lab' || level === 'crossfeed-vault' || level === 'race-condition');
+    expect(Object.keys(first.room.cubes)).toEqual(isAuthoredCampaignLevel(level) ? CAMPAIGN_DOCUMENTS[level].geometry.objects.filter(o => o.type === 'cube').map(o => `draft:${o.id}`) : level === 'crumble-lab' ? [] : level === 'crossfeed-vault' || level === 'race-condition' ? ['cubeA', 'cubeB'] : ['cube']);
+    expect(first.room.cube === null).toBe(isAuthoredCampaignLevel(level) || level === 'crumble-lab' || level === 'crossfeed-vault' || level === 'race-condition');
     const disk = JSON.parse(await readFile(join(dir, 'rooms', code + '.json'), 'utf8'));
     expect(disk.version).toBe(6); expect(disk.level).toBe(level);
     expect(disk.levelState).toEqual(newRecord(code, a.id, level).levelState);

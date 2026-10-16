@@ -1,3 +1,5 @@
+import { isAuthoredCampaignLevel } from '../src/coop/campaign.ts';
+import { isDeclarativeLevel } from '../src/coop/protocol.ts';
 import { advanceCrossfeed, crossfeedDue, freshCrossfeed, syncCrossfeed, type CrossfeedRuntime } from './crossfeed-state.ts';
 import { newParty, selectChamber, completeParty } from './party-state.ts';
 import type { Server, IncomingMessage } from 'node:http';
@@ -69,7 +71,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     }
     const elapsed = (room: Room) => Date.now() - Date.parse(room.record.createdAt) >= PUBLIC_DRAFT_LIMITS.lifetimeMs
         || room.peers.every(p => !p) && Date.now() - room.idleSince >= PUBLIC_DRAFT_LIMITS.abandonedMs;
-    const wss = new WebSocketServer({ noServer: true, maxPayload: options.drafts ? 8192 : 2048, perMessageDeflate: false });
+    const wss = new WebSocketServer({ noServer: true, maxPayload: 8192, perMessageDeflate: false });
     let queue = Promise.resolve();
     let queued = 0;
     let stream = 0;
@@ -217,7 +219,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         peer.actionSeq = message.seq;
         const room = peer.room, index = peer.slot - 1, before = durable(room);
         if (!currentInstance(room, message)) { result(false); return; }
-        if (message.type === 'crumble-trigger' && room.record.level !== 'workbench' && message.platform !== 'crumbleA' && message.platform !== 'crumbleB') { result(false); return; }
+        if (message.type === 'crumble-trigger' && !isDeclarativeLevel(room.record.level) && message.platform !== 'crumbleA' && message.platform !== 'crumbleB') { result(false); return; }
         if (message.type === 'restart-draft') {
             const frozen = options.drafts?.get(message.hash);
             if (!room.record.draft || peer.slot !== 1 || !frozen || frozen.coopError || temporary(room) && message.hash !== room.record.draft.hash || room.record.levelInstance >= Number.MAX_SAFE_INTEGER) { result(false); return; }
@@ -236,7 +238,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const selected = selectChamber(room.record, peer.visitor, message.level);
             if (!selected) { result(false); return; }
             room.transitioning = true;
-            room.record = selected; room.plates = [null, null];
+            room.record = selected; room.plates = [null, null]; room.draftHeld = [[], []]; room.draftCubeContacts = {};
             room.cubes = freshCubes(selected.level); room.crumble = freshCrumble(); room.race = freshRace(); room.crossfeed = freshCrossfeed();
             const simulator = room.peers[0] ? 1 : 2;
             for (const cube of Object.values(room.cubes)) assignCube(cube, simulator);
@@ -255,7 +257,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const cube = room.cubes[message.cubeId], def = rules(room);
             if (!cube || !def.cubeIds.includes(message.cubeId)) { denied(); return; }
             if (message.type === 'draft-cube-occupancy') {
-                if (room.record.level !== 'workbench' || !room.record.draft || message.epoch !== cube.epoch || cube.physicsAuthority !== peer.slot
+                if (!isDeclarativeLevel(room.record.level) || message.epoch !== cube.epoch || cube.physicsAuthority !== peer.slot
                     || message.devices.length > 0 && (cube.holder !== null || cube.pulling) || message.devices.some(id => !def.acceptsPlacement?.(room.record, id))) { denied(); return; }
                 if (JSON.stringify(room.draftCubeContacts[message.cubeId]) === JSON.stringify(message.devices)) { result(true); return; }
                 room.draftCubeContacts[message.cubeId] = [...message.devices]; room.record.cubePlacements[message.cubeId] = message.devices[0] ?? 'spawn';
@@ -269,7 +271,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                 if (message.epoch !== cube.epoch || cube.physicsAuthority !== peer.slot
                     || placement !== 'spawn' && (!def.cubeEnabled(room.record, message.cubeId) || cube.holder !== null || cube.pulling
                         || !def.acceptsPlacement?.(room.record, placement)
-                        || !['entry', 'routePower'].includes(placement) && room.record.level !== 'race-condition' && room.record.level !== 'workbench' && Object.entries(room.record.cubePlacements).some(([id, p]) => id !== message.cubeId && p === placement))) { denied(); return; }
+                        || !['entry', 'routePower'].includes(placement) && room.record.level !== 'race-condition' && !isDeclarativeLevel(room.record.level) && Object.entries(room.record.cubePlacements).some(([id, p]) => id !== message.cubeId && p === placement))) { denied(); return; }
                 if (room.record.cubePlacements[message.cubeId] === placement) { result(true); return; }
                 room.record.cubePlacements[message.cubeId] = placement;
             } else {
@@ -289,7 +291,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         }
         const def = rules(room);
         if (message.type === 'draft-occupancy') {
-            if (room.record.level !== 'workbench' || !room.record.draft || message.devices.some(id => !def.acceptsPlate(id, room.record))) { result(false); return; }
+            if (!isDeclarativeLevel(room.record.level) || message.devices.some(id => !def.acceptsPlate(id, room.record))) { result(false); return; }
             if (JSON.stringify(room.draftHeld[index]) === JSON.stringify(message.devices)) { result(true); return; }
             room.draftHeld[index] = [...message.devices];
         } else if (message.type === 'occupancy') {
@@ -354,17 +356,18 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             ws.on('pong', () => { peer.alive = true; });
             ws.on('close', () => { peers.delete(peer); serial(() => disconnect(peer)); });
             ws.on('message', (bytes, binary) => {
-                // Public draft support must not enlarge the campaign payload budget.
-                const limit = options.drafts && (!options.drafts.temporary || peer.custom || peer.room?.draft) ? 8192 : 2048;
+                // Only JSON rooms need larger sensor lists; other campaign/fixture messages retain the 2 KB budget.
+                const authored = isAuthoredCampaignLevel(peer.room?.record.level);
+                const limit = authored || options.drafts && (!options.drafts.temporary || peer.custom || peer.room?.draft) ? 8192 : 2048;
                 const length = Array.isArray(bytes) ? bytes.reduce((n, b) => n + b.byteLength, 0) : bytes.byteLength;
                 if (length > limit) { ws.close(1009, 'Message too large'); return; }
                 const now = Date.now();
                 // Avatar + two independent cube streams = 60 Hz; retain bounded input headroom.
-                const cubeCount = peer.room?.record.draft ? Math.min(8, Object.keys(peer.room.cubes).length) : 2;
+                const cubeCount = peer.room && (authored || peer.room.record.draft) ? Math.min(8, Object.keys(peer.room.cubes).length) : 2;
                 const rate = Math.max(90, 30 + cubeCount * 20);
                 peer.tokens = Math.min(Math.max(120, rate * 1.5), peer.tokens + (now - peer.refilled) * rate / 1000); peer.refilled = now;
-                if (--peer.tokens < 0 || peer.pending >= (peer.custom ? 8 : peer.room?.record.draft ? 20 : 8) || queued >= (peer.custom ? 64 : 256)) { error(peer, 'RATE_LIMITED'); ws.close(1008, 'Too many messages'); return; }
-                const message = binary ? null : parseClientMessage(bytes.toString(), !!options.drafts);
+                if (--peer.tokens < 0 || peer.pending >= (peer.custom ? 8 : authored || peer.room?.record.draft ? 20 : 8) || queued >= (peer.custom ? 64 : 256)) { error(peer, 'RATE_LIMITED'); ws.close(1008, 'Too many messages'); return; }
+                const message = binary ? null : parseClientMessage(bytes.toString(), authored || !!options.drafts);
                 if (!message) { error(peer, 'INVALID_MESSAGE'); ws.close(1008, 'Invalid message'); return; }
                 if (message.type === 'ping') { send(peer, { type: 'pong' }); return; }
                 if (message.type === 'cube') {

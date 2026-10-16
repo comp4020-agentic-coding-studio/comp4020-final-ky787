@@ -1,3 +1,4 @@
+import { isDeclarativeLevel } from './protocol.ts';
 import type { CrumbleAuthority, PuzzleWorld } from '../slice/world.ts';
 import type { CoopClient } from './client.ts';
 import type { CrumbleId } from './protocol.ts';
@@ -8,11 +9,11 @@ export class SharedCrumbleAuthority implements CrumbleAuthority {
     constructor(private client: CoopClient) {}
     sync(w: PuzzleWorld): void {
         const room = this.client.room;
-        if (room?.level !== 'crumble-lab' && room?.level !== 'race-condition' && room?.level !== 'crossfeed-vault' && room?.level !== 'workbench') return;
+        if (!room || !('platforms' in room.levelState)) return;
         const now = performance.now(), age = Math.max(0, now - this.client.roomReceivedAt);
         for (const p of w.platforms) {
-            if (room.level === 'workbench' ? p.def.kind !== 'crumble-prototype' : p.def.id !== 'crumbleA' && p.def.id !== 'crumbleB') continue;
-            const id: CrumbleId = room.level === 'workbench' ? `draft:${p.def.id}` : p.def.id as 'crumbleA' | 'crumbleB';
+            if (isDeclarativeLevel(room.level) ? p.def.kind !== 'crumble-prototype' : p.def.id !== 'crumbleA' && p.def.id !== 'crumbleB') continue;
+            const id: CrumbleId = isDeclarativeLevel(room.level) ? `draft:${p.def.id}` : p.def.id as 'crumbleA' | 'crumbleB';
             const state = room.levelState.platforms[id];
             if (!state) continue;
             const pending = this.client.pendingCrumble.get(id);
@@ -33,10 +34,10 @@ export class SharedCrumbleAuthority implements CrumbleAuthority {
     }
     sample(w: PuzzleWorld): void {
         const room = this.client.room;
-        if (room?.level !== 'crumble-lab' && room?.level !== 'race-condition' && room?.level !== 'crossfeed-vault' && room?.level !== 'workbench') return;
+        if (!room || !('platforms' in room.levelState)) return;
         for (const platform of w.platforms) {
             const nativeId = platform.def.id;
-            const id: CrumbleId = room.level === 'workbench' ? `draft:${nativeId}` : nativeId as CrumbleId;
+            const id: CrumbleId = isDeclarativeLevel(room.level) ? `draft:${nativeId}` : nativeId as CrumbleId;
             if (room.levelState.platforms[id]?.phase !== 'stable') continue;
             if (w.player.grounded && w.player.groundId === nativeId) this.client.triggerCrumble(id, 'foot');
             else if (w.player.rope.phase === 'attached' && w.player.rope.anchorId === nativeId) this.client.triggerCrumble(id, 'hook');

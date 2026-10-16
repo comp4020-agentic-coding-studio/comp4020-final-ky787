@@ -1,7 +1,10 @@
-# HANDSHAKE — cooperative draft
+# HANDSHAKE — cooperative chamber
 
-Canonical source: [`levels/drafts/handshake.json`](../../levels/drafts/handshake.json).
-This is an authored/mock workbench draft, not campaign content or binary evidence.
+Released source: [`levels/campaign/handshake.json`](../../levels/campaign/handshake.json).
+Editable draft: [`levels/drafts/handshake.json`](../../levels/drafts/handshake.json).
+This authored/mock chamber joined the campaign on the user's explicit request,
+2026-10-16. The released JSON preserves the tested draft layout. See the
+[integration contract](../adr/0010-json-coop-campaign.md); no binary evidence is implied.
 The intended first-time experience is a forgiving 5–8 minute introduction; that
 estimate has **not** been measured with inexperienced human players.
 
@@ -135,4 +138,4 @@ pnpm level:playtest levels/drafts/handshake.json --scenario levels/scenarios/han
 Human two-player acceptance remains required: check first-use grapple teaching,
 the boost hint, camera framing while aiming, controller latency, optional lift
 allocations, role exchange, recovery with a dropped cube, and actual blind solve
-time. No human playtesting or campaign acceptance is claimed.
+time. Campaign integration was requested separately; no human playtesting is claimed.

@@ -1,5 +1,5 @@
 import { CODE_PATTERN, isCoopLevel, cubeEntries, validDraftMetadata, type CubeId, type CubeMap, type ClientMessage, type SessionLevelId, type CubePlacement, type LevelStateMap, type Plate, type SharedCube, type SharedRoom } from '../src/coop/protocol.ts';
-import { isCampaignLevel, type PartyState } from '../src/coop/campaign.ts';
+import { isCampaignLevel, type AuthoredCampaignLevel, type PartyState } from '../src/coop/campaign.ts';
 import { UUID } from './identity.ts';
 import { freshCube } from './cube-state.ts';
 import { freshCrumble, type CrumbleRuntime } from './crumble-state.ts';
@@ -8,7 +8,7 @@ import { LEVEL_DEFINITIONS } from './level-definitions.ts';
 import { freshRace, type RaceRuntime } from './race-state.ts';
 import { freshCrossfeed, type CrossfeedRuntime } from './crossfeed-state.ts';
 
-export interface DurableStates {
+export interface DurableStates extends Record<AuthoredCampaignLevel, { devices: Record<string, boolean> }> {
     workbench: { devices: Record<string, boolean> };
     'race-condition': { phase: boolean; finalControl: boolean };
     'crossfeed-vault': { chamberRevision: 2; switchB: boolean; switchC: boolean; switchD: boolean; routeMode: boolean; legacyVictory?: true };

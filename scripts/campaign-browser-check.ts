@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-/** One persistent party, two real-input chamber solves, reconnect and crash recovery. */
+/** One persistent party, five real-input chamber solves, reconnect and crash recovery. */
 import { writeFile } from 'node:fs/promises';
 import { once } from 'node:events';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp } from './coop-browser.ts';
 import { crossfeedRoute } from './crossfeed-browser-check.ts';
+import { campaignDraftRoute } from './campaign-draft-route.ts';
 import { raceRoute } from './race-browser-check.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? '/tmp/bn-campaign-shots', internalLabs: false });
@@ -25,16 +26,19 @@ try {
     await b.read("(()=>{const c=binaryNinja.coop;c.socket.send(JSON.stringify({type:'select-level',seq:++c.actionSeq,levelInstance:c.room.levelInstance,level:'race-condition'}));})()");
     await sleep(150); check('forged guest request leaves both in lobby', (await snapshot(a)).multiplayer?.shared?.party?.phase === 'lobby');
     await shot(a, 'host-lobby'); await shot(b, 'guest-lobby');
-    await click(a, '[data-select-level="crossfeed-vault"]');
+    await click(a, '[data-select-level="handshake"]');
+    for (const p of [a, b]) await wait(p, 'Handshake first overview', s => s.room === 'handshake' && s.overviewVisible);
+    await campaignDraftRoute(h, 'handshake', [a, b]);
+    await click(a, '#next-chamber');
     for (const p of [a, b]) {
         const s = await wait(p, 'same-party Crossfeed overview', s => s.room === 'crossfeed-vault' && s.multiplayer?.shared?.party?.phase === 'playing' && s.overviewVisible);
-        check('fresh two-cube world on the existing socket', s.multiplayer!.code === code && s.multiplayer!.levelInstance === 2 && Object.keys(s.cubes).length === 2 && !s.multiplayer!.pendingCubeAction);
+        check('fresh two-cube world on the existing socket', s.multiplayer!.code === code && s.multiplayer!.levelInstance === 3 && Object.keys(s.cubes).length === 2 && !s.multiplayer!.pendingCubeAction);
     }
     // Guest on pause/overview while host selects another chamber, then restarts.
     await click(b, '#pause'); await click(a, '#pause'); await click(a, '#choose-chamber'); await click(a, '[data-select-level="race-condition"]');
-    for (const p of [a, b]) await wait(p, 'paused guest transitions automatically', s => s.room === 'race-condition' && s.overviewVisible && s.multiplayer?.levelInstance === 3);
+    for (const p of [a, b]) await wait(p, 'paused guest transitions automatically', s => s.room === 'race-condition' && s.overviewVisible && s.multiplayer?.levelInstance === 4);
     await click(a, '#pause'); await click(a, '#choose-chamber'); await click(a, '[data-select-level="crossfeed-vault"]');
-    for (const p of [a, b]) await wait(p, 'return to fresh Crossfeed', s => s.room === 'crossfeed-vault' && s.overviewVisible && s.multiplayer?.levelInstance === 4);
+    for (const p of [a, b]) await wait(p, 'return to fresh Crossfeed', s => s.room === 'crossfeed-vault' && s.overviewVisible && s.multiplayer?.levelInstance === 5);
     await crossfeedRoute(h, url, debug, false, [a, b]);
     for (const p of [a, b]) {
         await wait(p, 'shared victory pauses gameplay', s => s.multiplayer?.shared?.party?.phase === 'victory' && !s.started);
@@ -50,8 +54,15 @@ try {
     await sleep(150);
     check('old chamber traffic cannot alter new machinery/cubes', await a.read("!binaryNinja.coop.room.levelState.inputs.dropA && binaryNinja.coop.room.cubes.cubeA.seq < 99999 && binaryNinja.world.cubes.cubeA.x === 205 && binaryNinja.world.cubes.cubeA.y === 478"));
     await raceRoute(h, url, debug, false, [a, b]);
+    check('Race now leads to DEADLOCK', await visible(a, '#next-chamber') && await a.read("document.querySelector('#next-chamber').dataset.selectLevel === 'deadlock'"));
+    await click(a, '#next-chamber');
+    for (const p of [a, b]) await wait(p, 'Deadlock overview', s => s.room === 'deadlock' && s.overviewVisible);
+    await campaignDraftRoute(h, 'deadlock', [a, b]);
+    await click(a, '#next-chamber');
+    for (const p of [a, b]) await wait(p, 'Use After Free overview', s => s.room === 'use-after-free' && s.overviewVisible);
+    await campaignDraftRoute(h, 'use-after-free', [a, b]);
     check('last chamber shows campaign complete without a fictitious next level', await a.read("document.querySelector('#party-victory').textContent.includes('CAMPAIGN COMPLETE') && !document.querySelector('#next-chamber')"));
-    for (const p of [a, b]) check('both badges saved on same party', (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.length === 2);
+    for (const p of [a, b]) check('all five badges saved on same party', (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.length === 5);
     await shot(a, 'campaign-complete');
 
     async function restart(label: string) {
@@ -60,7 +71,7 @@ try {
         for (const p of [a, b]) await wait(p, label, s => s.multiplayer?.websocket === 'CONNECTED' && s.multiplayer.shared?.connected.every(Boolean) === true, 15000);
     }
     await restart('SIGKILL victory reconnect');
-    for (const p of [a, b]) check('restart restores victory and badges', await visible(p, '#party-victory') && (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.length === 2);
+    for (const p of [a, b]) check('restart restores victory and badges', await visible(p, '#party-victory') && (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.length === 5);
     await a.read('binaryNinja.coop.leave(false)');
     await wait(b, 'guest retains party while host disconnected', s => s.multiplayer?.shared?.connected[0] === false);
     check('guest has host-disconnected message and no selection', await b.read("document.querySelector('#party-status').textContent.includes('HOST DISCONNECTED') && !document.querySelector('[data-select-level]')"));
@@ -68,12 +79,12 @@ try {
     await click(a, '#choose-chamber');
     check('completed badges remain in selector', await a.read("[...document.querySelectorAll('.campaign-chamber small')].every(e => e.textContent.includes('COMPLETE'))"));
     await click(a, '[data-select-level="crossfeed-vault"]');
-    for (const p of [a, b]) await wait(p, 'replay starts fresh and keeps badges', s => s.room === 'crossfeed-vault' && s.overviewVisible && !s.multiplayer!.shared!.completed && s.multiplayer!.shared!.party!.completedLevels.length === 2);
+    for (const p of [a, b]) await wait(p, 'replay starts fresh and keeps badges', s => s.room === 'crossfeed-vault' && s.overviewVisible && !s.multiplayer!.shared!.completed && s.multiplayer!.shared!.party!.completedLevels.length === 5);
     await b.read('binaryNinja.coop.leave(false)'); await wait(a, 'guest disconnect', s => s.multiplayer?.shared?.connected[1] === false);
     await b.send('Page.reload'); await wait(b, 'same visitor returns as guest', s => s.multiplayer?.slot === 2 && s.multiplayer.websocket === 'CONNECTED');
     await restart('SIGKILL playing reconnect');
     for (const p of [a, b]) check('playing restart keeps chamber/code/progress', (await snapshot(p)).multiplayer!.code === code
-        && (await snapshot(p)).multiplayer!.shared!.party!.phase === 'playing' && (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.length === 2);
+        && (await snapshot(p)).multiplayer!.shared!.party!.phase === 'playing' && (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.length === 5);
     // Resuming from a pause preserves the first-entry overview.
     await click(b, '#pause'); await click(b, '#continue'); await tap(b, 'Space');
     await wait(b, 'guest resumes after overview', s => s.started);

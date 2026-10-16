@@ -1,3 +1,5 @@
+import { CAMPAIGN_DOCUMENTS } from '../coop/authored-campaign.ts';
+import { isAuthoredCampaignLevel } from '../coop/campaign.ts';
 import { COOP_LABS } from '../coop/labs.ts';
 import { roomConnections } from '../slice/connections.ts';
 import type { RoomDef, CameraReveal } from '../slice/rooms.ts';
@@ -6,6 +8,7 @@ import { type BuiltinControllerId, type DraftDocument, type DraftObject, type Dr
 export { newDraft } from './model.ts';
 /** Allowlisted factories only. No paths, evaluated strings, uploaded source or binary imports. */
 export function importDraft(factory: string): DraftDocument {
+    if (isAuthoredCampaignLevel(factory)) return structuredClone(CAMPAIGN_DOCUMENTS[factory]);
     if (!Object.hasOwn(COOP_LABS, factory)) throw new Error(`Unknown trusted room factory '${factory}'. Choose ${Object.keys(COOP_LABS).join(', ')}.`);
     const id = factory as BuiltinControllerId, first = COOP_LABS[id].room(1), second = COOP_LABS[id].room(2);
     const objects: DraftObject[] = [], bindings: DraftBinding[] = [], reveals: DraftReveal[] = [];

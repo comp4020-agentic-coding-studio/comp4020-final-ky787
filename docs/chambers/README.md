@@ -1,8 +1,15 @@
-# Cooperative chamber drafts
+# Authored cooperative chambers
 
-These three authored/mock JSON documents are editable workbench drafts. The
-accepted campaign, single-player tutorials and CONTROL SPINE evidence are unchanged.
-Human two-player acceptance is required before campaign integration.
+These three authored/mock chambers are available in the cooperative campaign,
+following the explicit integration request on 2026-10-16. Choose **CO-OP CAMPAIGN**,
+create a party, share its code and select a chamber. The order is HANDSHAKE →
+CROSSFEED VAULT → RACE CONDITION → DEADLOCK → USE AFTER FREE.
+
+Released JSON snapshots live in [`levels/campaign/`](../../levels/campaign/).
+The editable drafts below remain independent; future draft edits do not silently
+change the campaign. Single-player tutorials and CONTROL SPINE evidence are unchanged.
+See the [integration contract](../adr/0010-json-coop-campaign.md) for persistence,
+old-party compatibility and full campaign tests. Human playtesting is still outstanding.
 
 | Draft | Central discovery | Design and measured evidence |
 |---|---|---|

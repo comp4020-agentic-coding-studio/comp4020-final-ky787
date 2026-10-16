@@ -1,6 +1,6 @@
 import { isCampaignLevel, type CampaignLevel } from './campaign.ts';
 import type { PlayerState } from '../engine/physics.ts';
-import { cubeEntries, newerRoom, normalizeCode, websocketUrl, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SessionRoom, type Slot, type DraftId } from './protocol.ts';
+import { isDeclarativeLevel, cubeEntries, newerRoom, normalizeCode, websocketUrl, type CubeId, type CubeMap, type CubePlacement, type CubeResetCause, type CoopLevelId, type CrumbleId, type CrumbleTrigger, type Discontinuity, type Avatar, type ClientMessage, type CubeAction, type CubeTransform, type Plate, type ServerMessage, type SessionRoom, type Slot, type DraftId } from './protocol.ts';
 import { RemoteAvatar, RemoteCube } from './remote.ts';
 import { LocalPrediction, type PredictedAction } from './prediction.ts';
 export class CoopClient {
@@ -84,7 +84,7 @@ export class CoopClient {
     }
     occupyDraft(devices: DraftId[]): void {
         const key = [...devices].sort().join(',');
-        if (this.room?.level !== 'workbench' || this.draftDevices === key) return;
+        if (!isDeclarativeLevel(this.room?.level) || this.draftDevices === key) return;
         if (this.send({ type: 'draft-occupancy', seq: ++this.actionSeq, devices })) this.draftDevices = key;
     }
     private clearLevel(): void {
@@ -305,7 +305,7 @@ export class CoopClient {
             pendingControls: [...this.pendingControls.values()], pendingCrumble: [...this.pendingCrumble.keys()],
             pendingPhase: this.pendingPhase,
             buffer: this.room?.level === 'race-condition' ? { ...this.room.levelState.buffer, remainingMs: Math.max(0, this.room.levelState.buffer.remainingMs - (now - this.roomReceivedAt)) } : undefined,
-            crumblePhases: this.room?.level === 'crumble-lab' || this.room?.level === 'race-condition' || this.room?.level === 'crossfeed-vault' ? Object.fromEntries(Object.entries(this.room.levelState.platforms)
+            crumblePhases: this.room && 'platforms' in this.room.levelState ? Object.fromEntries(Object.entries(this.room.levelState.platforms)
                 .map(([id, p]) => [id, { ...p, remainingMs: Math.round(Math.max(0, p.remainingMs - (now - this.roomReceivedAt))) }])) : undefined,
             exitUnlocked: this.room?.exitUnlocked, reachedExit: this.room?.reachedExit, completed: this.room?.completed,
             cubes: this.room?.cubes, cubePlacements: this.room?.cubePlacements,

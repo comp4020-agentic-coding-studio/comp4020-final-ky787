@@ -5,6 +5,9 @@ import { SharedCubeAuthority } from './cube.ts';
 import { PairingAuthority, sampleExit, bodyOnPlate } from './authority.ts';
 import type { CoopLevelId, SharedRoom } from './protocol.ts';
 import { SharedCrumbleAuthority } from './crumble.ts';
+import { CAMPAIGN_DOCUMENTS } from './authored-campaign.ts';
+import { isAuthoredCampaignLevel, type AuthoredCampaignLevel } from './campaign.ts';
+import { DeclarativeAuthority } from '../workbench/declarative-authority.ts';
 import { RaceAuthority } from './race-authority.ts';
 import { CrossfeedAuthority } from './crossfeed-authority.ts';
 
@@ -79,8 +82,9 @@ const factories = {
 };
 export function createCoopAuthority(room: SharedRoom, client: CoopClient): CoopAuthority {
     if (room.level === 'workbench') throw new Error('Use the registered draft authority for workbench sessions');
-    const factory = factories[room.level] as (room: SharedRoom, client: CoopClient) => CoopAuthority;
-    const authority = factory(room, client);
+    const authority: CoopAuthority = isAuthoredCampaignLevel(room.level)
+        ? new DeclarativeAuthority(CAMPAIGN_DOCUMENTS[room.level], room as SharedRoom<AuthoredCampaignLevel>, client)
+        : (factories[room.level as keyof typeof factories] as (room: SharedRoom, client: CoopClient) => CoopAuthority)(room, client);
     authority.reset = () => client.localReset();
     authority.discontinuity = (entity, reason, cubeId) => client.markDiscontinuity(entity, reason, cubeId);
     return authority;

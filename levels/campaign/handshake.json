@@ -1,0 +1,539 @@
+{
+  "bindings": [
+    {
+      "id": "nearPower",
+      "output": "crossingPower",
+      "property": "active",
+      "target": "nearAnchor"
+    },
+    {
+      "id": "farPower",
+      "output": "crossingPower",
+      "property": "active",
+      "target": "farAnchor"
+    },
+    {
+      "id": "liftPower",
+      "output": "liftPower",
+      "property": "power",
+      "target": "serviceLift"
+    },
+    {
+      "id": "lowerLink",
+      "output": "relayPower",
+      "property": "power",
+      "target": "lowerRelay"
+    },
+    {
+      "id": "upperLink",
+      "output": "relayPower",
+      "property": "power",
+      "target": "upperRelay"
+    },
+    {
+      "id": "exitPower",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "crossingPower": {
+        "id": "crossing.occupied",
+        "op": "ref"
+      },
+      "exitReady": {
+        "args": [
+          {
+            "id": "maintenance.value",
+            "op": "ref"
+          },
+          {
+            "id": "exitSocket.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      },
+      "liftPower": {
+        "id": "liftPlate.occupied",
+        "op": "ref"
+      },
+      "relayPower": {
+        "id": "link.value",
+        "op": "ref"
+      }
+    }
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 1300,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 1600,
+        "y": 933
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 1660,
+        "y": 933
+      },
+      {
+        "h": 350,
+        "id": "centralBay",
+        "kind": "static",
+        "type": "platform",
+        "w": 1290,
+        "x": 1000,
+        "y": 950
+      },
+      {
+        "h": 350,
+        "id": "cubeAlcove",
+        "kind": "static",
+        "type": "platform",
+        "w": 400,
+        "x": 0,
+        "y": 950,
+        "blocksCubeInteraction": true
+      },
+      {
+        "h": 110,
+        "id": "recoveryFloor",
+        "kind": "static",
+        "type": "platform",
+        "w": 600,
+        "x": 400,
+        "y": 1190
+      },
+      {
+        "h": 120,
+        "id": "returnStep",
+        "kind": "static",
+        "type": "platform",
+        "w": 120,
+        "x": 880,
+        "y": 1070
+      },
+      {
+        "h": 35,
+        "id": "serviceGallery",
+        "kind": "static",
+        "type": "platform",
+        "w": 1010,
+        "x": 1280,
+        "y": 550
+      },
+      {
+        "h": 28,
+        "id": "maintenanceLedge",
+        "kind": "static",
+        "type": "platform",
+        "w": 250,
+        "x": 1780,
+        "y": 360
+      },
+      {
+        "activation": "signal",
+        "h": 24,
+        "hookable": true,
+        "id": "nearAnchor",
+        "kind": "code",
+        "label": "CROSSING / 01",
+        "type": "platform",
+        "w": 220,
+        "x": 780,
+        "y": 650
+      },
+      {
+        "activation": "signal",
+        "h": 24,
+        "hookable": true,
+        "id": "farAnchor",
+        "kind": "code",
+        "label": "CROSSING / 02",
+        "type": "platform",
+        "w": 220,
+        "x": 480,
+        "y": 610
+      },
+      {
+        "id": "payload",
+        "mark": "H",
+        "type": "cube",
+        "x": 100,
+        "y": 928
+      },
+      {
+        "id": "crossing",
+        "kind": "plate",
+        "label": "CROSSING",
+        "type": "device",
+        "x": 1120,
+        "y": 950
+      },
+      {
+        "id": "liftPlate",
+        "kind": "plate",
+        "label": "LIFT",
+        "type": "device",
+        "x": 1450,
+        "y": 950
+      },
+      {
+        "h": 440,
+        "id": "serviceLift",
+        "type": "lift",
+        "w": 140,
+        "x": 1140,
+        "y": 510
+      },
+      {
+        "id": "link",
+        "kind": "toggle",
+        "label": "LINK",
+        "type": "device",
+        "x": 1450,
+        "y": 550
+      },
+      {
+        "exitSide": 1,
+        "h": 110,
+        "id": "lowerRelay",
+        "pair": "service",
+        "type": "relay",
+        "w": 56,
+        "x": 1780,
+        "y": 840
+      },
+      {
+        "exitSide": 1,
+        "h": 110,
+        "id": "upperRelay",
+        "pair": "service",
+        "type": "relay",
+        "w": 56,
+        "x": 1300,
+        "y": 440
+      },
+      {
+        "id": "maintenance",
+        "kind": "terminal",
+        "label": "MAINTENANCE COMPLETE",
+        "type": "device",
+        "x": 1920,
+        "y": 360
+      },
+      {
+        "id": "exitSocket",
+        "kind": "socket",
+        "label": "PAYLOAD",
+        "type": "device",
+        "x": 1970,
+        "y": 950
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 100,
+        "x": 2160,
+        "y": 810
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpointControl",
+        "kind": "terminal",
+        "label": "BREAKPOINT",
+        "type": "device",
+        "x": 1350,
+        "y": 950
+      },
+      {
+        "activationControl": "checkpointControl",
+        "checkpoint": "relay",
+        "id": "breakpoint",
+        "type": "breakpoint",
+        "x": 1350,
+        "y": 950
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 1330,
+        "y": 933
+      },
+      {
+        "checkpoint": "relay",
+        "id": "checkpoint2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 1410,
+        "y": 933
+      }
+    ],
+    "width": 2290
+  },
+  "id": "handshake",
+  "instruction": "ONE PAYLOAD. TWO OPERATORS.",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "bounds": {
+          "h": 620,
+          "w": 1140,
+          "x": 100,
+          "y": 580
+        },
+        "duration": 1.2,
+        "id": "crossingView",
+        "padding": 50,
+        "source": "crossing"
+      },
+      {
+        "bounds": {
+          "h": 570,
+          "w": 550,
+          "x": 1080,
+          "y": 400
+        },
+        "duration": 1.2,
+        "id": "liftView",
+        "padding": 50,
+        "source": "liftPlate"
+      },
+      {
+        "bounds": {
+          "h": 570,
+          "w": 620,
+          "x": 1260,
+          "y": 410
+        },
+        "duration": 1.2,
+        "id": "linkView",
+        "padding": 40,
+        "source": "link"
+      },
+      {
+        "bounds": {
+          "x": 1880,
+          "y": 760,
+          "w": 400,
+          "h": 220
+        },
+        "duration": 1.2,
+        "id": "exitView",
+        "padding": 40,
+        "source": "maintenance"
+      }
+    ],
+    "display": {
+      "x": 35,
+      "y": 300
+    },
+    "labels": [
+      {
+        "id": "alcoveLabel",
+        "text": "SHARED PAYLOAD",
+        "x": 140,
+        "y": 805
+      },
+      {
+        "id": "galleryLabel",
+        "text": "MAINTENANCE GALLERY",
+        "x": 1530,
+        "y": 220
+      },
+      {
+        "id": "boostHint",
+        "text": "TWO HANDS. ONE STEP HIGHER.",
+        "x": 1580,
+        "y": 480
+      },
+      {
+        "id": "recoveryLabel",
+        "text": "RECOVERY  \u2192",
+        "x": 570,
+        "y": 1130
+      },
+      {
+        "id": "mockLabel",
+        "text": "AUTHORED CO-OP / NO NATIVE EVIDENCE",
+        "x": 30,
+        "y": 180
+      }
+    ],
+    "wires": [
+      {
+        "binding": "nearPower",
+        "id": "crossingNear",
+        "points": [
+          {
+            "x": 1120,
+            "y": 938
+          },
+          {
+            "x": 1120,
+            "y": 740
+          },
+          {
+            "x": 890,
+            "y": 740
+          },
+          {
+            "x": 890,
+            "y": 650
+          }
+        ]
+      },
+      {
+        "binding": "farPower",
+        "id": "crossingFar",
+        "points": [
+          {
+            "x": 1120,
+            "y": 938
+          },
+          {
+            "x": 1120,
+            "y": 770
+          },
+          {
+            "x": 590,
+            "y": 770
+          },
+          {
+            "x": 590,
+            "y": 610
+          }
+        ]
+      },
+      {
+        "binding": "liftPower",
+        "id": "liftWire",
+        "points": [
+          {
+            "x": 1450,
+            "y": 938
+          },
+          {
+            "x": 1450,
+            "y": 790
+          },
+          {
+            "x": 1210,
+            "y": 790
+          }
+        ]
+      },
+      {
+        "binding": "upperLink",
+        "id": "upperLinkWire",
+        "points": [
+          {
+            "x": 1450,
+            "y": 538
+          },
+          {
+            "x": 1450,
+            "y": 415
+          },
+          {
+            "x": 1328,
+            "y": 415
+          },
+          {
+            "x": 1328,
+            "y": 440
+          }
+        ]
+      },
+      {
+        "binding": "lowerLink",
+        "id": "lowerLinkWire",
+        "points": [
+          {
+            "x": 1450,
+            "y": 538
+          },
+          {
+            "x": 1500,
+            "y": 538
+          },
+          {
+            "x": 1500,
+            "y": 820
+          },
+          {
+            "x": 1808,
+            "y": 820
+          },
+          {
+            "x": 1808,
+            "y": 840
+          }
+        ]
+      },
+      {
+        "binding": "exitPower",
+        "id": "exitWire",
+        "points": [
+          {
+            "x": 1970,
+            "y": 938
+          },
+          {
+            "x": 1970,
+            "y": 780
+          },
+          {
+            "x": 2210,
+            "y": 780
+          },
+          {
+            "x": 2210,
+            "y": 810
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "complete": {
+      "exitSocket.occupied": true,
+      "link.value": true,
+      "maintenance.value": true
+    },
+    "crossing": {
+      "crossing.occupied": true
+    },
+    "idle": {},
+    "maintenance": {
+      "link.value": true,
+      "maintenance.value": true
+    },
+    "service": {
+      "crossing.occupied": true,
+      "liftPlate.occupied": true,
+      "link.value": true
+    }
+  },
+  "title": "HANDSHAKE",
+  "version": 1
+}

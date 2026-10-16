@@ -19,5 +19,6 @@ COPY --from=build /app/dist/ ./dist/
 COPY --from=build /app/node_modules/ ./node_modules/
 COPY server/ ./server/
 COPY src/ ./src/
+COPY levels/campaign/ ./levels/campaign/
 COPY package.json README.md ./
 CMD ["node", "server/app.ts"]

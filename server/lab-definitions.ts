@@ -1,7 +1,8 @@
+import type { AuthoredCampaignLevel } from '../src/coop/campaign.ts';
 import type { CoopLevelId } from '../src/coop/protocol.ts';
 import type { LevelDefinition } from './coop-state.ts';
 import { crumbleView, triggerCrumble } from './crumble-state.ts';
-export type MechanicsLabId = Exclude<CoopLevelId, 'pairing-bay' | 'race-condition' | 'crossfeed-vault'>;
+export type MechanicsLabId = Exclude<CoopLevelId, 'pairing-bay' | 'race-condition' | 'crossfeed-vault' | AuthoredCampaignLevel>;
 /** Trusted coordinate-free lab controllers, shared with the local workbench runtime. */
 export const LAB_DEFINITIONS: { [K in MechanicsLabId]: LevelDefinition<K> } = {
     'firewall-lab': {
