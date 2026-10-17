@@ -1,0 +1,36 @@
+{
+  "bcf_pe_sha256": "0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6",
+  "bits_per_case": 5,
+  "case_count": 64,
+  "chamber_id": "deadlock",
+  "clean_pe_sha256": "089e084593c95318dd160e50a8d2eb04b7b5cd74f354047bf3f48849b1790135",
+  "contract_sha256": "8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b",
+  "input_game_ports": [
+    "feed.occupied",
+    "safe.occupied",
+    "hatchToggle.value",
+    "payloadOne.occupied",
+    "payloadTwo.occupied",
+    "payloadThree.occupied"
+  ],
+  "input_names": [
+    "feed",
+    "safe",
+    "hatchToggle",
+    "payloadOne",
+    "payloadTwo",
+    "payloadThree"
+  ],
+  "native_results_sha256": "f418ada0b0dc5a558e3685542673f51418e1450943d535c96a1a44b9de81f98e",
+  "output_names": [
+    "cargoLift",
+    "shaftFirewall",
+    "serviceRelay",
+    "hatchOpen",
+    "payloadReady"
+  ],
+  "packed": "AgIEAQoKDAkCAgQBCgoMCQICBAEKCgwJAgIEAQoKDAkCAgQBCgoMCQICBAEKCgwJAgIEAQoKDAkWFhQVHh4cHQ==",
+  "schema": "coop-native-table/v1",
+  "specimen_id": "deadlock_ollvm_bcf",
+  "table_sha256": "beff6b3aeb157c6667bce098cc94d1a383b90236c9c6dca6aa0f4cc02ec5db2d"
+}

@@ -1,6 +1,7 @@
 import { isAuthoredCampaignLevel } from '../src/coop/campaign.ts';
 import { isDeclarativeLevel } from '../src/coop/protocol.ts';
 import { advanceCrossfeed, crossfeedDue, freshCrossfeed, syncCrossfeed, type CrossfeedRuntime } from './crossfeed-state.ts';
+import { nativeCrossfeedProjection } from './native/temporal.ts';
 import { newParty, selectChamber, completeParty } from './party-state.ts';
 import type { Server, IncomingMessage } from 'node:http';
 import { randomInt } from 'node:crypto';
@@ -131,7 +132,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             const remaining = room.peers.findIndex(Boolean);
             assignCube(cube, remaining < 0 ? null : (remaining + 1) as Slot);
         }
-        syncRace(context(room)); syncCrossfeed(context(room));
+        syncCoop(room);
         room.revision++;
         broadcast(room);
         Object.assign(peer, { room: undefined, slot: undefined });
@@ -200,7 +201,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         } else if (cube.physicsAuthority === null) {
             assignCube(cube, room.peers[0] ? 1 : 2);
         }
-        syncRace(context(room)); syncCrossfeed(context(room));
+        syncCoop(room);
         if (room.needsPersist) {
             room.record.revision = room.revision;
             await persist(room); room.needsPersist = false;
@@ -317,8 +318,15 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     function context(room: Room) {
         return { draftCubeContacts: room.draftCubeContacts, draftHeld: room.draftHeld.map((p, i) => room.peers[i] ? p : []) as [DraftId[], DraftId[]], record: room.record, held: room.plates.map((p, i) => room.peers[i] ? p : null) as [Plate, Plate], crumble: room.crumble, race: room.race, crossfeed: room.crossfeed, now: Date.now() };
     }
+    // Campaign CROSSFEED is native-backed; a custom draft with the crossfeed builtin keeps the mock.
+    // Both agree on raw route outputs, so grace falling edges are identical either way.
+    const syncCoop = (room: Room) => {
+        const ctx = context(room);
+        syncRace(ctx);
+        syncCrossfeed(ctx, room.record.level === 'crossfeed-vault' && !room.record.draft ? nativeCrossfeedProjection : undefined);
+    };
     async function commitAction(room: Room, before: string, timing: ActionTiming) {
-        syncRace(context(room)); syncCrossfeed(context(room));
+        syncCoop(room);
         if (rules(room).unlock(context(room))) room.record.exitUnlocked = true;
         room.record.completed = room.record.reachedExit.every(Boolean);
         completeParty(room.record);

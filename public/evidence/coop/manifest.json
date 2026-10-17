@@ -1,0 +1,71 @@
+{
+  "chambers": {
+    "crossfeed-vault": {
+      "bcf_pe_sha256": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b",
+      "disasm_file": "crossfeed-vault.disasm.json",
+      "evidence_file": "crossfeed-vault.evidence.json",
+      "kind": "temporal",
+      "native_results_sha256": "2623db3850c7ff0e87f1892859f8205e3451c31703989986f095cbad803da907",
+      "retained_trace_count": 32,
+      "specimen_id": "crossfeed-vault_ollvm_bcf",
+      "status_label": "VALIDATED OLLVM BCF",
+      "table_sha256": "1b225c0de8acf14af213947b6e329f7fdcf8448a3f173d3861e0a4166974dfff",
+      "trace_coverage_exhaustive": false,
+      "traces_file": "crossfeed-vault.traces.json"
+    },
+    "deadlock": {
+      "bcf_pe_sha256": "0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6",
+      "disasm_file": "deadlock.disasm.json",
+      "evidence_file": "deadlock.evidence.json",
+      "kind": "declarative",
+      "native_results_sha256": "f418ada0b0dc5a558e3685542673f51418e1450943d535c96a1a44b9de81f98e",
+      "retained_trace_count": 32,
+      "specimen_id": "deadlock_ollvm_bcf",
+      "status_label": "VALIDATED OLLVM BCF",
+      "table_sha256": "beff6b3aeb157c6667bce098cc94d1a383b90236c9c6dca6aa0f4cc02ec5db2d",
+      "trace_coverage_exhaustive": false,
+      "traces_file": "deadlock.traces.json"
+    },
+    "handshake": {
+      "bcf_pe_sha256": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8",
+      "disasm_file": "handshake.disasm.json",
+      "evidence_file": "handshake.evidence.json",
+      "kind": "declarative",
+      "native_results_sha256": "61c9e1ce062a535fc55547901793c5709914bd9b80a7fc2e91bb680af5e61760",
+      "retained_trace_count": 32,
+      "specimen_id": "handshake_ollvm_bcf",
+      "status_label": "VALIDATED OLLVM BCF",
+      "table_sha256": "41f0d9cf3bef31f3beac8faf200b26cda8bd3e34eb4b60145efb2dd20e52b647",
+      "trace_coverage_exhaustive": true,
+      "traces_file": "handshake.traces.json"
+    },
+    "race-condition": {
+      "bcf_pe_sha256": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a",
+      "disasm_file": "race-condition.disasm.json",
+      "evidence_file": "race-condition.evidence.json",
+      "kind": "temporal",
+      "native_results_sha256": "c0b2c36ca24d46b643b4480a07c1e1c1685bb7702ff3024a01c75846f59803b0",
+      "retained_trace_count": 32,
+      "specimen_id": "race-condition_ollvm_bcf",
+      "status_label": "VALIDATED OLLVM BCF",
+      "table_sha256": "ca76977be9045d2152772093ecdd9e4ff7c9aeede31bcaa0976a552927c7a350",
+      "trace_coverage_exhaustive": false,
+      "traces_file": "race-condition.traces.json"
+    },
+    "use-after-free": {
+      "bcf_pe_sha256": "733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb",
+      "disasm_file": "use-after-free.disasm.json",
+      "evidence_file": "use-after-free.evidence.json",
+      "kind": "declarative",
+      "native_results_sha256": "808b985171bcbb8abb39a99616ee3e97c6437372707191a2aaa4b467b6659210",
+      "retained_trace_count": 32,
+      "specimen_id": "use-after-free_ollvm_bcf",
+      "status_label": "VALIDATED OLLVM BCF",
+      "table_sha256": "322c40ec80b658c48742506b2fd698b1dc4086801dd2519c34fa9cf768a353d5",
+      "trace_coverage_exhaustive": true,
+      "traces_file": "use-after-free.traces.json"
+    }
+  },
+  "reference_commit": "see table contract_sha256",
+  "schema": "coop-native-evidence-manifest/v1"
+}

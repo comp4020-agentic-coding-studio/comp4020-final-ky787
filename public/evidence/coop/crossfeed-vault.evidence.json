@@ -1,0 +1,2837 @@
+{
+  "bcf_pe_sha256": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b",
+  "bogus": {
+    "assumptions": [
+      "Normal entry through bn_evaluate and decoded direct control flow; no external jump into an interior instruction or clone.",
+      "Code bytes and normal x86-64 instruction semantics remain intact; no debugger/exception mechanism rewrites RIP or flags.",
+      "The two 32-bit global loads complete successfully; each loaded x and y may be arbitrary and may differ between guards.",
+      "Calls use their ordinary ABI and return to their call sites; no stack/control-flow corruption or return-address manipulation.",
+      "This establishes clone unreachability under those conditions, not whole-program equivalence for arbitrary inputs/pointers or hardware faults."
+    ],
+    "clone_count": 56,
+    "clones": [
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002990",
+        "guard_ids": [
+          "opaque_guard_05",
+          "opaque_guard_06"
+        ],
+        "id": "bcf_clone_originalBB102alteredBB",
+        "instruction_count": 6,
+        "instructions": [
+          {
+            "bytes": "488b45d0",
+            "rva": "0x0000297c",
+            "text": "mov rax, qword ptr [rbp - 0x30]",
+            "va": "0x14000297c"
+          },
+          {
+            "bytes": "8a4dbd",
+            "rva": "0x00002980",
+            "text": "mov cl, byte ptr [rbp - 0x43]",
+            "va": "0x140002980"
+          },
+          {
+            "bytes": "80e101",
+            "rva": "0x00002983",
+            "text": "and cl, 1",
+            "va": "0x140002983"
+          },
+          {
+            "bytes": "0fb6c9",
+            "rva": "0x00002986",
+            "text": "movzx ecx, cl",
+            "va": "0x140002986"
+          },
+          {
+            "bytes": "8908",
+            "rva": "0x00002989",
+            "text": "mov dword ptr [rax], ecx",
+            "va": "0x140002989"
+          },
+          {
+            "bytes": "e906e8ffff",
+            "rva": "0x0000298b",
+            "text": "jmp 0x140001196",
+            "va": "0x14000298b"
+          }
+        ],
+        "ir_block": "originalBB102alteredBB",
+        "original_ir_block": "originalBB102",
+        "raw_block_ids": [
+          "bb_0000297C"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x0000297c"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002995",
+        "guard_ids": [
+          "opaque_guard_07",
+          "opaque_guard_08"
+        ],
+        "id": "bcf_clone_originalBB106alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e98ce8ffff",
+            "rva": "0x00002990",
+            "text": "jmp 0x140001221",
+            "va": "0x140002990"
+          }
+        ],
+        "ir_block": "originalBB106alteredBB",
+        "original_ir_block": "originalBB106",
+        "raw_block_ids": [
+          "bb_00002990"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002990"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029a9",
+        "guard_ids": [
+          "opaque_guard_09",
+          "opaque_guard_10"
+        ],
+        "id": "bcf_clone_originalBB110alteredBB",
+        "instruction_count": 6,
+        "instructions": [
+          {
+            "bytes": "488b45e0",
+            "rva": "0x00002995",
+            "text": "mov rax, qword ptr [rbp - 0x20]",
+            "va": "0x140002995"
+          },
+          {
+            "bytes": "8a4db9",
+            "rva": "0x00002999",
+            "text": "mov cl, byte ptr [rbp - 0x47]",
+            "va": "0x140002999"
+          },
+          {
+            "bytes": "80e101",
+            "rva": "0x0000299c",
+            "text": "and cl, 1",
+            "va": "0x14000299c"
+          },
+          {
+            "bytes": "0fb6c9",
+            "rva": "0x0000299f",
+            "text": "movzx ecx, cl",
+            "va": "0x14000299f"
+          },
+          {
+            "bytes": "8908",
+            "rva": "0x000029a2",
+            "text": "mov dword ptr [rax], ecx",
+            "va": "0x1400029a2"
+          },
+          {
+            "bytes": "e9f3e8ffff",
+            "rva": "0x000029a4",
+            "text": "jmp 0x14000129c",
+            "va": "0x1400029a4"
+          }
+        ],
+        "ir_block": "originalBB110alteredBB",
+        "original_ir_block": "originalBB110",
+        "raw_block_ids": [
+          "bb_00002995"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002995"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029ae",
+        "guard_ids": [
+          "opaque_guard_11",
+          "opaque_guard_12"
+        ],
+        "id": "bcf_clone_originalBB114alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e976e9ffff",
+            "rva": "0x000029a9",
+            "text": "jmp 0x140001324",
+            "va": "0x1400029a9"
+          }
+        ],
+        "ir_block": "originalBB114alteredBB",
+        "original_ir_block": "originalBB114",
+        "raw_block_ids": [
+          "bb_000029A9"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x000029a9"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029c0",
+        "guard_ids": [
+          "opaque_guard_13",
+          "opaque_guard_14"
+        ],
+        "id": "bcf_clone_originalBB118alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x000029ae",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x1400029ae"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x000029b2",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x1400029b2"
+          },
+          {
+            "bytes": "c70001000000",
+            "rva": "0x000029b5",
+            "text": "mov dword ptr [rax], 1",
+            "va": "0x1400029b5"
+          },
+          {
+            "bytes": "e9d9e9ffff",
+            "rva": "0x000029bb",
+            "text": "jmp 0x140001399",
+            "va": "0x1400029bb"
+          }
+        ],
+        "ir_block": "originalBB118alteredBB",
+        "original_ir_block": "originalBB118",
+        "raw_block_ids": [
+          "bb_000029AE"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %grappleAnchoralteredBB, align 4",
+            "output": "grappleAnchor",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x000029ae"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029d2",
+        "guard_ids": [
+          "opaque_guard_15",
+          "opaque_guard_16"
+        ],
+        "id": "bcf_clone_originalBB122alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x000029c0",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x1400029c0"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x000029c4",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x1400029c4"
+          },
+          {
+            "bytes": "c70000000000",
+            "rva": "0x000029c7",
+            "text": "mov dword ptr [rax], 0",
+            "va": "0x1400029c7"
+          },
+          {
+            "bytes": "e932eaffff",
+            "rva": "0x000029cd",
+            "text": "jmp 0x140001404",
+            "va": "0x1400029cd"
+          }
+        ],
+        "ir_block": "originalBB122alteredBB",
+        "original_ir_block": "originalBB122",
+        "raw_block_ids": [
+          "bb_000029C0"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %grappleAnchor9alteredBB, align 4",
+            "output": "grappleAnchor",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x000029c0"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029d7",
+        "guard_ids": [
+          "opaque_guard_17",
+          "opaque_guard_18"
+        ],
+        "id": "bcf_clone_originalBB126alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e998eaffff",
+            "rva": "0x000029d2",
+            "text": "jmp 0x14000146f",
+            "va": "0x1400029d2"
+          }
+        ],
+        "ir_block": "originalBB126alteredBB",
+        "original_ir_block": "originalBB126",
+        "raw_block_ids": [
+          "bb_000029D2"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x000029d2"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029ea",
+        "guard_ids": [
+          "opaque_guard_19",
+          "opaque_guard_20"
+        ],
+        "id": "bcf_clone_originalBB130alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x000029d7",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x1400029d7"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x000029db",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x1400029db"
+          },
+          {
+            "bytes": "c7400401000000",
+            "rva": "0x000029de",
+            "text": "mov dword ptr [rax + 4], 1",
+            "va": "0x1400029de"
+          },
+          {
+            "bytes": "e9faeaffff",
+            "rva": "0x000029e5",
+            "text": "jmp 0x1400014e4",
+            "va": "0x1400029e5"
+          }
+        ],
+        "ir_block": "originalBB130alteredBB",
+        "original_ir_block": "originalBB130",
+        "raw_block_ids": [
+          "bb_000029D7"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %bridgealteredBB, align 4",
+            "output": "bridge",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x000029d7"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x000029fd",
+        "guard_ids": [
+          "opaque_guard_21",
+          "opaque_guard_22"
+        ],
+        "id": "bcf_clone_originalBB134alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x000029ea",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x1400029ea"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x000029ee",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x1400029ee"
+          },
+          {
+            "bytes": "c7400400000000",
+            "rva": "0x000029f1",
+            "text": "mov dword ptr [rax + 4], 0",
+            "va": "0x1400029f1"
+          },
+          {
+            "bytes": "e953ebffff",
+            "rva": "0x000029f8",
+            "text": "jmp 0x140001550",
+            "va": "0x1400029f8"
+          }
+        ],
+        "ir_block": "originalBB134alteredBB",
+        "original_ir_block": "originalBB134",
+        "raw_block_ids": [
+          "bb_000029EA"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %bridge14alteredBB, align 4",
+            "output": "bridge",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x000029ea"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a02",
+        "guard_ids": [
+          "opaque_guard_23",
+          "opaque_guard_24"
+        ],
+        "id": "bcf_clone_originalBB138alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9baebffff",
+            "rva": "0x000029fd",
+            "text": "jmp 0x1400015bc",
+            "va": "0x1400029fd"
+          }
+        ],
+        "ir_block": "originalBB138alteredBB",
+        "original_ir_block": "originalBB138",
+        "raw_block_ids": [
+          "bb_000029FD"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x000029fd"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a07",
+        "guard_ids": [
+          "opaque_guard_25",
+          "opaque_guard_26"
+        ],
+        "id": "bcf_clone_originalBB142alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e92becffff",
+            "rva": "0x00002a02",
+            "text": "jmp 0x140001632",
+            "va": "0x140002a02"
+          }
+        ],
+        "ir_block": "originalBB142alteredBB",
+        "original_ir_block": "originalBB142",
+        "raw_block_ids": [
+          "bb_00002A02"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002a02"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a1a",
+        "guard_ids": [
+          "opaque_guard_27",
+          "opaque_guard_28"
+        ],
+        "id": "bcf_clone_originalBB146alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a07",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a07"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a0b",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a0b"
+          },
+          {
+            "bytes": "c7400801000000",
+            "rva": "0x00002a0e",
+            "text": "mov dword ptr [rax + 8], 1",
+            "va": "0x140002a0e"
+          },
+          {
+            "bytes": "e98eecffff",
+            "rva": "0x00002a15",
+            "text": "jmp 0x1400016a8",
+            "va": "0x140002a15"
+          }
+        ],
+        "ir_block": "originalBB146alteredBB",
+        "original_ir_block": "originalBB146",
+        "raw_block_ids": [
+          "bb_00002A07"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %liftFieldalteredBB, align 4",
+            "output": "liftField",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002a07"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a2d",
+        "guard_ids": [
+          "opaque_guard_29",
+          "opaque_guard_30"
+        ],
+        "id": "bcf_clone_originalBB150alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a1a",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a1a"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a1e",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a1e"
+          },
+          {
+            "bytes": "c7400800000000",
+            "rva": "0x00002a21",
+            "text": "mov dword ptr [rax + 8], 0",
+            "va": "0x140002a21"
+          },
+          {
+            "bytes": "e9e7ecffff",
+            "rva": "0x00002a28",
+            "text": "jmp 0x140001714",
+            "va": "0x140002a28"
+          }
+        ],
+        "ir_block": "originalBB150alteredBB",
+        "original_ir_block": "originalBB150",
+        "raw_block_ids": [
+          "bb_00002A1A"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %liftField21alteredBB, align 4",
+            "output": "liftField",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002a1a"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a32",
+        "guard_ids": [
+          "opaque_guard_31",
+          "opaque_guard_32"
+        ],
+        "id": "bcf_clone_originalBB154alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e94eedffff",
+            "rva": "0x00002a2d",
+            "text": "jmp 0x140001780",
+            "va": "0x140002a2d"
+          }
+        ],
+        "ir_block": "originalBB154alteredBB",
+        "original_ir_block": "originalBB154",
+        "raw_block_ids": [
+          "bb_00002A2D"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002a2d"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a45",
+        "guard_ids": [
+          "opaque_guard_33",
+          "opaque_guard_34"
+        ],
+        "id": "bcf_clone_originalBB158alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a32",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a32"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a36",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a36"
+          },
+          {
+            "bytes": "c7400c01000000",
+            "rva": "0x00002a39",
+            "text": "mov dword ptr [rax + 0xc], 1",
+            "va": "0x140002a39"
+          },
+          {
+            "bytes": "e9b1edffff",
+            "rva": "0x00002a40",
+            "text": "jmp 0x1400017f6",
+            "va": "0x140002a40"
+          }
+        ],
+        "ir_block": "originalBB158alteredBB",
+        "original_ir_block": "originalBB158",
+        "raw_block_ids": [
+          "bb_00002A32"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %serviceAccessalteredBB, align 4",
+            "output": "serviceAccess",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002a32"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a58",
+        "guard_ids": [
+          "opaque_guard_35",
+          "opaque_guard_36"
+        ],
+        "id": "bcf_clone_originalBB162alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a45",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a45"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a49",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a49"
+          },
+          {
+            "bytes": "c7400c00000000",
+            "rva": "0x00002a4c",
+            "text": "mov dword ptr [rax + 0xc], 0",
+            "va": "0x140002a4c"
+          },
+          {
+            "bytes": "e90aeeffff",
+            "rva": "0x00002a53",
+            "text": "jmp 0x140001862",
+            "va": "0x140002a53"
+          }
+        ],
+        "ir_block": "originalBB162alteredBB",
+        "original_ir_block": "originalBB162",
+        "raw_block_ids": [
+          "bb_00002A45"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %serviceAccess27alteredBB, align 4",
+            "output": "serviceAccess",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002a45"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a5d",
+        "guard_ids": [
+          "opaque_guard_37",
+          "opaque_guard_38"
+        ],
+        "id": "bcf_clone_originalBB166alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e971eeffff",
+            "rva": "0x00002a58",
+            "text": "jmp 0x1400018ce",
+            "va": "0x140002a58"
+          }
+        ],
+        "ir_block": "originalBB166alteredBB",
+        "original_ir_block": "originalBB166",
+        "raw_block_ids": [
+          "bb_00002A58"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002a58"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a62",
+        "guard_ids": [
+          "opaque_guard_39",
+          "opaque_guard_40"
+        ],
+        "id": "bcf_clone_originalBB170alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9e5eeffff",
+            "rva": "0x00002a5d",
+            "text": "jmp 0x140001947",
+            "va": "0x140002a5d"
+          }
+        ],
+        "ir_block": "originalBB170alteredBB",
+        "original_ir_block": "originalBB170",
+        "raw_block_ids": [
+          "bb_00002A5D"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002a5d"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a75",
+        "guard_ids": [
+          "opaque_guard_41",
+          "opaque_guard_42"
+        ],
+        "id": "bcf_clone_originalBB174alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a62",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a62"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a66",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a66"
+          },
+          {
+            "bytes": "c7401001000000",
+            "rva": "0x00002a69",
+            "text": "mov dword ptr [rax + 0x10], 1",
+            "va": "0x140002a69"
+          },
+          {
+            "bytes": "e947efffff",
+            "rva": "0x00002a70",
+            "text": "jmp 0x1400019bc",
+            "va": "0x140002a70"
+          }
+        ],
+        "ir_block": "originalBB174alteredBB",
+        "original_ir_block": "originalBB174",
+        "raw_block_ids": [
+          "bb_00002A62"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %relayGatesalteredBB, align 4",
+            "output": "relayGates",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002a62"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a88",
+        "guard_ids": [
+          "opaque_guard_43",
+          "opaque_guard_44"
+        ],
+        "id": "bcf_clone_originalBB178alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a75",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a75"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a79",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a79"
+          },
+          {
+            "bytes": "c7401000000000",
+            "rva": "0x00002a7c",
+            "text": "mov dword ptr [rax + 0x10], 0",
+            "va": "0x140002a7c"
+          },
+          {
+            "bytes": "e9a0efffff",
+            "rva": "0x00002a83",
+            "text": "jmp 0x140001a28",
+            "va": "0x140002a83"
+          }
+        ],
+        "ir_block": "originalBB178alteredBB",
+        "original_ir_block": "originalBB178",
+        "raw_block_ids": [
+          "bb_00002A75"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %relayGates36alteredBB, align 4",
+            "output": "relayGates",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002a75"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a8d",
+        "guard_ids": [
+          "opaque_guard_45",
+          "opaque_guard_46"
+        ],
+        "id": "bcf_clone_originalBB182alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e907f0ffff",
+            "rva": "0x00002a88",
+            "text": "jmp 0x140001a94",
+            "va": "0x140002a88"
+          }
+        ],
+        "ir_block": "originalBB182alteredBB",
+        "original_ir_block": "originalBB182",
+        "raw_block_ids": [
+          "bb_00002A88"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002a88"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002a92",
+        "guard_ids": [
+          "opaque_guard_47",
+          "opaque_guard_48"
+        ],
+        "id": "bcf_clone_originalBB186alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e977f0ffff",
+            "rva": "0x00002a8d",
+            "text": "jmp 0x140001b09",
+            "va": "0x140002a8d"
+          }
+        ],
+        "ir_block": "originalBB186alteredBB",
+        "original_ir_block": "originalBB186",
+        "raw_block_ids": [
+          "bb_00002A8D"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002a8d"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002aa5",
+        "guard_ids": [
+          "opaque_guard_49",
+          "opaque_guard_50"
+        ],
+        "id": "bcf_clone_originalBB190alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002a92",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002a92"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002a96",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002a96"
+          },
+          {
+            "bytes": "c7401401000000",
+            "rva": "0x00002a99",
+            "text": "mov dword ptr [rax + 0x14], 1",
+            "va": "0x140002a99"
+          },
+          {
+            "bytes": "e9daf0ffff",
+            "rva": "0x00002aa0",
+            "text": "jmp 0x140001b7f",
+            "va": "0x140002aa0"
+          }
+        ],
+        "ir_block": "originalBB190alteredBB",
+        "original_ir_block": "originalBB190",
+        "raw_block_ids": [
+          "bb_00002A92"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %leftRoutealteredBB, align 4",
+            "output": "leftRoute",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002a92"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002ab8",
+        "guard_ids": [
+          "opaque_guard_51",
+          "opaque_guard_52"
+        ],
+        "id": "bcf_clone_originalBB194alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002aa5",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002aa5"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002aa9",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002aa9"
+          },
+          {
+            "bytes": "c7401400000000",
+            "rva": "0x00002aac",
+            "text": "mov dword ptr [rax + 0x14], 0",
+            "va": "0x140002aac"
+          },
+          {
+            "bytes": "e933f1ffff",
+            "rva": "0x00002ab3",
+            "text": "jmp 0x140001beb",
+            "va": "0x140002ab3"
+          }
+        ],
+        "ir_block": "originalBB194alteredBB",
+        "original_ir_block": "originalBB194",
+        "raw_block_ids": [
+          "bb_00002AA5"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %leftRoute43alteredBB, align 4",
+            "output": "leftRoute",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002aa5"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002abd",
+        "guard_ids": [
+          "opaque_guard_53",
+          "opaque_guard_54"
+        ],
+        "id": "bcf_clone_originalBB198alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e99af1ffff",
+            "rva": "0x00002ab8",
+            "text": "jmp 0x140001c57",
+            "va": "0x140002ab8"
+          }
+        ],
+        "ir_block": "originalBB198alteredBB",
+        "original_ir_block": "originalBB198",
+        "raw_block_ids": [
+          "bb_00002AB8"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002ab8"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002ac2",
+        "guard_ids": [
+          "opaque_guard_55",
+          "opaque_guard_56"
+        ],
+        "id": "bcf_clone_originalBB202alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e90af2ffff",
+            "rva": "0x00002abd",
+            "text": "jmp 0x140001ccc",
+            "va": "0x140002abd"
+          }
+        ],
+        "ir_block": "originalBB202alteredBB",
+        "original_ir_block": "originalBB202",
+        "raw_block_ids": [
+          "bb_00002ABD"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002abd"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002ad5",
+        "guard_ids": [
+          "opaque_guard_57",
+          "opaque_guard_58"
+        ],
+        "id": "bcf_clone_originalBB206alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002ac2",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002ac2"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002ac6",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002ac6"
+          },
+          {
+            "bytes": "c7401801000000",
+            "rva": "0x00002ac9",
+            "text": "mov dword ptr [rax + 0x18], 1",
+            "va": "0x140002ac9"
+          },
+          {
+            "bytes": "e96df2ffff",
+            "rva": "0x00002ad0",
+            "text": "jmp 0x140001d42",
+            "va": "0x140002ad0"
+          }
+        ],
+        "ir_block": "originalBB206alteredBB",
+        "original_ir_block": "originalBB206",
+        "raw_block_ids": [
+          "bb_00002AC2"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %rightRoutealteredBB, align 4",
+            "output": "rightRoute",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002ac2"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002ae8",
+        "guard_ids": [
+          "opaque_guard_59",
+          "opaque_guard_60"
+        ],
+        "id": "bcf_clone_originalBB210alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002ad5",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002ad5"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002ad9",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002ad9"
+          },
+          {
+            "bytes": "c7401800000000",
+            "rva": "0x00002adc",
+            "text": "mov dword ptr [rax + 0x18], 0",
+            "va": "0x140002adc"
+          },
+          {
+            "bytes": "e9c6f2ffff",
+            "rva": "0x00002ae3",
+            "text": "jmp 0x140001dae",
+            "va": "0x140002ae3"
+          }
+        ],
+        "ir_block": "originalBB210alteredBB",
+        "original_ir_block": "originalBB210",
+        "raw_block_ids": [
+          "bb_00002AD5"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %rightRoute51alteredBB, align 4",
+            "output": "rightRoute",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002ad5"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002aed",
+        "guard_ids": [
+          "opaque_guard_61",
+          "opaque_guard_62"
+        ],
+        "id": "bcf_clone_originalBB214alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e92df3ffff",
+            "rva": "0x00002ae8",
+            "text": "jmp 0x140001e1a",
+            "va": "0x140002ae8"
+          }
+        ],
+        "ir_block": "originalBB214alteredBB",
+        "original_ir_block": "originalBB214",
+        "raw_block_ids": [
+          "bb_00002AE8"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002ae8"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b00",
+        "guard_ids": [
+          "opaque_guard_63",
+          "opaque_guard_64"
+        ],
+        "id": "bcf_clone_originalBB218alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002aed",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002aed"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002af1",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002af1"
+          },
+          {
+            "bytes": "c7401c01000000",
+            "rva": "0x00002af4",
+            "text": "mov dword ptr [rax + 0x1c], 1",
+            "va": "0x140002af4"
+          },
+          {
+            "bytes": "e990f3ffff",
+            "rva": "0x00002afb",
+            "text": "jmp 0x140001e90",
+            "va": "0x140002afb"
+          }
+        ],
+        "ir_block": "originalBB218alteredBB",
+        "original_ir_block": "originalBB218",
+        "raw_block_ids": [
+          "bb_00002AED"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %galleryAccessalteredBB, align 4",
+            "output": "galleryAccess",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002aed"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b13",
+        "guard_ids": [
+          "opaque_guard_65",
+          "opaque_guard_66"
+        ],
+        "id": "bcf_clone_originalBB222alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b00",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b00"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b04",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b04"
+          },
+          {
+            "bytes": "c7401c00000000",
+            "rva": "0x00002b07",
+            "text": "mov dword ptr [rax + 0x1c], 0",
+            "va": "0x140002b07"
+          },
+          {
+            "bytes": "e9e9f3ffff",
+            "rva": "0x00002b0e",
+            "text": "jmp 0x140001efc",
+            "va": "0x140002b0e"
+          }
+        ],
+        "ir_block": "originalBB222alteredBB",
+        "original_ir_block": "originalBB222",
+        "raw_block_ids": [
+          "bb_00002B00"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %galleryAccess56alteredBB, align 4",
+            "output": "galleryAccess",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002b00"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b18",
+        "guard_ids": [
+          "opaque_guard_67",
+          "opaque_guard_68"
+        ],
+        "id": "bcf_clone_originalBB226alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e950f4ffff",
+            "rva": "0x00002b13",
+            "text": "jmp 0x140001f68",
+            "va": "0x140002b13"
+          }
+        ],
+        "ir_block": "originalBB226alteredBB",
+        "original_ir_block": "originalBB226",
+        "raw_block_ids": [
+          "bb_00002B13"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002b13"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b2b",
+        "guard_ids": [
+          "opaque_guard_69",
+          "opaque_guard_70"
+        ],
+        "id": "bcf_clone_originalBB230alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b18",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b18"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b1c",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b1c"
+          },
+          {
+            "bytes": "c7402001000000",
+            "rva": "0x00002b1f",
+            "text": "mov dword ptr [rax + 0x20], 1",
+            "va": "0x140002b1f"
+          },
+          {
+            "bytes": "e9aff4ffff",
+            "rva": "0x00002b26",
+            "text": "jmp 0x140001fda",
+            "va": "0x140002b26"
+          }
+        ],
+        "ir_block": "originalBB230alteredBB",
+        "original_ir_block": "originalBB230",
+        "raw_block_ids": [
+          "bb_00002B18"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %vaultPoweralteredBB, align 4",
+            "output": "vaultPower",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002b18"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b3e",
+        "guard_ids": [
+          "opaque_guard_71",
+          "opaque_guard_72"
+        ],
+        "id": "bcf_clone_originalBB234alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b2b",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b2b"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b2f",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b2f"
+          },
+          {
+            "bytes": "c7402000000000",
+            "rva": "0x00002b32",
+            "text": "mov dword ptr [rax + 0x20], 0",
+            "va": "0x140002b32"
+          },
+          {
+            "bytes": "e908f5ffff",
+            "rva": "0x00002b39",
+            "text": "jmp 0x140002046",
+            "va": "0x140002b39"
+          }
+        ],
+        "ir_block": "originalBB234alteredBB",
+        "original_ir_block": "originalBB234",
+        "raw_block_ids": [
+          "bb_00002B2B"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %vaultPower61alteredBB, align 4",
+            "output": "vaultPower",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002b2b"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b43",
+        "guard_ids": [
+          "opaque_guard_73",
+          "opaque_guard_74"
+        ],
+        "id": "bcf_clone_originalBB238alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e96ff5ffff",
+            "rva": "0x00002b3e",
+            "text": "jmp 0x1400020b2",
+            "va": "0x140002b3e"
+          }
+        ],
+        "ir_block": "originalBB238alteredBB",
+        "original_ir_block": "originalBB238",
+        "raw_block_ids": [
+          "bb_00002B3E"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002b3e"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b56",
+        "guard_ids": [
+          "opaque_guard_75",
+          "opaque_guard_76"
+        ],
+        "id": "bcf_clone_originalBB242alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b43",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b43"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b47",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b47"
+          },
+          {
+            "bytes": "c7402401000000",
+            "rva": "0x00002b4a",
+            "text": "mov dword ptr [rax + 0x24], 1",
+            "va": "0x140002b4a"
+          },
+          {
+            "bytes": "e9cef5ffff",
+            "rva": "0x00002b51",
+            "text": "jmp 0x140002124",
+            "va": "0x140002b51"
+          }
+        ],
+        "ir_block": "originalBB242alteredBB",
+        "original_ir_block": "originalBB242",
+        "raw_block_ids": [
+          "bb_00002B43"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %vaultReturnalteredBB, align 4",
+            "output": "vaultReturn",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002b43"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b69",
+        "guard_ids": [
+          "opaque_guard_77",
+          "opaque_guard_78"
+        ],
+        "id": "bcf_clone_originalBB246alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b56",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b56"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b5a",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b5a"
+          },
+          {
+            "bytes": "c7402400000000",
+            "rva": "0x00002b5d",
+            "text": "mov dword ptr [rax + 0x24], 0",
+            "va": "0x140002b5d"
+          },
+          {
+            "bytes": "e927f6ffff",
+            "rva": "0x00002b64",
+            "text": "jmp 0x140002190",
+            "va": "0x140002b64"
+          }
+        ],
+        "ir_block": "originalBB246alteredBB",
+        "original_ir_block": "originalBB246",
+        "raw_block_ids": [
+          "bb_00002B56"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %vaultReturn66alteredBB, align 4",
+            "output": "vaultReturn",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002b56"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b6e",
+        "guard_ids": [
+          "opaque_guard_79",
+          "opaque_guard_80"
+        ],
+        "id": "bcf_clone_originalBB250alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e98ef6ffff",
+            "rva": "0x00002b69",
+            "text": "jmp 0x1400021fc",
+            "va": "0x140002b69"
+          }
+        ],
+        "ir_block": "originalBB250alteredBB",
+        "original_ir_block": "originalBB250",
+        "raw_block_ids": [
+          "bb_00002B69"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002b69"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b81",
+        "guard_ids": [
+          "opaque_guard_81",
+          "opaque_guard_82"
+        ],
+        "id": "bcf_clone_originalBB254alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b6e",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b6e"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b72",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b72"
+          },
+          {
+            "bytes": "c7402801000000",
+            "rva": "0x00002b75",
+            "text": "mov dword ptr [rax + 0x28], 1",
+            "va": "0x140002b75"
+          },
+          {
+            "bytes": "e9f1f6ffff",
+            "rva": "0x00002b7c",
+            "text": "jmp 0x140002272",
+            "va": "0x140002b7c"
+          }
+        ],
+        "ir_block": "originalBB254alteredBB",
+        "original_ir_block": "originalBB254",
+        "raw_block_ids": [
+          "bb_00002B6E"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %exitDooralteredBB, align 4",
+            "output": "exitDoor",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002b6e"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b94",
+        "guard_ids": [
+          "opaque_guard_83",
+          "opaque_guard_84"
+        ],
+        "id": "bcf_clone_originalBB258alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b81",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b81"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002b85",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002b85"
+          },
+          {
+            "bytes": "c7402800000000",
+            "rva": "0x00002b88",
+            "text": "mov dword ptr [rax + 0x28], 0",
+            "va": "0x140002b88"
+          },
+          {
+            "bytes": "e94af7ffff",
+            "rva": "0x00002b8f",
+            "text": "jmp 0x1400022de",
+            "va": "0x140002b8f"
+          }
+        ],
+        "ir_block": "originalBB258alteredBB",
+        "original_ir_block": "originalBB258",
+        "raw_block_ids": [
+          "bb_00002B81"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %exitDoor71alteredBB, align 4",
+            "output": "exitDoor",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002b81"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b99",
+        "guard_ids": [
+          "opaque_guard_85",
+          "opaque_guard_86"
+        ],
+        "id": "bcf_clone_originalBB262alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9b1f7ffff",
+            "rva": "0x00002b94",
+            "text": "jmp 0x14000234a",
+            "va": "0x140002b94"
+          }
+        ],
+        "ir_block": "originalBB262alteredBB",
+        "original_ir_block": "originalBB262",
+        "raw_block_ids": [
+          "bb_00002B94"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002b94"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002b9e",
+        "guard_ids": [
+          "opaque_guard_87",
+          "opaque_guard_88"
+        ],
+        "id": "bcf_clone_originalBB266alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e922f8ffff",
+            "rva": "0x00002b99",
+            "text": "jmp 0x1400023c0",
+            "va": "0x140002b99"
+          }
+        ],
+        "ir_block": "originalBB266alteredBB",
+        "original_ir_block": "originalBB266",
+        "raw_block_ids": [
+          "bb_00002B99"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002b99"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bb1",
+        "guard_ids": [
+          "opaque_guard_89",
+          "opaque_guard_90"
+        ],
+        "id": "bcf_clone_originalBB270alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002b9e",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002b9e"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002ba2",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002ba2"
+          },
+          {
+            "bytes": "c7402c01000000",
+            "rva": "0x00002ba5",
+            "text": "mov dword ptr [rax + 0x2c], 1",
+            "va": "0x140002ba5"
+          },
+          {
+            "bytes": "e985f8ffff",
+            "rva": "0x00002bac",
+            "text": "jmp 0x140002436",
+            "va": "0x140002bac"
+          }
+        ],
+        "ir_block": "originalBB270alteredBB",
+        "original_ir_block": "originalBB270",
+        "raw_block_ids": [
+          "bb_00002B9E"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %physicalLeftRoutealteredBB, align 4",
+            "output": "physicalLeftRoute",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002b9e"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bc4",
+        "guard_ids": [
+          "opaque_guard_91",
+          "opaque_guard_92"
+        ],
+        "id": "bcf_clone_originalBB274alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002bb1",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002bb1"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002bb5",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002bb5"
+          },
+          {
+            "bytes": "c7402c00000000",
+            "rva": "0x00002bb8",
+            "text": "mov dword ptr [rax + 0x2c], 0",
+            "va": "0x140002bb8"
+          },
+          {
+            "bytes": "e9def8ffff",
+            "rva": "0x00002bbf",
+            "text": "jmp 0x1400024a2",
+            "va": "0x140002bbf"
+          }
+        ],
+        "ir_block": "originalBB274alteredBB",
+        "original_ir_block": "originalBB274",
+        "raw_block_ids": [
+          "bb_00002BB1"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %physicalLeftRoute79alteredBB, align 4",
+            "output": "physicalLeftRoute",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002bb1"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bc9",
+        "guard_ids": [
+          "opaque_guard_93",
+          "opaque_guard_94"
+        ],
+        "id": "bcf_clone_originalBB278alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e945f9ffff",
+            "rva": "0x00002bc4",
+            "text": "jmp 0x14000250e",
+            "va": "0x140002bc4"
+          }
+        ],
+        "ir_block": "originalBB278alteredBB",
+        "original_ir_block": "originalBB278",
+        "raw_block_ids": [
+          "bb_00002BC4"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002bc4"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bce",
+        "guard_ids": [
+          "opaque_guard_95",
+          "opaque_guard_96"
+        ],
+        "id": "bcf_clone_originalBB282alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9b6f9ffff",
+            "rva": "0x00002bc9",
+            "text": "jmp 0x140002584",
+            "va": "0x140002bc9"
+          }
+        ],
+        "ir_block": "originalBB282alteredBB",
+        "original_ir_block": "originalBB282",
+        "raw_block_ids": [
+          "bb_00002BC9"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002bc9"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002be1",
+        "guard_ids": [
+          "opaque_guard_97",
+          "opaque_guard_98"
+        ],
+        "id": "bcf_clone_originalBB286alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002bce",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002bce"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002bd2",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002bd2"
+          },
+          {
+            "bytes": "c7403001000000",
+            "rva": "0x00002bd5",
+            "text": "mov dword ptr [rax + 0x30], 1",
+            "va": "0x140002bd5"
+          },
+          {
+            "bytes": "e919faffff",
+            "rva": "0x00002bdc",
+            "text": "jmp 0x1400025fa",
+            "va": "0x140002bdc"
+          }
+        ],
+        "ir_block": "originalBB286alteredBB",
+        "original_ir_block": "originalBB286",
+        "raw_block_ids": [
+          "bb_00002BCE"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %physicalRightRoutealteredBB, align 4",
+            "output": "physicalRightRoute",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002bce"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bf4",
+        "guard_ids": [
+          "opaque_guard_99",
+          "opaque_guard_100"
+        ],
+        "id": "bcf_clone_originalBB290alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002be1",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002be1"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002be5",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002be5"
+          },
+          {
+            "bytes": "c7403000000000",
+            "rva": "0x00002be8",
+            "text": "mov dword ptr [rax + 0x30], 0",
+            "va": "0x140002be8"
+          },
+          {
+            "bytes": "e972faffff",
+            "rva": "0x00002bef",
+            "text": "jmp 0x140002666",
+            "va": "0x140002bef"
+          }
+        ],
+        "ir_block": "originalBB290alteredBB",
+        "original_ir_block": "originalBB290",
+        "raw_block_ids": [
+          "bb_00002BE1"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %physicalRightRoute87alteredBB, align 4",
+            "output": "physicalRightRoute",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002be1"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bf9",
+        "guard_ids": [
+          "opaque_guard_101",
+          "opaque_guard_102"
+        ],
+        "id": "bcf_clone_originalBB294alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9d9faffff",
+            "rva": "0x00002bf4",
+            "text": "jmp 0x1400026d2",
+            "va": "0x140002bf4"
+          }
+        ],
+        "ir_block": "originalBB294alteredBB",
+        "original_ir_block": "originalBB294",
+        "raw_block_ids": [
+          "bb_00002BF4"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002bf4"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002bfe",
+        "guard_ids": [
+          "opaque_guard_103",
+          "opaque_guard_104"
+        ],
+        "id": "bcf_clone_originalBB298alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e949fbffff",
+            "rva": "0x00002bf9",
+            "text": "jmp 0x140002747",
+            "va": "0x140002bf9"
+          }
+        ],
+        "ir_block": "originalBB298alteredBB",
+        "original_ir_block": "originalBB298",
+        "raw_block_ids": [
+          "bb_00002BF9"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002bf9"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002c03",
+        "guard_ids": [
+          "opaque_guard_105",
+          "opaque_guard_106"
+        ],
+        "id": "bcf_clone_originalBB302alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9bdfbffff",
+            "rva": "0x00002bfe",
+            "text": "jmp 0x1400027c0",
+            "va": "0x140002bfe"
+          }
+        ],
+        "ir_block": "originalBB302alteredBB",
+        "original_ir_block": "originalBB302",
+        "raw_block_ids": [
+          "bb_00002BFE"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002bfe"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002c16",
+        "guard_ids": [
+          "opaque_guard_107",
+          "opaque_guard_108"
+        ],
+        "id": "bcf_clone_originalBB306alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002c03",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002c03"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002c07",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002c07"
+          },
+          {
+            "bytes": "c7403401000000",
+            "rva": "0x00002c0a",
+            "text": "mov dword ptr [rax + 0x34], 1",
+            "va": "0x140002c0a"
+          },
+          {
+            "bytes": "e920fcffff",
+            "rva": "0x00002c11",
+            "text": "jmp 0x140002836",
+            "va": "0x140002c11"
+          }
+        ],
+        "ir_block": "originalBB306alteredBB",
+        "original_ir_block": "originalBB306",
+        "raw_block_ids": [
+          "bb_00002C03"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 1, ptr %exitUnlockCandidatealteredBB, align 4",
+            "output": "exitUnlockCandidate",
+            "value": 1
+          }
+        ],
+        "start_rva": "0x00002c03"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002c29",
+        "guard_ids": [
+          "opaque_guard_109",
+          "opaque_guard_110"
+        ],
+        "id": "bcf_clone_originalBB310alteredBB",
+        "instruction_count": 4,
+        "instructions": [
+          {
+            "bytes": "488b45c0",
+            "rva": "0x00002c16",
+            "text": "mov rax, qword ptr [rbp - 0x40]",
+            "va": "0x140002c16"
+          },
+          {
+            "bytes": "488b00",
+            "rva": "0x00002c1a",
+            "text": "mov rax, qword ptr [rax]",
+            "va": "0x140002c1a"
+          },
+          {
+            "bytes": "c7403400000000",
+            "rva": "0x00002c1d",
+            "text": "mov dword ptr [rax + 0x34], 0",
+            "va": "0x140002c1d"
+          },
+          {
+            "bytes": "e979fcffff",
+            "rva": "0x00002c24",
+            "text": "jmp 0x1400028a2",
+            "va": "0x140002c24"
+          }
+        ],
+        "ir_block": "originalBB310alteredBB",
+        "original_ir_block": "originalBB310",
+        "raw_block_ids": [
+          "bb_00002C16"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [
+          {
+            "ir_instruction": "store i32 0, ptr %exitUnlockCandidate96alteredBB, align 4",
+            "output": "exitUnlockCandidate",
+            "value": 0
+          }
+        ],
+        "start_rva": "0x00002c16"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002c2e",
+        "guard_ids": [
+          "opaque_guard_111",
+          "opaque_guard_112"
+        ],
+        "id": "bcf_clone_originalBB314alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e9e0fcffff",
+            "rva": "0x00002c29",
+            "text": "jmp 0x14000290e",
+            "va": "0x140002c29"
+          }
+        ],
+        "ir_block": "originalBB314alteredBB",
+        "original_ir_block": "originalBB314",
+        "raw_block_ids": [
+          "bb_00002C29"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002c29"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x0000297c",
+        "guard_ids": [
+          "opaque_guard_03",
+          "opaque_guard_04"
+        ],
+        "id": "bcf_clone_originalBB98alteredBB",
+        "instruction_count": 1,
+        "instructions": [
+          {
+            "bytes": "e99fe7ffff",
+            "rva": "0x00002977",
+            "text": "jmp 0x14000111b",
+            "va": "0x140002977"
+          }
+        ],
+        "ir_block": "originalBB98alteredBB",
+        "original_ir_block": "originalBB98",
+        "raw_block_ids": [
+          "bb_00002977"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002977"
+      },
+      {
+        "classification": "obfuscator_generated_bogus",
+        "confidence": "strong",
+        "end_rva_exclusive": "0x00002977",
+        "guard_ids": [
+          "opaque_guard_01",
+          "opaque_guard_02"
+        ],
+        "id": "bcf_clone_originalBBalteredBB",
+        "instruction_count": 14,
+        "instructions": [
+          {
+            "bytes": "488b4df8",
+            "rva": "0x00002941",
+            "text": "mov rcx, qword ptr [rbp - 8]",
+            "va": "0x140002941"
+          },
+          {
+            "bytes": "4c8b45f0",
+            "rva": "0x00002945",
+            "text": "mov r8, qword ptr [rbp - 0x10]",
+            "va": "0x140002945"
+          },
+          {
+            "bytes": "b810000000",
+            "rva": "0x00002949",
+            "text": "mov eax, 0x10",
+            "va": "0x140002949"
+          },
+          {
+            "bytes": "48894598",
+            "rva": "0x0000294e",
+            "text": "mov qword ptr [rbp - 0x68], rax",
+            "va": "0x14000294e"
+          },
+          {
+            "bytes": "e819120000",
+            "rva": "0x00002952",
+            "text": "call 0x140003b70",
+            "va": "0x140002952"
+          },
+          {
+            "bytes": "4829c4",
+            "rva": "0x00002957",
+            "text": "sub rsp, rax",
+            "va": "0x140002957"
+          },
+          {
+            "bytes": "488b4598",
+            "rva": "0x0000295a",
+            "text": "mov rax, qword ptr [rbp - 0x68]",
+            "va": "0x14000295a"
+          },
+          {
+            "bytes": "4889e2",
+            "rva": "0x0000295e",
+            "text": "mov rdx, rsp",
+            "va": "0x14000295e"
+          },
+          {
+            "bytes": "e80a120000",
+            "rva": "0x00002961",
+            "text": "call 0x140003b70",
+            "va": "0x140002961"
+          },
+          {
+            "bytes": "4829c4",
+            "rva": "0x00002966",
+            "text": "sub rsp, rax",
+            "va": "0x140002966"
+          },
+          {
+            "bytes": "4889e0",
+            "rva": "0x00002969",
+            "text": "mov rax, rsp",
+            "va": "0x140002969"
+          },
+          {
+            "bytes": "4c8902",
+            "rva": "0x0000296c",
+            "text": "mov qword ptr [rdx], r8",
+            "va": "0x14000296c"
+          },
+          {
+            "bytes": "488908",
+            "rva": "0x0000296f",
+            "text": "mov qword ptr [rax], rcx",
+            "va": "0x14000296f"
+          },
+          {
+            "bytes": "e9c9e6ffff",
+            "rva": "0x00002972",
+            "text": "jmp 0x140001040",
+            "va": "0x140002972"
+          }
+        ],
+        "ir_block": "originalBBalteredBB",
+        "original_ir_block": "originalBB",
+        "raw_block_ids": [
+          "bb_00002941"
+        ],
+        "reached_by_any_permitted_run": false,
+        "resembles": [],
+        "start_rva": "0x00002941"
+      }
+    ],
+    "formula": "(((x * (x - 1)) mod 2^32) & 1) == 0 OR signed_i32(y) < 10",
+    "guard_count": 112,
+    "limitations": [
+      "Concrete non-execution is only a consistency check and is not used as the proof.",
+      "The verifier accepts this exact native instruction pattern; changed binaries must be analyzed again.",
+      "Unused cloned computations can disappear during lowering; exact retained instruction counts determine visual usefulness."
+    ],
+    "quantification": "For every independently loaded pair x,y in 0..2^32-1 at each guard; no x=y=0 assumption.",
+    "recommended_candidate_id": "bcf_clone_originalBB118alteredBB",
+    "source_file": "evidence/bogus-proof.json.gz",
+    "source_sha256": "b98b3b1b7aa5281b564084f4a6c6e0352216fde63f3b16c7b582e8331d49db2e"
+  },
+  "chamber_id": "crossfeed-vault",
+  "contract_sha256": "438dd4d1b613e0d76959c6ba8364442789e7ded0803e735ad8f62290c3fbca41",
+  "kind": "temporal",
+  "mapping_limits": [
+    "An output store is evidence for a signal, not a unique physical platform or complete backwards data-flow slice.",
+    "Multiple machinery bindings may share one signal and the same native region.",
+    "Authored unstable platforms have no proven-bogus-block mapping in this acquisition.",
+    "Supply accepted canonical state, retain server scheduling/latches, then apply existing bindings. Do not change geometry or ownership."
+  ],
+  "obfuscation": {
+    "compiler": "OLLVM Clang 16.0.6 (x86_64-pc-windows-msvc)",
+    "note": "Native outputs verified on Windows; the Linux server reads a verified lookup table, it does not execute the PE.",
+    "pass": "Bogus Control Flow (bcf_prob=100, bcf_loop=1)",
+    "status_label": "VALIDATED OLLVM BCF"
+  },
+  "outputs": [
+    {
+      "game_signal": "grappleAnchor",
+      "memory": "uint32_t at the output buffer supplied in RDX + 0 bytes",
+      "name": "grappleAnchor",
+      "store_sites": [
+        {
+          "byte_offset": 0,
+          "bytes": "c7 00 01 00 00 00",
+          "instruction_address": 5368714144,
+          "instruction_rva": 5024,
+          "mnemonic": "mov",
+          "observed_case_count": 10,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax], 1",
+          "raw_block_id": "bb_00001399"
+        },
+        {
+          "byte_offset": 0,
+          "bytes": "c7 00 00 00 00 00",
+          "instruction_address": 5368714251,
+          "instruction_rva": 5131,
+          "mnemonic": "mov",
+          "observed_case_count": 22,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax], 0",
+          "raw_block_id": "bb_00001404"
+        }
+      ]
+    },
+    {
+      "game_signal": "bridge",
+      "memory": "uint32_t at the output buffer supplied in RDX + 4 bytes",
+      "name": "bridge",
+      "store_sites": [
+        {
+          "byte_offset": 4,
+          "bytes": "c7 40 04 01 00 00 00",
+          "instruction_address": 5368714475,
+          "instruction_rva": 5355,
+          "mnemonic": "mov",
+          "observed_case_count": 11,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 4], 1",
+          "raw_block_id": "bb_000014E4"
+        },
+        {
+          "byte_offset": 4,
+          "bytes": "c7 40 04 00 00 00 00",
+          "instruction_address": 5368714583,
+          "instruction_rva": 5463,
+          "mnemonic": "mov",
+          "observed_case_count": 21,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 4], 0",
+          "raw_block_id": "bb_00001550"
+        }
+      ]
+    },
+    {
+      "game_signal": "liftField",
+      "memory": "uint32_t at the output buffer supplied in RDX + 8 bytes",
+      "name": "liftField",
+      "store_sites": [
+        {
+          "byte_offset": 8,
+          "bytes": "c7 40 08 01 00 00 00",
+          "instruction_address": 5368714927,
+          "instruction_rva": 5807,
+          "mnemonic": "mov",
+          "observed_case_count": 26,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 8], 1",
+          "raw_block_id": "bb_000016A8"
+        },
+        {
+          "byte_offset": 8,
+          "bytes": "c7 40 08 00 00 00 00",
+          "instruction_address": 5368715035,
+          "instruction_rva": 5915,
+          "mnemonic": "mov",
+          "observed_case_count": 6,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 8], 0",
+          "raw_block_id": "bb_00001714"
+        }
+      ]
+    },
+    {
+      "game_signal": "serviceAccess",
+      "memory": "uint32_t at the output buffer supplied in RDX + 12 bytes",
+      "name": "serviceAccess",
+      "store_sites": [
+        {
+          "byte_offset": 12,
+          "bytes": "c7 40 0c 01 00 00 00",
+          "instruction_address": 5368715261,
+          "instruction_rva": 6141,
+          "mnemonic": "mov",
+          "observed_case_count": 20,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0xc], 1",
+          "raw_block_id": "bb_000017F6"
+        },
+        {
+          "byte_offset": 12,
+          "bytes": "c7 40 0c 00 00 00 00",
+          "instruction_address": 5368715369,
+          "instruction_rva": 6249,
+          "mnemonic": "mov",
+          "observed_case_count": 12,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0xc], 0",
+          "raw_block_id": "bb_00001862"
+        }
+      ]
+    },
+    {
+      "game_signal": "relayGates",
+      "memory": "uint32_t at the output buffer supplied in RDX + 16 bytes",
+      "name": "relayGates",
+      "store_sites": [
+        {
+          "byte_offset": 16,
+          "bytes": "c7 40 10 01 00 00 00",
+          "instruction_address": 5368715715,
+          "instruction_rva": 6595,
+          "mnemonic": "mov",
+          "observed_case_count": 13,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x10], 1",
+          "raw_block_id": "bb_000019BC"
+        },
+        {
+          "byte_offset": 16,
+          "bytes": "c7 40 10 00 00 00 00",
+          "instruction_address": 5368715823,
+          "instruction_rva": 6703,
+          "mnemonic": "mov",
+          "observed_case_count": 19,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x10], 0",
+          "raw_block_id": "bb_00001A28"
+        }
+      ]
+    },
+    {
+      "game_signal": "leftRoute",
+      "memory": "uint32_t at the output buffer supplied in RDX + 20 bytes",
+      "name": "leftRoute",
+      "store_sites": [
+        {
+          "byte_offset": 20,
+          "bytes": "c7 40 14 01 00 00 00",
+          "instruction_address": 5368716166,
+          "instruction_rva": 7046,
+          "mnemonic": "mov",
+          "observed_case_count": 6,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x14], 1",
+          "raw_block_id": "bb_00001B7F"
+        },
+        {
+          "byte_offset": 20,
+          "bytes": "c7 40 14 00 00 00 00",
+          "instruction_address": 5368716274,
+          "instruction_rva": 7154,
+          "mnemonic": "mov",
+          "observed_case_count": 26,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x14], 0",
+          "raw_block_id": "bb_00001BEB"
+        }
+      ]
+    },
+    {
+      "game_signal": "rightRoute",
+      "memory": "uint32_t at the output buffer supplied in RDX + 24 bytes",
+      "name": "rightRoute",
+      "store_sites": [
+        {
+          "byte_offset": 24,
+          "bytes": "c7 40 18 01 00 00 00",
+          "instruction_address": 5368716617,
+          "instruction_rva": 7497,
+          "mnemonic": "mov",
+          "observed_case_count": 7,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x18], 1",
+          "raw_block_id": "bb_00001D42"
+        },
+        {
+          "byte_offset": 24,
+          "bytes": "c7 40 18 00 00 00 00",
+          "instruction_address": 5368716725,
+          "instruction_rva": 7605,
+          "mnemonic": "mov",
+          "observed_case_count": 25,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x18], 0",
+          "raw_block_id": "bb_00001DAE"
+        }
+      ]
+    },
+    {
+      "game_signal": "galleryAccess",
+      "memory": "uint32_t at the output buffer supplied in RDX + 28 bytes",
+      "name": "galleryAccess",
+      "store_sites": [
+        {
+          "byte_offset": 28,
+          "bytes": "c7 40 1c 01 00 00 00",
+          "instruction_address": 5368716951,
+          "instruction_rva": 7831,
+          "mnemonic": "mov",
+          "observed_case_count": 16,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x1c], 1",
+          "raw_block_id": "bb_00001E90"
+        },
+        {
+          "byte_offset": 28,
+          "bytes": "c7 40 1c 00 00 00 00",
+          "instruction_address": 5368717059,
+          "instruction_rva": 7939,
+          "mnemonic": "mov",
+          "observed_case_count": 16,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x1c], 0",
+          "raw_block_id": "bb_00001EFC"
+        }
+      ]
+    },
+    {
+      "game_signal": "vaultPower",
+      "memory": "uint32_t at the output buffer supplied in RDX + 32 bytes",
+      "name": "vaultPower",
+      "store_sites": [
+        {
+          "byte_offset": 32,
+          "bytes": "c7 40 20 01 00 00 00",
+          "instruction_address": 5368717281,
+          "instruction_rva": 8161,
+          "mnemonic": "mov",
+          "observed_case_count": 1,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x20], 1",
+          "raw_block_id": "bb_00001FDA"
+        },
+        {
+          "byte_offset": 32,
+          "bytes": "c7 40 20 00 00 00 00",
+          "instruction_address": 5368717389,
+          "instruction_rva": 8269,
+          "mnemonic": "mov",
+          "observed_case_count": 31,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x20], 0",
+          "raw_block_id": "bb_00002046"
+        }
+      ]
+    },
+    {
+      "game_signal": "vaultReturn",
+      "memory": "uint32_t at the output buffer supplied in RDX + 36 bytes",
+      "name": "vaultReturn",
+      "store_sites": [
+        {
+          "byte_offset": 36,
+          "bytes": "c7 40 24 01 00 00 00",
+          "instruction_address": 5368717611,
+          "instruction_rva": 8491,
+          "mnemonic": "mov",
+          "observed_case_count": 1,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x24], 1",
+          "raw_block_id": "bb_00002124"
+        },
+        {
+          "byte_offset": 36,
+          "bytes": "c7 40 24 00 00 00 00",
+          "instruction_address": 5368717719,
+          "instruction_rva": 8599,
+          "mnemonic": "mov",
+          "observed_case_count": 31,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x24], 0",
+          "raw_block_id": "bb_00002190"
+        }
+      ]
+    },
+    {
+      "game_signal": "exitDoor",
+      "memory": "uint32_t at the output buffer supplied in RDX + 40 bytes",
+      "name": "exitDoor",
+      "store_sites": [
+        {
+          "byte_offset": 40,
+          "bytes": "c7 40 28 01 00 00 00",
+          "instruction_address": 5368717945,
+          "instruction_rva": 8825,
+          "mnemonic": "mov",
+          "observed_case_count": 1,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x28], 1",
+          "raw_block_id": "bb_00002272"
+        },
+        {
+          "byte_offset": 40,
+          "bytes": "c7 40 28 00 00 00 00",
+          "instruction_address": 5368718053,
+          "instruction_rva": 8933,
+          "mnemonic": "mov",
+          "observed_case_count": 31,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x28], 0",
+          "raw_block_id": "bb_000022DE"
+        }
+      ]
+    },
+    {
+      "game_signal": null,
+      "memory": "uint32_t at the output buffer supplied in RDX + 44 bytes",
+      "name": "physicalLeftRoute",
+      "store_sites": [
+        {
+          "byte_offset": 44,
+          "bytes": "c7 40 2c 01 00 00 00",
+          "instruction_address": 5368718397,
+          "instruction_rva": 9277,
+          "mnemonic": "mov",
+          "observed_case_count": 7,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x2c], 1",
+          "raw_block_id": "bb_00002436"
+        },
+        {
+          "byte_offset": 44,
+          "bytes": "c7 40 2c 00 00 00 00",
+          "instruction_address": 5368718505,
+          "instruction_rva": 9385,
+          "mnemonic": "mov",
+          "observed_case_count": 25,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x2c], 0",
+          "raw_block_id": "bb_000024A2"
+        }
+      ]
+    },
+    {
+      "game_signal": null,
+      "memory": "uint32_t at the output buffer supplied in RDX + 48 bytes",
+      "name": "physicalRightRoute",
+      "store_sites": [
+        {
+          "byte_offset": 48,
+          "bytes": "c7 40 30 01 00 00 00",
+          "instruction_address": 5368718849,
+          "instruction_rva": 9729,
+          "mnemonic": "mov",
+          "observed_case_count": 7,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x30], 1",
+          "raw_block_id": "bb_000025FA"
+        },
+        {
+          "byte_offset": 48,
+          "bytes": "c7 40 30 00 00 00 00",
+          "instruction_address": 5368718957,
+          "instruction_rva": 9837,
+          "mnemonic": "mov",
+          "observed_case_count": 25,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x30], 0",
+          "raw_block_id": "bb_00002666"
+        }
+      ]
+    },
+    {
+      "game_signal": null,
+      "memory": "uint32_t at the output buffer supplied in RDX + 52 bytes",
+      "name": "exitUnlockCandidate",
+      "store_sites": [
+        {
+          "byte_offset": 52,
+          "bytes": "c7 40 34 01 00 00 00",
+          "instruction_address": 5368719421,
+          "instruction_rva": 10301,
+          "mnemonic": "mov",
+          "observed_case_count": 1,
+          "observed_values": [
+            1
+          ],
+          "op_str": "dword ptr [rax + 0x34], 1",
+          "raw_block_id": "bb_00002836"
+        },
+        {
+          "byte_offset": 52,
+          "bytes": "c7 40 34 00 00 00 00",
+          "instruction_address": 5368719529,
+          "instruction_rva": 10409,
+          "mnemonic": "mov",
+          "observed_case_count": 31,
+          "observed_values": [
+            0
+          ],
+          "op_str": "dword ptr [rax + 0x34], 0",
+          "raw_block_id": "bb_000028A2"
+        }
+      ]
+    }
+  ],
+  "schema": "coop-native-evidence/v1",
+  "server_owned": [
+    "Input occupancy arbitration and body/cube authority",
+    "Timer deadlines and status extraction",
+    "Control acceptance, cooldown and persisted latches",
+    "Checkpoint and persisted semantic cube placement",
+    "Exit latch updates, player arrivals and party completion",
+    "Crumble runtime and physics/collision geometry"
+  ],
+  "specimen_id": "crossfeed-vault_ollvm_bcf"
+}

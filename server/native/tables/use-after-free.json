@@ -1,0 +1,35 @@
+{
+  "bcf_pe_sha256": "733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb",
+  "bits_per_case": 6,
+  "case_count": 32,
+  "chamber_id": "use-after-free",
+  "clean_pe_sha256": "454a024ff15eef8414f6a651a7b909842539bbc254dcf7a5dbad36b9eb0e5028",
+  "contract_sha256": "522f076b3ab457ecd967979b9e944f04d85df69f577d4037213986fa897a1ed3",
+  "input_game_ports": [
+    "launch.occupied",
+    "plateA.occupied",
+    "plateB.occupied",
+    "plateC.occupied",
+    "assist.occupied"
+  ],
+  "input_names": [
+    "launch",
+    "plateA",
+    "plateB",
+    "plateC",
+    "assist"
+  ],
+  "native_results_sha256": "808b985171bcbb8abb39a99616ee3e97c6437372707191a2aaa4b467b6659210",
+  "output_names": [
+    "launchPower",
+    "routeA",
+    "routeB",
+    "routeC",
+    "assistBlocked",
+    "exitReady"
+  ],
+  "packed": "EBESExQVEhMYGRobFBUSEyAhIiMkJSIjODk6OzQ1MjM=",
+  "schema": "coop-native-table/v1",
+  "specimen_id": "use-after-free_ollvm_bcf",
+  "table_sha256": "322c40ec80b658c48742506b2fd698b1dc4086801dd2519c34fa9cf768a353d5"
+}

@@ -4,8 +4,14 @@ import type { LevelContext, LevelDefinition } from './coop-state.ts';
 import { crumbleView, triggerCrumble } from './crumble-state.ts';
 import type { CrumbleId, DeclarativeLevelId } from '../src/coop/protocol.ts';
 
+/** Replaceable output layer: computes controller output booleans from resolved device values.
+ * Custom/workbench sessions keep the authored mock evaluator; released campaign chambers inject
+ * a verified native-result lookup so machinery decisions come from the retained OLLVM BCF outputs. */
+export type OutputEvaluator = (draft: DraftDocument, deviceValues: Readonly<Record<string, boolean>>) => Record<string, boolean>;
+const mockOutputs: OutputEvaluator = (draft, deviceValues) => evaluateDraft(draft, deviceValues);
+
 /** One declarative controller for frozen custom sessions and released JSON chambers. */
-export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'>(draft: DraftDocument): LevelDefinition<L> {
+export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'>(draft: DraftDocument, evaluateOutputs: OutputEvaluator = mockOutputs): LevelDefinition<L> {
     const devices = draft.geometry.objects.filter((o): o is DraftDevice => o.type === 'device');
     const controls = devices.filter(o => o.kind === 'toggle' || o.kind === 'terminal');
     const occupied = devices.filter(o => o.kind !== 'toggle' && o.kind !== 'terminal');
@@ -48,7 +54,7 @@ export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'
             if (message.type === 'crumble-trigger') {
                 const platform = unstable.find(o => draftSignal(o.id) === message.platform);
                 if (!platform || platform.type !== 'platform') return false;
-                const v = values(ctx), frame = draftFrame(draft, v, evaluateDraft(draft, v));
+                const v = values(ctx), frame = draftFrame(draft, v, evaluateOutputs(draft, v));
                 const binding = draft.bindings.find(b => b.target === platform.id && b.property === 'active');
                 if (binding && !frame.signals?.[draftSignal(binding.id)]) return false;
                 const warning = (message.trigger === 'hook' ? platform.hookCrumbleDelay ?? 1.65 : platform.crumbleDelay ?? .6) * 1000;
@@ -68,8 +74,8 @@ export function declarativeDefinition<L extends DeclarativeLevelId = 'workbench'
                 ctx.crumble[id] ??= { phase: 'stable', deadline: 0, durationMs: 0 };
             }
             const devices = values(ctx);
-            return { devices, outputs: evaluateDraft(draft, devices), platforms: crumbleView(ctx.crumble, ctx.now) };
+            return { devices, outputs: evaluateOutputs(draft, devices), platforms: crumbleView(ctx.crumble, ctx.now) };
         },
-        unlock: ctx => { const v = values(ctx); return draftFrame(draft, v, evaluateDraft(draft, v)).outputs.exitDoor; },
+        unlock: ctx => { const v = values(ctx); return draftFrame(draft, v, evaluateOutputs(draft, v)).outputs.exitDoor; },
     };
 }

@@ -1,0 +1,33 @@
+{
+  "bcf_pe_sha256": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8",
+  "bits_per_case": 4,
+  "case_count": 32,
+  "chamber_id": "handshake",
+  "clean_pe_sha256": "b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9",
+  "contract_sha256": "2dab247f69198e05eda52cca23e3514e50b0446699b4284231863fff8689f171",
+  "input_game_ports": [
+    "crossing.occupied",
+    "liftPlate.occupied",
+    "link.value",
+    "maintenance.value",
+    "exitSocket.occupied"
+  ],
+  "input_names": [
+    "crossing",
+    "liftPlate",
+    "link",
+    "maintenance",
+    "exitSocket"
+  ],
+  "native_results_sha256": "61c9e1ce062a535fc55547901793c5709914bd9b80a7fc2e91bb680af5e61760",
+  "output_names": [
+    "crossingPower",
+    "liftPower",
+    "relayPower",
+    "exitReady"
+  ],
+  "packed": "AAECAwQFBgcAAQIDBAUGBwABAgMEBQYHCAkKCwwNDg8=",
+  "schema": "coop-native-table/v1",
+  "specimen_id": "handshake_ollvm_bcf",
+  "table_sha256": "41f0d9cf3bef31f3beac8faf200b26cda8bd3e34eb4b60145efb2dd20e52b647"
+}
