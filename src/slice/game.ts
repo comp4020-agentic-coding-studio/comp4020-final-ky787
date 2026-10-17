@@ -2,6 +2,8 @@ import { COOP_CAMPAIGN, isCampaignLevel } from '../coop/campaign.ts';
 import { partyMenu, type PartyView } from '../coop/party-menu.ts';
 import { cubeEntries } from '../coop/protocol.ts';
 import { EvidenceInspector } from './evidence-inspector.ts';
+import { NativeEvidenceInspector, nativeInspectorView } from '../coop/native-inspector.ts';
+import { isNativeChamber } from '../coop/native-evidence.ts';
 import { FIXED_DT, MAX_FRAME_TIME } from '../engine/constants.ts';
 import { InputManager } from '../ui/input.ts';
 import { PuzzleRenderer } from './render.ts';
@@ -30,6 +32,8 @@ export class SliceGame {
     ended = false;
     debug = false;
     private inspector: EvidenceInspector;
+    private nativeInspector!: NativeEvidenceInspector;
+    private nativeInspectorOpen = false;
     private resumeAfterInspector = false;
     private sourceBadge = document.querySelector<HTMLElement>('#controller-source')!;
     private traceView = document.querySelector<HTMLElement>('#trace-status')!;
@@ -62,8 +66,19 @@ export class SliceGame {
         this.traceCommits.className = 'trace-commits';
         this.renderer = new PuzzleRenderer(canvas);
         this.inspector = new EvidenceInspector(() => this.closeInspector(), show => { this.renderer.revealBogus = show; });
+        this.nativeInspector = new NativeEvidenceInspector(() => this.closeInspector());
         this.evidenceButton.addEventListener('click', () => {
             if (!this.inspector.element.hidden) { this.closeInspector(); return; }
+            // Co-op native-backed chambers use the dedicated native evidence inspector.
+            const nativeView = this.coopMode ? nativeInspectorView(this.coop.room) : null;
+            if (nativeView) {
+                this.resumeAfterInspector = this.started; this.started = false;
+                this.audio.setActive(false);
+                this.world.cancelGrapple(); this.input.releaseAll();
+                this.nativeInspectorOpen = true;
+                void this.nativeInspector.open(nativeView);
+                return;
+            }
             this.resumeAfterInspector = this.started; this.started = false;
             this.audio.setActive(false);
             this.world.cancelGrapple(); this.input.releaseAll();
@@ -133,7 +148,10 @@ export class SliceGame {
                 checkpoint: this.authority.checkpoint }, undefined, this.authority);
             this.renderer.room(this.world, room.completed); this.sound.reset(this.world);
             this.input.releaseAll(); this.accumulated = 0;
-            this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`; this.sourceBadge.textContent = 'mock-multiplayer';
+            const native = isNativeChamber(room.level);
+            this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`;
+            this.sourceBadge.textContent = native ? 'VALIDATED OLLVM BCF' : 'mock-multiplayer';
+            this.evidenceButton.hidden = !native;
             this.overviewVisible = isCampaignLevel(room.level) && initial && room.checkpoint === 'entry';
             this.overviewPending = this.overviewVisible; this.startButton.hidden = !this.overviewVisible;
             this.started = this.coop.playing && !this.coopPaused && !this.overviewVisible; this.canvas.focus();
@@ -142,6 +160,7 @@ export class SliceGame {
             const previous = this.authority.room;
             const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
+            if (this.nativeInspectorOpen) { const v = nativeInspectorView(room); if (v) this.nativeInspector.update(v); }
             const events = this.world.events.splice(0);
             if (room.level !== 'race-condition' && room.level !== 'crossfeed-vault' && !switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
             if (previous.checkpoint !== room.checkpoint) events.push({ kind: 'checkpoint', at: this.world.checkpointPosition() });
@@ -218,6 +237,7 @@ export class SliceGame {
         if (r.party.phase === 'victory' && view !== 'choose') view = 'victory';
         const key = JSON.stringify([view, r.code, r.levelInstance, r.party, r.connected, r.assigned, this.coop.status]);
         if (this.partyMenuKey === key && !this.menu.hidden) return;
+        this.nativeInspector.element.hidden = true; this.nativeInspectorOpen = false;
         this.partyView = view; this.partyMenuKey = key; this.coopPaused = true; this.started = false;
         this.coop.occupy(null); this.world.cancelGrapple(); this.input.releaseAll(); this.input.clearActions();
         this.audio.setActive(false); this.overviewVisible = false; this.startButton.hidden = true;
@@ -239,6 +259,7 @@ export class SliceGame {
     }
     private showCoopMenu(): void {
         if (this.coop.room?.party) { this.showPartyMenu('pause'); return; }
+        this.nativeInspector.element.hidden = true; this.nativeInspectorOpen = false;
         this.coopPaused = true; this.started = false; this.coop.occupy(null);
         this.audio.setActive(false); this.world.cancelGrapple(); this.input.releaseAll();
         this.menu.hidden = false;
@@ -248,7 +269,8 @@ export class SliceGame {
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus();
     }
     private closeInspector(): void {
-        this.inspector.element.hidden = true; this.started = this.resumeAfterInspector;
+        this.inspector.element.hidden = true; this.nativeInspector.element.hidden = true; this.nativeInspectorOpen = false;
+        this.started = this.resumeAfterInspector;
         this.input.releaseAll();
         if (this.overviewVisible) this.startButton.focus();
         else this.canvas.focus();

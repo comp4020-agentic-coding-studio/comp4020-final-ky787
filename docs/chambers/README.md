@@ -11,6 +11,13 @@ change the campaign. Single-player tutorials and CONTROL SPINE evidence are unch
 See the [integration contract](../adr/0010-json-coop-campaign.md) for persistence,
 old-party compatibility and full campaign tests. Human playtesting is still outstanding.
 
+As of 2026-10-17 all five campaign chambers are **native-backed**: their
+server-authoritative machinery decisions come from verified Windows-native OLLVM
+BCF controller result tables, not mock TypeScript expressions, and the evidence
+inspector shows the real native assembly. The Linux server reads a verified
+lookup table; it does not execute the Windows PE. See
+[native-backed controllers](../adr/0011-native-backed-coop-controllers.md).
+
 The 2026-10-16 campaign check completed all five chambers in one persistent party
 using two independent browser identities and real controls. All 78 campaign checks
 passed after the automatic checkpoint and payload-service refinement, including both exit arrivals, NEXT, badges, pause contact release,
