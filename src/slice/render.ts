@@ -21,6 +21,9 @@ import { drawBreakpoint, drawEntryGateways, drawEntryProjection, drawExitGate, d
 import { payloadReceivers } from './receiver-presentation.ts';
 import { drawReceivers, drawReceiverLabels } from './receiver-render.ts';
 import { drawPayload } from './payload-render.ts';
+import { pressurePads } from './machinery-presentation.ts';
+import { drawPressurePad, drawPadOutputPulse } from './plate-render.ts';
+import { drawGravityLift } from './lift-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     replay = new TracePlayback();
@@ -58,7 +61,7 @@ export class PuzzleRenderer {
         this.cameraDeaths = world.deaths;
         this.cameraReveals.reset(world);
         this.exitWasOpen = world.frame.outputs.exitDoor;
-        this.heroes.reset(world.room, { checkpoint: world.checkpoint, exitReady: world.frame.outputs.exitDoor, completed, receivers: payloadReceivers(world) });
+        this.heroes.reset(world.room, { checkpoint: world.checkpoint, exitReady: world.frame.outputs.exitDoor, completed, receivers: payloadReceivers(world), pads: pressurePads(world), lifts: world.lifts });
         this.replay = new TracePlayback();
         this.replay.update(world.frame, 0);
     }
@@ -89,9 +92,10 @@ export class PuzzleRenderer {
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
         const receivers = payloadReceivers(w);
+        const pads = pressurePads(w);
         const energyMotion = running && players?.connected !== false && !this.energyMotionPreference?.matches;
         const heroCues = this.heroes.update(r, { checkpoint: w.checkpoint, exitReady: w.frame.outputs.exitDoor,
-            completed: players?.completed ?? w.exited, receivers }, dt, running && players?.connected !== false);
+            completed: players?.completed ?? w.exited, receivers, pads, lifts: w.lifts }, dt, running && players?.connected !== false);
         if (w.deaths !== this.cameraDeaths || players?.connected === false) this.returnReveal = 0;
         this.cameraDeaths = w.deaths;
         // Authored reveal of the final physical route; outputs and controls never wait for it.
@@ -117,6 +121,8 @@ export class PuzzleRenderer {
             this.line(x, 0, x, r.height, C.grid, 0.6);
         if (this.showGrid) for (let y = 0; y < r.height; y += 50)
             this.line(0, y, r.width, y, C.grid, 0.6);
+        const visible = { x: cam.originX(), y: cam.originY(), w: cam.viewW / cam.zoom, h: cam.viewH / cam.zoom };
+        for (const lift of w.lifts) drawGravityLift(c, lift, this.heroes.machinery.lifts.get(lift.def.id)!, this.heroes.time, visible, cam.zoom, energyMotion, r.id !== 'uplink');
         this.text(r.id === 'workbench' ? `DRAFT / ${r.title}` : isCoopLevel(r.id) ? `CO-OP / ${r.title}` : `0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
         this.text(r.instruction, 80, r.id === 'uplink' ? 1045 : 132, 27, C.ink);
         drawConnections(c, this.connections, w);
@@ -193,7 +199,8 @@ export class PuzzleRenderer {
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
         }
         for (const region of r.regions ?? []) this.text(region.label, region.at.x, region.at.y, 24, C.dim);
-        drawMachinery(c, w, this.presentation);
+        drawMachinery(c, w);
+        for (const lift of w.lifts) drawGravityLift(c, lift, this.heroes.machinery.lifts.get(lift.def.id)!, this.heroes.time, visible, cam.zoom, energyMotion, r.id !== 'uplink', 'emitter');
         drawEntryGateways(c, r, this.heroes, cam.zoom);
         drawFirewalls(c, w.firewalls, w.elapsed);
         if (r.id === 'race-condition') {
@@ -221,7 +228,7 @@ export class PuzzleRenderer {
             ...(r.cubePads ?? []).map(p => ({ at: p.at, active: p.id === 'liftCargo' ? w.inputs.cubeOnPlate : p.id === 'finalLeft' ? w.inputs.cubeOnPlateB : w.inputs.cubeOnPlateC, depth: 0, label: p.label })),
         ];
         for (const plate of plates) {
-            if (!plate.at || receivers.some(receiver => receiver.at === plate.at)) continue;
+            if (!plate.at || receivers.some(receiver => receiver.at === plate.at) || pads.some(pad => pad.at === plate.at)) continue;
             const { x, y } = plate.at;
             c.fillStyle = '#101c23';
             c.fillRect(x - 51, y - 3, 102, 13);
@@ -234,6 +241,11 @@ export class PuzzleRenderer {
                 if (!r.plates?.some(p => p.at === plate.at)) { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
             }
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
+        }
+        for (const pad of pads) {
+            const state = this.heroes.machinery.pads.get(pad.id)!;
+            drawPressurePad(c, pad, state, this.heroes.time, energyMotion);
+            drawPadOutputPulse(c, pad, state, this.connections, w, energyMotion);
         }
         if (r.plateB && r.id === 'relay') {
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);

@@ -7,8 +7,10 @@ import { coopBrowser, type Cdp } from './coop-browser.ts';
 import { crossfeedRoute } from './crossfeed-browser-check.ts';
 import { campaignDraftRoute } from './campaign-draft-route.ts';
 import { raceRoute } from './race-browser-check.ts';
+import { reviewCampaignMachinery } from './machinery-campaign-review.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? '/tmp/bn-campaign-shots', internalLabs: false });
+if (process.env.BN_MACHINERY_ART === '1') reviewCampaignMachinery(h);
 const { check, click, snapshot, wait, sleep, shot, tap } = h;
 const visible = (p: Cdp, selector: string) => p.read<boolean>(`!!document.querySelector(${JSON.stringify(selector)}) && !document.querySelector(${JSON.stringify(selector)}).closest('[hidden]')`);
 try {

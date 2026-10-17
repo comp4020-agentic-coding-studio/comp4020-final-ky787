@@ -20,6 +20,7 @@ function state(w: PuzzleWorld) {
             : (w.room.plates ? [w.inputs.plateA, w.inputs.plateB, w.inputs.cubeOnPlate, w.inputs.plateC, w.inputs.cubeOnPlateB] : [w.inputs.plateA, w.inputs.plateB, w.room.id === 'pairing-bay' ? w.inputs.plateC : w.inputs.cubeOnPlateC,
                 !!w.room.cargoPlate && w.cargoPlateActive]).map((on, i) => ({ on, at: w.room.plates?.[i]?.at ?? [w.room.plate, w.room.plateB, w.room.plateC, w.room.cargoPlate][i] })))
             .filter(p => !receivers.some(r => r.at === p.at)),
+        lifts: Object.fromEntries(w.lifts.map(l => [l.def.signal, l.enabled])),
         outputs: { ...w.frame.outputs }, signals: { ...w.frame.signals }, timer: w.frame.timer?.phase, warning: w.platforms.filter(p => p.fuse >= 0).map(p => p.def.id) };
 }
 type AudioSink = Pick<GameAudio, 'play' | 'setLoop' | 'stopAll'>;
@@ -52,7 +53,12 @@ export class AudioPresentation {
         for (const signal of ['grappleAnchor', 'bridge', 'codePlatformA', 'codePlatformB'] as const)
             if (old.outputs[signal] !== next.outputs[signal]) play('codePower', undefined, .75, next.outputs[signal] ? 1 : .75);
         if (old.outputs.relayGates !== next.outputs.relayGates) play('relayPower', undefined, 1, next.outputs.relayGates ? 1 : .7);
-        if (old.outputs.liftField !== next.outputs.liftField) play('liftPower', undefined, 1, next.outputs.liftField ? 1 : .7);
+        // Include authored JSON outputs as well as the retained liftField signal.
+        // Several physical fields can share one output; that still makes one cue.
+        for (const [signal, on] of Object.entries(next.lifts)) if (old.lifts[signal] !== undefined && old.lifts[signal] !== on) {
+            const nearby = Math.max(0, ...w.lifts.filter(l => l.def.signal === signal).map(l => liftProximity(w.player, l.def)));
+            play('liftPower', undefined, nearby, on ? 1 : .7);
+        }
         if (old.outputs.exitDoor !== next.outputs.exitDoor) play('door', undefined, 1, next.outputs.exitDoor ? 1 : .8);
         for (const id of next.warning) if (!old.warning.includes(id)) {
             const p = w.platforms.find(p => p.def.id === id)!.def;

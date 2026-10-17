@@ -11,6 +11,8 @@ literal instructions, binary addresses, native blocks, or obfuscator evidence.
 | TRAVEL INCOMPLETE | Exit route is unavailable | Heavy portal frame, grey status, dim field |
 | TRAVEL COMPLETE | Exit route is available | Green status and illuminated frame/field |
 | PAYLOAD RECEIVER | Live cube-only occupancy | Compact guides, centred energy cube, thin circuit traces and amber/green status |
+| PRESSURE PAD | Live weight/contact input | Recessed amber button; depressed cyan-blue tread while occupied |
+| GRAVITY LIFT | Accepted upward transport power | Compact blue emitter, transparent flowing column and open upper stabilization arc |
 
 Exit readiness is separate from arrival. Co-op gates retain their physical
 `0 / 2 ARRIVED`, `1 / 2 ARRIVED`, and `2 / 2 ARRIVED` display. The accepted party
@@ -21,7 +23,10 @@ Toggle levers retain their pivoting handles. Genuine cube-only sockets use the
 [PAYLOAD RECEIVER](payload-receiver.md): amber while awaiting cargo, green after
 accepted occupancy, with green circuit traces and a centred energy payload. Free/carried cargo pulses
 purple; connected cargo breathes green. Reduced motion settles both palettes.
-Pressure plates retain their low, compressible footprints. RACE CONDITION's
+The [pressure pad and gravity lift](pressure-and-gravity.md) share the compact
+circuit-board vocabulary. Pad compression and lift startup are local visual
+transitions; physical power and contact remain immediate. Pressure plates retain
+their low, compressible footprints. RACE CONDITION's
 universal receiver sensor remains a pressure plate despite its cargo location.
 Neither asset uses checkpoint masts or breakpoint terminology.
 
@@ -42,6 +47,9 @@ Neither asset uses checkpoint masts or breakpoint terminology.
   `SliceGame` sends returned cosmetic cues to the existing audio manager.
   Camera updates, screen-to-world aiming, simulation steps and network messages
   keep their existing ownership.
+- `machinery-presentation.ts` observes existing accepted pad/lift states.
+  `plate-render.ts` and `lift-render.ts` share these assets across all room paths;
+  camera-visible lift detail is bounded independently of total shaft height.
 - Animation clocks are local and disposable. They do not enter visitor progress,
   room persistence, or the protocol. Diagnostics expose ages through
   `snapshot().heroAssets`; `null` means an already-settled baseline.
