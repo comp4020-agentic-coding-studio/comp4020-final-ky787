@@ -1,0 +1,28 @@
+{
+  "schema": "coop-native-handshake-gate/v1",
+  "status": "PASS",
+  "before_other_chamber_builds": true,
+  "native_frames": 64,
+  "reference_cases": 32,
+  "metrics": {
+    "clean": {
+      "function_rva": 4096,
+      "end_rva_exclusive": 4265,
+      "bytes": 169,
+      "instructions": 40,
+      "jump_instructions": 9,
+      "function_sha256": "4250bbadb646ced2435de4676790908a8655f74875d5ebb74a0deb6ae503a819",
+      "binary_sha256": "b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9"
+    },
+    "bcf": {
+      "function_rva": 4096,
+      "end_rva_exclusive": 5947,
+      "bytes": 1851,
+      "instructions": 542,
+      "jump_instructions": 88,
+      "function_sha256": "e0fed8707206b5de13587f938af530cc913b7e7fa7df122dfd9596d2d85d99d7",
+      "binary_sha256": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8"
+    }
+  },
+  "validation": "Actual game evaluateDraft/draftFrame oracle, clean and BCF native outputs, exact PE export/pdata bounds, decoded code and jump growth. Full CFG/proof/trace extraction follows separately."
+}

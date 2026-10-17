@@ -1,0 +1,629 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "crossfeed-vault",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_kind": "actual_server_projection_and_reducers",
+  "reference_source_sha256": {
+    "server/crossfeed-state.ts": "10562c8ee0da1fb509b93bc0f39675b56aa312cade55454e787c0687cfb53f50",
+    "server/crumble-state.ts": "83ccc4a60e81e351fb8c286cebced6e46372f9ef4f1f92976f0495b5b2ad9665",
+    "server/coop-state.ts": "246476aef5571e43c1f24bd827dff8c5c4cf86ae52c6e3fc4272930cccbe771f",
+    "server/multiplayer.ts": "7d3ed8eacdc3c3281d581c27eb6b29fe89cb563bd00592d4c5d6d70fc90ee272",
+    "src/coop/protocol.ts": "a810956e0dc5936c953bbd047917bcc6b3ec4a51a2fda89bc5d4795eb57024f2",
+    "src/coop/crossfeed-vault.ts": "fe961ec556acfda31cf06291a1cb3c9c49be9bd492377865d4cd2794debe8d22",
+    "docs/crossfeed-vault.md": "ceb10a0d08ba7c399235d6d8180b516ae462d99d70c36bc30a524690cd86766a",
+    "docs/adr/0008-reversible-coop-machinery.md": "5fcb5ea2883ff82f03cb8c5356524cb38e9eb9d63993049fe95d6dbcc9558cd4"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 56,
+    "output_size": 56,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "switchB",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Persisted reversible TRANSFER MODE toggle",
+      "initial": 0,
+      "bit": 0
+    },
+    {
+      "name": "switchC",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Persisted SYSTEM ONLINE terminal latch",
+      "initial": 0,
+      "bit": 1
+    },
+    {
+      "name": "switchD",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Persisted GALLERY ACCESS terminal latch",
+      "initial": 0,
+      "bit": 2
+    },
+    {
+      "name": "routeMode",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Persisted ROUTE SELECT toggle",
+      "initial": 0,
+      "bit": 3
+    },
+    {
+      "name": "plateAOccupied",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "entry ordinary plate: body or cube",
+      "initial": 0,
+      "bit": 4
+    },
+    {
+      "name": "routePowerOccupied",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "routePower ordinary plate: body or cube",
+      "initial": 0,
+      "bit": 5
+    },
+    {
+      "name": "cubeOnLiftCargo",
+      "offset": 24,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "At least one cube in liftCargo socket",
+      "initial": 0,
+      "bit": 6
+    },
+    {
+      "name": "cubeOnFinalLeft",
+      "offset": 28,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "At least one cube in finalLeft socket",
+      "initial": 0,
+      "bit": 7
+    },
+    {
+      "name": "cubeOnFinalRight",
+      "offset": 32,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "At least one cube in finalRight socket",
+      "initial": 0,
+      "bit": 8
+    },
+    {
+      "name": "finalPlateLeftOccupied",
+      "offset": 36,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Body-only finalLeft scanner occupancy; distinct from socket",
+      "initial": 0,
+      "bit": 9
+    },
+    {
+      "name": "finalPlateRightOccupied",
+      "offset": 40,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Body-only finalRight scanner occupancy; distinct from socket",
+      "initial": 0,
+      "bit": 10
+    },
+    {
+      "name": "exitUnlocked",
+      "offset": 44,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Existing durable server exit latch",
+      "initial": 0,
+      "bit": 11
+    },
+    {
+      "name": "leftGraceActive",
+      "offset": 48,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Server now < crossfeed.leftUntil; clock not evaluated in native code",
+      "initial": 0,
+      "bit": 12
+    },
+    {
+      "name": "rightGraceActive",
+      "offset": 52,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Server now < crossfeed.rightUntil; clock not evaluated in native code",
+      "initial": 0,
+      "bit": 13
+    }
+  ],
+  "outputs": [
+    {
+      "name": "grappleAnchor",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.grappleAnchor",
+      "game_signal": "grappleAnchor"
+    },
+    {
+      "name": "bridge",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.bridge",
+      "game_signal": "bridge"
+    },
+    {
+      "name": "liftField",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.liftField",
+      "game_signal": "liftField"
+    },
+    {
+      "name": "serviceAccess",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.serviceAccess",
+      "game_signal": "serviceAccess"
+    },
+    {
+      "name": "relayGates",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.relayGates",
+      "game_signal": "relayGates"
+    },
+    {
+      "name": "leftRoute",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.leftRoute",
+      "game_signal": "leftRoute"
+    },
+    {
+      "name": "rightRoute",
+      "offset": 24,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.rightRoute",
+      "game_signal": "rightRoute"
+    },
+    {
+      "name": "galleryAccess",
+      "offset": 28,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.galleryAccess",
+      "game_signal": "galleryAccess"
+    },
+    {
+      "name": "vaultPower",
+      "offset": 32,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.vaultPower",
+      "game_signal": "vaultPower"
+    },
+    {
+      "name": "vaultReturn",
+      "offset": 36,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.vaultReturn",
+      "game_signal": "vaultReturn"
+    },
+    {
+      "name": "exitDoor",
+      "offset": 40,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "persisted_latch_projection",
+      "meaning": "Existing record.exitUnlocked; stays true after inputs are removed",
+      "game_signal": "exitDoor"
+    },
+    {
+      "name": "physicalLeftRoute",
+      "offset": 44,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.leftRoute"
+    },
+    {
+      "name": "physicalRightRoute",
+      "offset": 48,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.rightRoute"
+    },
+    {
+      "name": "exitUnlockCandidate",
+      "offset": 52,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "unlock_candidate",
+      "meaning": "Current actual definition.unlock(ctx) predicate; does not itself set the server latch"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "platforms:service-door:openWhen",
+      "output": "serviceAccess",
+      "target": "service-door",
+      "collection": "platforms",
+      "property": "openWhen",
+      "invert": false,
+      "resolution": "True opens/removes this static barrier"
+    },
+    {
+      "id": "platforms:vault-divider:openWhen",
+      "output": "exitDoor",
+      "target": "vault-divider",
+      "collection": "platforms",
+      "property": "openWhen",
+      "invert": false,
+      "resolution": "True opens/removes this static barrier"
+    },
+    {
+      "id": "platforms:crossing-anchor:signal",
+      "output": "grappleAnchor",
+      "target": "crossing-anchor",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:return-bridge:signal",
+      "output": "bridge",
+      "target": "return-bridge",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:gallery-return-low:signal",
+      "output": "galleryAccess",
+      "target": "gallery-return-low",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:gallery-return-high:signal",
+      "output": "galleryAccess",
+      "target": "gallery-return-high",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:gallery-launch:signal",
+      "output": "galleryAccess",
+      "target": "gallery-launch",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:left1:signal",
+      "output": "leftRoute",
+      "target": "left1",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalLeftRoute",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:crumbleA:signal",
+      "output": "leftRoute",
+      "target": "crumbleA",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalLeftRoute",
+      "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:left3:signal",
+      "output": "leftRoute",
+      "target": "left3",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalLeftRoute",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:right1:signal",
+      "output": "rightRoute",
+      "target": "right1",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalRightRoute",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:crumbleB:signal",
+      "output": "rightRoute",
+      "target": "crumbleB",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalRightRoute",
+      "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:right3:signal",
+      "output": "rightRoute",
+      "target": "right3",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalRightRoute",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:vault-return:signal",
+      "output": "vaultReturn",
+      "target": "vault-return",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:vault-return-step:signal",
+      "output": "vaultReturn",
+      "target": "vault-return-step",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:final-left-low:signal",
+      "output": "vaultPower",
+      "target": "final-left-low",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:final-left-high:signal",
+      "output": "vaultPower",
+      "target": "final-left-high",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:final-right-low:signal",
+      "output": "vaultPower",
+      "target": "final-right-low",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:final-right-high:signal",
+      "output": "vaultPower",
+      "target": "final-right-high",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "lifts:central-lift:signal",
+      "output": "liftField",
+      "target": "central-lift",
+      "collection": "lifts",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "gates:transfer:signal",
+      "output": "relayGates",
+      "target": "transfer",
+      "collection": "gates",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "exit",
+      "output": "exitDoor",
+      "target": "exit",
+      "property": "unlocked",
+      "invert": false,
+      "resolution": "Existing server latch; player arrivals and party completion remain server-owned"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_abstract_projection",
+    "input_count": 14,
+    "exhaustive_row_count": 16384,
+    "row_count": 16384,
+    "encoding": "numeric case id bit i is inputs[i]",
+    "reachability": "Full abstract input product; runtime and finite-actor constraints are not asserted for synthetic contexts"
+  },
+  "initial_state": {
+    "inputs": {
+      "switchB": 0,
+      "switchC": 0,
+      "switchD": 0,
+      "routeMode": 0,
+      "plateAOccupied": 0,
+      "routePowerOccupied": 0,
+      "cubeOnLiftCargo": 0,
+      "cubeOnFinalLeft": 0,
+      "cubeOnFinalRight": 0,
+      "finalPlateLeftOccupied": 0,
+      "finalPlateRightOccupied": 0,
+      "exitUnlocked": 0,
+      "leftGraceActive": 0,
+      "rightGraceActive": 0
+    },
+    "native_outputs": "Every output written on every stateless invocation",
+    "harness_output_sentinel": 2779096485
+  },
+  "server_owned": [
+    "Input occupancy arbitration and body/cube authority",
+    "Timer deadlines and status extraction",
+    "Control acceptance, cooldown and persisted latches",
+    "Checkpoint and persisted semantic cube placement",
+    "Exit latch updates, player arrivals and party completion",
+    "Crumble runtime and physics/collision geometry"
+  ],
+  "timer_contract": {
+    "handover_ms": 325,
+    "toggle_interval_ms": 650,
+    "crumble_warning_ms": 1650,
+    "crumble_broken_ms": 2400
+  },
+  "exit_semantics": {
+    "existing_latch": "exitDoor",
+    "current_candidate": "exitUnlockCandidate",
+    "coordinator": "server/multiplayer.ts:commitAction calls actual definition.unlock and then sets record.exitUnlocked=true; arrivals remain separate"
+  },
+  "limits": [
+    "Exhaustive cases are synthetic abstract projections, not a claim that all vectors are reachable with two players and two cubes.",
+    "Synthetic contexts may exceed two body contacts or two cube entries and may combine runtime flags that sync would normalize. Every abstract input is nevertheless roundtripped through the actual current extractor/status projection.",
+    "Ordered fixtures use valid current records, exactly cubeA/cubeB and two body slots. They test reducers and snapshots, not geometry/reachability, WebSocket authorization, cube ownership or epoch acceptance.",
+    "Native code is stateless: it does not advance clocks, set latches, persist records, process arrivals, schedule crumble or authorize actions.",
+    "Raw signals, grace-inclusive physical power, current unlock candidate and existing durable exit door are separate outputs.",
+    "Crumble remains authored gameplay timing. Its warning/broken/stable observations are server evidence, never OLLVM/bogus-block evidence."
+  ],
+  "integration_status": "acquisition_only; live campaign remains unchanged"
+}

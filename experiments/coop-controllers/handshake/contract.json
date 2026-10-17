@@ -1,0 +1,258 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "handshake",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_kind": "actual_declarative_evaluator",
+  "reference_source_sha256": {
+    "levels/campaign/handshake.json": "9e44dd3d61c6d653b0dce8c2fa56b46760e31ff6ad569c75fb98f01193900371",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 20,
+    "output_size": 16,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "crossing",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "crossing.occupied",
+      "meaning": "CROSSING pressure plate occupied by an accepted player or cube",
+      "initial": 0,
+      "bit": 0
+    },
+    {
+      "name": "liftPlate",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "liftPlate.occupied",
+      "meaning": "LIFT pressure plate occupied by an accepted player or cube",
+      "initial": 0,
+      "bit": 1
+    },
+    {
+      "name": "link",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "link.value",
+      "meaning": "Server-owned LINK toggle value",
+      "initial": 0,
+      "bit": 2
+    },
+    {
+      "name": "maintenance",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "maintenance.value",
+      "meaning": "Server-owned MAINTENANCE terminal value (persistent once activated)",
+      "initial": 0,
+      "bit": 3
+    },
+    {
+      "name": "exitSocket",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "exitSocket.occupied",
+      "meaning": "Payload socket occupied by an accepted cube",
+      "initial": 0,
+      "bit": 4
+    }
+  ],
+  "outputs": [
+    {
+      "name": "crossingPower",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Power both crossing anchors",
+      "kind": "raw_combinational",
+      "game_signal": "draft:crossingPower",
+      "expression": {
+        "id": "crossing.occupied",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "liftPower",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Power service lift",
+      "kind": "raw_combinational",
+      "game_signal": "draft:liftPower",
+      "expression": {
+        "id": "liftPlate.occupied",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "relayPower",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Power both personnel relays",
+      "kind": "raw_combinational",
+      "game_signal": "draft:relayPower",
+      "expression": {
+        "id": "link.value",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "exitReady",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Current exit unlock request; not server-latched exitUnlocked or player arrival completion",
+      "kind": "raw_combinational",
+      "game_signal": "draft:exitReady",
+      "expression": {
+        "args": [
+          {
+            "id": "maintenance.value",
+            "op": "ref"
+          },
+          {
+            "id": "exitSocket.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "id": "nearPower",
+      "output": "crossingPower",
+      "property": "active",
+      "target": "nearAnchor",
+      "invert": false,
+      "resolved_signal": "draft:nearPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "farPower",
+      "output": "crossingPower",
+      "property": "active",
+      "target": "farAnchor",
+      "invert": false,
+      "resolved_signal": "draft:farPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "liftPower",
+      "output": "liftPower",
+      "property": "power",
+      "target": "serviceLift",
+      "invert": false,
+      "resolved_signal": "draft:liftPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "lowerLink",
+      "output": "relayPower",
+      "property": "power",
+      "target": "lowerRelay",
+      "invert": false,
+      "resolved_signal": "draft:lowerLink",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "upperLink",
+      "output": "relayPower",
+      "property": "power",
+      "target": "upperRelay",
+      "invert": false,
+      "resolved_signal": "draft:upperLink",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "exitPower",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit",
+      "invert": false,
+      "resolved_signal": "draft:exitPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 5,
+    "row_count": 32,
+    "encoding": "case id bit i is inputs[i]"
+  },
+  "initial_state": {
+    "inputs": {
+      "crossing": 0,
+      "liftPlate": 0,
+      "link": 0,
+      "maintenance": 0,
+      "exitSocket": 0
+    },
+    "native_outputs": "No retained state; every output is written by every invocation",
+    "harness_output_sentinel": 2779096485
+  },
+  "server_owned": [
+    "Player/cube occupancy arbitration and ownership",
+    "LINK toggle and MAINTENANCE terminal persistence",
+    "Exit latch, required two arrivals and campaign completion",
+    "Breakpoints/checkpoints, movement, grapple, cube carry and machinery physics"
+  ],
+  "exit_semantics": {
+    "raw_output": "exitReady",
+    "binding": "exitPower",
+    "latch": true,
+    "required_arrivals": 2,
+    "note": "The native snapshot can return exitReady=0 after payload removal; an already-latched server exit may remain unlocked."
+  },
+  "integration_status": "acquisition_only; live campaign remains unchanged"
+}

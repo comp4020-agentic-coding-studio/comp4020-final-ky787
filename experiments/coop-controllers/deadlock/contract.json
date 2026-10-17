@@ -1,0 +1,327 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "deadlock",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_kind": "actual_declarative_evaluator",
+  "reference_source_sha256": {
+    "levels/campaign/deadlock.json": "45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 24,
+    "output_size": 20,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "feed",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "feed.occupied",
+      "meaning": "FEED plate occupied by accepted body/cube",
+      "initial": 0,
+      "bit": 0
+    },
+    {
+      "name": "safe",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "safe.occupied",
+      "meaning": "SAFE plate occupied by accepted body/cube",
+      "initial": 0,
+      "bit": 1
+    },
+    {
+      "name": "hatchToggle",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "hatchToggle.value",
+      "meaning": "Server-owned reversible HATCH toggle",
+      "initial": 0,
+      "bit": 2
+    },
+    {
+      "name": "payloadOne",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "payloadOne.occupied",
+      "meaning": "Payload socket 1 occupied by accepted cube",
+      "initial": 0,
+      "bit": 3
+    },
+    {
+      "name": "payloadTwo",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "payloadTwo.occupied",
+      "meaning": "Payload socket 2 occupied by accepted cube",
+      "initial": 0,
+      "bit": 4
+    },
+    {
+      "name": "payloadThree",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "payloadThree.occupied",
+      "meaning": "Payload socket 3 occupied by accepted cube",
+      "initial": 0,
+      "bit": 5
+    }
+  ],
+  "outputs": [
+    {
+      "name": "cargoLift",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "FEED && SAFE cargo lift power",
+      "kind": "raw_combinational",
+      "game_signal": "draft:cargoLift",
+      "expression": {
+        "args": [
+          {
+            "id": "feed.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "safe.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      }
+    },
+    {
+      "name": "shaftFirewall",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "!SAFE active shaft firewall",
+      "kind": "raw_combinational",
+      "game_signal": "draft:shaftFirewall",
+      "expression": {
+        "arg": {
+          "id": "safe.occupied",
+          "op": "ref"
+        },
+        "op": "not"
+      }
+    },
+    {
+      "name": "serviceRelay",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "(SAFE && !FEED) || all three current payloads; completion powers both personnel relays",
+      "kind": "raw_combinational",
+      "game_signal": "draft:serviceRelay",
+      "expression": {
+        "args": [
+          {
+            "args": [
+              {
+                "id": "safe.occupied",
+                "op": "ref"
+              },
+              {
+                "arg": {
+                  "id": "feed.occupied",
+                  "op": "ref"
+                },
+                "op": "not"
+              }
+            ],
+            "op": "and"
+          },
+          {
+            "id": "payloadReady",
+            "op": "ref"
+          }
+        ],
+        "op": "or"
+      }
+    },
+    {
+      "name": "hatchOpen",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Manual hatch open request from server toggle",
+      "kind": "raw_combinational",
+      "game_signal": "draft:hatchOpen",
+      "expression": {
+        "id": "hatchToggle.value",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "payloadReady",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Current three-socket AND; exit unlock request, not latched exit state",
+      "kind": "raw_combinational",
+      "game_signal": "draft:payloadReady",
+      "expression": {
+        "args": [
+          {
+            "id": "payloadOne.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "payloadTwo.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "payloadThree.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "id": "cargoPower",
+      "output": "cargoLift",
+      "property": "power",
+      "target": "cargoField",
+      "invert": false,
+      "resolved_signal": "draft:cargoPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "firewallPower",
+      "output": "shaftFirewall",
+      "property": "active",
+      "target": "shaftBeam",
+      "invert": false,
+      "resolved_signal": "draft:firewallPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "serviceLowerPower",
+      "output": "serviceRelay",
+      "property": "power",
+      "target": "serviceLower",
+      "invert": false,
+      "resolved_signal": "draft:serviceLowerPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "serviceUpperPower",
+      "output": "serviceRelay",
+      "property": "power",
+      "target": "serviceUpper",
+      "invert": false,
+      "resolved_signal": "draft:serviceUpperPower",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "hatchOpening",
+      "output": "hatchOpen",
+      "property": "open",
+      "target": "hatch",
+      "invert": false,
+      "resolved_signal": "draft:hatchOpening",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "exitUnlock",
+      "output": "payloadReady",
+      "property": "unlock",
+      "target": "exit",
+      "invert": false,
+      "resolved_signal": "draft:exitUnlock",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 6,
+    "row_count": 64,
+    "encoding": "case id bit i is inputs[i]"
+  },
+  "initial_state": {
+    "inputs": {
+      "feed": 0,
+      "safe": 0,
+      "hatchToggle": 0,
+      "payloadOne": 0,
+      "payloadTwo": 0,
+      "payloadThree": 0
+    },
+    "native_outputs": "No retained state; every output is written by every invocation",
+    "harness_output_sentinel": 2779096485
+  },
+  "server_owned": [
+    "Player/cube occupancy arbitration and ownership",
+    "Toggle/terminal persistence (where present)",
+    "Exit latch, required two arrivals and campaign completion",
+    "Movement, grapple, cube carry/transport, manual catches and machinery physics",
+    "Unstable platform warning, crumble, respawn and collision timing (where present)"
+  ],
+  "exit_semantics": {
+    "raw_output": "payloadReady",
+    "binding": "exitUnlock",
+    "latch": true,
+    "required_arrivals": 2,
+    "note": "Current unlock request can fall while an already-latched server exit remains unlocked; no native state persists between calls."
+  },
+  "integration_status": "acquisition_only; live campaign remains unchanged",
+  "specific_boundary": "Removing any completed payload withdraws completion-powered serviceRelay unless SAFE && !FEED independently remains true; the persisted exit latch is irrelevant to serviceRelay."
+}

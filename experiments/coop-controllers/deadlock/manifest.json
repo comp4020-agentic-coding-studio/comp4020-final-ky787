@@ -1,0 +1,469 @@
+{
+  "schema": "coop-native-manifest/v1",
+  "chamber_id": "deadlock",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "contract_sha256": "8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b",
+  "reference_source_sha256": {
+    "levels/campaign/deadlock.json": "45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "native_source_sha256": {
+    "controller.c": "c373ab69016d1342de87d960010d3662a9800516c2002d2b888e2c171dad9b34",
+    "controller.h": "90fc42ea6a73ba235998010d0d0f675be37b7b274cb13ceb253927b3a8d81fa3",
+    "harness.c": "fe4d66d0e6a6a28238bd82d3141691389a6f340c74442865498a8ba7dd546e4a"
+  },
+  "compiler": {
+    "path": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+    "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+    "version": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n"
+  },
+  "linker": {
+    "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+    "sha256": "e8c524347b8bc87fba790d254c8a3b902bf1a4b63807093b816d992940af3791"
+  },
+  "seed": "00112233445566778899AABBCCDDEEFF",
+  "builds": [
+    {
+      "variant": "clean",
+      "optimization": "O0",
+      "transformations": [],
+      "frontend_extra_flags": [],
+      "binary_path": "bin/clean_x64.exe",
+      "binary_sha256": "089e084593c95318dd160e50a8d2eb04b7b5cd74f354047bf3f48849b1790135",
+      "ir_sha256": "699a166b459b48774587c64fed12d4d69fd4f1b83ec5a701a4d88f25b765301c",
+      "compiler_assembly_sha256": "bc1509390ddd9bd99e1003cbd2eae6cdd51dca50dfe7eacaa35b80bfb27baedc",
+      "labelled_assembly_sha256": "159bc060f9280d0758f28384da625774dc8e62f12c47b942f33303e7a9fff136",
+      "link_map_sha256": "1edea748cabd9c17cc66938d3aed353dfd13326fcdb385c95f8251b6a8a0660f",
+      "label_manifest_sha256": "c57572963cf7f6623a4abe0f6d0fe2ab15ce2b82e8fa830052585eec78b92ff5"
+    },
+    {
+      "variant": "bcf",
+      "optimization": "O0",
+      "transformations": [
+        "bcf"
+      ],
+      "frontend_extra_flags": [
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF"
+      ],
+      "binary_path": "bin/obfuscated_x64.exe",
+      "binary_sha256": "0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6",
+      "ir_sha256": "946350ce4d1b5e48566bd2cce6e9f48c651002ed707d742b103652c3733d62a1",
+      "compiler_assembly_sha256": "27a310b5cbda4740fe70997b1b3191cafc59b81e758e7f0779a4723a23815274",
+      "labelled_assembly_sha256": "f104915eb668de0519f6f5a582d4f09bea0f4ec75fc81eca3d27a6f68aa119c0",
+      "link_map_sha256": "96259a17ef2554bd22200e542887626d35bd17095f8acd3ec335f8bc1cc35d19",
+      "label_manifest_sha256": "fd3e8ac54eba5316d4ca7875c061b11039ae9273370636f42486e44db969b4f7"
+    }
+  ],
+  "exact_commands": [
+    {
+      "name": "compiler_version",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "--version"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n",
+      "stderr": ""
+    },
+    {
+      "name": "clean_harness",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-fno-stack-protector",
+        "-fno-discard-value-names",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\src\\harness.c",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\harness.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_freeze_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-fno-stack-protector",
+        "-fno-discard-value-names",
+        "-S",
+        "-emit-llvm",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\src\\controller.c",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\clean\\controller.ll"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_lower_frozen_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-Xclang",
+        "-disable-llvm-passes",
+        "-x",
+        "ir",
+        "-S",
+        "-masm=intel",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\clean\\controller.ll",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\clean\\controller.s"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_assemble_control",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\clean\\controller.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\clean.unlabelled.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_assemble_labelled",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\clean\\controller.labelled.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\clean.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_link",
+      "argv": [
+        "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+        "/NOLOGO",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\clean.obj",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\harness.obj",
+        "libcmt.lib",
+        "oldnames.lib",
+        "legacy_stdio_definitions.lib",
+        "/OUT:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\bin\\clean_x64.exe",
+        "/MACHINE:X64",
+        "/SUBSYSTEM:CONSOLE",
+        "/MAP:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\clean\\controller.map",
+        "/INCREMENTAL:NO",
+        "/OPT:NOREF",
+        "/OPT:NOICF",
+        "/Brepro",
+        "/DYNAMICBASE:NO",
+        "/NOIMPLIB"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "   Creating object E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\bin\\clean_x64.exp\n",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_freeze_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-fno-stack-protector",
+        "-fno-discard-value-names",
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF",
+        "-S",
+        "-emit-llvm",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\src\\controller.c",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\bcf\\controller.ll"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_lower_frozen_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-Xclang",
+        "-disable-llvm-passes",
+        "-x",
+        "ir",
+        "-S",
+        "-masm=intel",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\bcf\\controller.ll",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\bcf\\controller.s"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_assemble_control",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\bcf\\controller.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\bcf.unlabelled.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_assemble_labelled",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\bcf\\controller.labelled.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\bcf.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_link",
+      "argv": [
+        "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+        "/NOLOGO",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\bcf.obj",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\_build\\harness.obj",
+        "libcmt.lib",
+        "oldnames.lib",
+        "legacy_stdio_definitions.lib",
+        "/OUT:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\bin\\obfuscated_x64.exe",
+        "/MACHINE:X64",
+        "/SUBSYSTEM:CONSOLE",
+        "/MAP:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\build_or_identity\\bcf\\controller.map",
+        "/INCREMENTAL:NO",
+        "/OPT:NOREF",
+        "/OPT:NOICF",
+        "/Brepro",
+        "/DYNAMICBASE:NO",
+        "/NOIMPLIB"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock",
+      "exit_code": 0,
+      "stdout": "   Creating object E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\deadlock\\bin\\obfuscated_x64.exp\n",
+      "stderr": ""
+    }
+  ],
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 24,
+    "output_size": 20,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "input_output_mapping": "contract.json and integration.json",
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 6,
+    "row_count": 64,
+    "encoding": "case id bit i is inputs[i]"
+  },
+  "native_verification": {
+    "schema": "coop-native-results/v1",
+    "chamber_id": "deadlock",
+    "contract_sha256": "8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b",
+    "reference_path": "evidence/reference-vectors.json",
+    "reference_sha256": "fd22bfa3452f850a90c9f96d7bc35ab432f6edf86c77ff796ec185e491b826e9",
+    "input_names": [
+      "feed",
+      "safe",
+      "hatchToggle",
+      "payloadOne",
+      "payloadTwo",
+      "payloadThree"
+    ],
+    "output_names": [
+      "cargoLift",
+      "shaftFirewall",
+      "serviceRelay",
+      "hatchOpen",
+      "payloadReady"
+    ],
+    "case_count": 64,
+    "ordered_sequence_frames": 39,
+    "all_valid": true,
+    "failed_case_ids": [],
+    "sequence_validation": "Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.",
+    "sequence_count": 7,
+    "native_frames": 206,
+    "native_result_sha256": "f418ada0b0dc5a558e3685542673f51418e1450943d535c96a1a44b9de81f98e"
+  },
+  "trace_provenance": {
+    "tools": {
+      "pefile": "2024.8.26",
+      "capstone": "5.0.7",
+      "unicorn": "2.1.4"
+    },
+    "trace_artifact": {
+      "path": "evidence/representative-traces.json.gz",
+      "sha256": "d70fad27ed6196775f01f4255092db60c1f5d62667f0d3b90307084cba0b06c4"
+    },
+    "cfg_artifacts": {
+      "clean": {
+        "path": "evidence/disassembly-clean.json.gz",
+        "sha256": "1b0bb7a594e0414409cf340c96525a832966b7afda2bef02cff5850b74910209"
+      },
+      "bcf": {
+        "path": "evidence/disassembly-bcf.json.gz",
+        "sha256": "0aeda3bf7e1ac2482c94922c43a0809f768f9504b7a4f97fb9aaf02ddc9007da"
+      }
+    },
+    "selection": {
+      "method": "Endpoints, then greedy named input/output value and complete-output-frame diversity; deterministic distributed cases fill remaining slots",
+      "exhaustive_cases": false,
+      "limitation": "Representative dynamic evidence; no claim of exhaustive control-flow or output-store-site execution.",
+      "case_ids": [
+        0,
+        2,
+        3,
+        4,
+        6,
+        7,
+        24,
+        26,
+        28,
+        30,
+        32,
+        34,
+        36,
+        38,
+        40,
+        42,
+        44,
+        46,
+        48,
+        50,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63
+      ],
+      "available_case_count": 64,
+      "retained_trace_count": 32,
+      "trace_limit": 32
+    },
+    "cfg_metrics": {
+      "clean": {
+        "blocks": 22,
+        "edges": 31,
+        "instructions": 70,
+        "function_bytes": 288,
+        "clone_origin_blocks": 0
+      },
+      "bcf": {
+        "blocks": 142,
+        "edges": 195,
+        "instructions": 861,
+        "function_bytes": 2907,
+        "clone_origin_blocks": 22
+      }
+    }
+  },
+  "known_limits": [
+    "Native snapshot decisions only. The server retains occupancy authority, persistence, exit latching, arrivals and all movement/physics.",
+    "Static CFG is decoded, not an execution trace. Unobserved blocks remain unknown unless linked proof establishes impossibility.",
+    "Traces emulate exact PE instructions from bn_evaluate and linked helpers; native Windows stdout independently validates the final output frame.",
+    "Executed occurrence prefixes provide calculation context, not a complete backwards data-flow slice.",
+    "Server event ordering and timers remain supplied reference state, not emulated native scheduling."
+  ],
+  "files": {
+    "bin/clean_x64.exe": "089e084593c95318dd160e50a8d2eb04b7b5cd74f354047bf3f48849b1790135",
+    "bin/obfuscated_x64.exe": "0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6",
+    "build_or_identity/bcf/assembly_labels.json": "fd3e8ac54eba5316d4ca7875c061b11039ae9273370636f42486e44db969b4f7",
+    "build_or_identity/bcf/controller.labelled.s": "f104915eb668de0519f6f5a582d4f09bea0f4ec75fc81eca3d27a6f68aa119c0",
+    "build_or_identity/bcf/controller.ll": "946350ce4d1b5e48566bd2cce6e9f48c651002ed707d742b103652c3733d62a1",
+    "build_or_identity/bcf/controller.map": "96259a17ef2554bd22200e542887626d35bd17095f8acd3ec335f8bc1cc35d19",
+    "build_or_identity/bcf/controller.s": "27a310b5cbda4740fe70997b1b3191cafc59b81e758e7f0779a4723a23815274",
+    "build_or_identity/clean/assembly_labels.json": "c57572963cf7f6623a4abe0f6d0fe2ab15ce2b82e8fa830052585eec78b92ff5",
+    "build_or_identity/clean/controller.labelled.s": "159bc060f9280d0758f28384da625774dc8e62f12c47b942f33303e7a9fff136",
+    "build_or_identity/clean/controller.ll": "699a166b459b48774587c64fed12d4d69fd4f1b83ec5a701a4d88f25b765301c",
+    "build_or_identity/clean/controller.map": "1edea748cabd9c17cc66938d3aed353dfd13326fcdb385c95f8251b6a8a0660f",
+    "build_or_identity/clean/controller.s": "bc1509390ddd9bd99e1003cbd2eae6cdd51dca50dfe7eacaa35b80bfb27baedc",
+    "build_or_identity/commands.json": "707f84195fe638286772483cffe03c150056c7446d6a921815c5490b875822e4",
+    "build_or_identity/identity.json": "a04250b75e0d06d386caddf4704e6c5dcc5c4c8265c9ef0d85a30f636e41fff1",
+    "contract.json": "8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b",
+    "evidence/bogus-proof.json.gz": "3a650abf9c31a97bd7e476b85bfddaf4c2d31ed31f3c4c22f9d75ed1ac2355db",
+    "evidence/disassembly-bcf.json.gz": "0aeda3bf7e1ac2482c94922c43a0809f768f9504b7a4f97fb9aaf02ddc9007da",
+    "evidence/disassembly-clean.json.gz": "1b0bb7a594e0414409cf340c96525a832966b7afda2bef02cff5850b74910209",
+    "evidence/native-bcf-stdout.jsonl.gz": "2f466ae11c4a78e4613825a7dbc682f6422f553a7adf420eed2ef259fcd04c8f",
+    "evidence/native-clean-stdout.jsonl.gz": "2f466ae11c4a78e4613825a7dbc682f6422f553a7adf420eed2ef259fcd04c8f",
+    "evidence/native-results.json.gz": "f418ada0b0dc5a558e3685542673f51418e1450943d535c96a1a44b9de81f98e",
+    "evidence/native-summary.json": "67f2cd68559d92438063e937f8f026463b9e441261c465eb4f1a907c83759336",
+    "evidence/reference-vectors.json": "fd22bfa3452f850a90c9f96d7bc35ab432f6edf86c77ff796ec185e491b826e9",
+    "evidence/representative-traces.json.gz": "d70fad27ed6196775f01f4255092db60c1f5d62667f0d3b90307084cba0b06c4",
+    "evidence/trace-summary.json": "bfd5efa34ddbb757c53a99c898decb6692ba8d35f9a473eadd217c09f5a54fb1",
+    "integration.json": "4c4f0c37ba1dab593fe9de25195efc96f4394727c22d93b2e03c77c2ccaaa121",
+    "README.md": "3eda2eab37b3760182c1b7184ff631b324cb31149cdbf3905a139edcc4be9b90",
+    "src/controller.c": "c373ab69016d1342de87d960010d3662a9800516c2002d2b888e2c171dad9b34",
+    "src/controller.h": "90fc42ea6a73ba235998010d0d0f675be37b7b274cb13ceb253927b3a8d81fa3",
+    "src/harness.c": "fe4d66d0e6a6a28238bd82d3141691389a6f340c74442865498a8ba7dd546e4a"
+  }
+}

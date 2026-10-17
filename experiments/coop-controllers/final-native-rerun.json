@@ -1,0 +1,115 @@
+{
+  "schema": "coop-native-final-rerun/v1",
+  "status": "PASS",
+  "method": "Fresh actual TypeScript reference evaluation and fresh native Windows execution of all ten unchanged PEs",
+  "checks": [
+    {
+      "command": [
+        "node",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\reference_declarative.mjs",
+        "handshake"
+      ],
+      "exit_code": 0,
+      "semantic_reference_match": true,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\reference_declarative.mjs",
+        "deadlock"
+      ],
+      "exit_code": 0,
+      "semantic_reference_match": true,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\reference_declarative.mjs",
+        "use-after-free"
+      ],
+      "exit_code": 0,
+      "semantic_reference_match": true,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\reference_temporal.mjs",
+        "crossfeed-vault"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"chamber_id\":\"crossfeed-vault\",\"kind\":\"exhaustive_abstract_projection_plus_ordered_reducers\",\"input_count\":14,\"exhaustive_row_count\":16384,\"sequence_snapshot_count\":35,\"case_count\":16419,\"all_abstract_inputs_roundtripped\":true,\"all_ordered_records_valid\":true,\"sequence_count\":3,\"reference_sha256\":\"99f38daaae0db255a87196d387f231232b5c36b2fd8c5784606766a6f5fe84ed\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\reference_temporal.mjs",
+        "race-condition"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"chamber_id\":\"race-condition\",\"kind\":\"exhaustive_abstract_projection_plus_ordered_reducers\",\"input_count\":11,\"exhaustive_row_count\":4096,\"sequence_snapshot_count\":41,\"case_count\":4137,\"all_abstract_inputs_roundtripped\":true,\"all_ordered_records_valid\":true,\"sequence_count\":5,\"reference_sha256\":\"70f64a6963d9a14b1b2a5960592781b125210106f3234e9383d7b5d0b23ba6cc\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\royga\\anaconda3\\python.exe",
+        "-B",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\validate_native.py",
+        "handshake"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"schema\": \"coop-native-results/v1\",\n  \"chamber_id\": \"handshake\",\n  \"contract_sha256\": \"2dab247f69198e05eda52cca23e3514e50b0446699b4284231863fff8689f171\",\n  \"reference_path\": \"evidence/reference-vectors.json\",\n  \"reference_sha256\": \"cb571f53fea9352dfd3ffff9a5a99c56275b396dd37635ae319711fe42b9c19e\",\n  \"input_names\": [\n    \"crossing\",\n    \"liftPlate\",\n    \"link\",\n    \"maintenance\",\n    \"exitSocket\"\n  ],\n  \"output_names\": [\n    \"crossingPower\",\n    \"liftPower\",\n    \"relayPower\",\n    \"exitReady\"\n  ],\n  \"case_count\": 32,\n  \"ordered_sequence_frames\": 33,\n  \"all_valid\": true,\n  \"failed_case_ids\": [],\n  \"sequence_validation\": \"Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.\",\n  \"sequence_count\": 6,\n  \"native_frames\": 130,\n  \"native_result_sha256\": \"61c9e1ce062a535fc55547901793c5709914bd9b80a7fc2e91bb680af5e61760\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\royga\\anaconda3\\python.exe",
+        "-B",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\validate_native.py",
+        "crossfeed-vault"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"schema\": \"coop-native-results/v1\",\n  \"chamber_id\": \"crossfeed-vault\",\n  \"contract_sha256\": \"438dd4d1b613e0d76959c6ba8364442789e7ded0803e735ad8f62290c3fbca41\",\n  \"reference_path\": \"evidence/reference-vectors.json.gz\",\n  \"reference_sha256\": \"99f38daaae0db255a87196d387f231232b5c36b2fd8c5784606766a6f5fe84ed\",\n  \"input_names\": [\n    \"switchB\",\n    \"switchC\",\n    \"switchD\",\n    \"routeMode\",\n    \"plateAOccupied\",\n    \"routePowerOccupied\",\n    \"cubeOnLiftCargo\",\n    \"cubeOnFinalLeft\",\n    \"cubeOnFinalRight\",\n    \"finalPlateLeftOccupied\",\n    \"finalPlateRightOccupied\",\n    \"exitUnlocked\",\n    \"leftGraceActive\",\n    \"rightGraceActive\"\n  ],\n  \"output_names\": [\n    \"grappleAnchor\",\n    \"bridge\",\n    \"liftField\",\n    \"serviceAccess\",\n    \"relayGates\",\n    \"leftRoute\",\n    \"rightRoute\",\n    \"galleryAccess\",\n    \"vaultPower\",\n    \"vaultReturn\",\n    \"exitDoor\",\n    \"physicalLeftRoute\",\n    \"physicalRightRoute\",\n    \"exitUnlockCandidate\"\n  ],\n  \"case_count\": 16419,\n  \"ordered_sequence_frames\": 35,\n  \"all_valid\": true,\n  \"failed_case_ids\": [],\n  \"sequence_validation\": \"Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.\",\n  \"sequence_count\": 3,\n  \"native_frames\": 32908,\n  \"native_result_sha256\": \"2623db3850c7ff0e87f1892859f8205e3451c31703989986f095cbad803da907\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\royga\\anaconda3\\python.exe",
+        "-B",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\validate_native.py",
+        "race-condition"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"schema\": \"coop-native-results/v1\",\n  \"chamber_id\": \"race-condition\",\n  \"contract_sha256\": \"a3aaec07c61a6901cf42333082be133c621e9b949de3c5f7f72c45e07005aa92\",\n  \"reference_path\": \"evidence/reference-vectors.json.gz\",\n  \"reference_sha256\": \"70f64a6963d9a14b1b2a5960592781b125210106f3234e9383d7b5d0b23ba6cc\",\n  \"input_names\": [\n    \"dropA\",\n    \"dropB\",\n    \"payloadDelivered\",\n    \"traceOccupied\",\n    \"phase\",\n    \"returnOccupied\",\n    \"finalControl\",\n    \"exitUnlocked\",\n    \"phaseGraceActive\",\n    \"returnGraceActive\",\n    \"bufferPhase\"\n  ],\n  \"output_names\": [\n    \"topBridge\",\n    \"bufferBridge\",\n    \"safetyFirewall\",\n    \"raceFirewall\",\n    \"spanMaster\",\n    \"phaseA\",\n    \"phaseB\",\n    \"returnBridge\",\n    \"exitDoor\",\n    \"physicalPhaseA\",\n    \"physicalPhaseB\",\n    \"physicalReturnBridge\",\n    \"exitUnlockCandidate\"\n  ],\n  \"case_count\": 4137,\n  \"ordered_sequence_frames\": 41,\n  \"all_valid\": true,\n  \"failed_case_ids\": [],\n  \"sequence_validation\": \"Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.\",\n  \"sequence_count\": 5,\n  \"native_frames\": 8356,\n  \"native_result_sha256\": \"c0b2c36ca24d46b643b4480a07c1e1c1685bb7702ff3024a01c75846f59803b0\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\royga\\anaconda3\\python.exe",
+        "-B",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\validate_native.py",
+        "deadlock"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"schema\": \"coop-native-results/v1\",\n  \"chamber_id\": \"deadlock\",\n  \"contract_sha256\": \"8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b\",\n  \"reference_path\": \"evidence/reference-vectors.json\",\n  \"reference_sha256\": \"fd22bfa3452f850a90c9f96d7bc35ab432f6edf86c77ff796ec185e491b826e9\",\n  \"input_names\": [\n    \"feed\",\n    \"safe\",\n    \"hatchToggle\",\n    \"payloadOne\",\n    \"payloadTwo\",\n    \"payloadThree\"\n  ],\n  \"output_names\": [\n    \"cargoLift\",\n    \"shaftFirewall\",\n    \"serviceRelay\",\n    \"hatchOpen\",\n    \"payloadReady\"\n  ],\n  \"case_count\": 64,\n  \"ordered_sequence_frames\": 39,\n  \"all_valid\": true,\n  \"failed_case_ids\": [],\n  \"sequence_validation\": \"Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.\",\n  \"sequence_count\": 7,\n  \"native_frames\": 206,\n  \"native_result_sha256\": \"f418ada0b0dc5a558e3685542673f51418e1450943d535c96a1a44b9de81f98e\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\royga\\anaconda3\\python.exe",
+        "-B",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\shared\\validate_native.py",
+        "use-after-free"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"schema\": \"coop-native-results/v1\",\n  \"chamber_id\": \"use-after-free\",\n  \"contract_sha256\": \"522f076b3ab457ecd967979b9e944f04d85df69f577d4037213986fa897a1ed3\",\n  \"reference_path\": \"evidence/reference-vectors.json\",\n  \"reference_sha256\": \"3a827871ac32a1f6469f1f6e1f16c36de710e73b38fd7e3d413736ac4880b03a\",\n  \"input_names\": [\n    \"launch\",\n    \"plateA\",\n    \"plateB\",\n    \"plateC\",\n    \"assist\"\n  ],\n  \"output_names\": [\n    \"launchPower\",\n    \"routeA\",\n    \"routeB\",\n    \"routeC\",\n    \"assistBlocked\",\n    \"exitReady\"\n  ],\n  \"case_count\": 32,\n  \"ordered_sequence_frames\": 33,\n  \"all_valid\": true,\n  \"failed_case_ids\": [],\n  \"sequence_validation\": \"Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.\",\n  \"sequence_count\": 6,\n  \"native_frames\": 130,\n  \"native_result_sha256\": \"808b985171bcbb8abb39a99616ee3e97c6437372707191a2aaa4b467b6659210\"\n}\n",
+      "stderr": ""
+    }
+  ],
+  "retained_evidence_and_pe_files_checked": 64,
+  "all_evidence_and_binary_bytes_unchanged": true,
+  "changed_files": []
+}

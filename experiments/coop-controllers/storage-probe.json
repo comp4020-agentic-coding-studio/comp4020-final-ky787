@@ -1,0 +1,15 @@
+{
+  "schema": "coop-native-project-storage-probe/v1",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "method": "Call unchanged server/atomic-json.ts on a new experiment scratch file",
+  "result": {
+    "ok": false,
+    "code": "EPERM",
+    "syscall": "fsync",
+    "message": "EPERM: operation not permitted, fsync",
+    "written_payload": {
+      "probe": true
+    }
+  }
+}

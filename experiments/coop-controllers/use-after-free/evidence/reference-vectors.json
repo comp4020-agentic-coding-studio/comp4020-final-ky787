@@ -1,0 +1,1248 @@
+{
+  "schema": "coop-native-reference/v1",
+  "chamber_id": "use-after-free",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_implementation": [
+    "src/workbench/evaluate.ts:evaluateDraft",
+    "src/workbench/evaluate.ts:draftFrame"
+  ],
+  "reference_source_sha256": {
+    "levels/campaign/use-after-free.json": "b459b5c4b011aa3a1733b6d4e5629d97539c768d4ba2062bb1b6ea4848ef8571",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "contract_sha256": "522f076b3ab457ecd967979b9e944f04d85df69f577d4037213986fa897a1ed3",
+  "generator_sha256": "d047f7618a23a914d60787460ce72048d92a3b3b6f9a7470dde2be82310be48a",
+  "runtime": "v24.19.0",
+  "input_names": [
+    "launch",
+    "plateA",
+    "plateB",
+    "plateC",
+    "assist"
+  ],
+  "output_names": [
+    "launchPower",
+    "routeA",
+    "routeB",
+    "routeC",
+    "assistBlocked",
+    "exitReady"
+  ],
+  "input_encoding": "case id bit i is inputs[i]; canonical uint32 0 or 1",
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 5,
+    "case_count": 32
+  },
+  "initial_inputs": {
+    "launch": 0,
+    "plateA": 0,
+    "plateB": 0,
+    "plateC": 0,
+    "assist": 0
+  },
+  "cases": [
+    {
+      "id": 0,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 1,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 2,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 3,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 4,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 5,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 6,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 7,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 8,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 9,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 10,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 11,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 12,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 13,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 14,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 15,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 0
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 0,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 16,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 17,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 18,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 19,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 20,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 21,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 22,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 23,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 0,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 1,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 24,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 25,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 26,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 27,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 0,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 1,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 1,
+        "c2Binding": 1,
+        "c3Binding": 1,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 0
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 28,
+      "inputs": {
+        "launch": 0,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 29,
+      "inputs": {
+        "launch": 1,
+        "plateA": 0,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 0,
+        "routeB": 1,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 0,
+        "a2Binding": 0,
+        "a3Binding": 0,
+        "b1Binding": 1,
+        "b2Binding": 1,
+        "b3Binding": 1,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 0,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 30,
+      "inputs": {
+        "launch": 0,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 0,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 0,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 31,
+      "inputs": {
+        "launch": 1,
+        "plateA": 1,
+        "plateB": 1,
+        "plateC": 1,
+        "assist": 1
+      },
+      "expected_outputs": {
+        "launchPower": 1,
+        "routeA": 1,
+        "routeB": 0,
+        "routeC": 0,
+        "assistBlocked": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "launchBinding": 1,
+        "a1Binding": 1,
+        "a2Binding": 1,
+        "a3Binding": 1,
+        "b1Binding": 0,
+        "b2Binding": 0,
+        "b3Binding": 0,
+        "c1Binding": 0,
+        "c2Binding": 0,
+        "c3Binding": 0,
+        "assistBinding": 0,
+        "exitBinding": 1,
+        "retryBBinding": 1,
+        "retryCBinding": 1
+      },
+      "exit_unlock_requested": 1
+    }
+  ],
+  "sequences": [
+    {
+      "id": "all-off-on-off",
+      "scope": "Ordered stateless snapshots; no native/server persistence is simulated",
+      "case_ids": [
+        0,
+        31,
+        0
+      ]
+    },
+    {
+      "id": "single-launch-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        1,
+        0,
+        31,
+        30,
+        31
+      ]
+    },
+    {
+      "id": "single-plateA-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        2,
+        0,
+        31,
+        29,
+        31
+      ]
+    },
+    {
+      "id": "single-plateB-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        4,
+        0,
+        31,
+        27,
+        31
+      ]
+    },
+    {
+      "id": "single-plateC-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        8,
+        0,
+        31,
+        23,
+        31
+      ]
+    },
+    {
+      "id": "single-assist-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        16,
+        0,
+        31,
+        15,
+        31
+      ]
+    }
+  ],
+  "limits": [
+    "Uses the actual game evaluator; does not execute or interpret native C.",
+    "Raw outputs and once-inverted resolved bindings are separate.",
+    "Exit latches, two-player arrivals, control persistence, crumble timing, occupancy arbitration and physics remain server/game responsibilities."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "coop-native-preservation-result/v1",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "method": "Compare all originally tracked checkout file bytes to the pre-task baseline",
+  "tracked_files": 555,
+  "all_unchanged": true,
+  "mismatches": []
+}

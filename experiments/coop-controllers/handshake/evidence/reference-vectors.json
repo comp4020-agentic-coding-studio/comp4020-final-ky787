@@ -1,0 +1,926 @@
+{
+  "schema": "coop-native-reference/v1",
+  "chamber_id": "handshake",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_implementation": [
+    "src/workbench/evaluate.ts:evaluateDraft",
+    "src/workbench/evaluate.ts:draftFrame"
+  ],
+  "reference_source_sha256": {
+    "levels/campaign/handshake.json": "9e44dd3d61c6d653b0dce8c2fa56b46760e31ff6ad569c75fb98f01193900371",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "contract_sha256": "2dab247f69198e05eda52cca23e3514e50b0446699b4284231863fff8689f171",
+  "generator_sha256": "d047f7618a23a914d60787460ce72048d92a3b3b6f9a7470dde2be82310be48a",
+  "runtime": "v24.19.0",
+  "input_names": [
+    "crossing",
+    "liftPlate",
+    "link",
+    "maintenance",
+    "exitSocket"
+  ],
+  "output_names": [
+    "crossingPower",
+    "liftPower",
+    "relayPower",
+    "exitReady"
+  ],
+  "input_encoding": "case id bit i is inputs[i]; canonical uint32 0 or 1",
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 5,
+    "case_count": 32
+  },
+  "initial_inputs": {
+    "crossing": 0,
+    "liftPlate": 0,
+    "link": 0,
+    "maintenance": 0,
+    "exitSocket": 0
+  },
+  "cases": [
+    {
+      "id": 0,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 1,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 2,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 3,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 4,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 5,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 6,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 7,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 8,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 9,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 10,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 11,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 12,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 13,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 14,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 15,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 0
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 16,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 17,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 18,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 19,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 20,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 21,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 22,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 23,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 0,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 0
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 24,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 25,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 26,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 27,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 0,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 0,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 0,
+        "upperLink": 0,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 28,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 29,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 0,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 0,
+        "relayPower": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 0,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 30,
+      "inputs": {
+        "crossing": 0,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 0,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 0,
+        "farPower": 0,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 31,
+      "inputs": {
+        "crossing": 1,
+        "liftPlate": 1,
+        "link": 1,
+        "maintenance": 1,
+        "exitSocket": 1
+      },
+      "expected_outputs": {
+        "crossingPower": 1,
+        "liftPower": 1,
+        "relayPower": 1,
+        "exitReady": 1
+      },
+      "resolved_bindings": {
+        "nearPower": 1,
+        "farPower": 1,
+        "liftPower": 1,
+        "lowerLink": 1,
+        "upperLink": 1,
+        "exitPower": 1
+      },
+      "exit_unlock_requested": 1
+    }
+  ],
+  "sequences": [
+    {
+      "id": "all-off-on-off",
+      "scope": "Ordered stateless snapshots; no native/server persistence is simulated",
+      "case_ids": [
+        0,
+        31,
+        0
+      ]
+    },
+    {
+      "id": "single-crossing-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        1,
+        0,
+        31,
+        30,
+        31
+      ]
+    },
+    {
+      "id": "single-liftPlate-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        2,
+        0,
+        31,
+        29,
+        31
+      ]
+    },
+    {
+      "id": "single-link-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        4,
+        0,
+        31,
+        27,
+        31
+      ]
+    },
+    {
+      "id": "single-maintenance-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        8,
+        0,
+        31,
+        23,
+        31
+      ]
+    },
+    {
+      "id": "single-exitSocket-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        16,
+        0,
+        31,
+        15,
+        31
+      ]
+    }
+  ],
+  "limits": [
+    "Uses the actual game evaluator; does not execute or interpret native C.",
+    "Raw outputs and once-inverted resolved bindings are separate.",
+    "Exit latches, two-player arrivals, control persistence, crumble timing, occupancy arbitration and physics remain server/game responsibilities."
+  ]
+}

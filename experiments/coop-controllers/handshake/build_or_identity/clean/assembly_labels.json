@@ -1,0 +1,42 @@
+[
+  {
+    "symbol": "audit_LBB0_2",
+    "assembly_label": ".LBB0_2",
+    "ir_block": "if.else"
+  },
+  {
+    "symbol": "audit_LBB0_3",
+    "assembly_label": ".LBB0_3",
+    "ir_block": "if.end"
+  },
+  {
+    "symbol": "audit_LBB0_5",
+    "assembly_label": ".LBB0_5",
+    "ir_block": "if.else4"
+  },
+  {
+    "symbol": "audit_LBB0_6",
+    "assembly_label": ".LBB0_6",
+    "ir_block": "if.end6"
+  },
+  {
+    "symbol": "audit_LBB0_8",
+    "assembly_label": ".LBB0_8",
+    "ir_block": "if.else9"
+  },
+  {
+    "symbol": "audit_LBB0_9",
+    "assembly_label": ".LBB0_9",
+    "ir_block": "if.end11"
+  },
+  {
+    "symbol": "audit_LBB0_12",
+    "assembly_label": ".LBB0_12",
+    "ir_block": "if.else15"
+  },
+  {
+    "symbol": "audit_LBB0_13",
+    "assembly_label": ".LBB0_13",
+    "ir_block": "if.end17"
+  }
+]

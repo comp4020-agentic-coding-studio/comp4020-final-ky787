@@ -1,0 +1,4 @@
+pefile==2024.8.26
+capstone==5.0.7
+unicorn==2.1.4
+z3-solver==4.16.0.0

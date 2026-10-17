@@ -1,0 +1,43 @@
+{
+  "schema": "coop-native-negative-checks/v1",
+  "status": "PASS",
+  "method": "Deep-copy or inject loaded in-memory objects into independent portable checker functions; no retained source, binary, oracle, trace or proof file was modified.",
+  "reference_chamber": "use-after-free",
+  "cases": [
+    {
+      "mutation": "Flip the first semantic output event value while retaining actual write evidence",
+      "rejected": true,
+      "reason": "Output event differs from actual write or game reference"
+    },
+    {
+      "mutation": "Replace the first semantic event instruction bytes with 90",
+      "rejected": true,
+      "reason": "Output instruction bytes/descriptor differs from PE"
+    },
+    {
+      "mutation": "Clear the first raw occurrence's chronological next-occurrence ID",
+      "rejected": true,
+      "reason": "Next occurrence is not chronological"
+    },
+    {
+      "mutation": "Add 8 to the first step's recorded pre-instruction RSP delta value",
+      "rejected": true,
+      "reason": "Register delta before-value breaks chronology"
+    },
+    {
+      "mutation": "Omit the first exhaustive reference case from the loaded oracle table",
+      "rejected": true,
+      "reason": "Reference lacks unique exhaustive mixed-domain coverage"
+    },
+    {
+      "mutation": "Set assistBinding.invert=false in the loaded UAF contract while retaining the actual draftFrame reference bindings",
+      "rejected": true,
+      "reason": "Resolved binding applies wrong/missing/double inversion"
+    }
+  ],
+  "limits": [
+    "These are targeted verifier regression probes, not an exhaustive mutation test or formal proof of verifier correctness.",
+    "The first five probes also run on the first requested chamber during ordinary portable verification; this retained observation used USE AFTER FREE.",
+    "No PE or game process was re-executed for these negative checks."
+  ]
+}

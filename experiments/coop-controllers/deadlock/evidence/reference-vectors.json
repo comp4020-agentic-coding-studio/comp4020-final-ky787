@@ -1,0 +1,1869 @@
+{
+  "schema": "coop-native-reference/v1",
+  "chamber_id": "deadlock",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_implementation": [
+    "src/workbench/evaluate.ts:evaluateDraft",
+    "src/workbench/evaluate.ts:draftFrame"
+  ],
+  "reference_source_sha256": {
+    "levels/campaign/deadlock.json": "45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "contract_sha256": "8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b",
+  "generator_sha256": "d047f7618a23a914d60787460ce72048d92a3b3b6f9a7470dde2be82310be48a",
+  "runtime": "v24.19.0",
+  "input_names": [
+    "feed",
+    "safe",
+    "hatchToggle",
+    "payloadOne",
+    "payloadTwo",
+    "payloadThree"
+  ],
+  "output_names": [
+    "cargoLift",
+    "shaftFirewall",
+    "serviceRelay",
+    "hatchOpen",
+    "payloadReady"
+  ],
+  "input_encoding": "case id bit i is inputs[i]; canonical uint32 0 or 1",
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 6,
+    "case_count": 64
+  },
+  "initial_inputs": {
+    "feed": 0,
+    "safe": 0,
+    "hatchToggle": 0,
+    "payloadOne": 0,
+    "payloadTwo": 0,
+    "payloadThree": 0
+  },
+  "cases": [
+    {
+      "id": 0,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 1,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 2,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 3,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 4,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 5,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 6,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 7,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 8,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 9,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 10,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 11,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 12,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 13,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 14,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 15,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 16,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 17,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 18,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 19,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 20,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 21,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 22,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 23,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 24,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 25,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 26,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 27,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 28,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 29,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 30,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 31,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 0
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 32,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 33,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 34,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 35,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 36,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 37,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 38,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 39,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 40,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 41,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 42,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 43,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 44,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 45,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 46,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 47,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 0,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 48,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 49,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 50,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 51,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 0,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 0,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 52,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 53,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 54,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 55,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 0,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 0,
+        "hatchOpen": 1,
+        "payloadReady": 0
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 0,
+        "serviceUpperPower": 0,
+        "hatchOpening": 1,
+        "exitUnlock": 0
+      },
+      "exit_unlock_requested": 0
+    },
+    {
+      "id": 56,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 57,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 58,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 59,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 0,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 0,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 0,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 60,
+      "inputs": {
+        "feed": 0,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 61,
+      "inputs": {
+        "feed": 1,
+        "safe": 0,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 1,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 1,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 62,
+      "inputs": {
+        "feed": 0,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 0,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 0,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    },
+    {
+      "id": 63,
+      "inputs": {
+        "feed": 1,
+        "safe": 1,
+        "hatchToggle": 1,
+        "payloadOne": 1,
+        "payloadTwo": 1,
+        "payloadThree": 1
+      },
+      "expected_outputs": {
+        "cargoLift": 1,
+        "shaftFirewall": 0,
+        "serviceRelay": 1,
+        "hatchOpen": 1,
+        "payloadReady": 1
+      },
+      "resolved_bindings": {
+        "cargoPower": 1,
+        "firewallPower": 0,
+        "serviceLowerPower": 1,
+        "serviceUpperPower": 1,
+        "hatchOpening": 1,
+        "exitUnlock": 1
+      },
+      "exit_unlock_requested": 1
+    }
+  ],
+  "sequences": [
+    {
+      "id": "all-off-on-off",
+      "scope": "Ordered stateless snapshots; no native/server persistence is simulated",
+      "case_ids": [
+        0,
+        63,
+        0
+      ]
+    },
+    {
+      "id": "single-feed-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        1,
+        0,
+        63,
+        62,
+        63
+      ]
+    },
+    {
+      "id": "single-safe-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        2,
+        0,
+        63,
+        61,
+        63
+      ]
+    },
+    {
+      "id": "single-hatchToggle-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        4,
+        0,
+        63,
+        59,
+        63
+      ]
+    },
+    {
+      "id": "single-payloadOne-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        8,
+        0,
+        63,
+        55,
+        63
+      ]
+    },
+    {
+      "id": "single-payloadTwo-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        16,
+        0,
+        63,
+        47,
+        63
+      ]
+    },
+    {
+      "id": "single-payloadThree-reversible",
+      "scope": "One canonical input rises then falls",
+      "case_ids": [
+        0,
+        32,
+        0,
+        63,
+        31,
+        63
+      ]
+    }
+  ],
+  "limits": [
+    "Uses the actual game evaluator; does not execute or interpret native C.",
+    "Raw outputs and once-inverted resolved bindings are separate.",
+    "Exit latches, two-player arrivals, control persistence, crumble timing, occupancy arbitration and physics remain server/game responsibilities."
+  ]
+}

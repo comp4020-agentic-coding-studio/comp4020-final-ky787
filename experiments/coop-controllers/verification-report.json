@@ -1,0 +1,166 @@
+{
+  "schema": "coop-native-portable-verification/v1",
+  "status": "PASS",
+  "read_only": true,
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "manifest_sha256": "d5b89badb1f442fe91a96a151708962eca81695de769797a7af235c06bcf8da5",
+  "verifier_sha256": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e",
+  "proof_verifier_sha256": "da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731",
+  "chambers": [
+    {
+      "chamber_id": "handshake",
+      "status": "PASS",
+      "inputs": 5,
+      "outputs": 4,
+      "exhaustive_cases": 32,
+      "reference_cases": 32,
+      "ordered_sequence_snapshots": 33,
+      "native_frames": 130,
+      "retained_traces": 32,
+      "trace_coverage_exhaustive": true,
+      "output_commits": 128,
+      "opaque_guards": 28,
+      "proven_clones": 14,
+      "binary_sha256": {
+        "clean": "b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9",
+        "bcf": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8"
+      }
+    },
+    {
+      "chamber_id": "crossfeed-vault",
+      "status": "PASS",
+      "inputs": 14,
+      "outputs": 14,
+      "exhaustive_cases": 16384,
+      "reference_cases": 16419,
+      "ordered_sequence_snapshots": 35,
+      "native_frames": 32908,
+      "retained_traces": 32,
+      "trace_coverage_exhaustive": false,
+      "output_commits": 448,
+      "opaque_guards": 112,
+      "proven_clones": 56,
+      "binary_sha256": {
+        "clean": "be975d9287cf756d09c1f52aebea820c0f02ae90a8068f77852048052d9c418c",
+        "bcf": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b"
+      }
+    },
+    {
+      "chamber_id": "race-condition",
+      "status": "PASS",
+      "inputs": 11,
+      "outputs": 13,
+      "exhaustive_cases": 4096,
+      "reference_cases": 4137,
+      "ordered_sequence_snapshots": 41,
+      "native_frames": 8356,
+      "retained_traces": 32,
+      "trace_coverage_exhaustive": false,
+      "output_commits": 416,
+      "opaque_guards": 108,
+      "proven_clones": 54,
+      "binary_sha256": {
+        "clean": "2eb161048cac1f2734838ed3a87e601e6e990e311a6c316eacf88696928b8487",
+        "bcf": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a"
+      }
+    },
+    {
+      "chamber_id": "deadlock",
+      "status": "PASS",
+      "inputs": 6,
+      "outputs": 5,
+      "exhaustive_cases": 64,
+      "reference_cases": 64,
+      "ordered_sequence_snapshots": 39,
+      "native_frames": 206,
+      "retained_traces": 32,
+      "trace_coverage_exhaustive": false,
+      "output_commits": 160,
+      "opaque_guards": 44,
+      "proven_clones": 22,
+      "binary_sha256": {
+        "clean": "089e084593c95318dd160e50a8d2eb04b7b5cd74f354047bf3f48849b1790135",
+        "bcf": "0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6"
+      }
+    },
+    {
+      "chamber_id": "use-after-free",
+      "status": "PASS",
+      "inputs": 5,
+      "outputs": 6,
+      "exhaustive_cases": 32,
+      "reference_cases": 32,
+      "ordered_sequence_snapshots": 33,
+      "native_frames": 130,
+      "retained_traces": 32,
+      "trace_coverage_exhaustive": true,
+      "output_commits": 192,
+      "opaque_guards": 44,
+      "proven_clones": 22,
+      "binary_sha256": {
+        "clean": "454a024ff15eef8414f6a651a7b909842539bbc254dcf7a5dbad36b9eb0e5028",
+        "bcf": "733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb"
+      }
+    }
+  ],
+  "negative_checks": [
+    {
+      "case": "bad_event",
+      "rejected": true,
+      "reason": "Output event differs from actual write or game reference"
+    },
+    {
+      "case": "bad_instruction",
+      "rejected": true,
+      "reason": "Output instruction bytes/descriptor differs from PE"
+    },
+    {
+      "case": "wrong_occurrence",
+      "rejected": true,
+      "reason": "Next occurrence is not chronological"
+    },
+    {
+      "case": "wrong_register",
+      "rejected": true,
+      "reason": "Register delta before-value breaks chronology"
+    },
+    {
+      "case": "missing_exhaustive_case",
+      "rejected": true,
+      "reason": "Reference lacks unique exhaustive mixed-domain coverage"
+    }
+  ],
+  "checks": [
+    "Exact retained-file inventories and SHA-256 manifests",
+    "Authoritative game source hashes, native ABI and raw/resolved bindings",
+    "Unique exhaustive canonical input products and independent retained declarative AST evaluation",
+    "Actual server sequence snapshot chronology and projection references",
+    "Clean/BCF native stdout and every named expected output, including ordered invocation streams",
+    "PE export/.pdata boundaries, exact instruction bytes, block partitions and encoded CFG edges",
+    "Trace register/flag/memory chronology, actual linked helpers, raw occurrences and committed native output stores",
+    "Retained output-site/value coverage summaries",
+    "Exact BCF native guard patterns, analytical parity proof and clone/IR/incoming-transfer provenance",
+    "BCF instruction and CFG growth relative to clean baseline"
+  ],
+  "limitations": [
+    "Read-only consistency audit: does not execute Windows PEs, re-run the game oracle, rebuild, emulate instructions, or invoke SMT.",
+    "Windows native execution remains the authority for observed native outputs; retained file checks alone cannot independently authenticate observation capture.",
+    "Trace executions are Unicorn runs of exact linked PE bytes and are separate from native Windows process observations.",
+    "Recorded object byte/relocation equivalence is hash-bound; disposable COFF objects are not required.",
+    "Temporal native controllers implement stateless projection only. Ordered server reducer observations do not mean the PE implements timer scheduling, persistence, occupancy arbitration or event acceptance.",
+    "Bogus-code proof is conditional on ordinary entry, intact code/flags, successful loads and normal calls; unobserved blocks alone are not proof.",
+    "No live campaign integration, authored geometry or physics change is certified by this package."
+  ],
+  "invocation_audit": {
+    "command": [
+      "C:/Users/royga/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+      "-I",
+      "-B",
+      "experiments\\coop-controllers\\shared\\verify_portable.py"
+    ],
+    "exit_code": 0,
+    "retained_file_count_before": 201,
+    "file_names_and_sha256_unchanged": true,
+    "python_execution": "Isolated Windows Python standard library; no installed third-party analysis packages required"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "coop-native-shared-manifest/v1",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "files": {
+    "analyze.py": "de08eaecbdb16fb57e092b0532feb799e0494b63e679eae378585b2982781f5e",
+    "build.py": "69bd67623f1bf40cd5f1374d85522ed891500c6305f368adea46f7877325f36e",
+    "final_native_check.py": "e1c134901068257e25a5129d0df154ed3f091180b86d99d78c81538897504db7",
+    "negative-check-results.json": "a4860d06b579aa04ffe17fec9395c877bf2397f11ded05b28ee7bb25fa589bf5",
+    "ollvm_source/BogusControlFlow.cpp": "87b108b3aec92f6684904795206862e626589c6e312cdde8330f3177b00ed72d",
+    "ollvm_source/CryptoUtils.cpp": "ad08e77bedc3c66ba365eb36aa214b2e276d4aa333632d10b6a8eb87db672569",
+    "ollvm_source/LICENSE-OBFUSCATOR.TXT": "0c9be6145c13ee8fee9a806f9e1dbfbed054b6c0084732694869255535006d1b",
+    "ollvm_source/manifest.json": "2ef3827decc2ae1f35af7539d72c16c8923c8c60f9f04166be887a16c4ca5622",
+    "ollvm_source/Plugin.cpp": "d4e19793a80b8b3ada6bac320fdf284c68e5a1b3ef48b6b94e4e7b85571e3d79",
+    "ollvm_source/Utils.cpp": "874ffe25f1e154d4dd9e8a1f9f6b6c648aa4d637154a1885dbdd1f1a3619a561",
+    "package.py": "534941f818b1e0fd6ec3e2dbd2e8f4e441d3d3da717d6e8231f6509698fd2ffb",
+    "PROOF.md": "02e3dd78087db1d9eea1299675fda21edfd321c58c7a16d97af54f045c491edd",
+    "prove_bogus.py": "ebe13356627f47872c3c9b53d1f652f074655555da073e8c2847ebc5cffbc3da",
+    "README-template.md": "a24d1860a592f630e91ecefcbb75a655f851f6538ff998ff7479b6e144ca13b9",
+    "reference-lock.json": "2ea1dfa9b3d6cc4055de99ac9c6cfc87a0821aa94288547227c417041400a69f",
+    "reference_declarative.mjs": "d047f7618a23a914d60787460ce72048d92a3b3b6f9a7470dde2be82310be48a",
+    "reference_temporal.mjs": "95b6c574e4364f50b234fc5697489d11888926688ceeba65d7afdb0b3c5e0aab",
+    "requirements-analysis.txt": "bb6da60a27211c175f0e66f088a9cd736b4a4a5b85f25bf43cd664bd4a12278a",
+    "toolchain.json": "301e8472197d0e9bddf88c943fc34f430763fe7bf5925f8d6eb3607d2b6e8dfb",
+    "toolchain_discovery.py": "60abf86830d5ca28c6d3b25b2b1874a339a47be42a3a102a0ed1d314c8de1903",
+    "validate_native.py": "1bdafadd28438b497c574c40536499dc74673c953a25c412b666a71ad1924eca",
+    "verify_portable.py": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e",
+    "verify_proof.py": "da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731"
+  }
+}

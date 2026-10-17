@@ -1,0 +1,1446 @@
+{
+  "schema": "coop-native-integration/v1",
+  "chamber_id": "race-condition",
+  "contract_sha256": "a3aaec07c61a6901cf42333082be133c621e9b949de3c5f7f72c45e07005aa92",
+  "status": "proposal_only_no_live_integration",
+  "trace_summary_sha256": "d9e07f2184a0be6feb27c882b944faf8b81ab39e0b83aaa58e9f1de26550550c",
+  "outputs": [
+    {
+      "name": "topBridge",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.topBridge",
+      "game_signal": "topBridge",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 0 bytes",
+      "bindings": [
+        {
+          "id": "platforms:cargo-top:signal",
+          "output": "topBridge",
+          "target": "cargo-top",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "topBridge",
+          "byte_offset": 0,
+          "instruction_rva": 4622,
+          "instruction_address": 5368713742,
+          "instruction": {
+            "id": "insn_0000120E",
+            "address": 5368713742,
+            "rva": 4622,
+            "size": 6,
+            "bytes": "c7 00 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 1"
+          },
+          "raw_block_id": "bb_00001207",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            3,
+            8,
+            48,
+            50,
+            56,
+            112,
+            114,
+            120,
+            128,
+            130,
+            136,
+            176,
+            178,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        },
+        {
+          "output": "topBridge",
+          "byte_offset": 0,
+          "instruction_rva": 4729,
+          "instruction_address": 5368713849,
+          "instruction": {
+            "id": "insn_00001279",
+            "address": 5368713849,
+            "rva": 4729,
+            "size": 6,
+            "bytes": "c7 00 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 0"
+          },
+          "raw_block_id": "bb_00001272",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            4,
+            6,
+            12,
+            15,
+            52,
+            54,
+            60,
+            63,
+            116,
+            118,
+            124,
+            127,
+            132,
+            134,
+            140,
+            143,
+            3517
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "bufferBridge",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.bufferBridge",
+      "game_signal": "bufferBridge",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 4 bytes",
+      "bindings": [
+        {
+          "id": "platforms:cargo-buffer:signal",
+          "output": "bufferBridge",
+          "target": "cargo-buffer",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "bufferBridge",
+          "byte_offset": 4,
+          "instruction_rva": 5194,
+          "instruction_address": 5368714314,
+          "instruction": {
+            "id": "insn_0000144A",
+            "address": 5368714314,
+            "rva": 5194,
+            "size": 7,
+            "bytes": "c7 40 04 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 1"
+          },
+          "raw_block_id": "bb_00001443",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            4,
+            48,
+            52,
+            112,
+            116,
+            128,
+            132,
+            176,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        },
+        {
+          "output": "bufferBridge",
+          "byte_offset": 4,
+          "instruction_rva": 5302,
+          "instruction_address": 5368714422,
+          "instruction": {
+            "id": "insn_000014B6",
+            "address": 5368714422,
+            "rva": 5302,
+            "size": 7,
+            "bytes": "c7 40 04 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 0"
+          },
+          "raw_block_id": "bb_000014AF",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            3,
+            6,
+            8,
+            12,
+            15,
+            50,
+            54,
+            56,
+            60,
+            63,
+            114,
+            118,
+            120,
+            124,
+            127,
+            130,
+            134,
+            136,
+            140,
+            143,
+            178,
+            3517
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "safetyFirewall",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.safetyFirewall",
+      "game_signal": "safetyFirewall",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 8 bytes",
+      "bindings": [
+        {
+          "id": "firewalls:safety-beam:signal",
+          "output": "safetyFirewall",
+          "target": "safety-beam",
+          "collection": "firewalls",
+          "property": "signal",
+          "invert": false,
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "safetyFirewall",
+          "byte_offset": 8,
+          "instruction_rva": 5646,
+          "instruction_address": 5368714766,
+          "instruction": {
+            "id": "insn_0000160E",
+            "address": 5368714766,
+            "rva": 5646,
+            "size": 7,
+            "bytes": "c7 40 08 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 1"
+          },
+          "raw_block_id": "bb_00001607",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            15,
+            48,
+            50,
+            52,
+            54,
+            63,
+            112,
+            114,
+            116,
+            118,
+            127,
+            128,
+            130,
+            132,
+            134,
+            143,
+            176,
+            178,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        },
+        {
+          "output": "safetyFirewall",
+          "byte_offset": 8,
+          "instruction_rva": 5754,
+          "instruction_address": 5368714874,
+          "instruction": {
+            "id": "insn_0000167A",
+            "address": 5368714874,
+            "rva": 5754,
+            "size": 7,
+            "bytes": "c7 40 08 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 0"
+          },
+          "raw_block_id": "bb_00001673",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            8,
+            12,
+            56,
+            60,
+            120,
+            124,
+            136,
+            140,
+            3517
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "raceFirewall",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.raceFirewall",
+      "game_signal": "raceFirewall",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 12 bytes",
+      "bindings": [
+        {
+          "id": "firewalls:race-beam:signal",
+          "output": "raceFirewall",
+          "target": "race-beam",
+          "collection": "firewalls",
+          "property": "signal",
+          "invert": false,
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "raceFirewall",
+          "byte_offset": 12,
+          "instruction_rva": 6100,
+          "instruction_address": 5368715220,
+          "instruction": {
+            "id": "insn_000017D4",
+            "address": 5368715220,
+            "rva": 6100,
+            "size": 7,
+            "bytes": "c7 40 0c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 1"
+          },
+          "raw_block_id": "bb_000017CD",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            12,
+            15,
+            60,
+            63,
+            124,
+            127,
+            140,
+            143,
+            3517
+          ]
+        },
+        {
+          "output": "raceFirewall",
+          "byte_offset": 12,
+          "instruction_rva": 6208,
+          "instruction_address": 5368715328,
+          "instruction": {
+            "id": "insn_00001840",
+            "address": 5368715328,
+            "rva": 6208,
+            "size": 7,
+            "bytes": "c7 40 0c 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 0"
+          },
+          "raw_block_id": "bb_00001839",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            48,
+            50,
+            52,
+            54,
+            56,
+            112,
+            114,
+            116,
+            118,
+            120,
+            128,
+            130,
+            132,
+            134,
+            136,
+            176,
+            178,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "spanMaster",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.spanMaster",
+      "game_signal": "spanMaster",
+      "role": "receiver-master wire and phase prediction gating; no separate physical platform.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 16 bytes",
+      "bindings": [],
+      "verified_bcf_store_sites": [
+        {
+          "output": "spanMaster",
+          "byte_offset": 16,
+          "instruction_rva": 6430,
+          "instruction_address": 5368715550,
+          "instruction": {
+            "id": "insn_0000191E",
+            "address": 5368715550,
+            "rva": 6430,
+            "size": 7,
+            "bytes": "c7 40 10 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 1"
+          },
+          "raw_block_id": "bb_00001917",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            176,
+            178,
+            3517
+          ]
+        },
+        {
+          "output": "spanMaster",
+          "byte_offset": 16,
+          "instruction_rva": 6538,
+          "instruction_address": 5368715658,
+          "instruction": {
+            "id": "insn_0000198A",
+            "address": 5368715658,
+            "rva": 6538,
+            "size": 7,
+            "bytes": "c7 40 10 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 0"
+          },
+          "raw_block_id": "bb_00001983",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "phaseA",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.phaseA",
+      "game_signal": "phaseA",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 20 bytes",
+      "bindings": [
+        {
+          "id": "platforms:span1:signal",
+          "output": "phaseA",
+          "target": "span1",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseA",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        },
+        {
+          "id": "platforms:span3:signal",
+          "output": "phaseA",
+          "target": "span3",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseA",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        },
+        {
+          "id": "platforms:span5:signal",
+          "output": "phaseA",
+          "target": "span5",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseA",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "phaseA",
+          "byte_offset": 20,
+          "instruction_rva": 6881,
+          "instruction_address": 5368716001,
+          "instruction": {
+            "id": "insn_00001AE1",
+            "address": 5368716001,
+            "rva": 6881,
+            "size": 7,
+            "bytes": "c7 40 14 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x14], 1"
+          },
+          "raw_block_id": "bb_00001ADA",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            176,
+            178,
+            3517
+          ]
+        },
+        {
+          "output": "phaseA",
+          "byte_offset": 20,
+          "instruction_rva": 6989,
+          "instruction_address": 5368716109,
+          "instruction": {
+            "id": "insn_00001B4D",
+            "address": 5368716109,
+            "rva": 6989,
+            "size": 7,
+            "bytes": "c7 40 14 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x14], 0"
+          },
+          "raw_block_id": "bb_00001B46",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "phaseB",
+      "offset": 24,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.phaseB",
+      "game_signal": "phaseB",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 24 bytes",
+      "bindings": [
+        {
+          "id": "platforms:crumbleA:signal",
+          "output": "phaseB",
+          "target": "crumbleA",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseB",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        },
+        {
+          "id": "platforms:crumbleB:signal",
+          "output": "phaseB",
+          "target": "crumbleB",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseB",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "phaseB",
+          "byte_offset": 24,
+          "instruction_rva": 7332,
+          "instruction_address": 5368716452,
+          "instruction": {
+            "id": "insn_00001CA4",
+            "address": 5368716452,
+            "rva": 7332,
+            "size": 7,
+            "bytes": "c7 40 18 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x18], 1"
+          },
+          "raw_block_id": "bb_00001C9D",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127
+          ]
+        },
+        {
+          "output": "phaseB",
+          "byte_offset": 24,
+          "instruction_rva": 7440,
+          "instruction_address": 5368716560,
+          "instruction": {
+            "id": "insn_00001D10",
+            "address": 5368716560,
+            "rva": 7440,
+            "size": 7,
+            "bytes": "c7 40 18 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x18], 0"
+          },
+          "raw_block_id": "bb_00001D09",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            176,
+            178,
+            3517,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "returnBridge",
+      "offset": 28,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.returnBridge",
+      "game_signal": "returnBridge",
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 28 bytes",
+      "bindings": [
+        {
+          "id": "platforms:return-bridge:signal",
+          "output": "returnBridge",
+          "target": "return-bridge",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalReturnBridge",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "returnBridge",
+          "byte_offset": 28,
+          "instruction_rva": 7666,
+          "instruction_address": 5368716786,
+          "instruction": {
+            "id": "insn_00001DF2",
+            "address": 5368716786,
+            "rva": 7666,
+            "size": 7,
+            "bytes": "c7 40 1c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x1c], 1"
+          },
+          "raw_block_id": "bb_00001DEB",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            176,
+            178,
+            3517
+          ]
+        },
+        {
+          "output": "returnBridge",
+          "byte_offset": 28,
+          "instruction_rva": 7774,
+          "instruction_address": 5368716894,
+          "instruction": {
+            "id": "insn_00001E5E",
+            "address": 5368716894,
+            "rva": 7774,
+            "size": 7,
+            "bytes": "c7 40 1c 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x1c], 0"
+          },
+          "raw_block_id": "bb_00001E57",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "exitDoor",
+      "offset": 32,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "persisted_latch_projection",
+      "meaning": "Existing record.exitUnlocked; stays true after inputs are removed",
+      "game_signal": "exitDoor",
+      "role": "Projects server exitUnlocked. This function neither creates nor clears that latch.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 32 bytes",
+      "bindings": [
+        {
+          "id": "exit",
+          "output": "exitDoor",
+          "target": "exit",
+          "property": "unlocked",
+          "invert": false,
+          "resolution": "Existing server latch; player arrivals and party completion remain server-owned"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "exitDoor",
+          "byte_offset": 32,
+          "instruction_rva": 8000,
+          "instruction_address": 5368717120,
+          "instruction": {
+            "id": "insn_00001F40",
+            "address": 5368717120,
+            "rva": 8000,
+            "size": 7,
+            "bytes": "c7 40 20 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x20], 1"
+          },
+          "raw_block_id": "bb_00001F39",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        },
+        {
+          "output": "exitDoor",
+          "byte_offset": 32,
+          "instruction_rva": 8108,
+          "instruction_address": 5368717228,
+          "instruction": {
+            "id": "insn_00001FAC",
+            "address": 5368717228,
+            "rva": 8108,
+            "size": 7,
+            "bytes": "c7 40 20 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x20], 0"
+          },
+          "raw_block_id": "bb_00001FA5",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            176,
+            178,
+            3517
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "physicalPhaseA",
+      "offset": 36,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.phaseA",
+      "role": "Grace-inclusive power for existing machinery; server crumble/physics constraints still apply.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 36 bytes",
+      "bindings": [
+        {
+          "id": "platforms:span1:signal",
+          "output": "phaseA",
+          "target": "span1",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseA",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        },
+        {
+          "id": "platforms:span3:signal",
+          "output": "phaseA",
+          "target": "span3",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseA",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        },
+        {
+          "id": "platforms:span5:signal",
+          "output": "phaseA",
+          "target": "span5",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseA",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "physicalPhaseA",
+          "byte_offset": 36,
+          "instruction_rva": 8573,
+          "instruction_address": 5368717693,
+          "instruction": {
+            "id": "insn_0000217D",
+            "address": 5368717693,
+            "rva": 8573,
+            "size": 7,
+            "bytes": "c7 40 24 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x24], 1"
+          },
+          "raw_block_id": "bb_00002176",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            176,
+            178,
+            3517
+          ]
+        },
+        {
+          "output": "physicalPhaseA",
+          "byte_offset": 36,
+          "instruction_rva": 8681,
+          "instruction_address": 5368717801,
+          "instruction": {
+            "id": "insn_000021E9",
+            "address": 5368717801,
+            "rva": 8681,
+            "size": 7,
+            "bytes": "c7 40 24 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x24], 0"
+          },
+          "raw_block_id": "bb_000021E2",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "physicalPhaseB",
+      "offset": 40,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.phaseB",
+      "role": "Grace-inclusive power for existing machinery; server crumble/physics constraints still apply.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 40 bytes",
+      "bindings": [
+        {
+          "id": "platforms:crumbleA:signal",
+          "output": "phaseB",
+          "target": "crumbleA",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseB",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        },
+        {
+          "id": "platforms:crumbleB:signal",
+          "output": "phaseB",
+          "target": "crumbleB",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalPhaseB",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "physicalPhaseB",
+          "byte_offset": 40,
+          "instruction_rva": 9146,
+          "instruction_address": 5368718266,
+          "instruction": {
+            "id": "insn_000023BA",
+            "address": 5368718266,
+            "rva": 9146,
+            "size": 7,
+            "bytes": "c7 40 28 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x28], 1"
+          },
+          "raw_block_id": "bb_000023B3",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            3517
+          ]
+        },
+        {
+          "output": "physicalPhaseB",
+          "byte_offset": 40,
+          "instruction_rva": 9254,
+          "instruction_address": 5368718374,
+          "instruction": {
+            "id": "insn_00002426",
+            "address": 5368718374,
+            "rva": 9254,
+            "size": 7,
+            "bytes": "c7 40 28 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x28], 0"
+          },
+          "raw_block_id": "bb_0000241F",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            176,
+            178,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "physicalReturnBridge",
+      "offset": 44,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.returnBridge",
+      "role": "Grace-inclusive power for existing machinery; server crumble/physics constraints still apply.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 44 bytes",
+      "bindings": [
+        {
+          "id": "platforms:return-bridge:signal",
+          "output": "returnBridge",
+          "target": "return-bridge",
+          "collection": "platforms",
+          "property": "signal",
+          "invert": false,
+          "physical_output": "physicalReturnBridge",
+          "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "physicalReturnBridge",
+          "byte_offset": 44,
+          "instruction_rva": 9598,
+          "instruction_address": 5368718718,
+          "instruction": {
+            "id": "insn_0000257E",
+            "address": 5368718718,
+            "rva": 9598,
+            "size": 7,
+            "bytes": "c7 40 2c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x2c], 1"
+          },
+          "raw_block_id": "bb_00002577",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            176,
+            178,
+            3517
+          ]
+        },
+        {
+          "output": "physicalReturnBridge",
+          "byte_offset": 44,
+          "instruction_rva": 9706,
+          "instruction_address": 5368718826,
+          "instruction": {
+            "id": "insn_000025EA",
+            "address": 5368718826,
+            "rva": 9706,
+            "size": 7,
+            "bytes": "c7 40 2c 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x2c], 0"
+          },
+          "raw_block_id": "bb_000025E3",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "exitUnlockCandidate",
+      "offset": 48,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "unlock_candidate",
+      "meaning": "Current actual definition.unlock(ctx) predicate; does not itself set the server latch",
+      "role": "Actual definition.unlock(ctx) candidate for server commitAction; no authored MachineSignal or new physical object.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 48 bytes",
+      "bindings": [],
+      "verified_bcf_store_sites": [
+        {
+          "output": "exitUnlockCandidate",
+          "byte_offset": 48,
+          "instruction_rva": 10053,
+          "instruction_address": 5368719173,
+          "instruction": {
+            "id": "insn_00002745",
+            "address": 5368719173,
+            "rva": 10053,
+            "size": 7,
+            "bytes": "c7 40 30 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x30], 1"
+          },
+          "raw_block_id": "bb_0000273E",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            3517
+          ]
+        },
+        {
+          "output": "exitUnlockCandidate",
+          "byte_offset": 48,
+          "instruction_rva": 10161,
+          "instruction_address": 5368719281,
+          "instruction": {
+            "id": "insn_000027B1",
+            "address": 5368719281,
+            "rva": 10161,
+            "size": 7,
+            "bytes": "c7 40 30 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x30], 0"
+          },
+          "raw_block_id": "bb_000027AA",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            6,
+            8,
+            12,
+            15,
+            48,
+            50,
+            52,
+            54,
+            56,
+            60,
+            63,
+            112,
+            114,
+            116,
+            118,
+            120,
+            124,
+            127,
+            128,
+            130,
+            132,
+            134,
+            136,
+            140,
+            143,
+            176,
+            178,
+            "seq:commit-payload-latch-and-restart:restart-without-payload"
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    }
+  ],
+  "server_owned": [
+    "Input occupancy arbitration and body/cube authority",
+    "Timer deadlines and status extraction",
+    "Control acceptance, cooldown and persisted latches",
+    "Checkpoint and persisted semantic cube placement",
+    "Exit latch updates, player arrivals and party completion",
+    "Crumble runtime and physics/collision geometry"
+  ],
+  "mapping_limits": [
+    "An output store is evidence for a signal, not a unique physical platform or complete backwards data-flow slice.",
+    "Multiple machinery bindings may share one signal and the same native region.",
+    "Authored unstable platforms have no proven-bogus-block mapping in this acquisition.",
+    "Supply accepted canonical state, retain server scheduling/latches, then apply existing bindings. Do not change geometry or ownership."
+  ]
+}

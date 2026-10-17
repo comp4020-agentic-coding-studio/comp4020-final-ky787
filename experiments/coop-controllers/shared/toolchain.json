@@ -1,0 +1,357 @@
+{
+  "schema": "coop-controller-toolchain-discovery/v1",
+  "observed_utc": "2026-10-17T08:11:52.786840+00:00",
+  "discovery_script_sha256": "60abf86830d5ca28c6d3b25b2b1874a339a47be42a3a102a0ed1d314c8de1903",
+  "platform": "win32",
+  "python_version": "3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]",
+  "tools": {
+    "ollvm16": {
+      "path": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "exists": true,
+      "bytes": 50116608,
+      "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+      "probe": {
+        "argv": [
+          "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm",
+        "full_output_sha256": "5a1501683f3bfae47cb96ba36934c3927d223bc38bd5a17b3e64c1b2166d0dd1"
+      },
+      "advertised_obfuscation_help": {
+        "argv": [
+          "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+          "-mllvm",
+          "--help-hidden",
+          "-x",
+          "c",
+          "-fsyntax-only",
+          "NUL"
+        ],
+        "exit_code": 0,
+        "lines": [
+          "  --aesSeed=<string>                                                - seed for the AES-CTR PRNG",
+          "  --bcf                                                             - Enable bogus control flow",
+          "  --bcf_loop=<number of times>                                      - Choose how many time the -bcf pass loop on a function",
+          "  --bcf_prob=<probability rate>                                     - Choose the probability [%] each basic blocks will be obfuscated by the -bcf pass",
+          "  --fla                                                             - Enable the flattening pass",
+          "  --split                                                           - Enable basic block splitting",
+          "  --split_num=<int>                                                 - Split <split_num> time each BB",
+          "  --sub                                                             - Enable instruction substitutions",
+          "  --sub_loop=<number of times>                                      - Choose how many time the -sub pass loops on a function"
+        ],
+        "full_output_sha256": "bf332fe758f9d4f4377800ac2854b0ce93d4eadd88ef1494f7776eef38903b84",
+        "interpretation": "Options advertised by this executable; no claim that every pass or combination produces correct or surviving machine-code transformations."
+      }
+    },
+    "hikari15": {
+      "path": "D:\\VM_Shared_Folder\\software\\ollvm\\for_website\\hikari15\\build-vs-patched\\Release\\bin\\clang.exe",
+      "exists": true,
+      "bytes": 64301056,
+      "sha256": "e968913828cbce9d64ced8fd23f90a68b5ca176276b35fd2bc6d379cc031edf1",
+      "probe": {
+        "argv": [
+          "D:\\VM_Shared_Folder\\software\\ollvm\\for_website\\hikari15\\build-vs-patched\\Release\\bin\\clang.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "clang version 15.0.0 (https://github.com/ChandHsu/Hikari-LLVM15 021f73404e4b0bd1ea05c7226953cab8d9801c7a)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\for_website\\hikari15\\build-vs-patched\\Release\\bin",
+        "full_output_sha256": "11771179369596c58cc78be8a29c662b2fdef24df507b9833d4b6bf5113a414c"
+      },
+      "advertised_obfuscation_help": {
+        "argv": [
+          "D:\\VM_Shared_Folder\\software\\ollvm\\for_website\\hikari15\\build-vs-patched\\Release\\bin\\clang.exe",
+          "-mllvm",
+          "--help-hidden",
+          "-x",
+          "c",
+          "-fsyntax-only",
+          "NUL"
+        ],
+        "exit_code": 0,
+        "lines": [
+          "  --aesSeed=<ulong>                                               - seed for the PRNG",
+          "  --bcf_cond_compl=<Complexity>                                   - The complexity of the expression used to generate branching condition",
+          "  --bcf_loop=<number of times>                                    - Choose how many time the -bcf pass loop on a function",
+          "  --bcf_prob=<probability rate>                                   - Choose the probability [%] each basic blocks will be obfuscated by the -bcf pass",
+          "  --enable-acdobf                                                 - Enable AntiClassDump.",
+          "  --enable-allobf                                                 - Enable All Obfuscation.",
+          "  --enable-bcfobf                                                 - Enable BogusControlFlow.",
+          "  --enable-cffobf                                                 - Enable Flattening.",
+          "  --enable-fco                                                    - Enable Function CallSite Obfuscation.",
+          "  --enable-funcwra                                                - Enable Function Wrapper.",
+          "  --enable-indibran                                               - Enable Indirect Branching.",
+          "  --enable-splitobf                                               - Enable BasicBlockSpliting.",
+          "  --enable-strcry                                                 - Enable Function CallSite Obfuscation.",
+          "  --enable-subobf                                                 - Enable Instruction Substitution.",
+          "  --fcoconfig=<filename>                                          - FunctionCallObfuscate Configuration Path",
+          "  --fw_prob=<Probability Rate>                                    - Choose the probability [%] For Each CallSite To Be Obfuscated By FunctionWrapper",
+          "  --split_num=<int>                                               - Split <split_num> time each BB",
+          "  --sub_loop=<number of times>                                    - Choose how many time the -sub pass loops on a function",
+          "  --sub_prob=<probability rate>                                   - Choose the probability [%] each basic blocks will be obfuscated by the InstructioSubstitution pass"
+        ],
+        "full_output_sha256": "4c8dc5c691338640b45816b394b9ed8b5127ec1f843a1eac5c912a83a2299171",
+        "interpretation": "Options advertised by this executable; no claim that every pass or combination produces correct or surviving machine-code transformations."
+      }
+    },
+    "stock_clang": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe",
+      "exists": true,
+      "bytes": 104747568,
+      "sha256": "4b0a905d901d2dd9f0fd034c9c4b91ae9e1fd9ab29dc3a29b022b044e8b7ba44",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\clang.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "clang version 22.1.3 (https://github.com/llvm/llvm-project e9846648fd6183ee6d8cbdb4502213fcf902a211)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin",
+        "full_output_sha256": "7680e3d1a02ac2f2c92b3edf3c21de416066f3abc3d8e59a6bb9aaa9eccb31a2"
+      }
+    },
+    "lld_link": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\lld-link.exe",
+      "exists": true,
+      "bytes": 71454768,
+      "sha256": "631a02cecb87f9f7f2270713d6c7f84e54a0fabce6c6638d21d3a0caea78204d",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\lld-link.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "LLD 22.1.3 (https://github.com/llvm/llvm-project e9846648fd6183ee6d8cbdb4502213fcf902a211)",
+        "full_output_sha256": "5dd6e1aae2c03f6f0b875039faaafa88c7cc55445fc708e09db17e119b8c9bb4"
+      }
+    },
+    "llvm_objdump": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\llvm-objdump.exe",
+      "exists": true,
+      "bytes": 21104688,
+      "sha256": "7e726d87fe123f10653998a78dc6a15492fb931f1e6de7265df7d923fc81a210",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\llvm-objdump.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "LLVM (http://llvm.org/):\n  LLVM version 22.1.3\n  Optimized build.\n\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)",
+        "full_output_sha256": "27f7c3886b7327c79d3a1cfa9af4eec4f629b7a7710eaaa6e0a3adcb8db480ae"
+      }
+    },
+    "llvm_readobj": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\llvm-readobj.exe",
+      "exists": true,
+      "bytes": 7311920,
+      "sha256": "c1af4e2f4885f30e58fb9a203d67af22e0fe34667408b5bdf409b920e005d6c3",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\llvm-readobj.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "LLVM (http://llvm.org/):\n  LLVM version 22.1.3\n  Optimized build.",
+        "full_output_sha256": "f0c774fbc348a9474f1dfc796aaba86db14789b959dc7724db5a1b6d538c90ab"
+      }
+    },
+    "lldb": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\lldb.exe",
+      "exists": true,
+      "bytes": 585784,
+      "sha256": "fe88bd42715d051085bdd385c57dfdb54bb9748f046c35f83aef564dd90668dd",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\lldb.exe",
+          "--version"
+        ],
+        "exit_code": 3228369022,
+        "output_excerpt": "error: unable to find 'python311.dll'.\nPLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.\nStack dump:\n0.\tProgram arguments: \"E:\\\\Visual Studio\\\\VC\\\\Tools\\\\Llvm\\\\x64\\\\bin\\\\lldb.exe\" --version\nException Code: 0xC06D007E\n#0 0x00007ffbb0e1408a (C:\\WINDOWS\\System32\\KERNELBASE.dll+0xc408a)\n#1 0x00007ff74c468ddb (E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\lldb.exe+0x38ddb)\n#2 0x00007ff74c49f2bd (E:\\Visual Studio\\VC\\Tools\\Llvm\\x64\\bin\\lldb.exe+0x6f2bd)",
+        "full_output_sha256": "fe064b427df83e8c718678fda72c34b1ee58b84d5e760e14e63632d617ff3638"
+      }
+    },
+    "msvc_link": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+      "exists": true,
+      "bytes": 3698528,
+      "sha256": "e8c524347b8bc87fba790d254c8a3b902bf1a4b63807093b816d992940af3791",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+          "/?"
+        ],
+        "exit_code": 1100,
+        "output_excerpt": "Microsoft (R) Incremental Linker Version 14.51.36248.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n usage: LINK [options] [files] [@commandfile]\n\n   options:\n\n      /ALIGN:#",
+        "full_output_sha256": "0f137dc8cc4b2397a4f99dd8ad48f489ea35696207baa4b8ea793da27376a4d8"
+      }
+    },
+    "msvc_cl": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe",
+      "exists": true,
+      "bytes": 893328,
+      "sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "usage: cl [ option... ] filename... [ /link linkoption... ]\nMicrosoft (R) C/C++ Optimizing Compiler Version 19.51.36248 for x64\nCopyright (C) Microsoft Corporation.  All rights reserved.\n",
+        "full_output_sha256": "c58aa2153b66bdda81ebc5dbd26a51d3d5eef7e7d8063e71e77300dc708ee1c6"
+      }
+    },
+    "dumpbin": {
+      "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\dumpbin.exe",
+      "exists": true,
+      "bytes": 23384,
+      "sha256": "730e0281b8b15751f5354cae3488524a3a9548f54122ef2e2daa31a85b0b2b4b",
+      "probe": {
+        "argv": [
+          "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\dumpbin.exe",
+          "/?"
+        ],
+        "exit_code": 1100,
+        "output_excerpt": "Microsoft (R) COFF/PE Dumper Version 14.51.36248.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\nusage: DUMPBIN [options] [files]\n\n   options:\n\n      /ALL",
+        "full_output_sha256": "03d44818b8e8d0ac1d56ee1ad1c07dafc27534eeca1bf69a6613dea7fc2502a3"
+      }
+    },
+    "python": {
+      "path": "C:\\Users\\royga\\anaconda3\\python.exe",
+      "exists": true,
+      "bytes": 104264,
+      "sha256": "7679e53fa969789309e81fdad0d52b8cda5f83c9abf7cb31a3c58bf24b31e264",
+      "probe": {
+        "argv": [
+          "C:\\Users\\royga\\anaconda3\\python.exe",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "Python 3.13.9",
+        "full_output_sha256": "0df0c6930540e62de799e38c975aeb099e8c87be01ebcb3ac156bdee0d2c02f7"
+      }
+    },
+    "node": {
+      "path": "C:\\Program Files\\nodejs\\node.EXE",
+      "exists": true,
+      "bytes": 92825416,
+      "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "probe": {
+        "argv": [
+          "C:\\Program Files\\nodejs\\node.EXE",
+          "--version"
+        ],
+        "exit_code": 0,
+        "output_excerpt": "v24.19.0",
+        "full_output_sha256": "b7677d3ec37ee1897ba07dc2cfe8292fe421c9ac93396cca5bbece486d1a2a41"
+      }
+    },
+    "pnpm": {
+      "path": "C:\\Users\\royga\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\bin\\fallback\\pnpm.CMD",
+      "sha256": "1b93f82a7506b0f644f5adc64a77470351d589dcbe4291d621147b72827f1d96",
+      "probe": {
+        "argv": "cmd.exe /d /s /c \"\"C:\\Users\\royga\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\bin\\fallback\\pnpm.CMD\" --version\"",
+        "exit_code": 0,
+        "stdout": "11.25.0\n",
+        "stderr": ""
+      }
+    }
+  },
+  "python_packages": {
+    "pefile": "2024.8.26",
+    "capstone": "5.0.7",
+    "unicorn": "2.1.4",
+    "z3-solver": "4.16.0.0",
+    "triton-library": null
+  },
+  "runtime_environment": {
+    "argv": "cmd.exe /d /s /c \"call \"E:\\Visual Studio\\Common7\\Tools\\VsDevCmd.bat\" -no_logo -arch=amd64 -host_arch=amd64 -vcvars_ver=14.51 >NUL && set\"",
+    "exit_code": 0,
+    "stderr": "",
+    "variables": {
+      "VCTOOLSVERSION": "14.51.36231",
+      "VCTOOLSINSTALLDIR": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\",
+      "WINDOWSSDKDIR": "C:\\Program Files (x86)\\Windows Kits\\10\\",
+      "WINDOWSSDKVERSION": "10.0.26100.0\\",
+      "INCLUDE": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\include;E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\ATLMFC\\include;E:\\Visual Studio\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.26100.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\cppwinrt;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\include\\um",
+      "LIB": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\ATLMFC\\lib\\x64;E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\lib\\um\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.26100.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.26100.0\\\\um\\x64"
+    },
+    "resolved_libraries": [
+      {
+        "name": "libcmt.lib",
+        "search_order_matches": [
+          {
+            "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64\\libcmt.lib",
+            "sha256": "74fe34fdba1d3c2d9ba052642dc995253ca918185b6036b1fb29cdb9beee5f80"
+          }
+        ]
+      },
+      {
+        "name": "oldnames.lib",
+        "search_order_matches": [
+          {
+            "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64\\oldnames.lib",
+            "sha256": "67653ba64d59a33964a811d950c9d424f7afacba8e613af60138f64fe10c2679"
+          }
+        ]
+      },
+      {
+        "name": "legacy_stdio_definitions.lib",
+        "search_order_matches": [
+          {
+            "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64\\legacy_stdio_definitions.lib",
+            "sha256": "c8588eeec69b915dfd0a30369d51d2164b537f9437c84ab2d33647df7e664861"
+          }
+        ]
+      },
+      {
+        "name": "libucrt.lib",
+        "search_order_matches": [
+          {
+            "path": "C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.26100.0\\ucrt\\x64\\libucrt.lib",
+            "sha256": "ea2ffa5d9b1ebc3fa76f34c364471750db8951b341dbccbc1bef628ef1a20e39"
+          }
+        ]
+      },
+      {
+        "name": "kernel32.lib",
+        "search_order_matches": [
+          {
+            "path": "C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.26100.0\\um\\x64\\kernel32.lib",
+            "sha256": "341c7d56125a03b458e4d5093e4c79b33123ccfdfd610fe236937b8e6f3134bb"
+          }
+        ]
+      }
+    ]
+  },
+  "debugger_discovery": {
+    "cdb_on_path": null,
+    "windbg_on_path": null,
+    "scope": "PATH plus Visual Studio x64 LLVM tools; Windows Kits Debuggers/x64 contains support DLLs but no cdb.exe in inspected installation. LLDB availability is a version probe, not a native-debug-session validation."
+  },
+  "selected_baseline": {
+    "compiler": "ollvm16",
+    "linker": "msvc_link",
+    "target": "x86_64-pc-windows-msvc",
+    "frontend_flags": [
+      "-m64",
+      "-O0",
+      "-fno-stack-protector",
+      "-fno-discard-value-names"
+    ],
+    "obfuscation_flags": [
+      "-mllvm",
+      "-bcf",
+      "-mllvm",
+      "-bcf_prob=100",
+      "-mllvm",
+      "-bcf_loop=1",
+      "-mllvm",
+      "-aesSeed=00112233445566778899AABBCCDDEEFF"
+    ],
+    "notes": [
+      "Same compiler hash as the frozen CONTROL SPINE experiment; exact per-controller commands and runtime/library environment are retained with each new build.",
+      "Only the controller translation unit receives BCF; harness is clean.",
+      "Hikari is the existing locally patched Clang15 compiler; its aesSeed accepts an unsigned integer, unlike this OLLVM16 string seed.",
+      "No compiler was rebuilt or patched. No controller was compiled by discovery."
+    ]
+  }
+}

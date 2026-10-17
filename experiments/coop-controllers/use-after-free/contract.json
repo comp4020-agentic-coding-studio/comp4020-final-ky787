@@ -1,0 +1,394 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "use-after-free",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_kind": "actual_declarative_evaluator",
+  "reference_source_sha256": {
+    "levels/campaign/use-after-free.json": "b459b5c4b011aa3a1733b6d4e5629d97539c768d4ba2062bb1b6ea4848ef8571",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 20,
+    "output_size": 24,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "launch",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "launch.occupied",
+      "meaning": "LAUNCH accepted pressure occupancy",
+      "initial": 0,
+      "bit": 0
+    },
+    {
+      "name": "plateA",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "plateA.occupied",
+      "meaning": "A accepted pressure occupancy",
+      "initial": 0,
+      "bit": 1
+    },
+    {
+      "name": "plateB",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "plateB.occupied",
+      "meaning": "B accepted pressure occupancy",
+      "initial": 0,
+      "bit": 2
+    },
+    {
+      "name": "plateC",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "plateC.occupied",
+      "meaning": "C accepted pressure occupancy",
+      "initial": 0,
+      "bit": 3
+    },
+    {
+      "name": "assist",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "assist.occupied",
+      "meaning": "ASSIST accepted pressure occupancy",
+      "initial": 0,
+      "bit": 4
+    }
+  ],
+  "outputs": [
+    {
+      "name": "launchPower",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Lower lift power",
+      "kind": "raw_combinational",
+      "game_signal": "draft:launchPower",
+      "expression": {
+        "id": "launch.occupied",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "routeA",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "A anchor chain power",
+      "kind": "raw_combinational",
+      "game_signal": "draft:routeA",
+      "expression": {
+        "id": "plateA.occupied",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "routeB",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "B anchor chain power: B && !A",
+      "kind": "raw_combinational",
+      "game_signal": "draft:routeB",
+      "expression": {
+        "args": [
+          {
+            "id": "plateB.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "plateA.occupied",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      }
+    },
+    {
+      "name": "routeC",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "C anchor chain power: C && !B",
+      "kind": "raw_combinational",
+      "game_signal": "draft:routeC",
+      "expression": {
+        "args": [
+          {
+            "id": "plateC.occupied",
+            "op": "ref"
+          },
+          {
+            "arg": {
+              "id": "plateB.occupied",
+              "op": "ref"
+            },
+            "op": "not"
+          }
+        ],
+        "op": "and"
+      }
+    },
+    {
+      "name": "assistBlocked",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Raw !(ASSIST && !C); finalLift binding inverts once",
+      "kind": "raw_combinational",
+      "game_signal": "draft:assistBlocked",
+      "expression": {
+        "arg": {
+          "args": [
+            {
+              "id": "assist.occupied",
+              "op": "ref"
+            },
+            {
+              "arg": {
+                "id": "plateC.occupied",
+                "op": "ref"
+              },
+              "op": "not"
+            }
+          ],
+          "op": "and"
+        },
+        "op": "not"
+      }
+    },
+    {
+      "name": "exitReady",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Current ASSIST exit unlock request; not latched exit state",
+      "kind": "raw_combinational",
+      "game_signal": "draft:exitReady",
+      "expression": {
+        "id": "assist.occupied",
+        "op": "ref"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "id": "launchBinding",
+      "output": "launchPower",
+      "property": "power",
+      "target": "lowerLift",
+      "invert": false,
+      "resolved_signal": "draft:launchBinding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "a1Binding",
+      "output": "routeA",
+      "property": "active",
+      "target": "a1",
+      "invert": false,
+      "resolved_signal": "draft:a1Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "a2Binding",
+      "output": "routeA",
+      "property": "active",
+      "target": "a2",
+      "invert": false,
+      "resolved_signal": "draft:a2Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "a3Binding",
+      "output": "routeA",
+      "property": "active",
+      "target": "a3",
+      "invert": false,
+      "resolved_signal": "draft:a3Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "b1Binding",
+      "output": "routeB",
+      "property": "active",
+      "target": "b1",
+      "invert": false,
+      "resolved_signal": "draft:b1Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "b2Binding",
+      "output": "routeB",
+      "property": "active",
+      "target": "b2",
+      "invert": false,
+      "resolved_signal": "draft:b2Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "b3Binding",
+      "output": "routeB",
+      "property": "active",
+      "target": "b3",
+      "invert": false,
+      "resolved_signal": "draft:b3Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "c1Binding",
+      "output": "routeC",
+      "property": "active",
+      "target": "c1",
+      "invert": false,
+      "resolved_signal": "draft:c1Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "c2Binding",
+      "output": "routeC",
+      "property": "active",
+      "target": "c2",
+      "invert": false,
+      "resolved_signal": "draft:c2Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "c3Binding",
+      "output": "routeC",
+      "property": "active",
+      "target": "c3",
+      "invert": false,
+      "resolved_signal": "draft:c3Binding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "assistBinding",
+      "invert": true,
+      "output": "assistBlocked",
+      "property": "power",
+      "target": "finalLift",
+      "resolved_signal": "draft:assistBinding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "exitBinding",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit",
+      "invert": false,
+      "resolved_signal": "draft:exitBinding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "retryBBinding",
+      "invert": true,
+      "output": "routeB",
+      "property": "open",
+      "target": "retryB",
+      "resolved_signal": "draft:retryBBinding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    },
+    {
+      "id": "retryCBinding",
+      "invert": true,
+      "output": "routeC",
+      "property": "open",
+      "target": "retryC",
+      "resolved_signal": "draft:retryCBinding",
+      "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 5,
+    "row_count": 32,
+    "encoding": "case id bit i is inputs[i]"
+  },
+  "initial_state": {
+    "inputs": {
+      "launch": 0,
+      "plateA": 0,
+      "plateB": 0,
+      "plateC": 0,
+      "assist": 0
+    },
+    "native_outputs": "No retained state; every output is written by every invocation",
+    "harness_output_sentinel": 2779096485
+  },
+  "server_owned": [
+    "Player/cube occupancy arbitration and ownership",
+    "Toggle/terminal persistence (where present)",
+    "Exit latch, required two arrivals and campaign completion",
+    "Movement, grapple, cube carry/transport, manual catches and machinery physics",
+    "Unstable platform warning, crumble, respawn and collision timing (where present)"
+  ],
+  "exit_semantics": {
+    "raw_output": "exitReady",
+    "binding": "exitBinding",
+    "latch": true,
+    "required_arrivals": 2,
+    "note": "Current unlock request can fall while an already-latched server exit remains unlocked; no native state persists between calls."
+  },
+  "integration_status": "acquisition_only; live campaign remains unchanged",
+  "specific_boundary": "assistBlocked is raw inverted logic. assistBinding inverts it once to final lift power. retryBBinding/retryCBinding invert raw routeB/routeC into open (retracted) requests; shelf solidity is game physics, not another native output."
+}

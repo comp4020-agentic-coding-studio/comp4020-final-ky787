@@ -1,0 +1,492 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "race-condition",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "reference_kind": "actual_server_projection_and_reducers",
+  "reference_source_sha256": {
+    "server/race-state.ts": "cc8ace95015f1220ea9bc9765ed214282aa60cf56849091ed92777049843b7e6",
+    "server/crumble-state.ts": "83ccc4a60e81e351fb8c286cebced6e46372f9ef4f1f92976f0495b5b2ad9665",
+    "server/coop-state.ts": "246476aef5571e43c1f24bd827dff8c5c4cf86ae52c6e3fc4272930cccbe771f",
+    "server/multiplayer.ts": "7d3ed8eacdc3c3281d581c27eb6b29fe89cb563bd00592d4c5d6d70fc90ee272",
+    "src/coop/protocol.ts": "a810956e0dc5936c953bbd047917bcc6b3ec4a51a2fda89bc5d4795eb57024f2",
+    "src/coop/race-condition.ts": "e748db991bb5d50bb6d07a042373d2268e46ce3e274afd44ac0d430048a76190",
+    "docs/race-condition.md": "51a86c418e8be950af0de3724efe0c6e647fc40cc27dc548324f64b9f1c4db75",
+    "docs/adr/0008-reversible-coop-machinery.md": "5fcb5ea2883ff82f03cb8c5356524cb38e9eb9d63993049fe95d6dbcc9558cd4"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 44,
+    "output_size": 52,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "dropA",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "dropA ordinary plate occupied by body or cube",
+      "initial": 0,
+      "bit": 0
+    },
+    {
+      "name": "dropB",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "dropB ordinary plate occupied by body or cube",
+      "initial": 0,
+      "bit": 1
+    },
+    {
+      "name": "payloadDelivered",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "receiver ordinary plate occupied by body or cube; not a permanent delivery bit",
+      "initial": 0,
+      "bit": 2
+    },
+    {
+      "name": "traceOccupied",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "trace ordinary plate occupied by body or cube",
+      "initial": 0,
+      "bit": 3
+    },
+    {
+      "name": "phase",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Persisted reversible PHASE toggle",
+      "initial": 0,
+      "bit": 4
+    },
+    {
+      "name": "returnOccupied",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "return ordinary plate occupied by body or cube",
+      "initial": 0,
+      "bit": 5
+    },
+    {
+      "name": "finalControl",
+      "offset": 24,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Persisted COMMIT terminal latch",
+      "initial": 0,
+      "bit": 6
+    },
+    {
+      "name": "exitUnlocked",
+      "offset": 28,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Existing durable server exit latch",
+      "initial": 0,
+      "bit": 7
+    },
+    {
+      "name": "phaseGraceActive",
+      "offset": 32,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Server now < race.phaseUntil; phase overlap still requires master power",
+      "initial": 0,
+      "bit": 8
+    },
+    {
+      "name": "returnGraceActive",
+      "offset": 36,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Server now < race.returnUntil",
+      "initial": 0,
+      "bit": 9
+    },
+    {
+      "name": "bufferPhase",
+      "offset": 40,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "meaning": "Server buffer phase: 0 idle, 1 window, 2 released, 3 expired",
+      "initial": 0,
+      "enum": {
+        "0": "idle",
+        "1": "window",
+        "2": "released",
+        "3": "expired"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "topBridge",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.topBridge",
+      "game_signal": "topBridge"
+    },
+    {
+      "name": "bufferBridge",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.bufferBridge",
+      "game_signal": "bufferBridge"
+    },
+    {
+      "name": "safetyFirewall",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.safetyFirewall",
+      "game_signal": "safetyFirewall"
+    },
+    {
+      "name": "raceFirewall",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.raceFirewall",
+      "game_signal": "raceFirewall"
+    },
+    {
+      "name": "spanMaster",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.spanMaster",
+      "game_signal": "spanMaster"
+    },
+    {
+      "name": "phaseA",
+      "offset": 20,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.phaseA",
+      "game_signal": "phaseA"
+    },
+    {
+      "name": "phaseB",
+      "offset": 24,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.phaseB",
+      "game_signal": "phaseB"
+    },
+    {
+      "name": "returnBridge",
+      "offset": 28,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "meaning": "Current actual project(ctx).outputs.returnBridge",
+      "game_signal": "returnBridge"
+    },
+    {
+      "name": "exitDoor",
+      "offset": 32,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "persisted_latch_projection",
+      "meaning": "Existing record.exitUnlocked; stays true after inputs are removed",
+      "game_signal": "exitDoor"
+    },
+    {
+      "name": "physicalPhaseA",
+      "offset": 36,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.phaseA"
+    },
+    {
+      "name": "physicalPhaseB",
+      "offset": 40,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.phaseB"
+    },
+    {
+      "name": "physicalReturnBridge",
+      "offset": 44,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "physical_projection",
+      "meaning": "Current actual project(ctx).physical.returnBridge"
+    },
+    {
+      "name": "exitUnlockCandidate",
+      "offset": 48,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "unlock_candidate",
+      "meaning": "Current actual definition.unlock(ctx) predicate; does not itself set the server latch"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "platforms:cargo-top:signal",
+      "output": "topBridge",
+      "target": "cargo-top",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:cargo-buffer:signal",
+      "output": "bufferBridge",
+      "target": "cargo-buffer",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:span1:signal",
+      "output": "phaseA",
+      "target": "span1",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalPhaseA",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:crumbleA:signal",
+      "output": "phaseB",
+      "target": "crumbleA",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalPhaseB",
+      "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:span3:signal",
+      "output": "phaseA",
+      "target": "span3",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalPhaseA",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:crumbleB:signal",
+      "output": "phaseB",
+      "target": "crumbleB",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalPhaseB",
+      "additional_server_constraint": "authored crumble warning/broken/stable runtime",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:span5:signal",
+      "output": "phaseA",
+      "target": "span5",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalPhaseA",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "platforms:return-bridge:signal",
+      "output": "returnBridge",
+      "target": "return-bridge",
+      "collection": "platforms",
+      "property": "signal",
+      "invert": false,
+      "physical_output": "physicalReturnBridge",
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "firewalls:race-beam:signal",
+      "output": "raceFirewall",
+      "target": "race-beam",
+      "collection": "firewalls",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "firewalls:safety-beam:signal",
+      "output": "safetyFirewall",
+      "target": "safety-beam",
+      "collection": "firewalls",
+      "property": "signal",
+      "invert": false,
+      "resolution": "Direct resolved signal; any physical_output is the grace-inclusive power projection"
+    },
+    {
+      "id": "exit",
+      "output": "exitDoor",
+      "target": "exit",
+      "property": "unlocked",
+      "invert": false,
+      "resolution": "Existing server latch; player arrivals and party completion remain server-owned"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_abstract_projection",
+    "input_count": 11,
+    "exhaustive_row_count": 4096,
+    "row_count": 4096,
+    "encoding": "numeric case id = (10-Boolean mask << 2) | bufferPhase; Boolean bit i is inputs[i] for i < 10",
+    "reachability": "Full abstract input product; runtime and finite-actor constraints are not asserted for synthetic contexts"
+  },
+  "initial_state": {
+    "inputs": {
+      "dropA": 0,
+      "dropB": 0,
+      "payloadDelivered": 0,
+      "traceOccupied": 0,
+      "phase": 0,
+      "returnOccupied": 0,
+      "finalControl": 0,
+      "exitUnlocked": 0,
+      "phaseGraceActive": 0,
+      "returnGraceActive": 0,
+      "bufferPhase": 0
+    },
+    "native_outputs": "Every output written on every stateless invocation",
+    "harness_output_sentinel": 2779096485
+  },
+  "server_owned": [
+    "Input occupancy arbitration and body/cube authority",
+    "Timer deadlines and status extraction",
+    "Control acceptance, cooldown and persisted latches",
+    "Checkpoint and persisted semantic cube placement",
+    "Exit latch updates, player arrivals and party completion",
+    "Crumble runtime and physics/collision geometry"
+  ],
+  "timer_contract": {
+    "buffer_ms": 2800,
+    "handover_ms": 350,
+    "toggle_interval_ms": 650,
+    "crumble_warning_ms": 1550,
+    "crumble_broken_ms": 2400,
+    "buffer_phase_enum": {
+      "0": "idle",
+      "1": "window",
+      "2": "released",
+      "3": "expired"
+    }
+  },
+  "exit_semantics": {
+    "existing_latch": "exitDoor",
+    "current_candidate": "exitUnlockCandidate",
+    "coordinator": "server/multiplayer.ts:commitAction calls actual definition.unlock and then sets record.exitUnlocked=true; arrivals remain separate"
+  },
+  "limits": [
+    "Exhaustive cases are synthetic abstract projections, not a claim that all vectors are reachable with two players and two cubes.",
+    "Synthetic contexts may exceed two body contacts or two cube entries and may combine runtime flags that sync would normalize. Every abstract input is nevertheless roundtripped through the actual current extractor/status projection.",
+    "Ordered fixtures use valid current records, exactly cubeA/cubeB and two body slots. They test reducers and snapshots, not geometry/reachability, WebSocket authorization, cube ownership or epoch acceptance.",
+    "Native code is stateless: it does not advance clocks, set latches, persist records, process arrivals, schedule crumble or authorize actions.",
+    "Raw signals, grace-inclusive physical power, current unlock candidate and existing durable exit door are separate outputs.",
+    "Crumble remains authored gameplay timing. Its warning/broken/stable observations are server evidence, never OLLVM/bogus-block evidence."
+  ],
+  "integration_status": "acquisition_only; live campaign remains unchanged"
+}

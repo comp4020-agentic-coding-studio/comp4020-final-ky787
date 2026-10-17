@@ -1,0 +1,103 @@
+{
+  "schema": "coop-native-build/v1",
+  "chamber_id": "race-condition",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "contract_sha256": "a3aaec07c61a6901cf42333082be133c621e9b949de3c5f7f72c45e07005aa92",
+  "compiler": {
+    "path": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+    "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+    "version": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n"
+  },
+  "linker": {
+    "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+    "sha256": "e8c524347b8bc87fba790d254c8a3b902bf1a4b63807093b816d992940af3791"
+  },
+  "seed": "00112233445566778899AABBCCDDEEFF",
+  "build_script_sha256": "69bd67623f1bf40cd5f1374d85522ed891500c6305f368adea46f7877325f36e",
+  "source_sha256": {
+    "controller.c": "6d471fd1f2a472f2c3dc532b602d87e3747d9e6419b37efc0feaef04c0c2379e",
+    "controller.h": "13794781818afb1a335499caeac083e9a928c1228b6c1d822bcd388996b6b4fb",
+    "harness.c": "f1ae70ed9a3c1391ccff93cd0683ebdef6d97999c1adcfd3ebd541d36b42bd67"
+  },
+  "object_sha256": {
+    "bcf.obj": "71b35f4adeffc0fb4d7af28612072218544ba8efd74dacdb0a1fa7e9056573c4",
+    "bcf.unlabelled.obj": "6e47939e89150b6373c0dbd16990715b8ce384c1cb7839c4acde977696bba597",
+    "clean.obj": "90cb22882745b74bc9a46fe97921631d0fe0b294392fe3c0a7b806274ca94968",
+    "clean.unlabelled.obj": "bce6f217cfbb0ffc6058319293d044a3eadad0f89da115c3d31b8461c72ffdac",
+    "harness.obj": "2140a44b1c41bd2edf701ccf55d8898bd33728c881c000593dfb5c9bd77a7b3d"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 44,
+    "output_size": 52,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "runtime": {
+    "environment": {
+      "VCToolsVersion": "14.51.36231",
+      "WindowsSDKVersion": "10.0.26100.0\\",
+      "INCLUDE": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\include;E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\ATLMFC\\include;E:\\Visual Studio\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.26100.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.26100.0\\\\cppwinrt;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\include\\um",
+      "LIB": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\ATLMFC\\lib\\x64;E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.8\\lib\\um\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.26100.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.26100.0\\\\um\\x64"
+    },
+    "libraries": {
+      "libcmt.lib": {
+        "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64\\libcmt.lib",
+        "sha256": "74fe34fdba1d3c2d9ba052642dc995253ca918185b6036b1fb29cdb9beee5f80"
+      },
+      "oldnames.lib": {
+        "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64\\oldnames.lib",
+        "sha256": "67653ba64d59a33964a811d950c9d424f7afacba8e613af60138f64fe10c2679"
+      },
+      "legacy_stdio_definitions.lib": {
+        "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64\\legacy_stdio_definitions.lib",
+        "sha256": "c8588eeec69b915dfd0a30369d51d2164b537f9437c84ab2d33647df7e664861"
+      }
+    }
+  },
+  "builds": [
+    {
+      "variant": "clean",
+      "optimization": "O0",
+      "transformations": [],
+      "frontend_extra_flags": [],
+      "binary_path": "bin/clean_x64.exe",
+      "binary_sha256": "2eb161048cac1f2734838ed3a87e601e6e990e311a6c316eacf88696928b8487",
+      "ir_sha256": "a62f9b133d7b2a0a62bf8babe654a4f956d04cc0634ae1e8938cb15e53b5f867",
+      "compiler_assembly_sha256": "dd564fc158ee3060802c42b74cc1058e21bc8ad005d30cad1fb5c4adb1992ae6",
+      "labelled_assembly_sha256": "63e2547385d108e29686526073e76164b970ca528e71f9969c1fb9fc14b0589e",
+      "link_map_sha256": "c3bfd4fbc5bbf0f05be02079dd1c31b0ca02e1201b46f71a4d9e55907c8029b4",
+      "label_manifest_sha256": "742546c98f2f9182e5faf7fded468d6c8477fa8551ec50c6cf560654387619e4"
+    },
+    {
+      "variant": "bcf",
+      "optimization": "O0",
+      "transformations": [
+        "bcf"
+      ],
+      "frontend_extra_flags": [
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF"
+      ],
+      "binary_path": "bin/obfuscated_x64.exe",
+      "binary_sha256": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a",
+      "ir_sha256": "6e290b27b7a001adf424fae87b3ffa7947908167acd0d57de90ae4a63427a6e7",
+      "compiler_assembly_sha256": "3a05584843e06c8506227175146d7004b479d71cfa840534aa1fad40d864d6ab",
+      "labelled_assembly_sha256": "b94109b01ffce466cfa2141f147f8014dba28da18e97934fe9b77647848968a2",
+      "link_map_sha256": "29c5f9d45b66eafb63dcf3e4fb0dae8f2eb1cb41a120de941f1628c0a7195cb9",
+      "label_manifest_sha256": "def97ddddf834328d9f4fc1929296e66a8ec025c1fac6cdd36cd532a5c6187eb"
+    }
+  ]
+}

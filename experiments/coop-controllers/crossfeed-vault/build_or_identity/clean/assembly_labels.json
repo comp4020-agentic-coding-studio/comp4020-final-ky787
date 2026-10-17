@@ -1,0 +1,167 @@
+[
+  {
+    "symbol": "audit_LBB0_2",
+    "assembly_label": ".LBB0_2",
+    "ir_block": "land.end"
+  },
+  {
+    "symbol": "audit_LBB0_4",
+    "assembly_label": ".LBB0_4",
+    "ir_block": "land.end5"
+  },
+  {
+    "symbol": "audit_LBB0_7",
+    "assembly_label": ".LBB0_7",
+    "ir_block": "if.else"
+  },
+  {
+    "symbol": "audit_LBB0_8",
+    "assembly_label": ".LBB0_8",
+    "ir_block": "if.end"
+  },
+  {
+    "symbol": "audit_LBB0_10",
+    "assembly_label": ".LBB0_10",
+    "ir_block": "if.else13"
+  },
+  {
+    "symbol": "audit_LBB0_11",
+    "assembly_label": ".LBB0_11",
+    "ir_block": "if.end15"
+  },
+  {
+    "symbol": "audit_LBB0_13",
+    "assembly_label": ".LBB0_13",
+    "ir_block": "if.then19"
+  },
+  {
+    "symbol": "audit_LBB0_14",
+    "assembly_label": ".LBB0_14",
+    "ir_block": "if.else20"
+  },
+  {
+    "symbol": "audit_LBB0_15",
+    "assembly_label": ".LBB0_15",
+    "ir_block": "if.end22"
+  },
+  {
+    "symbol": "audit_LBB0_17",
+    "assembly_label": ".LBB0_17",
+    "ir_block": "if.else26"
+  },
+  {
+    "symbol": "audit_LBB0_18",
+    "assembly_label": ".LBB0_18",
+    "ir_block": "if.end28"
+  },
+  {
+    "symbol": "audit_LBB0_21",
+    "assembly_label": ".LBB0_21",
+    "ir_block": "if.else35"
+  },
+  {
+    "symbol": "audit_LBB0_22",
+    "assembly_label": ".LBB0_22",
+    "ir_block": "if.end37"
+  },
+  {
+    "symbol": "audit_LBB0_25",
+    "assembly_label": ".LBB0_25",
+    "ir_block": "if.else42"
+  },
+  {
+    "symbol": "audit_LBB0_26",
+    "assembly_label": ".LBB0_26",
+    "ir_block": "if.end44"
+  },
+  {
+    "symbol": "audit_LBB0_29",
+    "assembly_label": ".LBB0_29",
+    "ir_block": "if.else50"
+  },
+  {
+    "symbol": "audit_LBB0_30",
+    "assembly_label": ".LBB0_30",
+    "ir_block": "if.end52"
+  },
+  {
+    "symbol": "audit_LBB0_32",
+    "assembly_label": ".LBB0_32",
+    "ir_block": "if.else55"
+  },
+  {
+    "symbol": "audit_LBB0_33",
+    "assembly_label": ".LBB0_33",
+    "ir_block": "if.end57"
+  },
+  {
+    "symbol": "audit_LBB0_35",
+    "assembly_label": ".LBB0_35",
+    "ir_block": "if.else60"
+  },
+  {
+    "symbol": "audit_LBB0_36",
+    "assembly_label": ".LBB0_36",
+    "ir_block": "if.end62"
+  },
+  {
+    "symbol": "audit_LBB0_38",
+    "assembly_label": ".LBB0_38",
+    "ir_block": "if.else65"
+  },
+  {
+    "symbol": "audit_LBB0_39",
+    "assembly_label": ".LBB0_39",
+    "ir_block": "if.end67"
+  },
+  {
+    "symbol": "audit_LBB0_41",
+    "assembly_label": ".LBB0_41",
+    "ir_block": "if.else70"
+  },
+  {
+    "symbol": "audit_LBB0_42",
+    "assembly_label": ".LBB0_42",
+    "ir_block": "if.end72"
+  },
+  {
+    "symbol": "audit_LBB0_44",
+    "assembly_label": ".LBB0_44",
+    "ir_block": "if.then77"
+  },
+  {
+    "symbol": "audit_LBB0_45",
+    "assembly_label": ".LBB0_45",
+    "ir_block": "if.else78"
+  },
+  {
+    "symbol": "audit_LBB0_46",
+    "assembly_label": ".LBB0_46",
+    "ir_block": "if.end80"
+  },
+  {
+    "symbol": "audit_LBB0_48",
+    "assembly_label": ".LBB0_48",
+    "ir_block": "if.then85"
+  },
+  {
+    "symbol": "audit_LBB0_49",
+    "assembly_label": ".LBB0_49",
+    "ir_block": "if.else86"
+  },
+  {
+    "symbol": "audit_LBB0_50",
+    "assembly_label": ".LBB0_50",
+    "ir_block": "if.end88"
+  },
+  {
+    "symbol": "audit_LBB0_54",
+    "assembly_label": ".LBB0_54",
+    "ir_block": "if.else95"
+  },
+  {
+    "symbol": "audit_LBB0_55",
+    "assembly_label": ".LBB0_55",
+    "ir_block": "if.end97"
+  }
+]

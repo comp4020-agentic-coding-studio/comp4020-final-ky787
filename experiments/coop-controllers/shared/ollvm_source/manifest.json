@@ -1,0 +1,133 @@
+{
+  "schema": "ollvm-pass-source-evidence/v1",
+  "source_repository": "https://github.com/wwh1004/ollvm-16",
+  "source_checkout_read_only": "E:\\Workspace\\seeing_through_obfuscation\\third_party\\obfuscators\\ollvm-16",
+  "head": "5cbfb7245415f6b8e9f845e70c848eeb1605045f",
+  "release_tag": "llvm-16.0.6",
+  "release_commit": "fe39b37ebdbce04d34a5c653b888d68ba4d394c9",
+  "status_porcelain": "",
+  "file_records": [
+    {
+      "path": "BogusControlFlow.cpp",
+      "sha256": "87b108b3aec92f6684904795206862e626589c6e312cdde8330f3177b00ed72d",
+      "size": 28640,
+      "source_relative_path": "Obfuscation/BogusControlFlow.cpp",
+      "release_tag_blob": "fed02d4ebac33d5cb01210a0d7eb5a261080ad4f",
+      "release_tag_content_sha256": "66d8ea8e6c943cef47b8309b0fd11e23f1c1b08e6cb4b3cd3261c4f71b168e18"
+    },
+    {
+      "path": "CryptoUtils.cpp",
+      "sha256": "ad08e77bedc3c66ba365eb36aa214b2e276d4aa333632d10b6a8eb87db672569",
+      "size": 51363,
+      "source_relative_path": "Obfuscation/CryptoUtils.cpp",
+      "release_tag_blob": "758ce7cb3f72950ce7d11a3daf668762cbaab103",
+      "release_tag_content_sha256": "ad08e77bedc3c66ba365eb36aa214b2e276d4aa333632d10b6a8eb87db672569"
+    },
+    {
+      "path": "Plugin.cpp",
+      "sha256": "d4e19793a80b8b3ada6bac320fdf284c68e5a1b3ef48b6b94e4e7b85571e3d79",
+      "size": 1210,
+      "source_relative_path": "Obfuscation/Plugin.cpp",
+      "release_tag_blob": "cf7c54085b2e349ccc4d555f0eff226007d54426",
+      "release_tag_content_sha256": "d4e19793a80b8b3ada6bac320fdf284c68e5a1b3ef48b6b94e4e7b85571e3d79"
+    },
+    {
+      "path": "Utils.cpp",
+      "sha256": "874ffe25f1e154d4dd9e8a1f9f6b6c648aa4d637154a1885dbdd1f1a3619a561",
+      "size": 3179,
+      "source_relative_path": "Obfuscation/Utils.cpp",
+      "release_tag_blob": "7d8455d9a52f2d0b1d9e92faf12c5da6b5ec822f",
+      "release_tag_content_sha256": "874ffe25f1e154d4dd9e8a1f9f6b6c648aa4d637154a1885dbdd1f1a3619a561"
+    },
+    {
+      "path": "LICENSE-OBFUSCATOR.TXT",
+      "sha256": "0c9be6145c13ee8fee9a806f9e1dbfbed054b6c0084732694869255535006d1b",
+      "size": 2218,
+      "source_relative_path": "Obfuscation/LICENSE-OBFUSCATOR.TXT",
+      "release_tag_blob": "ea86a85bf6f216abd13d275188bccf9a1faa5150",
+      "release_tag_content_sha256": "0c9be6145c13ee8fee9a806f9e1dbfbed054b6c0084732694869255535006d1b"
+    }
+  ],
+  "tag_to_head_diff": "diff --git a/Obfuscation/BogusControlFlow.cpp b/Obfuscation/BogusControlFlow.cpp\nindex fed02d4..4749bb9 100644\n--- a/Obfuscation/BogusControlFlow.cpp\n+++ b/Obfuscation/BogusControlFlow.cpp\n@@ -258,8 +258,9 @@ void addBogusFlow(BasicBlock *basicBlock, Function &F) {\n     i1 = (BasicBlock::iterator)basicBlock->getFirstNonPHIOrDbgOrLifetime();\n   if (basicBlock->getFirstNonPHI()->isEHPad())\n     return;\n-  // Fix Verifier.cpp: \"mismatched subprogram between llvm.dbg.value label and\n-  // !dbg attachment\"\n+  // Fix Verifier.cpp: \"CatchPadInst not the first non-PHI instruction in the\n+  // block.\", \"The unwind destination does not have an exception handling\n+  // instruction!\"\n   Twine *var;\n   var = new Twine(\"originalBB\");\n   BasicBlock *originalBB = basicBlock->splitBasicBlock(i1, *var);\n@@ -394,9 +395,8 @@ BasicBlock *createAlteredBasicBlock(BasicBlock *basicBlock, const Twine &Name,\n     if (isa<DbgInfoIntrinsic>(Instr))\n       Instr->eraseFromParent();\n   }\n-  // Fix Verifier.cpp: \"CatchPadInst not the first non-PHI instruction in the\n-  // block.\", \"The unwind destination does not have an exception handling\n-  // instruction!\"\n+  // Fix Verifier.cpp: \"mismatched subprogram between llvm.dbg.value label and\n+  // !dbg attachment\"\n \n   DEBUG_WITH_TYPE(\"gen\", errs()\n                              << \"bcf: The cloned basic block is now correct\\n\");\n",
+  "bcf_executable_code_equal_after_comment_whitespace_removal": true,
+  "interpretation": "The retained Git diff changes only two explanatory comments in BogusControlFlow.cpp. Other retained pass implementation files are identical to the release tag. The earlier compiler audit matched the installed executable to the release asset by size and SHA-256; this task rechecked that same executable identity.",
+  "line_guide": {
+    "BogusControlFlow.cpp": {
+      "flags": [
+        139,
+        156
+      ],
+      "selection": [
+        195,
+        215
+      ],
+      "split_and_clone": [
+        256,
+        272
+      ],
+      "gate_topology": [
+        278,
+        331
+      ],
+      "clone_and_debugloc": [
+        348,
+        397
+      ],
+      "junk_arithmetic": [
+        407,
+        447
+      ],
+      "predicate_globals": [
+        581,
+        592
+      ],
+      "actual_predicate": [
+        625,
+        650
+      ],
+      "eligibility": [
+        675,
+        696
+      ]
+    },
+    "CryptoUtils.cpp": {
+      "seed_option": [
+        50,
+        55
+      ],
+      "seed_initialization": [
+        502,
+        509
+      ],
+      "seed_format": [
+        552,
+        588
+      ],
+      "os_randomness": [
+        630,
+        709
+      ],
+      "range": [
+        811,
+        835
+      ]
+    },
+    "Plugin.cpp": {
+      "pass_pipeline": [
+        10,
+        25
+      ]
+    },
+    "Utils.cpp": {
+      "eligibility": [
+        56,
+        102
+      ]
+    }
+  },
+  "reuse_provenance": {
+    "copied_from_read_only_retained_evidence": "E:\\Workspace\\binary_binja_redesign\\experiments\\uplink_controller_ollvm_bcf_v1\\analysis\\ollvm_source",
+    "source_manifest_sha256": "4513bdc12644d6e994ee8254b56f68114c9f890bff0537c4e7d27cecd99ff3e0",
+    "scope": "Shared source snapshot for exact same OLLVM16 compiler; current binaries, guards and clone locations independently checked per chamber."
+  }
+}

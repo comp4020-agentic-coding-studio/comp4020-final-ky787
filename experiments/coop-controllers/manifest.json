@@ -1,0 +1,39 @@
+{
+  "schema": "coop-native-package/v1",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "chambers": {
+    "handshake": {
+      "manifest_path": "handshake/manifest.json",
+      "sha256": "992a33839d5027629fefe90de0384fb3397f06434104071dada3fa807ad1a044"
+    },
+    "crossfeed-vault": {
+      "manifest_path": "crossfeed-vault/manifest.json",
+      "sha256": "b561d090063236580b0499fa30c5cde7038d735d4ae29dd2d226ac261b9a5ba1"
+    },
+    "race-condition": {
+      "manifest_path": "race-condition/manifest.json",
+      "sha256": "a9e18bad960c4cf075fc4d2f448703dadad9d32aefc657a5a71760499a965132"
+    },
+    "deadlock": {
+      "manifest_path": "deadlock/manifest.json",
+      "sha256": "e93e895c09050ba983ee37fbd88fe250b1a99dbf750419bfb47447894367f3d2"
+    },
+    "use-after-free": {
+      "manifest_path": "use-after-free/manifest.json",
+      "sha256": "afc87e72d32e795e4389e8b1a1bb3c13178664ab0359c9f51d02f7735e217a8c"
+    }
+  },
+  "shared": {
+    "manifest_path": "shared/manifest.json",
+    "sha256": "5cab74bc28c33fd6bcc86d0c0a934c8f1d6361261ea90b24d91d858e91628e6c"
+  },
+  "files": {
+    ".gitattributes": "97fdea762a2bf0eb5ebae915e0f4be33094b9fed8d9d8ab955e949e98f2f16b4",
+    ".gitignore": "49d8d0ed0fb6a0ee919cdb2b5aa526fb3ab99b67510b9550859d74ecc442c15c",
+    "final-native-rerun.json": "86822e6fac4f4791e92811fdf120a9cc2e58fbb3a2de31cf61776b38df6fab09",
+    "preservation-report.json": "85a3e908de2727ba9bfa7d18340ab1cf43d10566b4f8c15c17b4abbfe5376454",
+    "project-checks.json": "9aee398e8fffbb63fc161d848202d5a8fa95a38a4435e6bc81b0d1285cf49cde",
+    "README.md": "e5125bc2b22e68fe92ea042a31384d91b275350594f4da635e3aaa57912799a2",
+    "storage-probe.json": "fe9a575d54f320698bc7aa038d15450b186c4e2b35c9341646fd70ac33c8ec90"
+  }
+}

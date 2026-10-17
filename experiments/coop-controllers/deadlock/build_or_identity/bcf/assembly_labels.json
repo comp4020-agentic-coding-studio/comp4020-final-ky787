@@ -1,0 +1,437 @@
+[
+  {
+    "symbol": "audit_LBB0_1",
+    "assembly_label": ".LBB0_1",
+    "ir_block": "originalBB"
+  },
+  {
+    "symbol": "audit_LBB0_2",
+    "assembly_label": ".LBB0_2",
+    "ir_block": "originalBBpart2"
+  },
+  {
+    "symbol": "audit_LBB0_3",
+    "assembly_label": ".LBB0_3",
+    "ir_block": "land.lhs.true"
+  },
+  {
+    "symbol": "audit_LBB0_4",
+    "assembly_label": ".LBB0_4",
+    "ir_block": "originalBB34"
+  },
+  {
+    "symbol": "audit_LBB0_5",
+    "assembly_label": ".LBB0_5",
+    "ir_block": "originalBBpart236"
+  },
+  {
+    "symbol": "audit_LBB0_6",
+    "assembly_label": ".LBB0_6",
+    "ir_block": "land.rhs"
+  },
+  {
+    "symbol": "audit_LBB0_7",
+    "assembly_label": ".LBB0_7",
+    "ir_block": "originalBB38"
+  },
+  {
+    "symbol": "audit_LBB0_8",
+    "assembly_label": ".LBB0_8",
+    "ir_block": "originalBBpart240"
+  },
+  {
+    "symbol": "audit_LBB0_9",
+    "assembly_label": ".LBB0_9",
+    "ir_block": "land.end"
+  },
+  {
+    "symbol": "audit_LBB0_10",
+    "assembly_label": ".LBB0_10",
+    "ir_block": "originalBB42"
+  },
+  {
+    "symbol": "audit_LBB0_11",
+    "assembly_label": ".LBB0_11",
+    "ir_block": "originalBBpart244"
+  },
+  {
+    "symbol": "audit_LBB0_12",
+    "assembly_label": ".LBB0_12",
+    "ir_block": "land.lhs.true4"
+  },
+  {
+    "symbol": "audit_LBB0_13",
+    "assembly_label": ".LBB0_13",
+    "ir_block": "originalBB46"
+  },
+  {
+    "symbol": "audit_LBB0_14",
+    "assembly_label": ".LBB0_14",
+    "ir_block": "originalBBpart248"
+  },
+  {
+    "symbol": "audit_LBB0_15",
+    "assembly_label": ".LBB0_15",
+    "ir_block": "if.then"
+  },
+  {
+    "symbol": "audit_LBB0_16",
+    "assembly_label": ".LBB0_16",
+    "ir_block": "originalBB50"
+  },
+  {
+    "symbol": "audit_LBB0_17",
+    "assembly_label": ".LBB0_17",
+    "ir_block": "originalBBpart252"
+  },
+  {
+    "symbol": "audit_LBB0_18",
+    "assembly_label": ".LBB0_18",
+    "ir_block": "if.else"
+  },
+  {
+    "symbol": "audit_LBB0_19",
+    "assembly_label": ".LBB0_19",
+    "ir_block": "originalBB54"
+  },
+  {
+    "symbol": "audit_LBB0_20",
+    "assembly_label": ".LBB0_20",
+    "ir_block": "originalBBpart256"
+  },
+  {
+    "symbol": "audit_LBB0_21",
+    "assembly_label": ".LBB0_21",
+    "ir_block": "if.end"
+  },
+  {
+    "symbol": "audit_LBB0_22",
+    "assembly_label": ".LBB0_22",
+    "ir_block": "originalBB58"
+  },
+  {
+    "symbol": "audit_LBB0_23",
+    "assembly_label": ".LBB0_23",
+    "ir_block": "originalBBpart260"
+  },
+  {
+    "symbol": "audit_LBB0_24",
+    "assembly_label": ".LBB0_24",
+    "ir_block": "if.then9"
+  },
+  {
+    "symbol": "audit_LBB0_25",
+    "assembly_label": ".LBB0_25",
+    "ir_block": "originalBB62"
+  },
+  {
+    "symbol": "audit_LBB0_26",
+    "assembly_label": ".LBB0_26",
+    "ir_block": "originalBBpart264"
+  },
+  {
+    "symbol": "audit_LBB0_27",
+    "assembly_label": ".LBB0_27",
+    "ir_block": "if.else10"
+  },
+  {
+    "symbol": "audit_LBB0_28",
+    "assembly_label": ".LBB0_28",
+    "ir_block": "originalBB66"
+  },
+  {
+    "symbol": "audit_LBB0_29",
+    "assembly_label": ".LBB0_29",
+    "ir_block": "originalBBpart268"
+  },
+  {
+    "symbol": "audit_LBB0_30",
+    "assembly_label": ".LBB0_30",
+    "ir_block": "if.end12"
+  },
+  {
+    "symbol": "audit_LBB0_31",
+    "assembly_label": ".LBB0_31",
+    "ir_block": "originalBB70"
+  },
+  {
+    "symbol": "audit_LBB0_32",
+    "assembly_label": ".LBB0_32",
+    "ir_block": "originalBBpart272"
+  },
+  {
+    "symbol": "audit_LBB0_33",
+    "assembly_label": ".LBB0_33",
+    "ir_block": "land.lhs.true15"
+  },
+  {
+    "symbol": "audit_LBB0_34",
+    "assembly_label": ".LBB0_34",
+    "ir_block": "originalBB74"
+  },
+  {
+    "symbol": "audit_LBB0_35",
+    "assembly_label": ".LBB0_35",
+    "ir_block": "originalBBpart276"
+  },
+  {
+    "symbol": "audit_LBB0_36",
+    "assembly_label": ".LBB0_36",
+    "ir_block": "lor.lhs.false"
+  },
+  {
+    "symbol": "audit_LBB0_37",
+    "assembly_label": ".LBB0_37",
+    "ir_block": "originalBB78"
+  },
+  {
+    "symbol": "audit_LBB0_38",
+    "assembly_label": ".LBB0_38",
+    "ir_block": "originalBBpart280"
+  },
+  {
+    "symbol": "audit_LBB0_39",
+    "assembly_label": ".LBB0_39",
+    "ir_block": "if.then19"
+  },
+  {
+    "symbol": "audit_LBB0_40",
+    "assembly_label": ".LBB0_40",
+    "ir_block": "originalBB82"
+  },
+  {
+    "symbol": "audit_LBB0_41",
+    "assembly_label": ".LBB0_41",
+    "ir_block": "originalBBpart284"
+  },
+  {
+    "symbol": "audit_LBB0_42",
+    "assembly_label": ".LBB0_42",
+    "ir_block": "if.else20"
+  },
+  {
+    "symbol": "audit_LBB0_43",
+    "assembly_label": ".LBB0_43",
+    "ir_block": "originalBB86"
+  },
+  {
+    "symbol": "audit_LBB0_44",
+    "assembly_label": ".LBB0_44",
+    "ir_block": "originalBBpart288"
+  },
+  {
+    "symbol": "audit_LBB0_45",
+    "assembly_label": ".LBB0_45",
+    "ir_block": "if.end22"
+  },
+  {
+    "symbol": "audit_LBB0_46",
+    "assembly_label": ".LBB0_46",
+    "ir_block": "originalBB90"
+  },
+  {
+    "symbol": "audit_LBB0_47",
+    "assembly_label": ".LBB0_47",
+    "ir_block": "originalBBpart292"
+  },
+  {
+    "symbol": "audit_LBB0_48",
+    "assembly_label": ".LBB0_48",
+    "ir_block": "if.then24"
+  },
+  {
+    "symbol": "audit_LBB0_49",
+    "assembly_label": ".LBB0_49",
+    "ir_block": "originalBB94"
+  },
+  {
+    "symbol": "audit_LBB0_50",
+    "assembly_label": ".LBB0_50",
+    "ir_block": "originalBBpart296"
+  },
+  {
+    "symbol": "audit_LBB0_51",
+    "assembly_label": ".LBB0_51",
+    "ir_block": "if.else25"
+  },
+  {
+    "symbol": "audit_LBB0_52",
+    "assembly_label": ".LBB0_52",
+    "ir_block": "originalBB98"
+  },
+  {
+    "symbol": "audit_LBB0_53",
+    "assembly_label": ".LBB0_53",
+    "ir_block": "originalBBpart2100"
+  },
+  {
+    "symbol": "audit_LBB0_54",
+    "assembly_label": ".LBB0_54",
+    "ir_block": "if.end27"
+  },
+  {
+    "symbol": "audit_LBB0_55",
+    "assembly_label": ".LBB0_55",
+    "ir_block": "originalBB102"
+  },
+  {
+    "symbol": "audit_LBB0_56",
+    "assembly_label": ".LBB0_56",
+    "ir_block": "originalBBpart2104"
+  },
+  {
+    "symbol": "audit_LBB0_57",
+    "assembly_label": ".LBB0_57",
+    "ir_block": "if.then29"
+  },
+  {
+    "symbol": "audit_LBB0_58",
+    "assembly_label": ".LBB0_58",
+    "ir_block": "originalBB106"
+  },
+  {
+    "symbol": "audit_LBB0_59",
+    "assembly_label": ".LBB0_59",
+    "ir_block": "originalBBpart2108"
+  },
+  {
+    "symbol": "audit_LBB0_60",
+    "assembly_label": ".LBB0_60",
+    "ir_block": "if.else31"
+  },
+  {
+    "symbol": "audit_LBB0_61",
+    "assembly_label": ".LBB0_61",
+    "ir_block": "originalBB110"
+  },
+  {
+    "symbol": "audit_LBB0_62",
+    "assembly_label": ".LBB0_62",
+    "ir_block": "originalBBpart2112"
+  },
+  {
+    "symbol": "audit_LBB0_63",
+    "assembly_label": ".LBB0_63",
+    "ir_block": "if.end33"
+  },
+  {
+    "symbol": "audit_LBB0_64",
+    "assembly_label": ".LBB0_64",
+    "ir_block": "originalBB114"
+  },
+  {
+    "symbol": "audit_LBB0_65",
+    "assembly_label": ".LBB0_65",
+    "ir_block": "originalBBpart2116"
+  },
+  {
+    "symbol": "audit_LBB0_66",
+    "assembly_label": ".LBB0_66",
+    "ir_block": "originalBBalteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_67",
+    "assembly_label": ".LBB0_67",
+    "ir_block": "originalBB34alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_68",
+    "assembly_label": ".LBB0_68",
+    "ir_block": "originalBB38alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_69",
+    "assembly_label": ".LBB0_69",
+    "ir_block": "originalBB42alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_70",
+    "assembly_label": ".LBB0_70",
+    "ir_block": "originalBB46alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_71",
+    "assembly_label": ".LBB0_71",
+    "ir_block": "originalBB50alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_72",
+    "assembly_label": ".LBB0_72",
+    "ir_block": "originalBB54alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_73",
+    "assembly_label": ".LBB0_73",
+    "ir_block": "originalBB58alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_74",
+    "assembly_label": ".LBB0_74",
+    "ir_block": "originalBB62alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_75",
+    "assembly_label": ".LBB0_75",
+    "ir_block": "originalBB66alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_76",
+    "assembly_label": ".LBB0_76",
+    "ir_block": "originalBB70alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_77",
+    "assembly_label": ".LBB0_77",
+    "ir_block": "originalBB74alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_78",
+    "assembly_label": ".LBB0_78",
+    "ir_block": "originalBB78alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_79",
+    "assembly_label": ".LBB0_79",
+    "ir_block": "originalBB82alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_80",
+    "assembly_label": ".LBB0_80",
+    "ir_block": "originalBB86alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_81",
+    "assembly_label": ".LBB0_81",
+    "ir_block": "originalBB90alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_82",
+    "assembly_label": ".LBB0_82",
+    "ir_block": "originalBB94alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_83",
+    "assembly_label": ".LBB0_83",
+    "ir_block": "originalBB98alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_84",
+    "assembly_label": ".LBB0_84",
+    "ir_block": "originalBB102alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_85",
+    "assembly_label": ".LBB0_85",
+    "ir_block": "originalBB106alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_86",
+    "assembly_label": ".LBB0_86",
+    "ir_block": "originalBB110alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_87",
+    "assembly_label": ".LBB0_87",
+    "ir_block": "originalBB114alteredBB"
+  }
+]

@@ -1,0 +1,627 @@
+{
+  "schema": "coop-native-integration/v1",
+  "chamber_id": "deadlock",
+  "contract_sha256": "8fbb66504e6989cb1f4a7ed1d88d2764d5cdbca4ba54a8122bb6774b389df08b",
+  "status": "proposal_only_no_live_integration",
+  "trace_summary_sha256": "bfd5efa34ddbb757c53a99c898decb6692ba8d35f9a473eadd217c09f5a54fb1",
+  "outputs": [
+    {
+      "name": "cargoLift",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "FEED && SAFE cargo lift power",
+      "kind": "raw_combinational",
+      "game_signal": "draft:cargoLift",
+      "expression": {
+        "args": [
+          {
+            "id": "feed.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "safe.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      },
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 0 bytes",
+      "bindings": [
+        {
+          "id": "cargoPower",
+          "output": "cargoLift",
+          "property": "power",
+          "target": "cargoField",
+          "invert": false,
+          "resolved_signal": "draft:cargoPower",
+          "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "cargoLift",
+          "byte_offset": 0,
+          "instruction_rva": 4870,
+          "instruction_address": 5368713990,
+          "instruction": {
+            "id": "insn_00001306",
+            "address": 5368713990,
+            "rva": 4870,
+            "size": 6,
+            "bytes": "c7 00 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 1"
+          },
+          "raw_block_id": "bb_000012FF",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            3,
+            7,
+            55,
+            59,
+            63
+          ]
+        },
+        {
+          "output": "cargoLift",
+          "byte_offset": 0,
+          "instruction_rva": 4977,
+          "instruction_address": 5368714097,
+          "instruction": {
+            "id": "insn_00001371",
+            "address": 5368714097,
+            "rva": 4977,
+            "size": 6,
+            "bytes": "c7 00 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 0"
+          },
+          "raw_block_id": "bb_0000136A",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            2,
+            4,
+            6,
+            24,
+            26,
+            28,
+            30,
+            32,
+            34,
+            36,
+            38,
+            40,
+            42,
+            44,
+            46,
+            48,
+            50,
+            52,
+            53,
+            54,
+            56,
+            57,
+            58,
+            60,
+            61,
+            62
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "shaftFirewall",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "!SAFE active shaft firewall",
+      "kind": "raw_combinational",
+      "game_signal": "draft:shaftFirewall",
+      "expression": {
+        "arg": {
+          "id": "safe.occupied",
+          "op": "ref"
+        },
+        "op": "not"
+      },
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 4 bytes",
+      "bindings": [
+        {
+          "id": "firewallPower",
+          "output": "shaftFirewall",
+          "property": "active",
+          "target": "shaftBeam",
+          "invert": false,
+          "resolved_signal": "draft:firewallPower",
+          "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "shaftFirewall",
+          "byte_offset": 4,
+          "instruction_rva": 5202,
+          "instruction_address": 5368714322,
+          "instruction": {
+            "id": "insn_00001452",
+            "address": 5368714322,
+            "rva": 5202,
+            "size": 7,
+            "bytes": "c7 40 04 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 1"
+          },
+          "raw_block_id": "bb_0000144B",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            4,
+            24,
+            28,
+            32,
+            36,
+            40,
+            44,
+            48,
+            52,
+            53,
+            56,
+            57,
+            60,
+            61
+          ]
+        },
+        {
+          "output": "shaftFirewall",
+          "byte_offset": 4,
+          "instruction_rva": 5310,
+          "instruction_address": 5368714430,
+          "instruction": {
+            "id": "insn_000014BE",
+            "address": 5368714430,
+            "rva": 5310,
+            "size": 7,
+            "bytes": "c7 40 04 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 0"
+          },
+          "raw_block_id": "bb_000014B7",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            2,
+            3,
+            6,
+            7,
+            26,
+            30,
+            34,
+            38,
+            42,
+            46,
+            50,
+            54,
+            55,
+            58,
+            59,
+            62,
+            63
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "serviceRelay",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "(SAFE && !FEED) || all three current payloads; completion powers both personnel relays",
+      "kind": "raw_combinational",
+      "game_signal": "draft:serviceRelay",
+      "expression": {
+        "args": [
+          {
+            "args": [
+              {
+                "id": "safe.occupied",
+                "op": "ref"
+              },
+              {
+                "arg": {
+                  "id": "feed.occupied",
+                  "op": "ref"
+                },
+                "op": "not"
+              }
+            ],
+            "op": "and"
+          },
+          {
+            "id": "payloadReady",
+            "op": "ref"
+          }
+        ],
+        "op": "or"
+      },
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 8 bytes",
+      "bindings": [
+        {
+          "id": "serviceLowerPower",
+          "output": "serviceRelay",
+          "property": "power",
+          "target": "serviceLower",
+          "invert": false,
+          "resolved_signal": "draft:serviceLowerPower",
+          "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+        },
+        {
+          "id": "serviceUpperPower",
+          "output": "serviceRelay",
+          "property": "power",
+          "target": "serviceUpper",
+          "invert": false,
+          "resolved_signal": "draft:serviceUpperPower",
+          "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "serviceRelay",
+          "byte_offset": 8,
+          "instruction_rva": 5767,
+          "instruction_address": 5368714887,
+          "instruction": {
+            "id": "insn_00001687",
+            "address": 5368714887,
+            "rva": 5767,
+            "size": 7,
+            "bytes": "c7 40 08 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 1"
+          },
+          "raw_block_id": "bb_00001680",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            2,
+            6,
+            26,
+            30,
+            34,
+            38,
+            42,
+            46,
+            50,
+            54,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63
+          ]
+        },
+        {
+          "output": "serviceRelay",
+          "byte_offset": 8,
+          "instruction_rva": 5875,
+          "instruction_address": 5368714995,
+          "instruction": {
+            "id": "insn_000016F3",
+            "address": 5368714995,
+            "rva": 5875,
+            "size": 7,
+            "bytes": "c7 40 08 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 0"
+          },
+          "raw_block_id": "bb_000016EC",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            3,
+            4,
+            7,
+            24,
+            28,
+            32,
+            36,
+            40,
+            44,
+            48,
+            52,
+            53,
+            55
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "hatchOpen",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Manual hatch open request from server toggle",
+      "kind": "raw_combinational",
+      "game_signal": "draft:hatchOpen",
+      "expression": {
+        "id": "hatchToggle.value",
+        "op": "ref"
+      },
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 12 bytes",
+      "bindings": [
+        {
+          "id": "hatchOpening",
+          "output": "hatchOpen",
+          "property": "open",
+          "target": "hatch",
+          "invert": false,
+          "resolved_signal": "draft:hatchOpening",
+          "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "hatchOpen",
+          "byte_offset": 12,
+          "instruction_rva": 6101,
+          "instruction_address": 5368715221,
+          "instruction": {
+            "id": "insn_000017D5",
+            "address": 5368715221,
+            "rva": 6101,
+            "size": 7,
+            "bytes": "c7 40 0c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 1"
+          },
+          "raw_block_id": "bb_000017CE",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            4,
+            6,
+            7,
+            28,
+            30,
+            36,
+            38,
+            44,
+            46,
+            52,
+            53,
+            54,
+            55,
+            60,
+            61,
+            62,
+            63
+          ]
+        },
+        {
+          "output": "hatchOpen",
+          "byte_offset": 12,
+          "instruction_rva": 6209,
+          "instruction_address": 5368715329,
+          "instruction": {
+            "id": "insn_00001841",
+            "address": 5368715329,
+            "rva": 6209,
+            "size": 7,
+            "bytes": "c7 40 0c 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 0"
+          },
+          "raw_block_id": "bb_0000183A",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            2,
+            3,
+            24,
+            26,
+            32,
+            34,
+            40,
+            42,
+            48,
+            50,
+            56,
+            57,
+            58,
+            59
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    },
+    {
+      "name": "payloadReady",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "meaning": "Current three-socket AND; exit unlock request, not latched exit state",
+      "kind": "raw_combinational",
+      "game_signal": "draft:payloadReady",
+      "expression": {
+        "args": [
+          {
+            "id": "payloadOne.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "payloadTwo.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "payloadThree.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      },
+      "role": "Current raw controller decision; apply each existing binding once.",
+      "memory": "uint32_t at the output buffer supplied in RDX + 16 bytes",
+      "bindings": [
+        {
+          "id": "exitUnlock",
+          "output": "payloadReady",
+          "property": "unlock",
+          "target": "exit",
+          "invert": false,
+          "resolved_signal": "draft:exitUnlock",
+          "resolution": "resolved = bool(raw_output) != invert; apply exactly once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "payloadReady",
+          "byte_offset": 16,
+          "instruction_rva": 6431,
+          "instruction_address": 5368715551,
+          "instruction": {
+            "id": "insn_0000191F",
+            "address": 5368715551,
+            "rva": 6431,
+            "size": 7,
+            "bytes": "c7 40 10 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 1"
+          },
+          "raw_block_id": "bb_00001918",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63
+          ]
+        },
+        {
+          "output": "payloadReady",
+          "byte_offset": 16,
+          "instruction_rva": 6539,
+          "instruction_address": 5368715659,
+          "instruction": {
+            "id": "insn_0000198B",
+            "address": 5368715659,
+            "rva": 6539,
+            "size": 7,
+            "bytes": "c7 40 10 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 0"
+          },
+          "raw_block_id": "bb_00001984",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            2,
+            3,
+            4,
+            6,
+            7,
+            24,
+            26,
+            28,
+            30,
+            32,
+            34,
+            36,
+            38,
+            40,
+            42,
+            44,
+            46,
+            48,
+            50,
+            52,
+            53,
+            54,
+            55
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ],
+      "dynamic_evidence": "Exact PE instruction execution in Unicorn; terminal values also compared with native Windows harness stdout"
+    }
+  ],
+  "server_owned": [
+    "Player/cube occupancy arbitration and ownership",
+    "Toggle/terminal persistence (where present)",
+    "Exit latch, required two arrivals and campaign completion",
+    "Movement, grapple, cube carry/transport, manual catches and machinery physics",
+    "Unstable platform warning, crumble, respawn and collision timing (where present)"
+  ],
+  "mapping_limits": [
+    "An output store is evidence for a signal, not a unique physical platform or complete backwards data-flow slice.",
+    "Multiple machinery bindings may share one signal and the same native region.",
+    "Authored unstable platforms have no proven-bogus-block mapping in this acquisition.",
+    "Supply accepted canonical state, retain server scheduling/latches, then apply existing bindings. Do not change geometry or ownership."
+  ]
+}

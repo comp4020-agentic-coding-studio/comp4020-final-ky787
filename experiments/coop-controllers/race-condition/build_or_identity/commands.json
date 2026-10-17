@@ -1,0 +1,231 @@
+[
+  {
+    "name": "compiler_version",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "--version"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n",
+    "stderr": ""
+  },
+  {
+    "name": "clean_harness",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-O0",
+      "-fno-stack-protector",
+      "-fno-discard-value-names",
+      "-c",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\src\\harness.c",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\harness.obj"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "clean_freeze_ir",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-O0",
+      "-fno-stack-protector",
+      "-fno-discard-value-names",
+      "-S",
+      "-emit-llvm",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\src\\controller.c",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\clean\\controller.ll"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "clean_lower_frozen_ir",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-O0",
+      "-Xclang",
+      "-disable-llvm-passes",
+      "-x",
+      "ir",
+      "-S",
+      "-masm=intel",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\clean\\controller.ll",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\clean\\controller.s"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "clean_assemble_control",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-c",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\clean\\controller.s",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\clean.unlabelled.obj"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "clean_assemble_labelled",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-c",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\clean\\controller.labelled.s",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\clean.obj"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "clean_link",
+    "argv": [
+      "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+      "/NOLOGO",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\clean.obj",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\harness.obj",
+      "libcmt.lib",
+      "oldnames.lib",
+      "legacy_stdio_definitions.lib",
+      "/OUT:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\bin\\clean_x64.exe",
+      "/MACHINE:X64",
+      "/SUBSYSTEM:CONSOLE",
+      "/MAP:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\clean\\controller.map",
+      "/INCREMENTAL:NO",
+      "/OPT:NOREF",
+      "/OPT:NOICF",
+      "/Brepro",
+      "/DYNAMICBASE:NO",
+      "/NOIMPLIB"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "   Creating object E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\bin\\clean_x64.exp\n",
+    "stderr": ""
+  },
+  {
+    "name": "bcf_freeze_ir",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-O0",
+      "-fno-stack-protector",
+      "-fno-discard-value-names",
+      "-mllvm",
+      "-bcf",
+      "-mllvm",
+      "-bcf_prob=100",
+      "-mllvm",
+      "-bcf_loop=1",
+      "-mllvm",
+      "-aesSeed=00112233445566778899AABBCCDDEEFF",
+      "-S",
+      "-emit-llvm",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\src\\controller.c",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\bcf\\controller.ll"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "bcf_lower_frozen_ir",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-O0",
+      "-Xclang",
+      "-disable-llvm-passes",
+      "-x",
+      "ir",
+      "-S",
+      "-masm=intel",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\bcf\\controller.ll",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\bcf\\controller.s"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "bcf_assemble_control",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-c",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\bcf\\controller.s",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\bcf.unlabelled.obj"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "bcf_assemble_labelled",
+    "argv": [
+      "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+      "-m64",
+      "-c",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\bcf\\controller.labelled.s",
+      "-o",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\bcf.obj"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "bcf_link",
+    "argv": [
+      "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+      "/NOLOGO",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\bcf.obj",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\_build\\harness.obj",
+      "libcmt.lib",
+      "oldnames.lib",
+      "legacy_stdio_definitions.lib",
+      "/OUT:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\bin\\obfuscated_x64.exe",
+      "/MACHINE:X64",
+      "/SUBSYSTEM:CONSOLE",
+      "/MAP:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\build_or_identity\\bcf\\controller.map",
+      "/INCREMENTAL:NO",
+      "/OPT:NOREF",
+      "/OPT:NOICF",
+      "/Brepro",
+      "/DYNAMICBASE:NO",
+      "/NOIMPLIB"
+    ],
+    "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition",
+    "exit_code": 0,
+    "stdout": "   Creating object E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\bin\\obfuscated_x64.exp\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,277 @@
+[
+  {
+    "symbol": "audit_LBB0_1",
+    "assembly_label": ".LBB0_1",
+    "ir_block": "originalBB"
+  },
+  {
+    "symbol": "audit_LBB0_2",
+    "assembly_label": ".LBB0_2",
+    "ir_block": "originalBBpart2"
+  },
+  {
+    "symbol": "audit_LBB0_3",
+    "assembly_label": ".LBB0_3",
+    "ir_block": "if.then"
+  },
+  {
+    "symbol": "audit_LBB0_4",
+    "assembly_label": ".LBB0_4",
+    "ir_block": "originalBB18"
+  },
+  {
+    "symbol": "audit_LBB0_5",
+    "assembly_label": ".LBB0_5",
+    "ir_block": "originalBBpart220"
+  },
+  {
+    "symbol": "audit_LBB0_6",
+    "assembly_label": ".LBB0_6",
+    "ir_block": "if.else"
+  },
+  {
+    "symbol": "audit_LBB0_7",
+    "assembly_label": ".LBB0_7",
+    "ir_block": "originalBB22"
+  },
+  {
+    "symbol": "audit_LBB0_8",
+    "assembly_label": ".LBB0_8",
+    "ir_block": "originalBBpart224"
+  },
+  {
+    "symbol": "audit_LBB0_9",
+    "assembly_label": ".LBB0_9",
+    "ir_block": "if.end"
+  },
+  {
+    "symbol": "audit_LBB0_10",
+    "assembly_label": ".LBB0_10",
+    "ir_block": "originalBB26"
+  },
+  {
+    "symbol": "audit_LBB0_11",
+    "assembly_label": ".LBB0_11",
+    "ir_block": "originalBBpart228"
+  },
+  {
+    "symbol": "audit_LBB0_12",
+    "assembly_label": ".LBB0_12",
+    "ir_block": "if.then3"
+  },
+  {
+    "symbol": "audit_LBB0_13",
+    "assembly_label": ".LBB0_13",
+    "ir_block": "originalBB30"
+  },
+  {
+    "symbol": "audit_LBB0_14",
+    "assembly_label": ".LBB0_14",
+    "ir_block": "originalBBpart232"
+  },
+  {
+    "symbol": "audit_LBB0_15",
+    "assembly_label": ".LBB0_15",
+    "ir_block": "if.else4"
+  },
+  {
+    "symbol": "audit_LBB0_16",
+    "assembly_label": ".LBB0_16",
+    "ir_block": "originalBB34"
+  },
+  {
+    "symbol": "audit_LBB0_17",
+    "assembly_label": ".LBB0_17",
+    "ir_block": "originalBBpart236"
+  },
+  {
+    "symbol": "audit_LBB0_18",
+    "assembly_label": ".LBB0_18",
+    "ir_block": "if.end6"
+  },
+  {
+    "symbol": "audit_LBB0_19",
+    "assembly_label": ".LBB0_19",
+    "ir_block": "originalBB38"
+  },
+  {
+    "symbol": "audit_LBB0_20",
+    "assembly_label": ".LBB0_20",
+    "ir_block": "originalBBpart240"
+  },
+  {
+    "symbol": "audit_LBB0_21",
+    "assembly_label": ".LBB0_21",
+    "ir_block": "if.then8"
+  },
+  {
+    "symbol": "audit_LBB0_22",
+    "assembly_label": ".LBB0_22",
+    "ir_block": "originalBB42"
+  },
+  {
+    "symbol": "audit_LBB0_23",
+    "assembly_label": ".LBB0_23",
+    "ir_block": "originalBBpart244"
+  },
+  {
+    "symbol": "audit_LBB0_24",
+    "assembly_label": ".LBB0_24",
+    "ir_block": "if.else9"
+  },
+  {
+    "symbol": "audit_LBB0_25",
+    "assembly_label": ".LBB0_25",
+    "ir_block": "originalBB46"
+  },
+  {
+    "symbol": "audit_LBB0_26",
+    "assembly_label": ".LBB0_26",
+    "ir_block": "originalBBpart248"
+  },
+  {
+    "symbol": "audit_LBB0_27",
+    "assembly_label": ".LBB0_27",
+    "ir_block": "if.end11"
+  },
+  {
+    "symbol": "audit_LBB0_28",
+    "assembly_label": ".LBB0_28",
+    "ir_block": "originalBB50"
+  },
+  {
+    "symbol": "audit_LBB0_29",
+    "assembly_label": ".LBB0_29",
+    "ir_block": "originalBBpart252"
+  },
+  {
+    "symbol": "audit_LBB0_30",
+    "assembly_label": ".LBB0_30",
+    "ir_block": "land.lhs.true"
+  },
+  {
+    "symbol": "audit_LBB0_31",
+    "assembly_label": ".LBB0_31",
+    "ir_block": "originalBB54"
+  },
+  {
+    "symbol": "audit_LBB0_32",
+    "assembly_label": ".LBB0_32",
+    "ir_block": "originalBBpart256"
+  },
+  {
+    "symbol": "audit_LBB0_33",
+    "assembly_label": ".LBB0_33",
+    "ir_block": "if.then14"
+  },
+  {
+    "symbol": "audit_LBB0_34",
+    "assembly_label": ".LBB0_34",
+    "ir_block": "originalBB58"
+  },
+  {
+    "symbol": "audit_LBB0_35",
+    "assembly_label": ".LBB0_35",
+    "ir_block": "originalBBpart260"
+  },
+  {
+    "symbol": "audit_LBB0_36",
+    "assembly_label": ".LBB0_36",
+    "ir_block": "if.else15"
+  },
+  {
+    "symbol": "audit_LBB0_37",
+    "assembly_label": ".LBB0_37",
+    "ir_block": "originalBB62"
+  },
+  {
+    "symbol": "audit_LBB0_38",
+    "assembly_label": ".LBB0_38",
+    "ir_block": "originalBBpart264"
+  },
+  {
+    "symbol": "audit_LBB0_39",
+    "assembly_label": ".LBB0_39",
+    "ir_block": "if.end17"
+  },
+  {
+    "symbol": "audit_LBB0_40",
+    "assembly_label": ".LBB0_40",
+    "ir_block": "originalBB66"
+  },
+  {
+    "symbol": "audit_LBB0_41",
+    "assembly_label": ".LBB0_41",
+    "ir_block": "originalBBpart268"
+  },
+  {
+    "symbol": "audit_LBB0_42",
+    "assembly_label": ".LBB0_42",
+    "ir_block": "originalBBalteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_43",
+    "assembly_label": ".LBB0_43",
+    "ir_block": "originalBB18alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_44",
+    "assembly_label": ".LBB0_44",
+    "ir_block": "originalBB22alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_45",
+    "assembly_label": ".LBB0_45",
+    "ir_block": "originalBB26alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_46",
+    "assembly_label": ".LBB0_46",
+    "ir_block": "originalBB30alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_47",
+    "assembly_label": ".LBB0_47",
+    "ir_block": "originalBB34alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_48",
+    "assembly_label": ".LBB0_48",
+    "ir_block": "originalBB38alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_49",
+    "assembly_label": ".LBB0_49",
+    "ir_block": "originalBB42alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_50",
+    "assembly_label": ".LBB0_50",
+    "ir_block": "originalBB46alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_51",
+    "assembly_label": ".LBB0_51",
+    "ir_block": "originalBB50alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_52",
+    "assembly_label": ".LBB0_52",
+    "ir_block": "originalBB54alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_53",
+    "assembly_label": ".LBB0_53",
+    "ir_block": "originalBB58alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_54",
+    "assembly_label": ".LBB0_54",
+    "ir_block": "originalBB62alteredBB"
+  },
+  {
+    "symbol": "audit_LBB0_55",
+    "assembly_label": ".LBB0_55",
+    "ir_block": "originalBB66alteredBB"
+  }
+]

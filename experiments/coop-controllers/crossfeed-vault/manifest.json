@@ -1,0 +1,494 @@
+{
+  "schema": "coop-native-manifest/v1",
+  "chamber_id": "crossfeed-vault",
+  "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "contract_sha256": "438dd4d1b613e0d76959c6ba8364442789e7ded0803e735ad8f62290c3fbca41",
+  "reference_source_sha256": {
+    "server/crossfeed-state.ts": "10562c8ee0da1fb509b93bc0f39675b56aa312cade55454e787c0687cfb53f50",
+    "server/crumble-state.ts": "83ccc4a60e81e351fb8c286cebced6e46372f9ef4f1f92976f0495b5b2ad9665",
+    "server/coop-state.ts": "246476aef5571e43c1f24bd827dff8c5c4cf86ae52c6e3fc4272930cccbe771f",
+    "server/multiplayer.ts": "7d3ed8eacdc3c3281d581c27eb6b29fe89cb563bd00592d4c5d6d70fc90ee272",
+    "src/coop/protocol.ts": "a810956e0dc5936c953bbd047917bcc6b3ec4a51a2fda89bc5d4795eb57024f2",
+    "src/coop/crossfeed-vault.ts": "fe961ec556acfda31cf06291a1cb3c9c49be9bd492377865d4cd2794debe8d22",
+    "docs/crossfeed-vault.md": "ceb10a0d08ba7c399235d6d8180b516ae462d99d70c36bc30a524690cd86766a",
+    "docs/adr/0008-reversible-coop-machinery.md": "5fcb5ea2883ff82f03cb8c5356524cb38e9eb9d63993049fe95d6dbcc9558cd4"
+  },
+  "native_source_sha256": {
+    "controller.c": "7fdaa73457abe7270a287c0a9ee134195d796289fc7bf968b0db0a083bd71d9d",
+    "controller.h": "7a22535094fe2326fd87f28ea05328ea04358c4670d5bed818ef85029e2b84d7",
+    "harness.c": "1d047de95540e14445baf52de5f27ec79a3dd2532691104b6faf5048923bed6e"
+  },
+  "compiler": {
+    "path": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+    "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+    "version": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n"
+  },
+  "linker": {
+    "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+    "sha256": "e8c524347b8bc87fba790d254c8a3b902bf1a4b63807093b816d992940af3791"
+  },
+  "seed": "00112233445566778899AABBCCDDEEFF",
+  "builds": [
+    {
+      "variant": "clean",
+      "optimization": "O0",
+      "transformations": [],
+      "frontend_extra_flags": [],
+      "binary_path": "bin/clean_x64.exe",
+      "binary_sha256": "be975d9287cf756d09c1f52aebea820c0f02ae90a8068f77852048052d9c418c",
+      "ir_sha256": "632fd122c434c9018c7c780bc4f0744d8d51b11502025f118792c0c4650b7d63",
+      "compiler_assembly_sha256": "09b7aa465ecb32c2e9898e71607bfde307c56ae617a9baf1c9e57e6c430ab8b5",
+      "labelled_assembly_sha256": "220b4a6c77ab40208fc62176d15f8c2964af4f68d3977774202e4b61333ac504",
+      "link_map_sha256": "fdc90cf53ef1e642646bf81f2b885257dd11fe970e51cfe5cd5350b3eff7dae2",
+      "label_manifest_sha256": "70aec637fa4f3fddef8c2a4da3b7de6affca085b4969add0107417859f5d8c86"
+    },
+    {
+      "variant": "bcf",
+      "optimization": "O0",
+      "transformations": [
+        "bcf"
+      ],
+      "frontend_extra_flags": [
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF"
+      ],
+      "binary_path": "bin/obfuscated_x64.exe",
+      "binary_sha256": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b",
+      "ir_sha256": "4909d858debbf4bed7df4dc2f8ec45d030dbfe6ffea61271a26db7f0df88eda8",
+      "compiler_assembly_sha256": "57e6465c601afeb8e723e038cad9f17c251a2e041d0fe961be9fd8a091d5a6a6",
+      "labelled_assembly_sha256": "c60b082af092325da04a878927f125e9bb8aa89c7ad7d1d8e591911b72947562",
+      "link_map_sha256": "c8a31afa388bc84e5f8804ebf73ac0e59b9ef537952afb4500ed3afbc596ded1",
+      "label_manifest_sha256": "c1fae95b8c7b5a888d668abf2a4af5c537a99a8a7531521fa5859e04123199de"
+    }
+  ],
+  "exact_commands": [
+    {
+      "name": "compiler_version",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "--version"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n",
+      "stderr": ""
+    },
+    {
+      "name": "clean_harness",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-fno-stack-protector",
+        "-fno-discard-value-names",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\src\\harness.c",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\harness.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_freeze_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-fno-stack-protector",
+        "-fno-discard-value-names",
+        "-S",
+        "-emit-llvm",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\src\\controller.c",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\clean\\controller.ll"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_lower_frozen_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-Xclang",
+        "-disable-llvm-passes",
+        "-x",
+        "ir",
+        "-S",
+        "-masm=intel",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\clean\\controller.ll",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\clean\\controller.s"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_assemble_control",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\clean\\controller.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\clean.unlabelled.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_assemble_labelled",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\clean\\controller.labelled.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\clean.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "clean_link",
+      "argv": [
+        "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+        "/NOLOGO",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\clean.obj",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\harness.obj",
+        "libcmt.lib",
+        "oldnames.lib",
+        "legacy_stdio_definitions.lib",
+        "/OUT:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\bin\\clean_x64.exe",
+        "/MACHINE:X64",
+        "/SUBSYSTEM:CONSOLE",
+        "/MAP:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\clean\\controller.map",
+        "/INCREMENTAL:NO",
+        "/OPT:NOREF",
+        "/OPT:NOICF",
+        "/Brepro",
+        "/DYNAMICBASE:NO",
+        "/NOIMPLIB"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "   Creating object E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\bin\\clean_x64.exp\n",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_freeze_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-fno-stack-protector",
+        "-fno-discard-value-names",
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF",
+        "-S",
+        "-emit-llvm",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\src\\controller.c",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\bcf\\controller.ll"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_lower_frozen_ir",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-O0",
+        "-Xclang",
+        "-disable-llvm-passes",
+        "-x",
+        "ir",
+        "-S",
+        "-masm=intel",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\bcf\\controller.ll",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\bcf\\controller.s"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_assemble_control",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\bcf\\controller.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\bcf.unlabelled.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_assemble_labelled",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-m64",
+        "-c",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\bcf\\controller.labelled.s",
+        "-o",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\bcf.obj"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "bcf_link",
+      "argv": [
+        "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+        "/NOLOGO",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\bcf.obj",
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\_build\\harness.obj",
+        "libcmt.lib",
+        "oldnames.lib",
+        "legacy_stdio_definitions.lib",
+        "/OUT:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\bin\\obfuscated_x64.exe",
+        "/MACHINE:X64",
+        "/SUBSYSTEM:CONSOLE",
+        "/MAP:E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\build_or_identity\\bcf\\controller.map",
+        "/INCREMENTAL:NO",
+        "/OPT:NOREF",
+        "/OPT:NOICF",
+        "/Brepro",
+        "/DYNAMICBASE:NO",
+        "/NOIMPLIB"
+      ],
+      "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault",
+      "exit_code": 0,
+      "stdout": "   Creating object E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\crossfeed-vault\\bin\\obfuscated_x64.exp\n",
+      "stderr": ""
+    }
+  ],
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 56,
+    "output_size": 56,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "input_output_mapping": "contract.json and integration.json",
+  "coverage": {
+    "kind": "exhaustive_abstract_projection",
+    "input_count": 14,
+    "exhaustive_row_count": 16384,
+    "row_count": 16384,
+    "encoding": "numeric case id bit i is inputs[i]",
+    "reachability": "Full abstract input product; runtime and finite-actor constraints are not asserted for synthetic contexts"
+  },
+  "native_verification": {
+    "schema": "coop-native-results/v1",
+    "chamber_id": "crossfeed-vault",
+    "contract_sha256": "438dd4d1b613e0d76959c6ba8364442789e7ded0803e735ad8f62290c3fbca41",
+    "reference_path": "evidence/reference-vectors.json.gz",
+    "reference_sha256": "99f38daaae0db255a87196d387f231232b5c36b2fd8c5784606766a6f5fe84ed",
+    "input_names": [
+      "switchB",
+      "switchC",
+      "switchD",
+      "routeMode",
+      "plateAOccupied",
+      "routePowerOccupied",
+      "cubeOnLiftCargo",
+      "cubeOnFinalLeft",
+      "cubeOnFinalRight",
+      "finalPlateLeftOccupied",
+      "finalPlateRightOccupied",
+      "exitUnlocked",
+      "leftGraceActive",
+      "rightGraceActive"
+    ],
+    "output_names": [
+      "grappleAnchor",
+      "bridge",
+      "liftField",
+      "serviceAccess",
+      "relayGates",
+      "leftRoute",
+      "rightRoute",
+      "galleryAccess",
+      "vaultPower",
+      "vaultReturn",
+      "exitDoor",
+      "physicalLeftRoute",
+      "physicalRightRoute",
+      "exitUnlockCandidate"
+    ],
+    "case_count": 16419,
+    "ordered_sequence_frames": 35,
+    "all_valid": true,
+    "failed_case_ids": [],
+    "sequence_validation": "Actual native calls in retained sequence order; reference server owns transitions and timer scheduling. Native controller is stateless.",
+    "sequence_count": 3,
+    "native_frames": 32908,
+    "native_result_sha256": "2623db3850c7ff0e87f1892859f8205e3451c31703989986f095cbad803da907"
+  },
+  "trace_provenance": {
+    "tools": {
+      "pefile": "2024.8.26",
+      "capstone": "5.0.7",
+      "unicorn": "2.1.4"
+    },
+    "trace_artifact": {
+      "path": "evidence/representative-traces.json.gz",
+      "sha256": "ecb3e7e8a1a47924386a228f0dec19ef6f9097ccf3ecd917145d60f7abe02b2e"
+    },
+    "cfg_artifacts": {
+      "clean": {
+        "path": "evidence/disassembly-clean.json.gz",
+        "sha256": "55888f3870d4ee026971294fa30d5871e0748c67582258a1c29fc3a602ced451"
+      },
+      "bcf": {
+        "path": "evidence/disassembly-bcf.json.gz",
+        "sha256": "39c382a32eb515e8a901524e07c7f1a18cff856a7dbe70a16880182824443069"
+      }
+    },
+    "selection": {
+      "method": "Endpoints, then greedy named input/output value and complete-output-frame diversity; deterministic distributed cases fill remaining slots",
+      "exhaustive_cases": false,
+      "limitation": "Representative dynamic evidence; no claim of exhaustive control-flow or output-store-site execution.",
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        16,
+        18,
+        20,
+        22,
+        34,
+        35,
+        38,
+        39,
+        42,
+        43,
+        46,
+        47,
+        50,
+        54,
+        58,
+        62,
+        64,
+        65,
+        68,
+        69,
+        80,
+        84,
+        14331,
+        "seq:payload-scanners-latch-and-restart:restart-readRoomRecord"
+      ],
+      "available_case_count": 16419,
+      "retained_trace_count": 32,
+      "trace_limit": 32
+    },
+    "cfg_metrics": {
+      "clean": {
+        "blocks": 56,
+        "edges": 80,
+        "instructions": 165,
+        "function_bytes": 703,
+        "clone_origin_blocks": 0
+      },
+      "bcf": {
+        "blocks": 361,
+        "edges": 497,
+        "instructions": 2130,
+        "function_bytes": 7214,
+        "clone_origin_blocks": 56
+      }
+    }
+  },
+  "known_limits": [
+    "Exhaustive cases are synthetic abstract projections, not a claim that all vectors are reachable with two players and two cubes.",
+    "Synthetic contexts may exceed two body contacts or two cube entries and may combine runtime flags that sync would normalize. Every abstract input is nevertheless roundtripped through the actual current extractor/status projection.",
+    "Ordered fixtures use valid current records, exactly cubeA/cubeB and two body slots. They test reducers and snapshots, not geometry/reachability, WebSocket authorization, cube ownership or epoch acceptance.",
+    "Native code is stateless: it does not advance clocks, set latches, persist records, process arrivals, schedule crumble or authorize actions.",
+    "Raw signals, grace-inclusive physical power, current unlock candidate and existing durable exit door are separate outputs.",
+    "Crumble remains authored gameplay timing. Its warning/broken/stable observations are server evidence, never OLLVM/bogus-block evidence.",
+    "Static CFG is decoded, not an execution trace. Unobserved blocks remain unknown unless linked proof establishes impossibility.",
+    "Traces emulate exact PE instructions from bn_evaluate and linked helpers; native Windows stdout independently validates the final output frame.",
+    "Executed occurrence prefixes provide calculation context, not a complete backwards data-flow slice.",
+    "Server event ordering and timers remain supplied reference state, not emulated native scheduling."
+  ],
+  "files": {
+    "bin/clean_x64.exe": "be975d9287cf756d09c1f52aebea820c0f02ae90a8068f77852048052d9c418c",
+    "bin/obfuscated_x64.exe": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b",
+    "build_or_identity/bcf/assembly_labels.json": "c1fae95b8c7b5a888d668abf2a4af5c537a99a8a7531521fa5859e04123199de",
+    "build_or_identity/bcf/controller.labelled.s": "c60b082af092325da04a878927f125e9bb8aa89c7ad7d1d8e591911b72947562",
+    "build_or_identity/bcf/controller.ll": "4909d858debbf4bed7df4dc2f8ec45d030dbfe6ffea61271a26db7f0df88eda8",
+    "build_or_identity/bcf/controller.map": "c8a31afa388bc84e5f8804ebf73ac0e59b9ef537952afb4500ed3afbc596ded1",
+    "build_or_identity/bcf/controller.s": "57e6465c601afeb8e723e038cad9f17c251a2e041d0fe961be9fd8a091d5a6a6",
+    "build_or_identity/clean/assembly_labels.json": "70aec637fa4f3fddef8c2a4da3b7de6affca085b4969add0107417859f5d8c86",
+    "build_or_identity/clean/controller.labelled.s": "220b4a6c77ab40208fc62176d15f8c2964af4f68d3977774202e4b61333ac504",
+    "build_or_identity/clean/controller.ll": "632fd122c434c9018c7c780bc4f0744d8d51b11502025f118792c0c4650b7d63",
+    "build_or_identity/clean/controller.map": "fdc90cf53ef1e642646bf81f2b885257dd11fe970e51cfe5cd5350b3eff7dae2",
+    "build_or_identity/clean/controller.s": "09b7aa465ecb32c2e9898e71607bfde307c56ae617a9baf1c9e57e6c430ab8b5",
+    "build_or_identity/commands.json": "ed099797998dba7becfc5f7c4c686c01ad6faf2734f0461e551e0019f14300d0",
+    "build_or_identity/identity.json": "a419d8f81201a559be3abab3ed39708e173b0c85dbecacf54f2fc11cb4bd6b01",
+    "contract.json": "438dd4d1b613e0d76959c6ba8364442789e7ded0803e735ad8f62290c3fbca41",
+    "evidence/bogus-proof.json.gz": "b98b3b1b7aa5281b564084f4a6c6e0352216fde63f3b16c7b582e8331d49db2e",
+    "evidence/disassembly-bcf.json.gz": "39c382a32eb515e8a901524e07c7f1a18cff856a7dbe70a16880182824443069",
+    "evidence/disassembly-clean.json.gz": "55888f3870d4ee026971294fa30d5871e0748c67582258a1c29fc3a602ced451",
+    "evidence/native-bcf-stdout.jsonl.gz": "d7a1cf554ec9b71016b7771561cd311242a66ce1e5477eae3a3e0933bd82af58",
+    "evidence/native-clean-stdout.jsonl.gz": "d7a1cf554ec9b71016b7771561cd311242a66ce1e5477eae3a3e0933bd82af58",
+    "evidence/native-results.json.gz": "2623db3850c7ff0e87f1892859f8205e3451c31703989986f095cbad803da907",
+    "evidence/native-summary.json": "9106c03f2bda4830b458a3d4f8e07e5fc162bf1fb26c5fecb7850f0d8e3af82f",
+    "evidence/reference-vectors.json.gz": "99f38daaae0db255a87196d387f231232b5c36b2fd8c5784606766a6f5fe84ed",
+    "evidence/representative-traces.json.gz": "ecb3e7e8a1a47924386a228f0dec19ef6f9097ccf3ecd917145d60f7abe02b2e",
+    "evidence/server-sequences.json": "18465b17b9f8c1cc2d12cefcb836a36cf39e29d9169a72a10f3ef19eaf8aa235",
+    "evidence/trace-summary.json": "a89c939e3b9abd0c0d57979d78d9acf72f7d86c123d9c18363261e56b4ab55dc",
+    "integration.json": "47a8e35360e5112fd7c00585acd5e90467954a03891629a849b93e0b965981d7",
+    "README.md": "653c60ea1f10240055223e73553a4709b0f62ddc889e230f1f6138dfccc141ea",
+    "src/controller.c": "7fdaa73457abe7270a287c0a9ee134195d796289fc7bf968b0db0a083bd71d9d",
+    "src/controller.h": "7a22535094fe2326fd87f28ea05328ea04358c4670d5bed818ef85029e2b84d7",
+    "src/harness.c": "1d047de95540e14445baf52de5f27ec79a3dd2532691104b6faf5048923bed6e"
+  }
+}

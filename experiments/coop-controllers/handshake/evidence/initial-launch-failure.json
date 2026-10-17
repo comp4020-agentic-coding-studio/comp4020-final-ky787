@@ -1,0 +1,15 @@
+{
+  "schema": "coop-native-launch-attempt/v1",
+  "phase": "Restricted initial Windows launch",
+  "binaries": {
+    "clean": "b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9",
+    "bcf": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8"
+  },
+  "errors": {
+    "clean": "[WinError 623] {Illegal System DLL Relocation}\r\nThe system DLL %hs was relocated in memory. The application will not run properly.\r\nThe relocation occurred because the DLL %hs occupied an address range reserved for Windows system DLLs. The vendor supplying the DLL should be contacted for a new DLL",
+    "bcf": "[WinError 623] {Illegal System DLL Relocation}\r\nThe system DLL %hs was relocated in memory. The application will not run properly.\r\nThe relocation occurred because the DLL %hs occupied an address range reserved for Windows system DLLs. The vendor supplying the DLL should be contacted for a new DLL"
+  },
+  "native_frames_obtained": 0,
+  "recorded_result": false,
+  "case_count_requested": 32
+}
