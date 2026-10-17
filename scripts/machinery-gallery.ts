@@ -1,5 +1,5 @@
 /** Publish selected real production-browser captures; no alternative art renderer. */
-import { copyFile, mkdir, readdir, writeFile } from 'node:fs/promises';
+import { access, copyFile, mkdir, readdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -39,7 +39,11 @@ for (const [file] of cards) {
     if (!sourceFile) throw new Error(`Missing real campaign capture: ${file}`);
     await copyFile(join(source, campaign ? 'campaign' : '', sourceFile), join(target, `${file}.png`));
 }
-for (const file of ['before-pad-empty-detail', 'before-pad-held-detail', 'before-lift-powered']) await copyFile(join(source, `${file}.png`), join(target, `${file}.png`));
+const reportFiles = new Set(await readdir(source));
+for (const file of ['before-pad-empty-detail', 'before-pad-held-detail', 'before-lift-powered']) {
+    if (reportFiles.has(`${file}.png`)) await copyFile(join(source, `${file}.png`), join(target, `${file}.png`));
+    else await access(join(target, `${file}.png`)); // Fresh clones reuse the committed c6dcb35 baseline.
+}
 // Normal-speed crops/resizes of actual canvas recordings, retaining their time axis.
 const recordings = [
     ['pad-cycle', 'crop=620:233:470:480', 'PRESS / HOLD / RELEASE', 'A complete pad cycle and sustained powered animation, from actual walking contact.', '03-pad-held-detail'],
