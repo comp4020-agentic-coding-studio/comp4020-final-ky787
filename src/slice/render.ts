@@ -3,6 +3,9 @@ import { characterForSlot, characterLabel } from '../character/presentation.ts';
 import type { CharacterProfiles, Slot } from '../coop/protocol.ts';
 import { cubeEntries, isDeclarativeLevel, type CubeId } from '../coop/protocol.ts';
 import { isCampaignLevel, isAuthoredCampaignLevel } from '../coop/campaign.ts';
+import { NativeWorldEvidence } from '../coop/native-world-evidence.ts';
+import { NativeWorldRenderer } from './native-world-render.ts';
+import { nativeWorldRegionLabel } from './native-world-presentation.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
 import { drawNinja } from '../render/ninja.ts';
@@ -31,6 +34,8 @@ const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', in
 export class PuzzleRenderer {
     /** Solo / editor appearance; multiplayer appearance comes from authoritative slot profiles. */
     profile: PublicCharacterProfile = { ...DEFAULT_CHARACTER_PROFILE };
+    nativeWorld = new NativeWorldEvidence();
+    nativeWorldDisplay = new NativeWorldRenderer();
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
@@ -144,6 +149,7 @@ export class PuzzleRenderer {
             }
             this.text('RESET FIELD', h.x + 24, h.y + 43, 13, C.red);
         }
+        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion);
         drawPlatformListings(c, w, this.replay, this.presentation);
         for (const p of w.platforms) {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };
@@ -169,12 +175,19 @@ export class PuzzleRenderer {
             c.setLineDash(active ? [] : [5, 5]);
             c.strokeRect(b.x, b.y, b.w, b.h);
             c.setLineDash([]);
-            const address = r.id === 'uplink' ? platformAddress(p, this.replay) : null;
-            this.text(address ?? b.label ?? b.id, b.x + 8, b.y + Math.min(19, b.h - 7), address ? 11 : 12, colour);
+            const nativeHeader = cam.zoom >= .65 ? this.nativeWorldDisplay.header(this.nativeWorld, r.id, b.id) : null;
+            const address = r.id === 'uplink' ? platformAddress(p, this.replay) : nativeHeader?.address;
+            const headerColour = nativeHeader ? nativeHeader.powered ? C.cyan : C.dim : colour;
+            c.save();
+            if (nativeHeader) c.globalAlpha = 1;
+            this.text(address ?? b.label ?? b.id, b.x + 8, b.y + Math.min(19, b.h - 7), address ? 11 : 12, headerColour);
             if (address) {
-                const type = crumble ? this.revealBogus ? 'PROVEN BOGUS' : 'UNSTABLE' : active ? 'CODE' : 'GHOST';
-                this.text(type, b.x + b.w - type.length * 5.5 - 6, b.y + Math.min(18, b.h - 8), 9, colour);
+                const type = crumble ? r.id === 'uplink' && this.revealBogus ? 'PROVEN BOGUS' : 'UNSTABLE' : nativeHeader?.powered === null ? 'UNKNOWN' : (nativeHeader ? nativeHeader.powered : active) ? 'CODE' : 'GHOST';
+                if (!nativeHeader || b.w >= address.length * 6.7 + type.length * 5.5 + 20)
+                    this.text(type, b.x + b.w - type.length * 5.5 - 6, b.y + Math.min(18, b.h - 8), 9, crumble ? C.amber : headerColour);
+                else if (crumble) this.text('UNSTABLE', b.x + 8, b.y + b.h + 14, 9, C.amber);
             }
+            c.restore();
             if (crumble) {
                 if (!address) this.text(isCampaignLevel(r.id) ? 'UNSTABLE' : 'prototype', b.x + 12, b.y + 49, 11, C.amber);
                 if (p.fuse >= 0) {
@@ -203,7 +216,10 @@ export class PuzzleRenderer {
             for (const p of w.platforms.filter(p => p.def.signal === 'codePlatformB'))
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
         }
-        for (const region of r.regions ?? []) this.text(region.label, region.at.x, region.at.y, 24, C.dim);
+        for (const region of r.regions ?? []) {
+            const label = this.nativeWorld.state?.chamber === r.id ? nativeWorldRegionLabel(region.label) : region.label;
+            this.text(label, region.at.x, region.at.y, 24, C.dim);
+        }
         drawMachinery(c, w);
         for (const lift of w.lifts) drawGravityLift(c, lift, this.heroes.machinery.lifts.get(lift.def.id)!, this.heroes.time, visible, cam.zoom, energyMotion, r.id !== 'uplink', 'emitter');
         drawEntryGateways(c, r, this.heroes, cam.zoom);
@@ -274,7 +290,7 @@ export class PuzzleRenderer {
             this.ring(x + dx, y - 72, 7, C.ink);
             this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, r.id === 'race-condition' || 'terminal' in lever && !lever.terminal ? y - 90 : y + 40, 13, lever.active ? C.cyan : C.amber);
         }
-        if (r.id !== 'uplink' && r.id !== 'crossfeed-vault' && r.id !== 'race-condition') {
+        if (this.nativeWorld.state?.chamber !== r.id && r.id !== 'uplink' && r.id !== 'crossfeed-vault' && r.id !== 'race-condition') {
             const feedback = this.presentation.describe(r.id, w.frame);
             const displayOn = feedback.active, message = feedback.text;
             c.fillStyle = '#111f29';

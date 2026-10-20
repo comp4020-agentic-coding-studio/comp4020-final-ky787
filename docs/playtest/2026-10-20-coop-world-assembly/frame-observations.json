@@ -1,0 +1,27 @@
+{
+  "scope": "Local Chromium headless observations before parallel regression activity; fixed HANDSHAKE camera; 120 samples after 10 warm-up frames per case. Canvas text instrumentation active, pixel readback inactive. These are not an isolated renderer benchmark.",
+  "observations": [
+    {
+      "label": "HANDSHAKE accepted active crossing frame intervals",
+      "timing": {
+        "frames": 120,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.799999999999272,
+        "maxMs": 16.800000000000182,
+        "drawnPanels": 3
+      },
+      "note": "Local headless observation with bounded Canvas text instrumentation; no pixel-readback while measuring; not an isolated renderer benchmark."
+    },
+    {
+      "label": "HANDSHAKE unavailable world-assembly frame intervals",
+      "timing": {
+        "frames": 120,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.799999999999727,
+        "maxMs": 16.800000000000182,
+        "drawnPanels": 0
+      },
+      "note": "Local headless observation with bounded Canvas text instrumentation; no pixel-readback while measuring; not an isolated renderer benchmark."
+    }
+  ]
+}

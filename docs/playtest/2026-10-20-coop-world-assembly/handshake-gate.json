@@ -1,0 +1,2663 @@
+{
+  "pass": true,
+  "scope": "Production browser; real onboarding and accepted pressure contact; fixed presentation camera only",
+  "checks": [
+    "PASS two independent named visitors keep their server-owned slots",
+    "PASS handshake-overview: own specimen loaded",
+    "PASS handshake-overview: static panel provenance matches acquired instructions and recorded output stores",
+    "PASS handshake-overview: no fabricated live execution or unstable/bogus claims",
+    "PASS overview collapses listings to compact labels",
+    "PASS handshake-crossing-inactive: own specimen loaded",
+    "PASS handshake-crossing-inactive: static panel provenance matches acquired instructions and recorded output stores",
+    "PASS handshake-crossing-inactive: normal zoom renders actual native instruction text to Canvas",
+    "PASS handshake-crossing-inactive: native listing text has visible screen pixels",
+    "PASS handshake-crossing-inactive: no fabricated live execution or unstable/bogus claims",
+    "PASS initial crossing has a confirmed inactive native output",
+    "PASS handshake-crossing-active: own specimen loaded",
+    "PASS handshake-crossing-active: static panel provenance matches acquired instructions and recorded output stores",
+    "PASS handshake-crossing-active: normal zoom renders actual native instruction text to Canvas",
+    "PASS handshake-crossing-active: native listing text has visible screen pixels",
+    "PASS handshake-crossing-active: no fabricated live execution or unstable/bogus claims",
+    "PASS real pressure contact changes the confirmed native display",
+    "PASS handshake-both-players: own specimen loaded",
+    "PASS handshake-both-players: static panel provenance matches acquired instructions and recorded output stores",
+    "PASS handshake-both-players: normal zoom renders actual native instruction text to Canvas",
+    "PASS handshake-both-players: native listing text has visible screen pixels",
+    "PASS handshake-both-players: no fabricated live execution or unstable/bogus claims",
+    "PASS both named players retain readable Canvas labels",
+    "PASS handshake-lift-relay: own specimen loaded",
+    "PASS handshake-lift-relay: static panel provenance matches acquired instructions and recorded output stores",
+    "PASS handshake-lift-relay: normal zoom renders actual native instruction text to Canvas",
+    "PASS handshake-lift-relay: native listing text has visible screen pixels",
+    "PASS handshake-lift-relay: no fabricated live execution or unstable/bogus claims",
+    "PASS handshake-exit: own specimen loaded",
+    "PASS handshake-exit: static panel provenance matches acquired instructions and recorded output stores",
+    "PASS handshake-exit: normal zoom renders actual native instruction text to Canvas",
+    "PASS handshake-exit: native listing text has visible screen pixels",
+    "PASS handshake-exit: no fabricated live execution or unstable/bogus claims",
+    "PASS reconnection restores own specimen and both character profiles",
+    "PASS no browser runtime errors",
+    "PASS no browser runtime errors"
+  ],
+  "report": [
+    {
+      "label": "handshake-overview",
+      "chamber": "handshake",
+      "native": {
+        "status": "ready",
+        "chamber": "handshake",
+        "specimen": "handshake_ollvm_bcf",
+        "presentation": "static-output-store",
+        "connected": true,
+        "outputs": {
+          "crossingPower": false,
+          "liftPower": false,
+          "relayPower": false,
+          "exitReady": false
+        },
+        "physical": {},
+        "exitUnlocked": false,
+        "excerpts": [
+          {
+            "output": "crossingPower",
+            "block": "bb_000010EA",
+            "store": 5368713457,
+            "addresses": [
+              5368713450,
+              5368713454,
+              5368713457
+            ]
+          },
+          {
+            "output": "liftPower",
+            "block": "bb_00001236",
+            "store": 5368713789,
+            "addresses": [
+              5368713782,
+              5368713786,
+              5368713789
+            ]
+          },
+          {
+            "output": "relayPower",
+            "block": "bb_00001384",
+            "store": 5368714123,
+            "addresses": [
+              5368714116,
+              5368714120,
+              5368714123
+            ]
+          },
+          {
+            "output": "exitReady",
+            "block": "bb_0000154B",
+            "store": 5368714578,
+            "addresses": [
+              5368714571,
+              5368714575,
+              5368714578
+            ]
+          }
+        ],
+        "panels": [
+          {
+            "objectId": "nearAnchor",
+            "output": "crossingPower",
+            "address": 5368713457,
+            "storeAddress": 5368713457,
+            "raw": false,
+            "physical": false,
+            "expanded": false,
+            "static": true,
+            "bounds": {
+              "x": 715,
+              "y": 690,
+              "w": 224.7502770374349,
+              "h": 48.17573505928242
+            },
+            "instructions": []
+          },
+          {
+            "objectId": "serviceLift",
+            "output": "liftPower",
+            "address": 5368713789,
+            "storeAddress": 5368713789,
+            "raw": false,
+            "physical": false,
+            "expanded": false,
+            "static": true,
+            "bounds": {
+              "x": 1280,
+              "y": 610,
+              "w": 173.64210593106577,
+              "h": 48.17573505928242
+            },
+            "instructions": []
+          },
+          {
+            "objectId": "lowerRelay",
+            "output": "relayPower",
+            "address": 5368714123,
+            "storeAddress": 5368714123,
+            "raw": false,
+            "physical": false,
+            "expanded": false,
+            "static": true,
+            "bounds": {
+              "x": 1630,
+              "y": 610,
+              "w": 186.41914870765805,
+              "h": 48.17573505928242
+            },
+            "instructions": []
+          },
+          {
+            "objectId": "exit",
+            "output": "exitReady",
+            "address": 5368714578,
+            "storeAddress": 5368714578,
+            "raw": false,
+            "physical": false,
+            "expanded": false,
+            "static": true,
+            "bounds": {
+              "x": 1965,
+              "y": 610,
+              "w": 173.64210593106577,
+              "h": 48.17573505928242
+            },
+            "instructions": []
+          }
+        ]
+      },
+      "rendered": []
+    },
+    {
+      "label": "handshake-crossing-inactive",
+      "chamber": "handshake",
+      "native": {
+        "status": "ready",
+        "chamber": "handshake",
+        "specimen": "handshake_ollvm_bcf",
+        "presentation": "static-output-store",
+        "connected": true,
+        "outputs": {
+          "crossingPower": false,
+          "liftPower": false,
+          "relayPower": false,
+          "exitReady": false
+        },
+        "physical": {},
+        "exitUnlocked": false,
+        "excerpts": [
+          {
+            "output": "crossingPower",
+            "block": "bb_000010EA",
+            "store": 5368713457,
+            "addresses": [
+              5368713450,
+              5368713454,
+              5368713457
+            ]
+          },
+          {
+            "output": "liftPower",
+            "block": "bb_00001236",
+            "store": 5368713789,
+            "addresses": [
+              5368713782,
+              5368713786,
+              5368713789
+            ]
+          },
+          {
+            "output": "relayPower",
+            "block": "bb_00001384",
+            "store": 5368714123,
+            "addresses": [
+              5368714116,
+              5368714120,
+              5368714123
+            ]
+          },
+          {
+            "output": "exitReady",
+            "block": "bb_0000154B",
+            "store": 5368714578,
+            "addresses": [
+              5368714571,
+              5368714575,
+              5368714578
+            ]
+          }
+        ],
+        "panels": [
+          {
+            "objectId": "nearAnchor",
+            "output": "crossingPower",
+            "address": 5368713457,
+            "storeAddress": 5368713457,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 715,
+              "y": 690,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713450,
+                "rva": 4330,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713454,
+                "rva": 4334,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713457,
+                "rva": 4337,
+                "size": 6,
+                "bytes": "c7 00 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax], 1",
+                "block_id": "bb_000010EA"
+              }
+            ]
+          },
+          {
+            "objectId": "serviceLift",
+            "output": "liftPower",
+            "address": 5368713789,
+            "storeAddress": 5368713789,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1280,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713782,
+                "rva": 4662,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713786,
+                "rva": 4666,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713789,
+                "rva": 4669,
+                "size": 7,
+                "bytes": "c7 40 04 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 4], 1",
+                "block_id": "bb_00001236"
+              }
+            ]
+          },
+          {
+            "objectId": "lowerRelay",
+            "output": "relayPower",
+            "address": 5368714123,
+            "storeAddress": 5368714123,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1630,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714116,
+                "rva": 4996,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714120,
+                "rva": 5000,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714123,
+                "rva": 5003,
+                "size": 7,
+                "bytes": "c7 40 08 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 8], 1",
+                "block_id": "bb_00001384"
+              }
+            ]
+          }
+        ]
+      },
+      "rendered": [
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 399.43499707432056,
+          "y": 364.12539803861,
+          "width": 58.228317616623826,
+          "height": 8,
+          "colour": "#8399a5",
+          "at": 2338.8000000044703,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 159.64172028751636,
+          "y": 332.1529611337028,
+          "width": 58.228317616623826,
+          "height": 8,
+          "colour": "#8399a5",
+          "at": 2338.8000000044703,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": 607.1499919998018,
+          "y": 344.3500048342503,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 2521,
+          "pixels": 141
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 609.999991964039,
+          "y": 363.3500045958317,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 2521,
+          "pixels": 522
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 609.999991964039,
+          "y": 378.55000440509684,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 2521,
+          "pixels": 400
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 609.999991964039,
+          "y": 393.750004214362,
+          "width": 150.9943340427708,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 2521,
+          "pixels": 452
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 1143.899985264477,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 2521,
+          "pixels": 149
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499852287142,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 2521.10000000149,
+          "pixels": 499
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499852287142,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 2521.10000000149,
+          "pixels": 391
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499852287142,
+          "y": 317.7500051680363,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 2521.10000000149,
+          "pixels": 481
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 1476.3999810921518,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 2521.10000000149,
+          "pixels": 154
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1479.249981056389,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 2521.10000000149,
+          "pixels": 310
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1479.249981056389,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 2521.10000000149,
+          "pixels": 310
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1479.249981056389,
+          "y": 317.7500051680363,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 2521.10000000149,
+          "pixels": 375
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 665.0999912726252,
+          "y": 291.1500055018223,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#8399a5",
+          "at": 2521.2000000029802,
+          "pixels": 171
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 380.09999484890386,
+          "y": 253.15000597865946,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#8399a5",
+          "at": 2521.2000000029802,
+          "pixels": 171
+        }
+      ]
+    },
+    {
+      "label": "handshake-crossing-active",
+      "chamber": "handshake",
+      "native": {
+        "status": "ready",
+        "chamber": "handshake",
+        "specimen": "handshake_ollvm_bcf",
+        "presentation": "static-output-store",
+        "connected": true,
+        "outputs": {
+          "crossingPower": true,
+          "liftPower": false,
+          "relayPower": false,
+          "exitReady": false
+        },
+        "physical": {},
+        "exitUnlocked": false,
+        "excerpts": [
+          {
+            "output": "crossingPower",
+            "block": "bb_000010EA",
+            "store": 5368713457,
+            "addresses": [
+              5368713450,
+              5368713454,
+              5368713457
+            ]
+          },
+          {
+            "output": "liftPower",
+            "block": "bb_00001236",
+            "store": 5368713789,
+            "addresses": [
+              5368713782,
+              5368713786,
+              5368713789
+            ]
+          },
+          {
+            "output": "relayPower",
+            "block": "bb_00001384",
+            "store": 5368714123,
+            "addresses": [
+              5368714116,
+              5368714120,
+              5368714123
+            ]
+          },
+          {
+            "output": "exitReady",
+            "block": "bb_0000154B",
+            "store": 5368714578,
+            "addresses": [
+              5368714571,
+              5368714575,
+              5368714578
+            ]
+          }
+        ],
+        "panels": [
+          {
+            "objectId": "nearAnchor",
+            "output": "crossingPower",
+            "address": 5368713457,
+            "storeAddress": 5368713457,
+            "raw": true,
+            "physical": true,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 715,
+              "y": 690,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713450,
+                "rva": 4330,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713454,
+                "rva": 4334,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713457,
+                "rva": 4337,
+                "size": 6,
+                "bytes": "c7 00 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax], 1",
+                "block_id": "bb_000010EA"
+              }
+            ]
+          },
+          {
+            "objectId": "serviceLift",
+            "output": "liftPower",
+            "address": 5368713789,
+            "storeAddress": 5368713789,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1280,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713782,
+                "rva": 4662,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713786,
+                "rva": 4666,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713789,
+                "rva": 4669,
+                "size": 7,
+                "bytes": "c7 40 04 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 4], 1",
+                "block_id": "bb_00001236"
+              }
+            ]
+          },
+          {
+            "objectId": "lowerRelay",
+            "output": "relayPower",
+            "address": 5368714123,
+            "storeAddress": 5368714123,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1630,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714116,
+                "rva": 4996,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714120,
+                "rva": 5000,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714123,
+                "rva": 5003,
+                "size": 7,
+                "bytes": "c7 40 08 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 8], 1",
+                "block_id": "bb_00001384"
+              }
+            ]
+          }
+        ]
+      },
+      "rendered": [
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": -43.02975906335632,
+          "y": 388.99958272113145,
+          "width": 69.61651175573934,
+          "height": 8.409621238708496,
+          "colour": "#8099ac",
+          "at": 4087.7000000029802,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": -39.87615109884064,
+          "y": 410.0236358179027,
+          "width": 235.4303852103185,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.8000000044703,
+          "pixels": 649
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": -39.87615109884064,
+          "y": 426.8428782953197,
+          "width": 182.26868532411754,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.8000000044703,
+          "pixels": 529
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": -39.87615109884064,
+          "y": 443.66212077273667,
+          "width": 167.0796282137744,
+          "height": 13.665634512901306,
+          "colour": "#e0eaf3",
+          "at": 4087.8000000044703,
+          "pixels": 0
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 550.8997409204312,
+          "y": 304.9033703340465,
+          "width": 69.61651175573934,
+          "height": 8.409621238708496,
+          "colour": "#8099ac",
+          "at": 4087.8000000044703,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 554.0533488849469,
+          "y": 325.9274234308177,
+          "width": 235.4303852103185,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.8000000044703,
+          "pixels": 290
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 554.0533488849469,
+          "y": 342.7466659082347,
+          "width": 182.26868532411754,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.8000000044703,
+          "pixels": 198
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 554.0533488849469,
+          "y": 359.5659083856517,
+          "width": 197.45774243446067,
+          "height": 13.665634512901306,
+          "colour": "#e0eaf3",
+          "at": 4087.8000000044703,
+          "pixels": 331
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 918.8206701139279,
+          "y": 304.9033703340465,
+          "width": 69.61651175573934,
+          "height": 8.409621238708496,
+          "colour": "#8099ac",
+          "at": 4087.9000000059605,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 921.9742780784436,
+          "y": 325.9274234308177,
+          "width": 235.4303852103185,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.9000000059605,
+          "pixels": 96
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 921.9742780784436,
+          "y": 342.7466659082347,
+          "width": 182.26868532411754,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.9000000059605,
+          "pixels": 0
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 921.9742780784436,
+          "y": 359.5659083856517,
+          "width": 197.45774243446067,
+          "height": 13.665634512901306,
+          "colour": "#e0eaf3",
+          "at": 4087.9000000059605,
+          "pixels": 84
+        },
+        {
+          "text": "0x140001552",
+          "font": "10px ui-monospace, monospace",
+          "x": 1270.9735594848462,
+          "y": 304.9033703340465,
+          "width": 69.61651175573934,
+          "height": 8.409621238708496,
+          "colour": "#8099ac",
+          "at": 4087.9000000059605,
+          "pixels": 74
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1274.1271674493619,
+          "y": 325.9274234308177,
+          "width": 235.4303852103185,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.9000000059605,
+          "pixels": 197
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1274.1271674493619,
+          "y": 342.7466659082347,
+          "width": 182.26868532411754,
+          "height": 13.665634512901306,
+          "colour": "#c6d8e8",
+          "at": 4087.9000000059605,
+          "pixels": 0
+        },
+        {
+          "text": "mov dword ptr [rax + 0xc], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1274.1271674493619,
+          "y": 359.5659083856517,
+          "width": 212.6467995448038,
+          "height": 13.665634512901306,
+          "colour": "#e0eaf3",
+          "at": 4087.9000000059605,
+          "pixels": 4
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 21.09360288179596,
+          "y": 330.132234050172,
+          "width": 76.57816293131327,
+          "height": 8.409621238708496,
+          "colour": "#64e6d5",
+          "at": 4088,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": -294.26719356977264,
+          "y": 288.0841278566295,
+          "width": 76.57816293131327,
+          "height": 8.409621238708496,
+          "colour": "#64e6d5",
+          "at": 4088,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": 607.1499919998018,
+          "y": 344.3500048342503,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4272,
+          "pixels": 141
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 609.999991964039,
+          "y": 363.3500045958317,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4272,
+          "pixels": 523
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 609.999991964039,
+          "y": 378.55000440509684,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4272,
+          "pixels": 400
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 609.999991964039,
+          "y": 393.750004214362,
+          "width": 150.9943340427708,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4272,
+          "pixels": 452
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 1143.899985264477,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4272.10000000149,
+          "pixels": 149
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499852287142,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4272.10000000149,
+          "pixels": 499
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499852287142,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4272.10000000149,
+          "pixels": 391
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499852287142,
+          "y": 317.7500051680363,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4272.20000000298,
+          "pixels": 481
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 1476.3999810921518,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4272.20000000298,
+          "pixels": 154
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1479.249981056389,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4272.20000000298,
+          "pixels": 310
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1479.249981056389,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4272.20000000298,
+          "pixels": 310
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1479.249981056389,
+          "y": 317.7500051680363,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4272.20000000298,
+          "pixels": 375
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 665.0999912726252,
+          "y": 291.1500055018223,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 4272.4000000059605,
+          "pixels": 223
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 380.09999484890386,
+          "y": 253.15000597865946,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 4272.4000000059605,
+          "pixels": 223
+        }
+      ]
+    },
+    {
+      "label": "handshake-both-players",
+      "chamber": "handshake",
+      "native": {
+        "status": "ready",
+        "chamber": "handshake",
+        "specimen": "handshake_ollvm_bcf",
+        "presentation": "static-output-store",
+        "connected": true,
+        "outputs": {
+          "crossingPower": true,
+          "liftPower": false,
+          "relayPower": false,
+          "exitReady": false
+        },
+        "physical": {},
+        "exitUnlocked": false,
+        "excerpts": [
+          {
+            "output": "crossingPower",
+            "block": "bb_000010EA",
+            "store": 5368713457,
+            "addresses": [
+              5368713450,
+              5368713454,
+              5368713457
+            ]
+          },
+          {
+            "output": "liftPower",
+            "block": "bb_00001236",
+            "store": 5368713789,
+            "addresses": [
+              5368713782,
+              5368713786,
+              5368713789
+            ]
+          },
+          {
+            "output": "relayPower",
+            "block": "bb_00001384",
+            "store": 5368714123,
+            "addresses": [
+              5368714116,
+              5368714120,
+              5368714123
+            ]
+          },
+          {
+            "output": "exitReady",
+            "block": "bb_0000154B",
+            "store": 5368714578,
+            "addresses": [
+              5368714571,
+              5368714575,
+              5368714578
+            ]
+          }
+        ],
+        "panels": [
+          {
+            "objectId": "nearAnchor",
+            "output": "crossingPower",
+            "address": 5368713457,
+            "storeAddress": 5368713457,
+            "raw": true,
+            "physical": true,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 715,
+              "y": 690,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713450,
+                "rva": 4330,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713454,
+                "rva": 4334,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713457,
+                "rva": 4337,
+                "size": 6,
+                "bytes": "c7 00 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax], 1",
+                "block_id": "bb_000010EA"
+              }
+            ]
+          },
+          {
+            "objectId": "serviceLift",
+            "output": "liftPower",
+            "address": 5368713789,
+            "storeAddress": 5368713789,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1280,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713782,
+                "rva": 4662,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713786,
+                "rva": 4666,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713789,
+                "rva": 4669,
+                "size": 7,
+                "bytes": "c7 40 04 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 4], 1",
+                "block_id": "bb_00001236"
+              }
+            ]
+          },
+          {
+            "objectId": "lowerRelay",
+            "output": "relayPower",
+            "address": 5368714123,
+            "storeAddress": 5368714123,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1630,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714116,
+                "rva": 4996,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714120,
+                "rva": 5000,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714123,
+                "rva": 5003,
+                "size": 7,
+                "bytes": "c7 40 08 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 8], 1",
+                "block_id": "bb_00001384"
+              }
+            ]
+          },
+          {
+            "objectId": "exit",
+            "output": "exitReady",
+            "address": 5368714578,
+            "storeAddress": 5368714578,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1965,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714571,
+                "rva": 5451,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_0000154B"
+              },
+              {
+                "address": 5368714575,
+                "rva": 5455,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_0000154B"
+              },
+              {
+                "address": 5368714578,
+                "rva": 5458,
+                "size": 7,
+                "bytes": "c7 40 0c 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 0xc], 1",
+                "block_id": "bb_0000154B"
+              }
+            ]
+          }
+        ]
+      },
+      "rendered": [
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": 764.3061419725418,
+          "y": 229.38790728710956,
+          "width": 69.62396435730625,
+          "height": 8.410521507263184,
+          "colour": "#8099ac",
+          "at": 4162.5,
+          "pixels": 10
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 767.4600875377655,
+          "y": 250.41421105526751,
+          "width": 235.45558855379932,
+          "height": 13.667097449302673,
+          "colour": "#c6d8e8",
+          "at": 4162.5,
+          "pixels": 189
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 767.4600875377655,
+          "y": 267.2352540697939,
+          "width": 182.28819759003818,
+          "height": 13.667097449302673,
+          "colour": "#c6d8e8",
+          "at": 4162.5,
+          "pixels": 164
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 767.4600875377655,
+          "y": 284.05629708432025,
+          "width": 167.097514457535,
+          "height": 13.667097449302673,
+          "colour": "#e0eaf3",
+          "at": 4162.5,
+          "pixels": 398
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 1358.2992234230042,
+          "y": 145.28269221447772,
+          "width": 69.62396435730625,
+          "height": 8.410521507263184,
+          "colour": "#8099ac",
+          "at": 4162.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1361.4531689882278,
+          "y": 166.30899598263568,
+          "width": 235.45558855379932,
+          "height": 13.667097449302673,
+          "colour": "#c6d8e8",
+          "at": 4162.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1361.4531689882278,
+          "y": 183.13003899716205,
+          "width": 182.28819759003818,
+          "height": 13.667097449302673,
+          "colour": "#c6d8e8",
+          "at": 4162.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1361.4531689882278,
+          "y": 199.9510820116884,
+          "width": 197.47888072254136,
+          "height": 13.667097449302673,
+          "colour": "#e0eaf3",
+          "at": 4162.5,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 828.4363684654236,
+          "y": 170.51425673626727,
+          "width": 76.58636079303687,
+          "height": 8.410521507263184,
+          "colour": "#64e6d5",
+          "at": 4162.5999999940395,
+          "pixels": 257
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 513.0418119430542,
+          "y": 128.46164919995135,
+          "width": 76.58636079303687,
+          "height": 8.410521507263184,
+          "colour": "#64e6d5",
+          "at": 4162.5999999940395,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": 274.64998892420226,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4345.69999999553,
+          "pixels": 145
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 277.4999888884395,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.69999999553,
+          "pixels": 532
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 277.4999888884395,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.69999999553,
+          "pixels": 431
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 277.4999888884395,
+          "y": 384.25000433357127,
+          "width": 150.9943340427708,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4345.69999999553,
+          "pixels": 439
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 811.3999821888774,
+          "y": 258.8500059071339,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4345.79999999702,
+          "pixels": 146
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 814.2499821531146,
+          "y": 277.8500056687153,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.79999999702,
+          "pixels": 547
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 814.2499821531146,
+          "y": 293.05000547798045,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.79999999702,
+          "pixels": 420
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 814.2499821531146,
+          "y": 308.2500052872456,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4345.79999999702,
+          "pixels": 481
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 1143.8999780165523,
+          "y": 258.8500059071339,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4345.79999999702,
+          "pixels": 155
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499779807895,
+          "y": 277.8500056687153,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.79999999702,
+          "pixels": 499
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499779807895,
+          "y": 293.05000547798045,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.79999999702,
+          "pixels": 395
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1146.7499779807895,
+          "y": 308.2500052872456,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4345.79999999702,
+          "pixels": 484
+        },
+        {
+          "text": "0x140001552",
+          "font": "10px ui-monospace, monospace",
+          "x": 1462.149974023041,
+          "y": 258.8500059071339,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4345.79999999702,
+          "pixels": 142
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1464.9999739872783,
+          "y": 277.8500056687153,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.79999999702,
+          "pixels": 331
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1464.9999739872783,
+          "y": 293.05000547798045,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4345.79999999702,
+          "pixels": 334
+        },
+        {
+          "text": "mov dword ptr [rax + 0xc], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1464.9999739872783,
+          "y": 308.2500052872456,
+          "width": 192.17460696352646,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4345.79999999702,
+          "pixels": 412
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 332.5999881970256,
+          "y": 281.6500056210316,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 4345.79999999702,
+          "pixels": 280
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 47.59999177330428,
+          "y": 243.65000609786875,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 4345.79999999702,
+          "pixels": 236
+        }
+      ]
+    },
+    {
+      "label": "handshake-lift-relay",
+      "chamber": "handshake",
+      "native": {
+        "status": "ready",
+        "chamber": "handshake",
+        "specimen": "handshake_ollvm_bcf",
+        "presentation": "static-output-store",
+        "connected": true,
+        "outputs": {
+          "crossingPower": true,
+          "liftPower": false,
+          "relayPower": false,
+          "exitReady": false
+        },
+        "physical": {},
+        "exitUnlocked": false,
+        "excerpts": [
+          {
+            "output": "crossingPower",
+            "block": "bb_000010EA",
+            "store": 5368713457,
+            "addresses": [
+              5368713450,
+              5368713454,
+              5368713457
+            ]
+          },
+          {
+            "output": "liftPower",
+            "block": "bb_00001236",
+            "store": 5368713789,
+            "addresses": [
+              5368713782,
+              5368713786,
+              5368713789
+            ]
+          },
+          {
+            "output": "relayPower",
+            "block": "bb_00001384",
+            "store": 5368714123,
+            "addresses": [
+              5368714116,
+              5368714120,
+              5368714123
+            ]
+          },
+          {
+            "output": "exitReady",
+            "block": "bb_0000154B",
+            "store": 5368714578,
+            "addresses": [
+              5368714571,
+              5368714575,
+              5368714578
+            ]
+          }
+        ],
+        "panels": [
+          {
+            "objectId": "nearAnchor",
+            "output": "crossingPower",
+            "address": 5368713457,
+            "storeAddress": 5368713457,
+            "raw": true,
+            "physical": true,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 715,
+              "y": 690,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713450,
+                "rva": 4330,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713454,
+                "rva": 4334,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_000010EA"
+              },
+              {
+                "address": 5368713457,
+                "rva": 4337,
+                "size": 6,
+                "bytes": "c7 00 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax], 1",
+                "block_id": "bb_000010EA"
+              }
+            ]
+          },
+          {
+            "objectId": "serviceLift",
+            "output": "liftPower",
+            "address": 5368713789,
+            "storeAddress": 5368713789,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1280,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713782,
+                "rva": 4662,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713786,
+                "rva": 4666,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713789,
+                "rva": 4669,
+                "size": 7,
+                "bytes": "c7 40 04 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 4], 1",
+                "block_id": "bb_00001236"
+              }
+            ]
+          },
+          {
+            "objectId": "lowerRelay",
+            "output": "relayPower",
+            "address": 5368714123,
+            "storeAddress": 5368714123,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1630,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714116,
+                "rva": 4996,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714120,
+                "rva": 5000,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714123,
+                "rva": 5003,
+                "size": 7,
+                "bytes": "c7 40 08 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 8], 1",
+                "block_id": "bb_00001384"
+              }
+            ]
+          },
+          {
+            "objectId": "exit",
+            "output": "exitReady",
+            "address": 5368714578,
+            "storeAddress": 5368714578,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1965,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714571,
+                "rva": 5451,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_0000154B"
+              },
+              {
+                "address": 5368714575,
+                "rva": 5455,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_0000154B"
+              },
+              {
+                "address": 5368714578,
+                "rva": 5458,
+                "size": 7,
+                "bytes": "c7 40 0c 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 0xc], 1",
+                "block_id": "bb_0000154B"
+              }
+            ]
+          }
+        ]
+      },
+      "rendered": [
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": 103.65002006166833,
+          "y": 410.85000399978526,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4921.20000000298,
+          "pixels": 145
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 106.50002002590554,
+          "y": 429.8500037613667,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.20000000298,
+          "pixels": 530
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 106.50002002590554,
+          "y": 445.0500035706318,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.20000000298,
+          "pixels": 431
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 106.50002002590554,
+          "y": 460.25000337989695,
+          "width": 150.9943340427708,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4921.20000000298,
+          "pixels": 439
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 640.4000133263435,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4921.20000000298,
+          "pixels": 146
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 643.2500132905807,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.20000000298,
+          "pixels": 547
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 643.2500132905807,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.20000000298,
+          "pixels": 420
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 643.2500132905807,
+          "y": 384.25000433357127,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4921.30000000447,
+          "pixels": 480
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 972.9000091540183,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4921.30000000447,
+          "pixels": 154
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 975.7500091182555,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.30000000447,
+          "pixels": 499
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 975.7500091182555,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.30000000447,
+          "pixels": 395
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 975.7500091182555,
+          "y": 384.25000433357127,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4921.30000000447,
+          "pixels": 484
+        },
+        {
+          "text": "0x140001552",
+          "font": "10px ui-monospace, monospace",
+          "x": 1291.1500051605071,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 4921.30000000447,
+          "pixels": 142
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1294.0000051247443,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.30000000447,
+          "pixels": 522
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1294.0000051247443,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 4921.30000000447,
+          "pixels": 404
+        },
+        {
+          "text": "mov dword ptr [rax + 0xc], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1294.0000051247443,
+          "y": 384.25000433357127,
+          "width": 192.17460696352646,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 4921.30000000447,
+          "pixels": 538
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 161.60001933449166,
+          "y": 357.6500046673573,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 4921.4000000059605,
+          "pixels": 235
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": -123.39997708922965,
+          "y": 319.65000514419444,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 4921.4000000059605,
+          "pixels": 64
+        }
+      ]
+    },
+    {
+      "label": "handshake-exit",
+      "chamber": "handshake",
+      "native": {
+        "status": "ready",
+        "chamber": "handshake",
+        "specimen": "handshake_ollvm_bcf",
+        "presentation": "static-output-store",
+        "connected": true,
+        "outputs": {
+          "crossingPower": true,
+          "liftPower": false,
+          "relayPower": false,
+          "exitReady": false
+        },
+        "physical": {},
+        "exitUnlocked": false,
+        "excerpts": [
+          {
+            "output": "crossingPower",
+            "block": "bb_000010EA",
+            "store": 5368713457,
+            "addresses": [
+              5368713450,
+              5368713454,
+              5368713457
+            ]
+          },
+          {
+            "output": "liftPower",
+            "block": "bb_00001236",
+            "store": 5368713789,
+            "addresses": [
+              5368713782,
+              5368713786,
+              5368713789
+            ]
+          },
+          {
+            "output": "relayPower",
+            "block": "bb_00001384",
+            "store": 5368714123,
+            "addresses": [
+              5368714116,
+              5368714120,
+              5368714123
+            ]
+          },
+          {
+            "output": "exitReady",
+            "block": "bb_0000154B",
+            "store": 5368714578,
+            "addresses": [
+              5368714571,
+              5368714575,
+              5368714578
+            ]
+          }
+        ],
+        "panels": [
+          {
+            "objectId": "serviceLift",
+            "output": "liftPower",
+            "address": 5368713789,
+            "storeAddress": 5368713789,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1280,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368713782,
+                "rva": 4662,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713786,
+                "rva": 4666,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001236"
+              },
+              {
+                "address": 5368713789,
+                "rva": 4669,
+                "size": 7,
+                "bytes": "c7 40 04 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 4], 1",
+                "block_id": "bb_00001236"
+              }
+            ]
+          },
+          {
+            "objectId": "lowerRelay",
+            "output": "relayPower",
+            "address": 5368714123,
+            "storeAddress": 5368714123,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1630,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714116,
+                "rva": 4996,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714120,
+                "rva": 5000,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_00001384"
+              },
+              {
+                "address": 5368714123,
+                "rva": 5003,
+                "size": 7,
+                "bytes": "c7 40 08 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 8], 1",
+                "block_id": "bb_00001384"
+              }
+            ]
+          },
+          {
+            "objectId": "exit",
+            "output": "exitReady",
+            "address": 5368714578,
+            "storeAddress": 5368714578,
+            "raw": false,
+            "physical": false,
+            "expanded": true,
+            "static": true,
+            "bounds": {
+              "x": 1965,
+              "y": 610,
+              "w": 320,
+              "h": 116
+            },
+            "instructions": [
+              {
+                "address": 5368714571,
+                "rva": 5451,
+                "size": 4,
+                "bytes": "48 8b 45 d8",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rbp - 0x28]",
+                "block_id": "bb_0000154B"
+              },
+              {
+                "address": 5368714575,
+                "rva": 5455,
+                "size": 3,
+                "bytes": "48 8b 00",
+                "mnemonic": "mov",
+                "op_str": "rax, qword ptr [rax]",
+                "block_id": "bb_0000154B"
+              },
+              {
+                "address": 5368714578,
+                "rva": 5458,
+                "size": 7,
+                "bytes": "c7 40 0c 01 00 00 00",
+                "mnemonic": "mov",
+                "op_str": "dword ptr [rax + 0xc], 1",
+                "block_id": "bb_0000154B"
+              }
+            ]
+          }
+        ]
+      },
+      "rendered": [
+        {
+          "text": "0x1400010F1",
+          "font": "10px ui-monospace, monospace",
+          "x": 103.65002006166833,
+          "y": 410.85000399978526,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5054.4000000059605,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 106.50002002590554,
+          "y": 429.8500037613667,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.4000000059605,
+          "pixels": 291
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 106.50002002590554,
+          "y": 445.0500035706318,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.4000000059605,
+          "pixels": 158
+        },
+        {
+          "text": "mov dword ptr [rax], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 106.50002002590554,
+          "y": 460.25000337989695,
+          "width": 150.9943340427708,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5054.4000000059605,
+          "pixels": 183
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 640.4000133263435,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5054.5,
+          "pixels": 17
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 643.2500132905807,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 643.2500132905807,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 643.2500132905807,
+          "y": 384.25000433357127,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5054.5,
+          "pixels": 0
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 972.9000091540183,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5054.5,
+          "pixels": 90
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 975.7500091182555,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 975.7500091182555,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.5,
+          "pixels": 0
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 975.7500091182555,
+          "y": 384.25000433357127,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5054.5,
+          "pixels": 133
+        },
+        {
+          "text": "0x140001552",
+          "font": "10px ui-monospace, monospace",
+          "x": 1291.1500051605071,
+          "y": 334.8500049534596,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5054.60000000149,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1294.0000051247443,
+          "y": 353.850004715041,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.60000000149,
+          "pixels": 0
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 1294.0000051247443,
+          "y": 369.05000452430613,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5054.60000000149,
+          "pixels": 0
+        },
+        {
+          "text": "mov dword ptr [rax + 0xc], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 1294.0000051247443,
+          "y": 384.25000433357127,
+          "width": 192.17460696352646,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5054.60000000149,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": 161.60001933449166,
+          "y": 357.6500046673573,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 5054.70000000298,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": -123.39997708922965,
+          "y": 319.65000514419444,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 5054.70000000298,
+          "pixels": 0
+        },
+        {
+          "text": "0x14000123D",
+          "font": "10px ui-monospace, monospace",
+          "x": 222.3999605881545,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5237.80000000447,
+          "pixels": 146
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 225.2499605523917,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5237.9000000059605,
+          "pixels": 547
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 225.2499605523917,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5237.9000000059605,
+          "pixels": 415
+        },
+        {
+          "text": "mov dword ptr [rax + 4], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 225.2499605523917,
+          "y": 317.7500051680363,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5237.9000000059605,
+          "pixels": 480
+        },
+        {
+          "text": "0x14000138B",
+          "font": "10px ui-monospace, monospace",
+          "x": 554.8999564158294,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5237.9000000059605,
+          "pixels": 155
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 557.7499563800666,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5237.9000000059605,
+          "pixels": 499
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 557.7499563800666,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5237.9000000059605,
+          "pixels": 391
+        },
+        {
+          "text": "mov dword ptr [rax + 8], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 557.7499563800666,
+          "y": 317.7500051680363,
+          "width": 178.44784932327457,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5237.9000000059605,
+          "pixels": 484
+        },
+        {
+          "text": "0x140001552",
+          "font": "10px ui-monospace, monospace",
+          "x": 873.1499524223182,
+          "y": 268.3500057879246,
+          "width": 62.914305851154495,
+          "height": 8,
+          "colour": "#8099ac",
+          "at": 5238,
+          "pixels": 142
+        },
+        {
+          "text": "mov rax, qword ptr [rbp - 0x28]",
+          "font": "12px ui-monospace, monospace",
+          "x": 875.9999523865554,
+          "y": 287.350005549506,
+          "width": 212.7647434239043,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5238,
+          "pixels": 522
+        },
+        {
+          "text": "mov rax, qword ptr [rax]",
+          "font": "12px ui-monospace, monospace",
+          "x": 875.9999523865554,
+          "y": 302.55000535877116,
+          "width": 164.72109168302268,
+          "height": 12.349999845027924,
+          "colour": "#c6d8e8",
+          "at": 5238,
+          "pixels": 400
+        },
+        {
+          "text": "mov dword ptr [rax + 0xc], 1",
+          "font": "12px ui-monospace, monospace",
+          "x": 875.9999523865554,
+          "y": 317.7500051680363,
+          "width": 192.17460696352646,
+          "height": 12.349999845027924,
+          "colour": "#e0eaf3",
+          "at": 5238,
+          "pixels": 538
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": -256.4000334036973,
+          "y": 291.1500055018223,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 5238.10000000149,
+          "pixels": 0
+        },
+        {
+          "text": "0x1400010F1",
+          "font": "500 11px ui-monospace, monospace",
+          "x": -541.4000298274186,
+          "y": 253.15000597865946,
+          "width": 69.20573643626994,
+          "height": 8,
+          "colour": "#64e6d5",
+          "at": 5238.10000000149,
+          "pixels": 0
+        }
+      ]
+    },
+    {
+      "label": "HANDSHAKE accepted active crossing frame intervals",
+      "timing": {
+        "frames": 120,
+        "medianMs": 16.699999999999818,
+        "p95Ms": 16.700000000000728,
+        "maxMs": 16.800000000000182,
+        "drawnPanels": 3
+      },
+      "note": "Local headless observation with bounded Canvas text instrumentation; no pixel-readback while measuring; not an isolated renderer benchmark."
+    }
+  ]
+}

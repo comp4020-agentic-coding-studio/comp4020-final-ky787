@@ -8,9 +8,11 @@ import { crossfeedRoute } from './crossfeed-browser-check.ts';
 import { campaignDraftRoute } from './campaign-draft-route.ts';
 import { raceRoute } from './race-browser-check.ts';
 import { reviewCampaignMachinery } from './machinery-campaign-review.ts';
+import { reviewNativeWorldCampaign } from './native-world-campaign-review.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? '/tmp/bn-campaign-shots', internalLabs: false });
 if (process.env.BN_MACHINERY_ART === '1') reviewCampaignMachinery(h);
+const finishNativeReview = process.env.BN_NATIVE_WORLD_REVIEW === '1' ? reviewNativeWorldCampaign(h) : null;
 const { check, click, snapshot, wait, sleep, shot, tap } = h;
 const visible = (p: Cdp, selector: string) => p.read<boolean>(`!!document.querySelector(${JSON.stringify(selector)}) && !document.querySelector(${JSON.stringify(selector)}).closest('[hidden]')`);
 try {
@@ -91,6 +93,7 @@ try {
     await click(b, '#pause'); await click(b, '#continue'); await tap(b, 'Space');
     await wait(b, 'guest resumes after overview', s => s.started);
     for (const p of [a, b]) check('no browser runtime errors', p.errors.length === 0, p.errors.join('\n'));
+    await finishNativeReview?.();
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {
     for (const [i, p] of h.clients.entries()) { await shot(p, `failure-${i}`).catch(() => {}); await writeFile(join(h.shots, `failure-${i}.json`), JSON.stringify(await snapshot(p).catch(() => null), null, 2)); }

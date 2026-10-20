@@ -6,7 +6,7 @@
 
 ![RACE CONDITION chamber overview, including its grapple route and control machinery](docs/playtest/2026-10-12-hero-assets/race-overview-compact.png)
 
-Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. This is an evolving final project: the public co-op campaign is playable, the public level builder saves drafts in your browser, and binary-backed gameplay is implemented in the single-player CONTROL SPINE showcase. The co-op chambers currently use authored controllers, **not** generated binaries.
+Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The five playable co-op chambers use server-authoritative lookup tables verified against Windows x64 OLLVM-16 BCF binaries; the server does not execute those PEs. The single-player CONTROL SPINE showcase retains its separate validated evidence, and the public Level Builder saves authored drafts in your browser.
 
 ## Play the game
 
@@ -70,7 +70,9 @@ The fourth tutorial chamber, **CONTROL SPINE** (internally `uplink`), uses a val
 
 One optional unstable region is associated with a separately supported bogus-code classification: a cloned block with proven infeasible incoming paths. The block's physical collapse timing remains an **authored gameplay metaphor**, not literal processor behavior. Displayed authored string effects and the other tutorial controllers are likewise not presented as native binary evidence.
 
-**Current evidence boundary:** All five co-op campaign chambers and workbench drafts use authored/mock controllers. Their signal changes are real game behavior, but they are **not yet backed by newly compiled, obfuscated binaries**. The intended longer-term workflow is to accept a fun puzzle first, freeze its logical contract, and only then generate and validate a matching binary. Unobserved execution alone is never treated as proof that a block is bogus.
+All five co-op campaign chambers use server-authoritative decisions from [verified Windows x64 OLLVM-16 BCF results](docs/adr/0011-native-backed-coop-controllers.md). The Linux server reads verified lookup tables; it does not execute the PEs. Compact [in-world assembly panels](docs/native-world-assembly.md) show genuine static output-store excerpts beside the machinery they control, with current accepted output status shown separately. Shared platforms reuse the same native region. Server-owned timers, latches and authored instability remain distinct from the binary evidence.
+
+**Evidence boundary:** Workbench drafts and public custom levels retain authored/mock controllers. A static listing is not a current execution trace, and unobserved execution alone is never proof that a block is bogus.
 
 See [CONTROL SPINE's design and evidence notes](docs/c8-vertical-slice.md) and the checked data in `game_data/`.
 
@@ -190,6 +192,11 @@ pnpm check
 
 # Production client build, including CONTROL SPINE bundle validation
 pnpm build
+
+# Native lookup/evidence provenance and browser assembly review
+pnpm check:native
+pnpm check:native-evidence
+pnpm check:world-assembly
 
 # Real-input two-player campaign regression
 pnpm check:campaign
