@@ -1,0 +1,16 @@
+Local validation — 20 October 2026
+PASS pnpm typecheck
+PASS pnpm check — 73 unit files, 681 tests passing, 3 pre-existing skips; 3 HTTP specs passing
+PASS focused observability tests — final 34 tests across 4 files
+PASS pnpm build — retained CONTROL SPINE validation included; pre-existing large-chunk advisory
+PASS pnpm check:observability — two independent browser parties; real-input DEADLOCK solve
+PASS pnpm check:campaign — 289.3 seconds
+PASS pnpm check:public-coop — 59.1 seconds
+PASS pnpm check:character — 40.7 seconds
+PASS pnpm check:workbench — 31.3 seconds
+PASS pnpm check:native — 21 retained artifacts
+PASS pnpm check:evidence
+PASS native tables, campaign definitions and CONTROL SPINE evidence unchanged from a2f1f81
+PASS 16 WebSocket visitors / 8 parties / 480 transform packets without movement log growth
+
+Production checks are distinct; see the dated technical handoff.

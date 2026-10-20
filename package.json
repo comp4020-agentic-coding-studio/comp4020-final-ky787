@@ -32,6 +32,7 @@
     "check:multiplayer-firewall": "node scripts/labs-browser-check.ts firewall-lab",
     "check:race": "node scripts/race-browser-check.ts",
     "check:campaign": "node scripts/campaign-browser-check.ts",
+    "check:observability": "node scripts/observability-browser-check.ts",
     "check:character": "node scripts/character-browser-check.ts",
     "check:checkpoints": "node scripts/checkpoint-browser-check.ts",
     "workbench": "node scripts/level-tools/workbench.ts",

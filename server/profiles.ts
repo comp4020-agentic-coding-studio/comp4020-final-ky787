@@ -5,7 +5,8 @@ import { UUID } from './identity.ts';
 import { parseCharacterProfile, type ProfileRecord, type PublicCharacterProfile } from '../src/character/profile.ts';
 
 interface LoadedProfile { record: ProfileRecord; malformed?: string }
-type ProfileListener = (visitor: string, profile: PublicCharacterProfile) => void;
+export interface ProfileSaveMetadata { created: boolean; revision: number }
+type ProfileListener = (visitor: string, profile: PublicCharacterProfile, metadata: ProfileSaveMetadata) => void;
 
 /** Profiles have their own revision and files; resetting progress never touches them. */
 export class ProfileStore {
@@ -56,7 +57,7 @@ export class ProfileStore {
                 await atomicJson(join(this.directory, `${visitor}.recovery.json`), { recoveredAt: new Date().toISOString(), raw: current.malformed });
             await atomicJson(this.path(visitor), { version: 1, ...next, updatedAt: new Date().toISOString() });
             for (const listener of this.listeners) {
-                try { listener(visitor, { ...validated }); }
+                try { listener(visitor, { ...validated }, { created: current.record.profile === null, revision: next.revision }); }
                 catch { /* Presentation subscribers must not turn a durable save into a failure. */ }
             }
             return { ok: true, record: next };

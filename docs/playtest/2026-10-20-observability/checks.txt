@@ -1,0 +1,19 @@
+PASS anonymous snapshot is denied
+PASS anonymous events is denied
+PASS invalid credential cannot unlock dashboard
+PASS credential cleared from DOM and absent from URL
+PASS two same-name players distinguished by opaque session and slot
+PASS public telemetry has no room-join codes
+PASS deadlock: two independent visitors retain one party
+PASS deadlock: authored-start physical solve with both arrivals
+PASS real receiver transitions recorded with three distinct payloads
+PASS HATCH toggle, plates, lift, exit unlock and both arrivals visible
+PASS both names attached to their correct slots
+PASS history bounded and no transform events
+PASS reconnection does not duplicate completion
+PASS names rendered as text without injected elements
+PASS game has no browser runtime errors
+PASS game has no browser runtime errors
+PASS game has no browser runtime errors
+PASS game has no browser runtime errors
+PASS logout revokes data access

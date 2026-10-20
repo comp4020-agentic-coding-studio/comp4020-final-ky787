@@ -98,6 +98,10 @@ Each cube has one accepted simulation authority at a time, with epoch/sequence c
 
 These choices and their alternatives are documented in [ADR 0001 — Multiplayer authority](docs/adr/0001-multiplayer-authority.md), [ADR 0002 — Shared cubes](docs/adr/0002-shared-cube-authority.md), [ADR 0009 — Persistent parties](docs/adr/0009-persistent-coop-parties.md), and the [multiplayer implementation record](docs/c9-multiplayer.md).
 
+## Operations dashboard
+
+The private `/ops` dashboard shows current cooperative parties, character names and slots, accepted puzzle interactions, payload deliveries, completions and server health. Activity is also emitted as bounded structured JSON to server stdout. Administrator access requires `OBSERVABILITY_TOKEN`; without it, private access is disabled. See the [observability runbook](docs/observability.md) for secret configuration, privacy, Fly logs and the Crit 10 demonstration.
+
 ## Level Workbench — for people and coding agents
 
 Choose **LEVEL BUILDER** from the game menu, or open the [Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html) directly. Author levels on your own, then test or play them with a friend using the existing cooperative game engine.
@@ -189,6 +193,9 @@ pnpm build
 
 # Real-input two-player campaign regression
 pnpm check:campaign
+
+# Protected operations dashboard, two simultaneous parties and a real DEADLOCK solve
+pnpm check:observability
 
 # Character creation, real hover/focus/touch preview and two-player appearances
 pnpm check:character

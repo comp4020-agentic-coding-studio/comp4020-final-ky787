@@ -1,3 +1,5 @@
+import { GameplayTelemetry } from './gameplay-telemetry.ts';
+import type { Telemetry } from './telemetry.ts';
 import { DEFAULT_CHARACTER_PROFILE, parseCharacterProfile, type PublicCharacterProfile } from '../src/character/profile.ts';
 import type { CharacterProfiles } from '../src/coop/protocol.ts';
 import { isAuthoredCampaignLevel } from '../src/coop/campaign.ts';
@@ -43,8 +45,10 @@ interface Room {
     cubes: CubeMap<SharedCube>; crumble: CrumbleRuntime; race: RaceRuntime; crossfeed: CrossfeedRuntime; revision: number; needsPersist: boolean;
     idleSince: number; failed: boolean; transitioning?: boolean;
 }
-export interface ActionTiming { action: string; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
+export interface ActionTiming { action: string; accepted?: boolean; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
 export interface MultiplayerOptions {
+    /** Optional, fail-open observer. Never becomes part of authoritative state. */
+    telemetry?: Telemetry;
     /** Reads appearance using the server's HttpOnly visitor identity, never a client slot claim. */
     loadProfile?: (visitor: string) => Promise<PublicCharacterProfile | null>;
     /** Local snapshots or the bounded, temporary public registry. */
@@ -63,6 +67,8 @@ export function generateCode(): string {
 }
 /** One process, one volume, bounded memory. No world geometry or physics imports. */
 export async function attachMultiplayer(server: Server, dataDir: string, options: MultiplayerOptions = {}) {
+    const observer = new GameplayTelemetry(options.telemetry);
+    const observe = (work: (telemetry: Telemetry) => void) => { if (options.telemetry) try { work(options.telemetry); } catch { /* Gameplay survives observer failures. */ } };
     const directory = join(dataDir, 'rooms');
     await mkdir(directory, { recursive: true });
     const rooms = new Map<string, Room>();
@@ -72,7 +78,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     function expire(room: Room) {
         room.failed = true;
         for (const peer of room.peers) if (peer) { error(peer, 'ROOM_EXPIRED', 'This temporary custom room expired. Ask the host to start a new room from their saved level.'); peer.ws.close(1000, 'Room expired'); }
-        rooms.delete(room.record.code); options.drafts?.release?.(room.record.code);
+        observe(t => t.emit('room_expired', { session: room.record.code, chamber: room.record.level }, { reason: 'temporary_room_lifetime' }, 'warn'));
+        observer.remove(room); rooms.delete(room.record.code); options.drafts?.release?.(room.record.code);
         expired.add(room.record.code); if (expired.size > 64) expired.delete(expired.values().next().value!);
     }
     const elapsed = (room: Room) => Date.now() - Date.parse(room.record.createdAt) >= PUBLIC_DRAFT_LIMITS.lifetimeMs
@@ -84,7 +91,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     // Only semantic events enter this queue. Avatar/cube traffic never waits for disk.
     function serial(work: () => Promise<void>) {
         queued++;
-        queue = queue.then(work).catch(() => { console.error('Multiplayer operation failed'); }).finally(() => { queued--; });
+        queue = queue.then(work).catch(() => { observe(t => t.emit('multiplayer_operation_failed', {}, { operation: 'semantic_queue' }, 'error')); }).finally(() => { queued--; });
         return queue;
     }
     function send(peer: Peer, message: ServerMessage) {
@@ -92,7 +99,12 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         if (peer.ws.bufferedAmount > 65536) { peer.ws.terminate(); return; }
         peer.ws.send(JSON.stringify(message));
     }
-    const error = (peer: Peer, code: string, message = code.replaceAll('_', ' ')) => send(peer, { type: 'error', code, message });
+    const error = (peer: Peer, code: string, message = code.replaceAll('_', ' ')) => {
+        // Fixed server codes only: never include payloads, join codes or arbitrary error text.
+        observe(t => t.emit(code === 'RATE_LIMITED' ? 'rate_limit_reached' : 'room_operation_rejected',
+            peer.room ? observer.context(peer.room, peer.slot) : { visitor: peer.visitor }, { code }, 'warn'));
+        send(peer, { type: 'error', code, message });
+    };
     // Registry discrimination guarantees the rule and record have the same level.
     const rules = (room: Room): LevelDefinition<SessionLevelId> => room.draft?.level === 'workbench' ? room.draft.definition as LevelDefinition<SessionLevelId> : definition(room.record.level);
     const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cubes, room.crumble, Date.now(), room.race, room.crossfeed, rules(room), room.draftHeld, room.draftCubeContacts), revision: room.revision, profiles: room.profiles });
@@ -107,7 +119,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         try { await atomicJson(join(directory, `${room.record.code}.json`), room.record); }
         catch {
             // Fail closed. Never keep accepting changes that cannot be acknowledged durably.
-            room.failed = true;
+            observe(t => t.emit('room_persistence_failed', { session: room.record.code, chamber: room.record.level }, { operation: 'room_save' }, 'error'));
+            observer.remove(room); room.failed = true;
             for (const p of room.peers) if (p) { error(p, 'ROOM_UNAVAILABLE'); p.ws.close(1011, 'Room storage unavailable'); }
             room.peers = [null, null]; room.plates = [null, null];
             rooms.delete(room.record.code);
@@ -138,6 +151,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     async function disconnect(peer: Peer) {
         if (!ownsSlot(peer)) return;
         const room = peer.room, index = peer.slot - 1;
+        observer.event('player_disconnected', room, peer.slot);
         room.peers[index] = null; room.plates[index] = null; room.draftHeld[index] = []; room.idleSince = Date.now();
         for (const cube of Object.values(room.cubes)) if (cube.physicsAuthority === peer.slot) {
             const remaining = room.peers.findIndex(Boolean);
@@ -146,13 +160,14 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         syncCoop(room);
         room.revision++;
         broadcast(room);
+        observer.transition(room, () => rules(room).project(context(room)), undefined, undefined, 'player_disconnect');
         Object.assign(peer, { room: undefined, slot: undefined });
     }
     function draftRecord(code: string, visitor: string, frozen: FrozenDraftSession): RoomRecord {
         const record = frozen.level === 'workbench' ? newRecord(code, visitor, frozen.level, undefined, frozen.definition) : newRecord(code, visitor, frozen.level);
         record.draft = structuredClone(frozen.metadata); record.party = null; return record;
     }
-    async function enter(peer: Peer, message: Extract<ClientMessage, { type: 'create' | 'create-party' | 'create-draft' | 'join' }>) {
+    async function enter(peer: Peer, message: Extract<ClientMessage, { type: 'create' | 'create-party' | 'create-draft' | 'join' }>, timing: ActionTiming) {
         if (peer.room) { error(peer, 'ALREADY_JOINED'); return; }
         const custom = !!options.drafts?.temporary && (message.type === 'create-draft' || message.type === 'join' && !!rooms.get(normalizeCode(message.code) ?? '')?.draft);
         if (custom && !peer.custom) {
@@ -193,6 +208,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         const profile = await appearance(peer.visitor);
         if (peer.ws.readyState !== WebSocket.OPEN) return;
         let index = room.record.visitors.indexOf(peer.visitor);
+        const returning = message.type === 'join' && index >= 0;
+        const newlyJoined = message.type !== 'join' || index < 0;
         if (index < 0) {
             if (room.record.visitors[1]) { error(peer, 'ROOM_FULL'); return; }
             index = 1;
@@ -218,18 +235,28 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         syncCoop(room);
         if (room.needsPersist) {
             room.record.revision = room.revision;
-            await persist(room); room.needsPersist = false;
+            timing.durable = true;
+            const start = performance.now();
+            try { await persist(room); } finally { timing.persistMs = performance.now() - start; }
+            room.needsPersist = false;
         }
         send(peer, { type: 'snapshot', slot: peer.slot, room: view(room) });
         broadcast(room);
+        timing.accepted = true;
+        if (message.type !== 'join') observer.event('party_created', room, peer.slot);
+        observer.event(returning ? 'player_reconnected' : 'player_connected', room, peer.slot);
+        if (newlyJoined) observer.event('player_joined_party', room, peer.slot);
+        if (message.type !== 'join' && room.record.party?.phase !== 'lobby') observer.event('chamber_started', room, peer.slot);
+        // Restored rooms establish a baseline; snapshots never replay old completions/deliveries.
+        observer.transition(room, () => rules(room).project(context(room)), undefined, undefined, 'player_connect');
     }
     async function action(peer: Peer, message: ClientMessage, timing: ActionTiming) {
         if (peer.ws.readyState !== WebSocket.OPEN) return;
-        if (message.type === 'create' || message.type === 'create-party' || message.type === 'create-draft' || message.type === 'join') { await enter(peer, message); return; }
-        if (message.type === 'leave') { await disconnect(peer); peer.ws.close(1000, 'Left room'); return; }
+        if (message.type === 'create' || message.type === 'create-party' || message.type === 'create-draft' || message.type === 'join') { await enter(peer, message, timing); return; }
+        if (message.type === 'leave') { timing.accepted = ownsSlot(peer); await disconnect(peer); peer.ws.close(1000, 'Left room'); return; }
         if (!ownsSlot(peer)) { error(peer, 'NOT_JOINED'); return; }
         if (!('seq' in message) || message.type === 'avatar' || message.type === 'cube') return;
-        const result = (accepted: boolean) => send(peer, { type: 'action-result', seq: message.seq, accepted, room: view(peer.room) });
+        const result = (accepted: boolean) => { timing.accepted = accepted; send(peer, { type: 'action-result', seq: message.seq, accepted, room: view(peer.room) }); };
         if (message.seq <= peer.actionSeq) { result(false); error(peer, 'STALE_ACTION'); return; }
         peer.actionSeq = message.seq;
         const room = peer.room, index = peer.slot - 1, before = durable(room);
@@ -245,8 +272,12 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             for (const cube of Object.values(room.cubes)) assignCube(cube, room.peers[0] ? 1 : 2);
             for (const member of room.peers) if (member) member.stream = ++stream;
             fresh.revision = ++room.revision; timing.durable = true;
-            const start = performance.now(); await persist(room); timing.persistMs = performance.now() - start; room.transitioning = false;
-            result(true); broadcast(room); return;
+            const start = performance.now();
+            try { await persist(room); } finally { timing.persistMs = performance.now() - start; }
+            room.transitioning = false;
+            result(true); broadcast(room);
+            observer.event('chamber_started', room, peer.slot, { reason: 'custom_restart' });
+            observer.baseline(room, () => rules(room).project(context(room))); return;
         }
         if (message.type === 'select-level') {
             if (room.record.draft) { result(false); return; }
@@ -261,12 +292,14 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             room.record.revision = ++room.revision;
             timing.durable = true;
             const start = performance.now();
-            await persist(room); timing.persistMs = performance.now() - start;
+            try { await persist(room); } finally { timing.persistMs = performance.now() - start; }
             room.transitioning = false;
-            result(true); broadcast(room); return;
+            result(true); broadcast(room);
+            observer.event('chamber_selected', room, peer.slot); observer.event('chamber_started', room, peer.slot);
+            observer.baseline(room, () => rules(room).project(context(room))); return;
         }
         if (room.record.party && room.record.party.phase !== 'playing') { result(false); return; }
-        if (room.record.level === 'race-condition' && advanceRace(room.race, Date.now())) { room.revision++; broadcast(room); }
+        if (room.record.level === 'race-condition' && advanceRace(room.race, Date.now())) { room.revision++; broadcast(room); observer.transition(room, () => rules(room).project(context(room)), undefined, undefined, 'server_timer'); }
         if ('epoch' in message) {
             const denied = () => { result(false); send(peer, { type: 'cube-denied', levelInstance: room.record.levelInstance, cubeId: message.cubeId, seq: message.seq }); };
             const cube = room.cubes[message.cubeId], def = rules(room);
@@ -302,6 +335,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             }
             await commitAction(room, before, timing);
             result(true); broadcast(room);
+            observer.transition(room, () => rules(room).project(context(room)), peer.slot, message);
             return;
         }
         const def = rules(room);
@@ -328,6 +362,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         } else return;
         await commitAction(room, before, timing);
         result(true); broadcast(room);
+        observer.transition(room, () => rules(room).project(context(room)), peer.slot, message);
     }
     function context(room: Room) {
         return { draftCubeContacts: room.draftCubeContacts, draftHeld: room.draftHeld.map((p, i) => room.peers[i] ? p : []) as [DraftId[], DraftId[]], record: room.record, held: room.plates.map((p, i) => room.peers[i] ? p : null) as [Plate, Plate], crumble: room.crumble, race: room.race, crossfeed: room.crossfeed, now: Date.now() };
@@ -349,8 +384,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             timing.durable = true;
             room.record.revision = room.revision;
             const start = performance.now();
-            await persist(room);
-            timing.persistMs = performance.now() - start;
+            try { await persist(room); } finally { timing.persistMs = performance.now() - start; }
         }
     }
     function currentInstance(room: Room, message: ClientMessage): boolean {
@@ -416,9 +450,10 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                     if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
                     const timing: ActionTiming = { action: message.type, queueMs: performance.now() - receivedAt, persistMs: 0, totalMs: 0, durable: false };
                     try { await action(peer, message, timing); }
-                    catch { error(peer, 'ROOM_UNAVAILABLE', 'ROOM UNAVAILABLE — PLEASE RETRY'); }
+                    catch { observe(t => t.emit('multiplayer_operation_failed', peer.room ? observer.context(peer.room, peer.slot) : { visitor: peer.visitor }, { operation: message.type }, 'error')); error(peer, 'ROOM_UNAVAILABLE', 'ROOM UNAVAILABLE — PLEASE RETRY'); }
                     finally {
                         peer.pending--; timing.totalMs = performance.now() - receivedAt;
+                        observe(t => t.observeAction({ ...timing, accepted: timing.accepted === true }));
                         options.onActionTiming?.(timing);
                     }
                 });
@@ -434,7 +469,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     const sweep = setInterval(() => {
         for (const [code, room] of rooms) {
             if (temporary(room)) { if (elapsed(room)) expire(room); }
-            else if (room.peers.every(p => !p) && Date.now() - room.idleSince > (options.idleMs ?? 300000)) rooms.delete(code);
+            else if (room.peers.every(p => !p) && Date.now() - room.idleSince > (options.idleMs ?? 300000)) { observer.remove(room); rooms.delete(code); }
         }
         options.drafts?.sweep?.();
     }, options.sweepMs ?? 30000);
@@ -449,7 +484,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                     const crumbleChanged = advanceCrumble(room.crumble, Date.now());
                     const raceChanged = room.record.level === 'race-condition' && advanceRace(room.race, Date.now());
                     const crossfeedChanged = room.record.level === 'crossfeed-vault' && advanceCrossfeed(room.crossfeed, Date.now());
-                    if (crumbleChanged || raceChanged || crossfeedChanged) { room.revision++; broadcast(room); }
+                    if (crumbleChanged || raceChanged || crossfeedChanged) { room.revision++; broadcast(room); observer.transition(room, () => rules(room).project(context(room)), undefined, undefined, 'server_timer'); }
                 }
             } finally { timerQueued = false; }
         });
@@ -472,7 +507,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                     const index = room.record.visitors.indexOf(visitor);
                     if (room.failed || index < 0 || JSON.stringify(room.profiles[index]) === JSON.stringify(current)) continue;
                     room.profiles[index] = { ...current };
-                    room.revision++; broadcast(room);
+                    room.revision++; broadcast(room); observer.session(room);
                 }
             });
         },

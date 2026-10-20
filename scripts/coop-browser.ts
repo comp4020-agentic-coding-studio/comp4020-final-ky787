@@ -1,3 +1,4 @@
+import { serverStarted } from './server-started.ts';
 import { onboardNinja } from './character-onboarding.ts';
 /** Shared muted browser/session utilities; routes use real input and read-only snapshots. */
 import { spawn, type ChildProcess } from 'node:child_process';
@@ -86,7 +87,7 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => reject(new Error('App start timed out')), 6000);
             app!.once('error', reject);
-            app!.stdout!.on('data', b => { const p = String(b).match(/listening on (\d+)/)?.[1]; if (p) { clearTimeout(timeout); resolve(`http://127.0.0.1:${p}/`); } });
+            app!.stdout!.on('data', serverStarted(port => { clearTimeout(timeout); resolve(`http://127.0.0.1:${port}/`); }));
             app!.stderr!.on('data', b => process.stderr.write(b));
         });
     }

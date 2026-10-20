@@ -1,3 +1,4 @@
+import { serverStarted } from '../scripts/server-started.ts';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, rm, readdir, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -21,10 +22,7 @@ async function start(dir: string): Promise<{
     children.push(child);
     const url = await new Promise<string>((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Server start timed out')), 5000);
-        child.stdout!.on('data', b => { const match = String(b).match(/listening on (\d+)/); if (match) {
-            clearTimeout(timeout);
-            resolve(`http://127.0.0.1:${match[1]}`);
-        } });
+        child.stdout!.on('data', serverStarted(port => { clearTimeout(timeout); resolve(`http://127.0.0.1:${port}`); }));
         child.once('error', reject);
         child.stderr!.on('data', () => { });
     });

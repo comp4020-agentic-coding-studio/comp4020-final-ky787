@@ -8,6 +8,8 @@ import { ensureVisitor, sameOrigin } from './identity.ts';
 import { attachMultiplayer } from './multiplayer.ts';
 import { PublicDraftRegistry, PublicDraftError, PUBLIC_DRAFT_LIMITS } from './public-drafts.ts';
 import { ProfileStore } from './profiles.ts';
+import { Telemetry, type TelemetryContext } from './telemetry.ts';
+import { createOperations, type OperationsOptions } from './ops.ts';
 import { validateCharacterProfile } from '../src/character/profile.ts';
 interface RecordData {
     id: string;
@@ -16,9 +18,15 @@ interface RecordData {
     progress: Progress;
 }
 /** One Fly machine/volume. Per-visitor serialization + revision checks prevent lost tab writes. */
-export async function createApp(dataDir: string, siteDir = resolve('dist'), options: { profiles?: ProfileStore } = {}) {
+export async function createApp(dataDir: string, siteDir = resolve('dist'), options: { profiles?: ProfileStore; telemetry?: Telemetry; operations?: OperationsOptions } = {}) {
     await mkdir(dataDir, { recursive: true });
     const profiles = options.profiles ?? new ProfileStore(dataDir);
+    const telemetry = options.telemetry ?? new Telemetry();
+    const operations = createOperations(telemetry, { token: process.env.OBSERVABILITY_TOKEN, ...options.operations });
+    // Observation must never turn an accepted save or gameplay request into a failure.
+    const emit = (event: string, context: TelemetryContext = {}, fields: Record<string, unknown> = {}, level: 'info' | 'warn' | 'error' = 'info') => {
+        try { telemetry.emit(event, context, fields, level); } catch { /* Observation only. */ }
+    };
     const queues = new Map<string, Promise<unknown>>();
     const drafts = new PublicDraftRegistry();
     let uploads = 0;
@@ -49,18 +57,25 @@ export async function createApp(dataDir: string, siteDir = resolve('dist'), opti
         }
     }
     async function save(record: RecordData): Promise<void> {
-        await atomicJson(join(dataDir, `${record.id}.json`), record);
+        const started = performance.now();
+        try { await atomicJson(join(dataDir, `${record.id}.json`), record); }
+        catch (error) { emit('persistence_failed', { visitor: record.id }, { operation: 'progress_save' }, 'error'); throw error; }
+        finally {
+            const elapsedMs = performance.now() - started;
+            if (elapsedMs >= 100) emit('persistence_slow', { visitor: record.id }, { operation: 'progress_save', elapsedMs }, 'warn');
+        }
     }
     const mime: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.ogg': 'audio/ogg', '.txt': 'text/plain' };
     const server = createServer(async (req, res) => {
         const json = (code: number, value: unknown) => { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); };
         try {
             const url = new URL(req.url ?? '/', 'http://localhost');
+            if (await operations.handle(req, res, url)) return;
             if (url.pathname.startsWith('/api/custom/')) {
                 if (!sameOrigin(req)) { json(403, { error: 'Origin mismatch' }); return; }
                 const visitor = ensureVisitor(req, res);
                 if (url.pathname === '/api/custom/snapshots' && req.method === 'POST') {
-                    if (uploads >= 2) { json(429, { error: 'Custom uploads are busy. Please retry shortly.' }); return; }
+                    if (uploads >= 2) { emit('rate_limited', { visitor }, { operation: 'custom_upload' }, 'warn'); json(429, { error: 'Custom uploads are busy. Please retry shortly.' }); return; }
                     uploads++;
                     const deadline = setTimeout(() => req.destroy(), 10_000);
                     try {
@@ -80,7 +95,7 @@ export async function createApp(dataDir: string, siteDir = resolve('dist'), opti
                 if (match && req.method === 'GET') {
                     const hash = multiplayer.snapshotFor(match[1], visitor);
                     if (!hash) { json(404, { error: 'Room unavailable or you have not joined. Temporary rooms may expire or be interrupted by a server restart.' }); return; }
-                    if (!drafts.allowRead(visitor)) { json(429, { error: 'Too many snapshot downloads. Wait a minute, then rejoin this room.' }); return; }
+                    if (!drafts.allowRead(visitor)) { emit('rate_limited', { visitor }, { operation: 'custom_download' }, 'warn'); json(429, { error: 'Too many snapshot downloads. Wait a minute, then rejoin this room.' }); return; }
                     const document = drafts.document(hash);
                     json(200, { hash, document }); return;
                 }
@@ -113,7 +128,12 @@ export async function createApp(dataDir: string, siteDir = resolve('dist'), opti
                 }
                 const validated = validateCharacterProfile(payload.profile);
                 if (!validated.ok) { json(400, { error: validated.error }); return; }
-                const saved = await profiles.save(visitor, validated.profile, payload.revision as number);
+                const started = performance.now();
+                const saved = await profiles.save(visitor, validated.profile, payload.revision as number).catch(error => {
+                    emit('persistence_failed', { visitor, player: validated.profile.name }, { operation: 'profile_save' }, 'error'); throw error;
+                });
+                const elapsedMs = performance.now() - started;
+                if (elapsedMs >= 100) emit('persistence_slow', { visitor, player: validated.profile.name }, { operation: 'profile_save', elapsedMs }, 'warn');
                 if (!saved.ok) { json(409, { error: 'Your character changed in another tab. Reload the saved character before editing.', record: saved.record }); return; }
                 json(200, saved.record); return;
             }
@@ -203,25 +223,36 @@ export async function createApp(dataDir: string, siteDir = resolve('dist'), opti
             }
         }
         catch (error) {
-            console.error('Request failed:', (error as Error).message);
+            emit('request_failed', {}, { operation: 'http_request', code: 'UNAVAILABLE' }, 'error');
             if (!res.headersSent)
                 json(503, { error: 'Storage unavailable. Your existing save has not been replaced.' });
             else
                 res.end();
         }
     });
-    const multiplayer = await attachMultiplayer(server, dataDir, { drafts, loadProfile: async visitor => (await profiles.load(visitor)).profile, ...(process.env.NODE_ENV === 'test' ? {
+    const multiplayer = await attachMultiplayer(server, dataDir, { telemetry, drafts, loadProfile: async visitor => (await profiles.load(visitor)).profile, ...(process.env.NODE_ENV === 'test' ? {
         semanticDelayMs: Number(process.env.BN_TEST_SEMANTIC_DELAY_MS) || 0,
     } : {}) });
-    const unsubscribeProfiles = profiles.subscribe((visitor, profile) => multiplayer.profileUpdated(visitor, profile));
-    server.once('shutdown', unsubscribeProfiles);
-    server.once('close', unsubscribeProfiles);
+    const unsubscribeProfiles = profiles.subscribe((visitor, profile, metadata) => {
+        emit(metadata.created ? 'character_created' : 'character_updated', { visitor, player: profile.name }, { colour: profile.colour, revision: metadata.revision });
+        multiplayer.profileUpdated(visitor, profile);
+    });
+    server.once('listening', () => emit('server_started', {}, { port: (server.address() as { port: number }).port }));
+    let stopped = false;
+    const stop = () => {
+        if (stopped) return;
+        stopped = true;
+        emit('server_shutdown');
+        unsubscribeProfiles();
+        operations.close();
+        telemetry.close();
+    };
+    server.once('shutdown', stop);
+    server.once('close', stop);
     return server;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
     const server = await createApp(process.env.DATA_DIR ?? '/data');
-    server.listen(Number(process.env.PORT ?? 8080), '0.0.0.0', () => console.log(`Binary Ninja listening on ${(server.address() as {
-        port: number;
-    }).port}`));
-    process.on('SIGTERM', () => { server.emit('shutdown'); server.close(() => process.exit(0)); });
+    server.listen(Number(process.env.PORT ?? 8080), '0.0.0.0');
+    for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => { server.emit('shutdown'); server.close(); });
 }
