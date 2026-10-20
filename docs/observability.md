@@ -130,7 +130,16 @@ pnpm exec vitest run --config vitest.unit.config.ts tests/telemetry.test.ts test
 pnpm check:observability
 ```
 
-The browser check uses independent visitors and actual game interactions, observes the protected operations interface, and captures screenshots. Consult the dated implementation handoff for actual commands run, screenshot paths, deployment evidence and outstanding checks; running local checks does not establish that production has been verified.
+The browser check uses independent visitors and actual game interactions, observes the protected operations interface, and captures screenshots. After the owner has configured the production secret, the same test can verify the deployed dashboard:
+
+```bash
+read -r -s -p 'Production operations credential: ' OBSERVABILITY_TOKEN
+export OBSERVABILITY_TOKEN
+BN_BASE_URL=https://comp4020-final-ky787.fly.dev/ BN_SHOTS=/tmp/bn-ops-production pnpm check:observability
+unset OBSERVABILITY_TOKEN
+```
+
+This creates fresh test visitors and parties through the actual UI. Keep production screenshots and snapshots private because other active users may appear. Publish aggregate test results rather than production activity records. Consult the dated implementation handoff for actual commands run, screenshot paths, deployment evidence and outstanding checks; running local checks does not establish that production has been verified.
 
 ## Deliberate limitations
 

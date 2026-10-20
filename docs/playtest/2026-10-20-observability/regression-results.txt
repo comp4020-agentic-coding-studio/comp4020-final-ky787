@@ -14,3 +14,9 @@ PASS native tables, campaign definitions and CONTROL SPINE evidence unchanged fr
 PASS 16 WebSocket visitors / 8 parties / 480 transform packets without movement log growth
 
 Production checks are distinct; see the dated technical handoff.
+
+PASS GitHub checks + Fly deployment for f0fdf2f
+PASS production real-input DEADLOCK solve with two fresh browser identities
+PASS structured Fly logs: three payloads, both exit arrivals, exactly one completion
+PASS production public game HTTP 200; disabled private endpoints HTTP 503/no-store
+PENDING production administrator token, authenticated dashboard and SSE verification (explicit approval required)

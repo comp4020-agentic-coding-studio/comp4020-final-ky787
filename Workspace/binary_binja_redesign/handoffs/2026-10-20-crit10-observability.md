@@ -47,3 +47,19 @@ The successful local DEADLOCK sample recorded 60 accepted semantic actions, no f
 The existing public-main GitHub workflow deploys to the single 256 MB Fly machine. Read-only preflight found the existing application running and no configured Fly secrets. No deployment credentials were changed. Creating a production OBSERVABILITY_TOKEN requires the owner's explicit approval, requested separately; do not infer authenticated production readiness from local screenshots.
 
 Solo physics and the separate local workbench server have no gameplay stream in this dashboard. Main-server campaign, labs and public custom co-op share the instrumented observer. Current player gauges count accepted room participant connections, not anonymous page views. History, references and admin sessions reset with the process; stdout capture remains Fly's responsibility. This is accepted-state observation, not independent server physics or anti-cheat verification.
+
+## Live deployment verification
+
+Implementation commits `8df014b` and `f0fdf2f` are pushed. [GitHub checks and deployment](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/actions/runs/39381549435) passed, and the existing Fly machine deployed the corrected release (version 44, Sydney).
+
+Performed against `https://comp4020-final-ky787.fly.dev/`:
+
+- Public game returned HTTP 200.
+- Two fresh browser identities initialized profiles, joined one party and completed the full authored DEADLOCK scenario using real controls. No browser runtime errors occurred.
+- Fly's captured stdout contained valid structured activity for chamber selection/start, controls, plate edges, lift/relay changes, cube pickup/drop/accepted placement, all three distinct socket payloads, exit unlock, both exit arrivals and exactly one completion.
+- `/ops`, `/api/ops/snapshot` and `/api/ops/events` returned HTTP 503 with `Cache-Control: no-store` and an explicit disabled state because no administrator token is configured. No private data was returned.
+- Authenticated production login, dashboard metrics and SSE were **not tested**. Explicit owner approval to create the Fly secret remains pending. The complete local authenticated browser test passed; it is not a substitute for that final production check.
+
+[Production evidence](../../../docs/playtest/2026-10-20-observability/production-verification.json) contains aggregate verification only. Automatic approval review rejected a detailed production-record export; the accepted alternative publishes no player names, visitor/session references, individual event timestamps or activity records. Local synthetic screenshots remain the visual evidence.
+
+The final handoff-only update does not change deployed code or credentials. Secret configuration and production authenticated verification are the remaining activation steps, with exact commands in the runbook.

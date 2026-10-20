@@ -1,0 +1,62 @@
+{
+  "deploymentCommit": "f0fdf2f47aeb1afd731eef6c59cf0f302f215858",
+  "workflow": "https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/actions/runs/39381549435",
+  "scope": "Aggregate results from two fresh automated test visitors only; no individual production activity retained.",
+  "scenario": "DEADLOCK",
+  "realInputSolvePassed": true,
+  "browserRuntimeErrors": 0,
+  "structuredFlyLogsVerified": true,
+  "distinctPayloadsAccepted": 3,
+  "playersReachedExit": 2,
+  "chamberCompletions": 1,
+  "eventCategoriesObserved": [
+    "chamber_completed",
+    "chamber_selected",
+    "chamber_started",
+    "control_toggled",
+    "controller_output_changed",
+    "cube_dropped",
+    "cube_picked_up",
+    "cube_placed",
+    "cube_removed",
+    "exit_unlocked",
+    "lift_power_changed",
+    "party_created",
+    "payload_docked",
+    "player_connected",
+    "player_disconnected",
+    "player_joined_party",
+    "player_reached_exit",
+    "pressure_plate_activated",
+    "pressure_plate_released",
+    "relay_power_changed"
+  ],
+  "dashboardSecretConfigured": false,
+  "productionLoginAndAuthenticatedStreamVerified": false,
+  "accessChecks": [
+    {
+      "path": "/",
+      "status": 200,
+      "cacheControl": "no-cache",
+      "disabled": false
+    },
+    {
+      "path": "/ops",
+      "status": 503,
+      "cacheControl": "no-store",
+      "disabled": true
+    },
+    {
+      "path": "/api/ops/snapshot",
+      "status": 503,
+      "cacheControl": "no-store",
+      "disabled": true
+    },
+    {
+      "path": "/api/ops/events",
+      "status": 503,
+      "cacheControl": "no-store",
+      "disabled": true
+    }
+  ]
+}
