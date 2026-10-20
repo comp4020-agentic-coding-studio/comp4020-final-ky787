@@ -13,4 +13,4 @@ Captured from the actual local Node server and production game build. Four indep
 
 Screenshots were visually reviewed for readable names, session/chamber context, payload attribution and completion. They contain no administrator credential, join code or raw visitor UUID. The reused scenario’s detailed private identity report is deliberately excluded.
 
-These files establish local behavior. Aggregate-only live production verification is in `production-verification.json` and the implementation handoff. The deployed game and structured Fly events passed a real DEADLOCK solve; production administrator authentication remains unconfigured and untested.
+These files establish local behavior. Aggregate-only live production verification is in `production-verification.json` and the implementation handoff. The deployed game and structured Fly events passed a real DEADLOCK solve. Subsequent administrator activation and the full authenticated production browser test passed; see `production-activation.json`. Production screenshots and activity snapshots remain private.

@@ -19,4 +19,7 @@ PASS GitHub checks + Fly deployment for f0fdf2f
 PASS production real-input DEADLOCK solve with two fresh browser identities
 PASS structured Fly logs: three payloads, both exit arrivals, exactly one completion
 PASS production public game HTTP 200; disabled private endpoints HTTP 503/no-store
-PENDING production administrator token, authenticated dashboard and SSE verification (explicit approval required)
+PASS production administrator token configured after explicit approval; local copy saved owner-only and ignored
+PASS production authenticated dashboard and live SSE with two test parties and complete DEADLOCK solve
+PASS HTTPS secure cookie attributes, no-store, unauthorized 401 and logout revocation
+PASS administrator credential absent from recent Fly logs

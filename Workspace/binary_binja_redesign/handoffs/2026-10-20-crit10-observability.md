@@ -1,5 +1,7 @@
 # Crit 10 observability — 20 October 2026
 
+**Current status:** administrator activation is complete after explicit owner approval. Production login, secure cookies and the full live dashboard browser check passed; see the activation record below. Earlier disabled-state checks are retained chronologically.
+
 ## Scope and implementation
 
 Started from `a2f1f81a7431c025da2695cd41155da28a0d0c91`. Inspected current HEAD, fetched origin, and read repository instructions. Existing user changes to CLAUDE.md, PROCESS.md, deleted earlier handoffs and levels/drafts/blank-room.json were left untouched and excluded from the feature commit.
@@ -58,8 +60,18 @@ Performed against `https://comp4020-final-ky787.fly.dev/`:
 - Two fresh browser identities initialized profiles, joined one party and completed the full authored DEADLOCK scenario using real controls. No browser runtime errors occurred.
 - Fly's captured stdout contained valid structured activity for chamber selection/start, controls, plate edges, lift/relay changes, cube pickup/drop/accepted placement, all three distinct socket payloads, exit unlock, both exit arrivals and exactly one completion.
 - `/ops`, `/api/ops/snapshot` and `/api/ops/events` returned HTTP 503 with `Cache-Control: no-store` and an explicit disabled state because no administrator token is configured. No private data was returned.
-- Authenticated production login, dashboard metrics and SSE were **not tested**. Explicit owner approval to create the Fly secret remains pending. The complete local authenticated browser test passed; it is not a substitute for that final production check.
+- Authenticated production login, dashboard metrics and SSE were **not tested**. At this initial deployment check, owner approval to create the Fly secret was still pending; activation was subsequently completed below. The complete local authenticated browser test passed; it is not a substitute for that final production check.
 
 [Production evidence](../../../docs/playtest/2026-10-20-observability/production-verification.json) contains aggregate verification only. Automatic approval review rejected a detailed production-record export; the accepted alternative publishes no player names, visitor/session references, individual event timestamps or activity records. Local synthetic screenshots remain the visual evidence.
 
-The final handoff-only update does not change deployed code or credentials. Secret configuration and production authenticated verification are the remaining activation steps, with exact commands in the runbook.
+The initial handoff-only update did not change deployed code or credentials. Secret configuration and production authenticated verification were the remaining activation steps at that point; both were subsequently completed below.
+
+## Administrator activation completed
+
+The owner explicitly approved generating the administrator credential, configuring Fly and retaining a local copy. A random 32-byte credential was saved to `.local-data/secrets/observability-token.txt` with mode `0600`, owned by the local user and ignored by Git, then imported into the Fly `OBSERVABILITY_TOKEN` secret through stdin. The value was never placed in a URL, command argument, chat message or repository. The existing Fly machine restarted successfully; deployment credentials and game code were unchanged.
+
+The production `pnpm check:observability` run passed with four independent test visitors across two parties and a real-input DEADLOCK solve. The authenticated dashboard showed live party/player metrics, accepted puzzle interactions, all three payloads, both exit arrivals and completion. Disconnect/reconnect, administrator reload, SSE reconnection and logout revocation passed. The production screenshot was visually reviewed and remains local/private.
+
+Separate HTTPS checks verified anonymous snapshot/stream requests receive 401, login and authenticated snapshots succeed, responses use `no-store`, and the session cookie is `HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`. A revoked cookie receives 401. The credential was checked against recent Fly logs and was absent.
+
+[Aggregate activation evidence](../../../docs/playtest/2026-10-20-observability/production-activation.json) contains no names, visitor/session references, individual activity timestamps or credentials. Private browser evidence is under `.local-data/ops-verification/`. No activation steps remain; the owner can enter the saved local password at `https://comp4020-final-ky787.fly.dev/ops`.

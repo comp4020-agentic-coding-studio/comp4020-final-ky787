@@ -1,0 +1,36 @@
+{
+  "phase": "administrator activation after explicit owner approval",
+  "dashboardSecretConfigured": true,
+  "productionLoginAndAuthenticatedStreamVerified": true,
+  "localCredentialCopySaved": true,
+  "localCredentialFileMode": "0600",
+  "credentialIgnoredByGit": true,
+  "credentialAbsentFromRecentFlyLogs": true,
+  "realBrowserCheckPassed": true,
+  "testVisitors": 4,
+  "testParties": 2,
+  "completeChamberSolve": "DEADLOCK",
+  "livePayloadDeliveriesVerified": true,
+  "liveCompletionVerified": true,
+  "disconnectAndReconnectVerified": true,
+  "administratorReloadAndStreamReconnectVerified": true,
+  "logoutRevocationVerified": true,
+  "accessChecks": {
+    "/api/ops/snapshot": 401,
+    "/api/ops/events": 401,
+    "loginPageStatus": 200,
+    "loginPageNoStore": true,
+    "cookieProtection": {
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Strict",
+      "path": "/",
+      "maxAgeSeconds": 28800
+    },
+    "authenticatedSnapshotStatus": 200,
+    "snapshotNoStore": true,
+    "boundedHistory": true,
+    "revokedSessionStatus": 401
+  },
+  "privacy": "Only aggregate outcomes published. Production screenshots and activity snapshots remain private and ignored locally."
+}
