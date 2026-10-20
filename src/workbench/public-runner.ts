@@ -1,3 +1,4 @@
+import { DEFAULT_CHARACTER_PROFILE, colourHex } from '../character/profile.ts';
 import './custom.css';
 import { DraftSession } from './coop-session.ts';
 import { InputManager } from '../ui/input.ts';
@@ -13,10 +14,17 @@ const canvas = $<HTMLCanvasElement>('stage'), renderer = new PuzzleRenderer(canv
 const audio = new GameAudio(), sound = new AudioPresentation(audio);
 let completed = false, diagnostics = false, lastWorld: DraftSession['world'] = null, last = 0, accumulated = 0;
 const session = new DraftSession(update, error => { $('status').textContent = error; }, room => `/api/custom/rooms/${room.code}/snapshot`, true);
+const participants = document.createElement('div'); participants.id = 'custom-players'; participants.setAttribute('aria-label', 'Players'); $('invitation').after(participants);
 function update() {
     const c = session.client, room = c.room;
     $('status').textContent = session.error || (c.connected ? `${room?.connected.every(Boolean) ? 'PARTNER JOINED' : 'WAITING FOR PARTNER'} · PLAYER ${c.slot}` : c.status);
     if (room) {
+        participants.replaceChildren(...room.connected.map((connected, i) => {
+            const profile = room.profiles?.[i] ?? DEFAULT_CHARACTER_PROFILE, badge = document.createElement('span');
+            badge.style.borderColor = colourHex(profile.colour);
+            badge.textContent = `${profile.name} / P${i + 1}${i === 0 ? ' · HOST' : ' · GUEST'} · ${connected ? 'CONNECTED' : room.assigned[i] ? 'DISCONNECTED' : 'WAITING'}`;
+            return badge;
+        }));
         $<HTMLInputElement>('code').value = room.code;
         const invite = new URL('/custom-level.html', location.origin); invite.searchParams.set('code', room.code);
         if (testing) invite.searchParams.set('mode', 'test');
@@ -88,7 +96,7 @@ function frame(now: number) {
             }
         }
         sound.observe(w, c.takeMachineryEvents()); sound.ambience(w, active && !document.hidden);
-        const cues = renderer.draw(w, dt, input.state.aim, input.overviewHeld, c.slot ? { localSlot: c.slot, connected: c.connected, remote: c.remote.sample(now), reachedExit: c.room?.reachedExit ?? [false, false], completed,
+        const cues = renderer.draw(w, dt, input.state.aim, input.overviewHeld, c.slot ? { localSlot: c.slot, profiles: c.room?.profiles, connected: c.connected, remote: c.remote.sample(now), reachedExit: c.room?.reachedExit ?? [false, false], completed,
             remotePullingCubes: cubeEntries(c.room?.cubes ?? {}).filter(([id, cube]) => cube.pulling && !c.ownsCubeFor(id)).map(([id]) => id) } : undefined, active);
         for (const { cue, at } of cues) audio.play(cue, Math.max(0, 1 - Math.hypot(at.x - w.player.x, at.y - w.player.y) / 1100));
         if (testing && diagnostics) $('diagnostics').textContent = 'TEST INFORMATION · READ ONLY\n' + JSON.stringify(observe(), null, 2);

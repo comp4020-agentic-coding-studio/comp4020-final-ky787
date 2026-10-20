@@ -1,3 +1,6 @@
+import { colourHex, DEFAULT_CHARACTER_PROFILE, type PublicCharacterProfile } from '../character/profile.ts';
+import { characterForSlot, characterLabel } from '../character/presentation.ts';
+import type { CharacterProfiles, Slot } from '../coop/protocol.ts';
 import { cubeEntries, isDeclarativeLevel, type CubeId } from '../coop/protocol.ts';
 import { isCampaignLevel, isAuthoredCampaignLevel } from '../coop/campaign.ts';
 import { TracePlayback } from './evidence-presentation.ts';
@@ -26,6 +29,8 @@ import { drawPressurePad, drawPadOutputPulse } from './plate-render.ts';
 import { drawGravityLift } from './lift-render.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
+    /** Solo / editor appearance; multiplayer appearance comes from authoritative slot profiles. */
+    profile: PublicCharacterProfile = { ...DEFAULT_CHARACTER_PROFILE };
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
@@ -87,7 +92,7 @@ export class PuzzleRenderer {
         c.arc(x, y, radius, 0, Math.PI * 2);
         c.stroke();
     }
-    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { localSlot: 1 | 2; connected?: boolean; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }, running = true, editorCamera = this.editorCamera): HeroCue[] {
+    draw(w: PuzzleWorld, dt: number, aim: Vec2, overview: boolean, players?: { profiles?: CharacterProfiles; localSlot: 1 | 2; connected?: boolean; remote: PlayerState | null; reachedExit: [boolean, boolean]; completed: boolean; remotePullingCube?: boolean; remotePullingCubes?: CubeId[] }, running = true, editorCamera = this.editorCamera): HeroCue[] {
         this.resize();
         this.replay.update(w.frame, dt);
         const c = this.ctx, cam = this.camera, r = w.room;
@@ -305,20 +310,21 @@ export class PuzzleRenderer {
         drawReceivers(c, receivers, this.heroes.receivers, this.heroes.time, 'front', energyMotion);
         drawReceiverLabels(c, receivers, cam.zoom);
         const p = w.player, rope = p.rope;
+        const localProfile = players ? characterForSlot(players.profiles, players.localSlot) : this.profile;
+        const localAccent = colourHex(localProfile.colour);
+        const remoteSlot = players?.localSlot === 1 ? 2 : 1;
+        const remoteProfile = characterForSlot(players?.profiles, remoteSlot);
         if (rope.phase !== 'idle') {
-            this.line(p.x, p.y, rope.tip.x, rope.tip.y, C.cyan, 2);
+            this.line(p.x, p.y, rope.tip.x, rope.tip.y, localAccent, 2);
             this.ring(rope.tip.x, rope.tip.y, 4, C.ink);
         }
-        const localAccent = players?.localSlot === 2 ? '#b59bff' : C.cyan;
         if (players?.remote) {
-            const other = players.remote, accent = players.localSlot === 1 ? '#b59bff' : C.cyan;
+            const other = players.remote, accent = colourHex(remoteProfile.colour);
             if (other.rope.phase !== 'idle') this.line(other.x, other.y, other.rope.tip.x, other.rope.tip.y, accent);
             drawNinja(c, other, w.elapsed, accent);
-            this.text(`PLAYER ${players.localSlot === 1 ? 2 : 1}`, other.x - 32, other.y - 30, 10, accent);
         }
         drawNinja(c, p, w.elapsed, localAccent);
         drawEntryProjection(c, r, this.heroes);
-        if (players) this.text(`YOU / P${players.localSlot}`, p.x - 26, p.y - 30, 10, localAccent);
         const hint = w.interactionHint();
         if (hint) {
             const station = r.breakpoints?.find(b => Math.hypot(p.x - b.at.x, p.y - (b.at.y - 25)) < 90);
@@ -375,12 +381,43 @@ export class PuzzleRenderer {
             this.text('SAFE RECOVERY FLOOR · JUMP BACK UP', 1220, 700, 13, C.dim);
         this.particles.update(dt);
         this.particles.draw(c);
+        this.drawCharacterLabels([
+            { player: p, profile: localProfile, slot: players?.localSlot, local: true, prompt: !!hint || rope.phase === 'attached' || w.keyboardGrapple || !!target && !p.grounded },
+            ...(players?.remote ? [{ player: players.remote, profile: remoteProfile, slot: remoteSlot as Slot, local: false, prompt: false }] : []),
+        ], dpr);
         if (w.deathFlash > 0) {
             c.setTransform(dpr, 0, 0, dpr, 0, 0);
             c.fillStyle = `rgba(250,129,126,${w.deathFlash * .4})`;
             c.fillRect(0, 0, cam.viewW, cam.viewH);
         }
         return heroCues;
+    }
+    private drawCharacterLabels(entries: { player: PlayerState; profile: PublicCharacterProfile; slot?: Slot; local: boolean; prompt: boolean }[], dpr: number): void {
+        const c = this.ctx, cam = this.camera;
+        c.save(); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // CSS-pixel text remains readable during room overview and never changes camera or collision bounds.
+        c.font = '500 11px ui-monospace, monospace'; c.textBaseline = 'middle'; c.textAlign = 'center';
+        const placed: { x: number; y: number; w: number; h: number }[] = [];
+        for (const entry of entries) {
+            const text = characterLabel(entry.profile, entry.slot, entry.local, cam.zoom);
+            const w = c.measureText(text).width + 16, h = 20;
+            const anchorX = (entry.player.x - cam.originX()) * cam.zoom;
+            const anchorY = (entry.player.y - cam.originY()) * cam.zoom;
+            if (anchorX < -w || anchorX > cam.viewW + w || anchorY < -60 || anchorY > cam.viewH + 80) continue;
+            const x = Math.max(4, Math.min(cam.viewW - w - 4, anchorX - w / 2));
+            let y = Math.max(4, anchorY - (entry.prompt ? Math.max(88 * cam.zoom, 46) : Math.max(25 * cam.zoom, 19)) - h);
+            for (const other of placed) if (x < other.x + other.w + 4 && x + w + 4 > other.x && y < other.y + other.h + 4 && y + h + 4 > other.y) {
+                y = other.y - h - 4;
+                if (y < 4) y = other.y + other.h + 4;
+            }
+            placed.push({ x, y, w, h });
+            const accent = colourHex(entry.profile.colour);
+            c.fillStyle = '#0c131aeb'; c.fillRect(x, y, w, h);
+            c.strokeStyle = accent; c.lineWidth = 1;
+            c.beginPath(); c.moveTo(x, y + 3); c.lineTo(x, y + h - 3); c.stroke();
+            c.fillStyle = C.ink; c.fillText(text, x + w / 2, y + h / 2);
+        }
+        c.restore();
     }
 }
 function ropeOn(id: string, w: PuzzleWorld): boolean { return w.player.rope.phase === 'attached' && w.player.rope.anchorId === id; }

@@ -1,3 +1,5 @@
+import { DEFAULT_CHARACTER_PROFILE, parseCharacterProfile, type PublicCharacterProfile } from '../src/character/profile.ts';
+import type { CharacterProfiles } from '../src/coop/protocol.ts';
 import { isAuthoredCampaignLevel } from '../src/coop/campaign.ts';
 import { isDeclarativeLevel } from '../src/coop/protocol.ts';
 import { advanceCrossfeed, crossfeedDue, freshCrossfeed, syncCrossfeed, type CrossfeedRuntime } from './crossfeed-state.ts';
@@ -35,6 +37,7 @@ export interface FrozenDraftRegistry {
     sweep?(): void;
 }
 interface Room {
+    profiles: CharacterProfiles;
     draft?: FrozenDraftSession; draftHeld: [DraftId[], DraftId[]]; draftCubeContacts: CubeMap<DraftId[]>;
     record: RoomRecord; peers: [Peer | null, Peer | null]; plates: [Plate, Plate];
     cubes: CubeMap<SharedCube>; crumble: CrumbleRuntime; race: RaceRuntime; crossfeed: CrossfeedRuntime; revision: number; needsPersist: boolean;
@@ -42,6 +45,8 @@ interface Room {
 }
 export interface ActionTiming { action: string; queueMs: number; persistMs: number; totalMs: number; durable: boolean }
 export interface MultiplayerOptions {
+    /** Reads appearance using the server's HttpOnly visitor identity, never a client slot claim. */
+    loadProfile?: (visitor: string) => Promise<PublicCharacterProfile | null>;
     /** Local snapshots or the bounded, temporary public registry. */
     drafts?: FrozenDraftRegistry;
     /** Local services can enforce their bound origin as well as ordinary same-origin checks. */
@@ -80,6 +85,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     function serial(work: () => Promise<void>) {
         queued++;
         queue = queue.then(work).catch(() => { console.error('Multiplayer operation failed'); }).finally(() => { queued--; });
+        return queue;
     }
     function send(peer: Peer, message: ServerMessage) {
         if (peer.ws.readyState !== WebSocket.OPEN) return;
@@ -89,7 +95,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     const error = (peer: Peer, code: string, message = code.replaceAll('_', ' ')) => send(peer, { type: 'error', code, message });
     // Registry discrimination guarantees the rule and record have the same level.
     const rules = (room: Room): LevelDefinition<SessionLevelId> => room.draft?.level === 'workbench' ? room.draft.definition as LevelDefinition<SessionLevelId> : definition(room.record.level);
-    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cubes, room.crumble, Date.now(), room.race, room.crossfeed, rules(room), room.draftHeld, room.draftCubeContacts), revision: room.revision });
+    const view = (room: Room) => ({ ...sharedRoom(room.record, room.peers.map(Boolean) as [boolean, boolean], room.plates, room.cubes, room.crumble, Date.now(), room.race, room.crossfeed, rules(room), room.draftHeld, room.draftCubeContacts), revision: room.revision, profiles: room.profiles });
     // Explicit durable projection. Live occupancy, owners, streams and transforms are absent.
     const durable = (room: Room) => JSON.stringify([room.record.levelState, room.record.checkpoint, room.record.cubePlacements,
         room.record.exitUnlocked, room.record.reachedExit, room.record.completed, room.record.party, room.record.level, room.record.levelInstance, room.record.draft]);
@@ -108,6 +114,10 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             throw new Error('Room storage unavailable');
         }
     }
+    async function appearance(visitor: string): Promise<PublicCharacterProfile> {
+        try { return parseCharacterProfile(await options.loadProfile?.(visitor)) ?? { ...DEFAULT_CHARACTER_PROFILE }; }
+        catch { return { ...DEFAULT_CHARACTER_PROFILE }; } // A profile outage never disables an existing party.
+    }
     async function load(code: string): Promise<Room | null> {
         const current = rooms.get(code);
         if (current) { if (temporary(current) && elapsed(current)) { expire(current); return null; } return current; }
@@ -120,7 +130,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         const record = readRoomRecord(value, code, frozen?.level === 'workbench' ? frozen.definition : undefined);
         if (!record) throw new Error('Invalid room record');
         if (rooms.size >= 64) throw new Error('Room capacity');
-        const room: Room = { draft: frozen, draftHeld: [[], []], draftCubeContacts: {}, record, revision: record.revision, needsPersist: record !== value, cubes: freshCubes(record.level, frozen?.level === 'workbench' ? frozen.definition as LevelDefinition<SessionLevelId> : definition(record.level)), crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
+        const profiles = await Promise.all(record.visitors.map(visitor => visitor ? appearance(visitor) : null)) as CharacterProfiles;
+        const room: Room = { profiles, draft: frozen, draftHeld: [[], []], draftCubeContacts: {}, record, revision: record.revision, needsPersist: record !== value, cubes: freshCubes(record.level, frozen?.level === 'workbench' ? frozen.definition as LevelDefinition<SessionLevelId> : definition(record.level)), crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(), peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
         rooms.set(code, room);
         return room;
     }
@@ -167,7 +178,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             if (frozen?.coopError) { error(peer, 'DRAFT_NOT_COOP_COMPATIBLE', frozen.coopError); return; }
             const record = frozen ? draftRecord(code, peer.visitor, frozen) : message.type === 'create-party' ? newParty(code, peer.visitor) : newRecord(code, peer.visitor, message.type === 'create' ? message.level ?? 'pairing-bay' : 'pairing-bay');
             const level = record.level;
-            room = { record, draft: frozen, draftHeld: [[], []], draftCubeContacts: {}, revision: 0, needsPersist: true,
+            room = { profiles: [null, null], record, draft: frozen, draftHeld: [[], []], draftCubeContacts: {}, revision: 0, needsPersist: true,
                 cubes: freshCubes(level, frozen?.level === 'workbench' ? frozen.definition as LevelDefinition<SessionLevelId> : definition(level)), crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(),
                 peers: [null, null], plates: [null, null], idleSince: Date.now(), failed: false };
             rooms.set(code, room);
@@ -179,12 +190,15 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
             if (!room) { error(peer, expired.has(code) ? 'ROOM_EXPIRED' : 'ROOM_NOT_FOUND', expired.has(code) ? 'This temporary room expired. Ask the host to create a new room.' : 'Room not found. Check the code; temporary rooms are lost after a server restart.'); return; }
         }
         if (peer.ws.readyState !== WebSocket.OPEN) return;
+        const profile = await appearance(peer.visitor);
+        if (peer.ws.readyState !== WebSocket.OPEN) return;
         let index = room.record.visitors.indexOf(peer.visitor);
         if (index < 0) {
             if (room.record.visitors[1]) { error(peer, 'ROOM_FULL'); return; }
             index = 1;
             room.record.visitors[1] = peer.visitor; room.needsPersist = true;
         }
+        room.profiles[index] = profile;
         const previous = room.peers[index];
         if (previous) {
             // Retire first: queued old-socket actions/close cannot affect the replacement.
@@ -445,6 +459,23 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
     server.on('close', shutdown);
     server.on('shutdown', shutdown);
     return { rooms, shutdown, drained: () => queue,
+        /** Called only after a trusted profile save. No WebSocket message may set appearance. */
+        profileUpdated(visitor: string, profile: PublicCharacterProfile): Promise<void> {
+            const sanitized = parseCharacterProfile(profile);
+            if (!sanitized) return Promise.resolve();
+            return serial(async () => {
+                // Re-read when available so rapid/tab-concurrent saves cannot publish stale appearance.
+                let current = sanitized;
+                if (options.loadProfile) try { current = parseCharacterProfile(await options.loadProfile(visitor)) ?? sanitized; }
+                catch { /* A trusted successful save is still usable if the follow-up read fails. */ }
+                for (const room of rooms.values()) {
+                    const index = room.record.visitors.indexOf(visitor);
+                    if (room.failed || index < 0 || JSON.stringify(room.profiles[index]) === JSON.stringify(current)) continue;
+                    room.profiles[index] = { ...current };
+                    room.revision++; broadcast(room);
+                }
+            });
+        },
         snapshotFor(code: string, visitor: string) {
             const room = rooms.get(code);
             if (!room || !temporary(room)) return undefined;

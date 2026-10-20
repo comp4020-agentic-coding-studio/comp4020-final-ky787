@@ -1,3 +1,4 @@
+import { CharacterProfileClient } from '../character/client.ts';
 /** Dedicated local diagnostic page; excluded from the production Vite input. */
 import { InputManager } from '../ui/input.ts';
 import { PuzzleRenderer } from '../slice/render.ts';
@@ -14,6 +15,7 @@ const errorPanel = document.querySelector<HTMLElement>('#error')!;
 const query = new URL(location.href).searchParams;
 const input = new InputManager(true), renderer = new PuzzleRenderer(canvas);
 const bootstrap = await fetch('/api/workbench/bootstrap').then(r => r.json()) as { token: string; engineRevision: string; files: string[] };
+void new CharacterProfileClient().load().then(profile => { if (profile) renderer.profile = profile; }).catch(() => {});
 const latest = document.querySelector<HTMLSelectElement>('#latest')!;
 const restartButton = document.querySelector<HTMLButtonElement>('#restart')!;
 latest.add(new Option('Choose saved draft', ''));
@@ -131,7 +133,7 @@ function frame(now: number) {
                 }
             } else accumulated = 0;
             const c = session?.client;
-            renderer.draw(w, running ? dt : 0, input.state.aim, overview || input.overviewHeld, c?.slot ? { localSlot: c.slot, connected: c.connected, remote: c.remote.sample(performance.now()), reachedExit: c.room?.reachedExit ?? [false, false], completed: c.room?.completed ?? false } : undefined, running);
+            renderer.draw(w, running ? dt : 0, input.state.aim, overview || input.overviewHeld, c?.slot ? { localSlot: c.slot, profiles: c.room?.profiles, connected: c.connected, remote: c.remote.sample(performance.now()), reachedExit: c.room?.reachedExit ?? [false, false], completed: c.room?.completed ?? false } : undefined, running);
         }
     } catch (error) { running = false; showError(error); }
     requestAnimationFrame(frame);

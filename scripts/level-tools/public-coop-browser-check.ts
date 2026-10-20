@@ -1,3 +1,4 @@
+import { onboardNinja } from '../character-onboarding.ts';
 /** Production-only UI + real-input acceptance. No player/cube/controller state injection. */
 import { mkdir, readFile, writeFile, rm, readdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -148,7 +149,7 @@ try {
     await h.click(host, '#replay'); await wait(host, { path: 'session.generation', equals: 2 }); await wait(guest, { path: 'session.generation', equals: 2 });
     await wait(host, { path: 'checkpoint', equals: 'entry' }); await wait(host, { path: 'player.x', equals: 120 });
     check('host replay resets puzzle, cubes and completion with unchanged snapshot and new generation', !(await observation(host)).completed && (await observation(host)).hash === savedHash && (await observation(guest)).hash === savedHash && (await observation(host)).session.sharedCubes['draft:payload'].holder === null);
-    await h.click(host, '#return'); await until(host, '!!globalThis.binaryNinja?.store.ready');
+    await h.click(host, '#return'); await until(host, '!!globalThis.binaryNinja?.store.ready'); await onboardNinja(host);
     check('custom play leaves official progress unchanged', JSON.stringify(await host.read("fetch('/api/progress').then(r=>r.json())")) === JSON.stringify(progress));
     await h.click(host, '#my-levels'); await until(host, 'document.querySelectorAll(".level-card").length===1');
     check('returning to MY LEVELS retains the authored map', true);

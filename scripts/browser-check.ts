@@ -4,6 +4,7 @@
  * pnpm build; DATA_DIR=/tmp/bn-playtest pnpm start
  * pnpm check:browser [url] [screenshot-directory]
  */
+import { onboardNinja } from './character-onboarding.ts';
 import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -250,7 +251,7 @@ async function waitFor(cdp: Cdp, what: string, predicate: (s: Snap) => boolean, 
             continue;
         }
         const s = await snap(cdp);
-        if (predicate(s))
+        if (predicate(s) && (what === 'save API' || await evaluate<boolean>(cdp, '!!binaryNinja.snapshot().character.ready')))
             return s;
         if (Date.now() > deadline)
             throw new Error(`Timed out: ${what}: ${JSON.stringify(s)}`);
@@ -565,9 +566,10 @@ async function main() {
         cdp = await connect(URL_BASE);
         await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false });
         await waitFor(cdp, 'save API', s => s.persistence.visitor !== '');
+        check('audio waits for the first real gesture', (await snap(cdp)).audio.state === 'locked' && (await snap(cdp)).audio.voices === 0);
+        await onboardNinja({ send: (method, params) => cdp!.send(method, params), read: expression => evaluate(cdp!, expression) });
         await shot(cdp, 'start');
         check('new visitor starts at pressure', (await snap(cdp)).room === 'pressure');
-        check('audio waits for the first real gesture', (await snap(cdp)).audio.state === 'locked' && (await snap(cdp)).audio.voices === 0);
         check('all four rooms available from the menu', await evaluate(cdp, 'document.querySelectorAll(".level-select button").length === 4'));
         // Native keyboard navigation includes the public builder before the four rooms.
         await tap(cdp, 'Tab');

@@ -1,3 +1,4 @@
+import { CharacterProfileClient } from '../character/client.ts';
 import './editor.css';
 import { cloneDraft, codeActivation, draftHash, newDraft, objectBounds, objectPort, serializeDraft, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftObject } from './model.ts';
 import { BUILTIN_OUTPUTS, validateDraft } from './validation.ts';
@@ -124,6 +125,8 @@ export class WorkbenchEditor {
     async bootstrap() {
         try {
             const boot = await this.storage.initialize(); this.storageReady = true;
+            // Cosmetic lookup is optional; editing and portable level JSON never depend on it.
+            void new CharacterProfileClient().load().then(profile => { if (profile) this.renderer.profile = profile; }).catch(() => {});
             this.engineRevision = boot.engineRevision; this.dataDirectory = boot.location;
             this.files = await this.storage.list(); this.refreshFiles();
             if (boot.gameUrl) { const link = $<HTMLAnchorElement>('#back-to-game'); link.href = boot.gameUrl; link.hidden = false; }

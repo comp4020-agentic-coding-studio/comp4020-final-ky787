@@ -5,6 +5,7 @@ import { resolve, join } from 'node:path';
 import { mkdir, readFile, unlink } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { createServer as createViteServer, type ViteDevServer } from 'vite';
+import { ProfileStore } from '../../server/profiles.ts';
 import { ensureVisitor } from '../../server/identity.ts';
 import { attachMultiplayer } from '../../server/multiplayer.ts';
 import { atomicJson } from '../../server/atomic-json.ts';
@@ -13,7 +14,10 @@ import { validateDraft } from '../../src/workbench/validation.ts';
 import { DraftStorage, StorageError, draftRecord, MAX_DOCUMENT_BYTES } from './storage.ts';
 import { DraftSessionRegistry } from './session-registry.ts';
 
-export async function startWorkbench(options: { port?: number; draftRoot?: string; dataDir?: string; frontend?: boolean; gameUrl?: () => string | undefined } = {}) {
+export async function startWorkbench(options: { port?: number; draftRoot?: string; dataDir?: string; frontend?: boolean; profiles?: ProfileStore; browserHost?: string; gameUrl?: () => string | undefined } = {}) {
+    const profiles = options.profiles ?? new ProfileStore(resolve(process.env.DATA_DIR ?? '.local-data'));
+    const browserHost = options.browserHost ?? '127.0.0.1';
+    if (!['127.0.0.1', 'localhost'].includes(browserHost)) throw new Error('Workbench browser host must be loopback');
     const storage = new DraftStorage(options.draftRoot);
     await storage.ready();
     const dataDir = resolve(options.dataDir ?? '.workbench');
@@ -126,6 +130,7 @@ export async function startWorkbench(options: { port?: number; draftRoot?: strin
                 json(res, 404, { error: 'Unknown workbench operation' }); return;
             }
             if (url.pathname === '/api/identity' && method === 'GET') { json(res, 200, { id: ensureVisitor(req, res) }); return; }
+            if (url.pathname === '/api/profile' && method === 'GET') { json(res, 200, await profiles.load(ensureVisitor(req, res))); return; }
             // Never provide the normal progress store from this process.
             if (url.pathname.startsWith('/api/')) { json(res, 404, { error: 'Unavailable in workbench' }); return; }
             if (method !== 'GET' && method !== 'HEAD') { json(res, 405, { error: 'Method not allowed' }); return; }
@@ -137,6 +142,7 @@ export async function startWorkbench(options: { port?: number; draftRoot?: strin
             else json(res, 400, { error: error instanceof Error ? error.message : String(error) });
         }
     });
+    let unsubscribeProfiles: (() => void) | undefined;
     let multiplayer: Awaited<ReturnType<typeof attachMultiplayer>> | undefined;
     try {
     vite = options.frontend === false ? undefined : await createViteServer({
@@ -146,19 +152,20 @@ export async function startWorkbench(options: { port?: number; draftRoot?: strin
             fs: { strict: true, allow: [resolve('.')], deny: ['**/.git/**', '**/.aws/**', '**/.codex/**', '**/.agents/**', '**/.claude/**', '**/Workspace/**', '**/.env*', '**/*.pem', '**/.workbench/**', '**/levels/**'] } },
         optimizeDeps: { entries: ['workbench.html', 'workbench-runner.html'], include: [] },
     });
-    multiplayer = await attachMultiplayer(server, join(dataDir, 'sessions'), { drafts: registry, ignoredUpgradePath: '/__workbench-vite', acceptsUpgrade: req => !!origin && req.headers.host === new URL(origin).host && req.headers.origin === origin });
+    multiplayer = await attachMultiplayer(server, join(dataDir, 'sessions'), { drafts: registry, loadProfile: async visitor => (await profiles.load(visitor)).profile, ignoredUpgradePath: '/__workbench-vite', acceptsUpgrade: req => !!origin && req.headers.host === new URL(origin).host && req.headers.origin === origin });
+    unsubscribeProfiles = profiles.subscribe((visitor, profile) => { multiplayer?.profileUpdated(visitor, profile); });
     await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(options.port ?? 4174, '127.0.0.1', () => { server.off('error', reject); resolve(); }); });
     } catch (error) {
-        server.emit('shutdown'); server.closeAllConnections();
+        unsubscribeProfiles?.(); server.emit('shutdown'); server.closeAllConnections();
         await Promise.all([vite?.close(), multiplayer?.drained(), new Promise<void>(resolve => server.close(() => resolve()))]);
         throw error;
     }
     const address = server.address();
     if (!address || typeof address === 'string') throw new Error('Workbench did not bind a TCP port');
-    origin = `http://127.0.0.1:${address.port}`;
+    origin = `http://${browserHost}:${address.port}`;
     let closing: Promise<void> | undefined;
     const close = () => closing ??= (async () => {
-        server.emit('shutdown'); server.closeAllConnections();
+        unsubscribeProfiles?.(); server.emit('shutdown'); server.closeAllConnections();
         await Promise.all([new Promise<void>(resolve => server.close(() => resolve())), vite?.close(), multiplayer?.drained()]);
     })();
     return { server, storage, registry, token, origin, dataDir, engineRevision, close };

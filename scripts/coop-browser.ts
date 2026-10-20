@@ -1,3 +1,4 @@
+import { onboardNinja } from './character-onboarding.ts';
 /** Shared muted browser/session utilities; routes use real input and read-only snapshots. */
 import { spawn, type ChildProcess } from 'node:child_process';
 import { once } from 'node:events';
@@ -41,7 +42,7 @@ export class Cdp {
         return result.result.value;
     }
 }
-export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options: { shots?: string; internalLabs?: boolean; readyExpression?: string } = {}) {
+export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options: { shots?: string; internalLabs?: boolean; readyExpression?: string; onboarding?: boolean } = {}) {
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const checks: string[] = [];
     const shots = options.shots ?? join(tmpdir(), 'bn-coop-shots');
@@ -126,6 +127,7 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
                 await sleep(30);
             }
         } else await wait(client, 'campaign loaded', s => s.persistence.visitor !== '');
+        if (options.onboarding !== false && await client.read<boolean>('!!globalThis.binaryNinja')) await onboardNinja(client);
         return client;
     }
     const snapshot = (p: Cdp) => p.read<S>('binaryNinja.snapshot()');

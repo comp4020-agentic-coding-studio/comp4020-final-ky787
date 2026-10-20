@@ -1,8 +1,11 @@
 /** Wire contract: shared logic is coordinate-free; avatars are disposable presentation. */
+import type { PublicCharacterProfile } from '../character/profile.ts';
 import { isCampaignLevel, AUTHORED_CAMPAIGN_LEVELS, isAuthoredCampaignLevel, type AuthoredCampaignLevel, type CampaignLevel, type PartyState } from './campaign.ts';
 export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}$/;
 export type Slot = 1 | 2;
+/** Public appearance only; tuple position is the authoritative player slot. */
+export type CharacterProfiles = [PublicCharacterProfile | null, PublicCharacterProfile | null];
 export const COOP_LEVELS = ['pairing-bay', 'relay-lab', 'lift-lab', 'crumble-lab', 'boost-lab', 'firewall-lab', 'crossfeed-vault', 'race-condition', ...AUTHORED_CAMPAIGN_LEVELS] as const;
 export type CoopLevelId = typeof COOP_LEVELS[number];
 export type SessionLevelId = CoopLevelId | 'workbench';
@@ -86,6 +89,8 @@ export interface LevelStateMap extends Record<AuthoredCampaignLevel, Declarative
     'crumble-lab': { tested: { foot: boolean; hook: boolean }; platforms: Record<CrumbleId, CrumblePhase> };
 }
 interface SharedSession {
+    /** Optional for older fixtures; populated by the server from visitor membership. */
+    profiles?: CharacterProfiles;
     draft?: DraftSessionMetadata;
     party: PartyState | null;
     levelInstance: number;

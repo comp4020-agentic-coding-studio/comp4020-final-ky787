@@ -4,6 +4,7 @@ import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { createApp } from '../server/app.ts';
+import { ProfileStore } from '../server/profiles.ts';
 import { startWorkbench } from './level-tools/service.ts';
 
 function port(value: string, name: string): number {
@@ -28,7 +29,9 @@ async function main() {
     const apiPort = port(process.env.DEV_API_PORT ?? '8080', 'DEV_API_PORT');
     const frontendPort = port(values.port!, '--port');
     const workbenchPort = port(process.env.DEV_WORKBENCH_PORT ?? '0', 'DEV_WORKBENCH_PORT');
-    const api = await createApp(resolve(process.env.DATA_DIR ?? '.local-data'));
+    const dataDir = resolve(process.env.DATA_DIR ?? '.local-data');
+    const profiles = new ProfileStore(dataDir);
+    const api = await createApp(dataDir, undefined, { profiles });
     let vite: ViteDevServer | undefined;
     let workbench: Awaited<ReturnType<typeof startWorkbench>> | undefined;
     let backendStarted = false;
@@ -49,7 +52,8 @@ async function main() {
         });
         backendStarted = true;
         const backend = `http://127.0.0.1:${(api.address() as AddressInfo).port}`;
-        workbench = await startWorkbench({ port: workbenchPort, dataDir: resolve(process.env.WORKBENCH_DATA_DIR ?? '.workbench'),
+        workbench = await startWorkbench({ port: workbenchPort, dataDir: resolve(process.env.WORKBENCH_DATA_DIR ?? '.workbench'), profiles,
+            browserHost: ['localhost', '127.0.0.1'].includes(values.host!) ? values.host : '127.0.0.1',
             gameUrl: () => vite?.resolvedUrls?.local[0] });
         vite = await createViteServer({
             define: { 'import.meta.env.VITE_WORKBENCH_URL': JSON.stringify(workbench.origin + '/') },

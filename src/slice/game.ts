@@ -1,3 +1,6 @@
+import { CharacterProfileClient } from '../character/client.ts';
+import { CharacterCreator } from '../character/creator.ts';
+import { DEFAULT_CHARACTER_PROFILE, colourHex, type PublicCharacterProfile } from '../character/profile.ts';
 import { COOP_CAMPAIGN, isCampaignLevel } from '../coop/campaign.ts';
 import { partyMenu, type PartyView } from '../coop/party-menu.ts';
 import { cubeEntries } from '../coop/protocol.ts';
@@ -20,6 +23,9 @@ import { COOP_LABS } from '../coop/labs.ts';
 import { isCoopLevel, normalizeCode, type CoopLevelId, type SharedRoom } from '../coop/protocol.ts';
 export class SliceGame {
     store = new ProgressStore();
+    profiles = new CharacterProfileClient();
+    private character!: CharacterCreator;
+    private characterReady = false;
     world = new PuzzleWorld(ROOMS[0], freshProgress().rooms.pressure);
     renderer: PuzzleRenderer;
     input = new InputManager(true);
@@ -87,6 +93,7 @@ export class SliceGame {
         this.renderer.room(this.world);
         this.input.attach(canvas, host);
         this.menu = document.querySelector('#menu')!;
+        this.character = new CharacterCreator(this.menu);
         this.debugView = document.querySelector('#debug')!;
         this.status = document.querySelector('#save-status')!;
         this.roomTitle = document.querySelector('#room-title')!;
@@ -112,8 +119,10 @@ export class SliceGame {
             void this.store.flush();
         } });
         window.addEventListener('blur', () => { this.world.cancelGrapple(); silence(); });
-        window.addEventListener('pagehide', () => { silence(); void this.store.flush(); this.coop.leave(false); });
+        window.addEventListener('pagehide', () => { this.character.close(); silence(); void this.store.flush(); this.coop.leave(false); });
         window.addEventListener('pageshow', event => {
+            if (event.persisted && !this.characterReady) { void this.loadCharacter(); return; }
+            if (event.persisted && this.menu.querySelector('#character-form')) this.showMenu();
             if (event.persisted && this.coopMode) {
                 const code = this.coop.remembered();
                 if (code) this.enterCoop(code); else this.leaveCoop();
@@ -124,9 +133,57 @@ export class SliceGame {
         requestAnimationFrame(t => this.frame(t));
         await this.store.load();
         this.loadRoom();
-        this.showMenu();
-        const code = this.coop.remembered();
-        if (code) this.enterCoop(code);
+        await this.loadCharacter();
+    }
+    private async loadCharacter(): Promise<void> {
+        this.menu.hidden = false;
+        this.menu.innerHTML = '<div class="menu-card character-loading" role="status"><span class="eyebrow">BINARY NINJA</span><h2>Loading your ninja…</h2><p>Connecting to your saved character.</p></div>';
+        try {
+            const profile = await this.profiles.load();
+            if (profile) this.finishCharacter();
+            else this.openCharacter(false);
+        } catch {
+            this.menu.innerHTML = '<div class="menu-card character-loading"><span class="eyebrow">CHARACTER CONNECTION</span><h2>Your ninja is offline.</h2><p>Your saved character could not be loaded. Retry, or create a temporary ninja for this visit. A guest character is not saved.</p><button id="retry-profile" class="primary">RETRY CONNECTION</button><button id="guest-profile">CREATE GUEST NINJA</button></div>';
+            this.menu.querySelector('#retry-profile')!.addEventListener('click', () => { void this.loadCharacter(); });
+            this.menu.querySelector('#guest-profile')!.addEventListener('click', () => this.openCharacter(false, true));
+        }
+    }
+    private finishCharacter(): void {
+        const first = !this.characterReady;
+        this.character.close(); this.characterReady = true;
+        this.renderer.profile = this.profiles.profile ?? DEFAULT_CHARACTER_PROFILE;
+        this.input.releaseAll(); this.input.clearActions();
+        this.partyMenuKey = ''; this.showMenu();
+        if (first) { const code = this.coop.remembered(); if (code) this.enterCoop(code); }
+    }
+    private openCharacter(customize: boolean, guest = false): void {
+        this.started = false; this.audio.setActive(false);
+        this.input.releaseAll(); this.input.clearActions(); this.world.cancelGrapple();
+        if (this.coopMode) { this.coopPaused = true; this.coop.occupy(null); }
+        this.menu.hidden = false;
+        const useGuest = (profile: PublicCharacterProfile) => { this.profiles.useGuest(profile); this.finishCharacter(); };
+        this.character.open({ mode: customize ? 'customize' : 'initialize', profile: this.profiles.profile ?? undefined,
+            persistent: !guest && (this.profiles.persisted || this.profiles.ready),
+            onSave: async profile => {
+                if (guest) this.profiles.useGuest(profile);
+                else await this.profiles.save(profile);
+                this.finishCharacter();
+            },
+            ...(!customize || !this.profiles.persisted ? { onGuest: useGuest } : {}),
+            ...(customize ? { onCancel: () => { this.character.close(); this.renderer.profile = this.profiles.profile ?? DEFAULT_CHARACTER_PROFILE; this.input.releaseAll(); this.input.clearActions(); this.partyMenuKey = ''; this.showMenu(); } } : {}),
+        });
+    }
+    private bindCharacterMenu(): void {
+        const button = document.createElement('button'); button.id = 'customize-ninja'; button.textContent = 'CUSTOMIZE NINJA';
+        button.addEventListener('click', () => this.openCharacter(true));
+        const profile = this.profiles.profile ?? DEFAULT_CHARACTER_PROFILE;
+        const identity = document.createElement('div'); identity.className = 'character-summary';
+        const swatch = document.createElement('i'); swatch.style.backgroundColor = colourHex(profile.colour); swatch.setAttribute('aria-hidden', 'true');
+        const name = document.createElement('strong'); name.textContent = profile.name;
+        const detail = document.createElement('small'); detail.textContent = this.profiles.persisted ? 'YOUR NINJA' : 'GUEST NINJA · NOT SAVED';
+        identity.append(swatch, name, detail);
+        const card = this.menu.querySelector('.menu-card')!;
+        card.insertBefore(identity, card.querySelector(':scope > button')); identity.after(button);
     }
     private enterCoop(code?: string, level?: CoopLevelId): void {
         this.started = false; this.coopMode = true; this.coopPaused = false; this.authority = null;
@@ -174,6 +231,7 @@ export class SliceGame {
             if (!previous.completed && room.completed) this.audio.play('complete');
             else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
         }
+        if (this.character.active) { this.started = false; this.coopPaused = true; this.menu.hidden = false; return; }
         if (room.party && room.party.phase !== 'playing') {
             this.started = false; this.overviewVisible = false; this.overviewPending = false; this.startButton.hidden = true;
             this.input.releaseAll(); this.input.clearActions(); this.world.cancelGrapple();
@@ -184,7 +242,7 @@ export class SliceGame {
         if (!this.coopMode) return;
         if (!this.coop.connected) { this.started = false; this.world.cancelGrapple(); this.world.syncAuthority(); this.sound.reset(this.world); this.input.releaseAll(); }
         const r = this.coop.room;
-        const slots = r ? r.connected.map((on, i) => `PLAYER ${i + 1}   ${on ? 'CONNECTED' : r.assigned[i] ? 'DISCONNECTED' : 'WAITING FOR PARTNER'}${r.reachedExit[i] ? ' · ARRIVED' : ''}`).join('\n') : '';
+        const slots = r ? r.connected.map((on, i) => `${r.profiles?.[i]?.name ?? 'Ninja'} / P${i + 1}   ${on ? 'CONNECTED' : r.assigned[i] ? 'DISCONNECTED' : 'WAITING FOR PARTNER'}${r.reachedExit[i] ? ' · ARRIVED' : ''}`).join('\n') : '';
         const partner = r && this.coop.slot ? this.coop.slot === 1 ? 1 : 0 : 1;
         const status = !this.coop.connected ? this.coop.status
             : r?.party && this.coop.slot === 2 && !r.connected[0] ? 'HOST DISCONNECTED — WAITING FOR RECONNECT'
@@ -210,7 +268,7 @@ export class SliceGame {
             }
         });
         codeRow.append(code, copy);
-        const who = document.createElement('span'); who.textContent = this.coop.slot ? `YOU — PLAYER ${this.coop.slot}` : 'CONNECTING TO SESSION';
+        const who = document.createElement('span'); who.textContent = this.coop.slot ? `${r?.profiles?.[this.coop.slot - 1]?.name ?? 'Ninja'} / YOU · P${this.coop.slot}` : 'CONNECTING TO SESSION';
         const list = document.createElement('pre'); list.textContent = slots;
         const state = document.createElement('b'); state.id = 'coop-state'; state.setAttribute('role', 'status'); state.textContent = status;
         this.coopHud.append(label, codeRow, copied, who, list, state);
@@ -231,11 +289,12 @@ export class SliceGame {
         this.ended = false; this.loadRoom(); this.showMenu();
     }
     private showPartyMenu(view: PartyView): void {
+        if (!this.characterReady || this.character.active) return;
         const r = this.coop.room;
         if (!r?.party || !this.coop.slot) return;
         if (r.party.phase === 'lobby') view = 'lobby';
         if (r.party.phase === 'victory' && view !== 'choose') view = 'victory';
-        const key = JSON.stringify([view, r.code, r.levelInstance, r.party, r.connected, r.assigned, this.coop.status]);
+        const key = JSON.stringify([view, r.code, r.levelInstance, r.party, r.connected, r.assigned, r.profiles, this.coop.status]);
         if (this.partyMenuKey === key && !this.menu.hidden) return;
         this.nativeInspector.element.hidden = true; this.nativeInspectorOpen = false;
         this.partyView = view; this.partyMenuKey = key; this.coopPaused = true; this.started = false;
@@ -243,6 +302,7 @@ export class SliceGame {
         this.audio.setActive(false); this.overviewVisible = false; this.startButton.hidden = true;
         this.menu.hidden = false; this.coopHud.hidden = true;
         this.menu.innerHTML = partyMenu(r, this.coop.slot, this.coop.connected, view);
+        this.bindCharacterMenu();
         this.menu.querySelector('#party-audio')!.innerHTML = this.audioMenu(); this.bindAudio();
         this.menu.querySelector('#party-copy')!.addEventListener('click', async () => {
             const feedback = this.menu.querySelector('#party-copy-status')!;
@@ -258,6 +318,7 @@ export class SliceGame {
         this.menu.querySelector('#leave-coop')!.addEventListener('click', () => this.leaveCoop());
     }
     private showCoopMenu(): void {
+        if (!this.characterReady || this.character.active) return;
         if (this.coop.room?.party) { this.showPartyMenu('pause'); return; }
         this.nativeInspector.element.hidden = true; this.nativeInspectorOpen = false;
         this.coopPaused = true; this.started = false; this.coop.occupy(null);
@@ -266,6 +327,7 @@ export class SliceGame {
         this.menu.innerHTML = `<div class="menu-card"><span class="eyebrow">CO-OP / MOCK TEST CHAMBER</span><h2>${this.world.room.title}</h2><p>Room ${this.coop.room?.code ?? 'connecting'} · You are Player ${this.coop.slot ?? '…'}</p><p>Your slot and shared checkpoint stay saved when you leave.</p><button id="continue" class="primary">CONTINUE ${this.world.room.title}</button><button id="leave-coop">LEAVE ROOM / SINGLE PLAYER</button><p class="fine">A / D move · Space jump · E interact<br>Hold click to hook · R resets only you</p></div>`;
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
         this.menu.querySelector('#leave-coop')!.addEventListener('click', () => this.leaveCoop());
+        this.bindCharacterMenu();
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus();
     }
     private closeInspector(): void {
@@ -292,6 +354,7 @@ export class SliceGame {
         this.roomTitle.textContent = `0${ROOMS.findIndex(r => r.id === id) + 1} / ${roomById(id).title}`;
     }
     private showMenu(): void {
+        if (!this.characterReady || this.character.active) return;
         if (this.coopMode) { this.showCoopMenu(); return; }
         this.started = false;
         this.audio.setActive(false);
@@ -337,6 +400,7 @@ export class SliceGame {
       ${this.audioMenu()}
       <p class="fine">A / D move · Space jump · E interact<br>Airborne Space: hook · Attached Space: jump off<br>Hold click also hooks · R checkpoint · Tab overview</p>
       <p class="prototype-note">CONTROL SPINE: validated OLLVM controller + real assembly.<br>Its strings use authored single-byte XOR; tutorials remain mock.<br>Platform physics and crumble timing are game abstractions.</p></div>`;
+        this.bindCharacterMenu();
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus({ preventScroll: true });
         this.menu.querySelector('#my-levels')!.addEventListener('click', async () => { if (await this.store.flush() || confirm(`${this.store.status}. Open My Levels and leave this unsaved progress?`)) location.assign('/my-levels.html'); });
         const builderButton = this.menu.querySelector<HTMLButtonElement>('#level-builder');
@@ -470,7 +534,7 @@ export class SliceGame {
         }
     }
     snapshot() {
-        return { room: this.world.room.id, player: this.world.player, cube: this.world.cube, cubes: this.world.cubes, inputs: this.world.inputs, outputs: this.world.frame.outputs,
+        return { character: { profile: this.profiles.profile, persisted: this.profiles.persisted, ready: this.characterReady, editing: this.character.active }, room: this.world.room.id, player: this.world.player, cube: this.world.cube, cubes: this.world.cubes, inputs: this.world.inputs, outputs: this.world.frame.outputs,
             multiplayer: this.coopMode ? { ...this.coop.diagnostics(), ...this.supportDiagnostics(), shared: this.coop.room, remote: this.coop.remote.sample(performance.now()) } : null,
             source: this.world.frame.source, signals: this.world.frame.signals, controllerStatus: this.coopMode ? 'mock multiplayer controller / binary integration pending' : undefined, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
@@ -496,7 +560,8 @@ export class SliceGame {
         if (this.input.takeAction('debug'))
             this.debug = !this.debug;
         if (this.input.takeAction('escape')) {
-            if (!this.inspector.element.hidden) this.closeInspector();
+            if (this.character.active) this.menu.querySelector<HTMLButtonElement>('#cancel-character')?.click();
+            else if (!this.inspector.element.hidden) this.closeInspector();
             else if (!this.menu.hidden && this.menu.querySelector('#reset-confirmation:not([hidden])'))
                 this.menu.querySelector<HTMLButtonElement>('#cancel-reset')!.click();
             else if (this.started || this.overviewVisible)
@@ -556,7 +621,7 @@ export class SliceGame {
             for (const [id, cube] of cubeEntries(this.world.cubes)) if (!this.world.cubeIsResetting(id)) this.coop.publishCube(cube, now, id);
         }
         const heroCues = this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
-            this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, connected: this.coop.connected, remote: this.coop.remote.sample(now),
+            this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, profiles: this.coop.room?.profiles, connected: this.coop.connected, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,
                 remotePullingCubes: cubeEntries(this.coop.room?.cubes ?? {}).filter(([id, c]) => c.pulling && !this.coop.ownsCubeFor(id)).map(([id]) => id) } : undefined, this.started);
         for (const { cue, at } of heroCues) this.audio.play(cue, Math.max(0, 1 - Math.hypot(at.x - this.world.player.x, at.y - this.world.player.y) / 1100));
@@ -576,7 +641,7 @@ export class SliceGame {
             this.traceLabel.textContent = `RETAINED ${replay.trace.id} · ${replay.step + 1}/${replay.trace.instruction_count} · ${replay.occurrence ? `${replay.occurrence.block_id} visit ${replay.occurrence.visit_number}` : 'linked helper'} | outputs immediate · strings authored`;
             [...this.traceCommits.children].forEach((node, index) => node.classList.toggle('committed', replay.trace!.semantic_events[index].step_index <= replay.step));
         }
-        this.status.textContent = this.coopMode ? `${this.coop.status} · CO-OP SESSION` : this.store.status;
+        this.status.textContent = this.coopMode ? `${this.coop.status} · CO-OP SESSION` : `${this.store.status}${this.characterReady && !this.profiles.persisted ? ' · GUEST NINJA NOT SAVED' : ''}`;
         this.debugView.hidden = !this.debug;
         document.querySelector<HTMLElement>('#return-cube')!.hidden = this.coopMode;
         this.traceView.hidden = this.world.room.id !== 'uplink' || !this.debug;

@@ -1,0 +1,29 @@
+Binary Ninja character profiles — 2026-10-20
+Base: 68e9fc78924a816914d8d3e5c1316a768e79c93f
+
+PASS pnpm typecheck
+PASS pnpm check
+  Native table/evidence generation: all 21 artifacts unchanged/verified.
+  Unit/integration: 69 files; 649 passed, 3 existing skips.
+  HTTP specs against isolated production Node app: 2 files, 3 passed.
+PASS pnpm build
+  CONTROL SPINE bundle: 32 states / 32 traces validated.
+  Production module audit excludes privileged/local workbench services.
+  Existing large-chunk advisory remains; build succeeds.
+PASS pnpm check:campaign — 78 assertions; all five physical solves, both slots, reconnect and process restart.
+PASS pnpm check:public-coop — 49 assertions; test/play routes, replay, reconnect, progress isolation.
+PASS pnpm check:workbench — 56 assertions; local authoring/physics and recovery.
+PASS pnpm check:public-builder — 67 assertions; IndexedDB, import/export, physical playtest, browser restart.
+PASS pnpm check:workbench-menu — 13 assertions; game/editor navigation, cookie/progress and save barrier.
+PASS node scripts/browser-check.ts <isolated-app> <temporary-shots> — 120 assertions; all four solo rooms and reset/reload.
+
+PASS pnpm check:character — 77 assertions; 19 visually reviewed screenshots; zero browser runtime errors.
+
+Character-specific pointer, keyboard, touch, persistence, failure recovery and multiplayer rendering evidence:
+  checks.txt (check:character)
+  renderer-evidence.json (production canvas draw calls, actual pixels and slot positions)
+  01–17 PNG screenshots (visual review)
+
+Tests use actual onboarding, not disabled gates or seeded profile storage.
+The public-builder network assertion now permits only optional GET /api/profile; it continues to reject every upload and every other API operation during editor storage/import/playtest.
+No physics, authored levels or binary evidence were changed by this feature.

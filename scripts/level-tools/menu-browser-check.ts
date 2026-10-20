@@ -32,7 +32,7 @@ try {
         await harness.sleep(30);
     }
     const frontend = output.match(/Local:\s+(http:\/\/localhost:\d+)\//)![1];
-    const builder = output.match(/Level Builder ready: (http:\/\/127\.0\.0\.1:\d+)\//)![1];
+    const builder = output.match(/Level Builder ready: (http:\/\/(?:localhost|127\.0\.0\.1):\d+)\//)![1];
     const browser = await harness.launch();
     page = await harness.page(frontend, browser);
     check('local main menu exposes Level Builder', await page.read("!!document.querySelector('#level-builder')"));
@@ -57,7 +57,7 @@ try {
     await until('!workbench.snapshot().dirty');
     check('undo restores authored draft before leaving', await page.read('JSON.stringify(workbench.snapshot().document)') === documentBefore);
     await harness.click(page, '#back-to-game');
-    await until(`location.origin===${JSON.stringify(frontend)} && !!globalThis.binaryNinja?.store.ready`);
+    await until(`location.origin===${JSON.stringify(frontend)} && !!globalThis.binaryNinja?.snapshot().character.ready`);
     check('Back to game returns to the real menu', await page.read("!!document.querySelector('#level-builder')"));
     check('builder visit preserves game saves and identity', JSON.stringify(await page.read("fetch('/api/progress').then(r=>r.json())")) === JSON.stringify(progressBefore));
     // Both writes reach the real temporary save server. Delay each request to
@@ -75,7 +75,7 @@ try {
     check('builder navigation waits with the button disabled during queued saves', await page.read(`location.origin===${JSON.stringify(frontend)} && document.querySelector('#level-builder').disabled`));
     await until(`location.origin===${JSON.stringify(builder)} && !!globalThis.workbench?.ready`);
     await harness.click(page, '#back-to-game');
-    await until(`location.origin===${JSON.stringify(frontend)} && !!globalThis.binaryNinja?.store.ready`);
+    await until(`location.origin===${JSON.stringify(frontend)} && !!globalThis.binaryNinja?.snapshot().character.ready`);
     check('both queued saves finish before leaving the game', await page.read("binaryNinja.store.progress.currentRoom === 'switch' && binaryNinja.store.revision === 2"));
     if (page.errors.length) throw new Error(page.errors.join('\n'));
     const production = await harness.startServer();

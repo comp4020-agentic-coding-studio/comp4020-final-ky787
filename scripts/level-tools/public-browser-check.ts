@@ -1,3 +1,4 @@
+import { onboardNinja } from '../character-onboarding.ts';
 /** Stage 1 acceptance against generated dist served by the production Node app. */
 import { mkdir, writeFile, readFile, readdir, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -26,6 +27,7 @@ async function page(path: string, context?: string, script?: string) {
     if (script) await client.send('Page.addScriptToEvaluateOnNewDocument', { source: script });
     await client.send('Page.navigate', { url: origin + path });
     await until(client, path.startsWith('workbench') ? '!!globalThis.workbench?.ready' : '!!globalThis.binaryNinja?.store.ready');
+    if (!path.startsWith('workbench')) await onboardNinja(client);
     return client;
 }
 async function dialog(page: Cdp, action: () => Promise<unknown>, accept: boolean, promptText?: string) {
@@ -175,7 +177,7 @@ try {
         ['invalid activation', { ...exportedDoc, geometry: { ...exportedDoc.geometry, objects: [...exportedDoc.geometry.objects, { type: 'platform', id: 'bad', kind: 'code', x: 1, y: 1, w: 2, h: 2, activation: 'malicious' }] } }],
     ] as const) { await writeFile(bad, JSON.stringify(value)); const before = serializeDraft(await doc(p)); await importFile(p, bad); await until(p, "document.querySelector('#status').textContent.startsWith('JSON rejected')"); check(`${label} rejected without replacing current draft`, serializeDraft(await doc(p)) === before); }
     await writeFile(bad, ' '.repeat(1_000_001)); await importFile(p, bad); await until(p, "document.querySelector('#status').textContent.includes('1 MB')"); check('oversized file rejected before JSON parsing', true);
-    check('editor storage/import/playtest sends no API requests or uploads', network.every(r => !r.path.startsWith('/api/') && r.method === 'GET'));
+    check('editor storage/import/playtest sends no uploads; only optional cosmetic profile reads use the API', network.every(r => r.method === 'GET' && (!r.path.startsWith('/api/') || r.path === '/api/profile')));
     // Failures are injected at browser storage boundaries, never in application branches.
     await p.read("window.originalPut=IDBObjectStore.prototype.put; IDBObjectStore.prototype.put=function(){throw new DOMException('quota test','QuotaExceededError')}");
     await p.read("document.querySelector('#world').focus()"); await p.send('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await p.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
@@ -206,7 +208,7 @@ try {
     await h.sleep(300); await rm(join(h.temporary, 'chrome', 'DevToolsActivePort'), { force: true });
     debuggerUrl = await h.launch(); root = await new Cdp(debuggerUrl).open(); p = await page('workbench.html');
     check('saved drafts survive closing and reopening the browser profile', await p.read(`workbench.snapshot().draftId===${JSON.stringify(reopenId)}`) && serializeDraft(await doc(p)) === reopenDocument);
-    await h.click(p, '#back-to-game'); await until(p, '!!globalThis.binaryNinja?.store.ready');
+    await h.click(p, '#back-to-game'); await until(p, '!!globalThis.binaryNinja?.store.ready'); await onboardNinja(p);
     check('Back to Game preserves visitor identity and campaign progress', JSON.stringify(await p.read("fetch('/api/progress').then(r=>r.json())")) === JSON.stringify(progress));
     await h.click(p, '#create-party'); await until(p, '!!binaryNinja.snapshot().multiplayer?.code');
     const party = await p.read<{code:string;slot:number;visitor:string}>('({code:binaryNinja.snapshot().multiplayer.code,slot:binaryNinja.snapshot().multiplayer.slot,visitor:binaryNinja.snapshot().persistence.visitor})');

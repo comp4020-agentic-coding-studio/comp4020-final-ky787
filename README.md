@@ -10,6 +10,8 @@ Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. This is an evol
 
 ## Play the game
 
+On your first visit, enter an operative name, preview the eight colours on the animated ninja, and choose **INITIALIZE NINJA**. Hover or keyboard focus previews a colour; clicking or Enter/Space selects it. Returning visitors load their saved character automatically. **CUSTOMIZE NINJA** in the menu changes your name and colour without resetting progress or leaving your party. Your partner sees the same name and colour in every cooperative chamber. See the [character profile contract](docs/character-profiles.md).
+
 The game has two main modes:
 
 | Mode | Chambers | Purpose |
@@ -187,6 +189,9 @@ pnpm build
 
 # Real-input two-player campaign regression
 pnpm check:campaign
+
+# Character creation, real hover/focus/touch preview and two-player appearances
+pnpm check:character
 
 # Production public builder (run pnpm build first)
 pnpm check:public-builder

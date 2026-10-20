@@ -1,0 +1,77 @@
+PASS new visitor is gated by INITIALIZE NINJA
+PASS initial cyan selection reaches the actual renderer — #64E6D5; 3096 actual accent pixels; 7 production ninja outline draws
+PASS real pointer hover immediately paints purple without clicking — #B59BFF; 3096 actual accent pixels; 16 production ninja outline draws
+PASS hover keeps cyan selected and leaves the saved profile empty
+PASS moving directly between swatches paints orange — #FFAC55; 3096 actual accent pixels; 26 production ninja outline draws
+PASS repeated swatch movement paints pink — #FF70CB; 3096 actual accent pixels; 29 production ninja outline draws
+PASS pointer leaving the palette restores selected cyan — #64E6D5; 3096 actual accent pixels; 31 production ninja outline draws
+PASS click selects purple and leaving it keeps purple — #B59BFF; 3096 actual accent pixels; 46 production ninja outline draws
+PASS local selection is not persisted before initialize
+PASS keyboard Tab focuses and previews cyan — #64E6D5; 2875 actual accent pixels; 67 production ninja outline draws
+PASS keyboard focus temporarily previews purple — #B59BFF; 2871 actual accent pixels; 71 production ninja outline draws
+PASS keyboard focus does not select until activation
+PASS Enter commits focused purple locally
+PASS keyboard can preview the next colour — #55AAFF; 2856 actual accent pixels; 78 production ninja outline draws
+PASS Space commits focused electric blue locally
+PASS empty name receives a visible validation message
+PASS HTML-like name is rejected and displayed only as text
+PASS name entry immediately updates the preview caption
+PASS actual preview cycles idle, run, jump and landing without gameplay simulation
+PASS reduced motion stops animation frames
+PASS reduced motion still paints colour input immediately — #FFAC55; 3096 actual accent pixels; 329 production ninja outline draws
+PASS initialize persists selected purple, never a temporary hovered orange
+PASS closed creator stops rendering its preview
+PASS returning visitor skips onboarding without flashing it
+PASS customization loads the saved colour — #B59BFF; 3096 actual accent pixels; 2 production ninja outline draws
+PASS cancel discards selected and previewed colours plus edited name
+PASS solo pressure uses saved purple through drawNinja
+PASS solo switch uses saved purple through drawNinja
+PASS solo relay uses saved purple through drawNinja
+PASS solo uplink uses saved purple through drawNinja
+PASS resetting campaign progress retains the saved character
+PASS two independent browser visitors create different persistent characters
+PASS lobby shows both names, colours and original host/guest roles
+PASS lobby shows both names, colours and original host/guest roles
+PASS guest retains no chamber-selection permission
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(181, 155, 255, 0.9)","pixels":104},{"colour":"rgba(255, 172, 85, 0.9)","pixels":87}]
+PASS slot colours stay at the correct physical player positions on this viewing computer
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(181, 155, 255, 0.9)","pixels":104},{"colour":"rgba(255, 172, 85, 0.9)","pixels":109}]
+PASS slot colours stay at the correct physical player positions on this viewing computer
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(181, 155, 255, 0.9)","pixels":4},{"colour":"rgba(255, 172, 85, 0.9)","pixels":3}]
+PASS slot colours stay at the correct physical player positions on this viewing computer
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS overview names remain compact and readable at low zoom
+PASS reconnection restores both profiles without swapping slots
+PASS customizing while connected preserves party, chamber, checkpoint, badges and cube positions
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(164, 247, 106, 0.9)","pixels":126},{"colour":"rgba(255, 172, 85, 0.9)","pixels":127}]
+PASS slot colours stay at the correct physical player positions on this viewing computer
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS public custom chamber publishes the participants’ own profiles
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(164, 247, 106, 0.9)","pixels":116},{"colour":"rgba(255, 172, 85, 0.9)","pixels":55}]
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS public custom chamber publishes the participants’ own profiles
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(164, 247, 106, 0.9)","pixels":104},{"colour":"rgba(255, 172, 85, 0.9)","pixels":38}]
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(164, 247, 106, 0.9)","pixels":151},{"colour":"rgba(255, 172, 85, 0.9)","pixels":145}]
+PASS slot colours stay at the correct physical player positions on this viewing computer
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS #stage: both named ninjas have their own production renderer accents and visible pixels — [{"colour":"rgba(164, 247, 106, 0.9)","pixels":110},{"colour":"rgba(255, 172, 85, 0.9)","pixels":94}]
+PASS slot colours stay at the correct physical player positions on this viewing computer
+PASS name labels use readable 11px screen text and retain P1/P2 roles
+PASS visitor with progress and no profile is prompted without losing completion badges
+PASS initializing an existing visitor preserves campaign state
+PASS profile service outage presents retry and explicit nonpersistent fallback
+PASS retry recovers into real onboarding
+PASS guest fallback is explicitly session-only and never marked saved
+PASS guest character was never persisted
+PASS mobile creator has no horizontal overflow or gameplay controls covering its form
+PASS touch tap selects and paints orange without hover — #FFAC55; 3096 actual accent pixels; 10 production ninja outline draws
+PASS touch selection is committed locally
+PASS touch selection persists the selected colour
+PASS no browser runtime errors
+PASS no browser runtime errors
+PASS no browser runtime errors
+PASS no browser runtime errors
+PASS no browser runtime errors

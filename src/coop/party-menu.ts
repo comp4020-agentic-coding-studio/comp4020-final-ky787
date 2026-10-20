@@ -1,5 +1,9 @@
+import { CHARACTER_COLOURS, colourHex } from '../character/profile.ts';
+import { characterForSlot } from '../character/presentation.ts';
 import { COOP_CAMPAIGN, isCampaignLevel, nextChamber } from './campaign.ts';
 import type { SharedRoom, Slot } from './protocol.ts';
+
+const escape = (value: string): string => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!);
 
 export type PartyView = 'lobby' | 'pause' | 'choose' | 'victory';
 /** Local presentation only; the server independently checks every selection. */
@@ -17,7 +21,10 @@ export function partyMenu(room: SharedRoom, slot: Slot, connected: boolean, view
         <h2>${view === 'victory' ? level.title : selecting ? 'Choose a chamber.' : level.title}</h2>
         ${view === 'victory' ? `<p class="victory-message">BOTH PLAYERS ESCAPED</p><p>${String(number).padStart(2, '0')} / ${String(COOP_CAMPAIGN.length).padStart(2, '0')}${campaignComplete ? ' · CAMPAIGN COMPLETE' : !next ? ' · FINAL CHAMBER' : ''}</p>` : ''}
         <div class="party-code">PARTY / <strong>${room.code}</strong> <button id="party-copy">COPY</button><span id="party-copy-status" role="status"></span></div>
-        <div class="party-members">${room.connected.map((on, i) => `<div>PLAYER ${i + 1} — ${i === 0 ? 'HOST' : 'GUEST'} <b>${on ? 'CONNECTED' : room.assigned[i] ? 'DISCONNECTED' : 'WAITING'}</b>${slot === i + 1 ? ' · YOU' : ''}</div>`).join('')}</div>
+        <div class="party-members">${room.connected.map((on, i) => {
+            const profile = characterForSlot(room.profiles, (i + 1) as Slot), colour = CHARACTER_COLOURS.find(c => c.id === profile.colour)!;
+            return `<div class="party-member" data-player-slot="${i + 1}" style="--member-colour:${colourHex(profile.colour)}"><span class="party-member-role">P${i + 1} / ${i === 0 ? 'HOST' : 'GUEST'}${slot === i + 1 ? ' · YOU' : ''}</span><strong class="party-member-name"><span class="party-member-swatch" aria-hidden="true"></span>${room.assigned[i] ? escape(profile.name) : 'Awaiting ninja'}</strong><span class="party-member-state">${room.assigned[i] ? `${colour.name.toUpperCase()} · ` : ''}<b>${on ? 'CONNECTED' : room.assigned[i] ? 'DISCONNECTED' : 'WAITING'}</b></span></div>`;
+        }).join('')}</div>
         <p id="party-status" role="status">${status}</p>
         ${selecting ? `<nav class="campaign-select" aria-label="Campaign chambers">${COOP_CAMPAIGN.map((l, i) => `<div class="campaign-chamber"><div><strong>${String(i + 1).padStart(2, '0')} — ${l.title}</strong><small>${party.completedLevels.includes(l.id) ? 'COMPLETE' : ''}${party.phase !== 'lobby' && room.level === l.id ? ' · CURRENT' : ''}</small></div>${host ? `<button data-select-level="${l.id}" ${connected ? '' : 'disabled'}>START</button>` : ''}</div>`).join('')}</nav>
         ${party.phase !== 'lobby' && host ? '<p class="fine">Starting a chamber resets its puzzle progress for both players. Completion badges stay saved.</p>' : ''}` : ''}

@@ -7,6 +7,8 @@ import { atomicJson } from './atomic-json.ts';
 import { ensureVisitor, sameOrigin } from './identity.ts';
 import { attachMultiplayer } from './multiplayer.ts';
 import { PublicDraftRegistry, PublicDraftError, PUBLIC_DRAFT_LIMITS } from './public-drafts.ts';
+import { ProfileStore } from './profiles.ts';
+import { validateCharacterProfile } from '../src/character/profile.ts';
 interface RecordData {
     id: string;
     revision: number;
@@ -14,8 +16,9 @@ interface RecordData {
     progress: Progress;
 }
 /** One Fly machine/volume. Per-visitor serialization + revision checks prevent lost tab writes. */
-export async function createApp(dataDir: string, siteDir = resolve('dist')) {
+export async function createApp(dataDir: string, siteDir = resolve('dist'), options: { profiles?: ProfileStore } = {}) {
     await mkdir(dataDir, { recursive: true });
+    const profiles = options.profiles ?? new ProfileStore(dataDir);
     const queues = new Map<string, Promise<unknown>>();
     const drafts = new PublicDraftRegistry();
     let uploads = 0;
@@ -88,6 +91,31 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
                 if (!sameOrigin(req)) { json(403, { error: 'Origin mismatch' }); return; }
                 json(200, { id: ensureVisitor(req, res) });
                 return;
+            }
+            if (url.pathname === '/api/profile') {
+                if (req.method !== 'GET' && req.method !== 'PUT') { json(405, { error: 'Method not allowed' }); return; }
+                if (!sameOrigin(req)) { json(403, { error: 'Origin mismatch' }); return; }
+                const visitor = ensureVisitor(req, res);
+                if (req.method === 'GET') { json(200, await profiles.load(visitor)); return; }
+                let body = '', size = 0;
+                for await (const chunk of req) {
+                    size += Buffer.byteLength(chunk);
+                    if (size > 1024) { json(413, { error: 'Character profile is too large.' }); return; }
+                    body += chunk;
+                }
+                let payload: Record<string, unknown>;
+                try { payload = JSON.parse(body); }
+                catch { json(400, { error: 'Invalid JSON' }); return; }
+                if (!payload || typeof payload !== 'object' || Array.isArray(payload)
+                    || Object.keys(payload).length !== 2 || !Object.hasOwn(payload, 'profile') || !Object.hasOwn(payload, 'revision')
+                    || !Number.isSafeInteger(payload.revision) || (payload.revision as number) < 0) {
+                    json(400, { error: 'Send a character profile and its current revision.' }); return;
+                }
+                const validated = validateCharacterProfile(payload.profile);
+                if (!validated.ok) { json(400, { error: validated.error }); return; }
+                const saved = await profiles.save(visitor, validated.profile, payload.revision as number);
+                if (!saved.ok) { json(409, { error: 'Your character changed in another tab. Reload the saved character before editing.', record: saved.record }); return; }
+                json(200, saved.record); return;
             }
             if (url.pathname === '/api/progress') {
                 if (!['GET', 'PUT'].includes(req.method ?? '')) {
@@ -182,9 +210,12 @@ export async function createApp(dataDir: string, siteDir = resolve('dist')) {
                 res.end();
         }
     });
-    const multiplayer = await attachMultiplayer(server, dataDir, { drafts, ...(process.env.NODE_ENV === 'test' ? {
+    const multiplayer = await attachMultiplayer(server, dataDir, { drafts, loadProfile: async visitor => (await profiles.load(visitor)).profile, ...(process.env.NODE_ENV === 'test' ? {
         semanticDelayMs: Number(process.env.BN_TEST_SEMANTIC_DELAY_MS) || 0,
     } : {}) });
+    const unsubscribeProfiles = profiles.subscribe((visitor, profile) => multiplayer.profileUpdated(visitor, profile));
+    server.once('shutdown', unsubscribeProfiles);
+    server.once('close', unsubscribeProfiles);
     return server;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
