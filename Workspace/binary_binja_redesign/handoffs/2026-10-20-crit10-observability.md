@@ -19,7 +19,7 @@ Receiver events identify the accepted reporting participant, not an inferred hum
 Completed locally:
 
 - `pnpm typecheck` — passed.
-- `pnpm check` — passed (73 unit-test files: 681 passing, 3 existing skips; HTTP spec: 3 passing).
+- `pnpm check` — passed (73 unit-test files: 683 passing, 3 existing skips; HTTP spec: 3 passing).
 - `pnpm build` — passed, including CONTROL SPINE retained-bundle validation. Existing large-chunk advisory remains.
 - Focused telemetry/operations/gameplay/profile logging tests — 34 passing across four files after final observer refinements.
 - `pnpm check:observability` — passed: authentication/invalid credentials, live initial/subsequent snapshots, four independent players/two parties, three actual payload deliveries, named exits/completion, reconnect without duplicate completion, bounded history, safe text rendering and logout revocation.
@@ -32,7 +32,7 @@ Completed locally:
 - `pnpm check:character` — passed (40.7 seconds).
 - `pnpm check:workbench` — passed (31.3 seconds).
 
-All requested local regressions passed. Production verification is recorded separately below.
+All requested local regressions passed. CI then caught that the added membership-save timing changed the existing `ActionTiming.durable` convention. The instrumentation now preserves that convention while recording measured membership persistence in telemetry; existing regression assertions were retained. A fresh complete `pnpm check` passed (683 unit tests plus 3 HTTP specs). Production verification is recorded separately below.
 
 The first observability browser run completed DEADLOCK but caught an incorrect test expectation for a terminal activation. DEADLOCK actually uses the HATCH toggle and FEED/SAFE plates. The assertion now checks those actual event categories; the complete rerun passed. No gameplay check was weakened.
 

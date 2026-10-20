@@ -235,7 +235,8 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
         syncCoop(room);
         if (room.needsPersist) {
             room.record.revision = room.revision;
-            timing.durable = true;
+            // Preserve ActionTiming.durable's existing gameplay-action convention.
+            // Membership persistence still contributes its measured latency below.
             const start = performance.now();
             try { await persist(room); } finally { timing.persistMs = performance.now() - start; }
             room.needsPersist = false;
@@ -453,7 +454,7 @@ export async function attachMultiplayer(server: Server, dataDir: string, options
                     catch { observe(t => t.emit('multiplayer_operation_failed', peer.room ? observer.context(peer.room, peer.slot) : { visitor: peer.visitor }, { operation: message.type }, 'error')); error(peer, 'ROOM_UNAVAILABLE', 'ROOM UNAVAILABLE — PLEASE RETRY'); }
                     finally {
                         peer.pending--; timing.totalMs = performance.now() - receivedAt;
-                        observe(t => t.observeAction({ ...timing, accepted: timing.accepted === true }));
+                        observe(t => t.observeAction({ ...timing, durable: timing.durable || timing.persistMs > 0, accepted: timing.accepted === true }));
                         options.onActionTiming?.(timing);
                     }
                 });

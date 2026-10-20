@@ -1,6 +1,6 @@
 Local validation — 20 October 2026
 PASS pnpm typecheck
-PASS pnpm check — 73 unit files, 681 tests passing, 3 pre-existing skips; 3 HTTP specs passing
+PASS pnpm check — 73 unit files, 683 tests passing, 3 pre-existing skips; 3 HTTP specs passing
 PASS focused observability tests — final 34 tests across 4 files
 PASS pnpm build — retained CONTROL SPINE validation included; pre-existing large-chunk advisory
 PASS pnpm check:observability — two independent browser parties; real-input DEADLOCK solve
