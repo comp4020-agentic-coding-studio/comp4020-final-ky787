@@ -5,6 +5,8 @@ import { cubeEntries, isDeclarativeLevel, type CubeId } from '../coop/protocol.t
 import { isCampaignLevel, isAuthoredCampaignLevel } from '../coop/campaign.ts';
 import { NativeWorldEvidence } from '../coop/native-world-evidence.ts';
 import { NativeWorldRenderer } from './native-world-render.ts';
+import { RaceCargoEvidence } from '../coop/race-cargo-evidence.ts';
+import { RaceCargoRenderer } from './race-cargo-render.ts';
 import { nativeWorldRegionLabel } from './native-world-presentation.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
@@ -36,6 +38,8 @@ export class PuzzleRenderer {
     profile: PublicCharacterProfile = { ...DEFAULT_CHARACTER_PROFILE };
     nativeWorld = new NativeWorldEvidence();
     nativeWorldDisplay = new NativeWorldRenderer();
+    raceCargo = new RaceCargoEvidence();
+    raceCargoDisplay = new RaceCargoRenderer();
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
@@ -149,7 +153,8 @@ export class PuzzleRenderer {
             }
             this.text('RESET FIELD', h.x + 24, h.y + 43, 13, C.red);
         }
-        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion);
+        this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, cam.zoom, dt, energyMotion, running, overview, performance.now(), reveal.id === 'dropA' || reveal.id === 'dropB');
+        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion, this.raceCargo.status === 'ready');
         drawPlatformListings(c, w, this.replay, this.presentation);
         for (const p of w.platforms) {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };
@@ -225,11 +230,13 @@ export class PuzzleRenderer {
         drawEntryGateways(c, r, this.heroes, cam.zoom);
         drawFirewalls(c, w.firewalls, w.elapsed);
         if (r.id === 'race-condition') {
-            const timer = w.frame.timer!;
+            const cargoTimer = this.raceCargoDisplay.view?.timer;
+            const timer = cargoTimer && cargoTimer.seconds !== null && cargoTimer.phase !== null ? { ...cargoTimer, seconds: cargoTimer.seconds } : w.frame.timer!;
             c.fillStyle = '#35434b'; c.fillRect(130, 650, 150, 8);
             c.fillStyle = timer.phase === 'expired' ? C.red : C.amber;
             c.fillRect(130, 650, 150 * timer.fraction, 8);
-            this.text(timer.phase === 'window' ? `${timer.seconds.toFixed(1)}s` : timer.phase === 'expired' ? 'EXPIRED' : timer.phase === 'released' ? 'TRANSFER' : 'BUFFER', 140, 634, 14, C.amber);
+            const held = this.raceCargoDisplay.view && !this.raceCargoDisplay.view.timerLive ? ' · HELD' : '';
+            this.text(timer.phase === 'window' ? `${timer.seconds.toFixed(1)}s${held}` : timer.phase === 'expired' ? 'EXPIRED' : timer.phase === 'released' ? 'TRANSFER' : 'BUFFER', 140, 634, 14, C.amber);
         }
         if (r.id === 'uplink') {
             // Labels sit clear of the shaft edges and are drawn AFTER the field.

@@ -6,7 +6,7 @@
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { coopBrowser, type Cdp } from './coop-browser.ts';
+import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { onboardNinja } from './character-onboarding.ts';
 import type { NativeDisasm, NativeEvidence } from '../src/coop/native-evidence.ts';
 
@@ -75,8 +75,9 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
         sources.set(chamber, source);
     }
     const view = await native(p), paints = await painted(p), expanded = view.panels.filter(panel => panel.expanded);
+    const cargo = chamber === 'race-condition' ? await p.read<GameSnapshot['raceCargo']>('binaryNinja.snapshot().raceCargo') : null;
     check(`${label}: own specimen loaded`, view.chamber === chamber && view.status === 'ready' && view.specimen === source.evidence.specimen_id);
-    check(`${label}: static panel provenance matches acquired instructions and recorded output stores`, view.panels.length > 0 && view.panels.every(panel => {
+    check(`${label}: static panel provenance matches acquired instructions and recorded output stores`, (view.panels.length > 0 || cargo?.visible === true && cargo.sections.length === 4) && view.panels.every(panel => {
         const output = source.evidence.outputs.find(output => output.name === panel.output);
         return panel.static && !!output?.store_sites.some(site => site.instruction_address === panel.storeAddress)
             && panel.instructions.every((instruction, index) => source.disasm.instructions.some(known => known.address === instruction.address
@@ -85,14 +86,32 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
                 && (!index || instruction.address === panel.instructions[index - 1].address + panel.instructions[index - 1].size));
     }));
     check(`${label}: native status reads only accepted server values`, view.panels.every(panel => panel.raw === (view.outputs[panel.output] ?? view.physical[panel.output] ?? null)));
+    if (chamber === 'race-condition') {
+        check(`${label}: grouped RACE asset available`, cargo?.availability === 'ready' && cargo.mode === 'STATE-LINKED');
+        check(`${label}: only four superseded cargo listings suppressed`, !view.panels.some(panel => ['topBridge', 'bufferBridge', 'safetyFirewall', 'raceFirewall'].includes(panel.output)));
+        if (cargo?.visible) {
+            check(`${label}: grouped excerpts preserve separate blocks, exact native bytes and within-fragment contiguity`, cargo.sections.length === 4 && cargo.sections.every(section => {
+                const output = source.evidence.outputs.find(o => o.name === section.output);
+                return section.raw === view.outputs[section.output] && output?.store_sites.some(site => site.instruction_rva === section.storeRva && site.observed_values.includes(Number(section.raw)))
+                    && (cargo.detail !== 'assembly' || section.fragments.length === 3)
+                    && section.fragments.every(fragment => fragment.omittedBefore.includes('omitted') && fragment.instructions.every((i, n) =>
+                        i.block_id === fragment.block && source.disasm.instructions.some(known => known.address === i.address && known.bytes === i.bytes
+                            && known.rva === i.rva && known.size === i.size && known.block_id === i.block_id && known.mnemonic === i.mnemonic && known.op_str === i.op_str)
+                        && (!n || i.address === fragment.instructions[n - 1].address + fragment.instructions[n - 1].size)));
+            }));
+            if (cargo.detail === 'assembly') check(`${label}: grouped native text is visibly painted`, cargo.sections.every(s => s.fragments.every(f => f.instructions.every(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.height >= 8 && paint.pixels > 4)))));
+        }
+        report.push({ label, cargo });
+    }
     const inverted = view.panels.find(panel => panel.output === 'assistBlocked');
     if (inverted) check(`${label}: assistBlocked retains raw value and inverted lift power`, inverted.raw !== null && inverted.physical === !inverted.raw);
     const wireSignal = view.panels.find(panel => panel.output === 'spanMaster');
     if (wireSignal) check(`${label}: wire-only spanMaster reports a signal without inventing physical machinery`,
         wireSignal.physical === null && (!wireSignal.expanded || paints.some(paint => paint.text.includes(`RAW ${Number(wireSignal.raw)} · SIGNAL `))));
     if (requireExpanded) {
-        check(`${label}: normal zoom renders actual native instruction text to Canvas`, expanded.length > 0 && expanded.some(panel => panel.instructions.some(instruction =>
-            paints.some(paint => paint.text.includes(`${instruction.mnemonic} ${instruction.op_str}`) && paint.pixels > 4))));
+        const flatPaint = expanded.some(panel => panel.instructions.some(instruction => paints.some(paint => paint.text.includes(`${instruction.mnemonic} ${instruction.op_str}`) && paint.pixels > 4)));
+        const groupedPaint = cargo?.detail === 'assembly' && cargo.sections.some(s => s.fragments.some(f => f.instructions.some(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.pixels > 4))));
+        check(`${label}: normal zoom renders actual native instruction text to Canvas`, flatPaint || groupedPaint);
         check(`${label}: native listing text has visible screen pixels`, paints.some(paint => /\b(mov|test|cmp|lea|and|or|jmp|je|jne)\b/.test(paint.text) && paint.height >= 8 && paint.pixels > 4));
     }
     check(`${label}: no fabricated live execution or unstable/bogus claims`, !paints.some(paint => /executing live|proven bogus|AUTHORED MOCK|NO NATIVE EVIDENCE/i.test(paint.text)));
@@ -156,7 +175,7 @@ try {
         // Other chamber camera regions are authored review views, not geometry changes.
         const reviews = [
             { chamber: 'crossfeed-vault', views: [['crossfeed-left-route', 1800, 520, .95], ['crossfeed-right-route-gallery', 3700, 470, .95], ['crossfeed-cargo-machinery', 2050, 1330, .95]] },
-            { chamber: 'race-condition', views: [['race-phase-a-b', 1250, 430, .95], ['race-cargo-firewalls', 780, 840, .95], ['race-exit', 3500, 550, .95]] },
+            { chamber: 'race-condition', views: [['race-phase-a-b', 1250, 430, .95], ['race-cargo-firewalls', 761, 1050, 1.05], ['race-exit', 3500, 550, .95]] },
             { chamber: 'deadlock', views: [['deadlock-lower-lift', 900, 2780, .95], ['deadlock-shaft-firewall', 800, 2350, .95], ['deadlock-upper-payload', 1000, 900, .95]] },
             { chamber: 'use-after-free', views: [['use-after-free-route-a', 900, 1850, .95], ['use-after-free-route-b', 1050, 1620, .95], ['use-after-free-route-c', 1000, 1320, .95], ['use-after-free-final-lift-exit', 1350, 990, .9], ['use-after-free-assist-inversion', 1500, 1500, 1]] },
         ] as const;
@@ -183,7 +202,7 @@ try {
         await b.send('Page.navigate', { url: await a.read<string>("document.querySelector('#invite').value") });
         await until(b, '!!globalThis.customLevel?.observe().ready && customLevel.observe().session.peers.every(Boolean)');
         await sleep(200);
-        for (const p of [a, b]) check('public custom room does not load campaign assembly', await p.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json'))")
+        for (const p of [a, b]) check('public custom room does not load campaign assembly', await p.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json') || r.name.includes('.cargo.json'))")
             && !(await painted(p)).some(paint => /0x140[0-9a-f]+/i.test(paint.text)));
         await h.shot(a, 'public-custom-no-native-overlay');
 
@@ -193,7 +212,7 @@ try {
         await solo.read('binaryNinja.renderer.editorCamera={x:2450,y:760,zoom:.95}'); await sleep(200);
         await h.shot(solo, 'control-spine-existing-service-assembly');
         check('CONTROL SPINE retains its original evidence renderer without co-op overlays', !(await native(solo)).panels.length
-            && await solo.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json'))")
+            && await solo.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json') || r.name.includes('.cargo.json'))")
             && (await painted(solo)).some(paint => /^0x140/i.test(paint.text)));
         await solo.read('binaryNinja.renderer.editorCamera=undefined');
 

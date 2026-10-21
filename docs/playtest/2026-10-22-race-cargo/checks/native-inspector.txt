@@ -1,0 +1,12 @@
+$ node scripts/native-evidence-browser-check.ts
+PASS evidence button available for native-backed HANDSHAKE
+PASS source badge reads VALIDATED OLLVM BCF
+PASS evidence inspector opens
+PASS inspector shows NATIVE-VERIFIED status
+PASS inspector shows the verified obfuscated PE hash
+PASS output region shows a real native store instruction from the evidence file
+PASS bogus region shows proven-clone evidence with assumptions
+PASS bogus region does not claim live execution
+PASS inspector closes and gameplay can resume
+
+9 checks passed

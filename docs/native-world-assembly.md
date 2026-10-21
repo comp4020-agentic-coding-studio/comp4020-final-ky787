@@ -6,6 +6,11 @@ they do not execute native code, evaluate a controller, or participate in physic
 The server continues using the existing verified native lookup tables described
 in [ADR 0011](adr/0011-native-backed-coop-controllers.md).
 
+RACE's four cargo mechanisms now use a separate grouped
+[state-linked cargo panel](race-cargo-panel.md), with genuine zero/one store
+alternatives and static input/branch fragments. The five `coop-native-world/v1`
+assets, validator and the other machinery panels retain the contract below.
+
 ## Evidence and generation
 
 Run `pnpm gen:native-world` to regenerate the small world artifacts, or
@@ -95,8 +100,8 @@ execution path.
 World panels do not load or replay traces. HANDSHAKE and USE AFTER FREE have
 exhaustive retained traces; CROSSFEED, RACE and DEADLOCK have representative
 coverage. Neither kind of coverage licenses a fabricated current path. The
-existing detailed inspector and CONTROL SPINE's retained trace presentation are
-unchanged.
+existing representative-trace inspector remains distinct from the new RACE
+cargo detail. CONTROL SPINE's retained trace presentation is unchanged.
 
 [`src/coop/native-world-evidence.ts`](../src/coop/native-world-evidence.ts) copies
 only accepted room output snapshots and physical projections. It never consumes

@@ -1,0 +1,35 @@
+{
+  "schema": "race-cargo-verification/v1",
+  "status": "PASS",
+  "manifest_sha256": "ffe1e31abe130f47ed00483cca790056799a7d38530412775879b70787a7d106",
+  "scope": "retained-evidence audit; no new native execution, hardware tracing or game simulation",
+  "specimen_sha256": {
+    "clean": "2eb161048cac1f2734838ed3a87e601e6e990e311a6c316eacf88696928b8487",
+    "bcf": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a"
+  },
+  "fragments": 26,
+  "conditions": 8,
+  "local_opaque_guards": 31,
+  "retained_race_guards_rechecked": 108,
+  "exact_cases": 17,
+  "reused_selected_traces": 7,
+  "new_traces": 10,
+  "trace_records_checked": 42,
+  "native_evaluations_verified": 84,
+  "original_exhaustive_rows": 4096,
+  "scenarios": 4,
+  "scenario_steps": 25,
+  "compositions": 68,
+  "observations": 300,
+  "tamper_checks_rejected": [
+    "instruction bytes",
+    "specimen identity",
+    "source block identity",
+    "one-store relabelled zero",
+    "branch destination",
+    "invented gap edge",
+    "missing four-valued phase case"
+  ],
+  "pre_study_tracked_files_unchanged": null,
+  "read_only": true
+}

@@ -1,0 +1,18 @@
+PASS timely: distinct visitors
+PASS initial-nearby-1600: accepted state and authentic selected stores
+PASS initial-nearby-1600: readable native Canvas text in ordinary camera
+PASS window-drop-a-1600: accepted state and authentic selected stores
+PASS window-drop-a-1600: readable native Canvas text in ordinary camera
+PASS released-clear-drop-b-1600: accepted state and authentic selected stores
+PASS released-clear-drop-b-1600: readable native Canvas text in ordinary camera
+PASS receiver arrival rearms accepted phase
+PASS receiver-arrival-drop-b-1600: accepted state and authentic selected stores
+PASS receiver-arrival-drop-b-1600: readable native Canvas text in ordinary camera
+PASS drop-b-small-1024: accepted state and authentic selected stores
+PASS inspector shows both authentic stores and provenance
+PASS drop-b-reduced-motion-1600: accepted state and authentic selected stores
+PASS drop-b-reduced-motion-1600: readable native Canvas text in ordinary camera
+PASS reduced motion settles all pulses
+PASS normal play never loads traces/disassembly
+PASS timely: no browser errors
+PASS timely: no browser errors

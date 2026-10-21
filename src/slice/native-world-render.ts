@@ -26,10 +26,10 @@ export class NativeWorldRenderer {
     header(evidence: NativeWorldEvidence, chamber: string, objectId: string): { address: string; powered: boolean | null } | null {
         if (evidence.data?.chamber_id !== chamber) return null;
         const mapped = nativeWorldPlatformBinding(evidence.data, objectId);
-        return mapped && evidence.state ? { address: hex(mapped.output.excerpt.store_address), powered: evidence.state.connected ? nativeWorldBindingState(evidence.state, mapped.output, mapped.binding).physical : null } : null;
+        return mapped && evidence.state ? { address: `${chamber === 'race-condition' && ['cargo-top', 'cargo-buffer'].includes(objectId) ? 'STATIC ' : ''}${hex(mapped.output.excerpt.store_address)}`, powered: evidence.state.connected ? nativeWorldBindingState(evidence.state, mapped.output, mapped.binding).physical : null } : null;
     }
 
-    draw(c: CanvasRenderingContext2D, w: PuzzleWorld, evidence: NativeWorldEvidence, view: Box, zoom: number, dt: number, animate: boolean): NativeWorldPanel[] {
+    draw(c: CanvasRenderingContext2D, w: PuzzleWorld, evidence: NativeWorldEvidence, view: Box, zoom: number, dt: number, animate: boolean, cargoGrouped = false): NativeWorldPanel[] {
         this.panels = [];
         const data = evidence.data, state = evidence.state;
         if (!data || !state || data.chamber_id !== w.room.id) return this.panels;
@@ -38,6 +38,7 @@ export class NativeWorldRenderer {
         if (animate) this.time += Math.max(0, Math.min(dt, .1));
         const compactBounds: Box[] = [];
         for (const place of WORLD_ASSEMBLY_PLACEMENTS[data.chamber_id] ?? []) {
+            if (cargoGrouped && data.chamber_id === 'race-condition' && ['topBridge', 'bufferBridge', 'safetyFirewall', 'raceFirewall'].includes(place.output)) continue;
             const mapped = nativeWorldPlacementBinding(data, place, w.room);
             if (!mapped) continue; // malformed/missing evidence never substitutes invented text
             const { output, binding } = mapped, excerpt = output.excerpt;
@@ -50,7 +51,9 @@ export class NativeWorldRenderer {
             const instructions = excerpt.instructions;
             const width = expanded ? Math.max(320, ...instructions.map(i => `${i.mnemonic} ${i.op_str}`.length * 6.8 + 30)) * scale : (output.name.length * 6.1 + 28) * scale;
             const height = (expanded ? 68 + instructions.length * 16 : 23) * scale;
-            const bounds = { x: place.x, y: place.y, w: width, h: height };
+            const x = cargoGrouped && data.chamber_id === 'race-condition' && place.output === 'spanMaster' ? 350 : place.x;
+            const y = cargoGrouped && data.chamber_id === 'race-condition' && ['spanMaster', 'phaseA', 'phaseB'].includes(place.output) ? place.output === 'spanMaster' ? 180 : 165 : place.y;
+            const bounds = { x, y, w: width, h: height };
             if (!intersects(bounds, view)) continue;
             if (!expanded && compactBounds.some(other => intersects(bounds, other))) continue;
             if (!expanded) compactBounds.push(bounds);
@@ -61,7 +64,6 @@ export class NativeWorldRenderer {
             const pulse = animate && state.connected && changed.at >= 0 ? Math.max(0, 1 - (this.time - changed.at) / .35) : 0;
             const powered = binding ? physical : accepted.raw;
             const colour = state.connected && powered ? cyan : muted;
-            const x = place.x, y = place.y;
             c.save();
             c.fillStyle = '#0b1923f2'; c.fillRect(x, y, width, height);
             c.strokeStyle = pulse > 0 ? '#b8fff0' : powered && state.connected ? '#416d70' : '#344958';

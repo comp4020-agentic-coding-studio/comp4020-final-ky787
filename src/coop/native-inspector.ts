@@ -11,6 +11,10 @@ import {
     isNativeChamber, type NativeChamberId, type NativeEvidence, type NativeTraces, type NativeTrace,
 } from './native-evidence.ts';
 import type { SharedRoom, SessionRoom } from './protocol.ts';
+import type { RaceCargoEvidence } from './race-cargo-evidence.ts';
+import { cargoEvidenceDetails } from './race-cargo-inspector.ts';
+import { CARGO_SECTIONS } from './race-cargo-types.ts';
+import { CARGO_LABELS } from '../slice/race-cargo-presentation.ts';
 
 export interface NativeInspectorView {
     chamber: NativeChamberId;
@@ -18,18 +22,19 @@ export interface NativeInspectorView {
     devices: Readonly<Record<string, boolean>> | null;
     /** Current named native outputs the server reported, for display. */
     outputs: Readonly<Record<string, boolean>>;
+    cargo?: Pick<RaceCargoEvidence, 'data' | 'state' | 'status'>;
 }
 
 /** Derive the inspector view from a co-op room snapshot, if it is native-backed. */
-export function nativeInspectorView(room: SessionRoom | null): NativeInspectorView | null {
-    if (!room || !isNativeChamber(room.level)) return null;
+export function nativeInspectorView(room: SessionRoom | null, cargo?: RaceCargoEvidence): NativeInspectorView | null {
+    if (!room || room.draft || !isNativeChamber(room.level)) return null;
     const chamber = room.level;
     const state = room.levelState as { devices?: Record<string, boolean>; outputs?: Record<string, boolean> };
     if ('devices' in state && state.devices && state.outputs) {
         return { chamber, devices: state.devices, outputs: state.outputs };
     }
     const temporal = room.levelState as { outputs?: Record<string, boolean> };
-    return { chamber, devices: null, outputs: temporal.outputs ?? {} };
+    return { chamber, devices: null, outputs: temporal.outputs ?? {}, ...(chamber === 'race-condition' && cargo ? { cargo } : {}) };
 }
 
 export class NativeEvidenceInspector {
@@ -42,6 +47,7 @@ export class NativeEvidenceInspector {
     private traces: NativeTraces | null = null;
     private view: NativeInspectorView | null = null;
     private renderKey = '';
+    private generation = 0;
 
     constructor(private onClose: () => void) {
         this.element.querySelector('button')!.addEventListener('click', () => this.onClose());
@@ -53,14 +59,20 @@ export class NativeEvidenceInspector {
         this.view = view;
         this.element.hidden = false;
         this.bogusLabel.style.display = 'none'; // native inspector manages bogus via the region select
-        if (this.current !== view.chamber) {
+        if (this.current !== view.chamber || !this.evidence) {
+            const generation = ++this.generation;
             this.current = view.chamber;
             this.evidence = null; this.traces = null; this.renderKey = '';
             this.pre.textContent = 'Loading verified native evidence…';
+            this.populateRegions(); this.render();
             try {
-                [this.evidence, this.traces] = await Promise.all([loadEvidence(view.chamber), loadTraces(view.chamber)]);
+                const [evidence, traces] = await Promise.all([loadEvidence(view.chamber), loadTraces(view.chamber)]);
+                if (generation !== this.generation) return;
+                this.evidence = evidence; this.traces = traces;
             } catch (error) {
-                this.pre.textContent = `Native evidence could not be loaded: ${(error as Error).message}`;
+                if (generation !== this.generation) return;
+                if (this.select.value.startsWith('cargo:')) this.render();
+                else this.pre.textContent = `Native evidence could not be loaded: ${(error as Error).message}`;
                 return;
             }
             this.populateRegions();
@@ -76,11 +88,17 @@ export class NativeEvidenceInspector {
     }
 
     private populateRegions(): void {
-        if (!this.evidence) return;
+        const previous = this.select.value;
         this.select.replaceChildren();
+        if (this.current === 'race-condition') {
+            CARGO_SECTIONS.forEach((s, n) => this.select.add(new Option(`Cargo · ${CARGO_LABELS[n]} · STATE-LINKED`, `cargo:${s}`)));
+            this.select.add(new Option('Cargo · optional obfuscator guard', 'cargo:guard'));
+        }
+        if (!this.evidence) return;
         this.select.add(new Option('Current state · outputs and store sites', 'current'));
         for (const output of this.evidence.outputs) this.select.add(new Option(`Output · ${output.name}`, `output:${output.name}`));
         this.select.add(new Option(`Proven bogus clones (${this.evidence.bogus.clone_count})`, 'bogus'));
+        if ([...this.select.options].some(o => o.value === previous)) this.select.value = previous;
     }
 
     private currentTrace(): { trace: NativeTrace | null; caseId: number | null; exact: boolean } {
@@ -94,11 +112,16 @@ export class NativeEvidenceInspector {
     }
 
     private render(): void {
-        if (!this.evidence || !this.traces || !this.view) return;
-        const key = `${this.select.value}:${JSON.stringify(this.view)}`;
+        if (!this.view) return;
+        const key = `${this.select.value}:${JSON.stringify({ ...this.view, cargo: this.view.cargo ? { status: this.view.cargo.status, state: this.view.cargo.state } : undefined })}`;
         if (key === this.renderKey) return;
         this.renderKey = key;
         const region = this.select.value;
+        if (region.startsWith('cargo:')) {
+            this.pre.textContent = this.view.cargo ? cargoEvidenceDetails(this.view.cargo, region.slice(6)) : 'Cargo accepted state unavailable.';
+            return;
+        }
+        if (!this.evidence || !this.traces) return;
         this.pre.textContent = region === 'bogus' ? this.renderBogus()
             : region.startsWith('output:') ? this.renderOutput(region.slice('output:'.length))
             : this.renderCurrent();

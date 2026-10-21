@@ -1,0 +1,108 @@
+$ pnpm typecheck && pnpm check:native && pnpm test:unit && pnpm test
+$ tsc --noEmit
+$ node scripts/native/generate-tables.ts --check && pnpm check:native-world && pnpm check:race-cargo
+✓ server/native/tables/handshake.json
+✓ public/evidence/coop/handshake.evidence.json
+✓ public/evidence/coop/handshake.traces.json
+✓ public/evidence/coop/handshake.disasm.json
+✓ server/native/tables/deadlock.json
+✓ public/evidence/coop/deadlock.evidence.json
+✓ public/evidence/coop/deadlock.traces.json
+✓ public/evidence/coop/deadlock.disasm.json
+✓ server/native/tables/use-after-free.json
+✓ public/evidence/coop/use-after-free.evidence.json
+✓ public/evidence/coop/use-after-free.traces.json
+✓ public/evidence/coop/use-after-free.disasm.json
+✓ server/native/tables/crossfeed-vault.json
+✓ public/evidence/coop/crossfeed-vault.evidence.json
+✓ public/evidence/coop/crossfeed-vault.traces.json
+✓ public/evidence/coop/crossfeed-vault.disasm.json
+✓ server/native/tables/race-condition.json
+✓ public/evidence/coop/race-condition.evidence.json
+✓ public/evidence/coop/race-condition.traces.json
+✓ public/evidence/coop/race-condition.disasm.json
+✓ public/evidence/coop/manifest.json
+
+checked 21 artifacts, 8137.6 KB total
+$ node scripts/native/world-evidence.ts --check
+✓ public/evidence/coop/handshake.world.json (6502 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/deadlock.world.json (7710 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/use-after-free.world.json (10491 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/crossfeed-vault.world.json (24024 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/race-condition.world.json (20166 bytes; PE bytes, blocks, stores and targets verified)
+$ node scripts/native/race-cargo-evidence.ts --check
+✓ public/evidence/coop/race-condition.cargo.json: 25595 / 36000 bytes; 26 distinct fragments; catalogue, PE bytes, blocks, stores and targets verified
+$ vitest run --config vitest.unit.config.ts
+
+ RUN  v5.0.1 /tmp/bn-race-cargo-panel
+
+{"id":1,"timestamp":"2026-10-21T23:37:11.528Z","level":"info","event":"server_started","port":38267}
+{"id":1,"timestamp":"2026-10-21T23:37:11.551Z","level":"info","event":"server_started","port":36633}
+{"id":2,"timestamp":"2026-10-21T23:37:11.623Z","level":"info","event":"character_created","visitorRef":"visitor-36f69bf7b335","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":2,"timestamp":"2026-10-21T23:37:11.627Z","level":"warn","event":"room_operation_rejected","visitorRef":"visitor-63407870e40e","code":"DRAFT_UNAVAILABLE"}
+{"id":3,"timestamp":"2026-10-21T23:37:11.641Z","level":"info","event":"server_shutdown"}
+{"id":3,"timestamp":"2026-10-21T23:37:11.642Z","level":"info","event":"party_created","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":4,"timestamp":"2026-10-21T23:37:11.643Z","level":"info","event":"player_connected","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":5,"timestamp":"2026-10-21T23:37:11.643Z","level":"info","event":"player_joined_party","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":6,"timestamp":"2026-10-21T23:37:11.643Z","level":"info","event":"chamber_started","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":1,"timestamp":"2026-10-21T23:37:11.657Z","level":"info","event":"server_started","port":42537}
+{"id":7,"timestamp":"2026-10-21T23:37:11.661Z","level":"info","event":"player_connected","visitorRef":"visitor-59038baf124e","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":1}
+{"id":8,"timestamp":"2026-10-21T23:37:11.661Z","level":"info","event":"player_joined_party","visitorRef":"visitor-59038baf124e","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":1}
+{"id":9,"timestamp":"2026-10-21T23:37:11.676Z","level":"info","event":"checkpoint_activated","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"checkpointId":"draft:breakpoint","source":"accepted_action","levelInstance":1}
+{"id":10,"timestamp":"2026-10-21T23:37:11.681Z","level":"info","event":"chamber_started","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"reason":"custom_restart","levelInstance":2}
+{"id":11,"timestamp":"2026-10-21T23:37:11.709Z","level":"warn","event":"room_operation_rejected","visitorRef":"visitor-e78fe5d9f5be","code":"SESSION_REPLACED"}
+{"id":12,"timestamp":"2026-10-21T23:37:11.714Z","level":"info","event":"player_reconnected","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":2}
+{"id":2,"timestamp":"2026-10-21T23:37:11.729Z","level":"info","event":"character_created","visitorRef":"visitor-cdb2e61a10c4","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":13,"timestamp":"2026-10-21T23:37:11.749Z","level":"info","event":"party_created","visitorRef":"visitor-63407870e40e","sessionRef":"session-f0c32cfd4552","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":14,"timestamp":"2026-10-21T23:37:11.749Z","level":"info","event":"player_connected","visitorRef":"visitor-63407870e40e","sessionRef":"session-f0c32cfd4552","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":15,"timestamp":"2026-10-21T23:37:11.749Z","level":"info","event":"player_joined_party","visitorRef":"visitor-63407870e40e","sessionRef":"session-f0c32cfd4552","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":16,"timestamp":"2026-10-21T23:37:11.752Z","level":"info","event":"player_disconnected","visitorRef":"visitor-59038baf124e","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":2}
+{"id":17,"timestamp":"2026-10-21T23:37:11.753Z","level":"info","event":"player_disconnected","visitorRef":"visitor-e78fe5d9f5be","sessionRef":"session-17cf85bff495","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":2}
+{"id":18,"timestamp":"2026-10-21T23:37:11.754Z","level":"info","event":"player_disconnected","visitorRef":"visitor-63407870e40e","sessionRef":"session-f0c32cfd4552","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":19,"timestamp":"2026-10-21T23:37:11.755Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:11.765Z","level":"info","event":"server_started","port":38051}
+{"id":2,"timestamp":"2026-10-21T23:37:11.786Z","level":"info","event":"server_shutdown"}
+{"id":3,"timestamp":"2026-10-21T23:37:11.801Z","level":"info","event":"character_updated","visitorRef":"visitor-cdb2e61a10c4","player":"ZeroDay","revision":2,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-21T23:37:11.805Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:11.830Z","level":"info","event":"server_started","port":44171}
+{"id":2,"timestamp":"2026-10-21T23:37:11.879Z","level":"info","event":"character_created","visitorRef":"visitor-25b6ed259fec","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-21T23:37:11.903Z","level":"info","event":"character_created","visitorRef":"visitor-c53f1a6a9bb2","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":4,"timestamp":"2026-10-21T23:37:11.944Z","level":"info","event":"character_updated","visitorRef":"visitor-c53f1a6a9bb2","player":"ZeroDay","revision":2,"colour":"orange"}
+{"id":5,"timestamp":"2026-10-21T23:37:11.951Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:11.956Z","level":"info","event":"server_started","port":36675}
+{"id":2,"timestamp":"2026-10-21T23:37:11.980Z","level":"info","event":"character_created","visitorRef":"visitor-38b5222abb2d","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-21T23:37:12.004Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:12.177Z","level":"info","event":"server_started","port":39829}
+{"id":1,"timestamp":"2026-10-21T23:37:12.664Z","level":"info","event":"server_started","port":35223}
+{"id":2,"timestamp":"2026-10-21T23:37:12.717Z","level":"info","event":"character_created","visitorRef":"visitor-b4df5af6e758","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-21T23:37:12.772Z","level":"info","event":"character_created","visitorRef":"visitor-b4df5af6e758","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":4,"timestamp":"2026-10-21T23:37:12.816Z","level":"info","event":"character_created","visitorRef":"visitor-b4df5af6e758","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":5,"timestamp":"2026-10-21T23:37:12.820Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-21T23:37:13.103Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:13.281Z","level":"info","event":"server_started","port":32839}
+{"id":2,"timestamp":"2026-10-21T23:37:13.297Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:13.922Z","level":"info","event":"server_started","port":34413}
+{"id":2,"timestamp":"2026-10-21T23:37:14.024Z","level":"info","event":"character_created","visitorRef":"visitor-a9ed5cac0d95","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-21T23:37:14.052Z","level":"info","event":"character_created","visitorRef":"visitor-d92185c8eeef","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-21T23:37:14.164Z","level":"info","event":"character_updated","visitorRef":"visitor-a9ed5cac0d95","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-21T23:37:14.199Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-21T23:37:14.213Z","level":"info","event":"server_started","port":37841}
+{"id":2,"timestamp":"2026-10-21T23:37:14.256Z","level":"info","event":"character_created","visitorRef":"visitor-72aa03c25d21","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-21T23:37:14.278Z","level":"info","event":"character_created","visitorRef":"visitor-4b84a5d645f6","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-21T23:37:14.366Z","level":"info","event":"character_updated","visitorRef":"visitor-72aa03c25d21","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-21T23:37:14.393Z","level":"info","event":"server_shutdown"}
+
+ Test Files  77 passed (77)
+      Tests  769 passed | 3 skipped (772)
+   Start at  10:37:10
+   Duration  16.44s (tests 77%, transform 12%, import 9%, environment 2%)
+
+$ vitest run
+
+ RUN  v5.0.1 /tmp/bn-race-cargo-panel
+
+
+ Test Files  2 passed (2)
+      Tests  3 passed (3)
+   Start at  10:37:27
+   Duration  545ms (import 67%, tests 25%, transform 7%, worker 1%)

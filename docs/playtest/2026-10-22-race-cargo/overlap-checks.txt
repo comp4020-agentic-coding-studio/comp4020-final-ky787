@@ -1,0 +1,7 @@
+PASS overlap: distinct visitors
+PASS overlap-drop-b-1600: accepted state and authentic selected stores
+PASS overlap-drop-b-1600: readable native Canvas text in ordinary camera
+PASS overlap-drop-a-1600: accepted state and authentic selected stores
+PASS overlap-drop-a-1600: readable native Canvas text in ordinary camera
+PASS overlap: no browser errors
+PASS overlap: no browser errors

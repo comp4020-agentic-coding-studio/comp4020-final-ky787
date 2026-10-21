@@ -53,7 +53,7 @@ function compactInstruction(i: NativeDisasmInstruction): NativeDisasmInstruction
 }
 
 /** Resolve each RVA to real PE bytes, independently of the disassembly JSON. */
-function peBytesAt(pe: Buffer, rva: number, size: number): Buffer {
+export function peBytesAt(pe: Buffer, rva: number, size: number): Buffer {
     requireFact(pe.toString('ascii', 0, 2) === 'MZ', 'missing DOS header');
     const header = pe.readUInt32LE(0x3c);
     requireFact(pe.readUInt32LE(header) === 0x4550, 'missing PE signature');
