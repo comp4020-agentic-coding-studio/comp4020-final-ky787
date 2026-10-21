@@ -1,0 +1,760 @@
+{
+  "schema": "race-cargo-cases/v1",
+  "binary_sha256": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a",
+  "input_names": [
+    "dropA",
+    "dropB",
+    "payloadDelivered",
+    "traceOccupied",
+    "phase",
+    "returnOccupied",
+    "finalControl",
+    "exitUnlocked",
+    "phaseGraceActive",
+    "returnGraceActive",
+    "bufferPhase"
+  ],
+  "output_names": [
+    "topBridge",
+    "bufferBridge",
+    "safetyFirewall",
+    "raceFirewall",
+    "spanMaster",
+    "phaseA",
+    "phaseB",
+    "returnBridge",
+    "exitDoor",
+    "physicalPhaseA",
+    "physicalPhaseB",
+    "physicalReturnBridge",
+    "exitUnlockCandidate"
+  ],
+  "abstract_cases": 16,
+  "fixed_other_inputs": {
+    "payloadDelivered": 0,
+    "traceOccupied": 0,
+    "phase": 0,
+    "returnOccupied": 0,
+    "finalControl": 0,
+    "exitUnlocked": 0,
+    "phaseGraceActive": 0,
+    "returnGraceActive": 0
+  },
+  "additional_scenario_case_ids": [
+    16
+  ],
+  "reused_count": 7,
+  "new_count": 10,
+  "cases": [
+    {
+      "id": 0,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:initial",
+        "scenario:release-b-after-reset",
+        "scenario:initial",
+        "scenario:recovery-start-after-recorded-reset"
+      ],
+      "trace": {
+        "id": "bcf_case_0",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 1,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:drop-a-released",
+        "scenario:accepted-buffer-contact-seed",
+        "scenario:deadline-minus-one",
+        "scenario:second-attempt-a-release"
+      ],
+      "trace": {
+        "id": "bcf_case_1",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 2,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:b-released-no-recatch",
+        "scenario:b-released-after-transfer"
+      ],
+      "trace": {
+        "id": "bcf_case_2",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 3,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:deadline-exact-expired"
+      ],
+      "trace": {
+        "id": "bcf_case_3",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 4,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:drop-a-body",
+        "scenario:drop-a-body",
+        "scenario:second-attempt-drop-a"
+      ],
+      "trace": {
+        "id": "bcf_case_4",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 5,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:accepted-buffer-contact-seed",
+        "scenario:accepted-buffer-contact",
+        "scenario:second-buffer-contact"
+      ],
+      "trace": {
+        "id": "bcf_case_5",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 6,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero"
+      ],
+      "trace": {
+        "id": "bcf_case_6",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 7,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero"
+      ],
+      "trace": {
+        "id": "bcf_case_7",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 8,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:accepted-cube-reset-seed"
+      ],
+      "trace": {
+        "id": "bcf_case_8",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 9,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero"
+      ],
+      "trace": {
+        "id": "bcf_case_9",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 10,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:b-at-deadline-minus-one",
+        "scenario:a-released-clears-overlap",
+        "scenario:second-attempt-b-in-time"
+      ],
+      "trace": {
+        "id": "bcf_case_10",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 11,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:b-at-deadline-after-advance",
+        "scenario:deadline-plus-one"
+      ],
+      "trace": {
+        "id": "bcf_case_11",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 12,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero"
+      ],
+      "trace": {
+        "id": "bcf_case_12",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 13,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero"
+      ],
+      "trace": {
+        "id": "bcf_case_13",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 14,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero",
+        "scenario:both-controls-held"
+      ],
+      "trace": {
+        "id": "bcf_case_14",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 15,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "abstract cargo product; all eight other native Boolean inputs fixed to zero"
+      ],
+      "trace": {
+        "id": "bcf_case_15",
+        "path": "experiments/coop-controllers/race-condition/evidence/representative-traces.json.gz",
+        "origin": "reused_exact_full_input_trace"
+      },
+      "abstract_cargo_case": true
+    },
+    {
+      "id": 16,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 1,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "scope": [
+        "scenario:receiver-cube"
+      ],
+      "trace": {
+        "id": "bcf_case_16",
+        "path": "experiments/coop-controller-studies/race-cargo-v1/evidence/targeted-traces.json.gz",
+        "origin": "new_exact_pe_unicorn_execution"
+      },
+      "abstract_cargo_case": false
+    }
+  ],
+  "limits": [
+    "Every case records all 11 native fields; bufferPhase is a four-valued uint32.",
+    "The abstract product is not a claim of server or physical reachability.",
+    "Only exact full input vectors select a trace. Missing matches remain unknown.",
+    "Unicorn instruction execution and real Windows PE stdout are different evidence sources."
+  ]
+}

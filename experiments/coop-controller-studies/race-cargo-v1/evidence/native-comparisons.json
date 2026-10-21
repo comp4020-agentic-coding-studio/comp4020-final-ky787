@@ -1,0 +1,3228 @@
+{
+  "schema": "race-cargo-native-comparisons/v1",
+  "analyzed_revision": "0810cb8c4883c5a8bd979d49612108d39329d0f8",
+  "reference_sha256": "248b7d09968dc80901a996f490588c8a313b653fd6f1d86106eba8061005f198",
+  "scenario_sha256": "1fb0bd5f6309c416f61cc8ac18e1fda3ca5bae127c43e5ffeaaa4bccf948fcd8",
+  "producer_sha256": "8d0a213d8cea2834a8dbf5991062474c566d4ae4e85f62f491316b4613af0205",
+  "processes": {
+    "clean": {
+      "argv": [
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\bin\\clean_x64.exe"
+      ],
+      "binary_sha256": "2eb161048cac1f2734838ed3a87e601e6e990e311a6c316eacf88696928b8487",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":1,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":1,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n",
+      "input_stream": "0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 3\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 0 0 0 2\n1 0 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 0\n0 1 0 0 0 0 0 0 0 0 1\n0 1 0 0 0 0 0 0 0 0 2\n0 1 0 0 0 0 0 0 0 0 3\n1 1 0 0 0 0 0 0 0 0 0\n1 1 0 0 0 0 0 0 0 0 1\n1 1 0 0 0 0 0 0 0 0 2\n1 1 0 0 0 0 0 0 0 0 3\n0 0 1 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 1\n0 1 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 2\n0 0 1 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n1 1 0 0 0 0 0 0 0 0 2\n0 1 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 1\n0 1 0 0 0 0 0 0 0 0 2\n",
+      "platform": "Windows-11-10.0.26200-SP0"
+    },
+    "bcf": {
+      "argv": [
+        "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controllers\\race-condition\\bin\\obfuscated_x64.exe"
+      ],
+      "binary_sha256": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":1,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":1,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":3},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":0,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":1,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":0},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":1,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":0,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":0,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":1},\"outputs\":{\"topBridge\":1,\"bufferBridge\":1,\"safetyFirewall\":1,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n{\"inputs\":{\"dropA\":0,\"dropB\":1,\"payloadDelivered\":0,\"traceOccupied\":0,\"phase\":0,\"returnOccupied\":0,\"finalControl\":0,\"exitUnlocked\":0,\"phaseGraceActive\":0,\"returnGraceActive\":0,\"bufferPhase\":2},\"outputs\":{\"topBridge\":1,\"bufferBridge\":0,\"safetyFirewall\":0,\"raceFirewall\":0,\"spanMaster\":0,\"phaseA\":0,\"phaseB\":0,\"returnBridge\":0,\"exitDoor\":0,\"physicalPhaseA\":0,\"physicalPhaseB\":0,\"physicalReturnBridge\":0,\"exitUnlockCandidate\":0}}\n",
+      "input_stream": "0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 3\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 0 0 0 2\n1 0 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 0\n0 1 0 0 0 0 0 0 0 0 1\n0 1 0 0 0 0 0 0 0 0 2\n0 1 0 0 0 0 0 0 0 0 3\n1 1 0 0 0 0 0 0 0 0 0\n1 1 0 0 0 0 0 0 0 0 1\n1 1 0 0 0 0 0 0 0 0 2\n1 1 0 0 0 0 0 0 0 0 3\n0 0 1 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 1\n0 1 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 2\n0 0 1 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 3\n0 1 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n1 1 0 0 0 0 0 0 0 0 2\n0 1 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 2\n0 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0 0 1\n0 0 0 0 0 0 0 0 0 0 1\n0 1 0 0 0 0 0 0 0 0 2\n",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "rows": [
+    {
+      "id": 0,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 1,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 2,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 3,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 4,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 5,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 6,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 7,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 0,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 8,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 9,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 10,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 11,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 12,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 13,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 1
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 14,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 2
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 0,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 15,
+      "inputs": {
+        "dropA": 1,
+        "dropB": 1,
+        "payloadDelivered": 0,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 3
+      },
+      "expected_outputs": {
+        "topBridge": 0,
+        "bufferBridge": 0,
+        "safetyFirewall": 1,
+        "raceFirewall": 1,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": 16,
+      "inputs": {
+        "dropA": 0,
+        "dropB": 0,
+        "payloadDelivered": 1,
+        "traceOccupied": 0,
+        "phase": 0,
+        "returnOccupied": 0,
+        "finalControl": 0,
+        "exitUnlocked": 0,
+        "phaseGraceActive": 0,
+        "returnGraceActive": 0,
+        "bufferPhase": 0
+      },
+      "expected_outputs": {
+        "topBridge": 1,
+        "bufferBridge": 1,
+        "safetyFirewall": 1,
+        "raceFirewall": 0,
+        "spanMaster": 0,
+        "phaseA": 0,
+        "phaseB": 0,
+        "returnBridge": 0,
+        "exitDoor": 0,
+        "physicalPhaseA": 0,
+        "physicalPhaseB": 0,
+        "physicalReturnBridge": 0,
+        "exitUnlockCandidate": 0
+      },
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 1,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 1,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    }
+  ],
+  "ordered_scenario_rows": [
+    {
+      "event": "initial",
+      "case_id": 0,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "drop-a-body",
+      "case_id": 4,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "accepted-buffer-contact-seed",
+      "case_id": 5,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "drop-a-released",
+      "case_id": 1,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "b-at-deadline-minus-one",
+      "case_id": 10,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "b-released-no-recatch",
+      "case_id": 2,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "receiver-cube",
+      "case_id": 16,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 1,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 1,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "accepted-buffer-contact-seed",
+      "case_id": 1,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "deadline-minus-one",
+      "case_id": 1,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "deadline-exact-expired",
+      "case_id": 3,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "b-at-deadline-after-advance",
+      "case_id": 11,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "deadline-plus-one",
+      "case_id": 11,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 3
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "accepted-cube-reset-seed",
+      "case_id": 8,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "release-b-after-reset",
+      "case_id": 0,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "initial",
+      "case_id": 0,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "drop-a-body",
+      "case_id": 4,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "accepted-buffer-contact",
+      "case_id": 5,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "both-controls-held",
+      "case_id": 14,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 1,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "a-released-clears-overlap",
+      "case_id": 10,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "b-released-after-transfer",
+      "case_id": 2,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "recovery-start-after-recorded-reset",
+      "case_id": 0,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "second-attempt-drop-a",
+      "case_id": 4,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 0
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "second-buffer-contact",
+      "case_id": 5,
+      "clean": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 1,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 0,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "second-attempt-a-release",
+      "case_id": 1,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 0,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 1
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 1,
+          "safetyFirewall": 1,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    },
+    {
+      "event": "second-attempt-b-in-time",
+      "case_id": 10,
+      "clean": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "bcf": {
+        "inputs": {
+          "dropA": 0,
+          "dropB": 1,
+          "payloadDelivered": 0,
+          "traceOccupied": 0,
+          "phase": 0,
+          "returnOccupied": 0,
+          "finalControl": 0,
+          "exitUnlocked": 0,
+          "phaseGraceActive": 0,
+          "returnGraceActive": 0,
+          "bufferPhase": 2
+        },
+        "outputs": {
+          "topBridge": 1,
+          "bufferBridge": 0,
+          "safetyFirewall": 0,
+          "raceFirewall": 0,
+          "spanMaster": 0,
+          "phaseA": 0,
+          "phaseB": 0,
+          "returnBridge": 0,
+          "exitDoor": 0,
+          "physicalPhaseA": 0,
+          "physicalPhaseB": 0,
+          "physicalReturnBridge": 0,
+          "exitUnlockCandidate": 0
+        }
+      },
+      "valid": true
+    }
+  ],
+  "all_valid": true,
+  "unique_cases": 17,
+  "ordered_frames_per_pe": 25,
+  "native_calls": 84
+}
