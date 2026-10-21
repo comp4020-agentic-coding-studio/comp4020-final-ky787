@@ -232,6 +232,10 @@ try {
 
     for (const p of [a, b]) {
         await navigate(p, `${url}?labs=1`, '!!globalThis.binaryNinja?.snapshot().character.ready');
+        // Profile readiness precedes the asynchronous persisted-party reconnect.
+        // Wait for that real connection before leaving, otherwise a late join can
+        // replace the main menu after the test has started looking for lab inputs.
+        await wait(p, 'saved official party reconnects after custom play', s => s.room === 'handshake' && s.multiplayer?.websocket === 'CONNECTED');
         if ((await snapshot(p)).multiplayer) {
             if (await p.read<boolean>("document.querySelector('#menu').hidden")) await click(p, '#pause');
             await until(p, "!!document.querySelector('#leave-coop')");

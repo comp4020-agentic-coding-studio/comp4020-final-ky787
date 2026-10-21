@@ -1,0 +1,151 @@
+PASS public menu keeps four tutorial rooms and hides internal labs
+PASS creator is host; lobby guest waits with no start controls
+PASS guest selection is refused locally
+PASS forged guest request leaves both in lobby
+PASS host-lobby: in-world assembly uses the accepted room's native values
+PASS guest-lobby: in-world assembly uses the accepted room's native values
+PASS handshake: two independent visitors retain one party
+PASS handshake-initial-host: in-world assembly uses the accepted room's native values
+PASS handshake-initial-partner: in-world assembly uses the accepted room's native values
+PASS handshake-powered-crossing-host: in-world assembly uses the accepted room's native values
+PASS handshake-powered-crossing-partner: in-world assembly uses the accepted room's native values
+PASS handshake-cube-alcove-host: in-world assembly uses the accepted room's native values
+PASS handshake-cube-alcove-partner: in-world assembly uses the accepted room's native values
+PASS handshake-payload-return-host: in-world assembly uses the accepted room's native values
+PASS handshake-payload-return-partner: in-world assembly uses the accepted room's native values
+PASS handshake-cube-substitution-host: in-world assembly uses the accepted room's native values
+PASS handshake-cube-substitution-partner: in-world assembly uses the accepted room's native values
+PASS handshake-gallery-lift-host: in-world assembly uses the accepted room's native values
+PASS handshake-gallery-lift-partner: in-world assembly uses the accepted room's native values
+PASS handshake-relay-linked-host: in-world assembly uses the accepted room's native values
+PASS handshake-relay-linked-partner: in-world assembly uses the accepted room's native values
+PASS handshake-partner-held-boost-host: in-world assembly uses the accepted room's native values
+PASS handshake-partner-held-boost-partner: in-world assembly uses the accepted room's native values
+PASS handshake-maintenance-complete-host: in-world assembly uses the accepted room's native values
+PASS handshake-maintenance-complete-partner: in-world assembly uses the accepted room's native values
+PASS handshake-near-complete-host: in-world assembly uses the accepted room's native values
+PASS handshake-near-complete-partner: in-world assembly uses the accepted room's native values
+PASS handshake-exit-unlocked-host: in-world assembly uses the accepted room's native values
+PASS handshake-exit-unlocked-partner: in-world assembly uses the accepted room's native values
+PASS handshake-completed-host: in-world assembly uses the accepted room's native values
+PASS handshake-completed-partner: in-world assembly uses the accepted room's native values
+PASS handshake: authored-start physical solve with both arrivals
+PASS fresh two-cube world on the existing socket
+PASS fresh two-cube world on the existing socket
+PASS [full chamber] overview: in-world assembly uses the accepted room's native values
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] walking into the breakpoint does not operate SYSTEM ONLINE
+PASS [full chamber] shared checkpoint does not teleport the waiting partner
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] boost-support: in-world assembly uses the accepted room's native values
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] upper-left-routing: in-world assembly uses the accepted room's native values
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] upper-right-routing: in-world assembly uses the accepted room's native values
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] victory overlay visible
+PASS [full chamber] victory overlay visible
+PASS [full chamber] host gets NEXT, guest waits
+PASS [full chamber] old chamber traffic cannot alter new machinery/cubes
+PASS [full] overview: in-world assembly uses the accepted room's native values
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] drop-b-camera: in-world assembly uses the accepted room's native values
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] trace-camera: in-world assembly uses the accepted room's native values
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four deliberate transfers retain the airborne chain
+PASS [full] right-deck: in-world assembly uses the accepted room's native values
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] return-camera: in-world assembly uses the accepted room's native values
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] commit: in-world assembly uses the accepted room's native values
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [full] complete: in-world assembly uses the accepted room's native values
+PASS [full] Race now leads to DEADLOCK
+PASS [full] deadlock: two independent visitors retain one party
+PASS [full] deadlock-stage-01-initial-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-01-initial-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-02-two-weights-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-02-two-weights-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-03-player-substitution-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-03-player-substitution-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-04-final-hover-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-04-final-hover-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-05-hatch-catch-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-05-hatch-catch-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-06-three-payloads-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-06-three-payloads-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-07-payload-service-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-07-payload-service-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-08-complete-operator: in-world assembly uses the accepted room's native values
+PASS [full] deadlock-stage-08-complete-carrier: in-world assembly uses the accepted room's native values
+PASS [full] deadlock: authored-start physical solve with both arrivals
+PASS [full] use-after-free: two independent visitors retain one party
+PASS [full] use-after-free-initial-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-initial-partner: in-world assembly uses the accepted room's native values
+PASS [full] pausing the unstable operator releases route power; resume resamples contact without resetting its fuse
+PASS [full] use-after-free-a-powered-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-a-powered-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-first-chain-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-first-chain-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-first-handover-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-first-handover-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-second-chain-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-second-chain-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-second-handover-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-second-handover-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-summit-assist-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-summit-assist-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-near-complete-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-near-complete-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-completed-host: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free-completed-partner: in-world assembly uses the accepted room's native values
+PASS [full] use-after-free: authored-start physical solve with both arrivals
+PASS [full] last chamber shows campaign complete without a fictitious next level
+PASS [full] all five badges saved on same party
+PASS [full] all five badges saved on same party
+PASS [full] campaign-complete: in-world assembly uses the accepted room's native values
+PASS [full] restart restores victory and badges
+PASS [full] restart restores victory and badges
+PASS [full] guest has host-disconnected message and no selection
+PASS [full] completed badges remain in selector
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] no browser runtime errors
+PASS [full] no browser runtime errors
+PASS [full] full physical campaign route rendered each chamber’s own native assembly

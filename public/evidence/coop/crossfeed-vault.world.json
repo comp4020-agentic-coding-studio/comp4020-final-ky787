@@ -1,0 +1,869 @@
+{
+  "schema": "coop-native-world/v1",
+  "chamber_id": "crossfeed-vault",
+  "specimen_id": "crossfeed-vault_ollvm_bcf",
+  "bcf_pe_sha256": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b",
+  "contract_sha256": "438dd4d1b613e0d76959c6ba8364442789e7ded0803e735ad8f62290c3fbca41",
+  "image_base": 5368709120,
+  "presentation": "static-output-store",
+  "sources": {
+    "integration_sha256": "47a8e35360e5112fd7c00585acd5e90467954a03891629a849b93e0b965981d7",
+    "disassembly_sha256": "39c382a32eb515e8a901524e07c7f1a18cff856a7dbe70a16880182824443069"
+  },
+  "outputs": [
+    {
+      "name": "grappleAnchor",
+      "kind": "raw_combinational",
+      "game_signal": "grappleAnchor",
+      "byte_offset": 0,
+      "bindings": [
+        {
+          "id": "platforms:crossing-anchor:signal",
+          "output": "grappleAnchor",
+          "target": "crossing-anchor",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001399",
+        "store_address": 5368714144,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368714137,
+            "rva": 5017,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00001399"
+          },
+          {
+            "address": 5368714141,
+            "rva": 5021,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001399"
+          },
+          {
+            "address": 5368714144,
+            "rva": 5024,
+            "size": 6,
+            "bytes": "c7 00 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 1",
+            "block_id": "bb_00001399"
+          }
+        ]
+      }
+    },
+    {
+      "name": "bridge",
+      "kind": "raw_combinational",
+      "game_signal": "bridge",
+      "byte_offset": 4,
+      "bindings": [
+        {
+          "id": "platforms:return-bridge:signal",
+          "output": "bridge",
+          "target": "return-bridge",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000014E4",
+        "store_address": 5368714475,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368714468,
+            "rva": 5348,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_000014E4"
+          },
+          {
+            "address": 5368714472,
+            "rva": 5352,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000014E4"
+          },
+          {
+            "address": 5368714475,
+            "rva": 5355,
+            "size": 7,
+            "bytes": "c7 40 04 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 1",
+            "block_id": "bb_000014E4"
+          }
+        ]
+      }
+    },
+    {
+      "name": "liftField",
+      "kind": "raw_combinational",
+      "game_signal": "liftField",
+      "byte_offset": 8,
+      "bindings": [
+        {
+          "id": "lifts:central-lift:signal",
+          "output": "liftField",
+          "target": "central-lift",
+          "property": "signal",
+          "invert": false,
+          "collection": "lifts"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000016A8",
+        "store_address": 5368714927,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368714920,
+            "rva": 5800,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_000016A8"
+          },
+          {
+            "address": 5368714924,
+            "rva": 5804,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000016A8"
+          },
+          {
+            "address": 5368714927,
+            "rva": 5807,
+            "size": 7,
+            "bytes": "c7 40 08 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 1",
+            "block_id": "bb_000016A8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "serviceAccess",
+      "kind": "raw_combinational",
+      "game_signal": "serviceAccess",
+      "byte_offset": 12,
+      "bindings": [
+        {
+          "id": "platforms:service-door:openWhen",
+          "output": "serviceAccess",
+          "target": "service-door",
+          "property": "openWhen",
+          "invert": false,
+          "collection": "platforms"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000017F6",
+        "store_address": 5368715261,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368715254,
+            "rva": 6134,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_000017F6"
+          },
+          {
+            "address": 5368715258,
+            "rva": 6138,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000017F6"
+          },
+          {
+            "address": 5368715261,
+            "rva": 6141,
+            "size": 7,
+            "bytes": "c7 40 0c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 1",
+            "block_id": "bb_000017F6"
+          }
+        ]
+      }
+    },
+    {
+      "name": "relayGates",
+      "kind": "raw_combinational",
+      "game_signal": "relayGates",
+      "byte_offset": 16,
+      "bindings": [
+        {
+          "id": "gates:transfer:signal",
+          "output": "relayGates",
+          "target": "transfer",
+          "property": "signal",
+          "invert": false,
+          "collection": "gates"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000019BC",
+        "store_address": 5368715715,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368715708,
+            "rva": 6588,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_000019BC"
+          },
+          {
+            "address": 5368715712,
+            "rva": 6592,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000019BC"
+          },
+          {
+            "address": 5368715715,
+            "rva": 6595,
+            "size": 7,
+            "bytes": "c7 40 10 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 1",
+            "block_id": "bb_000019BC"
+          }
+        ]
+      }
+    },
+    {
+      "name": "leftRoute",
+      "kind": "raw_combinational",
+      "game_signal": "leftRoute",
+      "byte_offset": 20,
+      "bindings": [
+        {
+          "id": "platforms:left1:signal",
+          "output": "leftRoute",
+          "target": "left1",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalLeftRoute"
+        },
+        {
+          "id": "platforms:crumbleA:signal",
+          "output": "leftRoute",
+          "target": "crumbleA",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalLeftRoute",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime"
+        },
+        {
+          "id": "platforms:left3:signal",
+          "output": "leftRoute",
+          "target": "left3",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalLeftRoute"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001B7F",
+        "store_address": 5368716166,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368716159,
+            "rva": 7039,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00001B7F"
+          },
+          {
+            "address": 5368716163,
+            "rva": 7043,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001B7F"
+          },
+          {
+            "address": 5368716166,
+            "rva": 7046,
+            "size": 7,
+            "bytes": "c7 40 14 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x14], 1",
+            "block_id": "bb_00001B7F"
+          }
+        ]
+      }
+    },
+    {
+      "name": "rightRoute",
+      "kind": "raw_combinational",
+      "game_signal": "rightRoute",
+      "byte_offset": 24,
+      "bindings": [
+        {
+          "id": "platforms:right1:signal",
+          "output": "rightRoute",
+          "target": "right1",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalRightRoute"
+        },
+        {
+          "id": "platforms:crumbleB:signal",
+          "output": "rightRoute",
+          "target": "crumbleB",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalRightRoute",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime"
+        },
+        {
+          "id": "platforms:right3:signal",
+          "output": "rightRoute",
+          "target": "right3",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalRightRoute"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001D42",
+        "store_address": 5368716617,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368716610,
+            "rva": 7490,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00001D42"
+          },
+          {
+            "address": 5368716614,
+            "rva": 7494,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001D42"
+          },
+          {
+            "address": 5368716617,
+            "rva": 7497,
+            "size": 7,
+            "bytes": "c7 40 18 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x18], 1",
+            "block_id": "bb_00001D42"
+          }
+        ]
+      }
+    },
+    {
+      "name": "galleryAccess",
+      "kind": "raw_combinational",
+      "game_signal": "galleryAccess",
+      "byte_offset": 28,
+      "bindings": [
+        {
+          "id": "platforms:gallery-return-low:signal",
+          "output": "galleryAccess",
+          "target": "gallery-return-low",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "platforms:gallery-return-high:signal",
+          "output": "galleryAccess",
+          "target": "gallery-return-high",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "platforms:gallery-launch:signal",
+          "output": "galleryAccess",
+          "target": "gallery-launch",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001E90",
+        "store_address": 5368716951,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368716944,
+            "rva": 7824,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00001E90"
+          },
+          {
+            "address": 5368716948,
+            "rva": 7828,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001E90"
+          },
+          {
+            "address": 5368716951,
+            "rva": 7831,
+            "size": 7,
+            "bytes": "c7 40 1c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x1c], 1",
+            "block_id": "bb_00001E90"
+          }
+        ]
+      }
+    },
+    {
+      "name": "vaultPower",
+      "kind": "raw_combinational",
+      "game_signal": "vaultPower",
+      "byte_offset": 32,
+      "bindings": [
+        {
+          "id": "platforms:final-left-low:signal",
+          "output": "vaultPower",
+          "target": "final-left-low",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "platforms:final-left-high:signal",
+          "output": "vaultPower",
+          "target": "final-left-high",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "platforms:final-right-low:signal",
+          "output": "vaultPower",
+          "target": "final-right-low",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "platforms:final-right-high:signal",
+          "output": "vaultPower",
+          "target": "final-right-high",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001FDA",
+        "store_address": 5368717281,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368717274,
+            "rva": 8154,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00001FDA"
+          },
+          {
+            "address": 5368717278,
+            "rva": 8158,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001FDA"
+          },
+          {
+            "address": 5368717281,
+            "rva": 8161,
+            "size": 7,
+            "bytes": "c7 40 20 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x20], 1",
+            "block_id": "bb_00001FDA"
+          }
+        ]
+      }
+    },
+    {
+      "name": "vaultReturn",
+      "kind": "raw_combinational",
+      "game_signal": "vaultReturn",
+      "byte_offset": 36,
+      "bindings": [
+        {
+          "id": "platforms:vault-return:signal",
+          "output": "vaultReturn",
+          "target": "vault-return",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "platforms:vault-return-step:signal",
+          "output": "vaultReturn",
+          "target": "vault-return-step",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00002124",
+        "store_address": 5368717611,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368717604,
+            "rva": 8484,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00002124"
+          },
+          {
+            "address": 5368717608,
+            "rva": 8488,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00002124"
+          },
+          {
+            "address": 5368717611,
+            "rva": 8491,
+            "size": 7,
+            "bytes": "c7 40 24 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x24], 1",
+            "block_id": "bb_00002124"
+          }
+        ]
+      }
+    },
+    {
+      "name": "exitDoor",
+      "kind": "persisted_latch_projection",
+      "game_signal": "exitDoor",
+      "byte_offset": 40,
+      "bindings": [
+        {
+          "id": "platforms:vault-divider:openWhen",
+          "output": "exitDoor",
+          "target": "vault-divider",
+          "property": "openWhen",
+          "invert": false,
+          "collection": "platforms"
+        },
+        {
+          "id": "exit",
+          "output": "exitDoor",
+          "target": "exit",
+          "property": "unlocked",
+          "invert": false
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00002272",
+        "store_address": 5368717945,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368717938,
+            "rva": 8818,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00002272"
+          },
+          {
+            "address": 5368717942,
+            "rva": 8822,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00002272"
+          },
+          {
+            "address": 5368717945,
+            "rva": 8825,
+            "size": 7,
+            "bytes": "c7 40 28 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x28], 1",
+            "block_id": "bb_00002272"
+          }
+        ]
+      }
+    },
+    {
+      "name": "physicalLeftRoute",
+      "kind": "physical_projection",
+      "game_signal": null,
+      "byte_offset": 44,
+      "bindings": [
+        {
+          "id": "platforms:left1:signal",
+          "output": "leftRoute",
+          "target": "left1",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalLeftRoute"
+        },
+        {
+          "id": "platforms:crumbleA:signal",
+          "output": "leftRoute",
+          "target": "crumbleA",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalLeftRoute",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime"
+        },
+        {
+          "id": "platforms:left3:signal",
+          "output": "leftRoute",
+          "target": "left3",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalLeftRoute"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00002436",
+        "store_address": 5368718397,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368718390,
+            "rva": 9270,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00002436"
+          },
+          {
+            "address": 5368718394,
+            "rva": 9274,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00002436"
+          },
+          {
+            "address": 5368718397,
+            "rva": 9277,
+            "size": 7,
+            "bytes": "c7 40 2c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x2c], 1",
+            "block_id": "bb_00002436"
+          }
+        ]
+      }
+    },
+    {
+      "name": "physicalRightRoute",
+      "kind": "physical_projection",
+      "game_signal": null,
+      "byte_offset": 48,
+      "bindings": [
+        {
+          "id": "platforms:right1:signal",
+          "output": "rightRoute",
+          "target": "right1",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalRightRoute"
+        },
+        {
+          "id": "platforms:crumbleB:signal",
+          "output": "rightRoute",
+          "target": "crumbleB",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalRightRoute",
+          "additional_server_constraint": "authored crumble warning/broken/stable runtime"
+        },
+        {
+          "id": "platforms:right3:signal",
+          "output": "rightRoute",
+          "target": "right3",
+          "property": "signal",
+          "invert": false,
+          "collection": "platforms",
+          "physical_output": "physicalRightRoute"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000025FA",
+        "store_address": 5368718849,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368718842,
+            "rva": 9722,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_000025FA"
+          },
+          {
+            "address": 5368718846,
+            "rva": 9726,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000025FA"
+          },
+          {
+            "address": 5368718849,
+            "rva": 9729,
+            "size": 7,
+            "bytes": "c7 40 30 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x30], 1",
+            "block_id": "bb_000025FA"
+          }
+        ]
+      }
+    },
+    {
+      "name": "exitUnlockCandidate",
+      "kind": "unlock_candidate",
+      "game_signal": null,
+      "byte_offset": 52,
+      "bindings": [],
+      "excerpt": {
+        "block_id": "bb_00002836",
+        "store_address": 5368719421,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368719414,
+            "rva": 10294,
+            "size": 4,
+            "bytes": "48 8b 45 c0",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x40]",
+            "block_id": "bb_00002836"
+          },
+          {
+            "address": 5368719418,
+            "rva": 10298,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00002836"
+          },
+          {
+            "address": 5368719421,
+            "rva": 10301,
+            "size": 7,
+            "bytes": "c7 40 34 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x34], 1",
+            "block_id": "bb_00002836"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -536,7 +536,7 @@ export class SliceGame {
     snapshot() {
         return { character: { profile: this.profiles.profile, persisted: this.profiles.persisted, ready: this.characterReady, editing: this.character.active }, room: this.world.room.id, player: this.world.player, cube: this.world.cube, cubes: this.world.cubes, inputs: this.world.inputs, outputs: this.world.frame.outputs,
             multiplayer: this.coopMode ? { ...this.coop.diagnostics(), ...this.supportDiagnostics(), shared: this.coop.room, remote: this.coop.remote.sample(performance.now()) } : null,
-            source: this.world.frame.source, signals: this.world.frame.signals, controllerStatus: this.coopMode ? 'mock multiplayer controller / binary integration pending' : undefined, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
+            source: this.world.frame.source, signals: this.world.frame.signals, controllerStatus: this.coopMode ? this.renderer.nativeWorld.state ? 'server-authoritative native-verified lookup / static world excerpts' : 'authored mock multiplayer controller' : undefined, evidence: this.world.frame.evidence, trace: this.renderer.replay.snapshot(), stringPresentation: this.world.room.id === 'uplink' ? 'authored single-byte XOR presentation / not OLLVM evidence' : 'authored mock text', platforms: this.world.platforms.map(p => ({ id: p.def.id, signal: p.def.signal, assemblyBinding: p.def.assemblyBinding, manifestation: p.def.label, enabled: p.solid.enabled, grappleable: p.solid.grappleable, fuse: p.fuse, respawn: p.respawn, evidenceId: p.def.evidenceId })),
             lifts: this.world.lifts.map(l => ({ id: l.def.id, enabled: l.enabled })),
             gates: this.world.gates.map(g => ({ id: g.def.id, enabled: g.enabled, playerCooldown: g.cooldown('player'), cubeCooldown: g.cooldown('cube') })),
             cubeTransferred: this.world.cubeTransferred,
@@ -545,6 +545,7 @@ export class SliceGame {
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
             audio: this.audio.snapshot(),
             heroAssets: this.renderer.heroes.snapshot(),
+            nativeWorld: { ...this.renderer.nativeWorld.snapshot(), panels: this.renderer.nativeWorldDisplay.panels },
             camera: { ...this.renderer.cameraReveals.selection, x: this.renderer.camera.x, y: this.renderer.camera.y, zoom: this.renderer.camera.zoom },
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
@@ -620,6 +621,7 @@ export class SliceGame {
             this.coop.publish(this.world.player, now);
             for (const [id, cube] of cubeEntries(this.world.cubes)) if (!this.world.cubeIsResetting(id)) this.coop.publishCube(cube, now, id);
         }
+        this.renderer.nativeWorld.update(this.coopMode ? this.coop.room : null, this.coop.connected);
         const heroCues = this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, profiles: this.coop.room?.profiles, connected: this.coop.connected, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,

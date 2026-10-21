@@ -12,7 +12,7 @@
     "check": "pnpm typecheck && pnpm check:native && pnpm test:unit && pnpm test",
     "check:uplink": "node scripts/check-uplink-bundle.ts",
     "gen:native": "node scripts/native/generate-tables.ts",
-    "check:native": "node scripts/native/generate-tables.ts --check",
+    "check:native": "node scripts/native/generate-tables.ts --check && pnpm check:native-world",
     "check:evidence": "node scripts/check-evidence.ts",
     "check:browser": "node scripts/browser-check.ts",
     "check:multiplayer": "node scripts/multiplayer-browser-check.ts",
@@ -45,7 +45,10 @@
     "check:public-builder": "node scripts/level-tools/public-browser-check.ts",
     "check:workbench-menu": "node scripts/level-tools/menu-browser-check.ts",
     "check:public-coop": "node scripts/level-tools/public-coop-browser-check.ts",
-    "check:native-evidence": "node scripts/native-evidence-browser-check.ts"
+    "check:native-evidence": "node scripts/native-evidence-browser-check.ts",
+    "gen:native-world": "node scripts/native/world-evidence.ts",
+    "check:native-world": "node scripts/native/world-evidence.ts --check",
+    "check:world-assembly": "node scripts/native-world-browser-check.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

@@ -1,0 +1,391 @@
+{
+  "schema": "coop-native-world/v1",
+  "chamber_id": "use-after-free",
+  "specimen_id": "use-after-free_ollvm_bcf",
+  "bcf_pe_sha256": "733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb",
+  "contract_sha256": "522f076b3ab457ecd967979b9e944f04d85df69f577d4037213986fa897a1ed3",
+  "image_base": 5368709120,
+  "presentation": "static-output-store",
+  "sources": {
+    "integration_sha256": "e9fe0c3a5cc968c1003bac2bb92b8139dd8df47f828a5c2c0cfe82e87007c8c8",
+    "disassembly_sha256": "867a960b25977ec4e6a202aed0a41bcc1249208902f35786390f2e842a8ce11f"
+  },
+  "outputs": [
+    {
+      "name": "launchPower",
+      "kind": "raw_combinational",
+      "game_signal": "draft:launchPower",
+      "byte_offset": 0,
+      "bindings": [
+        {
+          "id": "launchBinding",
+          "output": "launchPower",
+          "target": "lowerLift",
+          "property": "power",
+          "invert": false,
+          "resolved_signal": "draft:launchBinding"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000010EA",
+        "store_address": 5368713457,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368713450,
+            "rva": 4330,
+            "size": 4,
+            "bytes": "48 8b 45 d8",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x28]",
+            "block_id": "bb_000010EA"
+          },
+          {
+            "address": 5368713454,
+            "rva": 4334,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000010EA"
+          },
+          {
+            "address": 5368713457,
+            "rva": 4337,
+            "size": 6,
+            "bytes": "c7 00 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 1",
+            "block_id": "bb_000010EA"
+          }
+        ]
+      }
+    },
+    {
+      "name": "routeA",
+      "kind": "raw_combinational",
+      "game_signal": "draft:routeA",
+      "byte_offset": 4,
+      "bindings": [
+        {
+          "id": "a1Binding",
+          "output": "routeA",
+          "target": "a1",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:a1Binding"
+        },
+        {
+          "id": "a2Binding",
+          "output": "routeA",
+          "target": "a2",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:a2Binding"
+        },
+        {
+          "id": "a3Binding",
+          "output": "routeA",
+          "target": "a3",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:a3Binding"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001236",
+        "store_address": 5368713789,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368713782,
+            "rva": 4662,
+            "size": 4,
+            "bytes": "48 8b 45 d8",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x28]",
+            "block_id": "bb_00001236"
+          },
+          {
+            "address": 5368713786,
+            "rva": 4666,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001236"
+          },
+          {
+            "address": 5368713789,
+            "rva": 4669,
+            "size": 7,
+            "bytes": "c7 40 04 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 1",
+            "block_id": "bb_00001236"
+          }
+        ]
+      }
+    },
+    {
+      "name": "routeB",
+      "kind": "raw_combinational",
+      "game_signal": "draft:routeB",
+      "byte_offset": 8,
+      "bindings": [
+        {
+          "id": "b1Binding",
+          "output": "routeB",
+          "target": "b1",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:b1Binding"
+        },
+        {
+          "id": "b2Binding",
+          "output": "routeB",
+          "target": "b2",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:b2Binding"
+        },
+        {
+          "id": "b3Binding",
+          "output": "routeB",
+          "target": "b3",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:b3Binding"
+        },
+        {
+          "id": "retryBBinding",
+          "output": "routeB",
+          "target": "retryB",
+          "property": "open",
+          "invert": true,
+          "resolved_signal": "draft:retryBBinding"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000013FD",
+        "store_address": 5368714244,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368714237,
+            "rva": 5117,
+            "size": 4,
+            "bytes": "48 8b 45 d8",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x28]",
+            "block_id": "bb_000013FD"
+          },
+          {
+            "address": 5368714241,
+            "rva": 5121,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000013FD"
+          },
+          {
+            "address": 5368714244,
+            "rva": 5124,
+            "size": 7,
+            "bytes": "c7 40 08 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 1",
+            "block_id": "bb_000013FD"
+          }
+        ]
+      }
+    },
+    {
+      "name": "routeC",
+      "kind": "raw_combinational",
+      "game_signal": "draft:routeC",
+      "byte_offset": 12,
+      "bindings": [
+        {
+          "id": "c1Binding",
+          "output": "routeC",
+          "target": "c1",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:c1Binding"
+        },
+        {
+          "id": "c2Binding",
+          "output": "routeC",
+          "target": "c2",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:c2Binding"
+        },
+        {
+          "id": "c3Binding",
+          "output": "routeC",
+          "target": "c3",
+          "property": "active",
+          "invert": false,
+          "resolved_signal": "draft:c3Binding"
+        },
+        {
+          "id": "retryCBinding",
+          "output": "routeC",
+          "target": "retryC",
+          "property": "open",
+          "invert": true,
+          "resolved_signal": "draft:retryCBinding"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000015C4",
+        "store_address": 5368714699,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368714692,
+            "rva": 5572,
+            "size": 4,
+            "bytes": "48 8b 45 d8",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x28]",
+            "block_id": "bb_000015C4"
+          },
+          {
+            "address": 5368714696,
+            "rva": 5576,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000015C4"
+          },
+          {
+            "address": 5368714699,
+            "rva": 5579,
+            "size": 7,
+            "bytes": "c7 40 0c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 1",
+            "block_id": "bb_000015C4"
+          }
+        ]
+      }
+    },
+    {
+      "name": "assistBlocked",
+      "kind": "raw_combinational",
+      "game_signal": "draft:assistBlocked",
+      "byte_offset": 16,
+      "bindings": [
+        {
+          "id": "assistBinding",
+          "output": "assistBlocked",
+          "target": "finalLift",
+          "property": "power",
+          "invert": true,
+          "resolved_signal": "draft:assistBinding"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_00001788",
+        "store_address": 5368715151,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368715144,
+            "rva": 6024,
+            "size": 4,
+            "bytes": "48 8b 45 d8",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x28]",
+            "block_id": "bb_00001788"
+          },
+          {
+            "address": 5368715148,
+            "rva": 6028,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_00001788"
+          },
+          {
+            "address": 5368715151,
+            "rva": 6031,
+            "size": 7,
+            "bytes": "c7 40 10 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 1",
+            "block_id": "bb_00001788"
+          }
+        ]
+      }
+    },
+    {
+      "name": "exitReady",
+      "kind": "raw_combinational",
+      "game_signal": "draft:exitReady",
+      "byte_offset": 20,
+      "bindings": [
+        {
+          "id": "exitBinding",
+          "output": "exitReady",
+          "target": "exit",
+          "property": "unlock",
+          "invert": false,
+          "resolved_signal": "draft:exitBinding"
+        }
+      ],
+      "excerpt": {
+        "block_id": "bb_000018D6",
+        "store_address": 5368715485,
+        "observed_values": [
+          1
+        ],
+        "instructions": [
+          {
+            "address": 5368715478,
+            "rva": 6358,
+            "size": 4,
+            "bytes": "48 8b 45 d8",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rbp - 0x28]",
+            "block_id": "bb_000018D6"
+          },
+          {
+            "address": 5368715482,
+            "rva": 6362,
+            "size": 3,
+            "bytes": "48 8b 00",
+            "mnemonic": "mov",
+            "op_str": "rax, qword ptr [rax]",
+            "block_id": "bb_000018D6"
+          },
+          {
+            "address": 5368715485,
+            "rva": 6365,
+            "size": 7,
+            "bytes": "c7 40 14 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x14], 1",
+            "block_id": "bb_000018D6"
+          }
+        ]
+      }
+    }
+  ]
+}
