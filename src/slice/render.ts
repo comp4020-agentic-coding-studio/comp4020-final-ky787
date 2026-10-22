@@ -7,6 +7,8 @@ import { NativeWorldEvidence } from '../coop/native-world-evidence.ts';
 import { NativeWorldRenderer } from './native-world-render.ts';
 import { RaceCargoEvidence } from '../coop/race-cargo-evidence.ts';
 import { RaceCargoRenderer } from './race-cargo-render.ts';
+import { RaceMachineryEvidence } from '../coop/race-machinery-evidence.ts';
+import { RaceMachineryRenderer } from './race-machinery-render.ts';
 import { nativeWorldRegionLabel } from './native-world-presentation.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
@@ -40,6 +42,8 @@ export class PuzzleRenderer {
     nativeWorldDisplay = new NativeWorldRenderer();
     raceCargo = new RaceCargoEvidence();
     raceCargoDisplay = new RaceCargoRenderer();
+    raceMachinery = new RaceMachineryEvidence();
+    raceMachineryDisplay = new RaceMachineryRenderer();
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
@@ -154,7 +158,8 @@ export class PuzzleRenderer {
             this.text('RESET FIELD', h.x + 24, h.y + 43, 13, C.red);
         }
         this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, dt, energyMotion, running, performance.now());
-        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion, this.raceCargo.state !== null);
+        this.raceMachineryDisplay.draw(c, this.raceMachinery, r.id, visible, dt, energyMotion);
+        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion, this.raceCargo.state !== null, this.raceMachinery.state !== null);
         drawPlatformListings(c, w, this.replay, this.presentation);
         for (const p of w.platforms) {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };

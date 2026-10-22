@@ -15,6 +15,9 @@ import type { RaceCargoEvidence } from './race-cargo-evidence.ts';
 import { cargoEvidenceDetails } from './race-cargo-inspector.ts';
 import { CARGO_SECTIONS } from './race-cargo-types.ts';
 import { CARGO_LABELS } from '../slice/race-cargo-presentation.ts';
+import type { RaceMachineryEvidence } from './race-machinery-evidence.ts';
+import { RACE_MACHINERY_OUTPUTS } from './race-machinery-types.ts';
+import { machineryEvidenceDetails } from './race-machinery-inspector.ts';
 
 export interface NativeInspectorView {
     chamber: NativeChamberId;
@@ -23,10 +26,11 @@ export interface NativeInspectorView {
     /** Current named native outputs the server reported, for display. */
     outputs: Readonly<Record<string, boolean>>;
     cargo?: Pick<RaceCargoEvidence, 'data' | 'state' | 'status'>;
+    machinery?: Pick<RaceMachineryEvidence, 'data' | 'state' | 'status'>;
 }
 
 /** Derive the inspector view from a co-op room snapshot, if it is native-backed. */
-export function nativeInspectorView(room: SessionRoom | null, cargo?: RaceCargoEvidence): NativeInspectorView | null {
+export function nativeInspectorView(room: SessionRoom | null, cargo?: RaceCargoEvidence, machinery?: RaceMachineryEvidence): NativeInspectorView | null {
     if (!room || room.draft || !isNativeChamber(room.level)) return null;
     const chamber = room.level;
     const state = room.levelState as { devices?: Record<string, boolean>; outputs?: Record<string, boolean> };
@@ -34,7 +38,7 @@ export function nativeInspectorView(room: SessionRoom | null, cargo?: RaceCargoE
         return { chamber, devices: state.devices, outputs: state.outputs };
     }
     const temporal = room.levelState as { outputs?: Record<string, boolean> };
-    return { chamber, devices: null, outputs: temporal.outputs ?? {}, ...(chamber === 'race-condition' && cargo ? { cargo } : {}) };
+    return { chamber, devices: null, outputs: temporal.outputs ?? {}, ...(chamber === 'race-condition' ? { cargo, machinery } : {}) };
 }
 
 export class NativeEvidenceInspector {
@@ -71,7 +75,7 @@ export class NativeEvidenceInspector {
                 this.evidence = evidence; this.traces = traces;
             } catch (error) {
                 if (generation !== this.generation) return;
-                if (this.select.value.startsWith('cargo:')) this.render();
+                if (/^(cargo|machinery):/.test(this.select.value)) this.render();
                 else this.pre.textContent = `Native evidence could not be loaded: ${(error as Error).message}`;
                 return;
             }
@@ -93,6 +97,7 @@ export class NativeEvidenceInspector {
         if (this.current === 'race-condition') {
             CARGO_SECTIONS.forEach((s, n) => this.select.add(new Option(`Cargo · ${CARGO_LABELS[n]} · STATE-LINKED`, `cargo:${s}`)));
             this.select.add(new Option('Cargo · optional obfuscator guard', 'cargo:guard'));
+            RACE_MACHINERY_OUTPUTS.forEach(s => this.select.add(new Option(`Machinery · ${s} · STATE-LINKED`, `machinery:${s}`)));
         }
         if (!this.evidence) return;
         this.select.add(new Option('Current state · outputs and store sites', 'current'));
@@ -113,10 +118,15 @@ export class NativeEvidenceInspector {
 
     private render(): void {
         if (!this.view) return;
-        const key = `${this.select.value}:${JSON.stringify({ ...this.view, cargo: this.view.cargo ? { status: this.view.cargo.status, state: this.view.cargo.state } : undefined })}`;
+        const key = `${this.select.value}:${JSON.stringify({ ...this.view, cargo: this.view.cargo ? { status: this.view.cargo.status, state: this.view.cargo.state } : undefined,
+            machinery: this.view.machinery ? { status: this.view.machinery.status, state: this.view.machinery.state } : undefined })}`;
         if (key === this.renderKey) return;
         this.renderKey = key;
         const region = this.select.value;
+        if (region.startsWith('machinery:')) {
+            this.pre.textContent = this.view.machinery ? machineryEvidenceDetails(this.view.machinery, region.slice(10)) : 'Machinery accepted state unavailable.';
+            return;
+        }
         if (region.startsWith('cargo:')) {
             this.pre.textContent = this.view.cargo ? cargoEvidenceDetails(this.view.cargo, region.slice(6)) : 'Cargo accepted state unavailable.';
             return;

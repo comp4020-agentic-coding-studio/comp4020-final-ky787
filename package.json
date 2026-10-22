@@ -12,7 +12,7 @@
     "check": "pnpm typecheck && pnpm check:native && pnpm test:unit && pnpm test",
     "check:uplink": "node scripts/check-uplink-bundle.ts",
     "gen:native": "node scripts/native/generate-tables.ts",
-    "check:native": "node scripts/native/generate-tables.ts --check && pnpm check:native-world && pnpm check:race-cargo",
+    "check:native": "node scripts/native/generate-tables.ts --check && pnpm check:native-world && pnpm check:race-cargo && pnpm check:race-machinery",
     "check:evidence": "node scripts/check-evidence.ts",
     "check:browser": "node scripts/browser-check.ts",
     "check:multiplayer": "node scripts/multiplayer-browser-check.ts",
@@ -49,6 +49,9 @@
     "gen:native-world": "node scripts/native/world-evidence.ts",
     "check:native-world": "node scripts/native/world-evidence.ts --check",
     "check:world-assembly": "node scripts/native-world-browser-check.ts",
+    "gen:race-machinery": "node scripts/native/race-machinery-evidence.ts",
+    "check:race-machinery": "node scripts/native/race-machinery-evidence.ts --check",
+    "check:race-machinery-browser": "node scripts/race-machinery-browser-check.ts",
     "gen:race-cargo": "node scripts/native/race-cargo-evidence.ts",
     "check:race-cargo": "node scripts/native/race-cargo-evidence.ts --check",
     "check:race-cargo-browser": "node scripts/race-cargo-browser-check.ts"

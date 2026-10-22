@@ -76,7 +76,7 @@ export class SliceGame {
         this.evidenceButton.addEventListener('click', () => {
             if (!this.inspector.element.hidden) { this.closeInspector(); return; }
             // Co-op native-backed chambers use the dedicated native evidence inspector.
-            const nativeView = this.coopMode ? nativeInspectorView(this.coop.room, this.renderer.raceCargo) : null;
+            const nativeView = this.coopMode ? nativeInspectorView(this.coop.room, this.renderer.raceCargo, this.renderer.raceMachinery) : null;
             if (nativeView) {
                 this.resumeAfterInspector = this.started; this.started = false;
                 this.audio.setActive(false);
@@ -217,7 +217,7 @@ export class SliceGame {
             const previous = this.authority.room;
             const switchWasVisible = this.world.inputs.switchB;
             this.authority.room = room; this.world.syncAuthority();
-            if (this.nativeInspectorOpen) { const v = nativeInspectorView(room, this.renderer.raceCargo); if (v) this.nativeInspector.update(v); }
+            if (this.nativeInspectorOpen) { const v = nativeInspectorView(room, this.renderer.raceCargo, this.renderer.raceMachinery); if (v) this.nativeInspector.update(v); }
             const events = this.world.events.splice(0);
             if (room.level !== 'race-condition' && room.level !== 'crossfeed-vault' && !switchWasVisible && this.world.inputs.switchB) events.push({ kind: 'switch', at: this.world.room.lever ?? this.world.room.controls?.find(c => c.id === 'switchB')?.at ?? this.world.player });
             if (previous.checkpoint !== room.checkpoint) events.push({ kind: 'checkpoint', at: this.world.checkpointPosition() });
@@ -547,6 +547,7 @@ export class SliceGame {
             heroAssets: this.renderer.heroes.snapshot(),
             nativeWorld: { ...this.renderer.nativeWorld.snapshot(), panels: this.renderer.nativeWorldDisplay.panels },
             raceCargo: this.renderer.raceCargoDisplay.diagnostic,
+            raceMachinery: this.renderer.raceMachineryDisplay.diagnostic,
             camera: { ...this.renderer.cameraReveals.selection, x: this.renderer.camera.x, y: this.renderer.camera.y, zoom: this.renderer.camera.zoom },
             progress: this.store.progress, persistence: { status: this.store.status, visitor: this.store.visitor, revision: this.store.revision, updatedAt: this.store.updatedAt } };
     }
@@ -624,7 +625,8 @@ export class SliceGame {
         }
         this.renderer.nativeWorld.update(this.coopMode ? this.coop.room : null, this.coop.connected);
         this.renderer.raceCargo.update(this.coopMode ? this.coop.room : null, this.coop.connected, this.coop.roomReceivedAt);
-        if (this.nativeInspectorOpen) { const v = nativeInspectorView(this.coop.room, this.renderer.raceCargo); if (v) this.nativeInspector.update(v); }
+        this.renderer.raceMachinery.update(this.coopMode ? this.coop.room : null, this.coop.connected, this.coop.roomReceivedAt);
+        if (this.nativeInspectorOpen) { const v = nativeInspectorView(this.coop.room, this.renderer.raceCargo, this.renderer.raceMachinery); if (v) this.nativeInspector.update(v); }
         const heroCues = this.renderer.draw(this.world, dt, aim, this.input.overviewHeld || this.overviewVisible,
             this.coopMode && this.coop.slot ? { localSlot: this.coop.slot, profiles: this.coop.room?.profiles, connected: this.coop.connected, remote: this.coop.remote.sample(now),
                 reachedExit: this.coop.room?.reachedExit ?? [false, false], completed: this.coop.room?.completed ?? false,

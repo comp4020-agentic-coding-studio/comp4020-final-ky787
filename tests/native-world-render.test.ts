@@ -78,5 +78,6 @@ describe('native world presentation is bounded static decoration', () => {
         const panels = f.renderer.draw(f.c, world, f.evidence, { ...view, w: 4200 }, 1, .016, true, true);
         expect(panels.map(p => p.output)).toEqual(['spanMaster', 'phaseA', 'phaseB', 'returnBridge', 'exitDoor']);
         expect(panels.map(p => [p.bounds.x, p.bounds.y])).toEqual([[740, 540], [900, 390], [1420, 400], [2520, 760], [3500, 570]]);
+        expect(f.renderer.draw(f.c, world, f.evidence, { ...view, w: 4200 }, 1, .016, true, true, true)).toEqual([]);
     });
 });

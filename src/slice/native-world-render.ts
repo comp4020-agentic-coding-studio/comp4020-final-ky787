@@ -29,7 +29,7 @@ export class NativeWorldRenderer {
         return mapped && evidence.state ? { address: `${chamber === 'race-condition' && ['cargo-top', 'cargo-buffer'].includes(objectId) ? 'STATIC ' : ''}${hex(mapped.output.excerpt.store_address)}`, powered: evidence.state.connected ? nativeWorldBindingState(evidence.state, mapped.output, mapped.binding).physical : null } : null;
     }
 
-    draw(c: CanvasRenderingContext2D, w: PuzzleWorld, evidence: NativeWorldEvidence, view: Box, zoom: number, dt: number, animate: boolean, cargoGrouped = false): NativeWorldPanel[] {
+    draw(c: CanvasRenderingContext2D, w: PuzzleWorld, evidence: NativeWorldEvidence, view: Box, zoom: number, dt: number, animate: boolean, cargoGrouped = false, machineryGrouped = false): NativeWorldPanel[] {
         this.panels = [];
         const data = evidence.data, state = evidence.state;
         if (!data || !state || data.chamber_id !== w.room.id) return this.panels;
@@ -39,6 +39,7 @@ export class NativeWorldRenderer {
         const compactBounds: Box[] = [];
         for (const place of WORLD_ASSEMBLY_PLACEMENTS[data.chamber_id] ?? []) {
             if (cargoGrouped && data.chamber_id === 'race-condition' && ['topBridge', 'bufferBridge', 'safetyFirewall', 'raceFirewall'].includes(place.output)) continue;
+            if (machineryGrouped && data.chamber_id === 'race-condition' && ['spanMaster', 'phaseA', 'phaseB', 'returnBridge', 'exitDoor'].includes(place.output)) continue;
             const mapped = nativeWorldPlacementBinding(data, place, w.room);
             if (!mapped) continue; // malformed/missing evidence never substitutes invented text
             const { output, binding } = mapped, excerpt = output.excerpt;

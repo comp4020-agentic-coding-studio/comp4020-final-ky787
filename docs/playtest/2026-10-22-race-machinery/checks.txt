@@ -1,0 +1,97 @@
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] cargo-comparison-drop-b: all five native stores follow accepted raw outputs
+PASS [full] cargo-comparison-drop-b: strings and colours follow physical power/latch, not just raw
+PASS [full] cargo-comparison-drop-b: fixed world dimensions and order
+PASS [full] cargo-comparison-drop-b: environmental typography without debug metadata
+PASS [full] span-phase-inactive-nearby: all five native stores follow accepted raw outputs
+PASS [full] span-phase-inactive-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] span-phase-inactive-nearby: fixed world dimensions and order
+PASS [full] span-phase-inactive-nearby: environmental typography without debug metadata
+PASS [full] span-phase-inactive-nearby: nearby native text is painted at readable world size
+PASS [full] return-inactive-nearby: all five native stores follow accepted raw outputs
+PASS [full] return-inactive-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] return-inactive-nearby: fixed world dimensions and order
+PASS [full] return-inactive-nearby: environmental typography without debug metadata
+PASS [full] return-inactive-nearby: nearby native text is painted at readable world size
+PASS [full] exit-locked-nearby: all five native stores follow accepted raw outputs
+PASS [full] exit-locked-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] exit-locked-nearby: fixed world dimensions and order
+PASS [full] exit-locked-nearby: environmental typography without debug metadata
+PASS [full] exit-locked-nearby: nearby native text is painted at readable world size
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] trace-operator-active: all five native stores follow accepted raw outputs
+PASS [full] trace-operator-active: strings and colours follow physical power/latch, not just raw
+PASS [full] trace-operator-active: fixed world dimensions and order
+PASS [full] trace-operator-active: environmental typography without debug metadata
+PASS [full] span-phase-a-active-nearby: all five native stores follow accepted raw outputs
+PASS [full] span-phase-a-active-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] span-phase-a-active-nearby: fixed world dimensions and order
+PASS [full] span-phase-a-active-nearby: environmental typography without debug metadata
+PASS [full] span-phase-a-active-nearby: nearby native text is painted at readable world size
+PASS [full] phase-small-1024: all five native stores follow accepted raw outputs
+PASS [full] phase-small-1024: strings and colours follow physical power/latch, not just raw
+PASS [full] phase-small-1024: fixed world dimensions and order
+PASS [full] phase-small-1024: environmental typography without debug metadata
+PASS [full] phase-small-1024: nearby native text is painted at readable world size
+PASS [full] phase-zoomed-out-small: all five native stores follow accepted raw outputs
+PASS [full] phase-zoomed-out-small: strings and colours follow physical power/latch, not just raw
+PASS [full] phase-zoomed-out-small: fixed world dimensions and order
+PASS [full] phase-zoomed-out-small: environmental typography without debug metadata
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four deliberate transfers retain the airborne chain
+PASS [full] live phase handover keeps A active while selecting its zero store
+PASS [full] phase-b-active-nearby: all five native stores follow accepted raw outputs
+PASS [full] phase-b-active-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] phase-b-active-nearby: fixed world dimensions and order
+PASS [full] phase-b-active-nearby: environmental typography without debug metadata
+PASS [full] phase-b-active-nearby: nearby native text is painted at readable world size
+PASS [full] reduced motion has final strings and no pulses
+PASS [full] phase-reduced-motion: all five native stores follow accepted raw outputs
+PASS [full] phase-reduced-motion: strings and colours follow physical power/latch, not just raw
+PASS [full] phase-reduced-motion: fixed world dimensions and order
+PASS [full] phase-reduced-motion: environmental typography without debug metadata
+PASS [full] phase-reduced-motion: nearby native text is painted at readable world size
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] return-operator-active: all five native stores follow accepted raw outputs
+PASS [full] return-operator-active: strings and colours follow physical power/latch, not just raw
+PASS [full] return-operator-active: fixed world dimensions and order
+PASS [full] return-operator-active: environmental typography without debug metadata
+PASS [full] return-active-nearby: all five native stores follow accepted raw outputs
+PASS [full] return-active-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] return-active-nearby: fixed world dimensions and order
+PASS [full] return-active-nearby: environmental typography without debug metadata
+PASS [full] return-active-nearby: nearby native text is painted at readable world size
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] exit-operator-unlocked: all five native stores follow accepted raw outputs
+PASS [full] exit-operator-unlocked: strings and colours follow physical power/latch, not just raw
+PASS [full] exit-operator-unlocked: fixed world dimensions and order
+PASS [full] exit-operator-unlocked: environmental typography without debug metadata
+PASS [full] exit-unlocked-nearby: all five native stores follow accepted raw outputs
+PASS [full] exit-unlocked-nearby: strings and colours follow physical power/latch, not just raw
+PASS [full] exit-unlocked-nearby: fixed world dimensions and order
+PASS [full] exit-unlocked-nearby: environmental typography without debug metadata
+PASS [full] exit-unlocked-nearby: nearby native text is painted at readable world size
+PASS [full] optional Evidence retains both stores, saved Boolean context and specimen
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [full] no browser errors
+PASS [full] no browser errors
+PASS [full] all five blocks use the new renderer without old duplicates
+PASS [full] normal runner never fetches large evidence/trace/disassembly

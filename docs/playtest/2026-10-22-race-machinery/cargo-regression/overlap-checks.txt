@@ -1,0 +1,12 @@
+PASS overlap: distinct visitors
+PASS overlap-drop-b-1600: accepted state and authentic selected stores
+PASS overlap-drop-b-1600: fixed world placement and natural camera scaling
+PASS overlap-drop-b-1600: quiet code and strings without dashboard metadata
+PASS overlap-drop-a-1600: accepted state and authentic selected stores
+PASS overlap-drop-a-1600: fixed world placement and natural camera scaling
+PASS overlap-drop-a-1600: quiet code and strings without dashboard metadata
+PASS overlap-settled-drop-b-1600: accepted state and authentic selected stores
+PASS overlap-settled-drop-b-1600: fixed world placement and natural camera scaling
+PASS overlap-settled-drop-b-1600: quiet code and strings without dashboard metadata
+PASS overlap: no browser errors
+PASS overlap: no browser errors

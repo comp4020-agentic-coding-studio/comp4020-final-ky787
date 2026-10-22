@@ -7,6 +7,10 @@ state. Detailed evidence remains available on demand in the existing inspector.
 This is presentation only: controller, server scheduling, protocol, physics and
 room geometry are unchanged.
 
+The five distributed [RACE machinery panels](race-machinery-panels.md) now use
+the same visual language through a separate compact asset and renderer. This
+does not change these four cargo blocks or their frozen evidence study.
+
 The 22 October 2026 environmental revision supersedes the original cargo
 dashboard. Do not restore its viewport fitting, inverse-zoom scaling, operator
 layouts, compact summary, address gutter, evidence bookkeeping or tutorial text.

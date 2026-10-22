@@ -9,6 +9,7 @@ import { join, resolve } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { onboardNinja } from './character-onboarding.ts';
 import { CARGO_BLOCKS } from '../src/slice/race-cargo-render.ts';
+import { RACE_MACHINERY_BLOCKS } from '../src/slice/race-machinery-render.ts';
 import type { NativeDisasm, NativeEvidence } from '../src/coop/native-evidence.ts';
 
 const handshakeOnly = process.argv.includes('--handshake');
@@ -77,8 +78,9 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
     }
     const view = await native(p), paints = await painted(p), expanded = view.panels.filter(panel => panel.expanded);
     const cargo = chamber === 'race-condition' ? await p.read<GameSnapshot['raceCargo']>('binaryNinja.snapshot().raceCargo') : null;
+    const machinery = chamber === 'race-condition' ? await p.read<GameSnapshot['raceMachinery']>('binaryNinja.snapshot().raceMachinery') : null;
     check(`${label}: own specimen loaded`, view.chamber === chamber && view.status === 'ready' && view.specimen === source.evidence.specimen_id);
-    check(`${label}: static panel provenance matches acquired instructions and recorded output stores`, (view.panels.length > 0 || cargo?.visible === true && cargo.sections.length === 4) && view.panels.every(panel => {
+    check(`${label}: static panel provenance matches acquired instructions and recorded output stores`, (view.panels.length > 0 || cargo?.visible === true && cargo.sections.length === 4 || machinery?.sections.some(s => s.visible) === true) && view.panels.every(panel => {
         const output = source.evidence.outputs.find(output => output.name === panel.output);
         return panel.static && !!output?.store_sites.some(site => site.instruction_address === panel.storeAddress)
             && panel.instructions.every((instruction, index) => source.disasm.instructions.some(known => known.address === instruction.address
@@ -89,7 +91,20 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
     check(`${label}: native status reads only accepted server values`, view.panels.every(panel => panel.raw === (view.outputs[panel.output] ?? view.physical[panel.output] ?? null)));
     if (chamber === 'race-condition') {
         check(`${label}: grouped RACE asset available`, cargo?.availability === 'ready' && cargo.mode === 'STATE-LINKED');
-        check(`${label}: only four superseded cargo listings suppressed`, !view.panels.some(panel => ['topBridge', 'bufferBridge', 'safetyFirewall', 'raceFirewall'].includes(panel.output)));
+        check(`${label}: all nine superseded RACE listings suppressed`, view.panels.length === 0);
+        check(`${label}: five distributed machinery blocks ready`, machinery?.availability === 'ready' && machinery.sections.length === 5);
+        check(`${label}: machinery fragments preserve exact acquisition records and raw store associations`, !!machinery && machinery.sections.every(s => {
+            const output = source.evidence.outputs.find(o => o.name === s.output);
+            return s.raw === view.outputs[s.output] && output?.store_sites.some(site => site.instruction_rva === s.storeRva && site.observed_values.includes(Number(s.raw)))
+                && s.fragments.every(f => f.omittedBefore.includes('not a CFG edge') && f.instructions.every((i, n) =>
+                    i.block_id === f.block && source.disasm.instructions.some(k => k.address === i.address && k.rva === i.rva && k.bytes === i.bytes && k.size === i.size && k.block_id === i.block_id && k.mnemonic === i.mnemonic && k.op_str === i.op_str)
+                    && (!n || i.address === f.instructions[n - 1].address + f.instructions[n - 1].size)));
+        }));
+        check(`${label}: machinery remains at fixed world bounds with accepted physical/latch semantics`, !!machinery && machinery.sections.every((s, n) => {
+            const p = RACE_MACHINERY_BLOCKS[n];
+            const physical = s.output === 'spanMaster' ? null : s.output === 'exitDoor' ? view.exitUnlocked : view.physical[s.output === 'returnBridge' ? 'physicalReturnBridge' : s.output === 'phaseA' ? 'physicalPhaseA' : 'physicalPhaseB'];
+            return s.bounds.x === p.x && s.bounds.y === p.y && s.bounds.w === p.w && s.bounds.h === p.h && s.physical === physical;
+        }));
         if (cargo?.visible) {
             check(`${label}: grouped excerpts preserve separate blocks, exact native bytes and within-fragment contiguity`, cargo.sections.length === 4 && cargo.sections.every(section => {
                 const output = source.evidence.outputs.find(o => o.name === section.output);
@@ -106,7 +121,7 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
             if (requireExpanded) check(`${label}: visible cargo code has painted pixels`, cargo.sections.filter(s => s.visible).some(s =>
                 s.fragments.some(f => f.instructions.some(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.pixels > 4)))));
         }
-        report.push({ label, cargo });
+        report.push({ label, cargo, machinery });
     }
     const inverted = view.panels.find(panel => panel.output === 'assistBlocked');
     if (inverted) check(`${label}: assistBlocked retains raw value and inverted lift power`, inverted.raw !== null && inverted.physical === !inverted.raw);
@@ -116,7 +131,8 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
     if (requireExpanded) {
         const flatPaint = expanded.some(panel => panel.instructions.some(instruction => paints.some(paint => paint.text.includes(`${instruction.mnemonic} ${instruction.op_str}`) && paint.pixels > 4)));
         const groupedPaint = cargo?.visible === true && cargo.sections.some(s => s.visible && s.fragments.some(f => f.instructions.some(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.pixels > 4))));
-        check(`${label}: normal zoom renders actual native instruction text to Canvas`, flatPaint || groupedPaint);
+        const machineryPaint = machinery?.sections.some(s => s.visible && s.fragments.some(f => f.instructions.some(i => paints.some(p => p.text === `${i.mnemonic} ${i.op_str}` && p.pixels > 4))));
+        check(`${label}: normal zoom renders actual native instruction text to Canvas`, flatPaint || groupedPaint || machineryPaint === true);
         check(`${label}: native listing text has visible screen pixels`, paints.some(paint => /\b(mov|test|cmp|lea|and|or|jmp|je|jne)\b/.test(paint.text) && paint.height >= 8 && paint.pixels > 4));
     }
     check(`${label}: no fabricated live execution or unstable/bogus claims`, !paints.some(paint => /executing live|proven bogus|AUTHORED MOCK|NO NATIVE EVIDENCE/i.test(paint.text)));
@@ -207,7 +223,7 @@ try {
         await b.send('Page.navigate', { url: await a.read<string>("document.querySelector('#invite').value") });
         await until(b, '!!globalThis.customLevel?.observe().ready && customLevel.observe().session.peers.every(Boolean)');
         await sleep(200);
-        for (const p of [a, b]) check('public custom room does not load campaign assembly', await p.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json') || r.name.includes('.cargo.json'))")
+        for (const p of [a, b]) check('public custom room does not load campaign assembly', await p.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json') || r.name.includes('.cargo.json') || r.name.includes('.machinery.json'))")
             && !(await painted(p)).some(paint => /0x140[0-9a-f]+/i.test(paint.text)));
         await h.shot(a, 'public-custom-no-native-overlay');
 
@@ -217,7 +233,7 @@ try {
         await solo.read('binaryNinja.renderer.editorCamera={x:2450,y:760,zoom:.95}'); await sleep(200);
         await h.shot(solo, 'control-spine-existing-service-assembly');
         check('CONTROL SPINE retains its original evidence renderer without co-op overlays', !(await native(solo)).panels.length
-            && await solo.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json') || r.name.includes('.cargo.json'))")
+            && await solo.read<boolean>("!performance.getEntriesByType('resource').some(r=>r.name.includes('.world.json') || r.name.includes('.cargo.json') || r.name.includes('.machinery.json'))")
             && (await painted(solo)).some(paint => /^0x140/i.test(paint.text)));
         await solo.read('binaryNinja.renderer.editorCamera=undefined');
 

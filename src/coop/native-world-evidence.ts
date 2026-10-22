@@ -31,25 +31,25 @@ const booleanValue = (value: unknown): boolean | null => typeof value === 'boole
 export function nativeWorldState(room: SharedRoom | null, connected = true): NativeWorldState | null {
     if (!room || room.draft || !isNativeChamber(room.level)) return null;
     const outputs: Record<string, boolean> = {}, physical: Record<string, boolean> = {};
-    const reported = (room.levelState as { outputs: Record<string, boolean> }).outputs;
+    const reported = (room.levelState as { outputs?: Record<string, boolean> })?.outputs;
     for (const name of CHAMBER_CONTRACTS[room.level].outputs) {
-        if (typeof reported[name] === 'boolean') outputs[name] = reported[name];
+        if (typeof reported?.[name] === 'boolean') outputs[name] = reported[name];
     }
     const assign = (name: string, value: unknown) => { if (typeof value === 'boolean') physical[name] = value; };
     if (room.level === 'crossfeed-vault') {
         assign('physicalLeftRoute', room.levelState.physical.leftRoute);
         assign('physicalRightRoute', room.levelState.physical.rightRoute);
     } else if (room.level === 'race-condition') {
-        assign('physicalPhaseA', room.levelState.physical.phaseA);
-        assign('physicalPhaseB', room.levelState.physical.phaseB);
-        assign('physicalReturnBridge', room.levelState.physical.returnBridge);
+        assign('physicalPhaseA', room.levelState?.physical?.phaseA);
+        assign('physicalPhaseB', room.levelState?.physical?.phaseB);
+        assign('physicalReturnBridge', room.levelState?.physical?.returnBridge);
     }
     return { chamber: room.level, levelInstance: room.levelInstance, revision: room.revision, connected,
         outputs, physical, exitUnlocked: booleanValue(room.exitUnlocked) };
 }
 
 /** Apply only the acquired binding's existing presentation semantics, never a new puzzle decision. */
-export function nativeWorldBindingState(state: NativeWorldState, output: NativeWorldOutput, binding?: NativeWorldBinding): NativeWorldBindingState {
+export function nativeWorldBindingState(state: NativeWorldState, output: Pick<NativeWorldOutput, 'name' | 'kind'>, binding?: NativeWorldBinding): NativeWorldBindingState {
     const raw = booleanValue(output.kind === 'physical_projection' ? state.physical[output.name] : state.outputs[output.name]);
     const latched = output.kind === 'persisted_latch_projection' || binding?.property === 'unlock' || binding?.property === 'unlocked';
     const inverted = !!binding?.invert;
