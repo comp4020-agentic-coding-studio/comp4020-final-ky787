@@ -1,0 +1,35 @@
+PASS timely: distinct visitors
+PASS initial-nearby-1600: accepted state and authentic selected stores
+PASS initial-nearby-1600: fixed world placement and natural camera scaling
+PASS initial-nearby-1600: quiet code and strings without dashboard metadata
+PASS nearby-pan-left-1600: accepted state and authentic selected stores
+PASS nearby-pan-left-1600: fixed world placement and natural camera scaling
+PASS nearby-pan-left-1600: quiet code and strings without dashboard metadata
+PASS nearby-pan-right-1600: accepted state and authentic selected stores
+PASS nearby-pan-right-1600: fixed world placement and natural camera scaling
+PASS nearby-pan-right-1600: quiet code and strings without dashboard metadata
+PASS nearby native text remains readable
+PASS nearby-overview-1600: accepted state and authentic selected stores
+PASS nearby-overview-1600: fixed world placement and natural camera scaling
+PASS nearby-overview-1600: quiet code and strings without dashboard metadata
+PASS window-drop-a-1600: accepted state and authentic selected stores
+PASS window-drop-a-1600: fixed world placement and natural camera scaling
+PASS window-drop-a-1600: quiet code and strings without dashboard metadata
+PASS released-clear-drop-b-1600: accepted state and authentic selected stores
+PASS released-clear-drop-b-1600: fixed world placement and natural camera scaling
+PASS released-clear-drop-b-1600: quiet code and strings without dashboard metadata
+PASS receiver arrival rearms accepted phase
+PASS receiver-arrival-drop-b-1600: accepted state and authentic selected stores
+PASS receiver-arrival-drop-b-1600: fixed world placement and natural camera scaling
+PASS receiver-arrival-drop-b-1600: quiet code and strings without dashboard metadata
+PASS drop-b-small-1024: accepted state and authentic selected stores
+PASS drop-b-small-1024: fixed world placement and natural camera scaling
+PASS drop-b-small-1024: quiet code and strings without dashboard metadata
+PASS inspector shows both authentic stores and provenance
+PASS drop-b-reduced-motion-1600: accepted state and authentic selected stores
+PASS drop-b-reduced-motion-1600: fixed world placement and natural camera scaling
+PASS drop-b-reduced-motion-1600: quiet code and strings without dashboard metadata
+PASS reduced motion settles each message and pulse
+PASS normal play never loads traces/disassembly
+PASS timely: no browser errors
+PASS timely: no browser errors

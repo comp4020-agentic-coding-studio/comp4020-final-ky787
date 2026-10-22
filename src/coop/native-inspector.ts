@@ -18,6 +18,9 @@ import { CARGO_LABELS } from '../slice/race-cargo-presentation.ts';
 import type { RaceMachineryEvidence } from './race-machinery-evidence.ts';
 import { RACE_MACHINERY_OUTPUTS } from './race-machinery-types.ts';
 import { machineryEvidenceDetails } from './race-machinery-inspector.ts';
+import type { EnvironmentalEvidence } from './environmental-evidence.ts';
+import { ENVIRONMENTAL_OUTPUTS, isEnvironmentalChamber } from './environmental-types.ts';
+import { environmentalEvidenceDetails } from './environmental-inspector.ts';
 
 export interface NativeInspectorView {
     chamber: NativeChamberId;
@@ -27,18 +30,19 @@ export interface NativeInspectorView {
     outputs: Readonly<Record<string, boolean>>;
     cargo?: Pick<RaceCargoEvidence, 'data' | 'state' | 'status'>;
     machinery?: Pick<RaceMachineryEvidence, 'data' | 'state' | 'status'>;
+    environmental?: Pick<EnvironmentalEvidence, 'data' | 'state' | 'status'>;
 }
 
 /** Derive the inspector view from a co-op room snapshot, if it is native-backed. */
-export function nativeInspectorView(room: SessionRoom | null, cargo?: RaceCargoEvidence, machinery?: RaceMachineryEvidence): NativeInspectorView | null {
+export function nativeInspectorView(room: SessionRoom | null, cargo?: RaceCargoEvidence, machinery?: RaceMachineryEvidence, environmental?: EnvironmentalEvidence): NativeInspectorView | null {
     if (!room || room.draft || !isNativeChamber(room.level)) return null;
     const chamber = room.level;
     const state = room.levelState as { devices?: Record<string, boolean>; outputs?: Record<string, boolean> };
     if ('devices' in state && state.devices && state.outputs) {
-        return { chamber, devices: state.devices, outputs: state.outputs };
+        return { chamber, devices: state.devices, outputs: state.outputs, environmental };
     }
     const temporal = room.levelState as { outputs?: Record<string, boolean> };
-    return { chamber, devices: null, outputs: temporal.outputs ?? {}, ...(chamber === 'race-condition' ? { cargo, machinery } : {}) };
+    return { chamber, devices: null, outputs: temporal.outputs ?? {}, ...(chamber === 'race-condition' ? { cargo, machinery } : { environmental }) };
 }
 
 export class NativeEvidenceInspector {
@@ -73,9 +77,12 @@ export class NativeEvidenceInspector {
                 const [evidence, traces] = await Promise.all([loadEvidence(view.chamber), loadTraces(view.chamber)]);
                 if (generation !== this.generation) return;
                 this.evidence = evidence; this.traces = traces;
+                // Current/environment navigation exists before the lazy package
+                // arrives; unchanged accepted state must still paint newly loaded data.
+                this.renderKey = '';
             } catch (error) {
                 if (generation !== this.generation) return;
-                if (/^(cargo|machinery):/.test(this.select.value)) this.render();
+                if (/^(cargo|machinery|environmental):/.test(this.select.value)) this.render();
                 else this.pre.textContent = `Native evidence could not be loaded: ${(error as Error).message}`;
                 return;
             }
@@ -99,10 +106,17 @@ export class NativeEvidenceInspector {
             this.select.add(new Option('Cargo · optional obfuscator guard', 'cargo:guard'));
             RACE_MACHINERY_OUTPUTS.forEach(s => this.select.add(new Option(`Machinery · ${s} · STATE-LINKED`, `machinery:${s}`)));
         }
-        if (!this.evidence) return;
-        this.select.add(new Option('Current state · outputs and store sites', 'current'));
-        for (const output of this.evidence.outputs) this.select.add(new Option(`Output · ${output.name}`, `output:${output.name}`));
-        this.select.add(new Option(`Proven bogus clones (${this.evidence.bogus.clone_count})`, 'bogus'));
+        // Preserve existing current/sample navigation; compact provenance is also
+        // available if the larger on-demand trace package fails to load.
+        if (this.current !== 'race-condition') this.select.add(new Option('Current state · outputs and store sites', 'current'));
+        if (this.current && isEnvironmentalChamber(this.current)) {
+            for (const output of ENVIRONMENTAL_OUTPUTS[this.current]) this.select.add(new Option(`Environment · ${output} · STATE-LINKED`, `environmental:${output}`));
+        }
+        if (this.evidence) {
+            if (this.current === 'race-condition') this.select.add(new Option('Current state · outputs and store sites', 'current'));
+            for (const output of this.evidence.outputs) this.select.add(new Option(`Output · ${output.name}`, `output:${output.name}`));
+            this.select.add(new Option(`Proven bogus clones (${this.evidence.bogus.clone_count})`, 'bogus'));
+        }
         if ([...this.select.options].some(o => o.value === previous)) this.select.value = previous;
     }
 
@@ -119,10 +133,15 @@ export class NativeEvidenceInspector {
     private render(): void {
         if (!this.view) return;
         const key = `${this.select.value}:${JSON.stringify({ ...this.view, cargo: this.view.cargo ? { status: this.view.cargo.status, state: this.view.cargo.state } : undefined,
-            machinery: this.view.machinery ? { status: this.view.machinery.status, state: this.view.machinery.state } : undefined })}`;
+            machinery: this.view.machinery ? { status: this.view.machinery.status, state: this.view.machinery.state } : undefined,
+            environmental: this.view.environmental ? { status: this.view.environmental.status, state: this.view.environmental.state } : undefined })}`;
         if (key === this.renderKey) return;
         this.renderKey = key;
         const region = this.select.value;
+        if (region.startsWith('environmental:')) {
+            this.pre.textContent = this.view.environmental ? environmentalEvidenceDetails(this.view.environmental, region.slice(14)) : 'Environmental accepted state unavailable.';
+            return;
+        }
         if (region.startsWith('machinery:')) {
             this.pre.textContent = this.view.machinery ? machineryEvidenceDetails(this.view.machinery, region.slice(10)) : 'Machinery accepted state unavailable.';
             return;

@@ -37,8 +37,8 @@ export function nativeWorldState(room: SharedRoom | null, connected = true): Nat
     }
     const assign = (name: string, value: unknown) => { if (typeof value === 'boolean') physical[name] = value; };
     if (room.level === 'crossfeed-vault') {
-        assign('physicalLeftRoute', room.levelState.physical.leftRoute);
-        assign('physicalRightRoute', room.levelState.physical.rightRoute);
+        assign('physicalLeftRoute', room.levelState?.physical?.leftRoute);
+        assign('physicalRightRoute', room.levelState?.physical?.rightRoute);
     } else if (room.level === 'race-condition') {
         assign('physicalPhaseA', room.levelState?.physical?.phaseA);
         assign('physicalPhaseB', room.levelState?.physical?.phaseB);

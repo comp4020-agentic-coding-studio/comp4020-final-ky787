@@ -9,6 +9,8 @@ import { RaceCargoEvidence } from '../coop/race-cargo-evidence.ts';
 import { RaceCargoRenderer } from './race-cargo-render.ts';
 import { RaceMachineryEvidence } from '../coop/race-machinery-evidence.ts';
 import { RaceMachineryRenderer } from './race-machinery-render.ts';
+import { EnvironmentalEvidence } from '../coop/environmental-evidence.ts';
+import { EnvironmentalRenderer } from './environmental-render.ts';
 import { nativeWorldRegionLabel } from './native-world-presentation.ts';
 import { TracePlayback } from './evidence-presentation.ts';
 import { drawPlatformListings, drawMachineListings, platformAddress } from './evidence-render.ts';
@@ -44,6 +46,8 @@ export class PuzzleRenderer {
     raceCargoDisplay = new RaceCargoRenderer();
     raceMachinery = new RaceMachineryEvidence();
     raceMachineryDisplay = new RaceMachineryRenderer();
+    environmental = new EnvironmentalEvidence();
+    environmentalDisplay = new EnvironmentalRenderer();
     replay = new TracePlayback();
     revealBogus = false;
     private returnReveal = 0;
@@ -159,6 +163,7 @@ export class PuzzleRenderer {
         }
         this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, dt, energyMotion, running, performance.now());
         this.raceMachineryDisplay.draw(c, this.raceMachinery, r.id, visible, dt, energyMotion);
+        this.environmentalDisplay.draw(c, this.environmental, r.id, visible, dt, energyMotion);
         this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion, this.raceCargo.state !== null, this.raceMachinery.state !== null);
         drawPlatformListings(c, w, this.replay, this.presentation);
         for (const p of w.platforms) {

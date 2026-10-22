@@ -6,14 +6,19 @@ they do not execute native code, evaluate a controller, or participate in physic
 The server continues using the existing verified native lookup tables described
 in [ADR 0011](adr/0011-native-backed-coop-controllers.md).
 
-All nine RACE mechanisms use fixed environmental code blocks:
-the four [cargo blocks](race-cargo-panel.md) and five distributed
-[machinery blocks](race-machinery-panels.md). They select genuine zero/one
-stores, use short authored strings and expose detailed evidence on demand.
-They do not use the dashboard layout, zoom-dependent labels or visible metadata
-described below. The five `coop-native-world/v1` assets and their validator remain
-unchanged; other chambers retain the contract below. RACE still uses that asset
-for static platform address identities, separate from selected result stores.
+All 34 existing campaign placements now use fixed environmental code: the nine
+RACE [cargo](race-cargo-panel.md)/[machinery](race-machinery-panels.md) blocks and
+25 [other co-op blocks](coop-environmental-assembly.md). They select genuine
+zero/one stores, use short authored strings and expose detailed evidence on
+demand. Assembly supplies atmosphere; machinery and geometry communicate the
+puzzle. No dashboard, technical status footer or zoom-dependent floating label
+belongs in normal gameplay.
+
+The five original `coop-native-world/v1` assets and their strict validator remain
+unchanged. They supply static platform address identities and binding evidence;
+their write-one addresses are not the selected state-linked store address.
+The sections below document that retained asset contract, not the superseded
+three-MOV diagnostic-card design.
 
 ## Evidence and generation
 
@@ -75,31 +80,30 @@ Machinery panels must resolve to an acquired output binding; signal-only
 diagnostics must identify an existing wire with exactly the same native game
 signal in the same chamber. A missing association is omitted rather than guessed.
 
-There is one expanded representative per displayed output. Other physical
+There is one representative decoration per displayed output. Other physical
 objects sharing that output reuse the **same** store address in compact platform
 headers. Multiple route platforms are not presented as separate native functions
 or independently compiled basic blocks.
 
-RACE's `spanMaster` uses a signal-only diagnostic associated with the existing
-`receiver-master` wire. Its acquired mapping explicitly identifies that wire
-and phase-prediction gating, with no physical platform binding. The panel shows
-the static native store and accepted `RAW` / `SIGNAL ON` or `SIGNAL OFF` status;
-its physical state remains absent. It does not invent a new machinery binding,
-a native control-flow edge or a timer implementation. The artifacts also retain
-helper outputs such as unlock candidates without requiring additional panels.
+RACE's `spanMaster` remains associated with the existing `receiver-master` wire,
+with no physical platform binding. Its environmental string describes accepted
+signal state. It does not invent a machinery binding, CFG edge or timer.
+The original assets also retain helper outputs such as unlock candidates without
+requiring additional decorations.
 
 Authored unstable platforms retain `UNSTABLE`. They have no mapping to proven
 unreachable BCF clones. The detailed evidence inspector remains the separate
 place to inspect those proof-backed clones.
 
-## Static code and accepted state
+## State-linked code and accepted state
 
-[`src/slice/native-world-render.ts`](../src/slice/native-world-render.ts) labels
-expanded excerpts `STATIC / WRITE 1`. The store-row accent identifies the
-verified output store; it never means that instruction is currently executing.
-The listing remains the same when the output is zero. Its separate raw/power
-status communicates the current accepted output without substituting a different
-execution path.
+`native-world-render.ts` retains static header support and legacy rendering
+checks. Its old 25 non-RACE diagnostic listings are unconditionally suppressed,
+including while the replacement data is loading or unavailable. RACE's existing
+replacement gates remain unchanged. The environmental renderers select separate
+verified zero/one records; they never edit an immediate on a fixed native record.
+The store accent associates the accepted result with a record, not an instruction
+executing. Status and colour independently use accepted binding semantics.
 
 World panels do not load or replay traces. HANDSHAKE and USE AFTER FREE have
 exhaustive retained traces; CROSSFEED, RACE and DEADLOCK have representative
@@ -123,14 +127,15 @@ local pending-control prediction. In particular:
 - Displayed power/open state is not a collision guarantee. Authored crumble
   phases and other physical constraints remain independently authoritative.
 
-A short border highlight marks a change in accepted output status, not CPU
-execution. Disconnected panels show subdued last-known state. These presentation
+A restrained store accent and authored string reveal mark meaningful accepted
+changes, not CPU execution. Disconnected panels show subdued last-known state. These presentation
 values never flow back into the authoritative controller or physics.
 
 ## Browser loading and rendering limits
 
-The world loader fetches only `/evidence/coop/<chamber>.world.json` for an eligible
-accepted campaign room. Large inspector disassembly/traces remain lazy-loaded
+The world loader fetches `/evidence/coop/<chamber>.world.json` for an eligible
+accepted campaign room. The independent environmental loader adds only that
+room’s bounded `.environment.json`; RACE retains its two existing compact assets. Large inspector disassembly/traces remain lazy-loaded
 separately and are not imported into the default JavaScript bundle. Public custom
 rooms, developer drafts, the Level Builder and solo tutorial rooms are excluded;
 a custom draft based on a campaign layout does not inherit its specimen.
@@ -147,12 +152,13 @@ all gameplay functioning. No fallback assembly is generated. Failed loads may
 retry on room re-entry or reconnect. Repeated render frames do not repeatedly
 fetch or retry failed assets.
 
-At normal zoom, the renderer shows a compact dark panel with three instruction
-lines. Below 0.8 zoom, panels collapse to small output labels; overlapping
-compact labels are omitted. Offscreen panels are culled. The renderer uses the
-existing reduced-motion preference for its brief accepted-state highlight.
-No machinery hitboxes, cube/receiver colours, player names or camera physics are
-changed by this feature.
+Environmental blocks have authored world rectangles, 12-unit monospace, fixed
+line slots and short state strings. They scale naturally with the camera and
+are culled by their real bounds. They never reflow, dock or become floating name
+tags. The .4-second authored reveal and .45-second store pulse respect reduced
+motion, pause and connection state. Lifecycle tracking continues while culled.
+Room/instance changes and fresh reconnection snapshots establish settled baselines.
+No machinery hitboxes, player names, cube authority or camera physics change.
 
 ## Verification and review
 
@@ -163,7 +169,8 @@ changed by this feature.
   chamber changes, stale responses, missing assets and custom-room exclusion.
 - `pnpm check:world-assembly` exercises the in-world presentation in actual
   browsers. Screenshots are stored under
-  [`docs/playtest/2026-10-20-coop-world-assembly/`](playtest/2026-10-20-coop-world-assembly/).
+  [current environmental review](playtest/2026-10-22-coop-environment/README.md);
+  the 20 October gallery records the superseded diagnostic design.
 - `BN_NATIVE_WORLD_REVIEW=1 pnpm check:campaign` observes accepted panel values
   at the existing real-input campaign route captures, without changing puzzle
   state or camera framing. The focused art captures use the existing presentation
@@ -172,7 +179,7 @@ changed by this feature.
   observability checks remain required regression evidence. Automated provenance
   tests do not constitute visual acceptance or prove geometric solvability.
 
-The dated technical handoff records the completed browser review, regression
-results, performance observations and any remaining layout limitations. This
-feature is developed on `feat/coop-world-assembly`; merging or deploying requires
-the separate review requested after Crit 10.
+The dated handoff records the completed visual review, checks and limitations.
+Delivery follows current AGENTS.md: reconcile main, commit/push and monitor the
+existing CI-gated Fly deployment. Human playtesting may refine decoration;
+expanding gameplay or binary contracts remains a separate decision.

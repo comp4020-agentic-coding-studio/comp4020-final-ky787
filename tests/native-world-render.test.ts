@@ -19,26 +19,28 @@ function fixture() {
 }
 const view = { x: 0, y: 0, w: 2300, h: 1400 };
 describe('native world presentation is bounded static decoration', () => {
-    it('renders exact native instruction strings and a fixed store annotation even while output is zero', () => {
-        const f = fixture();
-        const panels = f.renderer.draw(f.c, f.world, f.evidence, view, 1, .016, true);
-        expect(panels).toHaveLength(4);
-        const crossing = panels.find(p => p.output === 'crossingPower')!;
-        expect(crossing.raw).toBe(false); expect(crossing.physical).toBe(false);
-        expect(f.painted).toContain('STATIC / WRITE 1');
-        for (const i of crossing.instructions) expect(f.painted).toContain(`${i.mnemonic} ${i.op_str}`.trim());
-        expect(f.painted.some(v => /executed|bogus/i.test(v))).toBe(false);
+    it('retains HANDSHAKE fixed-write-one evidence/header identity while raw output changes', () => {
+        const f = fixture(), excerpt = structuredClone(f.evidence.data!.outputs[0].excerpt);
+        expect(excerpt.instructions.at(-1)?.op_str).toBe('dword ptr [rax], 1');
+        const off = f.renderer.header(f.evidence, 'handshake', 'draft:nearAnchor');
+        expect(off?.powered).toBe(false);
         f.evidence.state!.outputs = { ...f.evidence.state!.outputs, crossingPower: true };
-        const on = f.renderer.draw(f.c, f.world, f.evidence, view, 1, .016, true).find(p => p.output === 'crossingPower')!;
-        expect(on.raw).toBe(true); expect(on.instructions).toEqual(crossing.instructions);
+        const on = f.renderer.header(f.evidence, 'handshake', 'draft:nearAnchor');
+        expect(on?.powered).toBe(true); expect(on?.address).toBe(off?.address);
+        expect(f.evidence.data!.outputs[0].excerpt).toEqual(excerpt);
     });
-    it('collapses below reading zoom and culls outside the viewport', () => {
+    it('suppresses all 25 superseded diagnostics even at overview zoom or evidence failure', () => {
         const f = fixture();
-        const compact = f.renderer.draw(f.c, f.world, f.evidence, view, .25, .016, true);
-        expect(compact.length).toBeGreaterThan(0);
-        expect(compact.every(p => !p.expanded && p.instructions.length === 0)).toBe(true);
-        expect(f.painted.some(text => text.startsWith('mov '))).toBe(false);
-        expect(f.renderer.draw(f.c, f.world, f.evidence, { x: 5000, y: 5000, w: 100, h: 100 }, 1, .016, true)).toEqual([]);
+        for (const chamber of ['handshake', 'crossfeed-vault', 'deadlock', 'use-after-free'] as const) {
+            f.evidence.data = JSON.parse(readFileSync(`public/evidence/coop/${chamber}.world.json`, 'utf8'));
+            f.evidence.state!.chamber = chamber;
+            for (const zoom of [.25, .8, 1.2]) {
+                expect(f.renderer.draw(f.c, { room: { id: chamber } } as PuzzleWorld, f.evidence, view, zoom, .016, true)).toEqual([]);
+            }
+            f.evidence.data = null;
+            expect(f.renderer.draw(f.c, { room: { id: chamber } } as PuzzleWorld, f.evidence, view, 1, .016, true)).toEqual([]);
+        }
+        expect(f.painted).toEqual([]);
     });
     it('does not expose a previous specimen in another chamber or ordinary labels on failure', () => {
         const f = fixture();

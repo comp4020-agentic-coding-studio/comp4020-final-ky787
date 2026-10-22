@@ -1,0 +1,7 @@
+PASS expiry: distinct visitors
+PASS expired-drop-a-1600: accepted state and authentic selected stores
+PASS expired-drop-a-1600: fixed world placement and natural camera scaling
+PASS expired-drop-a-1600: quiet code and strings without dashboard metadata
+PASS second real attempt recovers delivery
+PASS expiry: no browser errors
+PASS expiry: no browser errors

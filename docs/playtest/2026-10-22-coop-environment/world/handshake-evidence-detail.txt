@@ -1,0 +1,69 @@
+ENVIRONMENTAL ASSEMBLY · STATE-LINKED
+handshake · crossingPower → nearAnchor
+Accepted raw output selects a genuine store; colour and authored string use the existing machinery binding.
+This associates a native result with accepted state. It does not show an instruction executing.
+Raw: false · binding power/open: false · ACCEPTED
+AUTHORED STATUS: CROSSING IDLE
+Associated fragment: crossingPower.write-0
+CROSSFEED routes include accepted physical grace. USE AFTER FREE assist uses the inverted binding.
+Exit bindings use the persisted unlock latch. Powered routes do not claim every unstable slab is solid.
+DEADLOCK service power includes the accepted completion-enabled result; controls alone do not determine its label.
+Specimen: handshake_ollvm_bcf · image base 0x140000000
+PE SHA-256: 002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8
+
+GENUINE ALTERNATIVES / SEPARATE STATIC FRAGMENTS
+
+… OMITTED code / alternative; NOT a direct CFG edge
+crossingPower.write-0 · output_store · bb_00001155
+RVA [0x1155, 0x1162)
+0x140001155  RVA 0x1155  48 8b 45 d8              mov rax, qword ptr [rbp - 0x28]  [4 bytes]
+0x140001159  RVA 0x1159  48 8b 00                 mov rax, qword ptr [rax]  [3 bytes]
+0x14000115C  RVA 0x115C  c7 00 00 00 00 00        mov dword ptr [rax], 0  [6 bytes]
+Write 0 · crossingPower · output buffer +0 · ASSOCIATED WITH ACCEPTED RAW RESULT
+
+… OMITTED code / alternative; NOT a direct CFG edge
+crossingPower.write-1 · output_store · bb_000010EA
+RVA [0x10EA, 0x10F7)
+0x1400010EA  RVA 0x10EA  48 8b 45 d8              mov rax, qword ptr [rbp - 0x28]  [4 bytes]
+0x1400010EE  RVA 0x10EE  48 8b 00                 mov rax, qword ptr [rax]  [3 bytes]
+0x1400010F1  RVA 0x10F1  c7 00 01 00 00 00        mov dword ptr [rax], 1  [6 bytes]
+Write 1 · crossingPower · output buffer +0
+
+… OMITTED code / alternative; NOT a direct CFG edge
+crossingPower.read · gameplay_check · bb_00001040
+RVA [0x107C, 0x1085)
+0x14000107C  RVA 0x107C  83 38 00                 cmp dword ptr [rax], 0  [3 bytes]
+0x14000107F  RVA 0x107F  0f 95 c0                 setne al  [3 bytes]
+0x140001082  RVA 0x1082  88 45 ef                 mov byte ptr [rbp - 0x11], al  [3 bytes]
+
+… OMITTED code / alternative; NOT a direct CFG edge
+crossingPower.branch · saved_boolean_branch · bb_000010B3
+RVA [0x10B3, 0x10BA)
+0x1400010B3  RVA 0x10B3  8a 45 ef                 mov al, byte ptr [rbp - 0x11]  [3 bytes]
+0x1400010B6  RVA 0x10B6  a8 01                    test al, 1  [2 bytes]
+0x1400010B8  RVA 0x10B8  75 02                    jne 0x1400010bc  [2 bytes]
+
+CONTEXT / LIMITS
+The comparison may read a direct input or a derived local Boolean. It is only part of the native condition.
+Gameplay comparisons spill a Boolean; intervening BCF code can clobber AL and flags. The later reload/TEST supplies branch flags.
+These selections exclude opaque-predicate guards. Real branch targets are preserved, including intervening blocks.
+Short-circuited checks are static context. No branch direction, registers, flags, PC or execution timing is inferred.
+Independent snapshots are independent evaluations, not a continuous trace through platform movement.
+The separate existing trace inspector retains its exact-match versus representative-sample distinction.
+Layout, colour and decoded strings are authored UI, not extracted PE strings or proof of bogus code.
+
+SOURCE FILES / SHA-256
+experiments/coop-controllers/handshake/contract.json
+  2dab247f69198e05eda52cca23e3514e50b0446699b4284231863fff8689f171
+experiments/coop-controllers/handshake/integration.json
+  7c0d4cb1e317a47e8faa11d0404dba819b92f194fed8bb89634d07552961b369
+experiments/coop-controllers/handshake/src/controller.c
+  9b9540da969306ff4d62297bbd6b446bcf011b6d52af9b26fb1f2c06b116fe73
+experiments/coop-controllers/handshake/src/controller.h
+  ba818d8fd00094315f12651bf7d98473f5ec88e419709cdf35bd8c09b03f0913
+experiments/coop-controllers/handshake/evidence/disassembly-bcf.json.gz
+  7a9437c42f8b95ef4a29ffae015bca3cec9b44b9a860323717355a0e67a6624b
+experiments/coop-controllers/handshake/bin/obfuscated_x64.exe
+  002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8
+experiments/coop-controllers/handshake/evidence/representative-traces.json.gz
+  c1ee1bd71fd2d67ba373a3b28a9a50a014f4cfa726ed10a6f68856703d48c3f0

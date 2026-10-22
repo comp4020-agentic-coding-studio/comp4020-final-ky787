@@ -4,6 +4,7 @@ import type { NativeDisasmInstruction } from '../coop/native-evidence.ts';
 import type { Box } from '../engine/geometry.ts';
 import type { PuzzleWorld } from './world.ts';
 import { WORLD_ASSEMBLY_PLACEMENTS, nativeWorldPlacementBinding, nativeWorldPlatformBinding } from './native-world-presentation.ts';
+import { isEnvironmentalChamber } from '../coop/environmental-types.ts';
 
 export interface NativeWorldPanel {
     objectId: string; output: string; address: number; storeAddress: number;
@@ -31,6 +32,9 @@ export class NativeWorldRenderer {
 
     draw(c: CanvasRenderingContext2D, w: PuzzleWorld, evidence: NativeWorldEvidence, view: Box, zoom: number, dt: number, animate: boolean, cargoGrouped = false, machineryGrouped = false): NativeWorldPanel[] {
         this.panels = [];
+        // These 25 placements now belong to the fixed environmental renderer,
+        // including loading/failure. Keep the original asset for static headers.
+        if (isEnvironmentalChamber(w.room.id)) return this.panels;
         const data = evidence.data, state = evidence.state;
         if (!data || !state || data.chamber_id !== w.room.id) return this.panels;
         const key = `${state.chamber}:${state.levelInstance}`;

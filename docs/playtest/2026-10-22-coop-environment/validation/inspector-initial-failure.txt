@@ -1,0 +1,15 @@
+$ node scripts/native-evidence-browser-check.ts
+PASS evidence button available for native-backed HANDSHAKE
+PASS source badge reads VALIDATED OLLVM BCF
+PASS evidence inspector opens
+FAIL inspector shows NATIVE-VERIFIED status
+file:///home/ky/Documents/ANU/2026%20Semester%202/COMP8020%20-%20Agentic%20Coding%20Studio/comp4020-final-ky787/scripts/coop-browser.ts:146
+        checks.push(line); process.stdout.write(line + '\n'); if (!ok) throw new Error(line);
+                                                                             ^
+
+Error: FAIL inspector shows NATIVE-VERIFIED status
+    at check (file:///home/ky/Documents/ANU/2026%20Semester%202/COMP8020%20-%20Agentic%20Coding%20Studio/comp4020-final-ky787/scripts/coop-browser.ts:146:78)
+    at file:///home/ky/Documents/ANU/2026%20Semester%202/COMP8020%20-%20Agentic%20Coding%20Studio/comp4020-final-ky787/scripts/native-evidence-browser-check.ts:40:5
+
+Node.js v24.21.0
+[ELIFECYCLE] Command failed with exit code 1.
