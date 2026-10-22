@@ -1,5 +1,15 @@
 # Binary Ninja — COMP8020 / COMP4020
 
+- Default to implementing, committing and pushing completed agentic work directly
+  on `main`, unless the user requests another workflow. This keeps work coordinated
+  across machines and repositories. Fetch origin and reconcile current main before
+  starting; preserve unrelated local changes and never force-push shared history.
+  Use a feature branch or separate worktree only when requested or when isolation
+  is necessary to protect concurrent work, then integrate the completed change.
+- Run proportionate checks before pushing. A push to `main` is the normal handoff
+  and intentionally triggers the existing CI-gated Fly deployment so the user can
+  manually test from other machines. Keep that deployment workflow and its checks;
+  do not bypass the gate or require a separate approval for this normal workflow.
 - Gameplay comes first: hand-authored cooperative platform puzzles, never
   physical layouts generated from CFGs. C8 is four rooms (three tutorials plus UPLINK) for one player;
   keep it independent of PAIRING BAY co-op sessions on the existing Node server.
