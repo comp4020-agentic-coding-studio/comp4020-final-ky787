@@ -69,4 +69,14 @@ describe('native world presentation is bounded static decoration', () => {
         f.evidence.state!.connected = false;
         expect(f.renderer.header(f.evidence, 'handshake', 'draft:nearAnchor')?.powered).toBeNull();
     });
+    it('suppresses only cargo replacements and keeps the other RACE panels at their original placements', () => {
+        const f = fixture();
+        f.evidence.data = JSON.parse(readFileSync('public/evidence/coop/race-condition.world.json', 'utf8'));
+        f.evidence.state = { chamber: 'race-condition', levelInstance: 2, revision: 3, connected: true,
+            outputs: {}, physical: {}, exitUnlocked: false };
+        const world = { room: raceCondition(1) } as PuzzleWorld;
+        const panels = f.renderer.draw(f.c, world, f.evidence, { ...view, w: 4200 }, 1, .016, true, true);
+        expect(panels.map(p => p.output)).toEqual(['spanMaster', 'phaseA', 'phaseB', 'returnBridge', 'exitDoor']);
+        expect(panels.map(p => [p.bounds.x, p.bounds.y])).toEqual([[740, 540], [900, 390], [1420, 400], [2520, 760], [3500, 570]]);
+    });
 });

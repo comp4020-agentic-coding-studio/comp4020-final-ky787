@@ -153,8 +153,8 @@ export class PuzzleRenderer {
             }
             this.text('RESET FIELD', h.x + 24, h.y + 43, 13, C.red);
         }
-        this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, cam.zoom, dt, energyMotion, running, overview, performance.now(), reveal.id === 'dropA' || reveal.id === 'dropB');
-        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion, this.raceCargo.status === 'ready');
+        this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, dt, energyMotion, running, performance.now());
+        this.nativeWorldDisplay.draw(c, w, this.nativeWorld, visible, cam.zoom, dt, energyMotion, this.raceCargo.state !== null);
         drawPlatformListings(c, w, this.replay, this.presentation);
         for (const p of w.platforms) {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };

@@ -1,9 +1,17 @@
 # RACE cargo presentation contract
 
-RACE CONDITION's **CARGO TRANSFER CONTROLLER** replaces four repetitive static
-write-one listings with one state-linked surface. It explains the accepted cargo
-mechanism without claiming to replay a CPU. This is presentation only; the
-controller, server scheduling, protocol, physics and room geometry are unchanged.
+RACE CONDITION uses four small, fixed pieces of native assembly as **optional
+environmental flavour**. Level structure and machinery communicate the puzzle;
+a short authored string and a subdued output-store accent respond to accepted
+state. Detailed evidence remains available on demand in the existing inspector.
+This is presentation only: controller, server scheduling, protocol, physics and
+room geometry are unchanged.
+
+The 22 October 2026 environmental revision supersedes the original cargo
+dashboard. Do not restore its viewport fitting, inverse-zoom scaling, operator
+layouts, compact summary, address gutter, evidence bookkeeping or tutorial text.
+The earlier dashboard screenshots and handoff are historical, not the current
+visual contract.
 
 ## Evidence identity and compact asset
 
@@ -53,7 +61,7 @@ writers or change its inventory to accommodate integration.
 [`RaceCargoEvidence`](../src/coop/race-cargo-evidence.ts) copies inputs, raw outputs,
 buffer phase/duration/remaining time and identity from **accepted `coop.room`**.
 It does not read `world.inputs`, predicted frame signals or pending phase control.
-One copied snapshot supplies all labels, store selections and explanations.
+One copied snapshot supplies store selections, authored strings and inspector details.
 
 - Raw `true` selects the genuine write-one fragment; `false` selects write-zero.
   Missing or invalid values stay `UNKNOWN`; no formula fills them in.
@@ -65,12 +73,14 @@ One copied snapshot supplies all labels, store selections and explanations.
 - The display uses the existing `RaceAuthority.bufferDisplay` semantics:
   subtract elapsed time since `roomReceivedAt` from accepted `remainingMs`, clamp
   at zero, and use received `durationMs`. It never starts another deadline.
-  Both panel and chute use the same computed display value. Zero cannot expire
+  The existing chute is the only visible countdown; the blocks have no timer.
+  Its shared presentation helper still owns the display value. Zero cannot expire
   a phase, choose another store, release support or declare failure.
 - Pause freezes the displayed countdown and labels it `HELD`; resuming catches
-  up from the original receipt. Disconnect shows `LAST KNOWN`, stops effects
-  and freezes the display. Transport reconnection alone does not certify an old
-  receipt as fresh. A new accepted snapshot restores current status without
+  up from the original receipt. Disconnect shows muted `OFFLINE` block strings,
+  stops effects and freezes the display. Diagnostics and Evidence retain the
+  explicit last-known distinction. Transport reconnection alone does not certify
+  an old receipt as fresh. A new accepted snapshot restores current status without
   inventing a transition from zero.
 - Party/room code or level-instance changes reset presentation bookkeeping.
   Initial loading, reconnect, pause and reduced motion establish a baseline.
@@ -79,50 +89,77 @@ One copied snapshot supplies all labels, store selections and explanations.
 
 Successful asset loads are cached, concurrent requests shared, and late responses
 guarded by a generation counter. Failures are isolated from gameplay and retry
-on re-entry/reconnect. A failure displays an unavailable annotation and retains
-the old explicitly static listings. Workbench/custom rooms never load this
-campaign evidence, even when based on RACE geometry.
+on re-entry/reconnect. A failure shows only muted `ASSEMBLY UNAVAILABLE` strings
+at the fixed block positions. The four superseded listings stay suppressed,
+including during loading/failure; no substitute instructions are invented.
+Workbench/custom rooms never load this campaign evidence, even when based on RACE
+geometry.
 
-## Authored messages and arrangement
+## Fixed environmental arrangement
 
-[`race-cargo-presentation.ts`](../src/slice/race-cargo-presentation.ts) owns status
-wording and transitions. Priority is: incomplete state, accepted expiry, overlap
-interlock, transfer-clear conjunction, active buffer window, upper release,
-released buffer, idle lower-support release, supports ready. Independent section
-states remain visible regardless of the headline.
+[`race-cargo-render.ts`](../src/slice/race-cargo-render.ts) draws four separate
+blocks behind machinery and characters in one authored row. Each is **328 × 124
+world units**, at **y=960**, with **24 units** between blocks:
 
-In particular, `TRANSFER CLEAR` requires released phase, A=false, B=true and all
-three lower/support/interlock outputs false. It does not claim delivery. Expiry
-outranks overlap. Idle with B held is not ready; releasing B after transfer does
-not recatch the buffer. Receiver arrival and reset are explained through the
-new accepted state rather than inferred cube motion.
+| Mechanism | World x | Displayed native context |
+| --- | ---: | --- |
+| Upper support | 800 | Genuine CMP, bare `...`, complete selected store excerpt (4 instructions) |
+| Buffer support | 1152 | Complete selected store excerpt (3 instructions) |
+| Safety beam | 1504 | Saved-Boolean reload/TEST/JNE, bare `...`, selected store instruction (4 instructions) |
+| Overlap interlock | 1856 | Complete selected store excerpt (3 instructions) |
 
-Supports use SOLID/RELEASED; firewalls use ACTIVE/CLEAR. Raw one therefore has
-different meanings and colours for supports and hazards. Brief border/store
-pulses and a short authored hex reveal use the existing animation, connection
-and reduced-motion gates. Native code is always readable and unmodified.
+The group occupies `(800, 960, 1384, 124)`, below the span firewall at y=900 and
+above the lower control wires at y=1120/1140. It clears the stairs to the left,
+the floor at y=1240 and DROP B. There is no enclosing dashboard, global caption,
+status row, timer, framing instructions or mechanism legend.
 
-[`race-cargo-render.ts`](../src/slice/race-cargo-render.ts) draws behind machinery
-and characters. The authored surface uses a row of four sections in ordinary
-1600-pixel cargo operator views and two columns in the nearby view. Canvas code
-is 11 screen pixels even below the old 0.8 zoom cutoff. Stable rows reserve space
-for either store. The operator surface stays within the viewport during the
-existing camera reveal; camera behaviour itself is unchanged. At small desktop
-widths or overview zoom, a deliberate summary points to Evidence instead of
-shrinking assembly to illegibility.
+Code and strings use **12 world-unit monospace text**, quiet dark backing and a
+thin muted edge. Only the actual selected output-store instruction receives a
+restrained green/red accent and brief pulse. Supports are green when solid and
+red when released; firewalls are red when active and green when clear. Other
+instructions stay subdued. The authored string uses a quiet neutral colour.
 
-Ordinary sections show an authentic CMP, the later Boolean reload/TEST/JNE, and
-the real selected store. Each keeps its RVA column and source raw block label.
-Explicit dividers identify omitted pointer setup, Boolean save/BCF, and
-intervening code/store setup. These dividers are **not direct CFG edges**. The
-genuine JNE operands still target their actual guard blocks. Complete input,
-phase, SETcc/spill and store-setup fragments are available in Evidence.
+World positions, dimensions, line slots, message baseline, font size and order
+never depend on zoom, viewport, player or operator. The renderer does not accept
+zoom/overview/operator layout arguments and applies no additional transform. The
+existing world/camera transform scales everything naturally; view bounds only
+cull individual fixed blocks. Text may become small, be partly clipped or leave
+the screen. That is intentional. Never dock, clamp, rearrange or enlarge it to
+chase a camera view. Selected zero/one alternatives and decoding have fixed space.
 
-The only suppressed listings are the four cargo outputs. `spanMaster`, `phaseA`,
-`phaseB`, `returnBridge` and `exitDoor` remain; the first three have authored
-placements above the cargo surface to avoid overlap. Related platform address
-headers retain their static original native identities and explicitly say
-`STATIC`; they are not the currently selected result-store address.
+Instruction operands remain exact, including memory offsets and genuine branch
+targets. Separate excerpts stay separate in diagnostics and the asset. A bare
+`...` denotes a visual gap, not an asserted CFG edge. Addresses, bytes, raw blocks,
+omission explanations and specimen provenance belong in Evidence/diagnostics,
+not the normal game view. There is no execution cursor or branch animation.
+
+The four superseded cargo listings remain suppressed. `spanMaster`, `phaseA`,
+`phaseB`, `returnBridge` and `exitDoor` keep their original authored placements;
+the dashboard's placement overrides have been removed. Platform address headers
+retain their original static identities.
+
+## Short authored state strings
+
+[`race-cargo-presentation.ts`](../src/slice/race-cargo-presentation.ts) supplies
+one short string per mechanism. Examples include `UPPER SUPPORT RELEASED`,
+`BUFFER HOLDING`, `BUFFER RELEASED`, `WINDOW EXPIRED`, `SAFETY BEAM ACTIVE` and
+`INTERLOCK CLEAR`. They describe current state without giving the solution
+sequence or claiming cargo delivery. Expiry is distinct from release; idle with
+B held still says BUFFER RELEASED, and letting go of B after transfer does not
+claim a recatch.
+
+Each block independently uses the existing CONTROL SPINE-style authored hex
+reveal when its message changes. A phase-only transition can reveal BUFFER
+HOLDING while the other three messages stay settled. Identical snapshots,
+countdown ticks and unrelated revisions never restart it. The instruction text
+never scrambles. Initial/missing state, a new room instance, reconnect, pause and
+reduced motion establish settled baselines. Disconnected code is muted and its
+string says OFFLINE; missing results stay UNKNOWN without selecting zero.
+
+The fuller `cargoFeedback` explanation and its deterministic expiry/overlap
+precedence remain in the inspector and read-only diagnostics. They are not drawn
+in normal play. Do not reintroduce the global feedback title/detail as a fifth
+panel or tutorial sentence.
 
 ## Evidence inspector and trace boundary
 
@@ -151,23 +188,30 @@ across cargo flight or timer waiting.
 
 `tests/race-cargo.test.ts` checks the 17 independent study vectors, all 25 ordered
 scenario frames, eight store identities, tamper rejection, explicit omissions,
-phase-only/unchanged/output transitions, unknown state, lifecycle resets, timers,
-reduced motion, caching, failure isolation and draft exclusion. The existing
+phase-only/unchanged/output transitions, independent strings, unknown state,
+lifecycle resets, timers, reduced motion, caching, failure isolation and draft
+exclusion. Canvas checks require fixed bounds across pans/zoom/viewport sizes,
+per-block culling, quiet text and genuine native records; they do not require
+all blocks to be readable or contained within every viewport. The existing
 HANDSHAKE fixed-write-one tests are intact.
 
 `pnpm check:world-assembly` retains its flat-list provenance/contiguity assertions
 for existing panels and separately verifies grouped RACE fragments. Read-only
 `snapshot().raceCargo` reports mode, availability, accepted values, phase/status,
-timer, selected fragment/store IDs, separate displayed instructions, bounds,
-detail level and pulses; it omits private party identity.
+timer, selected fragment/store IDs, separate displayed instructions, union bounds,
+fixed per-block bounds/visibility, world font size, strings, colours and pulses;
+it omits private party identity. Mode and provenance remain diagnostic data, not
+gameplay labels.
 
 `pnpm check:race-cargo-browser` uses real controls and two independent visitors.
 It covers accepted contact, timely transfer, receiver arrival, expiry, a second
-attempt, overlap, ordinary A/B views, a smaller desktop and reduced motion.
+attempt, overlap, real nearby camera pans, overview zoom, ordinary A/B views,
+a smaller desktop and reduced motion.
 It does not assign controller/world state or override the camera. Its real input
 results are separate from semantic fixture tests, which do not prove geometric
 reachability or WebSocket authorization. Screenshots and the completion receipt
-are in the [visual review](playtest/2026-10-22-race-cargo/README.md).
+are in the [visual review](playtest/2026-10-22-race-cargo-environment/README.md).
 
-Human two-person readability and puzzle playtesting remain the acceptance step
-before merge, deployment or expansion to other machinery/chambers.
+Delivery follows AGENTS.md: proportionate checks, commit/push to main, then the
+existing CI-gated Fly deployment for human visual/playtesting feedback. Puzzle
+or validated-contract expansion still requires the separate acceptance step.

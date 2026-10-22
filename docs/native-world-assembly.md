@@ -6,9 +6,10 @@ they do not execute native code, evaluate a controller, or participate in physic
 The server continues using the existing verified native lookup tables described
 in [ADR 0011](adr/0011-native-backed-coop-controllers.md).
 
-RACE's four cargo mechanisms now use a separate grouped
-[state-linked cargo panel](race-cargo-panel.md), with genuine zero/one store
-alternatives and static input/branch fragments. The five `coop-native-world/v1`
+RACE's four cargo mechanisms use separate fixed
+[environmental code blocks](race-cargo-panel.md), with genuine zero/one store
+alternatives, short authored strings and detailed evidence on demand. They do
+not use the dashboard layout or visible metadata described below. The five `coop-native-world/v1`
 assets, validator and the other machinery panels retain the contract below.
 
 ## Evidence and generation

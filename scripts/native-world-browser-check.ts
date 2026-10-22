@@ -8,6 +8,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { onboardNinja } from './character-onboarding.ts';
+import { CARGO_BLOCKS } from '../src/slice/race-cargo-render.ts';
 import type { NativeDisasm, NativeEvidence } from '../src/coop/native-evidence.ts';
 
 const handshakeOnly = process.argv.includes('--handshake');
@@ -93,13 +94,17 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
             check(`${label}: grouped excerpts preserve separate blocks, exact native bytes and within-fragment contiguity`, cargo.sections.length === 4 && cargo.sections.every(section => {
                 const output = source.evidence.outputs.find(o => o.name === section.output);
                 return section.raw === view.outputs[section.output] && output?.store_sites.some(site => site.instruction_rva === section.storeRva && site.observed_values.includes(Number(section.raw)))
-                    && (cargo.detail !== 'assembly' || section.fragments.length === 3)
+                    && section.fragments.flatMap(f => f.instructions).length >= 3 && section.fragments.flatMap(f => f.instructions).length <= 5
                     && section.fragments.every(fragment => fragment.omittedBefore.includes('omitted') && fragment.instructions.every((i, n) =>
                         i.block_id === fragment.block && source.disasm.instructions.some(known => known.address === i.address && known.bytes === i.bytes
                             && known.rva === i.rva && known.size === i.size && known.block_id === i.block_id && known.mnemonic === i.mnemonic && known.op_str === i.op_str)
                         && (!n || i.address === fragment.instructions[n - 1].address + fragment.instructions[n - 1].size)));
             }));
-            if (cargo.detail === 'assembly') check(`${label}: grouped native text is visibly painted`, cargo.sections.every(s => s.fragments.every(f => f.instructions.every(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.height >= 8 && paint.pixels > 4)))));
+            check(`${label}: cargo decoration retains its authored world bounds`, cargo.sections.every((s, n) => {
+                const p = CARGO_BLOCKS[n]; return s.bounds.x === p.x && s.bounds.y === p.y && s.bounds.w === p.w && s.bounds.h === p.h;
+            }));
+            if (requireExpanded) check(`${label}: visible cargo code has painted pixels`, cargo.sections.filter(s => s.visible).some(s =>
+                s.fragments.some(f => f.instructions.some(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.pixels > 4)))));
         }
         report.push({ label, cargo });
     }
@@ -110,7 +115,7 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
         wireSignal.physical === null && (!wireSignal.expanded || paints.some(paint => paint.text.includes(`RAW ${Number(wireSignal.raw)} · SIGNAL `))));
     if (requireExpanded) {
         const flatPaint = expanded.some(panel => panel.instructions.some(instruction => paints.some(paint => paint.text.includes(`${instruction.mnemonic} ${instruction.op_str}`) && paint.pixels > 4)));
-        const groupedPaint = cargo?.detail === 'assembly' && cargo.sections.some(s => s.fragments.some(f => f.instructions.some(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.pixels > 4))));
+        const groupedPaint = cargo?.visible === true && cargo.sections.some(s => s.visible && s.fragments.some(f => f.instructions.some(i => paints.some(paint => paint.text === `${i.mnemonic} ${i.op_str}` && paint.pixels > 4))));
         check(`${label}: normal zoom renders actual native instruction text to Canvas`, flatPaint || groupedPaint);
         check(`${label}: native listing text has visible screen pixels`, paints.some(paint => /\b(mov|test|cmp|lea|and|or|jmp|je|jne)\b/.test(paint.text) && paint.height >= 8 && paint.pixels > 4));
     }

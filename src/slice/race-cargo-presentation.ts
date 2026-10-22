@@ -21,6 +21,18 @@ export function cargoFeedback(s: CargoAccepted): { title: string; detail: string
 export function cargoSectionState(output: CargoOutput, raw: boolean | null): string {
     return raw === null ? 'UNKNOWN' : output.endsWith('Bridge') ? raw ? 'SOLID' : 'RELEASED' : raw ? 'ACTIVE' : 'CLEAR';
 }
+/** Short authored environmental strings. The detailed inspector keeps cargoFeedback. */
+export function cargoBlockMessage(s: CargoAccepted, output: CargoOutput): string {
+    const name = { topBridge: 'UPPER SUPPORT', bufferBridge: 'BUFFER', safetyFirewall: 'SAFETY BEAM', raceFirewall: 'INTERLOCK' }[output];
+    if (!s.connected) return `${name} OFFLINE`;
+    const raw = s.outputs[output];
+    if (raw === null || output === 'bufferBridge' && s.phase === null) return `${name} UNKNOWN`;
+    if (output === 'bufferBridge') {
+        if (s.phase === 'expired') return 'WINDOW EXPIRED';
+        return raw ? s.phase === 'window' ? 'BUFFER HOLDING' : 'BUFFER READY' : 'BUFFER RELEASED';
+    }
+    return `${name} ${cargoSectionState(output, raw)}`;
+}
 export function selectedCargoStore(data: CargoArtifact, output: CargoOutput, raw: boolean | null) {
     const section = data.sections.find(s => s.output === output);
     return raw === null || !section ? null : data.fragments.find(f => f.id === section.store_alternatives[raw ? '1' : '0']) ?? null;
@@ -30,29 +42,38 @@ export class CargoPresentation {
     private previous: CargoAccepted | null = null;
     private moving = false;
     private time = 0;
-    private messageAt = -Infinity;
+    private messageAt = new Map<CargoOutput, number>();
     private phaseAt = -Infinity;
     private outputAt = new Map<CargoOutput, number>();
     private timer: ReturnType<typeof cargoBufferDisplay> | null = null;
     update(s: CargoAccepted | null, now: number, dt: number, animate: boolean, running: boolean) {
-        if (!s) { this.previous = null; this.timer = null; this.outputAt.clear(); return null; }
-        const motion = animate && s.connected;
+        if (!s) { this.previous = null; this.timer = null; this.outputAt.clear(); this.messageAt.clear(); return null; }
+        const motion = animate && running && s.connected;
         const baseline = !this.previous || this.previous.key !== s.key || !this.previous.connected || !s.connected || !this.moving || !motion;
         this.time += motion ? Math.max(0, Math.min(dt, .1)) : 0;
         const feedback = cargoFeedback(s);
-        if (baseline) { this.outputAt.clear(); this.messageAt = -Infinity; this.phaseAt = -Infinity; }
+        if (baseline) { this.outputAt.clear(); this.messageAt.clear(); this.phaseAt = -Infinity; }
         else {
-            for (const o of CARGO_OUTPUTS) if (this.previous!.outputs[o] !== null && s.outputs[o] !== null && this.previous!.outputs[o] !== s.outputs[o]) this.outputAt.set(o, this.time);
+            for (const o of CARGO_OUTPUTS) {
+                if (this.previous!.outputs[o] === null || s.outputs[o] === null
+                    || o === 'bufferBridge' && (this.previous!.phase === null || s.phase === null)) {
+                    this.outputAt.delete(o); this.messageAt.delete(o); continue;
+                }
+                if (this.previous!.outputs[o] !== s.outputs[o]) this.outputAt.set(o, this.time);
+                if (cargoBlockMessage(this.previous!, o) !== cargoBlockMessage(s, o)) this.messageAt.set(o, this.time);
+            }
             if (this.previous!.phase !== s.phase) this.phaseAt = this.time;
-            if (cargoFeedback(this.previous!).title !== feedback.title) this.messageAt = this.time;
         }
         // Freeze stale/paused display; resuming uses the original receipt, never a new deadline.
         if (!this.timer || this.previous?.key !== s.key || this.previous?.phase !== s.phase || running && s.connected)
             this.timer = cargoBufferDisplay(s, now);
         this.previous = s; this.moving = motion;
         const pulse = (at: number) => motion ? Math.max(0, 1 - (this.time - at) / .45) : 0;
-        const fraction = motion ? Math.min(1, (this.time - this.messageAt) / .18) : 1;
-        return { feedback, revealed: revealMessage({ active: true, text: feedback.title, label: 'authored UI' }, fraction),
+        const messages = Object.fromEntries(CARGO_OUTPUTS.map(o => {
+            const text = cargoBlockMessage(s, o), fraction = motion ? Math.min(1, (this.time - (this.messageAt.get(o) ?? -Infinity)) / .4) : 1;
+            return [o, { text, fraction, revealed: revealMessage({ active: true, text, label: 'authored UI' }, fraction) }];
+        })) as Record<CargoOutput, { text: string; revealed: string; fraction: number }>;
+        return { feedback, messages,
             phasePulse: pulse(this.phaseAt), pulses: Object.fromEntries(CARGO_OUTPUTS.map(o => [o, pulse(this.outputAt.get(o) ?? -Infinity)])) as Record<CargoOutput, number>,
             timer: this.timer, timerLive: running && s.connected, lastKnown: !s.connected };
     }

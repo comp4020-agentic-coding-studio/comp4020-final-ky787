@@ -1,0 +1,169 @@
+$ node scripts/native-world-browser-check.ts
+PASS two independent named visitors keep their server-owned slots
+PASS handshake-overview: own specimen loaded
+PASS handshake-overview: static panel provenance matches acquired instructions and recorded output stores
+PASS handshake-overview: native status reads only accepted server values
+PASS handshake-overview: no fabricated live execution or unstable/bogus claims
+PASS overview collapses listings to compact labels
+PASS handshake-crossing-inactive: own specimen loaded
+PASS handshake-crossing-inactive: static panel provenance matches acquired instructions and recorded output stores
+PASS handshake-crossing-inactive: native status reads only accepted server values
+PASS handshake-crossing-inactive: normal zoom renders actual native instruction text to Canvas
+PASS handshake-crossing-inactive: native listing text has visible screen pixels
+PASS handshake-crossing-inactive: no fabricated live execution or unstable/bogus claims
+PASS initial crossing has a confirmed inactive native output
+PASS handshake-crossing-active: own specimen loaded
+PASS handshake-crossing-active: static panel provenance matches acquired instructions and recorded output stores
+PASS handshake-crossing-active: native status reads only accepted server values
+PASS handshake-crossing-active: normal zoom renders actual native instruction text to Canvas
+PASS handshake-crossing-active: native listing text has visible screen pixels
+PASS handshake-crossing-active: no fabricated live execution or unstable/bogus claims
+PASS real pressure contact changes the confirmed native display
+PASS handshake-both-players: own specimen loaded
+PASS handshake-both-players: static panel provenance matches acquired instructions and recorded output stores
+PASS handshake-both-players: native status reads only accepted server values
+PASS handshake-both-players: normal zoom renders actual native instruction text to Canvas
+PASS handshake-both-players: native listing text has visible screen pixels
+PASS handshake-both-players: no fabricated live execution or unstable/bogus claims
+PASS both named players retain readable Canvas labels
+PASS handshake-lift-relay: own specimen loaded
+PASS handshake-lift-relay: static panel provenance matches acquired instructions and recorded output stores
+PASS handshake-lift-relay: native status reads only accepted server values
+PASS handshake-lift-relay: normal zoom renders actual native instruction text to Canvas
+PASS handshake-lift-relay: native listing text has visible screen pixels
+PASS handshake-lift-relay: no fabricated live execution or unstable/bogus claims
+PASS handshake-exit: own specimen loaded
+PASS handshake-exit: static panel provenance matches acquired instructions and recorded output stores
+PASS handshake-exit: native status reads only accepted server values
+PASS handshake-exit: normal zoom renders actual native instruction text to Canvas
+PASS handshake-exit: native listing text has visible screen pixels
+PASS handshake-exit: no fabricated live execution or unstable/bogus claims
+PASS crossfeed-vault-overview: own specimen loaded
+PASS crossfeed-vault-overview: static panel provenance matches acquired instructions and recorded output stores
+PASS crossfeed-vault-overview: native status reads only accepted server values
+PASS crossfeed-vault-overview: no fabricated live execution or unstable/bogus claims
+PASS crossfeed-left-route: own specimen loaded
+PASS crossfeed-left-route: static panel provenance matches acquired instructions and recorded output stores
+PASS crossfeed-left-route: native status reads only accepted server values
+PASS crossfeed-left-route: normal zoom renders actual native instruction text to Canvas
+PASS crossfeed-left-route: native listing text has visible screen pixels
+PASS crossfeed-left-route: no fabricated live execution or unstable/bogus claims
+PASS crossfeed-right-route-gallery: own specimen loaded
+PASS crossfeed-right-route-gallery: static panel provenance matches acquired instructions and recorded output stores
+PASS crossfeed-right-route-gallery: native status reads only accepted server values
+PASS crossfeed-right-route-gallery: normal zoom renders actual native instruction text to Canvas
+PASS crossfeed-right-route-gallery: native listing text has visible screen pixels
+PASS crossfeed-right-route-gallery: no fabricated live execution or unstable/bogus claims
+PASS crossfeed-cargo-machinery: own specimen loaded
+PASS crossfeed-cargo-machinery: static panel provenance matches acquired instructions and recorded output stores
+PASS crossfeed-cargo-machinery: native status reads only accepted server values
+PASS crossfeed-cargo-machinery: normal zoom renders actual native instruction text to Canvas
+PASS crossfeed-cargo-machinery: native listing text has visible screen pixels
+PASS crossfeed-cargo-machinery: no fabricated live execution or unstable/bogus claims
+PASS race-condition-overview: own specimen loaded
+PASS race-condition-overview: static panel provenance matches acquired instructions and recorded output stores
+PASS race-condition-overview: native status reads only accepted server values
+PASS race-condition-overview: grouped RACE asset available
+PASS race-condition-overview: only four superseded cargo listings suppressed
+PASS race-condition-overview: grouped excerpts preserve separate blocks, exact native bytes and within-fragment contiguity
+PASS race-condition-overview: cargo decoration retains its authored world bounds
+PASS race-condition-overview: wire-only spanMaster reports a signal without inventing physical machinery
+PASS race-condition-overview: no fabricated live execution or unstable/bogus claims
+PASS race-phase-a-b: own specimen loaded
+PASS race-phase-a-b: static panel provenance matches acquired instructions and recorded output stores
+PASS race-phase-a-b: native status reads only accepted server values
+PASS race-phase-a-b: grouped RACE asset available
+PASS race-phase-a-b: only four superseded cargo listings suppressed
+PASS race-phase-a-b: wire-only spanMaster reports a signal without inventing physical machinery
+PASS race-phase-a-b: normal zoom renders actual native instruction text to Canvas
+PASS race-phase-a-b: native listing text has visible screen pixels
+PASS race-phase-a-b: no fabricated live execution or unstable/bogus claims
+PASS race-cargo-firewalls: own specimen loaded
+PASS race-cargo-firewalls: static panel provenance matches acquired instructions and recorded output stores
+PASS race-cargo-firewalls: native status reads only accepted server values
+PASS race-cargo-firewalls: grouped RACE asset available
+PASS race-cargo-firewalls: only four superseded cargo listings suppressed
+PASS race-cargo-firewalls: grouped excerpts preserve separate blocks, exact native bytes and within-fragment contiguity
+PASS race-cargo-firewalls: cargo decoration retains its authored world bounds
+PASS race-cargo-firewalls: visible cargo code has painted pixels
+PASS race-cargo-firewalls: normal zoom renders actual native instruction text to Canvas
+PASS race-cargo-firewalls: native listing text has visible screen pixels
+PASS race-cargo-firewalls: no fabricated live execution or unstable/bogus claims
+PASS race-exit: own specimen loaded
+PASS race-exit: static panel provenance matches acquired instructions and recorded output stores
+PASS race-exit: native status reads only accepted server values
+PASS race-exit: grouped RACE asset available
+PASS race-exit: only four superseded cargo listings suppressed
+PASS race-exit: normal zoom renders actual native instruction text to Canvas
+PASS race-exit: native listing text has visible screen pixels
+PASS race-exit: no fabricated live execution or unstable/bogus claims
+PASS deadlock-overview: own specimen loaded
+PASS deadlock-overview: static panel provenance matches acquired instructions and recorded output stores
+PASS deadlock-overview: native status reads only accepted server values
+PASS deadlock-overview: no fabricated live execution or unstable/bogus claims
+PASS deadlock-lower-lift: own specimen loaded
+PASS deadlock-lower-lift: static panel provenance matches acquired instructions and recorded output stores
+PASS deadlock-lower-lift: native status reads only accepted server values
+PASS deadlock-lower-lift: normal zoom renders actual native instruction text to Canvas
+PASS deadlock-lower-lift: native listing text has visible screen pixels
+PASS deadlock-lower-lift: no fabricated live execution or unstable/bogus claims
+PASS deadlock-shaft-firewall: own specimen loaded
+PASS deadlock-shaft-firewall: static panel provenance matches acquired instructions and recorded output stores
+PASS deadlock-shaft-firewall: native status reads only accepted server values
+PASS deadlock-shaft-firewall: normal zoom renders actual native instruction text to Canvas
+PASS deadlock-shaft-firewall: native listing text has visible screen pixels
+PASS deadlock-shaft-firewall: no fabricated live execution or unstable/bogus claims
+PASS deadlock-upper-payload: own specimen loaded
+PASS deadlock-upper-payload: static panel provenance matches acquired instructions and recorded output stores
+PASS deadlock-upper-payload: native status reads only accepted server values
+PASS deadlock-upper-payload: normal zoom renders actual native instruction text to Canvas
+PASS deadlock-upper-payload: native listing text has visible screen pixels
+PASS deadlock-upper-payload: no fabricated live execution or unstable/bogus claims
+PASS use-after-free-overview: own specimen loaded
+PASS use-after-free-overview: static panel provenance matches acquired instructions and recorded output stores
+PASS use-after-free-overview: native status reads only accepted server values
+PASS use-after-free-overview: assistBlocked retains raw value and inverted lift power
+PASS use-after-free-overview: no fabricated live execution or unstable/bogus claims
+PASS use-after-free-route-a: own specimen loaded
+PASS use-after-free-route-a: static panel provenance matches acquired instructions and recorded output stores
+PASS use-after-free-route-a: native status reads only accepted server values
+PASS use-after-free-route-a: assistBlocked retains raw value and inverted lift power
+PASS use-after-free-route-a: normal zoom renders actual native instruction text to Canvas
+PASS use-after-free-route-a: native listing text has visible screen pixels
+PASS use-after-free-route-a: no fabricated live execution or unstable/bogus claims
+PASS use-after-free-route-b: own specimen loaded
+PASS use-after-free-route-b: static panel provenance matches acquired instructions and recorded output stores
+PASS use-after-free-route-b: native status reads only accepted server values
+PASS use-after-free-route-b: assistBlocked retains raw value and inverted lift power
+PASS use-after-free-route-b: normal zoom renders actual native instruction text to Canvas
+PASS use-after-free-route-b: native listing text has visible screen pixels
+PASS use-after-free-route-b: no fabricated live execution or unstable/bogus claims
+PASS use-after-free-route-c: own specimen loaded
+PASS use-after-free-route-c: static panel provenance matches acquired instructions and recorded output stores
+PASS use-after-free-route-c: native status reads only accepted server values
+PASS use-after-free-route-c: assistBlocked retains raw value and inverted lift power
+PASS use-after-free-route-c: normal zoom renders actual native instruction text to Canvas
+PASS use-after-free-route-c: native listing text has visible screen pixels
+PASS use-after-free-route-c: no fabricated live execution or unstable/bogus claims
+PASS use-after-free-final-lift-exit: own specimen loaded
+PASS use-after-free-final-lift-exit: static panel provenance matches acquired instructions and recorded output stores
+PASS use-after-free-final-lift-exit: native status reads only accepted server values
+PASS use-after-free-final-lift-exit: normal zoom renders actual native instruction text to Canvas
+PASS use-after-free-final-lift-exit: native listing text has visible screen pixels
+PASS use-after-free-final-lift-exit: no fabricated live execution or unstable/bogus claims
+PASS use-after-free-assist-inversion: own specimen loaded
+PASS use-after-free-assist-inversion: static panel provenance matches acquired instructions and recorded output stores
+PASS use-after-free-assist-inversion: native status reads only accepted server values
+PASS use-after-free-assist-inversion: assistBlocked retains raw value and inverted lift power
+PASS use-after-free-assist-inversion: normal zoom renders actual native instruction text to Canvas
+PASS use-after-free-assist-inversion: native listing text has visible screen pixels
+PASS use-after-free-assist-inversion: no fabricated live execution or unstable/bogus claims
+PASS returning to an already loaded chamber reuses cached evidence
+PASS reconnection restores own specimen and both character profiles
+PASS public custom room does not load campaign assembly
+PASS public custom room does not load campaign assembly
+PASS CONTROL SPINE retains its original evidence renderer without co-op overlays
+PASS missing assembly asset leaves normal movement and controller session functional
+PASS missing asset does not leak a JavaScript exception
+PASS no browser runtime errors
+PASS no browser runtime errors

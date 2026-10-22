@@ -4,8 +4,8 @@ import type { SharedRoom } from '../src/coop/protocol.ts';
 import { buildCargoArtifact, serializeCargoArtifact, verifyCargoArtifact } from '../scripts/native/race-cargo-evidence.ts';
 import { CARGO_ASSET_BUDGET, CARGO_OUTPUTS, CARGO_STUDY, type CargoArtifact } from '../src/coop/race-cargo-types.ts';
 import { cargoAccepted, cargoBufferDisplay, parseCargoAsset, RaceCargoEvidence, validateCargoArtifact } from '../src/coop/race-cargo-evidence.ts';
-import { CargoPresentation, cargoFeedback, selectedCargoStore } from '../src/slice/race-cargo-presentation.ts';
-import { RaceCargoRenderer } from '../src/slice/race-cargo-render.ts';
+import { CargoPresentation, cargoBlockMessage, cargoFeedback, selectedCargoStore } from '../src/slice/race-cargo-presentation.ts';
+import { CARGO_BLOCKS, CARGO_CODE_SIZE, RaceCargoRenderer } from '../src/slice/race-cargo-render.ts';
 import { cargoEvidenceDetails } from '../src/coop/race-cargo-inspector.ts';
 
 const content = readFileSync('public/evidence/coop/race-condition.cargo.json', 'utf8');
@@ -105,12 +105,25 @@ describe('accepted semantic states, independent of physical reachability', () =>
         const window = p.update(accepted(5), 1000, .1, true, true)!;
         expect(window.feedback.title).toBe('BUFFER HOLDING'); expect(window.phasePulse).toBe(1);
         expect(Object.values(window.pulses).every(v => v === 0)).toBe(true);
+        expect(window.messages.bufferBridge.fraction).toBe(0);
+        expect(window.messages.topBridge.fraction).toBe(1);
+        expect(window.messages.safetyFirewall.fraction).toBe(1);
         const next = p.update({ ...accepted(5), revision: 5, remainingMs: 2600 }, 1200, .1, true, true)!;
         expect(next.phasePulse).toBeLessThan(1);
+        expect(next.messages.bufferBridge.fraction).toBeGreaterThan(0);
         for (let n = 0; n < 10; n++) p.update(accepted(5), 1200, .1, true, true);
         const same = p.update(accepted(5), 1200, .1, true, true)!;
-        expect(same.phasePulse).toBe(0); expect(same.revealed).toBe('BUFFER HOLDING');
+        expect(same.phasePulse).toBe(0); expect(same.messages.bufferBridge.revealed).toBe('BUFFER HOLDING');
         expect(p.update(accepted(1), 1200, .1, true, true)!.pulses.topBridge).toBe(1);
+    });
+    it('uses short independent mechanism strings for phase, expiry, release and reset', () => {
+        for (const c of cases) {
+            const s = accepted(c.id), message = cargoBlockMessage(s, 'bufferBridge');
+            if (s.phase === 'expired') expect(message).toBe('WINDOW EXPIRED');
+            else if (!s.outputs.bufferBridge) expect(message).toBe('BUFFER RELEASED');
+            else expect(message).toBe(s.phase === 'window' ? 'BUFFER HOLDING' : 'BUFFER READY');
+            expect(cargoBlockMessage(s, 'raceFirewall')).toBe(s.outputs.raceFirewall ? 'INTERLOCK ACTIVE' : 'INTERLOCK CLEAR');
+        }
     });
     it('resets transitions across party/instance/loading, disconnect/reconnect, pause and reduced motion', () => {
         const p = new CargoPresentation(); p.update(accepted(), 1000, .1, true, true);
@@ -120,7 +133,7 @@ describe('accepted semantic states, independent of physical reachability', () =>
         expect(p.update(accepted(), 1300, .1, true, true)!.pulses.topBridge).toBe(0);
         expect(p.update({ ...accepted(4), key: 'OTHER:2' }, 1300, .1, true, true)!.pulses.topBridge).toBe(0);
         const reduced = p.update(accepted(5), 1300, .1, false, true)!;
-        expect(reduced.phasePulse).toBe(0); expect(reduced.revealed).toBe(reduced.feedback.title);
+        expect(reduced.phasePulse).toBe(0); expect(Object.values(reduced.messages).every(m => m.revealed === m.text)).toBe(true);
         p.update(null, 1400, .1, true, true);
         expect(p.update(accepted(10), 1400, .1, true, true)!.pulses.bufferBridge).toBe(0);
     });
@@ -159,29 +172,93 @@ describe('failure isolation and Canvas fragments', () => {
         const late = new RaceCargoEvidence(); late.update(room(), true, 1); await settle(); late.update(null, true, 1);
         done({ ok: true, text: async () => content }); await settle(); expect(late.data).toBeNull(); expect(late.status).toBe('idle');
     });
-    it('renders distinct authentic fragments with visible omission dividers below the old 0.8 cutoff', () => {
-        const e = new RaceCargoEvidence(); e.data = asset(); e.state = accepted(10); e.status = 'ready';
-        const painted: string[] = [];
-        const c = { save() {}, restore() {}, translate() {}, scale() {}, fillRect() {}, strokeRect() {}, fillText(t: string) { painted.push(t); } } as unknown as CanvasRenderingContext2D;
-        const r = new RaceCargoRenderer(); r.draw(c, e, 'race-condition', { x: 0, y: 0, w: 2400, h: 1200 }, .65, .016, false, true, false, 1000);
-        expect(r.diagnostic.detail).toBe('assembly'); expect(r.diagnostic.sections).toHaveLength(4);
-        for (const s of r.diagnostic.sections) {
-            expect(s.fragments).toHaveLength(3);
-            for (const f of s.fragments) {
-                expect(f.omittedBefore).toContain('omitted'); expect(painted).toContain(f.omittedBefore);
-                expect(asset().fragments.some(a => a.id === f.id && a.source_block_id === f.block)).toBe(true);
-                for (const [n, i] of f.instructions.entries()) {
-                    expect(painted).toContain(`${i.mnemonic} ${i.op_str}`);
-                    if (n) expect(i.address).toBe(f.instructions[n - 1].address + f.instructions[n - 1].size);
+    function fixture(id = 10) {
+        const evidence = new RaceCargoEvidence(); evidence.data = asset(); evidence.state = accepted(id); evidence.status = 'ready';
+        const painted: { text: string; x: number; y: number; font: string; colour: string }[] = [];
+        // No transform methods: decoration must use the existing world transform without modifying it.
+        const context = { font: '', fillStyle: '', save() {}, restore() {}, fillRect() {},
+            fillText(this: { font: string; fillStyle: string }, text: string, x: number, y: number) { painted.push({ text, x, y, font: this.font, colour: this.fillStyle }); } } as unknown as CanvasRenderingContext2D;
+        const renderer = new RaceCargoRenderer();
+        const draw = (view = { x: 0, y: 0, w: 4200, h: 1420 }, animate = false) => {
+            painted.length = 0;
+            renderer.draw(context, evidence, 'race-condition', view, .1, animate, true, 1000);
+            return renderer.diagnostic;
+        };
+        return { evidence, painted, context, renderer, draw };
+    }
+    it('keeps native identities and separate excerpts while hiding evidence bookkeeping and tutorial prose', () => {
+        for (const id of [0, 4, 10, 14, 15]) {
+            const f = fixture(id), d = f.draw();
+            expect(d.detail).toBe('environmental'); expect(d.sections).toHaveLength(4);
+            for (const section of d.sections) {
+                const instructions = section.fragments.flatMap(f => f.instructions);
+                expect(instructions.length).toBeGreaterThanOrEqual(3); expect(instructions.length).toBeLessThanOrEqual(5);
+                for (const part of section.fragments) {
+                    const original = asset().fragments.find(a => a.id === part.id)!;
+                    expect(part.block).toBe(original.source_block_id); expect(part.omittedBefore).toContain('omitted');
+                    for (const [n, i] of part.instructions.entries()) {
+                        expect(original.instructions).toContainEqual(i);
+                        expect(f.painted.some(p => p.text === `${i.mnemonic} ${i.op_str}`)).toBe(true);
+                        if (n) expect(i.address).toBe(part.instructions[n - 1].address + part.instructions[n - 1].size);
+                    }
                 }
+                const store = selectedCargoStore(asset(), section.output, section.raw)!;
+                expect(section.storeId).toBe(store.id);
+                const instruction = store.instructions.find(i => i.rva === section.storeRva)!;
+                expect(f.painted).toContainEqual(expect.objectContaining({ text: `${instruction.mnemonic} ${instruction.op_str}`, colour: section.colour }));
             }
+            const text = f.painted.map(p => p.text).join('\n');
+            expect(text).toContain('...');
+            expect(text).not.toMatch(/CARGO TRANSFER CONTROLLER|ACCEPTED A|STATE-LINKED|RVA|RAW [01]|bb_|omitted|BCF|Evidence|Hold A|Release A|delivery|STATIC/);
+            expect(f.painted.filter(p => p.text.startsWith('"'))).toHaveLength(4);
         }
-        r.draw(c, e, 'race-condition', { x: 0, y: 0, w: 2000, h: 1200 }, .7, .016, false, true, false, 1000);
-        expect(r.diagnostic.detail).toBe('compact');
-        expect(r.diagnostic.bounds!.x + r.diagnostic.bounds!.w).toBeLessThanOrEqual(2000);
-        r.draw(c, e, 'workbench', { x: 0, y: 0, w: 2400, h: 1200 }, 1, .016, true, true, false, 1000);
-        expect(r.diagnostic.visible).toBe(false);
-        e.data = null; e.status = 'unavailable'; r.draw(c, e, 'race-condition', { x: 0, y: 0, w: 2400, h: 1200 }, 1, .016, true, true, false, 1000);
-        expect(painted).toContain('ASSEMBLY UNAVAILABLE'); expect(r.diagnostic.sections).toEqual([]);
+    });
+    it('keeps fixed bounds and world text coordinates across pans, zoom, overview and viewport sizes', () => {
+        const f = fixture(), first = f.draw();
+        const positions = first.sections.map(s => s.bounds);
+        const instructions = f.painted.filter(p => !p.text.startsWith('"'));
+        expect(positions).toEqual(CARGO_BLOCKS.map(({ x, y, w, h }) => ({ x, y, w, h })));
+        for (const camera of [
+            { x: 1500, y: 1050, zoom: 1.05, width: 1600, height: 900 }, // nearby
+            { x: 2100, y: 1050, zoom: 1.05, width: 1600, height: 900 }, // pan, no chute in view
+            { x: 1020, y: 840, zoom: .78, width: 1600, height: 900 }, // DROP A/B reveal
+            { x: 1020, y: 840, zoom: .52, width: 1024, height: 768 }, // small desktop
+            { x: 2090, y: 710, zoom: .3, width: 1280, height: 720 }, // overview
+        ]) {
+            const view = { x: camera.x - camera.width / camera.zoom / 2, y: camera.y - camera.height / camera.zoom / 2,
+                w: camera.width / camera.zoom, h: camera.height / camera.zoom };
+            const d = f.draw(view);
+            expect(d.bounds).toEqual(first.bounds); expect(d.sections.map(s => s.bounds)).toEqual(positions);
+            expect(d.detail).toBe('environmental');
+            for (const paint of f.painted.filter(p => !p.text.startsWith('"'))) {
+                expect(instructions).toContainEqual(paint); expect(paint.font).toBe(`${CARGO_CODE_SIZE}px ui-monospace, monospace`);
+            }
+            for (const s of d.sections) expect(s.visible).toBe(s.bounds.x < view.x + view.w && s.bounds.x + s.bounds.w > view.x
+                && s.bounds.y < view.y + view.h && s.bounds.y + s.bounds.h > view.y);
+        }
+        expect(f.draw({ x: 800, y: 950, w: 50, h: 150 }).sections.filter(s => s.visible).map(s => s.output)).toEqual(['topBridge']);
+        expect(f.draw({ x: 2400, y: 950, w: 50, h: 150 }).visible).toBe(false); expect(f.painted).toEqual([]);
+        // Old chute gate is outside this view, but the last two fixed blocks are inside it.
+        expect(f.draw({ x: 1500, y: 950, w: 800, h: 150 }).sections.filter(s => s.visible).map(s => s.output)).toEqual(['safetyFirewall', 'raceFirewall']);
+    });
+    it('uses mechanism colours, mutes disconnected/unknown state, and never moves during reveals or failure', () => {
+        const f = fixture(0), baseline = f.draw(undefined, true), positions = baseline.sections.map(s => s.bounds);
+        const section = (output: string) => f.renderer.diagnostic.sections.find(s => s.output === output)!;
+        expect(section('topBridge').colour).toBe(section('raceFirewall').colour);
+        expect(section('safetyFirewall').colour).not.toBe(section('raceFirewall').colour);
+        f.evidence.state = accepted(4); f.draw(undefined, true);
+        expect(section('topBridge').colour).toBe(section('safetyFirewall').colour);
+        expect(section('topBridge').revealed).not.toBe(section('topBridge').message);
+        expect(f.renderer.diagnostic.sections.map(s => s.bounds)).toEqual(positions);
+        f.evidence.state = { ...accepted(4), connected: false }; f.draw(undefined, true);
+        expect(new Set(f.renderer.diagnostic.sections.map(s => s.colour)).size).toBe(1);
+        expect(f.renderer.diagnostic.sections.every(s => s.message.endsWith('OFFLINE') && s.revealed === s.message && s.pulse === 0)).toBe(true);
+        f.evidence.state = { ...accepted(0), outputs: { ...accepted(0).outputs, topBridge: null } }; f.draw();
+        expect(section('topBridge').storeId).toBeNull(); expect(section('topBridge').message).toBe('UPPER SUPPORT UNKNOWN');
+        f.evidence.data = null; f.evidence.status = 'unavailable'; const unavailable = f.draw();
+        expect(unavailable.sections.every(s => s.storeId === null && s.fragments.length === 0 && s.message === 'ASSEMBLY UNAVAILABLE')).toBe(true);
+        expect(unavailable.sections.map(s => s.bounds)).toEqual(positions);
+        f.renderer.draw(f.context, f.evidence, 'workbench', { x: 0, y: 0, w: 4200, h: 1420 }, .1, true, true, 1000);
+        expect(f.renderer.diagnostic.visible).toBe(false); expect(f.renderer.diagnostic.sections).toEqual([]);
     });
 });

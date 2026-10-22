@@ -51,8 +51,7 @@ export class NativeWorldRenderer {
             const instructions = excerpt.instructions;
             const width = expanded ? Math.max(320, ...instructions.map(i => `${i.mnemonic} ${i.op_str}`.length * 6.8 + 30)) * scale : (output.name.length * 6.1 + 28) * scale;
             const height = (expanded ? 68 + instructions.length * 16 : 23) * scale;
-            const x = cargoGrouped && data.chamber_id === 'race-condition' && place.output === 'spanMaster' ? 350 : place.x;
-            const y = cargoGrouped && data.chamber_id === 'race-condition' && ['spanMaster', 'phaseA', 'phaseB'].includes(place.output) ? place.output === 'spanMaster' ? 180 : 165 : place.y;
+            const { x, y } = place;
             const bounds = { x, y, w: width, h: height };
             if (!intersects(bounds, view)) continue;
             if (!expanded && compactBounds.some(other => intersects(bounds, other))) continue;
