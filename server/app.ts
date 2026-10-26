@@ -4,6 +4,7 @@ import { resolve, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { freshProgress, validProgress, readProgress, type Progress } from '../src/slice/progress.ts';
 import { atomicJson } from './atomic-json.ts';
+import { streamAudio } from './audio-stream.ts';
 import { ensureVisitor, sameOrigin } from './identity.ts';
 import { attachMultiplayer } from './multiplayer.ts';
 import { PublicDraftRegistry, PublicDraftError, PUBLIC_DRAFT_LIMITS } from './public-drafts.ts';
@@ -209,6 +210,7 @@ export async function createApp(dataDir: string, siteDir = resolve('dist'), opti
                 return;
             }
             try {
+                if (extname(path) === '.ogg') { await streamAudio(req, res, path); return; }
                 const bytes = await readFile(path);
                 res.writeHead(200, { 'Content-Type': mime[extname(path)] ?? 'application/octet-stream', 'Cache-Control': path.includes('/assets/') ? 'public, max-age=31536000, immutable' : 'no-cache' });
                 res.end(req.method === 'HEAD' ? undefined : bytes);

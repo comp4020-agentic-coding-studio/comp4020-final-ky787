@@ -1,0 +1,78 @@
+PASS public title screen exposes tutorial and co-op without room grids or internal labs
+PASS creator is host; lobby guest waits with no start controls
+PASS guest selection is refused locally
+PASS forged guest request leaves both in lobby
+PASS handshake: two independent visitors retain one party
+PASS handshake: authored-start physical solve with both arrivals
+PASS fresh two-cube world on the existing socket
+PASS fresh two-cube world on the existing socket
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] walking into the breakpoint does not operate SYSTEM ONLINE
+PASS [full chamber] shared checkpoint does not teleport the waiting partner
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] victory overlay visible
+PASS [full chamber] victory overlay visible
+PASS [full chamber] host gets NEXT, guest waits
+PASS [full chamber] old chamber traffic cannot alter new machinery/cubes
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four deliberate transfers retain the airborne chain
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [full] Race now leads to DEADLOCK
+PASS [full] deadlock: two independent visitors retain one party
+PASS [full] deadlock: authored-start physical solve with both arrivals
+PASS [full] use-after-free: two independent visitors retain one party
+PASS [full] pausing the unstable operator releases route power; resume resamples contact without resetting its fuse
+PASS [full] use-after-free: authored-start physical solve with both arrivals
+PASS [full] last chamber shows campaign complete without a fictitious next level
+PASS [full] all five badges saved on same party
+PASS [full] all five badges saved on same party
+PASS [full] restart restores victory and badges
+PASS [full] restart restores victory and badges
+PASS [full] guest has host-disconnected message and no selection
+PASS [full] completed badges remain in selector
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] no browser runtime errors
+PASS [full] no browser runtime errors

@@ -1,0 +1,29 @@
+PASS before interaction neither music nor SFX start
+PASS legacy Effects preference survives with quiet independent Music default
+PASS music plays after real character setup without joining the SFX pool
+PASS zero Effects volume keeps Music audible
+PASS zero Music volume suspends both streaming decks
+PASS global Sound off immediately silences both paths
+PASS sound controls fit 1024×768
+PASS sound controls fit 420×800
+PASS reload retains independent levels and mute state
+PASS reloaded page still waits for a new gesture
+PASS lobby retains the menu theme
+PASS handshake: two independent visitors retain one party
+PASS handshake: authored-start physical solve with both arrivals
+PASS one completion stinger and quiet victory music after an actual two-player solve
+PASS victory updates do not restart the track or repeat the stinger
+PASS crossfeed-vault has its own streamed track and ordinary replication never reloads it
+PASS race-condition has its own streamed track and ordinary replication never reloads it
+PASS deadlock has its own streamed track and ordinary replication never reloads it
+PASS use-after-free has its own streamed track and ordinary replication never reloads it
+PASS reconnect preserves stream identity and playback position
+PASS window blur pauses every music deck and all effects
+PASS focus resumes the same track position
+PASS hidden document suspends streaming and effects
+PASS persisted pagehide suspends rather than creating replacement players
+PASS persisted page resume retains only the original two players
+PASS native loop preserves the same deck without a new load, play or crossfade
+PASS failed SFX and music downloads never block game input
+PASS browser audio loads without runtime or media failures
+PASS browser audio loads without runtime or media failures

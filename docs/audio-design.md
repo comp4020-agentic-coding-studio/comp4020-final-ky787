@@ -1,0 +1,81 @@
+# Audio presentation contract
+
+Audio observes accepted gameplay state. It never controls machinery, timings,
+physics, checkpoints, party roles or room progression. Failures must leave all
+of those systems usable.
+
+## Effects
+
+`GameAudio` loads only the 20 short assets named in `SOUNDS`. The original
+`confirm.ogg` is retained for provenance but excluded from the pool. Named cues
+have bounded gain, playback rate, cooldown and polyphony. The global limit is
+12 voices, with at most two machinery activations at once. Completion takes
+priority and has one voice; gameplay effects stop on pause/backgrounding.
+
+`AudioPresentation` coalesces duplicate cues in each observed transition.
+Several retained outputs can change in one controller step; their physical
+changes remain intact, while the highest-priority audible machinery cue wins:
+door, relay, lift, code. Tactile switch/cube feedback stays separate. Distance
+attenuation and existing reel/lift loops remain. `HeroPresentation` retains its
+existing breakpoint deployment/flag-confirmation timing. Restored snapshots
+baseline it without replaying old milestones.
+
+A co-op completion stinger starts **after** entering victory, so menu cleanup
+cannot cut it off. An initial/reconnected completed snapshot does not replay it.
+Background completions remain silent. Solo completion preserves automatic room
+progression while briefly ducking music.
+
+## Streaming music
+
+`MusicPlayer` owns at most two `HTMLAudioElement` decks. It never feeds long
+tracks into `GameAudio` or `decodeAudioData`. Scene changes reuse those decks
+with a 1.8-second smooth fade after the incoming track can play; the outgoing
+track remains available if a download fails. The source files include authored
+loop edits, declicking and no silent tail. Native `audio.loop` retains each
+complete musical cycle: no arbitrary overlap shortens bars or doubles off-beat
+percussion. An observed wrap counter is diagnostic only; media events do not
+trigger beat scheduling. A defensive `ended` fallback handles interrupted media. Decks request metadata lazily; there is no soundtrack prefetch.
+
+`SliceGame.syncMusic()` maps navigation to menu or chamber identity, independent
+of multiplayer revisions. Menu destinations and waiting lobbies share the title
+track. Pauses, inspectors, overviews and chamber selection keep the current
+track at 28% of its normal gain. Completion uses 18%; active solo tutorials use
+38%. Changes in ducking take 450 ms. Co-op reconnect and BFCache restoration
+reuse the retained chamber identity and playback position.
+
+Actual pointer/key gestures unlock playback. A rejected play promise records a
+nonblocking failure and waits for a later gesture/resume; no per-frame retry
+loop runs. Hidden/blurred pages pause both decks, retain positions and cancel
+animation callbacks. Pagehide suspends music; permanent departure disposes
+sources and event listeners. Music remains quiet while a pause stays open.
+
+The Node server streams OGG byte ranges with `Content-Length`, `Accept-Ranges`
+and `206`/`416` handling, so seeking does not allocate a whole soundtrack file
+per request. The game's static path checks remain in force.
+
+## Preferences and mix
+
+The existing `binary-ninja/c8-audio/v1` key remains. `volume` is the Effects
+level; `musicVolume` is independent; `muted` silences both. Existing Effects and
+mute values survive. Missing Music defaults to 35%, except legacy `volume:0`
+also initializes Music to zero to preserve intentional silence. Once the new
+Music value exists, zero Effects no longer mutes Music.
+
+New-user Effects defaults to 65%. All music masters are near −23 LUFS; the menu
+uses catalogue gain 1.2, chambers 1.0, yielding roughly −30.5/−32.1 LUFS at the
+35% default before ducking. These conservative defaults leave short effects
+foregrounded and can be adjusted in Settings or either pause menu.
+
+## Validation and provenance
+
+`tests/audio.test.ts`, `music.test.ts`, `music-assets.test.ts` and
+`audio-stream.test.ts` cover selection, migration, bounded playback, lifecycle,
+errors and provenance. `pnpm check:audio` exercises real browser media, two
+independent visitors and a physical HANDSHAKE solve, all scene transitions,
+completion, reconnect, controls and failure recovery. Synthetic lifecycle
+events and accelerated media seeking in that route are labeled as such.
+
+Sources, licenses, modifications and hashes live in [AUDIO_CREDITS.md](../AUDIO_CREDITS.md)
+and the two JSON catalogues. See [selection notes](audio-selection.md) for the
+limits of structural assessment: automated playback does not establish a human
+listening judgment about musical fit, fatigue or speech masking.

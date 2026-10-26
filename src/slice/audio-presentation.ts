@@ -1,5 +1,5 @@
 import { cubeEntries } from '../coop/protocol.ts';
-import { GameAudio, type SoundCue } from '../audio/game-audio.ts';
+import { GameAudio, MACHINERY_CUES, type SoundCue } from '../audio/game-audio.ts';
 import type { Box, Vec2 } from '../engine/geometry.ts';
 import type { MachineEvent, PuzzleWorld } from './world.ts';
 import { payloadReceivers } from './receiver-presentation.ts';
@@ -31,12 +31,23 @@ export class AudioPresentation {
     observe(w: PuzzleWorld, events: readonly MachineEvent[]): void {
         const next = state(w), old = this.previous; this.previous = next;
         if (!old) return;
+        const pending = new Map<SoundCue, { level: number; rate: number }>();
         const play = (cue: SoundCue, at?: Vec2, level = 1, rate = 1) => {
             const distance = at ? Math.hypot(at.x - w.player.x, at.y - w.player.y) : 0;
-            this.audio.play(cue, level * Math.max(0, 1 - distance / 1100), rate);
+            const audible = level * Math.max(0, 1 - distance / 1100);
+            if (audible > (pending.get(cue)?.level ?? 0)) pending.set(cue, { level: audible, rate });
+        };
+        const flush = () => {
+            // A single input can power several retained outputs. Keep their
+            // physical presentation, but use one readable activation sound.
+            const machinery = (['door', 'relayPower', 'liftPower', 'codePower'] as const).find(cue => pending.has(cue));
+            for (const [cue, { level, rate }] of pending) {
+                if (MACHINERY_CUES.includes(cue) && cue !== machinery) continue;
+                this.audio.play(cue, level, rate);
+            }
         };
         const death = events.find(e => e.kind === 'death');
-        if (death) { this.audio.stopAll(); play(death.cause === 'firewall' ? 'firewallZap' : 'death'); return; }
+        if (death) { this.audio.stopAll(); play(death.cause === 'firewall' ? 'firewallZap' : 'death'); flush(); return; }
         if (next.phase === 'firing' && old.phase !== 'firing') play('hookFire');
         if (next.phase === 'attached' && old.phase !== 'attached') play('hookAttach');
         if (old.phase === 'attached' && next.jumps > old.jumps) play('ropeJump');
@@ -72,7 +83,7 @@ export class AudioPresentation {
             if (e.kind === 'switch' && !events.some(e => e.kind === 'lift-latch')) play('switch', e.at);
             if (e.kind === 'terminal') play('latch', e.at);
             if (e.kind === 'lift-latch') play('latch', e.at);
-            if (e.kind === 'checkpoint' && !events.some(e => e.kind === 'lift-latch')) play('latch', e.at, .6);
+            if (e.kind === 'checkpoint' && !events.some(e => e.kind === 'lift-latch')) play('checkpoint', e.at);
             if (e.kind === 'crumble-respawn') play('codePower', e.at, .5);
             if (e.kind === 'crumble') play('crumbleBreak', e.at);
             if (e.kind === 'cube-firewall') play('firewallZap', e.at);
@@ -80,6 +91,7 @@ export class AudioPresentation {
         // A carried payload emits both events; a loose cube emits only relay-cargo.
         const transit = events.find(e => e.kind === 'teleport') ?? events.find(e => e.kind === 'relay-cargo');
         if (transit) play('teleport', transit.at);
+        flush();
     }
     ambience(w: PuzzleWorld, active: boolean): void {
         this.audio.setLoop('reel', active && (w.pullingCube || w.player.rope.phase === 'attached' && w.player.rope.taut) ? 1 : 0);

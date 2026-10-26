@@ -14,25 +14,28 @@ export const SOUNDS = {
     plate: { file: 'metal-touch.ogg', gain: .65, cooldown: .1 },
     pickup: { file: 'metal-touch.ogg', gain: .45, cooldown: .12, rate: 1.2 },
     drop: { file: 'metal-touch.ogg', gain: .55, cooldown: .12, rate: .85 },
-    switch: { file: 'confirm.ogg', gain: .32, cooldown: .12, rate: 1.15 },
-    codePower: { file: 'firewall-open.ogg', gain: .32, cooldown: .2 },
-    relayPower: { file: 'relay-on.ogg', gain: .60, cooldown: .25 },
+    switch: { file: 'switch-click.ogg', gain: .48, cooldown: .14 },
+    codePower: { file: 'code-power.ogg', gain: .30, cooldown: .24 },
+    relayPower: { file: 'relay-on.ogg', gain: .36, cooldown: .28 },
     teleport: { file: 'teleport.ogg', gain: .65, cooldown: .2 },
-    liftPower: { file: 'lift-on.ogg', gain: .55, cooldown: .25 },
-    latch: { file: 'confirm.ogg', gain: .45, cooldown: .25, rate: .9 },
-    door: { file: 'door-open.ogg', gain: .55, cooldown: .25 },
-    complete: { file: 'confirm.ogg', gain: .5, cooldown: .4 },
+    liftPower: { file: 'lift-on.ogg', gain: .36, cooldown: .28 },
+    latch: { file: 'latch-confirm.ogg', gain: .5, cooldown: .25 },
+    checkpoint: { file: 'checkpoint.ogg', gain: .48, cooldown: .4 },
+    door: { file: 'door-open.ogg', gain: .48, cooldown: .28 },
+    complete: { file: 'room-complete.ogg', gain: .65, cooldown: 1.5 },
     entryAttach: { file: 'grapple-attach.ogg', gain: .26, cooldown: .4, rate: .85 },
-    breakpointDeploy: { file: 'door-open.ogg', gain: .42, cooldown: .4, rate: .72 },
-    breakpointConfirm: { file: 'confirm.ogg', gain: .42, cooldown: .4, rate: 1.05 },
+    breakpointDeploy: { file: 'breakpoint-deploy.ogg', gain: .5, cooldown: .4 },
+    breakpointConfirm: { file: 'breakpoint-confirm.ogg', gain: .54, cooldown: .4 },
     payloadConfirm: { file: 'relay-on.ogg', gain: .28, cooldown: .18, rate: 1.3 },
     reel: { file: 'grapple-reel.ogg', gain: .085, cooldown: 0, loop: true },
     liftHum: { file: 'lift-hum.ogg', gain: .22, cooldown: 0, loop: true },
 } as const;
 export type SoundCue = keyof typeof SOUNDS;
-export interface AudioPreferences { volume: number; muted: boolean }
+export const SOUND_ASSET_COUNT = new Set(Object.values(SOUNDS).map(sound => sound.file)).size;
+export const MACHINERY_CUES: readonly SoundCue[] = ['codePower', 'relayPower', 'liftPower', 'door'];
+export interface AudioPreferences { volume: number; musicVolume: number; muted: boolean }
 export const AUDIO_STORAGE_KEY = 'binary-ninja/c8-audio/v1';
-const DEFAULTS: AudioPreferences = { volume: .65, muted: false };
+const DEFAULTS: AudioPreferences = { volume: .65, musicVolume: .35, muted: false };
 const clamp = (n: number) => Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0));
 interface Voice { cue: SoundCue; source: AudioBufferSourceNode; gain: GainNode; loop: boolean }
 interface Options {
@@ -58,12 +61,16 @@ export class GameAudio {
     private failures: string[] = [];
     private played: Partial<Record<SoundCue, number>> = {};
     private peak = 0;
-    constructor(private options: Options = {}) {
+    private options: Options;
+    constructor(options: Options = {}) {
+        this.options = options;
         this.store = options.storage === undefined ? storage() : options.storage;
         try {
             const saved = JSON.parse(this.store?.getItem(AUDIO_STORAGE_KEY) ?? 'null');
             if (saved && typeof saved === 'object') this.preferences = {
                 volume: typeof saved.volume === 'number' ? clamp(saved.volume) : DEFAULTS.volume,
+                // A legacy zero master level was an explicit request for silence.
+                musicVolume: typeof saved.musicVolume === 'number' ? clamp(saved.musicVolume) : saved.volume === 0 ? 0 : DEFAULTS.musicVolume,
                 muted: typeof saved.muted === 'boolean' ? saved.muted : DEFAULTS.muted,
             };
         } catch { /* Private browsing or malformed preferences: use defaults. */ }
@@ -99,6 +106,7 @@ export class GameAudio {
     getPreferences(): AudioPreferences { return { ...this.preferences }; }
     setPreferences(patch: Partial<AudioPreferences>): void {
         this.preferences = { volume: patch.volume === undefined ? this.preferences.volume : clamp(patch.volume),
+            musicVolume: patch.musicVolume === undefined ? this.preferences.musicVolume : clamp(patch.musicVolume),
             muted: patch.muted ?? this.preferences.muted };
         try { this.store?.setItem(AUDIO_STORAGE_KEY, JSON.stringify(this.preferences)); } catch { /* Optional browser preference. */ }
         if (this.preferences.muted || this.preferences.volume === 0) this.stopAll();
@@ -120,6 +128,9 @@ export class GameAudio {
         if ((!this.active && cue !== 'complete') || !this.audible()) return;
         const spec = SOUNDS[cue], now = this.context!.currentTime;
         if (now < (this.cooldown.get(cue) ?? 0) || level <= 0) return;
+        // Completion has its own musical phrase. Let it finish above the last
+        // machinery transition instead of dropping it into an already-full pool.
+        if (cue === 'complete') for (const voice of this.voices) if (voice.cue !== 'complete') this.stop(voice);
         if (this.startVoice(cue, level, rate, false)) this.cooldown.set(cue, now + spec.cooldown);
     }
     setLoop(cue: 'reel' | 'liftHum', level: number): void {
@@ -136,7 +147,17 @@ export class GameAudio {
         const buffer = this.buffers.get(SOUNDS[cue].file);
         if (!buffer || !this.context || !this.master) return;
         // Old manager's bounded pool policy: no loud stacks on repeated controls.
-        if ([...this.voices].filter(v => v.cue === cue).length >= 2 || this.voices.size >= 12) return;
+        const sameCueLimit = cue === 'complete' ? 1 : 2;
+        if ([...this.voices].filter(v => v.cue === cue).length >= sameCueLimit || this.voices.size >= 12) return;
+        // Rapidly toggling different machines cannot bypass per-cue cooldowns
+        // to stack four low-frequency activation samples over every input.
+        if (MACHINERY_CUES.includes(cue)) {
+            const machinery = [...this.voices].filter(v => MACHINERY_CUES.includes(v.cue));
+            if (machinery.length >= 2) {
+                const replace = cue === 'door' ? machinery.find(v => v.cue !== 'door') : undefined;
+                if (replace) this.stop(replace); else return;
+            }
+        }
         const source = this.context.createBufferSource(), gain = this.context.createGain();
         source.buffer = buffer; source.loop = loop;
         const spec = SOUNDS[cue]; source.playbackRate.value = Math.max(.65, Math.min(1.6, rate * ('rate' in spec ? spec.rate : 1)));

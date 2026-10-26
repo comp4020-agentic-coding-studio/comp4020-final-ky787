@@ -1,0 +1,248 @@
+{
+  "verifiedAt": "2026-10-26",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "reviewMethod": "Original-source licensing/descriptions plus decoded structural analysis. No subjective acoustic audition was available to the agent.",
+  "encoding": {
+    "codec": "vorbis",
+    "sampleRate": 44100,
+    "channels": 2,
+    "quality": 4,
+    "targetIntegratedLufs": -23
+  },
+  "ffmpegVersion": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "assets": [
+    {
+      "file": "menu.ogg",
+      "scene": "menu",
+      "title": "Claimed by the Void",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/claimed-by-the-void",
+      "download": "https://opengameart.org/sites/default/files/claimed_by_the_void_loop.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "067d1c0e0efb47548b3354b6d1293adfbffbfc24bc8eba1f0244a65110985e5d",
+      "sha256": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "bytes": 2808275,
+      "duration": 195.0,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 8599500,
+        "nativeAuthorLoopPreserved": true,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -13.05,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 8599500
+      },
+      "integratedLufs": -23.06,
+      "truePeakDbtp": -11.84,
+      "loudnessRangeLu": 5.2,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00065099,
+        "firstQuarterSecondRmsDb": -33.448,
+        "lastQuarterSecondRmsDb": -32.467
+      }
+    },
+    {
+      "file": "handshake.ogg",
+      "scene": "handshake",
+      "title": "Celestial Harmony",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/celestial-harmony",
+      "download": "https://opengameart.org/sites/default/files/celestial_harmony.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "3f3b8831623494863deb6a0cffb51cf4214575da657fd6e57648d84c77487629",
+      "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "bytes": 2414397,
+      "duration": 155.076916,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 8385785,
+        "trimStartSample": 651323,
+        "trimEndSampleExclusive": 7815877,
+        "cyclicCrossfadeSamples": 325662,
+        "inferredTempoBpm": 130,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -11.22,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 6838892
+      },
+      "integratedLufs": -23.07,
+      "truePeakDbtp": -10.49,
+      "loudnessRangeLu": 4.4,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00333343,
+        "firstQuarterSecondRmsDb": -24.248,
+        "lastQuarterSecondRmsDb": -27.521
+      }
+    },
+    {
+      "file": "crossfeed-vault.ogg",
+      "scene": "crossfeed-vault",
+      "title": "Stop For A Moment",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/stop-for-a-moment",
+      "download": "https://opengameart.org/sites/default/files/stop_for_a_moment.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "00d897231c27894ced10f4542940c354a4abb7e99924b71fbbb3d50addf9546b",
+      "sha256": "963e6c31a72405c8f0c1e63b7524b33398068d16fa50e2f593024ae6503f4062",
+      "bytes": 2520820,
+      "duration": 169.846145,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 8147687,
+        "trimStartSample": 0,
+        "trimEndSampleExclusive": 7815877,
+        "cyclicCrossfadeSamples": 325662,
+        "inferredTempoBpm": 130,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -11.95,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 7490215
+      },
+      "integratedLufs": -23.03,
+      "truePeakDbtp": -10.2,
+      "loudnessRangeLu": 3.6,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.0055212,
+        "firstQuarterSecondRmsDb": -27.434,
+        "lastQuarterSecondRmsDb": -27.805
+      }
+    },
+    {
+      "file": "race-condition.ogg",
+      "scene": "race-condition",
+      "title": "Hyperton",
+      "author": "Sudocolon",
+      "source": "https://opengameart.org/content/hyperton",
+      "download": "https://opengameart.org/sites/default/files/Hyperton.mp3",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "a98dea8138f10ce8b595c63b3fd1652e672a8425c361486234265638932953e3",
+      "sha256": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "bytes": 1566283,
+      "duration": 96.0,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 4235904,
+        "trimStartSample": 1105,
+        "trimEndSampleExclusive": 4234705,
+        "removedMp3PaddingSamples": 2304,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -10.98,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 4233600
+      },
+      "integratedLufs": -23.01,
+      "truePeakDbtp": -9.29,
+      "loudnessRangeLu": 3.2,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 2.977e-05,
+        "firstQuarterSecondRmsDb": -21.544,
+        "lastQuarterSecondRmsDb": -28.001
+      }
+    },
+    {
+      "file": "deadlock.ogg",
+      "scene": "deadlock",
+      "title": "Algate",
+      "author": "James Gargette (cinameng)",
+      "source": "https://opengameart.org/content/algate",
+      "download": "https://opengameart.org/sites/default/files/algate.zip",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "394868e3d533f6e447165391ab2876913b712559390bf73f4f839b798ebd8ced",
+      "sha256": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "bytes": 1608353,
+      "duration": 120.944943,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "archiveMembers": [
+          {
+            "file": "Algate/wav/algate_low.wav",
+            "sha256": "3e321cd0f2999af0f02ceb010b0a2bb4ab955978ac2b9f0986967bd7fa0fd0e3"
+          },
+          {
+            "file": "Algate/wav/algate.wav",
+            "sha256": "314c44c33d0cc0e909e1629941b1bdf7de3241a6ab51915c2043a5b58b517474"
+          }
+        ],
+        "variantOrder": [
+          "algate_low",
+          "algate_low",
+          "algate",
+          "algate_low",
+          "algate_low",
+          "algate",
+          "algate",
+          "algate_low"
+        ],
+        "variantTransitionSamples": 83339,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -1.38,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 5333672
+      },
+      "integratedLufs": -22.99,
+      "truePeakDbtp": -8.38,
+      "loudnessRangeLu": 1.8,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00023806,
+        "firstQuarterSecondRmsDb": -16.724,
+        "lastQuarterSecondRmsDb": -30.41
+      }
+    },
+    {
+      "file": "use-after-free.ogg",
+      "scene": "use-after-free",
+      "title": "Neural Malfunction",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/neural-malfunction",
+      "download": "https://opengameart.org/sites/default/files/neural_malfunction.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "8d917f86038c0f284fc6220ba200a16f2be268e5375d5caa7419401dd1e1cee7",
+      "sha256": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "bytes": 2240300,
+      "duration": 152.92034,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 6743787,
+        "nativeAuthorLoopPreserved": true,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -11.77,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 6743787
+      },
+      "integratedLufs": -23.11,
+      "truePeakDbtp": -9.11,
+      "loudnessRangeLu": 8.1,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00170303,
+        "firstQuarterSecondRmsDb": -31.236,
+        "lastQuarterSecondRmsDb": -32.289
+      }
+    }
+  ],
+  "totalBytes": 13158428
+}

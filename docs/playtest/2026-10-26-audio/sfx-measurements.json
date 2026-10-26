@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-26",
+  "method": "FFmpeg decoded 44.1 kHz mono float PCM. Sample peak, unweighted RMS, and NumPy real-FFT squared-bin energy above 1800 Hz. These measurements do not assert perceived loudness or subjective listening quality.",
+  "assets": [
+    {
+      "file": "confirm.ogg",
+      "sha256": "6ff6f4eb094a54d9757c2f9d7a54e96a8e9934b79951d6388835c071ae13ad07",
+      "durationSeconds": 0.810544,
+      "samplePeakDbfs": -3.738,
+      "rmsDbfs": -18.128,
+      "dominantFrequencyHz": 3138.6,
+      "spectralEnergyAbove1800HzPercent": 99.955
+    },
+    {
+      "file": "switch-click.ogg",
+      "sha256": "b0990c8119a9395137cc27b736b3b066f88f7f75df1601f1bf388d294a8b7e12",
+      "durationSeconds": 0.177098,
+      "samplePeakDbfs": -5.66,
+      "rmsDbfs": -24.444,
+      "dominantFrequencyHz": 1033.3,
+      "spectralEnergyAbove1800HzPercent": 0.118
+    },
+    {
+      "file": "latch-confirm.ogg",
+      "sha256": "b097eb4334e28ff994630c066384848e45f5fb92b2b29f6ed4e3a199bbf953b0",
+      "durationSeconds": 0.377052,
+      "samplePeakDbfs": -7.954,
+      "rmsDbfs": -21.12,
+      "dominantFrequencyHz": 328.9,
+      "spectralEnergyAbove1800HzPercent": 0.0
+    },
+    {
+      "file": "checkpoint.ogg",
+      "sha256": "d5835552a092596cb52b453427ed265c19b03acfe76a12280b455f8eae834b81",
+      "durationSeconds": 0.286939,
+      "samplePeakDbfs": -7.934,
+      "rmsDbfs": -18.178,
+      "dominantFrequencyHz": 390.3,
+      "spectralEnergyAbove1800HzPercent": 0.0
+    },
+    {
+      "file": "breakpoint-deploy.ogg",
+      "sha256": "ddfe545a3da1d95760001d1cd00a1cdf65e8099585a84e20eff50a45bf23b9a4",
+      "durationSeconds": 0.646599,
+      "samplePeakDbfs": -8.079,
+      "rmsDbfs": -22.865,
+      "dominantFrequencyHz": 400.6,
+      "spectralEnergyAbove1800HzPercent": 13.12
+    },
+    {
+      "file": "breakpoint-confirm.ogg",
+      "sha256": "f973c526385eea642903b99ff04b9ba5472d0e480cfecd2c1b170d8c79b5364f",
+      "durationSeconds": 0.574059,
+      "samplePeakDbfs": -7.975,
+      "rmsDbfs": -18.868,
+      "dominantFrequencyHz": 1120.1,
+      "spectralEnergyAbove1800HzPercent": 1.162
+    },
+    {
+      "file": "room-complete.ogg",
+      "sha256": "4a288c7d8167e6936b0e7a6f7f907008eeda31f319908acc5d7b94b9bf1511de",
+      "durationSeconds": 0.849388,
+      "samplePeakDbfs": -6.145,
+      "rmsDbfs": -15.434,
+      "dominantFrequencyHz": 415.6,
+      "spectralEnergyAbove1800HzPercent": 3.925
+    },
+    {
+      "file": "code-power.ogg",
+      "sha256": "245c755cb9f0e9910295befad5f653ef3e871dd0ada6d561c309e973045c27b8",
+      "durationSeconds": 0.797098,
+      "samplePeakDbfs": -9.042,
+      "rmsDbfs": -20.489,
+      "dominantFrequencyHz": 140.5,
+      "spectralEnergyAbove1800HzPercent": 0.003
+    },
+    {
+      "file": "relay-on.ogg",
+      "sha256": "6386ed2efde78513bdb365dbb03606bde4910d9f7904bb8f424e5c5f2cf16e04",
+      "durationSeconds": 0.953039,
+      "samplePeakDbfs": -5.91,
+      "rmsDbfs": -16.591,
+      "dominantFrequencyHz": 174.2,
+      "spectralEnergyAbove1800HzPercent": 0.019
+    },
+    {
+      "file": "lift-on.ogg",
+      "sha256": "1c219fbfd05a1506f43a00a906e7f06ffd4c759a32005fbc7247bf893848ea88",
+      "durationSeconds": 0.951111,
+      "samplePeakDbfs": -5.872,
+      "rmsDbfs": -16.565,
+      "dominantFrequencyHz": 189.3,
+      "spectralEnergyAbove1800HzPercent": 0.033
+    }
+  ],
+  "listeningStatus": "The agent has no perceptual audio input. Use the playable sfx-review.html/ogg for human audition; no listening claim is made."
+}

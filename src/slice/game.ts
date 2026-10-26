@@ -16,6 +16,8 @@ import { freshProgress, tutorialProgress, restartRoomProgress } from './progress
 import { ProgressStore } from './storage.ts';
 import { connectionPowered } from './connections.ts';
 import { GameAudio } from '../audio/game-audio.ts';
+import { MusicPlayer } from '../audio/music-player.ts';
+import { musicSceneForRoom } from '../audio/music-catalogue.ts';
 import { AudioPresentation } from './audio-presentation.ts';
 import { CoopClient } from '../coop/client.ts';
 import { createCoopAuthority, type CoopAuthority } from '../coop/lab-authority.ts';
@@ -40,6 +42,8 @@ export class SliceGame {
     renderer: PuzzleRenderer;
     input = new InputManager(true);
     audio = new GameAudio();
+    private music = new MusicPlayer();
+    private completionMusicUntil = 0;
     private sound = new AudioPresentation(this.audio);
     started = false;
     overviewVisible = false;
@@ -72,7 +76,8 @@ export class SliceGame {
     private authority: CoopAuthority | null = null;
     private coopHud = document.createElement('aside');
     constructor(readonly host: HTMLElement, readonly canvas: HTMLCanvasElement) {
-        const unlock = () => { void this.audio.unlock(); };
+        this.music.setPreferences(this.audio.getPreferences());
+        const unlock = () => { void this.audio.unlock(); void this.music.unlock(); };
         // Also stop a completion chime that is allowed on the already-paused menu.
         const silence = () => { this.audio.setActive(false); this.audio.stopAll(); };
         document.addEventListener('pointerdown', unlock, { capture: true, passive: true });
@@ -142,8 +147,9 @@ export class SliceGame {
             void this.store.flush();
         } });
         window.addEventListener('blur', () => { this.world.cancelGrapple(); silence(); });
-        window.addEventListener('pagehide', () => { this.character.close(); this.homePreview?.dispose(); this.homePreview = null; silence(); void this.store.flush(); this.coop.leave(false); });
+        window.addEventListener('pagehide', event => { this.music.setActive(false); if (!event.persisted) this.music.dispose(); this.character.close(); this.homePreview?.dispose(); this.homePreview = null; silence(); void this.store.flush(); this.coop.leave(false); });
         window.addEventListener('pageshow', event => {
+            this.music.setActive(true);
             if (event.persisted && !this.characterReady) { void this.loadCharacter(); return; }
             if (event.persisted && (this.menu.querySelector('#character-form') || this.view === 'home')) this.showHome();
             if (event.persisted && this.coopMode) {
@@ -257,6 +263,7 @@ export class SliceGame {
         if (!this.coopMode || !this.coop.slot) return;
         this.consumeInvitation(room.code);
         if (room.draft || room.level === 'workbench') { this.coop.leave(false); location.assign(`/custom-level.html?code=${room.code}`); return; }
+        let completedNow = false;
         const wasVictory = this.authority?.room.party?.phase === 'victory';
         const pausedView = this.partyView;
         const sameChamber = initial && this.authority?.room.code === room.code
@@ -294,7 +301,7 @@ export class SliceGame {
                 if (event.kind === 'crumble') this.renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
                 if (event.kind === 'cube-firewall') this.renderer.particles.burst(event.at.x, event.at.y, 14, '#ff943e', 170);
             }
-            if (!previous.completed && room.completed) this.audio.play('complete');
+            if (!previous.completed && room.completed) completedNow = true;
             else if (room.reachedExit.some((arrived, i) => arrived && !previous.reachedExit[i])) this.audio.play('latch', .35);
         }
         if (restorePause && room.party?.phase === 'playing') { this.partyMenuKey = ''; this.showPartyMenu(pausedView); }
@@ -305,6 +312,8 @@ export class SliceGame {
             this.input.releaseAll(); this.input.clearActions(); this.world.cancelGrapple();
             this.showPartyMenu(wasVictory && !initial && this.partyView === 'choose' ? 'choose' : room.party.phase === 'victory' ? 'victory' : 'lobby');
         }
+        // Entering victory stops gameplay voices. Start its stinger after that transition.
+        if (completedNow && !document.hidden && document.hasFocus()) this.completionSound();
     }
     private coopStatus(): void {
         if (!this.coopMode) return;
@@ -564,13 +573,16 @@ export class SliceGame {
     private audioMenu(): string {
         return `<fieldset class="audio-settings"><legend>SOUND</legend>
         <button id="audio-mute" type="button" aria-pressed="${this.audio.getPreferences().muted}">${this.audio.getPreferences().muted ? 'Sound off' : 'Sound on'}</button>
-        <label for="audio-volume">Volume <output id="audio-volume-value">${Math.round(this.audio.getPreferences().volume * 100)}%</output></label>
+        <label for="audio-volume">Effects <output id="audio-volume-value">${Math.round(this.audio.getPreferences().volume * 100)}%</output></label>
         <input id="audio-volume" type="range" min="0" max="100" value="${Math.round(this.audio.getPreferences().volume * 100)}">
+        <label for="music-volume">Music <output id="music-volume-value">${Math.round(this.audio.getPreferences().musicVolume * 100)}%</output></label>
+        <input id="music-volume" type="range" min="0" max="100" value="${Math.round(this.audio.getPreferences().musicVolume * 100)}">
       </fieldset>`;
     }
     private bindAudio(): void {
         this.menu.querySelector<HTMLButtonElement>('#audio-mute')!.addEventListener('click', e => {
             this.audio.setPreferences({ muted: !this.audio.getPreferences().muted });
+            this.music.setPreferences(this.audio.getPreferences());
             const button = e.currentTarget as HTMLButtonElement;
             button.textContent = this.audio.getPreferences().muted ? 'Sound off' : 'Sound on';
             button.setAttribute('aria-pressed', String(this.audio.getPreferences().muted));
@@ -578,8 +590,30 @@ export class SliceGame {
         this.menu.querySelector<HTMLInputElement>('#audio-volume')!.addEventListener('input', e => {
             const value = (e.currentTarget as HTMLInputElement).valueAsNumber;
             this.audio.setPreferences({ volume: value / 100 });
+            this.music.setPreferences(this.audio.getPreferences());
             this.menu.querySelector('#audio-volume-value')!.textContent = `${value}%`;
         });
+        this.menu.querySelector<HTMLInputElement>('#music-volume')!.addEventListener('input', e => {
+            const value = (e.currentTarget as HTMLInputElement).valueAsNumber;
+            this.audio.setPreferences({ musicVolume: value / 100 });
+            this.music.setPreferences(this.audio.getPreferences());
+            this.menu.querySelector('#music-volume-value')!.textContent = `${value}%`;
+        });
+    }
+    private completionSound(): void {
+        this.completionMusicUntil = performance.now() + 3000;
+        this.music.setDucked('complete');
+        this.audio.play('complete');
+    }
+    /** Scene identity depends on navigation/chamber, never on replicated frame revisions. */
+    private syncMusic(): void {
+        const room = this.coopMode ? this.coop.room ?? this.authority?.room ?? null : null;
+        const chamber = !!room && room.party?.phase !== 'lobby';
+        const solo = !this.coopMode && (['playing', 'pause', 'victory'].includes(this.view)
+            || this.view === 'settings' && this.settingsReturn === 'pause');
+        this.music.setScene(chamber ? musicSceneForRoom(room.level) : solo ? musicSceneForRoom(this.world.room.id) : 'menu');
+        this.music.setDucked(this.view === 'victory' || performance.now() < this.completionMusicUntil ? 'complete'
+            : (solo || chamber) && !this.started ? 'pause' : solo ? 'tutorial' : 'none');
     }
     private resumeRoom(): void {
         if (this.coopMode) {
@@ -639,7 +673,7 @@ export class SliceGame {
             firewalls: this.world.firewalls.map(f => ({ id: f.def.id, ...f.box })), lastDeath: this.world.lastDeath, cubeResetting: this.world.cubeResetting, resettingCubes: cubeEntries(this.world.cubes).filter(([id]) => this.world.cubeIsResetting(id)).map(([id]) => id),
             connections: this.renderer.connections.map(c => ({ id: c.id, input: c.input, output: c.output, powered: connectionPowered(c, this.world) })),
             checkpoint: this.world.checkpoint, deaths: this.world.deaths, pullingCube: this.world.pullingCube, keyboardGrapple: this.world.keyboardGrapple, ended: this.ended, started: this.started, overviewVisible: this.overviewVisible,
-            audio: this.audio.snapshot(),
+            audio: this.audio.snapshot(), music: this.music.snapshot(),
             heroAssets: this.renderer.heroes.snapshot(),
             nativeWorld: { ...this.renderer.nativeWorld.snapshot(), panels: this.renderer.nativeWorldDisplay.panels },
             raceCargo: this.renderer.raceCargoDisplay.diagnostic,
@@ -700,7 +734,7 @@ export class SliceGame {
                 }
                 if (this.world.exited) {
                     this.advance();
-                    if (audible) this.audio.play('complete');
+                    if (audible) this.completionSound();
                     break;
                 }
             }
@@ -709,6 +743,7 @@ export class SliceGame {
             this.accumulated = 0;
         this.sound.ambience(this.world, this.started && !document.hidden && document.hasFocus());
         this.audio.meter();
+        this.syncMusic();
         if (this.coopMode && this.coop.playing) {
             this.world.syncAuthority();
             this.sound.observe(this.world, this.coop.takeMachineryEvents());

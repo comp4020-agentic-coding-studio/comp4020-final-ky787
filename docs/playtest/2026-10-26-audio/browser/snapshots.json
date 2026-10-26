@@ -1,0 +1,1826 @@
+{
+  "host": {
+    "view": "home",
+    "switchOnboarding": {
+      "stage": "hidden",
+      "learned": false,
+      "confirmation": 0
+    },
+    "character": {
+      "profile": {
+        "name": "AudioHost",
+        "colour": "purple"
+      },
+      "persisted": true,
+      "ready": true,
+      "editing": false
+    },
+    "room": "pressure",
+    "player": {
+      "x": 140,
+      "y": 543,
+      "vx": 0,
+      "vy": 0,
+      "grounded": false,
+      "groundId": null,
+      "facing": 1,
+      "coyote": 0,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 140,
+          "y": 543
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 140,
+          "y": 543
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "cube": {
+      "x": 310,
+      "y": 538,
+      "vx": 0,
+      "vy": 0,
+      "carried": false,
+      "grounded": true,
+      "groundId": "near"
+    },
+    "cubes": {
+      "cube": {
+        "x": 310,
+        "y": 538,
+        "vx": 0,
+        "vy": 0,
+        "carried": false,
+        "grounded": true,
+        "groundId": "near"
+      }
+    },
+    "inputs": {
+      "plateA": false,
+      "plateB": false,
+      "plateC": false,
+      "cubeOnPlate": false,
+      "cubeOnPlateB": false,
+      "cubeOnPlateC": false,
+      "switchB": false,
+      "switchC": false
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "multiplayer": null,
+    "source": "mock-greybox",
+    "trace": null,
+    "stringPresentation": "authored mock text",
+    "platforms": [
+      {
+        "id": "floor",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      }
+    ],
+    "lifts": [],
+    "gates": [],
+    "cubeTransferred": false,
+    "firewalls": [],
+    "lastDeath": null,
+    "cubeResetting": false,
+    "resettingCubes": [],
+    "connections": [
+      {
+        "id": "exit-feed",
+        "input": "plateA",
+        "output": "exitDoor",
+        "powered": false
+      }
+    ],
+    "checkpoint": "entry",
+    "deaths": 0,
+    "pullingCube": false,
+    "keyboardGrapple": false,
+    "ended": false,
+    "started": false,
+    "overviewVisible": false,
+    "audio": {
+      "state": "running",
+      "active": false,
+      "loaded": 20,
+      "failed": [],
+      "voices": 0,
+      "loops": [],
+      "played": {
+        "entryAttach": 5,
+        "plate": 7,
+        "liftPower": 4,
+        "liftHum": 4,
+        "breakpointDeploy": 1,
+        "breakpointConfirm": 1,
+        "hookFire": 4,
+        "hookAttach": 4,
+        "reel": 4,
+        "ropeJump": 4,
+        "landing": 4,
+        "pickup": 3,
+        "drop": 3,
+        "switch": 1,
+        "teleport": 3,
+        "latch": 2,
+        "door": 1,
+        "payloadConfirm": 1,
+        "jump": 1,
+        "complete": 1
+      },
+      "peak": 0.25090184807777405,
+      "preferences": {
+        "volume": 0.41,
+        "musicVolume": 0.24,
+        "muted": false
+      }
+    },
+    "music": {
+      "scene": "menu",
+      "currentScene": "menu",
+      "unlocked": true,
+      "active": true,
+      "suspended": false,
+      "disposed": false,
+      "blocked": false,
+      "duck": "none",
+      "duckGain": 1,
+      "crossfading": false,
+      "crossfades": 7,
+      "loops": 1,
+      "preferences": {
+        "musicVolume": 0.24,
+        "muted": false
+      },
+      "failures": [],
+      "decks": [
+        {
+          "scene": "menu",
+          "src": "http://127.0.0.1:43211/audio/music/menu.ogg",
+          "readyState": 4,
+          "paused": false,
+          "currentTime": 0.558252,
+          "duration": 195,
+          "loop": true,
+          "gain": 1,
+          "volume": 0.288,
+          "starting": false,
+          "starts": 4,
+          "loads": 4
+        },
+        {
+          "scene": "use-after-free",
+          "src": "http://127.0.0.1:43211/audio/music/use-after-free.ogg",
+          "readyState": 4,
+          "paused": true,
+          "currentTime": 5.103529,
+          "duration": 152.92034,
+          "loop": true,
+          "gain": 0,
+          "volume": 0,
+          "starting": false,
+          "starts": 6,
+          "loads": 4
+        }
+      ]
+    },
+    "heroAssets": {
+      "entryAge": null,
+      "exitAge": null,
+      "completionAge": null,
+      "receivers": [],
+      "pads": [
+        {
+          "id": "plateA",
+          "active": false,
+          "supported": true,
+          "age": null,
+          "depression": 0
+        }
+      ],
+      "lifts": [],
+      "breakpoints": []
+    },
+    "nativeWorld": {
+      "status": "idle",
+      "chamber": null,
+      "specimen": null,
+      "presentation": null,
+      "connected": false,
+      "outputs": {},
+      "physical": {},
+      "exitUnlocked": null,
+      "excerpts": [],
+      "panels": []
+    },
+    "raceCargo": {
+      "mode": "STATE-LINKED",
+      "availability": "idle",
+      "visible": false,
+      "detail": "environmental",
+      "bounds": null,
+      "codeFontSize": 12,
+      "accepted": null,
+      "phase": null,
+      "status": "",
+      "lastKnown": false,
+      "timer": null,
+      "phasePulse": 0,
+      "sections": []
+    },
+    "raceMachinery": {
+      "mode": "STATE-LINKED",
+      "detail": "environmental",
+      "availability": "idle",
+      "lastKnown": false,
+      "codeFontSize": 12,
+      "sections": []
+    },
+    "environmentalAssembly": {
+      "mode": "STATE-LINKED",
+      "detail": "environmental",
+      "availability": "idle",
+      "chamber": null,
+      "lastKnown": false,
+      "codeFontSize": 12,
+      "sections": []
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 625,
+      "y": 360,
+      "zoom": 1.2162162161653527
+    },
+    "progress": {
+      "version": 3,
+      "currentRoom": "pressure",
+      "completedRooms": [],
+      "rooms": {
+        "pressure": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry"
+        },
+        "switch": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry"
+        },
+        "relay": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry"
+        },
+        "uplink": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry",
+          "switchC": false,
+          "cubeOnPlateC": false,
+          "cubeTransferred": false
+        }
+      },
+      "mechanics": [],
+      "history": []
+    },
+    "persistence": {
+      "status": "Saved on server",
+      "visitor": "3dfe19b3-5969-46f4-b435-d00366502728",
+      "revision": 1,
+      "updatedAt": "2026-10-26T07:40:38.160Z"
+    }
+  },
+  "guest": {
+    "view": "playing",
+    "switchOnboarding": {
+      "stage": "hidden",
+      "learned": false,
+      "confirmation": 0
+    },
+    "character": {
+      "profile": {
+        "name": "AudioGuest",
+        "colour": "orange"
+      },
+      "persisted": true,
+      "ready": true,
+      "editing": false
+    },
+    "room": "use-after-free",
+    "player": {
+      "x": 340,
+      "y": 2333,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "bottom",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 340,
+          "y": 2333
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 340,
+          "y": 2333
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "cube": null,
+    "cubes": {},
+    "inputs": {
+      "plateA": false,
+      "plateB": false,
+      "plateC": false,
+      "cubeOnPlate": false,
+      "cubeOnPlateB": false,
+      "cubeOnPlateC": false,
+      "switchB": false,
+      "switchC": false
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "multiplayer": {
+      "websocket": "CONNECTED",
+      "transport": "OPEN",
+      "url": "ws://127.0.0.1:43211/ws",
+      "code": "9CTP",
+      "visitor": "4cec01ad-58a4-4b51-93b2-3290c914f39f",
+      "slot": 2,
+      "party": {
+        "phase": "playing",
+        "completedLevels": [
+          "handshake"
+        ]
+      },
+      "host": false,
+      "levelInstance": 6,
+      "connected": [
+        false,
+        true
+      ],
+      "revision": 49,
+      "level": "use-after-free",
+      "checkpoint": "entry",
+      "levelState": {
+        "devices": {
+          "launch.occupied": false,
+          "plateA.occupied": false,
+          "plateB.occupied": false,
+          "plateC.occupied": false,
+          "assist.occupied": false
+        },
+        "outputs": {
+          "launchPower": false,
+          "routeA": false,
+          "routeB": false,
+          "routeC": false,
+          "assistBlocked": true,
+          "exitReady": false
+        },
+        "platforms": {
+          "crumbleA": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "crumbleB": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:operatorA": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:operatorB": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:operatorC": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:a1": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:a2": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:a3": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:b1": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:b2": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:b3": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:c1": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:c2": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          },
+          "draft:c3": {
+            "phase": "stable",
+            "remainingMs": 0,
+            "durationMs": 0
+          }
+        }
+      },
+      "lastLocalDiscontinuity": null,
+      "lastRemoteDiscontinuity": null,
+      "lastCubeDiscontinuity": null,
+      "pendingCheckpoints": [],
+      "pendingControls": [],
+      "pendingCrumble": [],
+      "pendingPhase": null,
+      "crumblePhases": {
+        "crumbleA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "crumbleB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:operatorA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:operatorB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:operatorC": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:a1": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:a2": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:a3": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:b1": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:b2": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:b3": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:c1": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:c2": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "draft:c3": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        }
+      },
+      "exitUnlocked": false,
+      "reachedExit": [
+        false,
+        false
+      ],
+      "completed": false,
+      "cubes": {},
+      "cubePlacements": {},
+      "cubePlacement": null,
+      "cubeOnCargoPlate": false,
+      "lastCubeReset": null,
+      "pendingCubeAction": null,
+      "predictedHolder": null,
+      "pendingSwitch": null,
+      "interactionTimings": {},
+      "ownsCubePhysics": false,
+      "cubeSnapshotsSent": 0,
+      "cubeSnapshotsReceived": 892,
+      "cubeSnapshotAgeMs": null,
+      "lastServerMessageAgeMs": 2215,
+      "sent": 876,
+      "received": 1727,
+      "reconnectAttempts": 0,
+      "remoteSnapshotAgeMs": null,
+      "partnerCubeSupportActive": false,
+      "supportCubeId": null,
+      "supportCarrierSlot": null,
+      "supportPosition": null,
+      "groundedOnPartnerCube": false,
+      "shared": {
+        "party": {
+          "phase": "playing",
+          "completedLevels": [
+            "handshake"
+          ]
+        },
+        "levelInstance": 6,
+        "code": "9CTP",
+        "level": "use-after-free",
+        "revision": 49,
+        "assigned": [
+          true,
+          true
+        ],
+        "connected": [
+          false,
+          true
+        ],
+        "levelState": {
+          "devices": {
+            "launch.occupied": false,
+            "plateA.occupied": false,
+            "plateB.occupied": false,
+            "plateC.occupied": false,
+            "assist.occupied": false
+          },
+          "outputs": {
+            "launchPower": false,
+            "routeA": false,
+            "routeB": false,
+            "routeC": false,
+            "assistBlocked": true,
+            "exitReady": false
+          },
+          "platforms": {
+            "crumbleA": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "crumbleB": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:operatorA": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:operatorB": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:operatorC": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:a1": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:a2": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:a3": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:b1": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:b2": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:b3": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:c1": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:c2": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            },
+            "draft:c3": {
+              "phase": "stable",
+              "remainingMs": 0,
+              "durationMs": 0
+            }
+          }
+        },
+        "cubes": {},
+        "cubePlacements": {},
+        "cube": null,
+        "cubePlacement": null,
+        "checkpoint": "entry",
+        "exitUnlocked": false,
+        "reachedExit": [
+          false,
+          false
+        ],
+        "completed": false,
+        "profiles": [
+          {
+            "name": "AudioHost",
+            "colour": "purple"
+          },
+          {
+            "name": "AudioGuest",
+            "colour": "orange"
+          }
+        ]
+      },
+      "remote": null
+    },
+    "source": "mock-greybox",
+    "signals": {
+      "draft:activation:on": true,
+      "draft:activation:off": false,
+      "draft:launchPower": false,
+      "draft:routeA": false,
+      "draft:routeB": false,
+      "draft:routeC": false,
+      "draft:assistBlocked": true,
+      "draft:exitReady": false,
+      "draft:launchBinding": false,
+      "draft:a1Binding": false,
+      "draft:a2Binding": false,
+      "draft:a3Binding": false,
+      "draft:b1Binding": false,
+      "draft:b2Binding": false,
+      "draft:b3Binding": false,
+      "draft:c1Binding": false,
+      "draft:c2Binding": false,
+      "draft:c3Binding": false,
+      "draft:assistBinding": false,
+      "draft:exitBinding": false,
+      "draft:retryBBinding": true,
+      "draft:retryCBinding": true
+    },
+    "controllerStatus": "server-authoritative native-verified lookup / static world excerpts",
+    "trace": null,
+    "stringPresentation": "authored mock text",
+    "platforms": [
+      {
+        "id": "bottom",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "refugeA",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "operatorA",
+        "manifestation": "A / 24s",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "refugeB",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "operatorB",
+        "manifestation": "B / 24s",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "refugeC",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "operatorC",
+        "manifestation": "C / 24s",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "summit",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "a1",
+        "signal": "draft:a1Binding",
+        "manifestation": "A1",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "a2",
+        "signal": "draft:a2Binding",
+        "manifestation": "A2",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "a3",
+        "signal": "draft:a3Binding",
+        "manifestation": "A3",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "b1",
+        "signal": "draft:b1Binding",
+        "manifestation": "B1",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "b2",
+        "signal": "draft:b2Binding",
+        "manifestation": "B2",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "b3",
+        "signal": "draft:b3Binding",
+        "manifestation": "B3",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "c1",
+        "signal": "draft:c1Binding",
+        "manifestation": "C1",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "c2",
+        "signal": "draft:c2Binding",
+        "manifestation": "C2",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "c3",
+        "signal": "draft:c3Binding",
+        "manifestation": "C3",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "catchLower",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "catchMiddle",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "summitBaffle",
+        "manifestation": "ASCENT BAFFLE",
+        "enabled": true,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "retryB",
+        "manifestation": "B RETRY → A",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      },
+      {
+        "id": "retryC",
+        "manifestation": "C RETRY ← B",
+        "enabled": false,
+        "grappleable": false,
+        "fuse": -1,
+        "respawn": 0
+      }
+    ],
+    "lifts": [
+      {
+        "id": "lowerLift",
+        "enabled": false
+      },
+      {
+        "id": "finalLift",
+        "enabled": false
+      }
+    ],
+    "gates": [],
+    "cubeTransferred": false,
+    "firewalls": [],
+    "lastDeath": null,
+    "cubeResetting": false,
+    "resettingCubes": [],
+    "connections": [
+      {
+        "id": "a1Wire",
+        "input": "plateA",
+        "output": "draft:a1Binding",
+        "powered": false
+      },
+      {
+        "id": "a2Wire",
+        "input": "plateA",
+        "output": "draft:a2Binding",
+        "powered": false
+      },
+      {
+        "id": "a3Wire",
+        "input": "plateA",
+        "output": "draft:a3Binding",
+        "powered": false
+      },
+      {
+        "id": "b1Wire",
+        "input": "plateA",
+        "output": "draft:b1Binding",
+        "powered": false
+      },
+      {
+        "id": "b2Wire",
+        "input": "plateA",
+        "output": "draft:b2Binding",
+        "powered": false
+      },
+      {
+        "id": "b3Wire",
+        "input": "plateA",
+        "output": "draft:b3Binding",
+        "powered": false
+      },
+      {
+        "id": "c1Wire",
+        "input": "plateA",
+        "output": "draft:c1Binding",
+        "powered": false
+      },
+      {
+        "id": "c2Wire",
+        "input": "plateA",
+        "output": "draft:c2Binding",
+        "powered": false
+      },
+      {
+        "id": "c3Wire",
+        "input": "plateA",
+        "output": "draft:c3Binding",
+        "powered": false
+      },
+      {
+        "id": "launchWire",
+        "input": "plateA",
+        "output": "draft:launchBinding",
+        "powered": false
+      },
+      {
+        "id": "assistWire",
+        "input": "plateA",
+        "output": "draft:assistBinding",
+        "powered": false
+      },
+      {
+        "id": "retryBWire",
+        "input": "plateA",
+        "output": "draft:routeB",
+        "powered": false
+      },
+      {
+        "id": "retryCWire",
+        "input": "plateA",
+        "output": "draft:routeC",
+        "powered": false
+      }
+    ],
+    "checkpoint": "entry",
+    "deaths": 0,
+    "pullingCube": false,
+    "keyboardGrapple": false,
+    "ended": false,
+    "started": true,
+    "overviewVisible": false,
+    "audio": {
+      "state": "running",
+      "active": true,
+      "loaded": 20,
+      "failed": [],
+      "voices": 0,
+      "loops": [],
+      "played": {
+        "entryAttach": 6,
+        "plate": 7,
+        "liftPower": 4,
+        "liftHum": 3,
+        "breakpointDeploy": 1,
+        "breakpointConfirm": 1,
+        "pickup": 3,
+        "drop": 3,
+        "jump": 4,
+        "landing": 5,
+        "switch": 1,
+        "teleport": 3,
+        "latch": 2,
+        "door": 1,
+        "payloadConfirm": 1,
+        "complete": 1
+      },
+      "peak": 0.41764938831329346,
+      "preferences": {
+        "volume": 0.65,
+        "musicVolume": 0.35,
+        "muted": false
+      }
+    },
+    "music": {
+      "scene": "use-after-free",
+      "currentScene": "use-after-free",
+      "unlocked": true,
+      "active": true,
+      "suspended": false,
+      "disposed": false,
+      "blocked": false,
+      "duck": "none",
+      "duckGain": 1,
+      "crossfading": false,
+      "crossfades": 6,
+      "loops": 0,
+      "preferences": {
+        "musicVolume": 0.35,
+        "muted": false
+      },
+      "failures": [],
+      "decks": [
+        {
+          "scene": "deadlock",
+          "src": "http://127.0.0.1:43211/audio/music/deadlock.ogg",
+          "readyState": 4,
+          "paused": true,
+          "currentTime": 4.281919,
+          "duration": 120.944943,
+          "loop": true,
+          "gain": 0,
+          "volume": 0,
+          "starting": false,
+          "starts": 3,
+          "loads": 3
+        },
+        {
+          "scene": "use-after-free",
+          "src": "http://127.0.0.1:43211/audio/music/use-after-free.ogg",
+          "readyState": 4,
+          "paused": false,
+          "currentTime": 8.407325,
+          "duration": 152.92034,
+          "loop": true,
+          "gain": 1,
+          "volume": 0.35,
+          "starting": false,
+          "starts": 3,
+          "loads": 4
+        }
+      ]
+    },
+    "heroAssets": {
+      "entryAge": 5.183100000000006,
+      "exitAge": null,
+      "completionAge": null,
+      "receivers": [],
+      "pads": [
+        {
+          "id": "draft:launch",
+          "active": false,
+          "supported": true,
+          "age": null,
+          "depression": 0
+        },
+        {
+          "id": "draft:plateA",
+          "active": false,
+          "supported": true,
+          "age": null,
+          "depression": 0
+        },
+        {
+          "id": "draft:plateB",
+          "active": false,
+          "supported": true,
+          "age": null,
+          "depression": 0
+        },
+        {
+          "id": "draft:plateC",
+          "active": false,
+          "supported": true,
+          "age": null,
+          "depression": 0
+        },
+        {
+          "id": "draft:assist",
+          "active": false,
+          "supported": true,
+          "age": null,
+          "depression": 0
+        }
+      ],
+      "lifts": [
+        {
+          "id": "lowerLift",
+          "enabled": false,
+          "age": null,
+          "illumination": 0
+        },
+        {
+          "id": "finalLift",
+          "enabled": false,
+          "age": null,
+          "illumination": 0
+        }
+      ],
+      "breakpoints": []
+    },
+    "nativeWorld": {
+      "status": "ready",
+      "chamber": "use-after-free",
+      "specimen": "use-after-free_ollvm_bcf",
+      "presentation": "static-output-store",
+      "connected": true,
+      "outputs": {
+        "launchPower": false,
+        "routeA": false,
+        "routeB": false,
+        "routeC": false,
+        "assistBlocked": true,
+        "exitReady": false
+      },
+      "physical": {},
+      "exitUnlocked": false,
+      "excerpts": [
+        {
+          "output": "launchPower",
+          "block": "bb_000010EA",
+          "store": 5368713457,
+          "addresses": [
+            5368713450,
+            5368713454,
+            5368713457
+          ]
+        },
+        {
+          "output": "routeA",
+          "block": "bb_00001236",
+          "store": 5368713789,
+          "addresses": [
+            5368713782,
+            5368713786,
+            5368713789
+          ]
+        },
+        {
+          "output": "routeB",
+          "block": "bb_000013FD",
+          "store": 5368714244,
+          "addresses": [
+            5368714237,
+            5368714241,
+            5368714244
+          ]
+        },
+        {
+          "output": "routeC",
+          "block": "bb_000015C4",
+          "store": 5368714699,
+          "addresses": [
+            5368714692,
+            5368714696,
+            5368714699
+          ]
+        },
+        {
+          "output": "assistBlocked",
+          "block": "bb_00001788",
+          "store": 5368715151,
+          "addresses": [
+            5368715144,
+            5368715148,
+            5368715151
+          ]
+        },
+        {
+          "output": "exitReady",
+          "block": "bb_000018D6",
+          "store": 5368715485,
+          "addresses": [
+            5368715478,
+            5368715482,
+            5368715485
+          ]
+        }
+      ],
+      "panels": []
+    },
+    "raceCargo": {
+      "mode": "STATE-LINKED",
+      "availability": "idle",
+      "visible": false,
+      "detail": "environmental",
+      "bounds": null,
+      "codeFontSize": 12,
+      "accepted": null,
+      "phase": null,
+      "status": "",
+      "lastKnown": false,
+      "timer": null,
+      "phasePulse": 0,
+      "sections": []
+    },
+    "raceMachinery": {
+      "mode": "STATE-LINKED",
+      "detail": "environmental",
+      "availability": "idle",
+      "lastKnown": false,
+      "codeFontSize": 12,
+      "sections": []
+    },
+    "environmentalAssembly": {
+      "mode": "STATE-LINKED",
+      "detail": "environmental",
+      "availability": "ready",
+      "chamber": "use-after-free",
+      "lastKnown": false,
+      "codeFontSize": 12,
+      "sections": [
+        {
+          "output": "routeA",
+          "target": "a2",
+          "group": "route-a",
+          "bounds": {
+            "x": 690,
+            "y": 1798,
+            "w": 328,
+            "h": 124
+          },
+          "visible": true,
+          "colour": "#ca817e",
+          "pulse": 0,
+          "message": "ROUTE A IDLE",
+          "revealed": "ROUTE A IDLE",
+          "raw": false,
+          "physical": false,
+          "powered": false,
+          "grace": false,
+          "inverted": false,
+          "latched": false,
+          "storeId": "routeA.write-0",
+          "storeRva": 4777,
+          "fragments": [
+            {
+              "id": "routeA.read",
+              "block": "bb_000011C0",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368713671,
+                  "rva": 4551,
+                  "size": 4,
+                  "bytes": "83 78 04 00",
+                  "mnemonic": "cmp",
+                  "op_str": "dword ptr [rax + 4], 0",
+                  "block_id": "bb_000011C0"
+                }
+              ],
+              "firstLineY": 20
+            },
+            {
+              "id": "routeA.write-0",
+              "block": "bb_000012A2",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368713890,
+                  "rva": 4770,
+                  "size": 4,
+                  "bytes": "48 8b 45 d8",
+                  "mnemonic": "mov",
+                  "op_str": "rax, qword ptr [rbp - 0x28]",
+                  "block_id": "bb_000012A2"
+                },
+                {
+                  "address": 5368713894,
+                  "rva": 4774,
+                  "size": 3,
+                  "bytes": "48 8b 00",
+                  "mnemonic": "mov",
+                  "op_str": "rax, qword ptr [rax]",
+                  "block_id": "bb_000012A2"
+                },
+                {
+                  "address": 5368713897,
+                  "rva": 4777,
+                  "size": 7,
+                  "bytes": "c7 40 04 00 00 00 00",
+                  "mnemonic": "mov",
+                  "op_str": "dword ptr [rax + 4], 0",
+                  "block_id": "bb_000012A2"
+                }
+              ],
+              "firstLineY": 44
+            }
+          ]
+        },
+        {
+          "output": "routeB",
+          "target": "b1",
+          "group": "route-b",
+          "bounds": {
+            "x": 1000,
+            "y": 1420,
+            "w": 328,
+            "h": 124
+          },
+          "visible": false,
+          "colour": "#ca817e",
+          "pulse": 0,
+          "message": "ROUTE B IDLE",
+          "revealed": "ROUTE B IDLE",
+          "raw": false,
+          "physical": false,
+          "powered": false,
+          "grace": false,
+          "inverted": false,
+          "latched": false,
+          "storeId": "routeB.write-0",
+          "storeRva": 5232,
+          "fragments": [
+            {
+              "id": "routeB.branch",
+              "block": "bb_000013C6",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368714182,
+                  "rva": 5062,
+                  "size": 3,
+                  "bytes": "8a 45 cd",
+                  "mnemonic": "mov",
+                  "op_str": "al, byte ptr [rbp - 0x33]",
+                  "block_id": "bb_000013C6"
+                },
+                {
+                  "address": 5368714185,
+                  "rva": 5065,
+                  "size": 2,
+                  "bytes": "a8 01",
+                  "mnemonic": "test",
+                  "op_str": "al, 1",
+                  "block_id": "bb_000013C6"
+                },
+                {
+                  "address": 5368714187,
+                  "rva": 5067,
+                  "size": 2,
+                  "bytes": "75 6e",
+                  "mnemonic": "jne",
+                  "op_str": "0x14000143b",
+                  "block_id": "bb_000013C6"
+                }
+              ],
+              "firstLineY": 20
+            },
+            {
+              "id": "routeB.write-0",
+              "block": "bb_00001469",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368714352,
+                  "rva": 5232,
+                  "size": 7,
+                  "bytes": "c7 40 08 00 00 00 00",
+                  "mnemonic": "mov",
+                  "op_str": "dword ptr [rax + 8], 0",
+                  "block_id": "bb_00001469"
+                }
+              ],
+              "firstLineY": 76
+            }
+          ]
+        },
+        {
+          "output": "routeC",
+          "target": "c1",
+          "group": "route-c",
+          "bounds": {
+            "x": 650,
+            "y": 1420,
+            "w": 328,
+            "h": 124
+          },
+          "visible": false,
+          "colour": "#ca817e",
+          "pulse": 0,
+          "message": "ROUTE C IDLE",
+          "revealed": "ROUTE C IDLE",
+          "raw": false,
+          "physical": false,
+          "powered": false,
+          "grace": false,
+          "inverted": false,
+          "latched": false,
+          "storeId": "routeC.write-0",
+          "storeRva": 5687,
+          "fragments": [
+            {
+              "id": "routeC.read",
+              "block": "bb_0000154E",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368714581,
+                  "rva": 5461,
+                  "size": 4,
+                  "bytes": "83 78 08 00",
+                  "mnemonic": "cmp",
+                  "op_str": "dword ptr [rax + 8], 0",
+                  "block_id": "bb_0000154E"
+                },
+                {
+                  "address": 5368714585,
+                  "rva": 5465,
+                  "size": 3,
+                  "bytes": "0f 95 c0",
+                  "mnemonic": "setne",
+                  "op_str": "al",
+                  "block_id": "bb_0000154E"
+                },
+                {
+                  "address": 5368714588,
+                  "rva": 5468,
+                  "size": 3,
+                  "bytes": "88 45 cb",
+                  "mnemonic": "mov",
+                  "op_str": "byte ptr [rbp - 0x35], al",
+                  "block_id": "bb_0000154E"
+                }
+              ],
+              "firstLineY": 20
+            },
+            {
+              "id": "routeC.write-0",
+              "block": "bb_00001630",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368714807,
+                  "rva": 5687,
+                  "size": 7,
+                  "bytes": "c7 40 0c 00 00 00 00",
+                  "mnemonic": "mov",
+                  "op_str": "dword ptr [rax + 0xc], 0",
+                  "block_id": "bb_00001630"
+                }
+              ],
+              "firstLineY": 76
+            }
+          ]
+        },
+        {
+          "output": "launchPower",
+          "target": "lowerLift",
+          "group": "launch",
+          "bounds": {
+            "x": 1240,
+            "y": 2130,
+            "w": 328,
+            "h": 124
+          },
+          "visible": true,
+          "colour": "#ca817e",
+          "pulse": 0,
+          "message": "LAUNCH LIFT INACTIVE",
+          "revealed": "LAUNCH LIFT INACTIVE",
+          "raw": false,
+          "physical": false,
+          "powered": false,
+          "grace": false,
+          "inverted": false,
+          "latched": false,
+          "storeId": "launchPower.write-0",
+          "storeRva": 4444,
+          "fragments": [
+            {
+              "id": "launchPower.write-0",
+              "block": "bb_00001155",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368713557,
+                  "rva": 4437,
+                  "size": 4,
+                  "bytes": "48 8b 45 d8",
+                  "mnemonic": "mov",
+                  "op_str": "rax, qword ptr [rbp - 0x28]",
+                  "block_id": "bb_00001155"
+                },
+                {
+                  "address": 5368713561,
+                  "rva": 4441,
+                  "size": 3,
+                  "bytes": "48 8b 00",
+                  "mnemonic": "mov",
+                  "op_str": "rax, qword ptr [rax]",
+                  "block_id": "bb_00001155"
+                },
+                {
+                  "address": 5368713564,
+                  "rva": 4444,
+                  "size": 6,
+                  "bytes": "c7 00 00 00 00 00",
+                  "mnemonic": "mov",
+                  "op_str": "dword ptr [rax], 0",
+                  "block_id": "bb_00001155"
+                }
+              ],
+              "firstLineY": 44
+            }
+          ]
+        },
+        {
+          "output": "assistBlocked",
+          "target": "finalLift",
+          "group": "assist",
+          "bounds": {
+            "x": 1500,
+            "y": 1450,
+            "w": 280,
+            "h": 124
+          },
+          "visible": false,
+          "colour": "#ca817e",
+          "pulse": 0,
+          "message": "ASSIST LIFT INACTIVE",
+          "revealed": "ASSIST LIFT INACTIVE",
+          "raw": true,
+          "physical": false,
+          "powered": false,
+          "grace": false,
+          "inverted": true,
+          "latched": false,
+          "storeId": "assistBlocked.write-1",
+          "storeRva": 6031,
+          "fragments": [
+            {
+              "id": "assistBlocked.branch",
+              "block": "bb_00001751",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368715089,
+                  "rva": 5969,
+                  "size": 3,
+                  "bytes": "8a 45 c9",
+                  "mnemonic": "mov",
+                  "op_str": "al, byte ptr [rbp - 0x37]",
+                  "block_id": "bb_00001751"
+                },
+                {
+                  "address": 5368715092,
+                  "rva": 5972,
+                  "size": 2,
+                  "bytes": "a8 01",
+                  "mnemonic": "test",
+                  "op_str": "al, 1",
+                  "block_id": "bb_00001751"
+                },
+                {
+                  "address": 5368715094,
+                  "rva": 5974,
+                  "size": 2,
+                  "bytes": "75 02",
+                  "mnemonic": "jne",
+                  "op_str": "0x14000175a",
+                  "block_id": "bb_00001751"
+                }
+              ],
+              "firstLineY": 20
+            },
+            {
+              "id": "assistBlocked.write-1",
+              "block": "bb_00001788",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368715151,
+                  "rva": 6031,
+                  "size": 7,
+                  "bytes": "c7 40 10 01 00 00 00",
+                  "mnemonic": "mov",
+                  "op_str": "dword ptr [rax + 0x10], 1",
+                  "block_id": "bb_00001788"
+                }
+              ],
+              "firstLineY": 76
+            }
+          ]
+        },
+        {
+          "output": "exitReady",
+          "target": "exit",
+          "group": "summit",
+          "bounds": {
+            "x": 1430,
+            "y": 590,
+            "w": 328,
+            "h": 124
+          },
+          "visible": false,
+          "colour": "#ca817e",
+          "pulse": 0,
+          "message": "EXIT LOCKED",
+          "revealed": "EXIT LOCKED",
+          "raw": false,
+          "physical": false,
+          "powered": false,
+          "grace": false,
+          "inverted": false,
+          "latched": true,
+          "storeId": "exitReady.write-0",
+          "storeRva": 6473,
+          "fragments": [
+            {
+              "id": "exitReady.read",
+              "block": "bb_00001860",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368715367,
+                  "rva": 6247,
+                  "size": 4,
+                  "bytes": "83 78 10 00",
+                  "mnemonic": "cmp",
+                  "op_str": "dword ptr [rax + 0x10], 0",
+                  "block_id": "bb_00001860"
+                }
+              ],
+              "firstLineY": 20
+            },
+            {
+              "id": "exitReady.write-0",
+              "block": "bb_00001942",
+              "omittedBefore": "omitted code; not a CFG edge",
+              "instructions": [
+                {
+                  "address": 5368715586,
+                  "rva": 6466,
+                  "size": 4,
+                  "bytes": "48 8b 45 d8",
+                  "mnemonic": "mov",
+                  "op_str": "rax, qword ptr [rbp - 0x28]",
+                  "block_id": "bb_00001942"
+                },
+                {
+                  "address": 5368715590,
+                  "rva": 6470,
+                  "size": 3,
+                  "bytes": "48 8b 00",
+                  "mnemonic": "mov",
+                  "op_str": "rax, qword ptr [rax]",
+                  "block_id": "bb_00001942"
+                },
+                {
+                  "address": 5368715593,
+                  "rva": 6473,
+                  "size": 7,
+                  "bytes": "c7 40 14 00 00 00 00",
+                  "mnemonic": "mov",
+                  "op_str": "dword ptr [rax + 0x14], 0",
+                  "block_id": "bb_00001942"
+                }
+              ],
+              "firstLineY": 44
+            }
+          ]
+        }
+      ]
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 760.9254498714654,
+      "y": 2123.0000000000014,
+      "zoom": 1.0513513513513513
+    },
+    "progress": {
+      "version": 3,
+      "currentRoom": "pressure",
+      "completedRooms": [],
+      "rooms": {
+        "pressure": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry"
+        },
+        "switch": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry"
+        },
+        "relay": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry"
+        },
+        "uplink": {
+          "switchB": false,
+          "cubeOnPlate": false,
+          "cubeOnPlateB": false,
+          "checkpoint": "entry",
+          "switchC": false,
+          "cubeOnPlateC": false,
+          "cubeTransferred": false
+        }
+      },
+      "mechanics": [],
+      "history": []
+    },
+    "persistence": {
+      "status": "New visitor · server ready",
+      "visitor": "4cec01ad-58a4-4b51-93b2-3290c914f39f",
+      "revision": 0,
+      "updatedAt": null
+    }
+  }
+}

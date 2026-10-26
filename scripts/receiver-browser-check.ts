@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** Production-rendered receiver review. Inputs move real bodies; only labelled editor
  * State Preview uses diagnostic values. No multiplayer occupancy/state injection. */
+import { SOUND_ASSET_COUNT } from '../src/audio/game-audio.ts';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { Cdp, coopBrowser } from './coop-browser.ts';
@@ -81,7 +82,7 @@ try {
         await until(host, 'two visitors connected', 'customLevel.observe().session.peers.every(Boolean)');
         // Real gestures unlock each audio context; a muted browser still counts bounded voices.
         await h.tap(guest, 'KeyA'); await h.tap(host, 'KeyD'); await h.sleep(350);
-        for (const p of pages) await until(p, 'audio samples loaded', 'customLevel.observe().audio.loaded===14');
+        for (const p of pages) await until(p, 'audio samples loaded', `customLevel.observe().audio.loaded===${SOUND_ASSET_COUNT}`);
         const counts = () => Promise.all(pages.map(async p => (await observe(p)).audio.played.payloadConfirm ?? 0));
         const baseline = await counts();
         await walk(host, 800);

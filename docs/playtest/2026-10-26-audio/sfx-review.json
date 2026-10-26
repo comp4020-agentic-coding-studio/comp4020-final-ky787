@@ -1,0 +1,194 @@
+{
+  "effectsVolume": 0.65,
+  "musicIncluded": false,
+  "peakBeforeEncoding": 0.329626,
+  "durationSeconds": 18.696,
+  "sections": [
+    {
+      "title": "Previous generic confirmation / completion",
+      "startSeconds": 0.4,
+      "endSeconds": 1.211,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "confirm.ogg",
+          "gain": 0.5,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New switch: short mechanical click",
+      "startSeconds": 2.011,
+      "endSeconds": 2.188,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "switch-click.ogg",
+          "gain": 0.48,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New latch: low rising pulse",
+      "startSeconds": 2.988,
+      "endSeconds": 3.365,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "latch-confirm.ogg",
+          "gain": 0.5,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New checkpoint: short two-tone confirmation",
+      "startSeconds": 4.165,
+      "endSeconds": 4.452,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "checkpoint.ogg",
+          "gain": 0.48,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New breakpoint: deployment, then flag confirmation at 1.2s",
+      "startSeconds": 5.252,
+      "endSeconds": 7.026,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "breakpoint-deploy.ogg",
+          "gain": 0.5,
+          "rate": 1
+        },
+        {
+          "offsetSeconds": 1.2,
+          "file": "breakpoint-confirm.ogg",
+          "gain": 0.54,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New room completion: rising 8-bit phrase",
+      "startSeconds": 7.826,
+      "endSeconds": 8.675,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "room-complete.ogg",
+          "gain": 0.65,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "Previous simultaneous switch / code / relay activation",
+      "startSeconds": 9.475,
+      "endSeconds": 10.428,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "confirm.ogg",
+          "gain": 0.32,
+          "rate": 1.15
+        },
+        {
+          "offsetSeconds": 0,
+          "file": "firewall-open.ogg",
+          "gain": 0.24,
+          "rate": 1
+        },
+        {
+          "offsetSeconds": 0,
+          "file": "relay-on.ogg",
+          "gain": 0.6,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New simultaneous switch / relay activation (one machinery cue)",
+      "startSeconds": 11.228,
+      "endSeconds": 12.181,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "switch-click.ogg",
+          "gain": 0.48,
+          "rate": 1
+        },
+        {
+          "offsetSeconds": 0,
+          "file": "relay-on.ogg",
+          "gain": 0.36,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "New isolated code activation",
+      "startSeconds": 12.981,
+      "endSeconds": 13.778,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "code-power.ogg",
+          "gain": 0.22499999999999998,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "Unchanged grapple fire / attach",
+      "startSeconds": 14.578,
+      "endSeconds": 15.328,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "grapple-fire.ogg",
+          "gain": 0.38,
+          "rate": 1
+        },
+        {
+          "offsetSeconds": 0.45,
+          "file": "grapple-attach.ogg",
+          "gain": 0.55,
+          "rate": 1
+        }
+      ]
+    },
+    {
+      "title": "Unchanged cube pickup / drop / plate",
+      "startSeconds": 16.128,
+      "endSeconds": 17.896,
+      "events": [
+        {
+          "offsetSeconds": 0,
+          "file": "metal-touch.ogg",
+          "gain": 0.45,
+          "rate": 1.2
+        },
+        {
+          "offsetSeconds": 0.65,
+          "file": "metal-touch.ogg",
+          "gain": 0.55,
+          "rate": 0.85
+        },
+        {
+          "offsetSeconds": 1.3,
+          "file": "metal-touch.ogg",
+          "gain": 0.52,
+          "rate": 1
+        }
+      ]
+    }
+  ],
+  "reviewStatus": "Playable artifact and signal measurements; no claim of perceptual listening by the coding agent."
+}

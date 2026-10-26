@@ -1,0 +1,33 @@
+PASS a player on the dock cannot visually activate either receiver
+PASS a player on the dock cannot visually activate either receiver
+PASS ordinary pressure plate still accepts the player and stays visually distinct
+PASS stationary free payload is purple and visibly animated across a full heartbeat
+PASS carried payload retains animated purple energy
+PASS accepted placement emits exactly one distinct confirmation on each client
+PASS connected payload stays green and animated across a full heartbeat
+PASS an off-centre accepted delivery snaps body and art to the same canonical pose
+PASS an off-centre accepted delivery snaps body and art to the same canonical pose
+PASS repeated shared snapshots do not restart the animation or sound
+PASS removal returns the carried cube to purple immediately
+PASS removal immediately clears the dock identity
+PASS release immediately reports awaiting payload without another confirmation
+PASS a later genuine delivery gets one new confirmation
+PASS reduced motion settles green without breathing or travelling cube energy
+PASS reduced motion keeps carried purple cargo distinct and still
+PASS receivers keep independent transition clocks
+PASS live release does not latch receiver occupancy or reset its neighbour; exit latch stays separate
+PASS reconnect displays powered idle with no detection replay
+PASS overview retains readable, in-bounds receiver status badges
+PASS custom receiver client has no runtime errors
+PASS custom receiver client has no runtime errors
+PASS Level Builder uses the shared awaiting-receiver display
+PASS stopped State Preview renders the steady detected state
+PASS local physics preview also excludes the player from socket occupancy
+PASS editor has no runtime errors
+PASS deadlock: two independent visitors retain one party
+PASS DEADLOCK shows three independently occupied receivers
+PASS all three DEADLOCK payloads have distinct fixed dock poses
+PASS all three DEADLOCK connection transitions have settled to green
+PASS deadlock: authored-start physical solve with both arrivals
+PASS DEADLOCK still finishes with all receivers live and both players arrived
+PASS DEADLOCK still finishes with all receivers live and both players arrived

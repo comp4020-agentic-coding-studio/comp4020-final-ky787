@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { SOUND_ASSET_COUNT } from '../src/audio/game-audio.ts';
 import { navigateMenu } from './menu-navigation.ts';
 /** Real keyboard/mouse C8 playthrough against the Node-served production build.
  * No teleports, input injection, or controller overrides in the main route.
@@ -507,7 +508,8 @@ async function uplinkRoute(cdp: Cdp) {
     await alignTo(cdp, 2860); await ropeReturn(cdp);
     check('UPLINK full retrieval route has no deaths', (await snap(cdp)).deaths === 0);
     const sound = (await snap(cdp)).audio;
-    check('rope jumps and the final transformation play decoded audio', sound.played.ropeJump >= 5 && sound.played.codePower > 0 && sound.played.door > 0 && sound.peak > 0);
+    check('rope jumps and the final transformation play decoded audio', sound.played.ropeJump >= 5 && sound.played.door === 1 && sound.peak > 0);
+    check('final door transformation coalesces the simultaneous code activation', (sound.played.codePower ?? 0) === 0);
 }
 async function ropeReturn(cdp: Cdp, testRecovery = false) {
     await key(cdp, 'keyDown', 'KeyA'); await tap(cdp, 'Space');
@@ -583,7 +585,7 @@ async function main() {
         await tap(cdp, 'Tab');
         check('My Levels is keyboard accessible inside Level Builder', await evaluate(cdp, 'document.activeElement.id === "my-levels"'));
         await click(cdp, '#back-main');
-        await waitFor(cdp, 'sound assets decode after a gesture', s => s.audio.loaded === 14);
+        await waitFor(cdp, 'sound assets decode after a gesture', s => s.audio.loaded === SOUND_ASSET_COUNT);
         check('all audio assets decode without errors', (await snap(cdp)).audio.state === 'running' && (await snap(cdp)).audio.failed.length === 0);
         await click(cdp, '[data-room="uplink"]');
         await waitFor(cdp, 'selected UPLINK', s => s.room === 'uplink');
