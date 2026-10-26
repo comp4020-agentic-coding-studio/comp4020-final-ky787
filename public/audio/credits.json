@@ -152,21 +152,21 @@
     },
     {
       "file": "switch-click.ogg",
-      "original": "Audio/switch_002.ogg",
+      "original": "Audio/toggle_001.ogg",
       "author": "Kenney",
       "source": "https://kenney.nl/assets/interface-sounds",
       "download": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip",
       "pack": "interface-sounds",
       "license": "CC0-1.0",
       "retrieved": "2026-10-26",
-      "sourceSha256": "6fc395be2ad1f99ce318a5d28f98fb76dbeb676d83a0b28239d8c1fb90736180",
+      "sourceSha256": "ca1d2dde5f0b286abac4f070e23edab8f30927c8a533665cdf2ac6492a415e49",
       "sourceArchiveSha256": "f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232",
-      "processing": "aformat=channel_layouts=mono,aresample=44100,atrim=end=0.18,highpass=f=80,lowpass=f=3000,afade=t=in:d=0.002,afade=t=out:st=0.12:d=0.06,volume=-7.727677dB; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.",
-      "targetPeakDbfs": -6,
-      "decodedPeakDbfs": -5.66,
-      "durationSeconds": 0.177098,
-      "sha256": "b0990c8119a9395137cc27b736b3b066f88f7f75df1601f1bf388d294a8b7e12",
-      "bytes": 4465
+      "processing": "aformat=channel_layouts=mono,aresample=44100,asetrate=28665,aresample=44100,atrim=end=0.20,highpass=f=100,lowpass=f=1400,lowpass=f=1400,afade=t=in:d=0.008,afade=t=out:st=0.12:d=0.08,volume=-6.039145dB; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.",
+      "targetPeakDbfs": -10,
+      "decodedPeakDbfs": -10.213,
+      "durationSeconds": 0.197098,
+      "sha256": "0af778cd7898d6ab68cc21d269639f2c0fda5a08ba15ca8e7f41f67bcd289bf0",
+      "bytes": 4540
     },
     {
       "file": "latch-confirm.ogg",
@@ -242,21 +242,55 @@
     },
     {
       "file": "room-complete.ogg",
-      "original": "Audio/8-Bit jingles/jingles_NES12.ogg",
+      "original": "Audio/confirmation_002.ogg",
       "author": "Kenney",
-      "source": "https://kenney.nl/assets/music-jingles",
-      "download": "https://kenney.nl/media/pages/assets/music-jingles/f37e530b9e-1677590399/kenney_music-jingles.zip",
-      "pack": "music-jingles",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "download": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip",
+      "pack": "interface-sounds",
       "license": "CC0-1.0",
       "retrieved": "2026-10-26",
-      "sourceSha256": "ac678f8435036f800f4b2244e6d6b929bfdd012640698ab9815b35b86bfbcd29",
-      "sourceArchiveSha256": "b729ba57959bd58793d2c5cafa348aaf2655d354f3da35ec4729e03ec77197b8",
-      "processing": "aformat=channel_layouts=mono,aresample=44100,highpass=f=60,lowpass=f=2800,afade=t=in:d=0.005,afade=t=out:st=0.76:d=0.09,volume=-4.390297dB; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.",
-      "targetPeakDbfs": -6,
-      "decodedPeakDbfs": -6.145,
-      "durationSeconds": 0.849388,
-      "sha256": "4a288c7d8167e6936b0e7a6f7f907008eeda31f319908acc5d7b94b9bf1511de",
-      "bytes": 11890
+      "sourceSha256": "33b17a9a9a2397c62b285c52c33a907fdffb476909c99e42dde603f6a7a8b12c",
+      "sourceArchiveSha256": "f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232",
+      "processing": "Cycle resampling and chord arrangement specified in arrangement and scripts/audio/build-sfx.py; aformat=channel_layouts=mono,aresample=44100,highpass=f=70,lowpass=f=1500,afade=t=in:d=0.015,afade=t=out:st=1.48:d=0.07,volume=-7.975043dB; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.",
+      "targetPeakDbfs": -8,
+      "decodedPeakDbfs": -8.027,
+      "durationSeconds": 1.55,
+      "sha256": "96de80a6cb5015c941eee0a51f76d7548f913d10492c8a8e5b359e78fb9e2ac8",
+      "bytes": 8824,
+      "arrangement": {
+        "method": "One-cycle resampling of the original CC0 tone; mild tanh saturation; simultaneous open-fifth/add9 chord; two quiet digital accents.",
+        "sourceCycleStartSample": 564.398561306618,
+        "sourceCycleEndSample": 601.9465315512846,
+        "chordFrequenciesHz": [
+          220,
+          330,
+          495
+        ],
+        "chordGains": [
+          0.63,
+          0.24,
+          0.13
+        ],
+        "durationSeconds": 1.55,
+        "attackSeconds": 0.055,
+        "releaseSeconds": 0.65,
+        "exponentialDecayPerSecond": 0.85,
+        "saturation": 1.15,
+        "accents": [
+          {
+            "offsetSeconds": 0.11,
+            "frequencyHz": 660,
+            "gain": 0.055,
+            "durationSeconds": 0.075
+          },
+          {
+            "offsetSeconds": 0.205,
+            "frequencyHz": 880,
+            "gain": 0.04,
+            "durationSeconds": 0.075
+          }
+        ]
+      }
     },
     {
       "file": "code-power.ogg",

@@ -1,0 +1,181 @@
+{
+  "date": "2026-10-26",
+  "baselineCommit": "9e3320736982389d47418db0aa19d5eacf3a6f0c",
+  "method": "SHA-256 of local bytes before and after the focused refinement. tutorial-relay was copied from baseline handshake before recording this manifest. Approved catalogue entries and gains also compared to baseline.",
+  "files": [
+    {
+      "file": "public/audio/door-open.ogg",
+      "before": "7d3af28ddd81187c3788b79129d053fd7064e181a7f45018c8018b5f1cb3536a",
+      "after": "7d3af28ddd81187c3788b79129d053fd7064e181a7f45018c8018b5f1cb3536a",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/crumble-break.ogg",
+      "before": "d69a1b25ba2058757da2a9b6a4e345d85d26accf80d8f03a6231dfda43ae71e0",
+      "after": "d69a1b25ba2058757da2a9b6a4e345d85d26accf80d8f03a6231dfda43ae71e0",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/landing.ogg",
+      "before": "d22c2f675cf8fa8454c0d420d17ccb04c211efce2426fcc106e36c4537855f16",
+      "after": "d22c2f675cf8fa8454c0d420d17ccb04c211efce2426fcc106e36c4537855f16",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/firewall-open.ogg",
+      "before": "64ed15deca96cf688a7091cbb3866ac109f5561b97dc0eec6931cc16e6283c88",
+      "after": "64ed15deca96cf688a7091cbb3866ac109f5561b97dc0eec6931cc16e6283c88",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/confirm.ogg",
+      "before": "6ff6f4eb094a54d9757c2f9d7a54e96a8e9934b79951d6388835c071ae13ad07",
+      "after": "6ff6f4eb094a54d9757c2f9d7a54e96a8e9934b79951d6388835c071ae13ad07",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/grapple-fire.ogg",
+      "before": "efa465fa2f8a98159a7b13e8552dcc40df78919b633ec89facdc0517c8c7ba59",
+      "after": "efa465fa2f8a98159a7b13e8552dcc40df78919b633ec89facdc0517c8c7ba59",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/switch-click.ogg",
+      "before": "b0990c8119a9395137cc27b736b3b066f88f7f75df1601f1bf388d294a8b7e12",
+      "after": "0af778cd7898d6ab68cc21d269639f2c0fda5a08ba15ca8e7f41f67bcd289bf0",
+      "unchanged": false
+    },
+    {
+      "file": "public/audio/grapple-attach.ogg",
+      "before": "6d8f48c38fe522b26937d5f9626dc80ccd6804f0adbc311a7e49011b90eeab34",
+      "after": "6d8f48c38fe522b26937d5f9626dc80ccd6804f0adbc311a7e49011b90eeab34",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/crumble-start.ogg",
+      "before": "88d2c5b2f1fede9f10dfa44850950516f2c701631a138efe8663c019a149d972",
+      "after": "88d2c5b2f1fede9f10dfa44850950516f2c701631a138efe8663c019a149d972",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/breakpoint-deploy.ogg",
+      "before": "ddfe545a3da1d95760001d1cd00a1cdf65e8099585a84e20eff50a45bf23b9a4",
+      "after": "ddfe545a3da1d95760001d1cd00a1cdf65e8099585a84e20eff50a45bf23b9a4",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/latch-confirm.ogg",
+      "before": "b097eb4334e28ff994630c066384848e45f5fb92b2b29f6ed4e3a199bbf953b0",
+      "after": "b097eb4334e28ff994630c066384848e45f5fb92b2b29f6ed4e3a199bbf953b0",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/checkpoint.ogg",
+      "before": "d5835552a092596cb52b453427ed265c19b03acfe76a12280b455f8eae834b81",
+      "after": "d5835552a092596cb52b453427ed265c19b03acfe76a12280b455f8eae834b81",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/breakpoint-confirm.ogg",
+      "before": "f973c526385eea642903b99ff04b9ba5472d0e480cfecd2c1b170d8c79b5364f",
+      "after": "f973c526385eea642903b99ff04b9ba5472d0e480cfecd2c1b170d8c79b5364f",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/teleport.ogg",
+      "before": "f58f0faaafe6f0fae582b95982b442bdeff606c43f9ec22004c03b55c95ab3b2",
+      "after": "f58f0faaafe6f0fae582b95982b442bdeff606c43f9ec22004c03b55c95ab3b2",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/relay-on.ogg",
+      "before": "6386ed2efde78513bdb365dbb03606bde4910d9f7904bb8f424e5c5f2cf16e04",
+      "after": "6386ed2efde78513bdb365dbb03606bde4910d9f7904bb8f424e5c5f2cf16e04",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/code-power.ogg",
+      "before": "245c755cb9f0e9910295befad5f653ef3e871dd0ada6d561c309e973045c27b8",
+      "after": "245c755cb9f0e9910295befad5f653ef3e871dd0ada6d561c309e973045c27b8",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/metal-touch.ogg",
+      "before": "4b88bbe677fa972dba77922a913cab39cfebff8fe8d683957db5c94477679806",
+      "after": "4b88bbe677fa972dba77922a913cab39cfebff8fe8d683957db5c94477679806",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/grapple-reel.ogg",
+      "before": "1102f8d58b122f83ab1282c492d2cb8c146044fb4c930648b6c48db407d08c94",
+      "after": "1102f8d58b122f83ab1282c492d2cb8c146044fb4c930648b6c48db407d08c94",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/room-complete.ogg",
+      "before": "4a288c7d8167e6936b0e7a6f7f907008eeda31f319908acc5d7b94b9bf1511de",
+      "after": "96de80a6cb5015c941eee0a51f76d7548f913d10492c8a8e5b359e78fb9e2ac8",
+      "unchanged": false
+    },
+    {
+      "file": "public/audio/lift-on.ogg",
+      "before": "1c219fbfd05a1506f43a00a906e7f06ffd4c759a32005fbc7247bf893848ea88",
+      "after": "1c219fbfd05a1506f43a00a906e7f06ffd4c759a32005fbc7247bf893848ea88",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/lift-hum.ogg",
+      "before": "16c184aaf81022c08d6028500438f8e3b1221658573540175243672ab4ddb18b",
+      "after": "16c184aaf81022c08d6028500438f8e3b1221658573540175243672ab4ddb18b",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/use-after-free.ogg",
+      "before": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "after": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/tutorial-relay.ogg",
+      "before": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "after": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/deadlock.ogg",
+      "before": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "after": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/menu.ogg",
+      "before": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "after": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/crossfeed-vault.ogg",
+      "before": "963e6c31a72405c8f0c1e63b7524b33398068d16fa50e2f593024ae6503f4062",
+      "after": "6615826a5e2a29d685a52e643ab55a6f732e082ea7c4bf3e5daa728a143e0886",
+      "unchanged": false
+    },
+    {
+      "file": "public/audio/music/race-condition.ogg",
+      "before": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "after": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/handshake.ogg",
+      "before": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "after": "71795cfc2d7970b27a4136f3c2621a85bc624056e7cd76a2ea5edcddfde1ad02",
+      "unchanged": false
+    },
+    {
+      "file": "src/audio/music-player.ts",
+      "before": "e9fc0340cdf48ff640d054d00c67b881c53f28b9bffcb79c9aae3f7bba642d9e",
+      "after": "e9fc0340cdf48ff640d054d00c67b881c53f28b9bffcb79c9aae3f7bba642d9e",
+      "unchanged": true
+    }
+  ]
+}

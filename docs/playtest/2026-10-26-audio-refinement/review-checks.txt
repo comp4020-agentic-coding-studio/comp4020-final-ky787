@@ -1,0 +1,24 @@
+PASS review has one player and fourteen labeled clip actions
+PASS review requires interaction and does not autoplay
+PASS review evidence link resolves: /docs/audio-selection.md
+PASS review evidence link resolves: /docs/playtest/2026-10-26-audio-refinement/manifest.json
+PASS review evidence link resolves: /docs/playtest/2026-10-26-audio-refinement/sfx-ab.html
+PASS review evidence link resolves: /docs/playtest/2026-10-26-audio-refinement/preservation.json
+PASS review evidence link resolves: /docs/playtest/2026-10-26-audio-refinement/README.md
+PASS gesture starts real review clip: handshake-old.ogg
+PASS gesture starts real review clip: handshake-old-seam.ogg
+PASS gesture starts real review clip: handshake-new.ogg
+PASS gesture starts real review clip: handshake-new-seam.ogg
+PASS gesture starts real review clip: handshake-alternate.ogg
+PASS gesture starts real review clip: handshake-alternate-seam.ogg
+PASS gesture starts real review clip: crossfeed-vault-old.ogg
+PASS gesture starts real review clip: crossfeed-vault-old-seam.ogg
+PASS gesture starts real review clip: crossfeed-vault-new.ogg
+PASS gesture starts real review clip: crossfeed-vault-new-seam.ogg
+PASS gesture starts real review clip: crossfeed-vault-alternate.ogg
+PASS gesture starts real review clip: crossfeed-vault-alternate-seam.ogg
+PASS gesture starts real review clip: toggle-ab.ogg
+PASS gesture starts real review clip: completion-ab.ogg
+PASS review fits 1440px
+PASS review fits 420px
+PASS no review JavaScript errors

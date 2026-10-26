@@ -1,0 +1,373 @@
+{
+  "pass": true,
+  "scope": "full-room campaign; real controls from authored starts",
+  "hash": "e05842d86169d80ec3d1b8f2b9de6a73ca1671fb30d0ec3784ad4f8efcb5cf06",
+  "failedStep": null,
+  "error": null,
+  "results": [
+    {
+      "label": "Authored initial state",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach central breakpoint",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Central breakpoint activates automatically from grounded walking",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner holds CROSSING",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber approaches the gap",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Attach to the near address bar",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Swing left across the recovery well",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Release first rope for transfer",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Transfer to far address bar",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Carry swing toward alcove",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Rope jump toward alcove",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Brake and land above alcove",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Settle on alcove floor",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach shared cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Pick up the shared payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Move to return launch",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Attach far address bar with payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Swing payload back to central bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Release far rope with payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Transfer payload swing to near address bar",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Cross back over bay edge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Rope jump back to bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Brake and land with the payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Clear bay edge before placing payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Set payload beside CROSSING",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Rest payload on ordinary CROSSING plate",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Both people leave CROSSING while cube keeps it powered",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Crossing remains live from the resting cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Recover shared cube for gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Carry cube again",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner powers LIFT after cube recovery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Enter powered lift",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Move from hover onto gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Land on permanent gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Bring payload below maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Stage payload away from LINK lever",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Return to LINK",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Enable reversible service link",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner leaves lift and enters lower relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner lands at service gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Holder approaches staged cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Hold payload beneath maintenance access",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber stands below held cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber jumps onto partner-held cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Settle on cube before upper jump",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Jump from held cube toward maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Land on maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach maintenance terminal",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Commit MAINTENANCE COMPLETE",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Exit still needs payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Holder returns cube through upper relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Holder brakes in central bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber descends safely from maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber uses service relay to regroup",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber lands in bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Place payload beside final socket",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Drop cube into live PAYLOAD socket",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "First physical exit arrival",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Second physical exit arrival",
+      "pass": true,
+      "campaignVictory": true
+    }
+  ],
+  "final": {
+    "host": {
+      "controls": {
+        "draft:link": true,
+        "draft:maintenance": true
+      },
+      "plates": {
+        "draft:crossing": false,
+        "draft:liftPlate": false,
+        "draft:exitSocket": true
+      },
+      "exitUnlocked": true,
+      "completed": true,
+      "acceptedParty": {
+        "party": {
+          "phase": "victory",
+          "completedLevels": [
+            "handshake"
+          ]
+        },
+        "level": "handshake",
+        "connected": [
+          true,
+          true
+        ],
+        "checkpoint": "reunion",
+        "exitUnlocked": true,
+        "reachedExit": [
+          true,
+          true
+        ],
+        "completed": true
+      }
+    },
+    "partner": {
+      "controls": {
+        "draft:link": true,
+        "draft:maintenance": true
+      },
+      "plates": {
+        "draft:crossing": false,
+        "draft:liftPlate": false,
+        "draft:exitSocket": true
+      },
+      "exitUnlocked": true,
+      "completed": true,
+      "acceptedParty": {
+        "party": {
+          "phase": "victory",
+          "completedLevels": [
+            "handshake"
+          ]
+        },
+        "level": "handshake",
+        "connected": [
+          true,
+          true
+        ],
+        "checkpoint": "reunion",
+        "exitUnlocked": true,
+        "reachedExit": [
+          true,
+          true
+        ],
+        "completed": true
+      }
+    }
+  },
+  "reportFormat": "Condensed physical route report: all assertion labels/results plus final accepted state; repetitive per-step physics snapshots omitted."
+}

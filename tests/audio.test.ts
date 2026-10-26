@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, mkdtemp, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { GameAudio, SOUNDS, SOUND_ASSET_COUNT, MACHINERY_CUES, AUDIO_STORAGE_KEY } from '../src/audio/game-audio.ts';
+import { GameAudio, SOUNDS, SOUND_ASSET_COUNT, MACHINERY_CUES, AUDIO_STORAGE_KEY, COMPLETION_DUCK_MS } from '../src/audio/game-audio.ts';
 import { AudioPresentation, liftProximity } from '../src/slice/audio-presentation.ts';
 import { PuzzleWorld } from '../src/slice/world.ts';
 import { roomById } from '../src/slice/rooms.ts';
@@ -187,7 +187,11 @@ it('ships every credited audio file with exact hashes, real Ogg bytes and an aud
                 expect(asset.sourceArchiveSha256).toBe(credits.sourcePacks[asset.pack].archiveSha256);
                 expect(asset.processing).toContain('lowpass=');
                 expect(asset.decodedPeakDbfs).toBeLessThan(-5.5);
-                expect(asset.durationSeconds).toBeLessThan(1.2);
+                expect(asset.durationSeconds).toBeLessThan(asset.file === SOUNDS.complete.file ? 1.8 : 1.2);
+                if (asset.file === SOUNDS.complete.file) {
+                    expect(COMPLETION_DUCK_MS).toBeGreaterThanOrEqual(asset.durationSeconds * 1000);
+                    expect(COMPLETION_DUCK_MS).toBeLessThanOrEqual(asset.durationSeconds * 1000 + 300);
+                }
             }
             const response = await fetch(`http://127.0.0.1:${port}/audio/${asset.file}`);
             expect(response.status).toBe(200); expect(response.headers.get('content-type')).toBe('audio/ogg');

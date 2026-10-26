@@ -15,7 +15,7 @@ import { ROOMS, roomById } from './rooms.ts';
 import { freshProgress, tutorialProgress, restartRoomProgress } from './progress.ts';
 import { ProgressStore } from './storage.ts';
 import { connectionPowered } from './connections.ts';
-import { GameAudio } from '../audio/game-audio.ts';
+import { GameAudio, COMPLETION_DUCK_MS } from '../audio/game-audio.ts';
 import { MusicPlayer } from '../audio/music-player.ts';
 import { musicSceneForRoom } from '../audio/music-catalogue.ts';
 import { AudioPresentation } from './audio-presentation.ts';
@@ -601,7 +601,7 @@ export class SliceGame {
         });
     }
     private completionSound(): void {
-        this.completionMusicUntil = performance.now() + 3000;
+        this.completionMusicUntil = performance.now() + COMPLETION_DUCK_MS;
         this.music.setDucked('complete');
         this.audio.play('complete');
     }
@@ -612,7 +612,7 @@ export class SliceGame {
         const solo = !this.coopMode && (['playing', 'pause', 'victory'].includes(this.view)
             || this.view === 'settings' && this.settingsReturn === 'pause');
         this.music.setScene(chamber ? musicSceneForRoom(room.level) : solo ? musicSceneForRoom(this.world.room.id) : 'menu');
-        this.music.setDucked(this.view === 'victory' || performance.now() < this.completionMusicUntil ? 'complete'
+        this.music.setDucked(performance.now() < this.completionMusicUntil ? 'complete'
             : (solo || chamber) && !this.started ? 'pause' : solo ? 'tutorial' : 'none');
     }
     private resumeRoom(): void {

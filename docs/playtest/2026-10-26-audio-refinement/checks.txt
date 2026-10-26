@@ -1,0 +1,42 @@
+PASS before interaction neither music nor SFX start
+PASS legacy Effects preference survives with quiet independent Music default
+PASS music plays after real character setup without joining the SFX pool
+PASS zero Effects volume keeps Music audible
+PASS zero Music volume suspends both streaming decks
+PASS global Sound off immediately silences both paths
+PASS sound controls fit 1024×768
+PASS sound controls fit 420×800
+PASS reload retains independent levels and mute state
+PASS reloaded page still waits for a new gesture
+PASS PRESSURE retains the quiet menu recording
+PASS lobby retains the menu theme
+PASS host streams the selected Handshake recording
+PASS guest streams the selected Handshake recording
+PASS handshake native loop preserves one deck without new loads, plays or crossfades
+PASS handshake: two independent visitors retain one party
+PASS handshake: authored-start physical solve with both arrivals
+PASS one completion stinger and quiet victory music after an actual two-player solve
+PASS victory returns to its pause mix after the short stinger without reloading or replaying
+PASS crossfeed-vault has its own streamed track and ordinary replication never reloads it
+PASS host streams the selected Crossfeed Vault recording
+PASS guest streams the selected Crossfeed Vault recording
+PASS crossfeed-vault native loop preserves one deck without new loads, plays or crossfades
+PASS race-condition has its own streamed track and ordinary replication never reloads it
+PASS deadlock has its own streamed track and ordinary replication never reloads it
+PASS use-after-free has its own streamed track and ordinary replication never reloads it
+PASS reconnect preserves stream identity and playback position
+PASS window blur pauses every music deck and all effects
+PASS focus resumes the same track position
+PASS hidden document suspends streaming and effects
+PASS persisted pagehide suspends rather than creating replacement players
+PASS persisted page resume retains only the original two players
+PASS menu native loop preserves one deck without new loads, plays or crossfades
+PASS SWITCH retains the quiet menu recording
+PASS the real SWITCH lever begins off
+PASS ordinary lever on plays the electronic switch without latch or checkpoint cues
+PASS ordinary lever off plays the electronic switch without latch or checkpoint cues
+PASS relay retains the original quiet solo recording
+PASS uplink retains the original quiet solo recording
+PASS failed SFX and music downloads never block game input
+PASS browser audio loads without runtime or media failures
+PASS browser audio loads without runtime or media failures

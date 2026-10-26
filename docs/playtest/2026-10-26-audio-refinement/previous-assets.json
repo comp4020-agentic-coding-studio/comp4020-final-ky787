@@ -1,0 +1,79 @@
+{
+  "recordedAt": "2026-10-26",
+  "assets": [
+    {
+      "file": "handshake.ogg",
+      "scene": "handshake",
+      "title": "Celestial Harmony",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/celestial-harmony",
+      "download": "https://opengameart.org/sites/default/files/celestial_harmony.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "3f3b8831623494863deb6a0cffb51cf4214575da657fd6e57648d84c77487629",
+      "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "bytes": 2414397,
+      "duration": 155.076916,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 8385785,
+        "trimStartSample": 651323,
+        "trimEndSampleExclusive": 7815877,
+        "cyclicCrossfadeSamples": 325662,
+        "inferredTempoBpm": 130,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -11.22,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 6838892
+      },
+      "integratedLufs": -23.07,
+      "truePeakDbtp": -10.49,
+      "loudnessRangeLu": 4.4,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00333343,
+        "firstQuarterSecondRmsDb": -24.248,
+        "lastQuarterSecondRmsDb": -27.521
+      }
+    },
+    {
+      "file": "crossfeed-vault.ogg",
+      "scene": "crossfeed-vault",
+      "title": "Stop For A Moment",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/stop-for-a-moment",
+      "download": "https://opengameart.org/sites/default/files/stop_for_a_moment.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "00d897231c27894ced10f4542940c354a4abb7e99924b71fbbb3d50addf9546b",
+      "sha256": "963e6c31a72405c8f0c1e63b7524b33398068d16fa50e2f593024ae6503f4062",
+      "bytes": 2520820,
+      "duration": 169.846145,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 8147687,
+        "trimStartSample": 0,
+        "trimEndSampleExclusive": 7815877,
+        "cyclicCrossfadeSamples": 325662,
+        "inferredTempoBpm": 130,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -11.95,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 7490215
+      },
+      "integratedLufs": -23.03,
+      "truePeakDbtp": -10.2,
+      "loudnessRangeLu": 3.6,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.0055212,
+        "firstQuarterSecondRmsDb": -27.434,
+        "lastQuarterSecondRmsDb": -27.805
+      }
+    }
+  ]
+}

@@ -38,12 +38,14 @@ function setup() {
 }
 
 describe('streaming music scenes', () => {
-    it('contains six local tracks and keeps tutorial/controller selection separate', () => {
-        expect(Object.keys(MUSIC_TRACKS)).toHaveLength(6);
+    it('contains seven local tracks and keeps solo tutorial music separate from co-op', () => {
+        expect(Object.keys(MUSIC_TRACKS)).toHaveLength(7);
         expect(musicSceneForRoom('pressure')).toBe('menu');
         expect(musicSceneForRoom('switch')).toBe('menu');
-        expect(musicSceneForRoom('relay')).toBe('handshake');
-        expect(musicSceneForRoom('uplink')).toBe('handshake');
+        expect(musicSceneForRoom('relay')).toBe('tutorial-relay');
+        expect(musicSceneForRoom('uplink')).toBe('tutorial-relay');
+        expect(musicSceneForRoom('handshake')).toBe('handshake');
+        expect(musicSceneForRoom('crossfeed-vault')).toBe('crossfeed-vault');
         expect(musicSceneForRoom('race-condition')).toBe('race-condition');
         expect(musicSceneForRoom('__proto__')).toBe('menu');
     });

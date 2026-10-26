@@ -49,75 +49,98 @@
     {
       "file": "handshake.ogg",
       "scene": "handshake",
-      "title": "Celestial Harmony",
-      "author": "vitalezzz",
-      "source": "https://opengameart.org/content/celestial-harmony",
-      "download": "https://opengameart.org/sites/default/files/celestial_harmony.flac",
+      "title": "Tower Defense Theme",
+      "author": "DST (Deceased Superior Technician)",
+      "source": "https://opengameart.org/content/tower-defense-theme",
+      "download": "https://opengameart.org/sites/default/files/DST-TowerDefenseTheme_1.mp3",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceSha256": "3f3b8831623494863deb6a0cffb51cf4214575da657fd6e57648d84c77487629",
-      "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
-      "bytes": 2414397,
-      "duration": 155.076916,
-      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "sourceSha256": "07cc9cd797c8ea6738b1bd740526f2610fd2ec0115774294ebda3a5ed8e62a30",
+      "sha256": "71795cfc2d7970b27a4136f3c2621a85bc624056e7cd76a2ea5edcddfde1ad02",
+      "bytes": 2214254,
+      "duration": 147.69229,
+      "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
       "edits": {
-        "sourceDecodedSamples": 8385785,
-        "trimStartSample": 651323,
-        "trimEndSampleExclusive": 7815877,
+        "sourceDecodedSamples": 8794368,
+        "trimStartSample": 1303751,
+        "trimEndSampleExclusive": 8142643,
         "cyclicCrossfadeSamples": 325662,
-        "inferredTempoBpm": 130,
+        "sourceTempoBpm": 130,
+        "tempoEvidence": "Author MP3 TBPM tag",
+        "mp3StartOffsetSamples": 1105,
         "boundaryDeclickSamplesPerSide": 128,
         "filter": "highpass=f=28,lowpass=f=14000",
-        "constantGainDb": -11.22,
+        "constantGainDb": -10.33,
         "dynamicCompression": false,
         "finalBoundaryDeclickSamplesPerSide": 128,
-        "encodedSamples": 6838892
+        "encodedSamples": 6513230
       },
-      "integratedLufs": -23.07,
-      "truePeakDbtp": -10.49,
-      "loudnessRangeLu": 4.4,
+      "integratedLufs": -23.04,
+      "truePeakDbtp": -7.94,
+      "loudnessRangeLu": 4.6,
       "loopAnalysis": {
         "longestSilenceBelowMinus60DbSeconds": 0.0,
-        "decodedBoundaryJump": 0.00333343,
-        "firstQuarterSecondRmsDb": -24.248,
-        "lastQuarterSecondRmsDb": -27.521
+        "decodedBoundaryJump": 0.00011385,
+        "firstQuarterSecondRmsDb": -24.973,
+        "lastQuarterSecondRmsDb": -33.383
+      },
+      "percussiveAnalysis": {
+        "file": "handshake.ogg",
+        "duration": 147.692,
+        "bassAttackRate": 3.62,
+        "highAttackRate": 4.12,
+        "bass95thGap": 0.464,
+        "high95thGap": 0.345,
+        "percussiveEnergy": 0.305,
+        "continuousPulseWindowPercent": 100.0
       }
     },
     {
       "file": "crossfeed-vault.ogg",
       "scene": "crossfeed-vault",
-      "title": "Stop For A Moment",
-      "author": "vitalezzz",
-      "source": "https://opengameart.org/content/stop-for-a-moment",
-      "download": "https://opengameart.org/sites/default/files/stop_for_a_moment.flac",
+      "title": "Jumping Cyborg",
+      "author": "Alexander Ehlers (tricksntraps)",
+      "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
+      "download": "https://opengameart.org/sites/default/files/jumping_cyborg_110bpm.ogg",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceSha256": "00d897231c27894ced10f4542940c354a4abb7e99924b71fbbb3d50addf9546b",
-      "sha256": "963e6c31a72405c8f0c1e63b7524b33398068d16fa50e2f593024ae6503f4062",
-      "bytes": 2520820,
-      "duration": 169.846145,
-      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "sourceSha256": "7d768754fc82f5b41a6a33c682d3572b6824f3b69d95d080f6386c7fd2a25696",
+      "sha256": "6615826a5e2a29d685a52e643ab55a6f732e082ea7c4bf3e5daa728a143e0886",
+      "bytes": 1912829,
+      "duration": 122.181814,
+      "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
       "edits": {
-        "sourceDecodedSamples": 8147687,
-        "trimStartSample": 0,
-        "trimEndSampleExclusive": 7815877,
-        "cyclicCrossfadeSamples": 325662,
-        "inferredTempoBpm": 130,
+        "sourceDecodedSamples": 11642651,
+        "trimStartSample": 5003345,
+        "trimEndSampleExclusive": 10776436,
+        "cyclicCrossfadeSamples": 384873,
+        "sourceTempoBpm": 110,
+        "tempoEvidence": "Author file name jumping_cyborg_110bpm.ogg",
         "boundaryDeclickSamplesPerSide": 128,
         "filter": "highpass=f=28,lowpass=f=14000",
-        "constantGainDb": -11.95,
+        "constantGainDb": -14.25,
         "dynamicCompression": false,
         "finalBoundaryDeclickSamplesPerSide": 128,
-        "encodedSamples": 7490215
+        "encodedSamples": 5388218
       },
-      "integratedLufs": -23.03,
-      "truePeakDbtp": -10.2,
-      "loudnessRangeLu": 3.6,
+      "integratedLufs": -23.06,
+      "truePeakDbtp": -10.14,
+      "loudnessRangeLu": 1.5,
       "loopAnalysis": {
         "longestSilenceBelowMinus60DbSeconds": 0.0,
-        "decodedBoundaryJump": 0.0055212,
-        "firstQuarterSecondRmsDb": -27.434,
-        "lastQuarterSecondRmsDb": -27.805
+        "decodedBoundaryJump": 0.00182329,
+        "firstQuarterSecondRmsDb": -23.12,
+        "lastQuarterSecondRmsDb": -23.885
+      },
+      "percussiveAnalysis": {
+        "file": "crossfeed-vault.ogg",
+        "duration": 122.182,
+        "bassAttackRate": 2.31,
+        "highAttackRate": 3.45,
+        "bass95thGap": 0.557,
+        "high95thGap": 0.418,
+        "percussiveEnergy": 0.252,
+        "continuousPulseWindowPercent": 100.0
       }
     },
     {
@@ -242,7 +265,64 @@
         "firstQuarterSecondRmsDb": -31.236,
         "lastQuarterSecondRmsDb": -32.289
       }
+    },
+    {
+      "file": "tutorial-relay.ogg",
+      "scene": "tutorial-relay",
+      "title": "Celestial Harmony",
+      "author": "vitalezzz",
+      "source": "https://opengameart.org/content/celestial-harmony",
+      "download": "https://opengameart.org/sites/default/files/celestial_harmony.flac",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "3f3b8831623494863deb6a0cffb51cf4214575da657fd6e57648d84c77487629",
+      "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "bytes": 2414397,
+      "duration": 155.076916,
+      "processing": "Authored-source loop arrangement/trim described in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 8385785,
+        "trimStartSample": 651323,
+        "trimEndSampleExclusive": 7815877,
+        "cyclicCrossfadeSamples": 325662,
+        "inferredTempoBpm": 130,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": -11.22,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 6838892
+      },
+      "integratedLufs": -23.07,
+      "truePeakDbtp": -10.49,
+      "loudnessRangeLu": 4.4,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00333343,
+        "firstQuarterSecondRmsDb": -24.248,
+        "lastQuarterSecondRmsDb": -27.521
+      },
+      "preservedFrom": {
+        "scene": "handshake",
+        "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+        "reason": "Human feedback: retain the original HANDSHAKE music for tutorial RELAY without re-encoding."
+      }
     }
   ],
-  "totalBytes": 13158428
+  "totalBytes": 14764691,
+  "feedbackRevision": {
+    "date": "2026-10-26",
+    "replacedScenes": [
+      "handshake",
+      "crossfeed-vault"
+    ],
+    "preservedSha256": {
+      "menu": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "race-condition": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "deadlock": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "use-after-free": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "tutorial-relay": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab"
+    },
+    "previousAssets": "docs/playtest/2026-10-26-audio-refinement/previous-assets.json"
+  }
 }

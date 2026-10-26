@@ -1,5 +1,20 @@
 # Binary Ninja soundtrack selection — 2026-10-26
 
+**Current revision: human feedback, 2026-10-26.** Seven runtime files now total
+**14,764,691 bytes (14.76 MB)**. HANDSHAKE uses DST's *Tower Defense Theme*;
+CROSSFEED VAULT uses Alexander Ehlers's *Jumping Cyborg*. The former HANDSHAKE
+file is preserved byte for byte as `tutorial-relay.ogg`. Menu, RACE CONDITION,
+DEADLOCK and USE AFTER FREE retain their approved bytes. The [dated refinement
+record below](#human-feedback-refinement--2026-10-26) is the current selection
+and preparation contract. [Compare the old/new/alternate clips](playtest/2026-10-26-audio-refinement/index.html).
+
+## Historical initial selection (superseded for HANDSHAKE and CROSSFEED)
+
+The following initial six-track record and its montage are retained as history.
+Its totals, two replaced scene assignments, runtime hashes and command-line
+options describe the initial export; use the dated refinement section for the
+current seven-track catalogue and targeted generator command.
+
 Six local electronic music loops accompany the title screen and the five co-op
 chambers. The runtime files total **13,158,428 bytes (13.16 MB)**. All shipped
 sources were published under **CC0 1.0** on their original OpenGameArt submission
@@ -155,3 +170,154 @@ then spend a few minutes in each real chamber with sound effects and voice
 conversation. Review the cue-to-music balance at the default slider setting,
 confirm each loop seam is unobtrusive, and compare menu music with the tutorial's
 ducked mix. The agent has not represented those subjective checks as completed.
+
+## Human feedback refinement — 2026-10-26
+
+Human playtesting approved the menu and the RACE CONDITION, DEADLOCK and USE
+AFTER FREE choices. The first two co-op tracks needed a more continuous
+**drum/bass groove**: accessible techno for HANDSHAKE and a stronger mid-speed
+pulse for CROSSFEED VAULT. The original HANDSHAKE track fits tutorial RELAY and
+is retained there unchanged. This revision changes those two co-op recordings
+only. It does not infer that genre labels or a higher BPM by themselves satisfy
+the feedback.
+
+### Selection evidence and its limits
+
+Seven additional original-source CC0 candidates from five credited artists were
+downloaded and decoded, beyond the original vitalezzz selections. Original
+submission pages, linked downloads and license declarations were checked on
+**2026-10-26**. [Candidate analysis](playtest/2026-10-26-audio-refinement/candidate-analysis.json)
+records full download hashes and each eight-second window's measurements.
+
+The analysis separates likely transient energy from sustained energy with a
+median-filter harmonic/percussive mask, then counts positive envelope attacks
+in 35–180 Hz and 2–9 kHz bands. A complete eight-second window passes the pulse
+continuity proxy when it has at least eight low-band and twelve high-band
+attacks. The table reports the whole original, before scene edits. This method
+can count synth transients as well as drums. It is **not** source separation,
+instrument recognition, a measure of musical quality, or a substitute for
+listening. In particular, the human-approved Algate has a lower proxy value than
+many candidates; larger numbers are not automatically better music.
+
+| Candidate and author | Percussive energy fraction | Pulse-continuous windows | Decision from structure and source description |
+| --- | ---: | ---: | --- |
+| [Tower Defense Theme](https://opengameart.org/content/tower-defense-theme), DST / Deceased Superior Technician | 0.324 | 100% | **HANDSHAKE.** Original describes a game loop and mellow techno. Its embedded 130 BPM tag supports bar-aligned editing; sustained attacks throughout and a longer changing arrangement support the requested accessible techno direction. Use the central body, rather than its sparse opening/outro. |
+| [Kuia](https://opengameart.org/content/kuia), James Gargette / cinameng | 0.595 | 100% | **HANDSHAKE alternate.** Original identifies lo-fi techno; especially strong, regular transient energy. Its 47-second native cycle is shorter and offers less structural change, so it remains a review alternative. |
+| [Return of Tower Defense Theme](https://opengameart.org/content/return-of-tower-defense-theme), DST | 0.205 | 100% | Another viable long techno loop; less transient-dominant than the selected DST recording. |
+| [Jumping Cyborg](https://opengameart.org/content/t-t-free-cyberpunk-pack-2), Alexander Ehlers / tricksntraps | 0.279 | 90.9% | **CROSSFEED VAULT.** Artist filename specifies 110 BPM. Select the sustained later passage, avoiding the low-band breakdown around 96–112 s and the ending fade. Stronger relative transient energy than the retired track without relying on a faster tempo. |
+| [New Factory](https://opengameart.org/content/t-t-free-cyberpunk-pack-2), Alexander Ehlers / tricksntraps | 0.357 | 93.8% | **CROSSFEED alternate.** 129 BPM in the original filename; very regular high-band attacks. Review edit excludes the bass-light passage around 32–40 s and ending fade. It is faster and the retained passage shorter than the selected 110 BPM recording. |
+| [Technological Messup](https://opengameart.org/content/technological-messup), Centurion_of_war | 0.329 | 100% | Viable loop, but low-band 95th-percentile attack gap is 0.755 s versus 0.546 s for Jumping Cyborg; the creator's combat/boss framing is a less direct fit for the intended mid-speed puzzle direction. |
+| [City Loop](https://opengameart.org/content/city-loop-0), wipics | 0.213 | 100% | Viable upbeat electronic alternative; its 56-second cycle and less transient-dominant structure offer less benefit for this specific revision. |
+
+The retired HANDSHAKE measured **0.106 / 84.2%** and retired CROSSFEED
+**0.176 / 95.2%** under the same whole-file proxy. The selected edits must retain
+continuous low/high attacks after trimming; those final-file measurements are
+recorded in the review manifest and runtime catalogue. The intended increase is
+in sustained rhythm prominence, not a simple BPM increase.
+
+The **final decoded HANDSHAKE edit** measures 0.305 transient energy and **100%**
+pulse-continuous complete windows; **final CROSSFEED** measures 0.252 and **100%**.
+These are relative-energy and continuity improvements over the retired files,
+with no claim that the proxy establishes subjective groove quality.
+
+No acoustic-perception facility became available during this refinement. The
+agent has **not** claimed to hear, prefer or subjectively approve these new
+tracks. The choices remain a structural recommendation shaped by human feedback.
+The supplied comparisons make the remaining listening judgment concrete.
+
+### Current runtime edits and provenance
+
+All seven runtime files remain stereo 44.1 kHz Ogg Vorbis. Common mastering for
+the two replacements is unchanged: 28 Hz high-pass, 14 kHz low-pass, constant
+gain to approximately −23 LUFS, 128-sample cyclic de-click on each side before
+and after filtering, Vorbis quality 4. No new notes, tempo changes or dynamic
+compression were introduced.
+
+| Runtime file | Recording | Duration | LUFS-I | True peak | Bytes |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `menu.ogg` | Claimed by the Void — preserved | 195.000 s | -23.06 | -11.84 dBTP | 2,808,275 |
+| `handshake.ogg` | Tower Defense Theme — new | 147.692 s | -23.04 | -7.94 dBTP | 2,214,254 |
+| `crossfeed-vault.ogg` | Jumping Cyborg — new | 122.182 s | -23.06 | -10.14 dBTP | 1,912,829 |
+| `race-condition.ogg` | Hyperton — preserved | 96.000 s | -23.01 | -9.29 dBTP | 1,566,283 |
+| `deadlock.ogg` | Algate — preserved | 120.945 s | -22.99 | -8.38 dBTP | 1,608,353 |
+| `use-after-free.ogg` | Neural Malfunction — preserved | 152.920 s | -23.11 | -9.11 dBTP | 2,240,300 |
+| `tutorial-relay.ogg` | Celestial Harmony — exact former HANDSHAKE | 155.077 s | -23.07 | -10.49 dBTP | 2,414,397 |
+
+**Total: 14,764,691 bytes**, below the existing 18 MB limit. The two new loops
+are extended 148/122-second passages, not short drum fragments repeated to
+inflate their durations.
+
+- HANDSHAKE takes source samples `[1303751, 8142643)` and overlaps 325,662
+  samples at the circular seam. These are bars 16–100 at the embedded 130 BPM,
+  with a 1,105-sample MP3 start offset and a four-bar overlap. Result: 6,513,230
+  samples. Constant gain: −10.33 dB.
+- CROSSFEED takes source samples `[5003345, 10776436)` (approximately
+  113.455–244.364 s) and overlaps 384,873 samples, four bars at the supplied
+  110 BPM. Result: 5,388,218 samples. Constant gain: −14.25 dB.
+- Tutorial RELAY is a byte-for-byte file copy of the old HANDSHAKE, with its
+  full original source/processing/hash metadata preserved under the new scene.
+  The original embedded title is deliberately retained too; there is no
+  re-encoding just to rename that tag.
+
+| Role | Original download SHA-256 | Exact download |
+| --- | --- | --- |
+| New HANDSHAKE | `07cc9cd797c8ea6738b1bd740526f2610fd2ec0115774294ebda3a5ed8e62a30` | [DST-TowerDefenseTheme_1.mp3](https://opengameart.org/sites/default/files/DST-TowerDefenseTheme_1.mp3) |
+| New CROSSFEED | `7d768754fc82f5b41a6a33c682d3572b6824f3b69d95d080f6386c7fd2a25696` | [jumping_cyborg_110bpm.ogg](https://opengameart.org/sites/default/files/jumping_cyborg_110bpm.ogg) |
+| HANDSHAKE alternate | `11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e` | [kuia.mp3](https://opengameart.org/sites/default/files/kuia.mp3) |
+| CROSSFEED alternate | `3365dd3d25697a54e843678d75f49732cd0bc88bfd3ccb574b39f0ed65fa7291` | [new_factory_129bpm_0.ogg](https://opengameart.org/sites/default/files/new_factory_129bpm_0.ogg) |
+
+Each original page explicitly selects [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The Cyberpunk pack credits Alexander Ehlers, Kuia credits James Gargette, and
+the DST MP3 embeds the expanded artist name Deceased Superior Technician. Those
+credits and provenance remain even though CC0 does not require attribution.
+Original downloads stay in the external cache, outside the shipped bundle.
+
+| Runtime verification | SHA-256 |
+| --- | --- |
+| New HANDSHAKE | `71795cfc2d7970b27a4136f3c2621a85bc624056e7cd76a2ea5edcddfde1ad02` |
+| New CROSSFEED | `6615826a5e2a29d685a52e643ab55a6f732e082ea7c4bf3e5daa728a143e0886` |
+| Tutorial RELAY = old HANDSHAKE | `06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab` |
+
+The four approved hashes remain the same as in the historical table. Their
+files and complete metadata entries are preserved, not regenerated. Both new
+OGGs have zero 100 ms windows below −60 dBFS. Their decoded last/first sample
+jumps are 0.000114 and 0.001823 full-scale respectively. Two runs using the
+recorded FFmpeg version produced identical replacement hashes. These checks
+cover file integrity, gaps and discontinuities; humans should judge the actual
+musical seam using the preview controls.
+
+### Targeted reproduction and A/B listening
+
+The current generator requires Python 3, NumPy, SciPy and FFmpeg/ffprobe:
+
+```sh
+python3 scripts/prepare-music.py
+```
+
+Its default rebuilds **only HANDSHAKE and CROSSFEED**, then the review excerpts.
+It validates hard-pinned hashes for the approved four and preserved tutorial
+before and after processing, and verifies their metadata remains unchanged.
+It will copy the old HANDSHAKE to tutorial RELAY only during an initial
+migration when the known old bytes still exist; otherwise it asks for the
+committed preserved file. It never recreates approved tracks. `--skip-review`
+limits the command to the two runtime replacements. `--cache`, `--output` (an
+existing catalogue with approved assets) and `--review-dir` are supported;
+the old `--review` montage option belongs only to the historical export.
+
+The [listening page](playtest/2026-10-26-audio-refinement/index.html) offers old,
+new and alternate for each chamber. Every body clip is **24 seconds**, and every
+seam clip is **four seconds from the end followed by four from the start** of
+its corresponding full loop. Each clip is independently normalized to about
+−23 LUFS, with 15 ms start/end fades only at the outer preview boundaries.
+There is no fade inserted at the middle of the seam demonstration. Full source
+or edited-loop positions, normalization gain, final measured loudness, licenses,
+hashes and per-window pulse analyses are in the
+[review manifest](playtest/2026-10-26-audio-refinement/manifest.json).
+
+The old CROSSFEED baseline is reconstructed only in a temporary directory and
+its full encoded SHA is checked against the retired asset. The old HANDSHAKE
+baseline reads the unchanged tutorial file. The Kuia alternative retains the
+author-supplied short loop; the New Factory alternative uses bars 24–68 at
+129 BPM with a four-bar cyclic overlap (74.419 s). Neither alternate ships in
+the runtime music directory. [Original metadata for the retired pair](playtest/2026-10-26-audio-refinement/previous-assets.json)
+remains available, and the historical six-track montage is not overwritten.

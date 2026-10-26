@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { onboardNinja } from './character-onboarding.ts';
 import { campaignDraftRoute } from './campaign-draft-route.ts';
-import { AUDIO_STORAGE_KEY, SOUND_ASSET_COUNT } from '../src/audio/game-audio.ts';
+import { AUDIO_STORAGE_KEY, COMPLETION_DUCK_MS, SOUND_ASSET_COUNT } from '../src/audio/game-audio.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? '/tmp/bn-audio-shots', internalLabs: false, onboarding: false });
 const { check, click, snapshot, wait, sleep, shot } = h;
@@ -24,6 +24,18 @@ async function slider(p: Cdp, id: string, percent: number) {
 }
 async function music(p: Cdp, scene: string) {
     return wait(p, `${scene} streams and fades in`, s => s.music.scene === scene && s.music.decks.some(d => d.scene === scene && !d.paused && d.readyState >= 2 && d.volume > 0 && d.currentTime > 0) && !s.music.crossfading, 20000);
+}
+const playingFile = (s: GameSnapshot, file: string) => s.music.decks.some(d => d.scene === s.music.scene && !d.paused
+    && d.readyState >= 2 && d.volume > 0 && d.currentTime > 0 && new URL(d.src).pathname === `/audio/music/${file}`);
+async function nativeLoop(p: Cdp, scene: string) {
+    const before = await music(p, scene);
+    // Seek media only; actual native playback must cross the authored file boundary.
+    await p.read("(()=>{const m=binaryNinja.music,d=m.decks.find(d=>d.scene===m.scene&&!d.audio.paused);d.audio.currentTime=d.audio.duration-2;})()");
+    const wrapped = await wait(p, `${scene} wraps at its authored duration`, s => s.music.loops > before.music.loops && audible(s) && !s.music.crossfading, 15000);
+    check(`${scene} native loop preserves one deck without new loads, plays or crossfades`, current(wrapped) < 8
+        && totalLoads(wrapped) === totalLoads(before) && wrapped.music.crossfades === before.music.crossfades
+        && wrapped.music.decks.every((d, i) => d.starts === before.music.decks[i].starts)
+        && wrapped.music.decks.filter(d => !d.paused).length === 1);
 }
 try {
     const url = await h.startServer(), debug = await h.launch();
@@ -57,6 +69,7 @@ try {
     check('reloaded page still waits for a new gesture', !(await snapshot(a)).music.unlocked);
     await click(a, '#tutorial'); if ((await snapshot(a)).overviewVisible) await click(a, '#start-room');
     await wait(a, 'quiet tutorial', s => s.started && audible(s) && s.music.duck === 'tutorial' && s.music.duckGain <= .39);
+    check('PRESSURE retains the quiet menu recording', (await snapshot(a)).room === 'pressure' && playingFile(await snapshot(a), 'menu.ogg'));
     await click(a, '#pause'); await wait(a, 'tutorial pause ducks without game effects', s => s.music.duck === 'pause' && s.music.duckGain < .3 && !s.audio.active && s.audio.voices === 0);
     await a.read("document.querySelector('.pause-settings').open=true"); await shot(a, '02-solo-pause-mix');
     await click(a, '#main-menu'); await music(a, 'menu');
@@ -68,15 +81,21 @@ try {
     await music(a, 'menu'); check('lobby retains the menu theme', (await snapshot(b)).music.scene === 'menu');
     await click(a, '[data-select-level="handshake"]');
     for (const p of [a, b]) await wait(p, 'Handshake overview', s => s.room === 'handshake' && s.overviewVisible);
-    await music(a, 'handshake');
+    for (const [role, p] of [['host', a], ['guest', b]] as const)
+        check(`${role} streams the selected Handshake recording`, playingFile(await music(p, 'handshake'), 'handshake.ogg'));
+    await nativeLoop(a, 'handshake');
     const beforeSolve = (await snapshot(a)).audio.played.complete ?? 0;
     const stinger = wait(a, 'completion stinger survives victory transition', s => s.view === 'victory' && (s.audio.played.complete ?? 0) === beforeSolve + 1, 90000);
     await campaignDraftRoute(h, 'handshake', [a, b]);
     const completed = await stinger;
     check('one completion stinger and quiet victory music after an actual two-player solve', completed.music.duck === 'complete' && completed.audio.voices > 0);
     await shot(a, '03-completion-mix');
-    const victoryLoads = totalLoads(completed); await sleep(300);
-    check('victory updates do not restart the track or repeat the stinger', totalLoads(await snapshot(a)) === victoryLoads && (await snapshot(a)).audio.played.complete === beforeSolve + 1);
+    const victoryLoads = totalLoads(completed);
+    await sleep(COMPLETION_DUCK_MS + 450);
+    const settledVictory = await wait(a, 'completion duck ends while victory remains open', s => s.view === 'victory' && s.music.duck === 'pause' && s.music.duckGain >= .27 && s.music.duckGain <= .29);
+    check('victory returns to its pause mix after the short stinger without reloading or replaying', totalLoads(settledVictory) === victoryLoads
+        && settledVictory.audio.played.complete === beforeSolve + 1
+        && settledVictory.music.decks.every((d, i) => d.starts === completed.music.decks[i].starts));
     await click(a, '#next-chamber');
     for (const scene of ['crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free'] as const) {
         if (scene !== 'crossfeed-vault') {
@@ -86,6 +105,11 @@ try {
         const playing = await music(a, scene), loads = totalLoads(playing), time = current(playing);
         await sleep(350);
         check(`${scene} has its own streamed track and ordinary replication never reloads it`, totalLoads(await snapshot(a)) === loads && current(await snapshot(a)) > time && (await snapshot(a)).music.decks.length === 2);
+        if (scene === 'crossfeed-vault') {
+            for (const [role, p] of [['host', a], ['guest', b]] as const)
+                check(`${role} streams the selected Crossfeed Vault recording`, playingFile(await music(p, scene), 'crossfeed-vault.ogg'));
+            await nativeLoop(a, scene);
+        }
     }
     await click(a, '#pause'); await a.read("document.querySelector('.pause-settings').open=true");
     await wait(a, 'co-op pause duck', s => s.music.duck === 'pause' && s.music.duckGain < .3); await shot(a, '04-coop-pause-mix');
@@ -110,15 +134,31 @@ try {
     await wait(a, 'BFCache handler reconnect', s => s.multiplayer?.websocket === 'CONNECTED'); await music(a, 'use-after-free');
     check('persisted page resume retains only the original two players', totalLoads(await snapshot(a)) === totalLoads(foreground) && (await snapshot(a)).music.decks.length === 2);
     await click(a, '#leave-coop'); await music(a, 'menu'); await shot(a, '05-return-menu');
-    const beforeLoopState = await snapshot(a), beforeLoop = beforeLoopState.music.loops;
-    // Accelerate media time only: exercise the actual boundary callback/decks without waiting three minutes.
-    await a.read("(()=>{const m=binaryNinja.music,d=m.decks.find(d=>d.scene===m.scene&&!d.audio.paused);d.audio.currentTime=d.audio.duration-2;})()");
-    await wait(a, 'real media wraps at its authored duration', s => s.music.loops > beforeLoop && audible(s) && !s.music.crossfading, 15000);
-    const wrapped = await snapshot(a);
-    check('native loop preserves the same deck without a new load, play or crossfade', current(wrapped) < 8
-        && totalLoads(wrapped) === totalLoads(beforeLoopState) && wrapped.music.crossfades === beforeLoopState.music.crossfades
-        && wrapped.music.decks.every((d, i) => d.starts === beforeLoopState.music.decks[i].starts)
-        && wrapped.music.decks.filter(d => !d.paused).length === 1);
+    await nativeLoop(a, 'menu');
+
+    const visitor = (await snapshot(a)).persistence.visitor, developer = new URL(url); developer.searchParams.set('labs', '1');
+    await a.send('Page.navigate', { url: developer.href });
+    await wait(a, 'same visitor returns to developer-enabled main menu', s => s.view === 'home' && s.character.ready && s.persistence.visitor === visitor);
+    await click(a, '[data-room="switch"]');
+    await wait(a, 'SWITCH starts with decoded effects', s => s.room === 'switch' && s.started && s.audio.loaded === SOUND_ASSET_COUNT);
+    check('SWITCH retains the quiet menu recording', playingFile(await music(a, 'menu'), 'menu.ogg'));
+    await h.walk(a, 275);
+    const beforeLever = await snapshot(a), specialCues = ['latch', 'checkpoint', 'breakpointDeploy', 'breakpointConfirm'] as const;
+    check('the real SWITCH lever begins off', !beforeLever.inputs.switchB);
+    for (const [on, count] of [[true, 1], [false, 2]] as const) {
+        await h.tap(a, 'KeyE');
+        const toggled = await wait(a, `real E turns the anchor ${on ? 'on' : 'off'}`, s => s.inputs.switchB === on && (s.audio.played.switch ?? 0) === (beforeLever.audio.played.switch ?? 0) + count);
+        check(`ordinary lever ${on ? 'on' : 'off'} plays the electronic switch without latch or checkpoint cues`, specialCues.every(cue => (toggled.audio.played[cue] ?? 0) === (beforeLever.audio.played[cue] ?? 0)));
+        await sleep(200); // Respect the real effect cooldown between physical key presses.
+    }
+    await shot(a, '06-switch-lever-audio');
+    for (const room of ['relay', 'uplink'] as const) {
+        await click(a, '#pause'); await click(a, `[data-room="${room}"]`);
+        if ((await snapshot(a)).overviewVisible) await click(a, '#start-room');
+        await wait(a, `${room} starts normally`, s => s.room === room && s.started);
+        check(`${room} retains the original quiet solo recording`, playingFile(await music(a, 'tutorial-relay'), 'tutorial-relay.ogg') && (await snapshot(a)).music.duck === 'tutorial');
+    }
+    await click(a, '#pause'); await click(a, '#main-menu'); await music(a, 'menu');
     const broken = await h.page(url, debug);
     await broken.send('Network.enable');
     await broken.send('Network.setBlockedURLs', { urls: ['*audio/*.ogg'] });

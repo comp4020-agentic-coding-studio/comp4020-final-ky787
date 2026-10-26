@@ -1,0 +1,1050 @@
+{
+  "verifiedAt": "2026-10-26",
+  "method": "22.05 kHz mono; 2048pt STFT/256hop; median17 harmonic/percussive soft mask; positive 2frame band-envelope change; attacks peak prominence32%of90percentile,minimum180ms spacing; 8sec continuity requires8 bass35-180Hz and12 high2-9kHz attacks",
+  "limitation": "Transient/pulse proxy only; no acoustic audition or instrument identification. Source originals analyzed before scene edits and gain. Exact processing function is analyse_groove in scripts/prepare-music.py.",
+  "candidates": [
+    {
+      "file": "kuia.mp3",
+      "duration": 47.177,
+      "bassAttackRate": 2.82,
+      "highAttackRate": 2.8,
+      "bass95thGap": 0.516,
+      "high95thGap": 0.511,
+      "percussiveEnergy": 0.595,
+      "continuousPulseWindowPercent": 100.0,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 25,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.602,
+          "rmsDb": -21.6
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 23,
+          "highAttacks": 20,
+          "percussiveEnergy": 0.606,
+          "rmsDb": -21.62
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 20,
+          "highAttacks": 22,
+          "percussiveEnergy": 0.583,
+          "rmsDb": -21.7
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 23,
+          "highAttacks": 22,
+          "percussiveEnergy": 0.592,
+          "rmsDb": -21.53
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 21,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.602,
+          "rmsDb": -21.79
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 21,
+          "highAttacks": 20,
+          "percussiveEnergy": 0.588,
+          "rmsDb": -21.6
+        }
+      ],
+      "title": "Kuia",
+      "author": "James Gargette (cinameng)",
+      "source": "https://opengameart.org/content/kuia",
+      "download": "https://opengameart.org/sites/default/files/kuia.mp3",
+      "sourceSha256": "11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "file": "DST-ReturnOfTowerDefenseTheme.mp3",
+      "duration": 192.052,
+      "bassAttackRate": 3.79,
+      "highAttackRate": 3.04,
+      "bass95thGap": 0.476,
+      "high95thGap": 0.488,
+      "percussiveEnergy": 0.205,
+      "continuousPulseWindowPercent": 100.0,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 17,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.25,
+          "rmsDb": -11.15
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 18,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.257,
+          "rmsDb": -11.19
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 30,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.237,
+          "rmsDb": -10.76
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 31,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.242,
+          "rmsDb": -10.61
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 31,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.246,
+          "rmsDb": -10.7
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 31,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.239,
+          "rmsDb": -10.77
+        },
+        {
+          "start": 48.0,
+          "bassAttacks": 31,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.229,
+          "rmsDb": -10.36
+        },
+        {
+          "start": 56.0,
+          "bassAttacks": 32,
+          "highAttacks": 20,
+          "percussiveEnergy": 0.212,
+          "rmsDb": -10.01
+        },
+        {
+          "start": 64.0,
+          "bassAttacks": 33,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.182,
+          "rmsDb": -7.63
+        },
+        {
+          "start": 72.0,
+          "bassAttacks": 34,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.201,
+          "rmsDb": -7.52
+        },
+        {
+          "start": 80.0,
+          "bassAttacks": 33,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.182,
+          "rmsDb": -7.47
+        },
+        {
+          "start": 88.0,
+          "bassAttacks": 32,
+          "highAttacks": 20,
+          "percussiveEnergy": 0.22,
+          "rmsDb": -8.44
+        },
+        {
+          "start": 96.0,
+          "bassAttacks": 31,
+          "highAttacks": 21,
+          "percussiveEnergy": 0.198,
+          "rmsDb": -7.78
+        },
+        {
+          "start": 104.0,
+          "bassAttacks": 31,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.195,
+          "rmsDb": -7.62
+        },
+        {
+          "start": 112.0,
+          "bassAttacks": 32,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.197,
+          "rmsDb": -7.48
+        },
+        {
+          "start": 120.0,
+          "bassAttacks": 33,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.202,
+          "rmsDb": -7.41
+        },
+        {
+          "start": 128.0,
+          "bassAttacks": 33,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.191,
+          "rmsDb": -7.51
+        },
+        {
+          "start": 136.0,
+          "bassAttacks": 33,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.176,
+          "rmsDb": -7.69
+        },
+        {
+          "start": 144.0,
+          "bassAttacks": 34,
+          "highAttacks": 22,
+          "percussiveEnergy": 0.199,
+          "rmsDb": -7.65
+        },
+        {
+          "start": 152.0,
+          "bassAttacks": 33,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.191,
+          "rmsDb": -7.59
+        },
+        {
+          "start": 160.0,
+          "bassAttacks": 32,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.193,
+          "rmsDb": -8.01
+        },
+        {
+          "start": 168.0,
+          "bassAttacks": 33,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.192,
+          "rmsDb": -7.65
+        },
+        {
+          "start": 176.0,
+          "bassAttacks": 31,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.2,
+          "rmsDb": -7.45
+        },
+        {
+          "start": 184.0,
+          "bassAttacks": 17,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.25,
+          "rmsDb": -11.07
+        },
+        {
+          "start": 192.0,
+          "bassAttacks": 1,
+          "highAttacks": 0,
+          "percussiveEnergy": 0.584,
+          "rmsDb": -23.11
+        }
+      ],
+      "title": "Return of Tower Defense Theme",
+      "author": "DST (Deceased Superior Technician)",
+      "source": "https://opengameart.org/content/return-of-tower-defense-theme",
+      "download": "https://opengameart.org/sites/default/files/DST-ReturnOfTowerDefenseTheme.mp3",
+      "sourceSha256": "83c5aa3fd10c83e4b429da54488f2423d7f3c374a7a8a92e0abd9959377446fd",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "file": "DST-TowerDefenseTheme_1.mp3",
+      "duration": 199.419,
+      "bassAttackRate": 3.27,
+      "highAttackRate": 4.08,
+      "bass95thGap": 0.476,
+      "high95thGap": 0.348,
+      "percussiveEnergy": 0.324,
+      "continuousPulseWindowPercent": 100.0,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 18,
+          "highAttacks": 32,
+          "percussiveEnergy": 0.494,
+          "rmsDb": -16.81
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 17,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.495,
+          "rmsDb": -16.97
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 17,
+          "highAttacks": 34,
+          "percussiveEnergy": 0.474,
+          "rmsDb": -16.81
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 18,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.395,
+          "rmsDb": -15.64
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 22,
+          "highAttacks": 33,
+          "percussiveEnergy": 0.341,
+          "rmsDb": -14.38
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 29,
+          "highAttacks": 34,
+          "percussiveEnergy": 0.322,
+          "rmsDb": -13.15
+        },
+        {
+          "start": 48.0,
+          "bassAttacks": 31,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.329,
+          "rmsDb": -12.7
+        },
+        {
+          "start": 56.0,
+          "bassAttacks": 29,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.327,
+          "rmsDb": -12.79
+        },
+        {
+          "start": 64.0,
+          "bassAttacks": 26,
+          "highAttacks": 31,
+          "percussiveEnergy": 0.253,
+          "rmsDb": -12.5
+        },
+        {
+          "start": 72.0,
+          "bassAttacks": 28,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.305,
+          "rmsDb": -13.71
+        },
+        {
+          "start": 80.0,
+          "bassAttacks": 29,
+          "highAttacks": 33,
+          "percussiveEnergy": 0.308,
+          "rmsDb": -11.51
+        },
+        {
+          "start": 88.0,
+          "bassAttacks": 30,
+          "highAttacks": 33,
+          "percussiveEnergy": 0.313,
+          "rmsDb": -11.42
+        },
+        {
+          "start": 96.0,
+          "bassAttacks": 29,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.324,
+          "rmsDb": -9.35
+        },
+        {
+          "start": 104.0,
+          "bassAttacks": 30,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.311,
+          "rmsDb": -9.13
+        },
+        {
+          "start": 112.0,
+          "bassAttacks": 29,
+          "highAttacks": 34,
+          "percussiveEnergy": 0.322,
+          "rmsDb": -9.44
+        },
+        {
+          "start": 120.0,
+          "bassAttacks": 31,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.335,
+          "rmsDb": -9.51
+        },
+        {
+          "start": 128.0,
+          "bassAttacks": 31,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.29,
+          "rmsDb": -10.33
+        },
+        {
+          "start": 136.0,
+          "bassAttacks": 25,
+          "highAttacks": 32,
+          "percussiveEnergy": 0.311,
+          "rmsDb": -10.82
+        },
+        {
+          "start": 144.0,
+          "bassAttacks": 31,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.32,
+          "rmsDb": -9.13
+        },
+        {
+          "start": 152.0,
+          "bassAttacks": 32,
+          "highAttacks": 35,
+          "percussiveEnergy": 0.317,
+          "rmsDb": -9.33
+        },
+        {
+          "start": 160.0,
+          "bassAttacks": 26,
+          "highAttacks": 34,
+          "percussiveEnergy": 0.328,
+          "rmsDb": -9.73
+        },
+        {
+          "start": 168.0,
+          "bassAttacks": 32,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.323,
+          "rmsDb": -10.32
+        },
+        {
+          "start": 176.0,
+          "bassAttacks": 30,
+          "highAttacks": 21,
+          "percussiveEnergy": 0.26,
+          "rmsDb": -10.31
+        },
+        {
+          "start": 184.0,
+          "bassAttacks": 17,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.433,
+          "rmsDb": -16.04
+        },
+        {
+          "start": 192.0,
+          "bassAttacks": 16,
+          "highAttacks": 30,
+          "percussiveEnergy": 0.5,
+          "rmsDb": -16.97
+        }
+      ],
+      "title": "Tower Defense Theme",
+      "author": "DST (Deceased Superior Technician)",
+      "source": "https://opengameart.org/content/tower-defense-theme",
+      "download": "https://opengameart.org/sites/default/files/DST-TowerDefenseTheme_1.mp3",
+      "sourceSha256": "07cc9cd797c8ea6738b1bd740526f2610fd2ec0115774294ebda3a5ed8e62a30",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "file": "tecnological_messup_v2_0.ogg",
+      "duration": 106.667,
+      "bassAttackRate": 2.71,
+      "highAttackRate": 2.91,
+      "bass95thGap": 0.755,
+      "high95thGap": 0.499,
+      "percussiveEnergy": 0.329,
+      "continuousPulseWindowPercent": 100.0,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 15,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.205,
+          "rmsDb": -20.1
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 15,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.187,
+          "rmsDb": -18.65
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 23,
+          "highAttacks": 23,
+          "percussiveEnergy": 0.271,
+          "rmsDb": -16.73
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 13,
+          "highAttacks": 21,
+          "percussiveEnergy": 0.222,
+          "rmsDb": -19.41
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 25,
+          "highAttacks": 22,
+          "percussiveEnergy": 0.36,
+          "rmsDb": -14.29
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 27,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.37,
+          "rmsDb": -14.37
+        },
+        {
+          "start": 48.0,
+          "bassAttacks": 17,
+          "highAttacks": 23,
+          "percussiveEnergy": 0.291,
+          "rmsDb": -16.61
+        },
+        {
+          "start": 56.0,
+          "bassAttacks": 27,
+          "highAttacks": 21,
+          "percussiveEnergy": 0.311,
+          "rmsDb": -13.6
+        },
+        {
+          "start": 64.0,
+          "bassAttacks": 23,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.276,
+          "rmsDb": -16.88
+        },
+        {
+          "start": 72.0,
+          "bassAttacks": 26,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.346,
+          "rmsDb": -14.62
+        },
+        {
+          "start": 80.0,
+          "bassAttacks": 22,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.335,
+          "rmsDb": -15.48
+        },
+        {
+          "start": 88.0,
+          "bassAttacks": 22,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.4,
+          "rmsDb": -14.09
+        },
+        {
+          "start": 96.0,
+          "bassAttacks": 25,
+          "highAttacks": 23,
+          "percussiveEnergy": 0.384,
+          "rmsDb": -13.4
+        },
+        {
+          "start": 104.0,
+          "bassAttacks": 9,
+          "highAttacks": 8,
+          "percussiveEnergy": 0.256,
+          "rmsDb": -17.26
+        }
+      ],
+      "title": "Technological Messup",
+      "author": "Centurion_of_war",
+      "source": "https://opengameart.org/content/technological-messup",
+      "download": "https://opengameart.org/sites/default/files/tecnological_messup_v2_0.ogg",
+      "sourceSha256": "d782c36a82cfdb02772001fb5830a8d4e0e82392dd157fe4410d07d11f01e45e",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "file": "jumping_cyborg_110bpm.ogg",
+      "duration": 264.006,
+      "bassAttackRate": 2.3,
+      "highAttackRate": 3.23,
+      "bass95thGap": 0.546,
+      "high95thGap": 0.418,
+      "percussiveEnergy": 0.279,
+      "continuousPulseWindowPercent": 90.9,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 23,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.275,
+          "rmsDb": -7.46
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 25,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.273,
+          "rmsDb": -7.24
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 18,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.269,
+          "rmsDb": -7.41
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 22,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.266,
+          "rmsDb": -7.86
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 22,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.27,
+          "rmsDb": -8.22
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 23,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.277,
+          "rmsDb": -7.38
+        },
+        {
+          "start": 48.0,
+          "bassAttacks": 21,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.272,
+          "rmsDb": -7.37
+        },
+        {
+          "start": 56.0,
+          "bassAttacks": 22,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.264,
+          "rmsDb": -7.69
+        },
+        {
+          "start": 64.0,
+          "bassAttacks": 17,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.279,
+          "rmsDb": -9.88
+        },
+        {
+          "start": 72.0,
+          "bassAttacks": 15,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.582,
+          "rmsDb": -15.76
+        },
+        {
+          "start": 80.0,
+          "bassAttacks": 15,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.444,
+          "rmsDb": -13.7
+        },
+        {
+          "start": 88.0,
+          "bassAttacks": 14,
+          "highAttacks": 25,
+          "percussiveEnergy": 0.448,
+          "rmsDb": -13.72
+        },
+        {
+          "start": 96.0,
+          "bassAttacks": 0,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.447,
+          "rmsDb": -16.54
+        },
+        {
+          "start": 104.0,
+          "bassAttacks": 0,
+          "highAttacks": 24,
+          "percussiveEnergy": 0.442,
+          "rmsDb": -16.65
+        },
+        {
+          "start": 112.0,
+          "bassAttacks": 17,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.274,
+          "rmsDb": -8.54
+        },
+        {
+          "start": 120.0,
+          "bassAttacks": 19,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.284,
+          "rmsDb": -7.8
+        },
+        {
+          "start": 128.0,
+          "bassAttacks": 24,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.276,
+          "rmsDb": -7.46
+        },
+        {
+          "start": 136.0,
+          "bassAttacks": 20,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.271,
+          "rmsDb": -7.75
+        },
+        {
+          "start": 144.0,
+          "bassAttacks": 22,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.28,
+          "rmsDb": -7.82
+        },
+        {
+          "start": 152.0,
+          "bassAttacks": 18,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.267,
+          "rmsDb": -8.93
+        },
+        {
+          "start": 160.0,
+          "bassAttacks": 26,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.27,
+          "rmsDb": -7.36
+        },
+        {
+          "start": 168.0,
+          "bassAttacks": 23,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.27,
+          "rmsDb": -7.26
+        },
+        {
+          "start": 176.0,
+          "bassAttacks": 22,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.265,
+          "rmsDb": -7.75
+        },
+        {
+          "start": 184.0,
+          "bassAttacks": 20,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.27,
+          "rmsDb": -7.33
+        },
+        {
+          "start": 192.0,
+          "bassAttacks": 23,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.273,
+          "rmsDb": -7.47
+        },
+        {
+          "start": 200.0,
+          "bassAttacks": 25,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.275,
+          "rmsDb": -7.16
+        },
+        {
+          "start": 208.0,
+          "bassAttacks": 20,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.274,
+          "rmsDb": -7.51
+        },
+        {
+          "start": 216.0,
+          "bassAttacks": 19,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.273,
+          "rmsDb": -7.82
+        },
+        {
+          "start": 224.0,
+          "bassAttacks": 23,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.276,
+          "rmsDb": -7.56
+        },
+        {
+          "start": 232.0,
+          "bassAttacks": 19,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.27,
+          "rmsDb": -7.79
+        },
+        {
+          "start": 240.0,
+          "bassAttacks": 20,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.283,
+          "rmsDb": -7.81
+        },
+        {
+          "start": 248.0,
+          "bassAttacks": 11,
+          "highAttacks": 19,
+          "percussiveEnergy": 0.276,
+          "rmsDb": -10.49
+        },
+        {
+          "start": 256.0,
+          "bassAttacks": 0,
+          "highAttacks": 0,
+          "percussiveEnergy": 0.13,
+          "rmsDb": -29.23
+        },
+        {
+          "start": 264.0,
+          "bassAttacks": 0,
+          "highAttacks": 0,
+          "percussiveEnergy": 0.0,
+          "rmsDb": -200.0
+        }
+      ],
+      "title": "Jumping Cyborg",
+      "author": "Alexander Ehlers (tricksntraps)",
+      "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
+      "download": "https://opengameart.org/sites/default/files/jumping_cyborg_110bpm.ogg",
+      "sourceSha256": "7d768754fc82f5b41a6a33c682d3572b6824f3b69d95d080f6386c7fd2a25696",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "file": "new_factory_129bpm_0.ogg",
+      "duration": 130.237,
+      "bassAttackRate": 2.43,
+      "highAttackRate": 3.82,
+      "bass95thGap": 0.476,
+      "high95thGap": 0.464,
+      "percussiveEnergy": 0.357,
+      "continuousPulseWindowPercent": 93.8,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 26,
+          "highAttacks": 34,
+          "percussiveEnergy": 0.377,
+          "rmsDb": -4.46
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 26,
+          "highAttacks": 33,
+          "percussiveEnergy": 0.376,
+          "rmsDb": -4.86
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 24,
+          "highAttacks": 30,
+          "percussiveEnergy": 0.34,
+          "rmsDb": -4.95
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 19,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.326,
+          "rmsDb": -5.93
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 2,
+          "highAttacks": 31,
+          "percussiveEnergy": 0.237,
+          "rmsDb": -15.55
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 12,
+          "highAttacks": 33,
+          "percussiveEnergy": 0.358,
+          "rmsDb": -7.96
+        },
+        {
+          "start": 48.0,
+          "bassAttacks": 23,
+          "highAttacks": 31,
+          "percussiveEnergy": 0.347,
+          "rmsDb": -4.91
+        },
+        {
+          "start": 56.0,
+          "bassAttacks": 25,
+          "highAttacks": 30,
+          "percussiveEnergy": 0.353,
+          "rmsDb": -5.13
+        },
+        {
+          "start": 64.0,
+          "bassAttacks": 23,
+          "highAttacks": 31,
+          "percussiveEnergy": 0.349,
+          "rmsDb": -5.02
+        },
+        {
+          "start": 72.0,
+          "bassAttacks": 20,
+          "highAttacks": 31,
+          "percussiveEnergy": 0.349,
+          "rmsDb": -5.19
+        },
+        {
+          "start": 80.0,
+          "bassAttacks": 20,
+          "highAttacks": 30,
+          "percussiveEnergy": 0.377,
+          "rmsDb": -4.86
+        },
+        {
+          "start": 88.0,
+          "bassAttacks": 16,
+          "highAttacks": 33,
+          "percussiveEnergy": 0.363,
+          "rmsDb": -5.76
+        },
+        {
+          "start": 96.0,
+          "bassAttacks": 20,
+          "highAttacks": 32,
+          "percussiveEnergy": 0.364,
+          "rmsDb": -5.37
+        },
+        {
+          "start": 104.0,
+          "bassAttacks": 21,
+          "highAttacks": 34,
+          "percussiveEnergy": 0.366,
+          "rmsDb": -5.22
+        },
+        {
+          "start": 112.0,
+          "bassAttacks": 22,
+          "highAttacks": 30,
+          "percussiveEnergy": 0.358,
+          "rmsDb": -5.41
+        },
+        {
+          "start": 120.0,
+          "bassAttacks": 17,
+          "highAttacks": 26,
+          "percussiveEnergy": 0.362,
+          "rmsDb": -6.35
+        },
+        {
+          "start": 128.0,
+          "bassAttacks": 0,
+          "highAttacks": 0,
+          "percussiveEnergy": 0.112,
+          "rmsDb": -61.93
+        }
+      ],
+      "title": "New Factory",
+      "author": "Alexander Ehlers (tricksntraps)",
+      "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
+      "download": "https://opengameart.org/sites/default/files/new_factory_129bpm_0.ogg",
+      "sourceSha256": "3365dd3d25697a54e843678d75f49732cd0bc88bfd3ccb574b39f0ed65fa7291",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    },
+    {
+      "file": "city-loop_0.mp3",
+      "duration": 56.424,
+      "bassAttackRate": 3.24,
+      "highAttackRate": 3.15,
+      "bass95thGap": 0.44,
+      "high95thGap": 0.418,
+      "percussiveEnergy": 0.213,
+      "continuousPulseWindowPercent": 100.0,
+      "windows": [
+        {
+          "start": 0.0,
+          "bassAttacks": 31,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.256,
+          "rmsDb": -9.27
+        },
+        {
+          "start": 8.0,
+          "bassAttacks": 30,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.26,
+          "rmsDb": -9.34
+        },
+        {
+          "start": 16.0,
+          "bassAttacks": 28,
+          "highAttacks": 21,
+          "percussiveEnergy": 0.211,
+          "rmsDb": -8.4
+        },
+        {
+          "start": 24.0,
+          "bassAttacks": 30,
+          "highAttacks": 27,
+          "percussiveEnergy": 0.219,
+          "rmsDb": -8.86
+        },
+        {
+          "start": 32.0,
+          "bassAttacks": 24,
+          "highAttacks": 28,
+          "percussiveEnergy": 0.207,
+          "rmsDb": -10.32
+        },
+        {
+          "start": 40.0,
+          "bassAttacks": 25,
+          "highAttacks": 29,
+          "percussiveEnergy": 0.159,
+          "rmsDb": -9.64
+        },
+        {
+          "start": 48.0,
+          "bassAttacks": 15,
+          "highAttacks": 18,
+          "percussiveEnergy": 0.148,
+          "rmsDb": -11.12
+        },
+        {
+          "start": 56.0,
+          "bassAttacks": 0,
+          "highAttacks": 0,
+          "percussiveEnergy": 0.021,
+          "rmsDb": -99.27
+        }
+      ],
+      "title": "City Loop",
+      "author": "wipics",
+      "source": "https://opengameart.org/content/city-loop-0",
+      "download": "https://opengameart.org/sites/default/files/city-loop_0.mp3",
+      "sourceSha256": "9349982fb8e365167bc5c89f2ac50d3b5376b9f627d506ba30a9b26c8230597e",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verifiedAt": "2026-10-26"
+    }
+  ]
+}

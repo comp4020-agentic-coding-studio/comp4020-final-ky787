@@ -23,7 +23,16 @@ baseline it without replaying old milestones.
 A co-op completion stinger starts **after** entering victory, so menu cleanup
 cannot cut it off. An initial/reconnected completed snapshot does not replay it.
 Background completions remain silent. Solo completion preserves automatic room
-progression while briefly ducking music.
+progression while briefly ducking music. The refined stinger is a 1.55-second
+simultaneous synth chord with quiet digital accents; the toggle is a separate
+0.197-second electronic cue. Other effect samples and runtime gains remain unchanged.
+
+Completion sets a monotonic **1.8-second duck deadline** when the stinger is
+triggered. The regular music synchronization returns to the current view's mix
+after that deadline. A completed co-op chamber does not hold the completion duck
+indefinitely: its victory/chamber-selection screen returns to the ordinary pause
+mix even while the result remains visible. Restored completed snapshots neither
+replay the stinger nor renew its deadline.
 
 ## Streaming music
 
@@ -36,11 +45,19 @@ complete musical cycle: no arbitrary overlap shortens bars or doubles off-beat
 percussion. An observed wrap counter is diagnostic only; media events do not
 trigger beat scheduling. A defensive `ended` fallback handles interrupted media. Decks request metadata lazily; there is no soundtrack prefetch.
 
+The focused soundtrack refinement changes asset selection without replacing
+this player or changing its looping, fades, autoplay, focus or streaming behavior.
+The catalogue now has seven runtime files: menu, five co-op chamber selections,
+and `tutorial-relay.ogg`. The latter preserves the previous Celestial Harmony
+file byte-for-byte at its existing gain for solo RELAY (`relay`) and CONTROL
+SPINE (`uplink`); those tutorials do not inherit the new co-op HANDSHAKE selection.
+PRESSURE and SWITCH continue using the unchanged menu track.
+
 `SliceGame.syncMusic()` maps navigation to menu or chamber identity, independent
 of multiplayer revisions. Menu destinations and waiting lobbies share the title
 track. Pauses, inspectors, overviews and chamber selection keep the current
-track at 28% of its normal gain. Completion uses 18%; active solo tutorials use
-38%. Changes in ducking take 450 ms. Co-op reconnect and BFCache restoration
+track at 28% of its normal gain. Completion uses 18% for the finite hold above;
+active solo tutorials use 38%. Changes in ducking take 450 ms. Co-op reconnect and BFCache restoration
 reuse the retained chamber identity and playback position.
 
 Actual pointer/key gestures unlock playback. A rejected play promise records a
