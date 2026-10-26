@@ -1,0 +1,208 @@
+{
+  "date": "2026-10-26",
+  "baseCommit": "c865475981d9d5ac54f3d4e3d13ed983935a4609",
+  "method": "SHA-256 before/after; measured audio levels and real browser playback. User listening selected the assets; no agent subjective audition.",
+  "deterministicGeneration": {
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+    "runsPerGenerator": 2,
+    "matchingOutputSha256": {
+      "public/audio/music/handshake.ogg": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
+      "public/audio/music/crossfeed-vault.ogg": "7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6",
+      "public/audio/landing.ogg": "199a252e4605bf98130b2d15aa40f50915b826f0d1a58016e8250aebe2ffefd3"
+    }
+  },
+  "preservedMusicMetadata": true,
+  "preservedOtherSfxMetadata": true,
+  "unchangedPlaybackFiles": {
+    "src/audio/music-player.ts": "e9fc0340cdf48ff640d054d00c67b881c53f28b9bffcb79c9aae3f7bba642d9e",
+    "src/audio/music-catalogue.ts": "73b3a1883cb889d030b780427d00ec5e0e07373326f26c908b202c9ef60cb98e",
+    "src/slice/game.ts": "2e0a0df685fda0ec13edef55ae4e6929680b0a60471de19fcdceef4e1f8ed5b7"
+  },
+  "runtimeAssets": [
+    {
+      "file": "public/audio/door-open.ogg",
+      "beforeSha256": "7d3af28ddd81187c3788b79129d053fd7064e181a7f45018c8018b5f1cb3536a",
+      "afterSha256": "7d3af28ddd81187c3788b79129d053fd7064e181a7f45018c8018b5f1cb3536a",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/crumble-break.ogg",
+      "beforeSha256": "d69a1b25ba2058757da2a9b6a4e345d85d26accf80d8f03a6231dfda43ae71e0",
+      "afterSha256": "d69a1b25ba2058757da2a9b6a4e345d85d26accf80d8f03a6231dfda43ae71e0",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/landing.ogg",
+      "beforeSha256": "d22c2f675cf8fa8454c0d420d17ccb04c211efce2426fcc106e36c4537855f16",
+      "afterSha256": "199a252e4605bf98130b2d15aa40f50915b826f0d1a58016e8250aebe2ffefd3",
+      "unchanged": false
+    },
+    {
+      "file": "public/audio/firewall-open.ogg",
+      "beforeSha256": "64ed15deca96cf688a7091cbb3866ac109f5561b97dc0eec6931cc16e6283c88",
+      "afterSha256": "64ed15deca96cf688a7091cbb3866ac109f5561b97dc0eec6931cc16e6283c88",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/confirm.ogg",
+      "beforeSha256": "6ff6f4eb094a54d9757c2f9d7a54e96a8e9934b79951d6388835c071ae13ad07",
+      "afterSha256": "6ff6f4eb094a54d9757c2f9d7a54e96a8e9934b79951d6388835c071ae13ad07",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/grapple-fire.ogg",
+      "beforeSha256": "efa465fa2f8a98159a7b13e8552dcc40df78919b633ec89facdc0517c8c7ba59",
+      "afterSha256": "efa465fa2f8a98159a7b13e8552dcc40df78919b633ec89facdc0517c8c7ba59",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/switch-click.ogg",
+      "beforeSha256": "0af778cd7898d6ab68cc21d269639f2c0fda5a08ba15ca8e7f41f67bcd289bf0",
+      "afterSha256": "0af778cd7898d6ab68cc21d269639f2c0fda5a08ba15ca8e7f41f67bcd289bf0",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/grapple-attach.ogg",
+      "beforeSha256": "6d8f48c38fe522b26937d5f9626dc80ccd6804f0adbc311a7e49011b90eeab34",
+      "afterSha256": "6d8f48c38fe522b26937d5f9626dc80ccd6804f0adbc311a7e49011b90eeab34",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/crumble-start.ogg",
+      "beforeSha256": "88d2c5b2f1fede9f10dfa44850950516f2c701631a138efe8663c019a149d972",
+      "afterSha256": "88d2c5b2f1fede9f10dfa44850950516f2c701631a138efe8663c019a149d972",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/breakpoint-deploy.ogg",
+      "beforeSha256": "ddfe545a3da1d95760001d1cd00a1cdf65e8099585a84e20eff50a45bf23b9a4",
+      "afterSha256": "ddfe545a3da1d95760001d1cd00a1cdf65e8099585a84e20eff50a45bf23b9a4",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/latch-confirm.ogg",
+      "beforeSha256": "b097eb4334e28ff994630c066384848e45f5fb92b2b29f6ed4e3a199bbf953b0",
+      "afterSha256": "b097eb4334e28ff994630c066384848e45f5fb92b2b29f6ed4e3a199bbf953b0",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/checkpoint.ogg",
+      "beforeSha256": "d5835552a092596cb52b453427ed265c19b03acfe76a12280b455f8eae834b81",
+      "afterSha256": "d5835552a092596cb52b453427ed265c19b03acfe76a12280b455f8eae834b81",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/breakpoint-confirm.ogg",
+      "beforeSha256": "f973c526385eea642903b99ff04b9ba5472d0e480cfecd2c1b170d8c79b5364f",
+      "afterSha256": "f973c526385eea642903b99ff04b9ba5472d0e480cfecd2c1b170d8c79b5364f",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/teleport.ogg",
+      "beforeSha256": "f58f0faaafe6f0fae582b95982b442bdeff606c43f9ec22004c03b55c95ab3b2",
+      "afterSha256": "f58f0faaafe6f0fae582b95982b442bdeff606c43f9ec22004c03b55c95ab3b2",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/relay-on.ogg",
+      "beforeSha256": "6386ed2efde78513bdb365dbb03606bde4910d9f7904bb8f424e5c5f2cf16e04",
+      "afterSha256": "6386ed2efde78513bdb365dbb03606bde4910d9f7904bb8f424e5c5f2cf16e04",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/code-power.ogg",
+      "beforeSha256": "245c755cb9f0e9910295befad5f653ef3e871dd0ada6d561c309e973045c27b8",
+      "afterSha256": "245c755cb9f0e9910295befad5f653ef3e871dd0ada6d561c309e973045c27b8",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/metal-touch.ogg",
+      "beforeSha256": "4b88bbe677fa972dba77922a913cab39cfebff8fe8d683957db5c94477679806",
+      "afterSha256": "4b88bbe677fa972dba77922a913cab39cfebff8fe8d683957db5c94477679806",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/grapple-reel.ogg",
+      "beforeSha256": "1102f8d58b122f83ab1282c492d2cb8c146044fb4c930648b6c48db407d08c94",
+      "afterSha256": "1102f8d58b122f83ab1282c492d2cb8c146044fb4c930648b6c48db407d08c94",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/room-complete.ogg",
+      "beforeSha256": "96de80a6cb5015c941eee0a51f76d7548f913d10492c8a8e5b359e78fb9e2ac8",
+      "afterSha256": "96de80a6cb5015c941eee0a51f76d7548f913d10492c8a8e5b359e78fb9e2ac8",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/lift-on.ogg",
+      "beforeSha256": "1c219fbfd05a1506f43a00a906e7f06ffd4c759a32005fbc7247bf893848ea88",
+      "afterSha256": "1c219fbfd05a1506f43a00a906e7f06ffd4c759a32005fbc7247bf893848ea88",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/lift-hum.ogg",
+      "beforeSha256": "16c184aaf81022c08d6028500438f8e3b1221658573540175243672ab4ddb18b",
+      "afterSha256": "16c184aaf81022c08d6028500438f8e3b1221658573540175243672ab4ddb18b",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/use-after-free.ogg",
+      "beforeSha256": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "afterSha256": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/tutorial-relay.ogg",
+      "beforeSha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "afterSha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/deadlock.ogg",
+      "beforeSha256": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "afterSha256": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/menu.ogg",
+      "beforeSha256": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "afterSha256": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/crossfeed-vault.ogg",
+      "beforeSha256": "6615826a5e2a29d685a52e643ab55a6f732e082ea7c4bf3e5daa728a143e0886",
+      "afterSha256": "7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6",
+      "unchanged": false
+    },
+    {
+      "file": "public/audio/music/race-condition.ogg",
+      "beforeSha256": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "afterSha256": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "unchanged": true
+    },
+    {
+      "file": "public/audio/music/handshake.ogg",
+      "beforeSha256": "71795cfc2d7970b27a4136f3c2621a85bc624056e7cd76a2ea5edcddfde1ad02",
+      "afterSha256": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
+      "unchanged": false
+    }
+  ],
+  "checks": {
+    "focusedUnitTests": 54,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "audioBrowser": "46 PASS checks, two independent profiles, actual HANDSHAKE solve, native loops, transitions, reconnect, completion, mute, visibility, repeated jumps and plate landing",
+    "liftBrowser": "29 PASS checks, both physical host/guest lift routes and accepted digital/latch cues on both clients"
+  },
+  "limits": "Loop continuity, loudness and ~3 dB onset change were measured, not heard by the agent. Final seam and perceived landing intensity remain open to human listening.",
+  "landingMeasurements": {
+    "method": "FFmpeg loudnorm true-peak analysis; first 50 ms decoded mono RMS comparison at equal landing speed.",
+    "assetTruePeakDbtp": -6.01,
+    "onsetGainChangeDb": 3.024,
+    "runtimeGain": 0.81,
+    "velocityFactor": "min(1, landingSpeed / 700)",
+    "cooldownSeconds": 0.12,
+    "dynamicCompressionAdded": false
+  }
+}

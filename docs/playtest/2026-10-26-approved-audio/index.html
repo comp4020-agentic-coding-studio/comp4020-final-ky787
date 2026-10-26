@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Binary Ninja — approved audio, 26 October 2026</title>
+<style>
+  :root { color-scheme: dark; font: 16px/1.55 system-ui,sans-serif; background:#0b1525; color:#e6edf5 }
+  body { max-width:850px; margin:3rem auto; padding:0 1.25rem }
+  h1 { line-height:1.2; font-size:2rem } h2 { color:#83e9f5; font-size:1.3rem }
+  section { padding:1rem 1.4rem; margin:1.4rem 0; border:1px solid #30445b; border-radius:12px; background:#112138 }
+  a { color:#83e9f5 } audio { display:block; width:100%; margin:.5rem 0 1rem }
+  p { margin:.6rem 0 } label { display:block } select { padding:.4rem; font:inherit; margin-left:.4rem }
+  small { color:#bac8d8 } code { overflow-wrap:anywhere }
+</style>
+<h1>Binary Ninja · approved audio</h1>
+<p>26 October 2026. These are the user's listening selections. The complete runtime tracks below loop; the eight-second seam clips cross the actual ending/start at 0:04.</p>
+<p>Playback starts only on request, one preview at a time. Music uses the default 35% level. Source licensing, hashes, loudness and browser playback were checked programmatically; the agent does not claim to hear these edits.</p>
+<section>
+  <h2>HANDSHAKE · Kuia</h2>
+  <p>James Gargette (cinameng) · <a href="https://opengameart.org/content/kuia">CC0 original</a></p>
+  <label for="kuia">Complete original musical period · 47.177 s · −23.04 LUFS</label>
+  <audio id="kuia" controls loop preload="none" src="../../../public/audio/music/handshake.ogg"></audio>
+  <label for="kuia-seam">Loop seam · last four seconds, then first four</label>
+  <audio id="kuia-seam" controls preload="none" src="handshake-seam.ogg"></audio>
+</section>
+<section>
+  <h2>CROSSFEED VAULT · Through the Sewers</h2>
+  <p>Alexander Ehlers (tricksntraps) · <a href="https://opengameart.org/content/t-t-free-cyberpunk-pack-2">CC0 original</a></p>
+  <label for="sewers">Prepared loop · 196.364 s · −23.07 LUFS</label>
+  <audio id="sewers" controls loop preload="none" src="../../../public/audio/music/crossfeed-vault.ogg"></audio>
+  <label for="sewers-seam">Loop seam · last four seconds, then first four</label>
+  <audio id="sewers-seam" controls preload="none" src="crossfeed-vault-seam.ogg"></audio>
+  <small>The original is <code>through_the_sewers_1766bpm.ogg</code>. Its filename is not a verified tempo measurement.</small>
+</section>
+<section>
+  <h2>Landing · soft impact</h2>
+  <p>Kenney · <a href="https://kenney.nl/assets/impact-sounds">Impact Sounds, CC0</a> · <code>impactSoft_medium_000.ogg</code></p>
+  <label for="speed">Landing speed
+    <select id="speed"><option value="250">Gentle · 250 px/s</option><option value="550" selected>Normal · 550 px/s</option><option value="1000">Large fall · 1,000 px/s</option></select>
+  </label>
+  <audio id="landing" controls preload="none" src="../../../public/audio/landing.ogg"></audio>
+  <small>Default 65% Effects, runtime gain 0.81 and the unchanged speed factor capped at 700 px/s. The first 50 ms measures 3.02 dB stronger than the previous landing at equal speed. Perceived balance is for human review.</small>
+</section>
+<p><a href="verification.json">Preservation and deterministic-generation report</a> · <a href="audio-browser-checks.txt">Browser checks</a> · <a href="lift-browser-checks.txt">Two-player lift checks</a> · <a href="../../audio-selection.md">Provenance and exact edits</a></p>
+<script>
+  const players = [...document.querySelectorAll('audio')];
+  for (const player of players) {
+    player.volume = .35;
+    player.addEventListener('play', () => players.forEach(other => { if (other !== player) other.pause(); }));
+  }
+  const landing = document.getElementById('landing'), speed = document.getElementById('speed');
+  const mix = () => { landing.volume = .65 * .81 * Math.min(1, Number(speed.value) / 700); };
+  speed.addEventListener('change', mix); mix();
+</script>
+</html>

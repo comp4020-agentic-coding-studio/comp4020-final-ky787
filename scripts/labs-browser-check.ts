@@ -4,10 +4,11 @@ import { once } from 'node:events';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
+import { SOUND_ASSET_COUNT } from '../src/audio/game-audio.ts';
 import { isCoopLevel } from '../src/coop/protocol.ts';
 const level = process.argv[2];
 if (!isCoopLevel(level) || level === 'pairing-bay' || level === 'crossfeed-vault' || level === 'race-condition') throw new Error('Choose relay-lab, lift-lab, crumble-lab, boost-lab or firewall-lab');
-const h = await coopBrowser({ shots: process.argv[4] });
+const h = await coopBrowser({ shots: process.argv[4] ?? process.env.BN_SHOTS });
 const { key, tap, walk, wait, snapshot, check, click, mouse, shot, sleep } = h;
 const labState = (s: GameSnapshot) => s.multiplayer?.shared;
 const crumble = (s: GameSnapshot, id: string) => s.platforms.find(p => p.id === id)!;
@@ -293,7 +294,19 @@ async function lift(a: Cdp, b: Cdp, riderSlot: 1 | 2) {
     await walk(rider, 790); await wait(rider, 'upper landing', s => s.player.grounded && s.player.groundId === 'upper');
     await walk(rider, 945); await tap(rider, 'KeyE');
     await wait(rider, 'upper drop accepted', s => !s.multiplayer?.pendingCubeAction && s.multiplayer?.cubeHolder === null);
-    await walk(rider, 800); await tap(rider, 'KeyE');
+    await walk(rider, 800);
+    for (const p of [rider, operator]) await wait(p, 'short effects loaded before latch', s => s.audio.loaded === SOUND_ASSET_COUNT);
+    const audioBeforeLatch = [await snapshot(rider), await snapshot(operator)];
+    await tap(rider, 'KeyE');
+    for (const [index, p] of [rider, operator].entries()) {
+        const before = audioBeforeLatch[index].audio.played;
+        await wait(p, 'accepted lift lever has a digital interaction cue', s => (s.audio.played.switch ?? 0) === (before.switch ?? 0) + 1);
+        await sleep(200);
+        const played = (await snapshot(p)).audio.played;
+        check(`lift lever reaches ${index === 0 ? 'operator' : 'partner'} as one switch with one secondary latch`,
+            played.switch === (before.switch ?? 0) + 1 && played.latch === (before.latch ?? 0) + 1
+            && (played.checkpoint ?? 0) === (before.checkpoint ?? 0));
+    }
     const checkpoint = await wait(operator, 'shared upper checkpoint', s => s.multiplayer?.checkpoint === 'upper');
     check('checkpoint update leaves lower partner in place', checkpoint.player.y > 800 && checkpoint.outputs.liftField);
     const riderAt = (await snapshot(rider)).player;

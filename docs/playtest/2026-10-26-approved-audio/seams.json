@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-26",
+  "method": "Last four seconds followed by first four of each final runtime loop; review-only loudness match. Full originals were used for generation, not these excerpts.",
+  "clips": [
+    {
+      "scene": "handshake",
+      "file": "handshake-seam.ogg",
+      "sha256": "df38b7702e4286fc6056b27cb0a1d8c75059d45778bc63709a8e508b7f6d85c8",
+      "bytes": 98003,
+      "duration": 8,
+      "excerptStartSeconds": null,
+      "sequence": "last4s,first4s",
+      "constantGainDb": 0.16,
+      "reviewFadeMilliseconds": 15,
+      "integratedLufs": -23.05,
+      "truePeakDbtp": -7.98,
+      "loudnessRangeLu": 0.7
+    },
+    {
+      "scene": "crossfeed-vault",
+      "file": "crossfeed-vault-seam.ogg",
+      "sha256": "268d03cdf06bc9ce8336afda8d162fc50d187e7e206516d47b51bbe70e1e200f",
+      "bytes": 129206,
+      "duration": 8,
+      "excerptStartSeconds": null,
+      "sequence": "last4s,first4s",
+      "constantGainDb": -0.65,
+      "reviewFadeMilliseconds": 15,
+      "integratedLufs": -23.11,
+      "truePeakDbtp": -11.64,
+      "loudnessRangeLu": 0.4
+    }
+  ]
+}

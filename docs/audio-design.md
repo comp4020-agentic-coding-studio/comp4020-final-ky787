@@ -25,7 +25,22 @@ cannot cut it off. An initial/reconnected completed snapshot does not replay it.
 Background completions remain silent. Solo completion preserves automatic room
 progression while briefly ducking music. The refined stinger is a 1.55-second
 simultaneous synth chord with quiet digital accents; the toggle is a separate
-0.197-second electronic cue. Other effect samples and runtime gains remain unchanged.
+0.197-second electronic cue. Completion remains unchanged pending human selection.
+
+Lever-shaped controls share the digital toggle cue even when their accepted
+event is `lift-latch`. The solo `switch` + `lift-latch` pair coalesces into one
+click. Latch confirmation sits behind that click at 30%; a checkpoint paired
+with an ordinary lever uses 40%. Genuine terminal controls retain their latch
+feedback; authored breakpoint stations retain hero timing. Presentation reads
+the existing room geometry/control kind; producers and authority are unchanged.
+
+The approved Kenney `impactSoft_medium_000.ogg` landing uses constant mastering
+gain and runtime gain 0.81. First-50-ms RMS is about 3 dB above the former landing
+at the same speed, with a full-volume peak below −7.8 dBFS. The existing velocity
+factor `min(1, landingSpeed / 700)` and 0.12-second cooldown remain. Emit once
+on an airborne-to-grounded transition; a newly pressed plate under the local
+player supplies its own impact instead. Distant/cube-driven plate changes do
+not suppress ordinary footfalls. Plate and cube samples/gains are unchanged.
 
 Completion sets a monotonic **1.8-second duck deadline** when the stinger is
 triggered. The regular music synchronization returns to the current view's mix
@@ -85,11 +100,15 @@ foregrounded and can be adjusted in Settings or either pause menu.
 
 ## Validation and provenance
 
-`tests/audio.test.ts`, `music.test.ts`, `music-assets.test.ts` and
-`audio-stream.test.ts` cover selection, migration, bounded playback, lifecycle,
-errors and provenance. `pnpm check:audio` exercises real browser media, two
+`tests/audio.test.ts`, `audio-refinement.test.ts`, `landing-audio.test.ts`,
+`music.test.ts`, `music-assets.test.ts` and `audio-stream.test.ts` cover selection,
+migration, bounded playback, accepted lever events, physical landing intensity,
+plate impacts, lifecycle, errors and provenance. `pnpm check:audio` exercises real browser media, two
 independent visitors and a physical HANDSHAKE solve, all scene transitions,
-completion, reconnect, controls and failure recovery. Synthetic lifecycle
+completion, reconnect, controls, repeated jumps, plate landings and failure recovery.
+`BN_TEST_AUDIO=1 pnpm check:multiplayer-lift` also checks both real lift roles:
+one accepted digital click with secondary latch feedback for each visitor.
+Synthetic lifecycle
 events and accelerated media seeking in that route are labeled as such.
 
 Sources, licenses, modifications and hashes live in [AUDIO_CREDITS.md](../AUDIO_CREDITS.md)

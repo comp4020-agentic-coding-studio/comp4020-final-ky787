@@ -1,18 +1,85 @@
 # Binary Ninja soundtrack selection — 2026-10-26
 
-**Current revision: human feedback, 2026-10-26.** Seven runtime files now total
-**14,764,691 bytes (14.76 MB)**. HANDSHAKE uses DST's *Tower Defense Theme*;
-CROSSFEED VAULT uses Alexander Ehlers's *Jumping Cyborg*. The former HANDSHAKE
-file is preserved byte for byte as `tutorial-relay.ogg`. Menu, RACE CONDITION,
-DEADLOCK and USE AFTER FREE retain their approved bytes. The [dated refinement
-record below](#human-feedback-refinement--2026-10-26) is the current selection
-and preparation contract. [Compare the old/new/alternate clips](playtest/2026-10-26-audio-refinement/index.html).
+**Current revision: explicit human listening selections, 2026-10-26.**
+HANDSHAKE uses **Kuia** and CROSSFEED VAULT uses **Through the Sewers**.
+Seven runtime files total **14,250,748 bytes (14.25 MB)**. All four protected
+recordings and the solo tutorial recording retain their exact bytes, metadata,
+scene assignments and playback gains. The current contract follows immediately;
+the earlier selection rounds below are historical.
+
+## Human-approved recordings and preparation
+
+The user chose these tracks by listening. No further candidate ranking or
+agent listening judgment is used for this pass. Source pages and direct
+downloads were verified on 2026-10-26. Both pages explicitly specify
+[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/), allowing public
+redistribution and adaptation without mandatory attribution. Credits are kept
+as provenance and courtesy. Original masters remain in an external cache.
+
+| Scene | Human-selected original | Final duration | LUFS-I | True peak | Bytes |
+| --- | --- | ---: | ---: | ---: | ---: |
+| HANDSHAKE | [Kuia](https://opengameart.org/content/kuia) — James Gargette (cinameng), `kuia.mp3` | 47.177143 s | −23.04 | −6.48 dBTP | 554,860 |
+| CROSSFEED VAULT | [Through the Sewers](https://opengameart.org/content/t-t-free-cyberpunk-pack-2) — Alexander Ehlers (tricksntraps), `through_the_sewers_1766bpm.ogg` | 196.364172 s | −23.07 | −11.44 dBTP | 3,058,280 |
+
+- Kuia retains **all 2,080,512 decoded source samples**, including the complete
+  musical period. The old 24-second comparison excerpt is not used as a source.
+- Through the Sewers uses source samples `[1,940,400, 10,952,860)` at 44.1 kHz,
+  or 44.000–248.364172 s, with an eight-second/352,800-sample equal-power cyclic
+  overlap. Output: 8,659,660 samples. This preserves the central arrangement
+  while removing opening silence/sparse introduction and the faded ending.
+  The tail at 240.364172 s is matched to the head at 44 s by three-band transient
+  envelopes (mean cosine similarity 0.664). That match guides the edit, not track
+  selection. **The unusual filename is not a verified BPM measurement**;
+  `tempoBpm` is null. No time stretching is applied.
+- Both use the existing 28 Hz high-pass / 14 kHz low-pass, constant gain to
+  approximately −23 LUFS, 128-sample wrap de-click per side before and after
+  filtering, stereo 44.1 kHz Vorbis quality 4. Gains are +0.51 dB and −15.34 dB
+  respectively. No compression, new notes or runtime mix changes.
+- Final decoded files have no 100 ms window below −60 dBFS. Boundary jumps are
+  0.002646 and 0.000218 full-scale. These checks detect silence/discontinuities;
+  the agent cannot hear the final musical seam. Both complete loops and seam
+  excerpts are on the [current listening page](playtest/2026-10-26-approved-audio/index.html).
+
+| File | Original SHA-256 | Runtime SHA-256 |
+| --- | --- | --- |
+| `handshake.ogg` | `11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e` | `52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d` |
+| `crossfeed-vault.ogg` | `a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99` | `7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6` |
+
+Direct originals: [kuia.mp3](https://opengameart.org/sites/default/files/kuia.mp3),
+[through_the_sewers_1766bpm.ogg](https://opengameart.org/sites/default/files/through_the_sewers_1766bpm.ogg).
+Complete metadata is in the [runtime catalogue](../public/audio/music/catalogue.json).
+
+PRESSURE and SWITCH still use the menu theme. Solo RELAY and CONTROL SPINE
+still use `tutorial-relay.ogg` (Celestial Harmony), hash
+`06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab`.
+`MusicPlayer`, scene gains, crossfades, pause/visibility, preferences and reconnect
+code are unchanged. The [preservation report](playtest/2026-10-26-approved-audio/verification.json)
+records before/after hashes for all runtime audio and retained playback code.
+
+### Reproduce the current approved assets
+
+Requires Python 3, NumPy, SciPy and FFmpeg/ffprobe. Two runs with FFmpeg
+6.1.1-3ubuntu5 produced identical hashes for both tracks and the landing sample.
+
+```sh
+python3 scripts/prepare-music.py --cache /tmp/bn-approved-audio
+python3 scripts/audio/build-sfx.py --cache /tmp/bn-approved-audio
+```
+
+The music command rebuilds **only the two approved replacements**, plus separate
+eight-second seam excerpts (last four seconds followed by first four, with
+independent preview loudness matching). `--skip-review` omits those excerpts.
+It requires the committed seven-track catalogue and verifies the preserved five
+files before and after processing, without rewriting them or their metadata.
+`--output` and `--review-dir` can redirect outputs. The SFX command defaults to
+**landing only**; the current completion cue remains untouched pending selection.
+The runtime does not load any review artifacts.
 
 ## Historical initial selection (superseded for HANDSHAKE and CROSSFEED)
 
 The following initial six-track record and its montage are retained as history.
 Its totals, two replaced scene assignments, runtime hashes and command-line
-options describe the initial export; use the dated refinement section for the
+options describe the initial export; use the human-approved section above for the
 current seven-track catalogue and targeted generator command.
 
 Six local electronic music loops accompany the title screen and the five co-op
@@ -171,7 +238,11 @@ conversation. Review the cue-to-music balance at the default slider setting,
 confirm each loop seam is unobtrusive, and compare menu music with the tutorial's
 ducked mix. The agent has not represented those subjective checks as completed.
 
-## Human feedback refinement — 2026-10-26
+## Historical human-feedback refinement — 2026-10-26
+
+This records commit `c865475` before the user's explicit Kuia/Through the Sewers
+selections. Its files, measurements and reproduction behavior are historical;
+the current generator and catalogue follow the human-approved section above.
 
 Human playtesting approved the menu and the RACE CONDITION, DEADLOCK and USE
 AFTER FREE choices. The first two co-op tracks needed a more continuous
@@ -225,7 +296,7 @@ agent has **not** claimed to hear, prefer or subjectively approve these new
 tracks. The choices remain a structural recommendation shaped by human feedback.
 The supplied comparisons make the remaining listening judgment concrete.
 
-### Current runtime edits and provenance
+### Prior runtime edits and provenance
 
 All seven runtime files remain stereo 44.1 kHz Ogg Vorbis. Common mastering for
 the two replacements is unchanged: 28 Hz high-pass, 14 kHz low-pass, constant
@@ -288,7 +359,7 @@ musical seam using the preview controls.
 
 ### Targeted reproduction and A/B listening
 
-The current generator requires Python 3, NumPy, SciPy and FFmpeg/ffprobe:
+The generator at `c865475` required Python 3, NumPy, SciPy and FFmpeg/ffprobe:
 
 ```sh
 python3 scripts/prepare-music.py

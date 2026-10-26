@@ -2,7 +2,7 @@
   "verifiedAt": "2026-10-26",
   "license": "CC0-1.0",
   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-  "reviewMethod": "Original-source licensing/descriptions plus decoded structural analysis. No subjective acoustic audition was available to the agent.",
+  "reviewMethod": "Explicit human listening selections. Source licensing and decoded loop/loudness checks by the agent; no claim of agent acoustic audition.",
   "encoding": {
     "codec": "vorbis",
     "sampleRate": 44100,
@@ -49,98 +49,77 @@
     {
       "file": "handshake.ogg",
       "scene": "handshake",
-      "title": "Tower Defense Theme",
-      "author": "DST (Deceased Superior Technician)",
-      "source": "https://opengameart.org/content/tower-defense-theme",
-      "download": "https://opengameart.org/sites/default/files/DST-TowerDefenseTheme_1.mp3",
+      "title": "Kuia",
+      "author": "James Gargette (cinameng)",
+      "source": "https://opengameart.org/content/kuia",
+      "download": "https://opengameart.org/sites/default/files/kuia.mp3",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceSha256": "07cc9cd797c8ea6738b1bd740526f2610fd2ec0115774294ebda3a5ed8e62a30",
-      "sha256": "71795cfc2d7970b27a4136f3c2621a85bc624056e7cd76a2ea5edcddfde1ad02",
-      "bytes": 2214254,
-      "duration": 147.69229,
+      "sourceSha256": "11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e",
+      "sha256": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
+      "bytes": 554860,
+      "duration": 47.177143,
       "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
       "edits": {
-        "sourceDecodedSamples": 8794368,
-        "trimStartSample": 1303751,
-        "trimEndSampleExclusive": 8142643,
-        "cyclicCrossfadeSamples": 325662,
-        "sourceTempoBpm": 130,
-        "tempoEvidence": "Author MP3 TBPM tag",
-        "mp3StartOffsetSamples": 1105,
+        "sourceDecodedSamples": 2080512,
+        "fullOriginalRecording": true,
+        "nativeAuthorLoopPreserved": true,
+        "trimStartSample": 0,
+        "trimEndSampleExclusive": 2080512,
         "boundaryDeclickSamplesPerSide": 128,
         "filter": "highpass=f=28,lowpass=f=14000",
-        "constantGainDb": -10.33,
+        "constantGainDb": 0.51,
         "dynamicCompression": false,
         "finalBoundaryDeclickSamplesPerSide": 128,
-        "encodedSamples": 6513230
+        "encodedSamples": 2080512
       },
       "integratedLufs": -23.04,
-      "truePeakDbtp": -7.94,
-      "loudnessRangeLu": 4.6,
+      "truePeakDbtp": -6.48,
+      "loudnessRangeLu": 0.7,
       "loopAnalysis": {
         "longestSilenceBelowMinus60DbSeconds": 0.0,
-        "decodedBoundaryJump": 0.00011385,
-        "firstQuarterSecondRmsDb": -24.973,
-        "lastQuarterSecondRmsDb": -33.383
-      },
-      "percussiveAnalysis": {
-        "file": "handshake.ogg",
-        "duration": 147.692,
-        "bassAttackRate": 3.62,
-        "highAttackRate": 4.12,
-        "bass95thGap": 0.464,
-        "high95thGap": 0.345,
-        "percussiveEnergy": 0.305,
-        "continuousPulseWindowPercent": 100.0
+        "decodedBoundaryJump": 0.00264567,
+        "firstQuarterSecondRmsDb": -22.175,
+        "lastQuarterSecondRmsDb": -25.906
       }
     },
     {
       "file": "crossfeed-vault.ogg",
       "scene": "crossfeed-vault",
-      "title": "Jumping Cyborg",
+      "title": "Through the Sewers",
       "author": "Alexander Ehlers (tricksntraps)",
       "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
-      "download": "https://opengameart.org/sites/default/files/jumping_cyborg_110bpm.ogg",
+      "download": "https://opengameart.org/sites/default/files/through_the_sewers_1766bpm.ogg",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceSha256": "7d768754fc82f5b41a6a33c682d3572b6824f3b69d95d080f6386c7fd2a25696",
-      "sha256": "6615826a5e2a29d685a52e643ab55a6f732e082ea7c4bf3e5daa728a143e0886",
-      "bytes": 1912829,
-      "duration": 122.181814,
+      "sourceSha256": "a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99",
+      "sha256": "7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6",
+      "bytes": 3058280,
+      "duration": 196.364172,
       "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
       "edits": {
-        "sourceDecodedSamples": 11642651,
-        "trimStartSample": 5003345,
-        "trimEndSampleExclusive": 10776436,
-        "cyclicCrossfadeSamples": 384873,
-        "sourceTempoBpm": 110,
-        "tempoEvidence": "Author file name jumping_cyborg_110bpm.ogg",
+        "sourceDecodedSamples": 12569596,
+        "trimStartSample": 1940400,
+        "trimEndSampleExclusive": 10952860,
+        "cyclicCrossfadeSamples": 352800,
+        "tempoBpm": null,
+        "tempoEvidence": "No verified tempo; 1766bpm is only part of the original filename.",
+        "seamSelection": "Eight-second overlap: 44.000s head and 240.364172s tail, selected by low/mid/high transient-envelope correlation (mean cosine similarity 0.664). No tempo assumption or time stretching.",
         "boundaryDeclickSamplesPerSide": 128,
         "filter": "highpass=f=28,lowpass=f=14000",
-        "constantGainDb": -14.25,
+        "constantGainDb": -15.34,
         "dynamicCompression": false,
         "finalBoundaryDeclickSamplesPerSide": 128,
-        "encodedSamples": 5388218
+        "encodedSamples": 8659660
       },
-      "integratedLufs": -23.06,
-      "truePeakDbtp": -10.14,
-      "loudnessRangeLu": 1.5,
+      "integratedLufs": -23.07,
+      "truePeakDbtp": -11.44,
+      "loudnessRangeLu": 5.2,
       "loopAnalysis": {
         "longestSilenceBelowMinus60DbSeconds": 0.0,
-        "decodedBoundaryJump": 0.00182329,
-        "firstQuarterSecondRmsDb": -23.12,
-        "lastQuarterSecondRmsDb": -23.885
-      },
-      "percussiveAnalysis": {
-        "file": "crossfeed-vault.ogg",
-        "duration": 122.182,
-        "bassAttackRate": 2.31,
-        "highAttackRate": 3.45,
-        "bass95thGap": 0.557,
-        "high95thGap": 0.418,
-        "percussiveEnergy": 0.252,
-        "continuousPulseWindowPercent": 100.0
+        "decodedBoundaryJump": 0.00021786,
+        "firstQuarterSecondRmsDb": -26.274,
+        "lastQuarterSecondRmsDb": -25.265
       }
     },
     {
@@ -309,7 +288,7 @@
       }
     }
   ],
-  "totalBytes": 14764691,
+  "totalBytes": 14250748,
   "feedbackRevision": {
     "date": "2026-10-26",
     "replacedScenes": [
@@ -323,6 +302,6 @@
       "use-after-free": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
       "tutorial-relay": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab"
     },
-    "previousAssets": "docs/playtest/2026-10-26-audio-refinement/previous-assets.json"
+    "selection": "Explicit human listening selections: complete Kuia and Through the Sewers."
   }
 }

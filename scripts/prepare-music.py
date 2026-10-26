@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild only the two feedback-selected music assets and A/B review excerpts.
+"""Rebuild only the two human-selected music assets and loop-seam review excerpts.
 
 Requires Python 3 + numpy + scipy, FFmpeg/ffprobe. Existing approved assets are
 hash-checked and never rewritten. Original masters remain outside the repository.
@@ -32,9 +32,10 @@ SOURCES = {
     "neural": {"title": "Neural Malfunction", "author": "vitalezzz", "page": "https://opengameart.org/content/neural-malfunction", "file": "neural_malfunction.flac", "hash": "8d917f86038c0f284fc6220ba200a16f2be268e5375d5caa7419401dd1e1cee7"},
 }
 SCENES = [
-    ("handshake", "tower"), ("crossfeed-vault", "cyborg"),
+    ("handshake", "kuia"), ("crossfeed-vault", "sewers"),
 ]
 SOURCES.update({
+    "sewers": {"title": "Through the Sewers", "author": "Alexander Ehlers (tricksntraps)", "page": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2", "file": "through_the_sewers_1766bpm.ogg", "hash": "a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99"},
     "tower": {"title": "Tower Defense Theme", "author": "DST (Deceased Superior Technician)", "page": "https://opengameart.org/content/tower-defense-theme", "file": "DST-TowerDefenseTheme_1.mp3", "hash": "07cc9cd797c8ea6738b1bd740526f2610fd2ec0115774294ebda3a5ed8e62a30"},
     "cyborg": {"title": "Jumping Cyborg", "author": "Alexander Ehlers (tricksntraps)", "page": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2", "file": "jumping_cyborg_110bpm.ogg", "hash": "7d768754fc82f5b41a6a33c682d3572b6824f3b69d95d080f6386c7fd2a25696"},
     "kuia": {"title": "Kuia", "author": "James Gargette (cinameng)", "page": "https://opengameart.org/content/kuia", "file": "kuia.mp3", "hash": "11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e"},
@@ -77,7 +78,7 @@ def write_pcm(path: Path, audio: np.ndarray) -> None:
 
 
 def crossfade_cycle(audio: np.ndarray, seconds: float) -> np.ndarray:
-    """Beat-aligned wrap: tail -> head, then continue at the head's next sample.
+    """Cyclic blend: tail -> head, then continue at the head's next sample.
 
     One crossfade's duration is removed; no silence/fade-to-zero is inserted.
     Equal-power gains preserve energy for uncorrelated musical passages.
@@ -166,24 +167,21 @@ def arrange(scene: str, path: Path, work: Path, *, legacy: bool = False) -> tupl
                            "tempoEvidence": "Author file name new_factory_129bpm.ogg", "reviewOnly": True})
             audio = crossfade_cycle(audio[start:end], fade)
         elif scene == "handshake" and not legacy:
-            # 130 BPM is embedded in the author's MP3. Retain bars 16–100;
-            # blend four bars at the wrap. Excludes the sparse opening/outro.
-            start = 1105 + round(16 * 240 / 130 * RATE)
-            end = 1105 + round(100 * 240 / 130 * RATE)
-            fade = 4 * 240 / 130
-            detail.update({"trimStartSample": start, "trimEndSampleExclusive": end,
-                           "cyclicCrossfadeSamples": round(fade * RATE), "sourceTempoBpm": 130,
-                           "tempoEvidence": "Author MP3 TBPM tag", "mp3StartOffsetSamples": 1105})
-            audio = crossfade_cycle(audio[start:end], fade)
+            # Complete author-supplied Kuia loop, including its full musical
+            # period. Never substitute the dated 24-second comparison excerpt.
+            assert len(audio) == 2080512, "Unexpected original Kuia decode"
+            detail.update({"fullOriginalRecording": True, "nativeAuthorLoopPreserved": True,
+                           "trimStartSample": 0, "trimEndSampleExclusive": len(audio)})
         elif scene == "crossfeed-vault" and not legacy:
-            # 110 BPM comes from the original file name. This sustained body
-            # avoids the 96–112s bass-light breakdown and the final fade-out.
-            start, end = round(52 * 240 / 110 * RATE), round(112 * 240 / 110 * RATE)
-            fade = 4 * 240 / 110
+            # Measured matching rhythmic envelopes, not the unusual filename,
+            # establish this overlap. Retain the long central arrangement and
+            # exclude opening silence/sparse intro and the quiet ending fade.
+            start, end, overlap = 1940400, 10952860, 352800
             detail.update({"trimStartSample": start, "trimEndSampleExclusive": end,
-                           "cyclicCrossfadeSamples": round(fade * RATE), "sourceTempoBpm": 110,
-                           "tempoEvidence": "Author file name jumping_cyborg_110bpm.ogg"})
-            audio = crossfade_cycle(audio[start:end], fade)
+                           "cyclicCrossfadeSamples": overlap, "tempoBpm": None,
+                           "tempoEvidence": "No verified tempo; 1766bpm is only part of the original filename.",
+                           "seamSelection": "Eight-second overlap: 44.000s head and 240.364172s tail, selected by low/mid/high transient-envelope correlation (mean cosine similarity 0.664). No tempo assumption or time stretching."})
+            audio = crossfade_cycle(audio[start:end], overlap / RATE)
         elif scene == "handshake":
             # Inferred 130 BPM; retain the central 88 bars, crossfade four bars.
             start, end, fade = round(8 * 240 / 130 * RATE), round(96 * 240 / 130 * RATE), 4 * 240 / 130
@@ -321,26 +319,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache", type=Path, default=Path(tempfile.gettempdir()) / "bn-music-sources")
     parser.add_argument("--output", type=Path, default=ROOT / "public/audio/music", help="Existing seven-track catalogue; approved files must already exist")
-    parser.add_argument("--review-dir", type=Path, default=ROOT / "docs/playtest/2026-10-26-audio-refinement")
+    parser.add_argument("--review-dir", type=Path, default=ROOT / "docs/playtest/2026-10-26-approved-audio")
     parser.add_argument("--skip-review", action="store_true", help="Only rebuild the two runtime replacements")
     args = parser.parse_args()
     args.cache.mkdir(parents=True, exist_ok=True)
     manifest_path = args.output / "catalogue.json"
     manifest = json.loads(manifest_path.read_text())
-    previous_path = ROOT / "docs/playtest/2026-10-26-audio-refinement/previous-assets.json"
-    previous = {a["scene"]: a for a in json.loads(previous_path.read_text())["assets"]}
-    # First migration only: copy the old HANDSHAKE exactly, never decode/re-encode.
-    tutorial = args.output / "tutorial-relay.ogg"
-    if not tutorial.exists():
-        old = args.output / "handshake.ogg"
-        assert sha(old) == PRESERVED["tutorial-relay"], "Restore tutorial-relay.ogg from its committed version"
-        tutorial.write_bytes(old.read_bytes())
-    if not any(a["scene"] == "tutorial-relay" for a in manifest["assets"]):
-        entry = copy.deepcopy(previous["handshake"])
-        entry.update({"scene": "tutorial-relay", "file": "tutorial-relay.ogg", "preservedFrom": {
-            "scene": "handshake", "sha256": PRESERVED["tutorial-relay"],
-            "reason": "Human feedback: retain the original HANDSHAKE music for tutorial RELAY without re-encoding."}})
-        manifest["assets"].append(entry)
     preserved = validate_preserved(args.output, manifest)
     preserved_metadata = {a["scene"]: copy.deepcopy(a) for a in manifest["assets"] if a["scene"] in PRESERVED}
     for source in SOURCES.values():
@@ -352,9 +336,10 @@ def main() -> None:
             asset = export_master(scene, source, download(source, args.cache), args.output / f"{scene}.ogg", work)
             manifest["assets"] = [asset if a["scene"] == scene else a for a in manifest["assets"]]
         manifest["verifiedAt"] = VERIFIED
+        manifest["reviewMethod"] = "Explicit human listening selections. Source licensing and decoded loop/loudness checks by the agent; no claim of agent acoustic audition."
         manifest["totalBytes"] = sum(a["bytes"] for a in manifest["assets"])
         manifest["feedbackRevision"] = {"date": VERIFIED, "replacedScenes": [s for s, _ in SCENES],
-                                        "preservedSha256": preserved, "previousAssets": "docs/playtest/2026-10-26-audio-refinement/previous-assets.json"}
+                                        "preservedSha256": preserved, "selection": "Explicit human listening selections: complete Kuia and Through the Sewers."}
         manifest["ffmpegVersion"] = command(["ffmpeg", "-version"], text=True).stdout.splitlines()[0]
         assert 8_000_000 <= manifest["totalBytes"] <= 18_000_000
         validate_preserved(args.output, manifest)
@@ -364,41 +349,16 @@ def main() -> None:
         if args.skip_review:
             return
         args.review_dir.mkdir(parents=True, exist_ok=True)
-        # Reconstruct the retired CROSSFEED into temporary storage for its A/B;
-        # pin its exact old encoded hash, so the baseline cannot silently change.
-        old_crossfeed = work / "crossfeed-vault.ogg"
-        export_master("crossfeed-vault", SOURCES["moment"], download(SOURCES["moment"], args.cache), old_crossfeed, work, legacy=True)
-        assert sha(old_crossfeed) == previous["crossfeed-vault"]["sha256"]
-        comparisons = []
-        for scene, alternate, alternate_start in [("handshake", "kuia", 8), ("crossfeed-vault", "factory", 15)]:
-            for variant in ["old", "new", "alternate"]:
-                if variant == "old":
-                    path = tutorial if scene == "handshake" else old_crossfeed
-                    provenance, start = previous[scene], 30
-                elif variant == "new":
-                    path = args.output / f"{scene}.ogg"
-                    provenance = next(a for a in manifest["assets"] if a["scene"] == scene)
-                    start = 30
-                else:
-                    source = SOURCES[alternate]
-                    path, start = work / f"review-{alternate}.ogg", alternate_start
-                    provenance = export_master(f"review-{alternate}", source, download(source, args.cache), path, work)
-                clip = excerpt(path, args.review_dir / f"{scene}-{variant}.ogg", start, work)
-                seam = excerpt(path, args.review_dir / f"{scene}-{variant}-seam.ogg", 0, work, seam=True)
-                analysis = analyse_groove(path)
-                comparisons.append({"scene": scene, "variant": variant, **clip, "seam": seam, "title": provenance["title"], "author": provenance["author"],
-                                    "source": provenance["source"], "license": "CC0-1.0", "licenseUrl": LICENSE_URL,
-                                    "provenance": provenance, "analysisOfFullInput": analysis})
-                if variant == "new":
-                    provenance["percussiveAnalysis"] = {k: v for k, v in analysis.items() if k != "windows"}
-                print(f"Review ready: {clip['file']} ({clip['integratedLufs']} LUFS)", flush=True)
-        review = {"verifiedAt": VERIFIED, "reviewMethod": "Human feedback drove this refinement; agent selection uses original licensing and structural analysis, not claimed acoustic audition.",
-                  "targetIntegratedLufs": -23, "excerptDurationSeconds": 24, "analysisMethod": GROOVE_METHOD,
-                  "clips": comparisons, "preservedRuntimeSha256": preserved}
-        (args.review_dir / "manifest.json").write_text(json.dumps(review, indent=2) + "\n")
-        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+        seams = []
+        for scene, _ in SCENES:
+            path = args.output / f"{scene}.ogg"
+            seams.append({"scene": scene, **excerpt(path, args.review_dir / f"{scene}-seam.ogg", 0, work, seam=True)})
+        (args.review_dir / "seams.json").write_text(json.dumps({"date": VERIFIED,
+            "method": "Last four seconds followed by first four of each final runtime loop; review-only loudness match. Full originals were used for generation, not these excerpts.",
+            "clips": seams}, indent=2) + "\n")
         validate_preserved(args.output, manifest)
-        print(f"Six A/B clips and manifest ready: {args.review_dir}")
+        print(f"Two loop seam previews ready: {args.review_dir}")
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,29 @@
+PASS [lift-lab / P1 acts] joining by code discovers the selected lab
+PASS [lift-lab / P1 acts] either player holds the lower control
+PASS [lift-lab / P1 acts] loose cube rises with one physics authority
+PASS [lift-lab / P1 acts] partner sees lift motion
+PASS [lift-lab / P1 acts] lift lever reaches operator as one switch with one secondary latch
+PASS [lift-lab / P1 acts] lift lever reaches partner as one switch with one secondary latch
+PASS [lift-lab / P1 acts] checkpoint update leaves lower partner in place
+PASS [lift-lab / P1 acts] reset moves only the resetting player to their upper slot
+PASS [lift-lab / P1 acts] second player rides after lower control releases
+PASS [lift-lab / P1 acts] carried cube keeps its offset and holder
+PASS [lift-lab / P1 acts] ordinary death releases carry and respawns upper without resetting partner
+PASS [lift-lab / P1 acts] one physical arrival cannot complete
+PASS [lift-lab / P1 acts] two distinct physical arrivals complete on both clients
+PASS [lift-lab / P1 acts] C8 visitor progress remains independent
+PASS [lift-lab / P2 acts] joining by code discovers the selected lab
+PASS [lift-lab / P2 acts] either player holds the lower control
+PASS [lift-lab / P2 acts] loose cube rises with one physics authority
+PASS [lift-lab / P2 acts] partner sees lift motion
+PASS [lift-lab / P2 acts] lift lever reaches operator as one switch with one secondary latch
+PASS [lift-lab / P2 acts] lift lever reaches partner as one switch with one secondary latch
+PASS [lift-lab / P2 acts] checkpoint update leaves lower partner in place
+PASS [lift-lab / P2 acts] reset moves only the resetting player to their upper slot
+PASS [lift-lab / P2 acts] second player rides after lower control releases
+PASS [lift-lab / P2 acts] carried cube keeps its offset and holder
+PASS [lift-lab / P2 acts] ordinary death releases carry and respawns upper without resetting partner
+PASS [lift-lab / P2 acts] one physical arrival cannot complete
+PASS [lift-lab / P2 acts] two distinct physical arrivals complete on both clients
+PASS [lift-lab / P2 acts] C8 visitor progress remains independent
+PASS [lift-lab / P2 acts] no browser exceptions or console errors

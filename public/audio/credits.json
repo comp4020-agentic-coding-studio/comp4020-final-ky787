@@ -34,13 +34,23 @@
     },
     {
       "file": "landing.ogg",
-      "original": "landing.ogg",
-      "author": "yd",
-      "source": "https://opengameart.org/content/platformer-sounds-terminal-interaction-door-shots-bang-and-footsteps",
+      "original": "Audio/impactSoft_medium_000.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "download": "https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip",
+      "pack": "impact-sounds",
       "license": "CC0-1.0",
-      "processing": "Copied byte-for-byte from Crit 5. Previously repaired Vorbis metadata, capped at 1 second.",
-      "sha256": "d22c2f675cf8fa8454c0d420d17ccb04c211efce2426fcc106e36c4537855f16",
-      "bytes": 7340
+      "retrieved": "2026-10-26",
+      "sourceSha256": "7d3ba0bb5e60a11b5d3e558c141303dcf494256675fbf753c0d252d2cf0481e3",
+      "sourceArchiveSha256": "029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8",
+      "processing": "aformat=channel_layouts=mono,aresample=44100,highpass=f=35,lowpass=f=14000,afade=t=in:d=0.001,afade=t=out:st=0.10:d=0.015,volume=-8.077754dB; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.",
+      "targetPeakDbfs": -6,
+      "decodedPeakDbfs": -6.007,
+      "durationSeconds": 0.115102,
+      "sha256": "199a252e4605bf98130b2d15aa40f50915b826f0d1a58016e8250aebe2ffefd3",
+      "bytes": 4111,
+      "onsetRms50msDbfs": -16.238,
+      "selection": "Explicit human listening approval: Kenney impactSoft_medium_000.ogg; constant gain only, no compression."
     },
     {
       "file": "crumble-start.ogg",
@@ -335,6 +345,14 @@
       "archiveSha256": "b729ba57959bd58793d2c5cafa348aaf2655d354f3da35ec4729e03ec77197b8",
       "licenseFile": "Kenney-Music-Jingles-License.txt",
       "sourceLicenseSha256": "373b1c880ee6c7a83c1ccf209f251cf45fc9ea9b1f0330844fa7be64a401adc4",
+      "verified": "2026-10-26"
+    },
+    "impact-sounds": {
+      "page": "https://kenney.nl/assets/impact-sounds",
+      "archive": "https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip",
+      "archiveSha256": "029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8",
+      "licenseFile": "Kenney-Impact-License.txt",
+      "sourceLicenseSha256": "b49aa9c56b04528b95913de13e506a0f7c5e807b9925db9bfef86af1f91120db",
       "verified": "2026-10-26"
     }
   }

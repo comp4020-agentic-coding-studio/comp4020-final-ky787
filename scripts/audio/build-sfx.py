@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Rebuild the two refined SFX from pinned original CC0 archives.
+"""Rebuild the human-approved landing SFX from the pinned official CC0 archive.
 
 Requires Python 3 and FFmpeg. Existing grapple, cube, plate and other retained
 assets are never rewritten. Pass --effects for specific additions or --all to
-explicitly rebuild all seven additions. Downloads stay in the supplied cache.
+explicitly rebuild all generator-managed effects. Downloads stay in the supplied cache.
 """
 import argparse
 import array
@@ -19,10 +19,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKS = {
     'sci-fi-sounds': ('6b296f9ecf-1677589334', '119340f351a5098ad814f78719438c0da355a9ce8a4c8a3af6a8d48aa3d49e04'),
     'interface-sounds': ('fa43c1dd4d-1677589452', 'f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232'),
+    'impact-sounds': ('87b4ddecda-1677589768', '029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8'),
     'music-jingles': ('f37e530b9e-1677590399', 'b729ba57959bd58793d2c5cafa348aaf2655d354f3da35ec4729e03ec77197b8'),
 }
 # name, pack, original path inside archive, processing before peak trim, target dBFS.
 EFFECTS = [
+    ('landing.ogg', 'impact-sounds', 'Audio/impactSoft_medium_000.ogg',
+     'highpass=f=35,lowpass=f=14000,afade=t=in:d=0.001,afade=t=out:st=0.10:d=0.015', -6),
     ('switch-click.ogg', 'interface-sounds', 'Audio/toggle_001.ogg',
      'asetrate=28665,aresample=44100,atrim=end=0.20,highpass=f=100,lowpass=f=1400,lowpass=f=1400,afade=t=in:d=0.008,afade=t=out:st=0.12:d=0.08', -10),
     ('latch-confirm.ogg', 'interface-sounds', 'Audio/maximize_006.ogg',
@@ -38,7 +41,7 @@ EFFECTS = [
     ('code-power.ogg', 'sci-fi-sounds', 'Audio/forceField_001.ogg',
      'atrim=end=0.8,highpass=f=55,lowpass=f=2000,afade=t=in:d=0.015,afade=t=out:st=0.65:d=0.15', -9),
 ]
-REFINED = ('switch-click.ogg', 'room-complete.ogg')
+REFINED = ('landing.ogg',)
 
 
 def digest(data):
@@ -114,7 +117,7 @@ def main():
     parser.add_argument('--cache', type=Path, default=Path('/tmp/bn-sound-overhaul'))
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument('--effects', nargs='+', choices=[effect[0] for effect in EFFECTS])
-    selection.add_argument('--all', action='store_true', help='Explicitly rebuild all seven additions')
+    selection.add_argument('--all', action='store_true', help='Explicitly rebuild all generator-managed effects')
     args = parser.parse_args()
     selected = set(effect[0] for effect in EFFECTS) if args.all else set(args.effects or REFINED)
     effects = [effect for effect in EFFECTS if effect[0] in selected]
@@ -139,7 +142,7 @@ def main():
         if b'CC0' not in license_bytes:
             raise ValueError(f'{pack} has no expected CC0 dedication')
         license_file = {'sci-fi-sounds': 'Kenney-License.txt', 'interface-sounds': 'Kenney-Interface-License.txt',
-                        'music-jingles': 'Kenney-Music-Jingles-License.txt'}[pack]
+                        'music-jingles': 'Kenney-Music-Jingles-License.txt', 'impact-sounds': 'Kenney-Impact-License.txt'}[pack]
         if not (output / license_file).exists():
             (output / license_file).write_bytes(license_bytes)
         packs[pack] = {'page': f'https://kenney.nl/assets/{pack}', 'archive': url,
@@ -175,6 +178,10 @@ def main():
                            'targetPeakDbfs': target, 'decodedPeakDbfs': round(20 * math.log10(max(abs(n) for n in decoded)), 3),
                            'durationSeconds': round(len(decoded) / 44100, 6),
                            'sha256': digest(data), 'bytes': len(data)}
+        if name == 'landing.ogg':
+            onset = decoded[:round(.05 * 44100)]
+            asset['onsetRms50msDbfs'] = round(20 * math.log10(math.sqrt(sum(n * n for n in onset) / len(onset))), 3)
+            asset['selection'] = 'Explicit human listening approval: Kenney impactSoft_medium_000.ogg; constant gain only, no compression.'
         if arrangement:
             asset['arrangement'] = arrangement
             asset['processing'] = 'Cycle resampling and chord arrangement specified in arrangement and scripts/audio/build-sfx.py; ' + asset['processing']

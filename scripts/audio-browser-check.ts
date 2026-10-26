@@ -152,6 +152,28 @@ try {
         await sleep(200); // Respect the real effect cooldown between physical key presses.
     }
     await shot(a, '06-switch-lever-audio');
+    for (let jump = 1; jump <= 3; jump++) {
+        const before = (await snapshot(a)).audio.played.landing ?? 0;
+        await h.tap(a, 'Space'); await wait(a, 'real jump leaves the floor', s => !s.player.grounded);
+        const landed = await wait(a, 'real jump plays one landing', s => s.player.grounded && (s.audio.played.landing ?? 0) === before + 1);
+        await sleep(180);
+        check(`ordinary jump ${jump} has one bounded landing cue`, landed.player.landingSpeed > 120 && (await snapshot(a)).audio.played.landing === before + 1);
+    }
+    await click(a, '#pause'); await click(a, '[data-room="pressure"]');
+    if ((await snapshot(a)).overviewVisible) await click(a, '#start-room');
+    await h.walk(a, 235); await h.key(a, 'Space', true);
+    try { await h.walk(a, 540); } finally { await h.key(a, 'Space', false); }
+    await wait(a, 'clear the cube and land normally', s => s.player.grounded);
+    await h.walk(a, 610); await wait(a, 'stand on pressure plate', s => s.inputs.plateA);
+    const beforePlateJump = await snapshot(a);
+    await h.tap(a, 'Space'); await wait(a, 'jump releases pressure plate', s => !s.player.grounded && !s.inputs.plateA);
+    await wait(a, 'land back on pressure plate', s => s.player.grounded && s.inputs.plateA);
+    await sleep(180);
+    const onPlate = await snapshot(a);
+    check('plate landing keeps the plate sound without a second landing impact',
+        (onPlate.audio.played.landing ?? 0) === (beforePlateJump.audio.played.landing ?? 0)
+        && (onPlate.audio.played.plate ?? 0) === (beforePlateJump.audio.played.plate ?? 0) + 2);
+
     for (const room of ['relay', 'uplink'] as const) {
         await click(a, '#pause'); await click(a, `[data-room="${room}"]`);
         if ((await snapshot(a)).overviewVisible) await click(a, '#start-room');

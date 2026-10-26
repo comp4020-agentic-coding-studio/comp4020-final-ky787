@@ -6,7 +6,7 @@ export const SOUNDS = {
     hookAttach: { file: 'grapple-attach.ogg', gain: .55, cooldown: .07 },
     ropeJump: { file: 'grapple-fire.ogg', gain: .32, cooldown: .12, rate: 1.3 },
     jump: { file: 'grapple-fire.ogg', gain: .16, cooldown: .12, rate: 1.5 },
-    landing: { file: 'landing.ogg', gain: .40, cooldown: .12 },
+    landing: { file: 'landing.ogg', gain: .81, cooldown: .12 },
     crumbleWarn: { file: 'crumble-start.ogg', gain: .55, cooldown: .25 },
     crumbleBreak: { file: 'crumble-break.ogg', gain: .48, cooldown: .2 },
     death: { file: 'crumble-break.ogg', gain: .42, cooldown: .4, rate: .72 },

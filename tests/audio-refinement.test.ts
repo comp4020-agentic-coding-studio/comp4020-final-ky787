@@ -51,16 +51,18 @@ it('CONTROL SPINE relay power preserves its separate ordinary lever and checkpoi
     h.world.interact(); h.observe();
     expect(h.world.checkpoint).toBe('relay');
     expect(h.feedback()).toEqual(['switch', 'checkpoint']);
+    expect(h.audio.play.mock.calls.find(([cue]) => cue === 'checkpoint')![1]).toBeLessThanOrEqual(.4);
 });
 
-it('the actual upper lift latch keeps its latch cue and suppresses duplicate switch/checkpoint feedback', () => {
+it('the upper lift lever uses one digital click with quiet latch confirmation and no duplicate checkpoint', () => {
     const h = solo('uplink'), at = h.world.room.upperLever!;
     Object.assign(h.world.player, { x: at.x, y: at.y - 25 });
     h.world.interact();
     expect(h.world.events.map(e => e.kind)).toEqual(expect.arrayContaining(['switch', 'lift-latch', 'checkpoint']));
-    h.observe(); expect(h.feedback()).toEqual(['latch']);
+    h.observe(); expect(h.feedback()).toEqual(['switch', 'latch']);
+    expect(h.audio.play.mock.calls.find(([cue]) => cue === 'latch')![1]).toBeLessThan(.31);
     expect(h.world.inputs.switchC).toBe(true); expect(h.world.checkpoint).toBe('upper');
-    h.world.interact(); h.observe(); expect(h.feedback()).toEqual(['latch']);
+    h.world.interact(); h.observe(); expect(h.feedback()).toEqual(['switch', 'latch']);
 });
 
 it('Crossfeed accepted toggles use switch while its terminal controls keep latch, once per transition', () => {
@@ -129,4 +131,25 @@ it('a checkpoint station owns its staged hero cues without also playing switch, 
     heroes.reset(room, restoredState); restoredAudio.observe();
     expect(restoredAudio.audio.play).not.toHaveBeenCalled();
     expect(heroes.update(room, restoredState, 10, true)).toEqual([]);
+});
+
+it('declarative co-op lever toggles use the same digital cue on accepted on and off edges', () => {
+    const h = coop('handshake'), at = h.world.room.controls!.find(c => c.id === 'draft:link')!.at;
+    Object.assign(h.world.player, { x: at.x, y: at.y - 25 });
+    for (const on of [true, false]) {
+        h.room.levelState.devices['link.value'] = on;
+        h.authority.sample(h.world); h.world.syncAuthority(); h.observe();
+        expect(h.feedback()).toEqual(['switch']); h.audio.play.mockClear();
+        h.authority.sample(h.world); h.observe(); expect(h.feedback()).toEqual([]);
+    }
+});
+
+it('an accepted co-op lift-latch event supplies the digital click even without a switch event', () => {
+    const h = coop('lift-lab'), at = h.world.room.upperLever!;
+    Object.assign(h.world.player, { x: at.x, y: at.y - 25 });
+    h.room.levelState.liftLatched = true; h.room.checkpoint = 'upper'; h.world.syncAuthority();
+    h.sound.observe(h.world, [{ kind: 'lift-latch', at }, { kind: 'checkpoint', at }]);
+    expect(h.feedback()).toEqual(['switch', 'latch']);
+    expect(h.audio.play.mock.calls.find(([cue]) => cue === 'latch')![1]).toBeLessThan(.31);
+    h.audio.play.mockClear(); h.observe(); expect(h.feedback()).toEqual([]);
 });

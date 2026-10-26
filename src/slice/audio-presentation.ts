@@ -1,6 +1,7 @@
 import { cubeEntries } from '../coop/protocol.ts';
 import { GameAudio, MACHINERY_CUES, type SoundCue } from '../audio/game-audio.ts';
 import type { Box, Vec2 } from '../engine/geometry.ts';
+import { PLAYER } from '../engine/constants.ts';
 import type { MachineEvent, PuzzleWorld } from './world.ts';
 import { payloadReceivers } from './receiver-presentation.ts';
 
@@ -52,7 +53,12 @@ export class AudioPresentation {
         if (next.phase === 'attached' && old.phase !== 'attached') play('hookAttach');
         if (old.phase === 'attached' && next.jumps > old.jumps) play('ropeJump');
         else if (old.grounded && !next.grounded && w.player.vy < -300) play('jump');
-        if (w.player.justLanded) play('landing', undefined, Math.min(1, w.player.landingSpeed / 700));
+        // A local footfall onto a newly pressed plate already has its impact.
+        // Do not suppress landings for remote plates or a cube pressing one.
+        const plateLanding = next.plates.some(({ on, at }, i) => on && !old.plates[i]?.on && at
+            && Math.abs(at.x - w.player.x) < 72 && Math.abs(at.y - w.player.y - PLAYER.height / 2) < 8);
+        if (w.player.justLanded && !old.grounded && next.grounded && !plateLanding)
+            play('landing', undefined, Math.min(1, w.player.landingSpeed / 700));
         for (const [id, c] of cubeEntries(w.cubes)) if (!w.cubeAuthority(id)?.consumeCorrection?.() && old.carried[id] !== next.carried[id]) play(next.carried[id] ? 'pickup' : 'drop', c);
         next.plates.forEach(({ on, at }, i) => {
             if (on !== old.plates[i]?.on) play('plate', at, .8, on ? 1 : .8);
@@ -75,15 +81,23 @@ export class AudioPresentation {
             const p = w.platforms.find(p => p.def.id === id)!.def;
             play('crumbleWarn', { x: p.x + p.w / 2, y: p.y });
         }
+        const samePoint = (a: Vec2 | undefined, b: Vec2) => !!a && Math.hypot(a.x - b.x, a.y - b.y) < 1;
+        const station = (at: Vec2) => w.room.breakpoints?.some(b => b.activationControl && samePoint(b.at, at));
+        // Mirror the existing renderer's control shapes, without changing event
+        // producers, input prediction or server acceptance. A latch can be a lever.
+        const lever = (e: MachineEvent) => !station(e.at) && (e.kind === 'switch' || e.kind === 'lift-latch'
+            || e.kind === 'terminal' && (samePoint(w.room.lever, e.at) || samePoint(w.room.upperLever, e.at)
+                || w.room.controls?.some(c => c.kind === 'toggle' && samePoint(c.at, e.at))));
+        const hasLever = events.some(lever), hasLiftLatch = events.some(e => e.kind === 'lift-latch');
         for (const e of events) {
             // Authored checkpoint machines own a deployment/confirmation pair on their local clock.
             if (e.kind === 'checkpoint' && w.room.breakpoints?.some(b => b.checkpoint === w.checkpoint)) continue;
-            if ((e.kind === 'terminal' || e.kind === 'lift-latch') && w.room.breakpoints?.some(b => b.activationControl
-                && Math.hypot(b.at.x - e.at.x, b.at.y - e.at.y) < 1)) continue;
-            if (e.kind === 'switch' && !events.some(e => e.kind === 'lift-latch')) play('switch', e.at);
-            if (e.kind === 'terminal') play('latch', e.at);
-            if (e.kind === 'lift-latch') play('latch', e.at);
-            if (e.kind === 'checkpoint' && !events.some(e => e.kind === 'lift-latch')) play('checkpoint', e.at);
+            if ((e.kind === 'switch' || e.kind === 'terminal' || e.kind === 'lift-latch') && station(e.at)) continue;
+            if (lever(e)) play('switch', e.at);
+            // Keep meaningful confirmation behind the immediate digital click.
+            // Map coalescing also handles the solo switch + lift-latch pair once.
+            if (e.kind === 'terminal' || e.kind === 'lift-latch') play('latch', e.at, lever(e) ? .3 : 1);
+            if (e.kind === 'checkpoint' && !hasLiftLatch) play('checkpoint', e.at, hasLever ? .4 : 1);
             if (e.kind === 'crumble-respawn') play('codePower', e.at, .5);
             if (e.kind === 'crumble') play('crumbleBreak', e.at);
             if (e.kind === 'cube-firewall') play('firewallZap', e.at);

@@ -46,10 +46,27 @@ it('ships exactly the seven scene tracks with verified provenance, hashes and bo
         expect(asset.source).toMatch(/^https:\/\/opengameart.org\/content\//);
         expect(asset.download).toMatch(/^https:\/\/opengameart.org\/sites\/default\/files\//);
         expect(asset.sourceSha256).toMatch(/^[a-f0-9]{64}$/); expect(asset.author.length).toBeGreaterThan(2);
-        expect(asset.processing.length).toBeGreaterThan(30); expect(asset.duration).toBeGreaterThanOrEqual(90);
+        expect(asset.processing.length).toBeGreaterThan(30); expect(asset.duration).toBeGreaterThanOrEqual(asset.scene === 'handshake' ? 47 : 90);
         expect(asset.duration).toBeLessThanOrEqual(240); expect(asset.truePeakDbtp).toBeLessThan(-6);
         expect(asset.integratedLufs).toBeGreaterThan(-24); expect(asset.integratedLufs).toBeLessThan(-22);
         expect(asset.loopAnalysis.longestSilenceBelowMinus60DbSeconds).toBe(0);
     }
     expect(total).toBe(catalogue.totalBytes); expect(total).toBeLessThan(18_000_000);
+});
+
+it('uses the full human-approved Kuia source and the exact Sewers recording without inferred filename tempo', async () => {
+    const { assets } = JSON.parse(await readFile('public/audio/music/catalogue.json', 'utf8'));
+    const kuia = assets.find((a: {scene: string}) => a.scene === 'handshake');
+    expect(kuia.title).toBe('Kuia');
+    expect(kuia.sourceSha256).toBe('11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e');
+    expect(kuia.edits.fullOriginalRecording).toBe(true);
+    expect(kuia.edits.trimStartSample).toBe(0);
+    expect(kuia.edits.encodedSamples).toBe(kuia.edits.sourceDecodedSamples);
+    expect(kuia.duration).toBeCloseTo(2080512 / 44100, 5);
+    const sewers = assets.find((a: {scene: string}) => a.scene === 'crossfeed-vault');
+    expect(sewers.title).toBe('Through the Sewers');
+    expect(sewers.download.endsWith('/through_the_sewers_1766bpm.ogg')).toBe(true);
+    expect(sewers.sourceSha256).toBe('a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99');
+    expect(sewers.edits.tempoBpm).toBeNull();
+    expect(sewers.edits.tempoEvidence).toContain('No verified tempo');
 });
