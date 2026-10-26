@@ -86,8 +86,8 @@ fail closed. Single-player C8 files and contracts are unchanged.
 
 Old and internal mechanics sessions use `party: null`, keeping their fixed-level
 behavior and accepting legacy messages without generation (they cannot transition).
-`?labs=1` exposes internal CREATE controls for regression routes; the public menu
-contains only TUTORIAL and CO-OP CAMPAIGN. This flag hides fixtures, not a security
+`?labs=1` exposes internal CREATE controls inside Play Co-op for regression routes.
+The public title and invitation flows are documented in [the menu contract](../main-menu-and-invitations.md). This flag hides fixtures, not a security
 boundary. The old `create {level}` protocol remains for developer routes and old
 clients. Creating a campaign chamber that way starts a playing party directly.
 

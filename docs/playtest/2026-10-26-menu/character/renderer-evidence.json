@@ -1,0 +1,604 @@
+[
+  {
+    "label": "initial cyan selection reaches the actual renderer",
+    "result": {
+      "accent": "#64E6D5",
+      "colour": "cyan",
+      "pixels": 3096,
+      "calls": 13
+    }
+  },
+  {
+    "label": "real pointer hover immediately paints purple without clicking",
+    "result": {
+      "accent": "#B59BFF",
+      "colour": "purple",
+      "pixels": 3096,
+      "calls": 30
+    }
+  },
+  {
+    "label": "moving directly between swatches paints orange",
+    "result": {
+      "accent": "#FFAC55",
+      "colour": "orange",
+      "pixels": 3096,
+      "calls": 48
+    }
+  },
+  {
+    "label": "repeated swatch movement paints pink",
+    "result": {
+      "accent": "#FF70CB",
+      "colour": "pink",
+      "pixels": 3096,
+      "calls": 52
+    }
+  },
+  {
+    "label": "pointer leaving the palette restores selected cyan",
+    "result": {
+      "accent": "#64E6D5",
+      "colour": "cyan",
+      "pixels": 3096,
+      "calls": 54
+    }
+  },
+  {
+    "label": "click selects purple and leaving it keeps purple",
+    "result": {
+      "accent": "#B59BFF",
+      "colour": "purple",
+      "pixels": 3096,
+      "calls": 78
+    }
+  },
+  {
+    "label": "keyboard Tab focuses and previews cyan",
+    "result": {
+      "accent": "#64E6D5",
+      "colour": "cyan",
+      "pixels": 3096,
+      "calls": 112
+    }
+  },
+  {
+    "label": "keyboard focus temporarily previews purple",
+    "result": {
+      "accent": "#B59BFF",
+      "colour": "purple",
+      "pixels": 2869,
+      "calls": 118
+    }
+  },
+  {
+    "label": "keyboard can preview the next colour",
+    "result": {
+      "accent": "#55AAFF",
+      "colour": "blue",
+      "pixels": 2866,
+      "calls": 127
+    }
+  },
+  {
+    "label": "reduced motion still paints colour input immediately",
+    "result": {
+      "accent": "#FFAC55",
+      "colour": "orange",
+      "pixels": 3096,
+      "calls": 591
+    }
+  },
+  {
+    "label": "customization loads the saved colour",
+    "result": {
+      "accent": "#B59BFF",
+      "colour": "purple",
+      "pixels": 3096,
+      "calls": 2
+    }
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 5537.300000000047,
+        "colour": "rgba(181, 155, 255, 0.9)",
+        "x": 874.5675231172208,
+        "y": 607.4489878954555,
+        "scale": 1.0513513088226318,
+        "pixels": 122
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 5537.100000000093,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 937.6486016465788,
+        "y": 607.4489878954555,
+        "scale": 1.0513513088226318,
+        "pixels": 110
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 5537.399999999907,
+        "text": "ShadowByte / P1 · YOU",
+        "x": 874.5675675675677,
+        "y": 571.1652397626476,
+        "width": 139.07373046875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 5537.399999999907,
+        "text": "ZeroDay / P2",
+        "x": 937.6486486486488,
+        "y": 547.1652397626476,
+        "width": 79.470703125,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": [
+      {
+        "x": 874.5675675675677,
+        "y": 607.4490235464314
+      },
+      {
+        "x": 937.6486486486488,
+        "y": 607.4490235464314
+      }
+    ]
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1999.1999999999534,
+        "colour": "rgba(181, 155, 255, 0.9)",
+        "x": 891.6891163757391,
+        "y": 604.5602870810762,
+        "scale": 1.0265376567840576,
+        "pixels": 65
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1999.1999999999534,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 953.2813757827826,
+        "y": 604.5602870810762,
+        "scale": 1.0265376567840576,
+        "pixels": 51
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1999.4000000001397,
+        "text": "ShadowByte / P1",
+        "x": 891.6890493778092,
+        "y": 544.8968070444135,
+        "width": 99.33837890625,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1999.4000000001397,
+        "text": "ZeroDay / P2 · YOU",
+        "x": 953.2813059536519,
+        "y": 568.8968070444135,
+        "width": 119.2060546875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": [
+      {
+        "x": 891.6890493778092,
+        "y": 604.560247284348
+      },
+      {
+        "x": 953.2813059536519,
+        "y": 604.560247284348
+      }
+    ]
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 7603.5,
+        "colour": "rgba(181, 155, 255, 0.9)",
+        "x": 1016.0930278004453,
+        "y": 523.4051078711327,
+        "scale": 0.47492969036102295,
+        "pixels": 4
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 7603.5,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 1044.5888092221066,
+        "y": 523.4051078711327,
+        "scale": 0.47492969036102295,
+        "pixels": 3
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 7603.5,
+        "text": "ShadowByte / P1 · YOU",
+        "x": 1016.0930058256112,
+        "y": 494.40510032669874,
+        "width": 139.07373046875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 7603.600000000093,
+        "text": "ZeroDay / P2",
+        "x": 1044.5887868136037,
+        "y": 470.40510032669874,
+        "width": 79.470703125,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": [
+      {
+        "x": 1016.0930058256112,
+        "y": 523.4051003266987
+      },
+      {
+        "x": 1044.5887868136037,
+        "y": 523.4051003266987
+      }
+    ]
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1739.5,
+        "colour": "rgba(164, 247, 106, 0.9)",
+        "x": 906.902544259181,
+        "y": 601.7409190711987,
+        "scale": 1.0044891834259033,
+        "pixels": 103
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1739.5,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 967.1718952647352,
+        "y": 601.7409190711987,
+        "scale": 1.0044891834259033,
+        "pixels": 95
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1739.6000000000931,
+        "text": "ShadowFlux / P1",
+        "x": 906.902503063041,
+        "y": 542.6286500280956,
+        "width": 99.33837890625,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1739.6000000000931,
+        "text": "ZeroDay / P2 · YOU",
+        "x": 967.1718506227766,
+        "y": 566.6286500280956,
+        "width": 119.2060546875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": [
+      {
+        "x": 906.902503063041,
+        "y": 601.7408781779855
+      },
+      {
+        "x": 967.1718506227766,
+        "y": 601.7408781779855
+      }
+    ]
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 457,
+        "colour": "rgba(164, 247, 106, 0.9)",
+        "x": 198.09459331557673,
+        "y": 553.1147154160972,
+        "scale": 0.9554054141044617,
+        "pixels": 124
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 456.89999999990687,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 274.52702644393366,
+        "y": 553.1147154160972,
+        "scale": 0.9554054141044617,
+        "pixels": 37
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 457.0999999998603,
+        "text": "ShadowFlux / P1 · YOU",
+        "x": 198.09459459459455,
+        "y": 519.2295768994977,
+        "width": 139.07373046875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 457.19999999995343,
+        "text": "ZeroDay / P2",
+        "x": 274.527027027027,
+        "y": 495.2295768994977,
+        "width": 79.470703125,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": null
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 609.3999999999069,
+        "colour": "rgba(164, 247, 106, 0.9)",
+        "x": 198.09459331557673,
+        "y": 553.8312330308513,
+        "scale": 0.9554054141044617,
+        "pixels": 104
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 609.3999999999069,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 274.52702644393366,
+        "y": 553.8312330308513,
+        "scale": 0.9554054141044617,
+        "pixels": 39
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 609.5999999998603,
+        "text": "ShadowFlux / P1",
+        "x": 198.09459459459455,
+        "y": 495.94609272917796,
+        "width": 99.33837890625,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 609.5999999998603,
+        "text": "ZeroDay / P2 · YOU",
+        "x": 274.527027027027,
+        "y": 519.946092729178,
+        "width": 119.2060546875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": null
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1545.3000000000466,
+        "colour": "rgba(164, 247, 106, 0.9)",
+        "x": 157.70269632339478,
+        "y": 549.7829557564655,
+        "scale": 1.0513513088226318,
+        "pixels": 126
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1545.3000000000466,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 425.7972800731659,
+        "y": 549.7829557564655,
+        "scale": 1.0513513088226318,
+        "pixels": 115
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1545.4000000001397,
+        "text": "ShadowFlux / P1 · YOU",
+        "x": 157.70270270270268,
+        "y": 513.499194729038,
+        "width": 139.07373046875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1545.4000000001397,
+        "text": "ZeroDay / P2",
+        "x": 425.7972972972973,
+        "y": 513.499194729038,
+        "width": 79.470703125,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": [
+      {
+        "x": 157.70270270270268,
+        "y": 549.7829785128217
+      },
+      {
+        "x": 425.7972972972973,
+        "y": 549.7829785128217
+      }
+    ]
+  },
+  {
+    "bodies": [
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1482.9000000001397,
+        "colour": "rgba(164, 247, 106, 0.9)",
+        "x": 157.70269632339478,
+        "y": 549.6400866170834,
+        "scale": 1.0513513088226318,
+        "pixels": 124
+      },
+      {
+        "kind": "ninja",
+        "canvas": "stage",
+        "at": 1482.9000000001397,
+        "colour": "rgba(255, 172, 85, 0.9)",
+        "x": 425.7972800731659,
+        "y": 549.6400866170834,
+        "scale": 1.0513513088226318,
+        "pixels": 116
+      }
+    ],
+    "labels": [
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1483.1000000000931,
+        "text": "ShadowFlux / P1",
+        "x": 157.70270270270268,
+        "y": 513.356326061875,
+        "width": 99.33837890625,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      },
+      {
+        "kind": "label",
+        "canvas": "stage",
+        "at": 1483,
+        "text": "ZeroDay / P2 · YOU",
+        "x": 425.7972972972973,
+        "y": 513.356326061875,
+        "width": 119.2060546875,
+        "font": "500 11px ui-monospace, monospace",
+        "transform": {
+          "a": 1,
+          "d": 1
+        }
+      }
+    ],
+    "expectedPositions": [
+      {
+        "x": 157.70270270270268,
+        "y": 549.6401098456588
+      },
+      {
+        "x": 425.7972972972973,
+        "y": 549.6401098456588
+      }
+    ]
+  },
+  {
+    "label": "touch tap selects and paints orange without hover",
+    "result": {
+      "accent": "#FFAC55",
+      "colour": "orange",
+      "pixels": 3096,
+      "calls": 16
+    }
+  }
+]

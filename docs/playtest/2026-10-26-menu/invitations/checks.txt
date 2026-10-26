@@ -1,0 +1,33 @@
+PASS Start Co-op creates a lobby without selecting or starting a chamber
+PASS waiting lobby cannot be dismissed by outside click
+PASS Copy Link shares the exact first-party root URL without debug or labs — http://127.0.0.1:39735/?join=7ANV
+PASS clipboard failure exposes a selected usable link and does not claim success
+PASS exact invitation remains intact during first-time ninja setup with no co-op connection
+PASS independent profile joins as guest and preserves server-owned host
+PASS accepted join consumes only the invitation query
+PASS both invited players reach actual co-op gameplay in the same party
+PASS co-op pause retains invite and leave without customization
+PASS opening co-op pause focuses Resume
+PASS Space resumes co-op without jumping or grappling
+PASS co-op pause retains invite and leave without customization
+PASS opening co-op pause focuses Resume
+PASS Space resumes co-op without jumping or grappling
+PASS network reconnect preserves guest assignment and selected chamber
+PASS reconnecting an active chamber does not repeat its already-dismissed overview
+PASS reconnecting the same chamber preserves an explicit co-op pause
+PASS simulated persisted pagehide leaves transport and silences audio
+PASS simulated BFCache lifecycle preserves same-chamber pause and dismissed overview
+PASS guest has conflicting remembered party before following another invitation
+PASS new invitation replaces remembered target only after acceptance
+PASS invalid active-party invitation retains party without exposing manual join or leave-and-join
+PASS a corrected active-party invitation replaces its previous notice
+PASS opening invitation while in another active party waits for an explicit leave choice
+PASS full invitation retains retry and URL without changing original two-player party
+PASS pasted foreign invitation is rejected locally without navigation or a connection
+PASS invalid invitation never creates or reconnects a party
+PASS correcting an invalid invitation with a valid manual target consumes the obsolete query
+PASS manual codes and canonical pasted URLs both preserve guest assignment
+PASS no browser runtime errors
+PASS no browser runtime errors
+PASS no browser runtime errors
+PASS no browser runtime errors

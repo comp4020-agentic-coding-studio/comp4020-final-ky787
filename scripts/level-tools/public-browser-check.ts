@@ -57,9 +57,9 @@ try {
     const downloads = join(h.temporary, 'downloads'); await mkdir(downloads);
     await root.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloads });
     p = await page('');
-    check('production main menu displays LEVEL BUILDER', await p.read("document.querySelector('#level-builder')?.textContent==='LEVEL BUILDER'"));
+    check('production main menu displays LEVEL BUILDER', await p.read("document.querySelector('#level-builder')?.textContent.toUpperCase().includes('LEVEL BUILDER')"));
     const progress = await p.read("fetch('/api/progress').then(r=>r.json())");
-    await h.shot(p, '01-production-menu'); await h.click(p, '#level-builder'); await until(p, '!!globalThis.workbench?.ready');
+    await h.shot(p, '01-production-menu'); await h.click(p, '#open-workbench'); await until(p, '!!globalThis.workbench?.ready');
     check('menu opens same-origin PUBLIC LEVEL BUILDER with browser storage', await p.read("location.pathname==='/workbench.html' && workbench.snapshot().storage==='browser' && document.querySelector('.badge').textContent==='PUBLIC LEVEL BUILDER'"));
     check('public Test with Friend is available while trusted filesystem imports stay hidden', await p.read("!document.querySelector('#coop').hidden && document.querySelector('#import-room').hidden"));
     check('storage warning and game return are visible', await p.read("document.querySelector('.wb-storage-notice').textContent.includes('private browsing') && !document.querySelector('#back-to-game').hidden"));

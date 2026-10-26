@@ -364,7 +364,8 @@ try {
             && !(await painted(p)).some(paint => /0x140[0-9a-f]+/i.test(paint.text)));
         await h.shot(a, 'public-custom-no-native-overlay');
 
-        const solo = await h.page(url, debug); await instrument(solo); await onboardNinja(solo, 'TraceReader', 'cyan');
+        const soloUrl = new URL(url); soloUrl.searchParams.set('debug', '1');
+        const solo = await h.page(soloUrl.href, debug); await instrument(solo); await onboardNinja(solo, 'TraceReader', 'cyan');
         await click(solo, '[data-room="uplink"]'); await wait(solo, 'CONTROL SPINE enters', s => s.room === 'uplink');
         if ((await snapshot(solo)).overviewVisible) await click(solo, '#start-room');
         await solo.read('binaryNinja.renderer.editorCamera={x:2450,y:760,zoom:.95}'); await sleep(200);

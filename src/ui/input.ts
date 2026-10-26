@@ -46,6 +46,14 @@ export class InputManager {
   private held = new Set<string>();
   private detach: (() => void)[] = [];
   private touchMove = 0;
+  private enabled = true;
+
+  /** Menus retain native keyboard navigation without buffering gameplay input. */
+  setEnabled(enabled: boolean): void {
+    this.enabled = enabled;
+    this.releaseAll();
+    this.clearActions();
+  }
 
   constructor(private readonly grapple: boolean) {}
 
@@ -55,6 +63,7 @@ export class InputManager {
       const target = e.target as HTMLElement | null;
       if (target && ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName)) return;
       const code = e.code;
+      if (!this.enabled && code !== "Escape" && code !== "F1") return;
       // Menu buttons keep native keyboard navigation and activation.
       if (target?.closest("button") && (code === "Tab" || code === "Space" || code === "Enter")) return;
       if (GAME_KEYS.has(code)) e.preventDefault();
@@ -87,6 +96,7 @@ export class InputManager {
       this.hasPointer = true;
     };
     const down = (e: PointerEvent): void => {
+      if (!this.enabled) return;
       setAim(e);
       canvas.focus();
       if (e.button !== 0) return;
@@ -136,6 +146,7 @@ export class InputManager {
       const kind = button.dataset.touch;
       const press = (e: PointerEvent): void => {
         e.preventDefault();
+        if (!this.enabled) return;
         if (kind === "left") this.touchMove = -1;
         else if (kind === "right") this.touchMove = 1;
         else if (kind === "use") this.pendingInteract = true;
@@ -198,7 +209,7 @@ export class InputManager {
   releaseAll(): void {
     this.held.clear();
     this.touchMove = 0;
-    this.state.grappleHeld = false;
+    Object.assign(this.state, emptyInput());
     this.pendingJump = false;
     this.pendingAirGrapple = false;
     this.pendingInteract = false;

@@ -45,6 +45,7 @@ export class CoopClient {
     private exitSent = false;
     constructor(private onRoom: (room: SessionRoom, initial: boolean) => void, private onStatus: () => void, private storageKey = 'bn_coop_room', private customTransport = false) {}
     get connected(): boolean { return this.status === 'CONNECTED' && !!this.room; }
+    get targetCode(): string | null { return this.active ? this.room?.code ?? (this.intent.type === 'join' ? this.intent.code : null) : null; }
     get isHost(): boolean { return !!(this.room?.party || this.room?.draft) && this.slot === 1; }
     get playing(): boolean { return this.connected && (!this.room!.party || this.room!.party.phase === 'playing'); }
     get ownsCube(): boolean { return this.ownsCubeFor('cube'); }
@@ -70,11 +71,24 @@ export class CoopClient {
         try { if (code) sessionStorage.setItem(this.storageKey, code); else sessionStorage.removeItem(this.storageKey); } catch { /* Manual room codes still work. */ }
     }
     start(code?: string, level?: CoopLevelId): void {
+        if (code !== undefined && !normalizeCode(code)) {
+            if (!this.active) this.status = 'ENTER A FOUR-CHARACTER ROOM CODE';
+            this.onStatus(); return;
+        }
         this.leave(false);
-        if (code !== undefined && !normalizeCode(code)) { this.status = 'ENTER A FOUR-CHARACTER ROOM CODE'; this.onStatus(); return; }
         this.active = true; this.reconnectAttempts = 0; this.room = null; this.slot = null;
         this.intent = code ? { type: 'join', code: normalizeCode(code)! } : level ? { type: 'create', level } : { type: 'create-party' };
         void this.connect();
+    }
+    /** Explicit invitations may override remembered rooms, never an active party. */
+    startInvitation(value: string): 'started' | 'active' | 'conflict' | 'invalid' {
+        const code = normalizeCode(value);
+        if (!code) return 'invalid';
+        if (this.active) {
+            return this.targetCode === code ? 'active' : 'conflict';
+        }
+        this.start(code);
+        return 'started';
     }
     startDraft(hash: string): void {
         this.leave(false); this.active = true; this.reconnectAttempts = 0; this.room = null; this.slot = null;
@@ -175,7 +189,10 @@ export class CoopClient {
                     this.placements = {};
                 } else if (message.type === 'error') {
                     if (message.code === 'STALE_ACTION') return;
-                    const messageText = message.message;
+                    const messageText = message.code === 'ROOM_FULL' ? 'This party already has two players. Ask your friend to create a new party.'
+                        : message.code === 'ROOM_EXPIRED' ? 'This party has expired. Ask your friend for a new invitation link.'
+                        : message.code === 'ROOM_NOT_FOUND' ? 'Party not found. Check the code or ask your friend for a new invitation link.'
+                        : message.code === 'INVALID_CODE' ? 'Enter a valid four-character party code.' : message.message;
                     this.leave(false); this.status = messageText; this.onStatus();
                 }
             };

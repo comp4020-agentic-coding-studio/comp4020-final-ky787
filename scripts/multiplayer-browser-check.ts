@@ -24,8 +24,11 @@ async function predictedTap(p: Cdp, kind: 'cube-pickup' | 'cube-drop' | 'switch'
     } finally { await key(p, 'KeyE', false); }
 }
 async function nearCube(p: Cdp) {
-    const x = (await snapshot(p)).cube!.x;
-    await walk(p, x - 120); await walk(p, x - 48);
+    const state = await snapshot(p), side = state.player.x < state.cube!.x ? -1 : 1;
+    await walk(p, state.cube!.x + side * 120);
+    // A released cube can finish docking during the approach. Stay on this
+    // side of its solid body and use the current position for the last step.
+    await walk(p, (await snapshot(p)).cube!.x + side * 42);
 }
 async function contestedPickup(first: Cdp, second: Cdp, firstSlot: number) {
     await nearCube(first); await nearCube(second);
@@ -123,7 +126,9 @@ try {
 
         await walk(runner, 430);
         const deaths = (await snapshot(runner)).deaths;
-        await key(runner, 'KeyD', true); await mouse(runner, 770, 226, true);
+        // Jump from the bank before hooking, as the onboarding teaches. This
+        // avoids a browser scheduling delay turning the approach into a fall.
+        await key(runner, 'KeyD', true); await tap(runner, 'Space'); await mouse(runner, 770, 226, true);
         await wait(runner, 'real hook attachment', s => s.player.rope.phase === 'attached');
         await wait(runner, 'rightward grapple release', s => s.player.x > 860 && s.player.y < 510 && s.player.vx > 0);
         await shot(runner, 'pairing-grapple');
@@ -177,8 +182,7 @@ try {
         await wait(runner, 'first carrier drops cube', s => s.multiplayer?.cubeHolder === null && !!s.cube?.grounded);
         check('one shared drop cue reaches each client', ((await snapshot(holder)).audio.played.drop ?? 0) === firstDropCues[0] + 1
             && ((await snapshot(runner)).audio.played.drop ?? 0) === firstDropCues[1] + 1);
-        const droppedCube = (await snapshot(runner)).cube!;
-        await walk(runner, droppedCube.x + 48); await tap(runner, 'KeyE');
+        await nearCube(runner); await tap(runner, 'KeyE');
         await wait(holder, 'partner wins handoff', s => s.multiplayer?.cubeHolder === runnerSlot && !!s.cube?.carried);
         check(`handoff P${holderSlot} → P${runnerSlot} transfers physics authority`, (await snapshot(holder)).multiplayer?.cubePhysicsAuthority === runnerSlot
             && (await snapshot(runner)).multiplayer?.ownsCubePhysics === true && (await snapshot(holder)).multiplayer?.ownsCubePhysics === false);
@@ -273,7 +277,7 @@ try {
                 JSON.stringify({ placement: restored.multiplayer?.cubePlacement, cube: restored.cube, access: restored.outputs.codePlatformA }));
         if (!process.argv[2]) {
             const disk = JSON.parse(await readFile(join(temporary, 'data', 'rooms', `${code}.json`), 'utf8'));
-            check('restart room file contains semantic placement without physics or ownership', disk.version === 5 && disk.cubePlacements.cube === 'cargoPlate'
+            check('restart room file contains semantic placement without physics or ownership', disk.version === 6 && disk.cubePlacements.cube === 'cargoPlate'
                 && !['cube', 'holder', 'physicsAuthority', 'x', 'y', 'vx', 'vy', 'transform'].some(k => k in disk));
             await finalAccess(holder); await finalAccess(runner);
         } else await finalAccess(holder);

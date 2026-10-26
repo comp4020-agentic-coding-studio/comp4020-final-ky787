@@ -14,12 +14,13 @@ export class NinjaPreview {
     private readonly visibilityChanged = (): void => this.schedule();
     private readonly motionChanged = (): void => this.schedule();
 
-    constructor(private readonly canvas: HTMLCanvasElement, colour: CharacterColour) {
+    constructor(private readonly canvas: HTMLCanvasElement, colour: CharacterColour, private readonly variant: 'classic' | 'swing' = 'classic') {
         this.context = canvas.getContext('2d')!;
         this.colour = colour;
         const ratio = Math.min(devicePixelRatio || 1, 2);
-        canvas.width = 440 * ratio;
-        canvas.height = 270 * ratio;
+        canvas.width = (variant === 'swing' ? 600 : 440) * ratio;
+        canvas.height = (variant === 'swing' ? 560 : 270) * ratio;
+        canvas.dataset.previewVariant = variant;
         document.addEventListener('visibilitychange', this.visibilityChanged);
         this.motion.addEventListener('change', this.motionChanged);
         this.schedule();
@@ -52,6 +53,7 @@ export class NinjaPreview {
     };
 
     private draw(now: number): void {
+        if (this.variant === 'swing') { this.drawSwing(now); return; }
         const ctx = this.context;
         const width = 440, height = 270, floor = 230;
         const time = this.motion.matches ? 0 : (now - this.startedAt) / 1000;
@@ -90,5 +92,54 @@ export class NinjaPreview {
         this.canvas.dataset.previewAccent = accent;
         this.canvas.dataset.previewColour = this.colour;
         this.canvas.dataset.animation = jumping ? 'jump' : running ? 'run' : 'idle';
+    }
+
+    /** An analytic pendulum pose, entirely separate from the grapple simulation. */
+    private drawSwing(now: number): void {
+        const ctx = this.context, width = 600, height = 560;
+        const time = this.motion.matches ? 0 : (now - this.startedAt) / 1000;
+        const accent = colourHex(this.colour);
+        const anchor = { x: 300, y: 84 }, length = 276;
+        const pose = (t: number): { x: number; y: number; angle: number } => {
+            const angle = .16 + Math.sin(t * .82) * .43;
+            return { x: anchor.x + Math.sin(angle) * length, y: anchor.y + Math.cos(angle) * length, angle };
+        };
+        const current = pose(time);
+        ctx.setTransform(this.canvas.width / width, 0, 0, this.canvas.height / height, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        // A quiet schematic anchor and one short fading trajectory sell the motion.
+        ctx.strokeStyle = '#46748755'; ctx.fillStyle = '#46748755'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(anchor.x - 72, anchor.y - 24); ctx.lineTo(anchor.x + 72, anchor.y - 24);
+        ctx.moveTo(anchor.x, anchor.y - 24); ctx.lineTo(anchor.x, anchor.y - 10); ctx.stroke();
+        for (const offset of [-72, 72]) ctx.fillRect(anchor.x + offset - 2, anchor.y - 26, 4, 4);
+        if (!this.motion.matches) {
+            ctx.lineWidth = 2;
+            for (let segment = 16; segment > 0; segment--) {
+                const from = pose(time - segment * .055), to = pose(time - (segment - 1) * .055);
+                ctx.globalAlpha = (1 - segment / 18) * .17;
+                ctx.strokeStyle = accent; ctx.beginPath(); ctx.moveTo(from.x, from.y + 49); ctx.lineTo(to.x, to.y + 49); ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+        }
+        ctx.strokeStyle = accent; ctx.lineWidth = 1.6; ctx.globalAlpha = .65;
+        ctx.beginPath(); ctx.moveTo(anchor.x, anchor.y); ctx.lineTo(current.x - 7, current.y - 32); ctx.stroke();
+        ctx.globalAlpha = .15; ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.arc(anchor.x, anchor.y, 10, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = .85; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(anchor.x, anchor.y, 10, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = accent; ctx.fillRect(anchor.x - 3, anchor.y - 3, 6, 6); ctx.globalAlpha = 1;
+
+        const p = this.player;
+        // drawNinja consumes velocity only to pose its scarf and lean, without integrating it.
+        p.x = 0; p.y = 0; p.grounded = false;
+        p.vx = this.motion.matches ? 0 : Math.cos(time * .82) * 190;
+        p.vy = this.motion.matches ? 0 : -Math.sin(current.angle) * p.vx * .5;
+        p.facing = p.vx < -15 ? -1 : 1;
+        ctx.save(); ctx.translate(current.x, current.y); ctx.rotate(-current.angle * .25); ctx.scale(4.8, 4.8);
+        drawNinja(ctx, p, time, accent); ctx.restore();
+        this.canvas.dataset.previewAccent = accent;
+        this.canvas.dataset.previewColour = this.colour;
+        this.canvas.dataset.animation = this.motion.matches ? 'swing-still' : 'swing';
     }
 }

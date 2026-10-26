@@ -38,7 +38,7 @@ try {
     check('local main menu exposes Level Builder', await page.read("!!document.querySelector('#level-builder')"));
     const progressBefore = await page.read("fetch('/api/progress').then(r=>r.json())");
     await harness.shot(page, '01-game-menu');
-    await harness.click(page, '#level-builder');
+    await harness.click(page, '#open-workbench');
     await until(`location.origin===${JSON.stringify(builder)} && !!globalThis.workbench?.ready && !document.querySelector('#back-to-game').hidden`);
     check('real localhost to loopback menu navigation loads builder', true);
     check('builder offers correct game return URL', await page.read(`document.querySelector('#back-to-game').href===${JSON.stringify(frontend + '/')}`));
@@ -70,9 +70,9 @@ try {
         store.save(structuredClone(store.progress));
         const newer = structuredClone(store.progress); newer.currentRoom = 'switch'; store.save(newer);
     })()`);
-    await harness.click(page, '#level-builder');
+    await harness.click(page, '#open-workbench');
     await harness.sleep(100);
-    check('builder navigation waits with the button disabled during queued saves', await page.read(`location.origin===${JSON.stringify(frontend)} && document.querySelector('#level-builder').disabled`));
+    check('builder navigation waits with the button disabled during queued saves', await page.read(`location.origin===${JSON.stringify(frontend)} && document.querySelector('#open-workbench').getAttribute('aria-disabled')==='true'`));
     await until(`location.origin===${JSON.stringify(builder)} && !!globalThis.workbench?.ready`);
     await harness.click(page, '#back-to-game');
     await until(`location.origin===${JSON.stringify(frontend)} && !!globalThis.binaryNinja?.snapshot().character.ready`);

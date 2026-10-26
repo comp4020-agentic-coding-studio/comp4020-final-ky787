@@ -62,3 +62,14 @@ export function readProgress(value: unknown): Progress | null {
     return { ...old, version: 3, rooms,
         currentRoom: TUTORIALS.every(id => old.completedRooms.includes(id)) ? 'uplink' : old.currentRoom };
 }
+
+/** Start the authored four-room tutorial again without erasing the visitor's record. */
+export function tutorialProgress(progress: Progress): Progress {
+    return { ...structuredClone(progress), currentRoom: 'pressure', rooms: freshProgress().rooms };
+}
+/** Restart one puzzle, retaining completion records, mechanics and historical events. */
+export function restartRoomProgress(progress: Progress): Progress {
+    const next = structuredClone(progress);
+    next.rooms[next.currentRoom] = freshProgress().rooms[next.currentRoom];
+    return next;
+}

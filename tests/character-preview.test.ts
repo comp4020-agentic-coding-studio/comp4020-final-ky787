@@ -11,6 +11,7 @@ let nextFrame: (time: number) => void;
 const context = {
     setTransform: vi.fn(), clearRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(),
     stroke: vi.fn(), fillRect: vi.fn(), save: vi.fn(), translate: vi.fn(), scale: vi.fn(), restore: vi.fn(),
+    rotate: vi.fn(), arc: vi.fn(),
 };
 beforeEach(() => {
     vi.clearAllMocks();
@@ -59,4 +60,34 @@ it('respects reduced motion while still displaying colour changes immediately', 
     preview.setColour('orange');
     expect(drawNinja).toHaveBeenLastCalledWith(context, expect.anything(), 0, '#FFAC55');
     expect(requestAnimationFrame).not.toHaveBeenCalled();
+});
+
+it('draws the title-screen swing through the same character renderer with the selected profile colour', () => {
+    preview = new NinjaPreview(canvas, 'purple', 'swing');
+    expect(canvas.dataset.previewVariant).toBe('swing');
+    expect(canvas.dataset.animation).toBe('swing');
+    expect(canvas.width / canvas.height).toBeCloseTo(600 / 560);
+    expect(drawNinja).toHaveBeenLastCalledWith(context, expect.objectContaining({ x: 0, y: 0, grounded: false }), expect.any(Number), '#B59BFF');
+    const initial = vi.mocked(context.translate).mock.calls.at(-1);
+    nextFrame(performance.now() + 1000);
+    expect(vi.mocked(context.translate).mock.calls.at(-1)).not.toEqual(initial);
+    preview.setColour('orange');
+    expect(drawNinja).toHaveBeenLastCalledWith(context, expect.anything(), expect.any(Number), '#FFAC55');
+});
+
+it('keeps a readable static grapple pose in reduced motion and removes listeners when leaving home', () => {
+    motion.matches = true;
+    const documentCleanup = vi.spyOn(document, 'removeEventListener');
+    const motionCleanup = vi.spyOn(motion, 'removeEventListener');
+    preview = new NinjaPreview(canvas, 'cyan', 'swing');
+    expect(canvas.dataset.animation).toBe('swing-still');
+    expect(requestAnimationFrame).not.toHaveBeenCalled();
+    expect(drawNinja).toHaveBeenLastCalledWith(context, expect.objectContaining({ vx: 0, vy: 0 }), 0, '#64E6D5');
+    preview.dispose();
+    expect(documentCleanup).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    expect(motionCleanup).toHaveBeenCalledWith('change', expect.any(Function));
+    const draws = vi.mocked(drawNinja).mock.calls.length;
+    document.dispatchEvent(new Event('visibilitychange'));
+    motion.dispatchEvent(new Event('change'));
+    expect(drawNinja).toHaveBeenCalledTimes(draws);
 });

@@ -7,7 +7,7 @@ rooms, award campaign badges, or inherit verified binary evidence.
 
 ## Public Level Builder
 
-Open [the public builder](https://comp4020-final-ky787.fly.dev/workbench.html) or select **LEVEL BUILDER** in the game menu. No account, developer token or local service is needed. **BACK TO GAME** returns on the same origin; visitor identity, tutorial progress and persistent party membership are preserved. The builder never reads or writes the campaign progress API.
+Open [the public builder](https://comp4020-final-ky787.fly.dev/workbench.html) or select **Level Builder → Open Level Builder** on the title screen. No account, developer token or local service is needed. **BACK TO GAME** returns on the same origin; visitor identity, tutorial progress and persistent party membership are preserved. The builder never reads or writes the campaign progress API.
 
 1. **New** opens a beginner draft; **Examples** offers a beginner room and a multi-signal room. Every copy is independent and authored/mock.
 2. Place, drag, resize and configure objects using the existing palette and inspector. New code platforms are Always Powered, so a new slab needs no controller work to playtest. **Connect** selects Controlled by Signal and creates a functional binding plus a decorative wire.

@@ -18,7 +18,7 @@ const visible = (p: Cdp, selector: string) => p.read<boolean>(`!!document.queryS
 try {
     const url = await h.startServer(), debug = await h.launch();
     const a = await h.page(url, debug), b = await h.page(url, debug);
-    check('public menu keeps four tutorial rooms and hides internal labs', await a.read("document.querySelectorAll('[data-room]').length === 4 && !document.querySelector('[data-create-lab]') && !!document.querySelector('#create-party')"));
+    check('public title screen exposes tutorial and co-op without room grids or internal labs', await a.read("!document.querySelector('[data-room]') && !document.querySelector('[data-create-lab]') && !!document.querySelector('#tutorial') && !!document.querySelector('#play-coop')"));
     await click(a, '#create-party'); const first = await wait(a, 'party lobby', s => s.multiplayer?.shared?.party?.phase === 'lobby');
     const code = first.multiplayer!.code!;
     await click(b, '#join-code'); await b.send('Input.insertText', { text: code }); await click(b, '#join-room');

@@ -36,6 +36,7 @@ import { drawPayload } from './payload-render.ts';
 import { pressurePads } from './machinery-presentation.ts';
 import { drawPressurePad, drawPadOutputPulse } from './plate-render.ts';
 import { drawGravityLift } from './lift-render.ts';
+import { SwitchOnboarding } from './switch-onboarding.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
     /** Solo / editor appearance; multiplayer appearance comes from authoritative slot profiles. */
@@ -61,6 +62,7 @@ export class PuzzleRenderer {
     editorCamera?: { x: number; y: number; zoom: number };
     particles = new Particles();
     heroes = new HeroPresentation();
+    switchOnboarding = new SwitchOnboarding();
     private readonly energyMotionPreference = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
     private ctx: CanvasRenderingContext2D;
     constructor(readonly canvas: HTMLCanvasElement, private presentation: MachinePresentation = authoredPresentation) { this.ctx = canvas.getContext('2d')!; }
@@ -73,7 +75,8 @@ export class PuzzleRenderer {
         this.camera.viewW = rect.width;
         this.camera.viewH = rect.height;
     }
-    room(world: PuzzleWorld, completed = false): void {
+    room(world: PuzzleWorld, completed = false, mechanics: readonly string[] = []): void {
+        this.switchOnboarding.reset(world.room.id, mechanics);
         this.connections = roomConnections(world.room);
         this.resize();
         this.camera.setWorld(world.room.width, world.room.height, 740);
@@ -365,6 +368,7 @@ export class PuzzleRenderer {
             else this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
         }
         const target = w.target(aim);
+        this.switchOnboarding.update(w, target, dt, running, energyMotion);
         if (target) {
             this.ring(target.point.x, target.point.y, 21, C.ink);
             c.setLineDash([3, 8]);
@@ -374,7 +378,8 @@ export class PuzzleRenderer {
         }
         if (rope.phase === 'attached') this.text(canJumpFromRope(p) ? 'SPACE · JUMP OFF' : 'SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
         else if (w.keyboardGrapple) this.text('SPACE · CANCEL HOOK', p.x - 65, p.y - 48, 13, C.cyan);
-        if (r.id === 'switch' || r.id === 'relay' || r.id === 'pairing-bay') {
+        if (r.id === 'switch') this.drawSwitchOnboarding(w, energyMotion);
+        if (r.id === 'relay' || r.id === 'pairing-bay') {
             this.text('HOLD CLICK + D', 305, 440, 15, C.ink);
             this.text('OR SPACE IN THE AIR', 285, 461, 13, C.cyan);
             this.text('Release as you swing right', 310, 483, 12, C.dim);
@@ -424,6 +429,39 @@ export class PuzzleRenderer {
             c.fillRect(0, 0, cam.viewW, cam.viewH);
         }
         return heroCues;
+    }
+    private drawSwitchOnboarding(world: PuzzleWorld, motion: boolean): void {
+        const { stage } = this.switchOnboarding;
+        if (stage === 'hidden' || stage === 'complete') return;
+        const c = this.ctx, anchor = world.platforms.find(platform => platform.def.id === 'anchor')!;
+        const point = anchor.solid.grapplePoint!;
+        const targeted = stage === 'targeted', attached = stage === 'attached';
+        if (!attached) {
+            // The same address bar and centre used by world.target(); this glow
+            // attracts attention but only its genuine target result confirms aim.
+            const pulse = this.switchOnboarding.pulse(motion);
+            c.save();
+            c.globalAlpha = targeted ? .9 : .3 + pulse * .2;
+            c.strokeStyle = C.cyan;
+            c.lineWidth = targeted ? 2 : 1.5;
+            c.strokeRect(anchor.solid.x - 6, anchor.solid.y - 6, anchor.solid.w + 12, CODE_SLAB_HEIGHT + 12);
+            this.ring(point.x, point.y, targeted ? 31 : 30 + pulse * 4, C.cyan);
+            c.restore();
+            if (targeted) this.text('TARGETED', point.x - 34, anchor.solid.y - 22, 12, C.cyan);
+        }
+        // Authored in-world sign above the approach: clear of both the jump arc
+        // and the anchor. It replaces SWITCH's old, easily missed floor text.
+        c.save();
+        c.fillStyle = '#0c1b25f5';
+        c.fillRect(80, 153, 490, 96);
+        this.line(80, 153, 80, 249, C.cyan, 3);
+        this.text(attached ? 'GRAPPLE CONNECTED' : targeted ? 'ANCHOR TARGETED' : '02 / AIM YOUR GRAPPLE', 96, 170, 11, C.cyan);
+        c.fillStyle = C.ink;
+        c.font = '600 20px ui-monospace, monospace';
+        c.fillText(attached ? 'NICE CATCH.' : targeted ? 'JUMP, THEN PRESS SPACE AGAIN' : 'MOVE YOUR MOUSE TO AIM', 96, 194);
+        c.fillText(attached ? 'HOLD D TO SWING RIGHT' : targeted ? 'IN MID-AIR TO GRAPPLE' : 'AT THE ANCHOR', 96, 217);
+        this.text(attached ? 'SPACE or release click to let go' : targeted ? 'Alternative: CLICK + HOLD on the anchor' : 'Move closer until the target ring locks on', 96, 238, 12, C.dim);
+        c.restore();
     }
     private drawCharacterLabels(entries: { player: PlayerState; profile: PublicCharacterProfile; slot?: Slot; local: boolean; prompt: boolean }[], dpr: number): void {
         const c = this.ctx, cam = this.camera;

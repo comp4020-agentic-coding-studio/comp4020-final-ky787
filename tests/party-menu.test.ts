@@ -34,6 +34,26 @@ it('victory has NEXT only when another chamber exists; guest status follows the 
     expect(doc.querySelector('#choose-chamber')?.className).toBe('primary');
 });
 
+it('pause is compact, offers invitation and leave actions, and keeps lobby and victory non-resumable', () => {
+    const party = newParty('ABCD', host), active = selectChamber(party, host, 'race-condition')!;
+    for (const slot of [1, 2] as const) {
+        const doc = new JSDOM(partyMenu(sharedRoom(active, [true, true], [null, null]), slot, true, 'pause')).window.document;
+        expect(doc.querySelector('.pause-card')).not.toBeNull();
+        expect(doc.querySelector('#continue')?.textContent).toBe('RESUME');
+        expect(doc.querySelector('#party-copy')?.textContent).toBe('COPY LINK');
+        expect(doc.querySelector('#party-copy-code')).not.toBeNull();
+        expect(doc.querySelector('#leave-coop')?.textContent).toContain('MAIN MENU');
+        expect(doc.querySelector('.party-members')).toBeNull();
+        expect(doc.querySelector('.campaign-select')).toBeNull();
+        expect(doc.querySelector('#customize-ninja')).toBeNull();
+        expect(doc.querySelector('#party-status')?.textContent).toBe('');
+        expect(!!doc.querySelector('#choose-chamber')).toBe(slot === 1);
+    }
+    expect(new JSDOM(partyMenu(sharedRoom(party, [true, false], [null, null]), 1, true, 'lobby')).window.document.querySelector('#continue')).toBeNull();
+    active.completed = true; completeParty(active);
+    expect(new JSDOM(partyMenu(sharedRoom(active, [true, true], [null, null]), 1, true, 'victory')).window.document.querySelector('#continue')).toBeNull();
+});
+
 it('both perspectives retain profile colours, names, host roles and safe compact labels', async () => {
     const { characterForSlot, characterLabel } = await import('../src/character/presentation.ts');
     const r = newParty('ABCD', host); r.visitors[1] = '22222222-2222-4222-8222-222222222222';

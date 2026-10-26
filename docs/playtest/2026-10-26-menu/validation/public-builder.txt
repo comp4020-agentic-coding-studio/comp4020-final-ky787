@@ -1,0 +1,68 @@
+$ node scripts/level-tools/public-browser-check.ts
+PASS production main menu displays LEVEL BUILDER
+PASS menu opens same-origin PUBLIC LEVEL BUILDER with browser storage
+PASS public Test with Friend is available while trusted filesystem imports stay hidden
+PASS storage warning and game return are visible
+PASS new code platform defaults to Always Powered and permits Playtest
+PASS production drag updates grid coordinates
+PASS undo restores placement
+PASS production resize updates authored dimensions
+PASS importable user text does not inject markup
+PASS duplicate creates an independent object
+PASS Always Inactive needs no binding and remains playable
+PASS controlled platform missing its binding blocks Playtest
+PASS functional connect selects signal mode and adds a real binding
+PASS State Preview evaluates controller outputs
+PASS WASD pans the production editor camera
+PASS wheel zoom changes production editor camera
+PASS middle drag pans
+PASS saved draft survives reload with full canonical data and stable ID
+PASS editing and saving again survives reload
+PASS query parameters cannot switch the public backend
+PASS stale tab write rejected, dirty document preserved
+PASS stale rename is rejected
+PASS stale delete is rejected
+PASS Save copy handles duplicate filenames with a fresh storage ID
+PASS opening another draft retains a recoverable unsaved document
+PASS unsaved recovery survives reload
+PASS Export JSON downloads complete canonical validated document
+PASS JSON import creates a fresh saved draft without overwriting duplicate document ID
+PASS isolated browser profile starts without other profiles drafts
+PASS shared JSON imports in an isolated profile with the same canonical semantics
+PASS cancelled deletion preserves saved draft
+PASS confirmed delete removes stored draft but leaves current work exportable
+PASS real player physics moves with keyboard input
+PASS real player jump leaves the floor
+PASS powered code accepts an actual pointer grapple across its address bar
+PASS real grapple swing crosses the authored gap
+PASS Stop restores authored geometry and camera, without saving physics positions
+PASS move the platform and repeat Playtest
+PASS fabricated binary evidence rejected without replacing current draft
+PASS executable expression rejected without replacing current draft
+PASS invalid activation rejected without replacing current draft
+PASS oversized file rejected before JSON parsing
+PASS editor storage/import/playtest sends no uploads; only optional cosmetic profile reads use the API
+PASS quota error leaves edits dirty and Export JSON available
+PASS unavailable IndexedDB explains failure and permits playtest/export
+PASS blocked database upgrade reports a clear recovery action
+PASS database upgrade preserves existing recovery records
+PASS older app refuses newer schema without deleting stored work
+PASS production excludes api/workbench/bootstrap
+PASS production excludes api/workbench/drafts
+PASS production excludes api/workbench/recovery
+PASS production excludes api/workbench/snapshots
+PASS production excludes workbench-runner.html
+PASS production excludes levels/drafts/blank-room.json
+PASS production excludes scripts/level-tools/service.ts
+PASS production excludes Workspace/binary_binja_redesign/
+PASS production rejects draft PUT
+PASS production bundle excludes /api/workbench/
+PASS production bundle excludes X-Workbench-Token
+PASS production bundle excludes LocalDraftStorage
+PASS production bundle excludes node:fs
+PASS production bundle excludes node:child_process
+PASS production bundle excludes DEV_WORKBENCH_PORT
+PASS saved drafts survive closing and reopening the browser profile
+PASS Back to Game preserves visitor identity and campaign progress
+PASS multi-signal example opens as an independent playable draft
+PASS builder visit preserves persistent campaign party membership and identity

@@ -167,8 +167,12 @@ it('campaign plate/cube arbitration, reversible machinery, two arrivals and gene
     expect(r.exitUnlocked).toBe(false); expect(r.levelState.outputs).toMatchObject({ cargoLift: false, shaftFirewall: true, serviceRelay: false });
     expect(Object.values(r.cubePlacements)).toEqual(['spawn', 'spawn', 'spawn']);
     r = (await f.act(1, { type: 'select-level', level: 'use-after-free' })).room;
+    // The guest must receive the new chamber generation before its client
+    // helper stamps the trigger. The host's acknowledgement is not that barrier.
+    await f.b.wait('room', message => message.room.levelInstance === r.levelInstance);
     await f.act(1, { type: 'draft-occupancy', devices: ['draft:plateA'] });
-    r = (await f.act(2, { type: 'crumble-trigger', platform: 'draft:a1', trigger: 'hook' })).room;
+    const triggered = await f.act(2, { type: 'crumble-trigger', platform: 'draft:a1', trigger: 'hook' });
+    expect(triggered.accepted).toBe(true); r = triggered.room;
     expect(r.levelState.platforms['draft:a1'].phase).toBe('warning');
     r = (await f.act(1, { type: 'select-level', level: 'use-after-free' })).room;
     expect(r.levelState.outputs.routeA).toBe(false); expect(r.levelState.platforms['draft:a1'].phase).toBe('stable');

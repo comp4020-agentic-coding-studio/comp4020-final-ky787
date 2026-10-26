@@ -1,0 +1,58 @@
+$ node scripts/level-tools/browser-check.ts
+5:02:36 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+PASS CLI/JSON-created draft opens from canonical file
+PASS actual engine preview built without errors
+PASS standalone editor does not invent a game navigation URL
+PASS palette places snapped object
+PASS canvas drag moves object on grid
+PASS one undo reverses whole drag
+PASS redo restores drag
+PASS resize handle updates dimensions
+PASS inspector text edit does not move/delete selected object
+PASS functional connection creates binding and wire
+PASS GUI expression equals JSON AND routes
+PASS shared evaluator resolves opposite routes
+PASS duplicate creates new stable ID
+PASS delete removes duplicate
+PASS undo restores deleted object
+PASS hierarchy Shift selection includes both control and machinery
+PASS GUI group duplicate remaps selected input and preserves external lever reference
+PASS group duplicate is one undoable change
+PASS configured 24-unit grid snaps placement
+PASS invalid inspector coordinate preserves last valid document
+PASS visibility control hides the object from canvas selection
+PASS hidden object cannot be selected on canvas
+PASS locked object ignores canvas move gesture
+PASS middle-pointer pan preserves world scale
+PASS wheel zoom keeps cursor world point anchored
+PASS held D pans Edit camera at the documented screen speed
+PASS diagonal WASD pan is normalized and moves up/right
+PASS keyboard pan screen speed stays consistent when zoomed
+PASS camera keys preserve authored data, dirty status and undo history
+PASS releasing WASD stops camera movement
+PASS typing WASD into a form preserves camera and accepts text
+PASS contenteditable focus owns WASD input
+PASS opening a modal clears held movement and closing it does not resume it
+PASS window blur clears held camera keys and ignores stale repeats
+PASS visibility changes clear held camera movement
+PASS declining dirty replacement preserves document
+PASS unsaved recovery stores the same structured draft separately
+PASS successful Save clears only the saved recovery snapshot
+PASS GUI save is the same canonical file/hash CLI validates
+PASS CLI process validates the exact GUI-saved file
+PASS State Preview actual evaluator powers left route
+PASS State Preview WASD pans without advancing physics or changing inputs
+PASS mode changes clear held camera movement
+PASS GUI input toggle swaps actual outputs
+PASS forced preview is clearly labelled
+PASS physical movement precedes reset
+PASS playtest WASD moves the avatar without panning the authored editor camera
+PASS R resets through engine and records the actual death event
+PASS held playtest movement stops when focus enters a field before keyup
+PASS focused Back to game link does not send movement, jump or reset to physics
+PASS playtest control guard retains native link Tab navigation
+PASS real physics stop preserves authored document
+PASS stop restores editor camera
+PASS actual measured trajectory recorded
+PASS normal zoom is actual 100 percent scale
+PASS external edit conflict preserves newer file and dirty GUI

@@ -1,3 +1,4 @@
+import { navigateMenu } from './menu-navigation.ts';
 import { serverStarted } from './server-started.ts';
 import { onboardNinja } from './character-onboarding.ts';
 /** Shared muted browser/session utilities; routes use real input and read-only snapshots. */
@@ -146,6 +147,7 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         checks.push(line); process.stdout.write(line + '\n'); if (!ok) throw new Error(line);
     }
     async function click(p: Cdp, selector: string) {
+        await navigateMenu(expression => p.read(expression), next => click(p, next), selector);
         const at = await p.read<{ x: number; y: number }>(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
         await p.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...at, button: 'left', buttons: 1, clickCount: 1 });
         await p.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at, button: 'left', buttons: 0, clickCount: 1 });

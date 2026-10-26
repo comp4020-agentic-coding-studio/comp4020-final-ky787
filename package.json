@@ -56,7 +56,10 @@
     "check:race-cargo": "node scripts/native/race-cargo-evidence.ts --check",
     "check:race-cargo-browser": "node scripts/race-cargo-browser-check.ts",
     "gen:environmental": "node scripts/native/environmental-evidence.ts",
-    "check:environmental": "node scripts/native/environmental-evidence.ts --check"
+    "check:environmental": "node scripts/native/environmental-evidence.ts --check",
+    "check:menu": "node scripts/menu-browser-check.ts",
+    "check:menu-invitations": "node scripts/menu-invitation-browser-check.ts",
+    "check:switch-onboarding": "node scripts/switch-onboarding-browser-check.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

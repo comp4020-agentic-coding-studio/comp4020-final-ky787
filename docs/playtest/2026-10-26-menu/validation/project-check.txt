@@ -1,0 +1,115 @@
+$ pnpm typecheck && pnpm check:native && pnpm test:unit && pnpm test
+$ tsc --noEmit
+$ node scripts/native/generate-tables.ts --check && pnpm check:native-world && pnpm check:race-cargo && pnpm check:race-machinery && pnpm check:environmental
+✓ server/native/tables/handshake.json
+✓ public/evidence/coop/handshake.evidence.json
+✓ public/evidence/coop/handshake.traces.json
+✓ public/evidence/coop/handshake.disasm.json
+✓ server/native/tables/deadlock.json
+✓ public/evidence/coop/deadlock.evidence.json
+✓ public/evidence/coop/deadlock.traces.json
+✓ public/evidence/coop/deadlock.disasm.json
+✓ server/native/tables/use-after-free.json
+✓ public/evidence/coop/use-after-free.evidence.json
+✓ public/evidence/coop/use-after-free.traces.json
+✓ public/evidence/coop/use-after-free.disasm.json
+✓ server/native/tables/crossfeed-vault.json
+✓ public/evidence/coop/crossfeed-vault.evidence.json
+✓ public/evidence/coop/crossfeed-vault.traces.json
+✓ public/evidence/coop/crossfeed-vault.disasm.json
+✓ server/native/tables/race-condition.json
+✓ public/evidence/coop/race-condition.evidence.json
+✓ public/evidence/coop/race-condition.traces.json
+✓ public/evidence/coop/race-condition.disasm.json
+✓ public/evidence/coop/manifest.json
+
+checked 21 artifacts, 8137.6 KB total
+$ node scripts/native/world-evidence.ts --check
+✓ public/evidence/coop/handshake.world.json (6502 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/deadlock.world.json (7710 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/use-after-free.world.json (10491 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/crossfeed-vault.world.json (24024 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/race-condition.world.json (20166 bytes; PE bytes, blocks, stores and targets verified)
+$ node scripts/native/race-cargo-evidence.ts --check
+✓ public/evidence/coop/race-condition.cargo.json: 25595 / 36000 bytes; 26 distinct fragments; catalogue, PE bytes, blocks, stores and targets verified
+$ node scripts/native/race-machinery-evidence.ts --check
+✓ public/evidence/coop/race-condition.machinery.json: 16753 / 24000 bytes; 20 separate fragments; exact PE bytes, blocks, ten observed stores and targets verified
+$ node scripts/native/environmental-evidence.ts --check
+✓ public/evidence/coop/handshake.environment.json: 12783 / 16000 bytes; 16 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/crossfeed-vault.environment.json: 31516 / 40000 bytes; 40 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/deadlock.environment.json: 15568 / 20000 bytes; 20 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/use-after-free.environment.json: 19044 / 24000 bytes; 24 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+$ vitest run --config vitest.unit.config.ts
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+{"id":1,"timestamp":"2026-10-26T06:23:57.852Z","level":"info","event":"server_started","port":36787}
+{"id":1,"timestamp":"2026-10-26T06:23:57.876Z","level":"info","event":"server_started","port":43885}
+{"id":2,"timestamp":"2026-10-26T06:23:57.949Z","level":"info","event":"character_created","visitorRef":"visitor-270457f74bba","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-26T06:23:57.980Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-26T06:23:57.989Z","level":"warn","event":"room_operation_rejected","visitorRef":"visitor-708557a0673a","code":"DRAFT_UNAVAILABLE"}
+{"id":1,"timestamp":"2026-10-26T06:23:57.998Z","level":"info","event":"server_started","port":43563}
+{"id":3,"timestamp":"2026-10-26T06:23:58.007Z","level":"info","event":"party_created","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":4,"timestamp":"2026-10-26T06:23:58.007Z","level":"info","event":"player_connected","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":5,"timestamp":"2026-10-26T06:23:58.007Z","level":"info","event":"player_joined_party","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":6,"timestamp":"2026-10-26T06:23:58.007Z","level":"info","event":"chamber_started","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":7,"timestamp":"2026-10-26T06:23:58.027Z","level":"info","event":"player_connected","visitorRef":"visitor-aafed7d8a12d","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":1}
+{"id":8,"timestamp":"2026-10-26T06:23:58.028Z","level":"info","event":"player_joined_party","visitorRef":"visitor-aafed7d8a12d","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":1}
+{"id":9,"timestamp":"2026-10-26T06:23:58.040Z","level":"info","event":"checkpoint_activated","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"checkpointId":"draft:breakpoint","source":"accepted_action","levelInstance":1}
+{"id":10,"timestamp":"2026-10-26T06:23:58.044Z","level":"info","event":"chamber_started","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"reason":"custom_restart","levelInstance":2}
+{"id":2,"timestamp":"2026-10-26T06:23:58.056Z","level":"info","event":"character_created","visitorRef":"visitor-3b8907ae00d8","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":11,"timestamp":"2026-10-26T06:23:58.068Z","level":"warn","event":"room_operation_rejected","visitorRef":"visitor-2111985808a5","code":"SESSION_REPLACED"}
+{"id":12,"timestamp":"2026-10-26T06:23:58.069Z","level":"info","event":"player_reconnected","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":2}
+{"id":13,"timestamp":"2026-10-26T06:23:58.092Z","level":"info","event":"party_created","visitorRef":"visitor-708557a0673a","sessionRef":"session-be916c45b77c","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":14,"timestamp":"2026-10-26T06:23:58.093Z","level":"info","event":"player_connected","visitorRef":"visitor-708557a0673a","sessionRef":"session-be916c45b77c","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":15,"timestamp":"2026-10-26T06:23:58.093Z","level":"info","event":"player_joined_party","visitorRef":"visitor-708557a0673a","sessionRef":"session-be916c45b77c","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":1,"timestamp":"2026-10-26T06:23:58.095Z","level":"info","event":"server_started","port":40363}
+{"id":16,"timestamp":"2026-10-26T06:23:58.098Z","level":"info","event":"player_disconnected","visitorRef":"visitor-aafed7d8a12d","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":2}
+{"id":17,"timestamp":"2026-10-26T06:23:58.099Z","level":"info","event":"player_disconnected","visitorRef":"visitor-2111985808a5","sessionRef":"session-2aa0cedb38f6","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":2}
+{"id":3,"timestamp":"2026-10-26T06:23:58.102Z","level":"info","event":"character_updated","visitorRef":"visitor-3b8907ae00d8","player":"ZeroDay","revision":2,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-26T06:23:58.107Z","level":"info","event":"server_shutdown"}
+{"id":18,"timestamp":"2026-10-26T06:23:58.101Z","level":"info","event":"player_disconnected","visitorRef":"visitor-708557a0673a","sessionRef":"session-be916c45b77c","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":19,"timestamp":"2026-10-26T06:23:58.101Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-26T06:23:58.116Z","level":"info","event":"server_started","port":41903}
+{"id":1,"timestamp":"2026-10-26T06:23:58.122Z","level":"info","event":"server_started","port":36351}
+{"id":2,"timestamp":"2026-10-26T06:23:58.150Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-26T06:23:58.151Z","level":"info","event":"character_created","visitorRef":"visitor-5add9a1ab6f4","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-26T06:23:58.172Z","level":"info","event":"character_created","visitorRef":"visitor-36c61108613b","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":4,"timestamp":"2026-10-26T06:23:58.195Z","level":"info","event":"character_updated","visitorRef":"visitor-36c61108613b","player":"ZeroDay","revision":2,"colour":"orange"}
+{"id":5,"timestamp":"2026-10-26T06:23:58.207Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-26T06:23:58.217Z","level":"info","event":"server_started","port":42845}
+{"id":2,"timestamp":"2026-10-26T06:23:58.240Z","level":"info","event":"character_created","visitorRef":"visitor-86b98fafffcd","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-26T06:23:58.257Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-26T06:23:58.999Z","level":"info","event":"server_started","port":34851}
+{"id":2,"timestamp":"2026-10-26T06:23:59.027Z","level":"info","event":"character_created","visitorRef":"visitor-4b5d7fe07e99","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-26T06:23:59.071Z","level":"info","event":"character_created","visitorRef":"visitor-4b5d7fe07e99","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":4,"timestamp":"2026-10-26T06:23:59.125Z","level":"info","event":"character_created","visitorRef":"visitor-4b5d7fe07e99","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":5,"timestamp":"2026-10-26T06:23:59.132Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-26T06:23:59.148Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-26T06:23:59.715Z","level":"info","event":"server_started","port":34573}
+{"id":2,"timestamp":"2026-10-26T06:23:59.816Z","level":"info","event":"character_created","visitorRef":"visitor-aaa16f4dd670","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-26T06:23:59.840Z","level":"info","event":"character_created","visitorRef":"visitor-a57ae16c8b83","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-26T06:23:59.946Z","level":"info","event":"character_updated","visitorRef":"visitor-aaa16f4dd670","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-26T06:23:59.978Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-26T06:23:59.987Z","level":"info","event":"server_started","port":37399}
+{"id":2,"timestamp":"2026-10-26T06:24:00.028Z","level":"info","event":"character_created","visitorRef":"visitor-d5dcc3b8ba0c","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-26T06:24:00.046Z","level":"info","event":"character_created","visitorRef":"visitor-2ef7d1e13d57","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-26T06:24:00.112Z","level":"info","event":"character_updated","visitorRef":"visitor-d5dcc3b8ba0c","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-26T06:24:00.137Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-26T06:24:00.809Z","level":"info","event":"server_started","port":39225}
+{"id":2,"timestamp":"2026-10-26T06:24:00.827Z","level":"info","event":"server_shutdown"}
+
+ Test Files  86 passed (86)
+      Tests  860 passed | 2 skipped (862)
+   Start at  17:23:56
+   Duration  16.88s (tests 76%, transform 10%, import 10%, environment 4%)
+
+$ vitest run
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  2 passed (2)
+      Tests  3 passed (3)
+   Start at  17:24:14
+   Duration  560ms (import 69%, tests 23%, transform 7%, worker 1%)

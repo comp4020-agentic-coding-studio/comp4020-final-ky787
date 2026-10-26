@@ -114,7 +114,7 @@ async function navigate(p: Cdp, url: string, ready: string) {
 
 try {
     const url = await h.startServer(), debug = await h.launch();
-    const a = await h.page(url, debug); await instrument(a);
+    const a = await h.page(`${url}?debug=1`, debug); await instrument(a);
     await until(a, "!!document.querySelector('#initialize-ninja')");
     check('new visitor is gated by INITIALIZE NINJA', !(await snapshot(a)).character.ready && !await a.read("!!document.querySelector('#create-party')"));
     await shot(a, '01-first-time-creation');
@@ -167,15 +167,16 @@ try {
     await a.send('Page.reload'); await wait(a, 'returning visitor menu', s => s.character.ready);
     check('returning visitor skips onboarding without flashing it', !await a.read('__characterOnboardingSeen.creator') && (await snapshot(a)).character.profile?.name === 'ShadowByte' && (await snapshot(a)).persistence.visitor === visitor);
     await shot(a, '07-returning-saved-character');
+    check('title screen renders the saved purple ninja using the shared renderer', await a.read("document.querySelector('#menu').dataset.view==='home' && document.querySelector('#home-ninja-preview').dataset.previewColour==='purple' && __characterPaint.counts['home-ninja-preview']>0"));
     await click(a, '#customize-ninja'); await preview(a, 'purple', 'customization loads the saved colour');
     await shot(a, '08-customization-from-menu');
     await typeName(a, 'DiscardMe'); await click(a, '[data-colour="red"]'); await hover(a, '[data-colour="lime"]'); await click(a, '#cancel-character');
     check('cancel discards selected and previewed colours plus edited name', JSON.stringify((await profile(a)).profile) === JSON.stringify({ name: 'ShadowByte', colour: 'purple' }) && (await snapshot(a)).character.profile?.name === 'ShadowByte');
 
     for (const room of ['pressure', 'switch', 'relay', 'uplink']) {
-        await click(a, `[data-room="${room}"]`); await wait(a, `solo ${room}`, s => s.room === room);
+        await click(a, `[data-room="${room}"]`); await wait(a, `solo ${room}`, s => s.room === room && (s.started || s.overviewVisible));
         await sleep(100);
-        check(`solo ${room} uses saved purple through drawNinja`, await a.read("__characterPaint.records.some(r=>r.kind==='ninja' && r.canvas!=='ninja-preview' && performance.now()-r.at<200 && r.colour.startsWith('rgba(181, 155, 255'))"));
+        check(`solo ${room} uses saved purple through drawNinja`, await a.read("__characterPaint.records.some(r=>r.kind==='ninja' && r.canvas==='stage' && performance.now()-r.at<200 && r.colour.startsWith('rgba(181, 155, 255'))"));
         await click(a, '#pause');
     }
     await click(a, '#reset-progress'); await click(a, '#confirm-reset');
@@ -206,14 +207,26 @@ try {
     await click(a, '#pause');
     if (!(await b.read<boolean>("!document.querySelector('#menu').hidden"))) await click(b, '#pause');
     const before = await snapshot(a);
+    check('gameplay pause keeps customization in the main menu', !await a.read("!!document.querySelector('#customize-ninja')"));
+    await click(a, '#leave-coop');
     await click(a, '#customize-ninja'); await typeName(a, 'ShadowFlux'); await click(a, '[data-colour="lime"]'); await click(a, '#save-character');
-    await wait(b, 'connected partner receives changed character', s => s.multiplayer?.shared?.profiles?.[0]?.name === 'ShadowFlux' && s.multiplayer.shared.profiles[0].colour === 'lime');
+    check('saved customization immediately updates the home preview', await a.read("document.querySelector('#home-profile-name').textContent==='ShadowFlux' && document.querySelector('#home-ninja-preview').dataset.previewColour==='lime'"));
+    await click(a, '#join-code'); await a.send('Input.insertText', { text: code }); await click(a, '#join-room');
+    await wait(a, 'host rejoins the existing slot after customization', s => s.multiplayer?.code === code && s.multiplayer.slot === 1 && s.multiplayer.shared?.connected.every(Boolean) === true);
+    await wait(b, 'connected partner receives returning host’s changed character', s => s.multiplayer?.shared?.profiles?.[0]?.name === 'ShadowFlux' && s.multiplayer.shared.profiles[0].colour === 'lime');
     const after = await snapshot(a);
-    check('customizing while connected preserves party, chamber, checkpoint, badges and cube positions',
+    // A rejoined world restores the full transmitted body, but groundId is a local
+    // collision cache absent from CubeTransform. Compare physical and durable state;
+    // unlike customization in an active world, rejoin legitimately reconstructs it.
+    const cubeBodies = (state: typeof before) => Object.fromEntries(Object.entries(state.cubes).map(([id, { groundId: _contact, ...body }]) => [id, body]));
+    check('leaving to customize and rejoining preserves party, chamber, checkpoint, badges and cube positions',
         after.multiplayer?.code === before.multiplayer?.code && after.room === before.room && after.checkpoint === before.checkpoint
         && JSON.stringify(after.multiplayer?.shared?.party) === JSON.stringify(before.multiplayer?.shared?.party)
-        && JSON.stringify(after.cubes) === JSON.stringify(before.cubes));
-    for (const p of [a, b]) { await click(p, '#continue'); if ((await snapshot(p)).overviewVisible) await click(p, '#start-room'); }
+        && JSON.stringify(after.multiplayer?.shared?.cubePlacements) === JSON.stringify(before.multiplayer?.shared?.cubePlacements)
+        && JSON.stringify(after.multiplayer?.shared?.levelState) === JSON.stringify(before.multiplayer?.shared?.levelState)
+        && JSON.stringify(cubeBodies(after)) === JSON.stringify(cubeBodies(before)),
+        JSON.stringify({ before: { code: before.multiplayer?.code, room: before.room, checkpoint: before.checkpoint, party: before.multiplayer?.shared?.party, cubes: before.cubes }, after: { code: after.multiplayer?.code, room: after.room, checkpoint: after.checkpoint, party: after.multiplayer?.shared?.party, cubes: after.cubes } }));
+    for (const p of [a, b]) { if (await p.read("!!document.querySelector('#continue')")) await click(p, '#continue'); if ((await snapshot(p)).overviewVisible) await click(p, '#start-room'); }
     await renderEvidence(b, '#stage', ['ShadowFlux', 'ZeroDay'], ['lime', 'orange']);
     await shot(b, '14-live-profile-update');
 

@@ -1,0 +1,12 @@
+PASS PRESSURE uses real carry input
+PASS unpowered SWITCH has no premature grapple instruction
+PASS mouse instruction is visible above the jump path
+PASS 1366×768 aiming prompt stays inside the canvas
+PASS 1024×768 aiming prompt stays inside the canvas
+PASS reduced motion keeps the aiming instructions visible
+PASS targeted stage teaches the two presses and mouse alternative
+PASS aiming alone does not mark the mechanic learned
+PASS first Space jumps without firing the rope
+PASS actual grapple is persisted by existing mechanic events
+PASS retired onboarding does not leave its text behind
+PASS browser reports no errors

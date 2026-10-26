@@ -4,7 +4,7 @@ A character is a cosmetic `{name, colour}` profile, separate from campaign progr
 
 ## Creation and customization
 
-The main game establishes its cookie by loading progress, then requests the profile. It shows a neutral loading view until this completes, so returning visitors never flash the creator. Visitors with progress but no profile see INITIALIZE NINJA once; saving leaves their progress and remembered party intact. The menu's CUSTOMIZE NINJA opens the same view with SAVE CHANGES and CANCEL. Party menus also expose it and use the existing pause/contact-release behavior.
+The main game establishes its cookie by loading progress, then requests the profile. It shows a neutral loading view until this completes, so returning visitors never flash the creator. Visitors with progress but no profile see INITIALIZE NINJA once; saving leaves their progress and remembered party intact. The title screen's Customize Ninja opens the same view with SAVE CHANGES and CANCEL; both return to the title with the saved colour shown immediately. Gameplay pause and party menus do not expose customization. Leaving a party to customize and then rejoining preserves its server-owned slot and puzzle state.
 
 Names trim outer spaces and accept 2–16 ASCII letters, digits, spaces, underscores and hyphens. Controls and markup are rejected. DOM names use `textContent`; lobby templates escape names. The eight approved colour IDs and hex accents are defined in `src/character/profile.ts`. The server accepts IDs only.
 

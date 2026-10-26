@@ -1,0 +1,14 @@
+$ node scripts/level-tools/menu-browser-check.ts
+PASS local main menu exposes Level Builder
+PASS real localhost to loopback menu navigation loads builder
+PASS builder offers correct game return URL
+PASS cancelled dirty return keeps editor and unsaved document
+PASS undo restores authored draft before leaving
+PASS Back to game returns to the real menu
+PASS builder visit preserves game saves and identity
+PASS builder navigation waits with the button disabled during queued saves
+PASS both queued saves finish before leaving the game
+PASS production menu exposes public Level Builder
+PASS production public builder exists
+PASS production workbench-runner.html unavailable
+PASS production api/workbench/bootstrap unavailable

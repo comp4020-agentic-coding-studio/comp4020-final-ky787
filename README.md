@@ -10,7 +10,9 @@ Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The five playab
 
 ## Play the game
 
-On your first visit, enter an operative name, preview the eight colours on the animated ninja, and choose **INITIALIZE NINJA**. Hover or keyboard focus previews a colour; clicking or Enter/Space selects it. Returning visitors load their saved character automatically. **CUSTOMIZE NINJA** in the menu changes your name and colour without resetting progress or leaving your party. Your partner sees the same name and colour in every cooperative chamber. See the [character profile contract](docs/character-profiles.md).
+On your first visit, enter an operative name, preview the eight colours on the animated ninja, and choose **INITIALIZE NINJA**. Hover or keyboard focus previews a colour; clicking or Enter/Space selects it. Returning visitors load their saved character automatically. **Customize Ninja** on the title screen changes your name and colour without resetting progress. Leave an active party before customizing; you can rejoin it with its code. Your partner sees the same name and colour in every cooperative chamber. See the [character profile contract](docs/character-profiles.md).
+
+**Tutorial** always begins a fresh run at PRESSURE while retaining your previous completion records. Returning visitors can **Continue** their saved room. The title screen also offers **Play Co-op**, **Level Builder**, **Customize Ninja**, **About**, and **Settings**. Escape or clicking outside an ordinary pause card resumes the same room. See the [menu and invitation contract](docs/main-menu-and-invitations.md).
 
 The game has two main modes:
 
@@ -21,8 +23,8 @@ The game has two main modes:
 
 To play co-op:
 
-1. On one browser, choose **CO-OP CAMPAIGN → CREATE PARTY**.
-2. Share the four-character party code with another person. They choose **JOIN PARTY** from a **different device or browser profile**.
+1. On one browser, choose **Play Co-op → Start Co-op**.
+2. Choose **COPY LINK** and share the invitation (`https://<game-host>/?join=7K3M`). Your friend opens it in a **different device or browser profile**, initializes their ninja if needed, and joins your party. **Play Co-op → Join Co-op** also accepts the four-character code.
 3. The creator is the party's host and chooses the chamber. Both players can operate the puzzle; neither has a fixed gameplay role.
 4. Solve the machinery together, then **both physically enter the unlocked exit** to finish. The host can choose the next chamber, replay, or select another chamber.
 
@@ -38,7 +40,8 @@ The optional mechanics laboratories used during development are preserved behind
 | --- | --- |
 | **A / D** or **Left / Right arrows** | Move left / right |
 | **Space**, **W**, or **Up arrow** | Jump |
-| **Space while airborne** | Attempt to hook an available grapple anchor |
+| **Move mouse** | Aim at a powered anchor or code address bar; the target ring confirms selection |
+| **Space while airborne** | Attempt to hook the highlighted grapple target |
 | **Space while attached** | Jump off / release the grapple |
 | **Hold left mouse button** | Aim and hold a grapple; release to let go |
 | **E** | Interact with a switch, terminal or cube; pick up / put down payloads |
@@ -106,7 +109,7 @@ The private `/ops` dashboard shows current cooperative parties, character names 
 
 ## Level Workbench — for people and coding agents
 
-Choose **LEVEL BUILDER** from the game menu, or open the [Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html) directly. Author levels on your own, then test or play them with a friend using the existing cooperative game engine.
+Choose **Level Builder → Open Level Builder** from the title screen, or open the [Public Level Builder](https://comp4020-final-ky787.fly.dev/workbench.html) directly. Author levels on your own, then test or play them with a friend using the existing cooperative game engine.
 
 | Mode | Saving | Playtesting |
 | --- | --- | --- |
@@ -130,7 +133,7 @@ New code platforms default to **Always Powered**, so geometry can be playtested 
 
 **TEST WITH FRIEND** opens a separate game tab with a four-character code and invitation link. Unsaved editor work stays in the original tab. The invited friend needs no JSON file or editor. Two tabs sharing a visitor cookie are one player; use separate browser profiles or devices. Test information is optional and read-only.
 
-**MY LEVELS** opens the browser-local collection directly from the game menu. Choose **EDIT**, **PLAY WITH FRIEND**, **EXPORT JSON**, or confirmed **DELETE**. Normal custom play hides diagnostics and editing controls. Both players reach the exit to finish; the host can **REPLAY LEVEL** with a new session generation. Saved maps remain intact. To revise a test, return to the editor, edit/save, and start a new room; running snapshots never change.
+**Level Builder → My Levels** opens the browser-local collection from the title screen. Choose **EDIT**, **PLAY WITH FRIEND**, **EXPORT JSON**, or confirmed **DELETE**. Normal custom play hides diagnostics and editing controls. Both players reach the exit to finish; the host can **REPLAY LEVEL** with a new session generation. Saved maps remain intact. To revise a test, return to the editor, edit/save, and start a new room; running snapshots never change.
 
 Public rooms expire after two hours, or five minutes after both players disconnect. Unlaunched uploads expire after two minutes. Server restarts end these rooms. No custom draft or custom room is written to `/data`, published in a gallery, or added to campaign saves/badges. Limits include eight active rooms, 256 KB per snapshot, 2 MB total canonical snapshot bytes, and three staged/active sessions per visitor. Save/Export is how you keep the original.
 
@@ -150,7 +153,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open the development URL printed in the terminal (normally **http://localhost:5173**). `pnpm dev` starts the Vite client, the Node HTTP/WebSocket server (normally port 8080), and a loopback-only Level Workbench service. Select **LEVEL BUILDER** from the local game menu. Stop all three with **Ctrl+C**.
+Open the development URL printed in the terminal (normally **http://localhost:5173**). `pnpm dev` starts the Vite client, the Node HTTP/WebSocket server (normally port 8080), and a loopback-only Level Workbench service. Select **Level Builder → Open Level Builder** from the local title screen. Stop all three with **Ctrl+C**.
 
 To launch the editor independently:
 
@@ -214,6 +217,9 @@ pnpm check:public-coop
 # Local editor browser workflow
 pnpm check:workbench
 pnpm check:workbench-menu
+pnpm check:menu
+pnpm check:menu-invitations
+pnpm check:switch-onboarding
 
 # Validate the retained process/evidence references
 pnpm check:evidence

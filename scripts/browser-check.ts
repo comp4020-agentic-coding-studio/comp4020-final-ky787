@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { navigateMenu } from './menu-navigation.ts';
 /** Real keyboard/mouse C8 playthrough against the Node-served production build.
  * No teleports, input injection, or controller overrides in the main route.
  * pnpm build; DATA_DIR=/tmp/bn-playtest pnpm start
@@ -10,7 +11,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { freshProgress, type Progress } from '../src/slice/progress.ts';
-const URL_BASE = process.argv[2] ?? "http://localhost:8080/";
+const reviewUrl = new URL(process.argv[2] ?? "http://localhost:8080/"); reviewUrl.searchParams.set("labs", "1");
+const URL_BASE = reviewUrl.href;
 const SHOTS = process.argv[3] ?? join(tmpdir(), "binary-ninja-shots");
 const BROWSERS = [process.env.BROWSER_BIN, "chromium-browser", "chromium", "google-chrome", "google-chrome-stable", "brave-browser"].filter(Boolean) as string[];
 const PORT = 9334;
@@ -307,6 +309,7 @@ const checks: string[] = [];
 function check(label: string, ok: boolean, detail = ''): void { checks.push(`${ok ? 'PASS' : 'FAIL'} ${label}${detail ? ' — ' + detail : ''}`); if (!ok)
     throw new Error(label + ' ' + detail); }
 async function click(cdp: Cdp, selector: string) {
+    await navigateMenu(expression => evaluate(cdp, expression), next => click(cdp, next), selector);
     const at = await evaluate<{ x: number; y: number }>(cdp, `(()=>{const el=document.querySelector(${JSON.stringify(selector)});el.scrollIntoView({block:'nearest'});const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
     await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...at, button: 'left', buttons: 1, clickCount: 1 });
     await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at, button: 'left', buttons: 0, clickCount: 1 });
@@ -570,17 +573,19 @@ async function main() {
         await onboardNinja({ send: (method, params) => cdp!.send(method, params), read: expression => evaluate(cdp!, expression) });
         await shot(cdp, 'start');
         check('new visitor starts at pressure', (await snap(cdp)).room === 'pressure');
-        check('all four rooms available from the menu', await evaluate(cdp, 'document.querySelectorAll(".level-select button").length === 4'));
-        // Native keyboard navigation includes the public builder before the four rooms.
+        check('title screen exposes Tutorial, Play Co-op and Level Builder without a room grid', await evaluate(cdp, '!!document.querySelector("#tutorial") && !!document.querySelector("#play-coop") && !!document.querySelector("#level-builder") && !document.querySelector("[data-room]")'));
+        await tap(cdp, 'Tab');
+        check('Play Co-op is keyboard accessible from Tutorial', await evaluate(cdp, 'document.activeElement.id === "play-coop"'));
         await tap(cdp, 'Tab');
         check('Level Builder is keyboard accessible from the main menu', await evaluate(cdp, 'document.activeElement.id === "level-builder"'));
+        await tap(cdp, 'Space');
+        check('builder opens its own destination with both tools', await evaluate(cdp, '!!document.querySelector("#open-workbench") && !!document.querySelector("#my-levels")'));
         await tap(cdp, 'Tab');
-        check('My Levels is keyboard accessible from the main menu', await evaluate(cdp, 'document.activeElement.id === "my-levels"'));
-        for (let i = 0; i < 4; i++) await tap(cdp, 'Tab');
-        check('level select supports keyboard navigation', await evaluate(cdp, 'document.activeElement.dataset.room === "uplink"'));
+        check('My Levels is keyboard accessible inside Level Builder', await evaluate(cdp, 'document.activeElement.id === "my-levels"'));
+        await click(cdp, '#back-main');
         await waitFor(cdp, 'sound assets decode after a gesture', s => s.audio.loaded === 14);
         check('all audio assets decode without errors', (await snap(cdp)).audio.state === 'running' && (await snap(cdp)).audio.failed.length === 0);
-        await tap(cdp, 'Space');
+        await click(cdp, '[data-room="uplink"]');
         await waitFor(cdp, 'selected UPLINK', s => s.room === 'uplink');
         check('selecting UPLINK does not complete skipped rooms', (await snap(cdp)).progress.completedRooms.length === 0);
         await checkValidatedFrame(cdp, 'direct room selection');

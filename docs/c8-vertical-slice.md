@@ -38,6 +38,31 @@ return bridge. A cube can then replace a player on Plate B to hold the exit.
 The single-player route requires that return crossing to retrieve the cube. No network
 semantics are implemented or implied.
 
+## SWITCH cursor onboarding — 2026-10-26
+
+SWITCH alone has a staged, authored aiming cue. After its existing switch powers
+`anchor`, a sign above the approach says **MOVE YOUR MOUSE TO AIM AT THE ANCHOR**.
+The glow follows the existing hookable address bar and its attachment centre;
+**ANCHOR TARGETED** appears only when `PuzzleWorld.target(aim)` selects that real
+anchor within the existing range. The next instruction is **JUMP, THEN PRESS
+SPACE AGAIN IN MID-AIR TO GRAPPLE**, with **CLICK + HOLD** as an alternative.
+Moving the cursor or firing a missed hook never records mechanic completion.
+
+The real attached rope triggers 2.8 seconds of positive feedback, then retires
+the cue. The existing `grapple` mechanic event remains responsible for progress
+persistence; `PuzzleRenderer.room` receives the saved mechanics so a returning
+player who has learned grappling does not repeat the lesson. Pause freezes the
+feedback timer. Reduced motion keeps a static anchor highlight and the same
+readable sign. The cue does not add listeners, animation loops, controller
+signals, collision geometry or native evidence.
+
+Focused checks are `tests/switch-onboarding.test.ts` and
+`tests/platform-grapple.test.ts`. After a production build, run
+`node scripts/switch-onboarding-browser-check.ts` for a real keyboard/mouse route
+from PRESSURE, staged screenshots at 1600×900, 1366×768 and 1024×768, reduced
+motion, actual attachment and reload persistence. `BN_SHOTS` selects the output
+directory.
+
 ## CONTROL SPINE — showcase redesign, 2026-10-05
 
 The fourth room is now **CONTROL SPINE**, retaining room ID `uplink`, save schema
@@ -689,17 +714,18 @@ position, velocity, rope or frame snapshots are persisted. Cube-on-plate saves
 reconstruct a cube at the correct plate, including B; other loose cubes return to authored spawn.
 A carried cube therefore need not be rescued after returning to the site.
 
-The start/pause menu offers all four rooms from the beginning, with current and
-completed status. Selecting a different room saves the outgoing logical state
-and restores the selected room at its saved checkpoint. Selecting the current
-room resumes play. Visiting a room never marks it complete; reload continues
-the selected room. This uses the existing per-room version-3 save without a
-schema change. The selector supports mouse and Tab/Space/Enter navigation.
-The browser route checks direct UPLINK selection, reload, revisiting completed
-rooms and retained cube/latch state. Menu captures are in
-`docs/playtest/level-select-menu.png` and `level-select-compact.png` (960×640).
+The full-screen title offers **Tutorial**, which starts PRESSURE with fresh puzzle
+memories for all four C8 rooms while preserving completion records, mechanics and
+history. Returning visitors can **Continue** their saved room. Gameplay pause has
+Resume, Restart Room, Main Menu and compact sound controls. The former four-room
+grid is available only in Settings under `?debug=1` or `?labs=1`, preserving the
+developer regression routes. Selecting a different developer room saves its
+outgoing logical state and restores the selected checkpoint; visiting never
+marks a room complete. These changes use the existing version-3 save without a
+schema change. See [the menu contract](main-menu-and-invitations.md) and the
+[2026-10-26 visual review](playtest/2026-10-26-menu/).
 
-**Reset all progress…** is available from the same menu, including before
+**Reset all progress…** is available in Settings, including before
 completion. Its inline confirmation defaults focus to Cancel; Escape cancels
 without resuming play. Confirmation replaces all room memories, completed rooms,
 discoveries and activity with fresh PRESSURE progress through the existing
