@@ -60,7 +60,8 @@
     "check:menu": "node scripts/menu-browser-check.ts",
     "check:menu-invitations": "node scripts/menu-invitation-browser-check.ts",
     "check:switch-onboarding": "node scripts/switch-onboarding-browser-check.ts",
-    "check:audio": "node scripts/audio-browser-check.ts"
+    "check:audio": "node scripts/audio-browser-check.ts",
+    "check:maintenance": "node scripts/maintenance-browser-check.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

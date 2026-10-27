@@ -36,6 +36,7 @@ import { drawPayload } from './payload-render.ts';
 import { pressurePads } from './machinery-presentation.ts';
 import { drawPressurePad, drawPadOutputPulse } from './plate-render.ts';
 import { drawGravityLift } from './lift-render.ts';
+import { drawMaintenanceControl } from './maintenance-render.ts';
 import { SwitchOnboarding } from './switch-onboarding.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
@@ -291,12 +292,23 @@ export class PuzzleRenderer {
         if (r.plateB && r.id === 'relay') {
             if (w.frame.outputs.bridge && !w.frame.outputs.exitDoor) this.text('MOVE THE CUBE TO B', 1090, 355, 16, C.amber);
         }
+        const hint = w.interactionHint();
+        let maintenanceOwnsHint = false;
         for (const lever of [
             { id: 'lever', at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
             { id: 'upperLever', at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
             ...(r.controls ?? []).map(s => ({ id: s.id, at: s.at, active: w.frame.controls?.[s.id] ?? (s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id as 'switchB' | 'switchC']), name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle' })),
         ]) {
             if (!lever.at || r.breakpoints?.some(b => b.activationControl === lever.id)) continue;
+            if (r.id === 'handshake' && lever.id === 'draft:maintenance') {
+                // Use the authority's existing hint, including grounded/range and
+                // cube-priority rules. A nearby airborne player is not yet ready.
+                const ready = hint === `E · ${lever.name}`;
+                maintenanceOwnsHint = ready || !!lever.active && hint === 'COMMITTED';
+                drawMaintenanceControl(c, lever.at, !!lever.active, ready,
+                    this.heroes.time, energyMotion, cam.zoom);
+                continue;
+            }
             const { x, y } = lever.at;
             c.fillStyle = C.wall;
             c.fillRect(x - 24, y - 36, 48, 36);
@@ -361,8 +373,7 @@ export class PuzzleRenderer {
         }
         drawNinja(c, p, w.elapsed, localAccent);
         drawEntryProjection(c, r, this.heroes);
-        const hint = w.interactionHint();
-        if (hint) {
+        if (hint && !maintenanceOwnsHint) {
             const station = r.breakpoints?.find(b => Math.hypot(p.x - b.at.x, p.y - (b.at.y - 25)) < 90);
             if (station) this.text(hint, station.at.x - hint.length * 3.6, station.at.y + 78, 12, C.ink);
             else this.text(hint, p.x - 80, p.y - 72, 15, C.ink);

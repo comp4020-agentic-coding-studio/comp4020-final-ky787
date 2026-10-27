@@ -1,0 +1,209 @@
+[
+  {
+    "name": "01-dormant-approach",
+    "state": {
+      "completed": false,
+      "hint": "PARTNER CARRYING",
+      "grounded": true,
+      "groundId": "partner-cube-support:draft:payload",
+      "exit": false,
+      "player": {
+        "x": 1733.4777777777745,
+        "y": 451
+      },
+      "camera": {
+        "zoom": 1.05135135135135,
+        "x": 1529.0745501285337,
+        "y": 370.0000000000005
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 0,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "02-ready-approach",
+    "state": {
+      "completed": false,
+      "hint": "E · MAINTENANCE COMPLETE",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 1.05135135135135,
+        "x": 1529.0745501285337,
+        "y": 370.0000000000005
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 0,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "02-ready-1024",
+    "state": {
+      "completed": false,
+      "hint": "E · MAINTENANCE COMPLETE",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 0.8238984822708766,
+        "x": 1668.564215109614,
+        "y": 392.0385908585834
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 0,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "02-ready-800",
+    "state": {
+      "completed": false,
+      "hint": "E · MAINTENANCE COMPLETE",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 0.643980330668256,
+        "x": 1668.86301653822,
+        "y": 375.01145376504957
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 0,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "03-completed-green",
+    "state": {
+      "completed": true,
+      "hint": "COMMITTED",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 1.050260344040013,
+        "x": 1528.284103041863,
+        "y": 618.7372667546271
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 1,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "03-completed-green-1024",
+    "state": {
+      "completed": true,
+      "hint": "COMMITTED",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 0.8242622634565651,
+        "x": 1668.8384805426917,
+        "y": 391.86556793888775
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 1,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "03-completed-green-800",
+    "state": {
+      "completed": true,
+      "hint": "COMMITTED",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 0.6439769807716502,
+        "x": 1668.8597854527393,
+        "y": 375.0134045329086
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 1,
+      "reducedMotion": false
+    }
+  },
+  {
+    "name": "04-completed-reduced-motion",
+    "state": {
+      "completed": true,
+      "hint": "COMMITTED",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1917.3194444444441,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 1.0460758180829732,
+        "x": 1525.2370773027992,
+        "y": 371.8659711615139
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 1,
+      "reducedMotion": true
+    }
+  },
+  {
+    "name": "05-completed-departure",
+    "state": {
+      "completed": true,
+      "hint": "",
+      "grounded": true,
+      "groundId": "maintenanceLedge",
+      "exit": false,
+      "player": {
+        "x": 1820.3986111111112,
+        "y": 343
+      },
+      "camera": {
+        "zoom": 1.051327523978329,
+        "x": 1529.0573044518806,
+        "y": 370.0083857102731
+      },
+      "visible": true,
+      "clearOfHud": true,
+      "latchSounds": 1,
+      "reducedMotion": false
+    }
+  }
+]

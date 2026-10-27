@@ -37,6 +37,46 @@ contact area. Its two markers remain on the starting floor. There is no separate
 checkpoint terminal or E interaction, and the checkpoint powers no route. Wires observe destination bindings, not a second controller. Camera
 reveals frame the affected crossing, lift, link and exit; Tab retains manual overview.
 
+### Maintenance control presentation
+
+The campaign's `draft:maintenance` control uses
+[`maintenance-render.ts`](../../src/slice/maintenance-render.ts): a compact hovering
+screen and recessed industrial press pad, built from the existing Canvas metalwork
+helpers. Four short animated signal filaments extend at most 64 world units to
+either side. The housing floats above the existing contact point; it adds no
+collision or hook surface. Filaments render behind the players and remain above
+the ledge. Glow, hover and packet motion respect the existing reduced-motion and
+paused/disconnected presentation policy.
+
+Its presentation observes existing state only:
+
+- **Unconfirmed:** muted blue-grey housing, dim telemetry and faint filaments.
+- **Ready:** cyan display, mild pulse and visible signal packets only while the
+  existing interaction hint offers `E · MAINTENANCE COMPLETE`. This preserves the
+  grounded/elevation/range checks and cube interaction priority; jumping beneath
+  the control does not make it usable. The ready caption carries `E · CONFIRM`
+  below the object, replacing its overhead interaction hint so the prompt stays
+  clear of the player and compact desktop session overlay.
+- **Latched:** the accepted `frame.controls['draft:maintenance']` value turns the
+  screen and filaments green, displays a checkmark, and seats the pad into closed
+  catches. This appearance persists regardless of player proximity. Repeated E
+  does not undo the commitment or replay its confirmation sound.
+
+The campaign-only renderer leaves authored geometry, drafts, controller outputs,
+completion/save logic and existing terminal audio unchanged. Other terminals keep
+their existing rendering. `pnpm check:maintenance` replays the canonical real-input
+HANDSHAKE route with focused state checks and normal-camera captures at 1600×900,
+1024×768 and 800×600; use `BN_SHOTS` to choose the report directory.
+
+The [2026-10-27 review](../playtest/2026-10-27-maintenance/review.json) retains
+normal-camera [unconfirmed](../playtest/2026-10-27-maintenance/01-dormant-approach.png),
+[ready/interaction](../playtest/2026-10-27-maintenance/02-ready-approach.png),
+[completed](../playtest/2026-10-27-maintenance/05-completed-departure.png) and
+[800×600 completed](../playtest/2026-10-27-maintenance/03-completed-green-800.png)
+captures. Both players completed the 59-step route with zero deaths; the repeated
+press left the latch and confirmation audio count unchanged. This is automated
+physical and visual review, not human playtest acceptance.
+
 ## Intended two-player solution
 
 1. One player holds CROSSING while the other jumps/hooks/swings to the alcove,

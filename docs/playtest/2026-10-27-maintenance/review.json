@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-27",
+  "scope": "Campaign HANDSHAKE maintenance control presentation only; real browser inputs, no injected gameplay state or custom camera.",
+  "checks": [
+    {
+      "command": "pnpm typecheck",
+      "result": "pass"
+    },
+    {
+      "command": "pnpm test:unit tests/handshake-physics.test.ts tests/audio-refinement.test.ts",
+      "result": "27 tests passed"
+    },
+    {
+      "command": "pnpm build",
+      "result": "pass; existing large-chunk warning remains"
+    },
+    {
+      "command": "BN_SHOTS=.workbench/reports/2026-10-27-maintenance pnpm check:maintenance",
+      "result": "pass"
+    }
+  ],
+  "scenario": {
+    "pass": true,
+    "steps": 59,
+    "campaign_hash": "e05842d86169d80ec3d1b8f2b9de6a73ca1671fb30d0ec3784ad4f8efcb5cf06",
+    "completed": {
+      "host": true,
+      "partner": true
+    },
+    "deaths": {
+      "host": 0,
+      "partner": 0
+    }
+  },
+  "screenshots": [
+    "01-dormant-approach.png",
+    "02-ready-approach.png",
+    "02-ready-1024.png",
+    "02-ready-800.png",
+    "03-completed-green.png",
+    "03-completed-green-1024.png",
+    "03-completed-green-800.png",
+    "04-completed-reduced-motion.png",
+    "05-completed-departure.png"
+  ],
+  "review": "Muted, cyan-ready and green-latched states inspected in normal gameplay views. Four short filaments stay above the ledge and behind avatars. Housing, filaments and captions fit all three desktop sizes and clear the session panel. The green check and latched caption persist after departure; repeated E neither resets the latch nor replays its sound.",
+  "limitations": [
+    "Automated physical solve and screenshot review; human playtesting has not been performed.",
+    "Workbench draft previews retain the generic terminal art; this renderer is scoped to the campaign control."
+  ]
+}
