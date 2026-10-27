@@ -1,0 +1,448 @@
+[
+  {
+    "name": "death field adds flowing signals at 0s",
+    "pass": true
+  },
+  {
+    "name": "death field adds flowing signals at 0.7s",
+    "pass": true
+  },
+  {
+    "name": "death field adds flowing signals at 5s",
+    "pass": true
+  },
+  {
+    "name": "death field preserves the approved still frame at 0s",
+    "pass": true
+  },
+  {
+    "name": "death field preserves the approved still frame at 0.7s",
+    "pass": true
+  },
+  {
+    "name": "death field preserves the approved still frame at 5s",
+    "pass": true
+  },
+  {
+    "name": "static 430×70 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 7525
+    }
+  },
+  {
+    "name": "static 430×70 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 30100
+    }
+  },
+  {
+    "name": "static 430×70 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 63840
+    }
+  },
+  {
+    "name": "static 165×22 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 913
+    }
+  },
+  {
+    "name": "static 165×22 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 3630
+    }
+  },
+  {
+    "name": "static 165×22 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 14520
+    }
+  },
+  {
+    "name": "static 30×280 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 2100
+    }
+  },
+  {
+    "name": "static 30×280 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 8400
+    }
+  },
+  {
+    "name": "static 30×280 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 17280
+    }
+  },
+  {
+    "name": "static 315×270 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 21330
+    }
+  },
+  {
+    "name": "static 315×270 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 85050
+    }
+  },
+  {
+    "name": "static 315×270 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 131328
+    }
+  },
+  {
+    "name": "static 12×8 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 24
+    }
+  },
+  {
+    "name": "static 12×8 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 96
+    }
+  },
+  {
+    "name": "static 12×8 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 384
+    }
+  },
+  {
+    "name": "static 2×2 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 1
+    }
+  },
+  {
+    "name": "static 2×2 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 4
+    }
+  },
+  {
+    "name": "static 2×2 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 16
+    }
+  },
+  {
+    "name": "static world patterns and packets stay anchored while panning at 0.5 (1600 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 2,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "static world patterns and packets stay anchored while panning at 1 (1600 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "static world patterns and packets stay anchored while panning at 2 (1600 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "static world patterns and packets stay anchored while panning at 0.5 (430 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "static world patterns and packets stay anchored while panning at 1 (430 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "static world patterns and packets stay anchored while panning at 2 (430 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "static reduced motion ignores elapsed time",
+    "pass": true
+  },
+  {
+    "name": "static deterministic at the same time",
+    "pass": true
+  },
+  {
+    "name": "static signal decoration moves",
+    "pass": true,
+    "detail": {
+      "motionDelta": 54
+    }
+  },
+  {
+    "name": "static interior pixels remain stationary between edge animation frames",
+    "pass": true,
+    "detail": {
+      "bodyDelta": 1,
+      "tolerance": 1
+    }
+  },
+  {
+    "name": "hazard 430×70 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 7525
+    }
+  },
+  {
+    "name": "hazard 430×70 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 30100
+    }
+  },
+  {
+    "name": "hazard 430×70 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 63840
+    }
+  },
+  {
+    "name": "hazard 165×22 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 913
+    }
+  },
+  {
+    "name": "hazard 165×22 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 3630
+    }
+  },
+  {
+    "name": "hazard 165×22 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 14520
+    }
+  },
+  {
+    "name": "hazard 30×280 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 2100
+    }
+  },
+  {
+    "name": "hazard 30×280 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 8400
+    }
+  },
+  {
+    "name": "hazard 30×280 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 17280
+    }
+  },
+  {
+    "name": "hazard 315×270 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 21330
+    }
+  },
+  {
+    "name": "hazard 315×270 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 85050
+    }
+  },
+  {
+    "name": "hazard 315×270 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 131328
+    }
+  },
+  {
+    "name": "hazard 12×8 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 24
+    }
+  },
+  {
+    "name": "hazard 12×8 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 96
+    }
+  },
+  {
+    "name": "hazard 12×8 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 384
+    }
+  },
+  {
+    "name": "hazard 2×2 at 0.5 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 1
+    }
+  },
+  {
+    "name": "hazard 2×2 at 1 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 4
+    }
+  },
+  {
+    "name": "hazard 2×2 at 2 clips every painted pixel",
+    "pass": true,
+    "detail": {
+      "spill": 0,
+      "inside": 16
+    }
+  },
+  {
+    "name": "hazard world patterns and packets stay anchored while panning at 0.5 (1600 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 2,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "hazard world patterns and packets stay anchored while panning at 1 (1600 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "hazard world patterns and packets stay anchored while panning at 2 (1600 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "hazard world patterns and packets stay anchored while panning at 0.5 (430 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 2,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "hazard world patterns and packets stay anchored while panning at 1 (430 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "hazard world patterns and packets stay anchored while panning at 2 (430 wide)",
+    "pass": true,
+    "detail": {
+      "maxDelta": 1,
+      "tolerance": 2
+    }
+  },
+  {
+    "name": "hazard reduced motion ignores elapsed time",
+    "pass": true
+  },
+  {
+    "name": "hazard deterministic at the same time",
+    "pass": true
+  },
+  {
+    "name": "hazard signal decoration moves",
+    "pass": true,
+    "detail": {
+      "motionDelta": 59
+    }
+  }
+]

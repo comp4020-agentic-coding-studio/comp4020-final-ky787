@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
+import { reviewCrossfeedLift } from './terrain-campaign-review.ts';
 import type { CubeId, SharedRoom } from '../src/coop/protocol.ts';
 type Snapshot = GameSnapshot;
 export async function crossfeedRoute(h: Awaited<ReturnType<typeof coopBrowser<Snapshot>>>, url: string, debug: string, reverse = false, partyPlayers?: [Cdp, Cdp]) {
@@ -308,6 +309,7 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
 
 async function main() {
 const h = await coopBrowser<Snapshot>({ shots: process.env.BN_SHOTS ?? '/tmp/bn-crossfeed-shots' });
+const finishTerrainReview = process.env.BN_TERRAIN_REVIEW === '1' ? reviewCrossfeedLift(h) : null;
 const { check, shot, snapshot } = h;
 
 try {
@@ -323,6 +325,7 @@ try {
         await crossfeedRoute(h, url, debug, true);
     }
     for (const c of h.clients) check('browser has no runtime errors', c.errors.length === 0, c.errors.join('\n'));
+    await finishTerrainReview?.();
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {
     for (let i = 0; i < h.clients.length; i++) {

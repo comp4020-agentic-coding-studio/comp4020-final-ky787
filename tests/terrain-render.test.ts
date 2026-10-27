@@ -11,7 +11,7 @@ function record(kind: 'static' | 'hazard', box: Box, view: Box, time = 0, motion
         },
         set: (_, name, value) => { commands.push(['set', name, typeof value === 'object' ? 'gradient' : value]); return true; },
     }) as CanvasRenderingContext2D;
-    if (kind === 'static') drawStaticPlatform(context, box, view);
+    if (kind === 'static') drawStaticPlatform(context, box, view, time, motion);
     else drawDeathZone(context, box, view, time, motion);
     return commands;
 }
@@ -40,7 +40,14 @@ describe.each(['static', 'hazard'] as const)('%s terrain presentation', kind => 
         const box = { x: 70, y: 120, w: 4320, h: 70 };
         expect(record(kind, box, view, 0, false)).toEqual(record(kind, box, view, 100, false));
         expect(record(kind, box, view, 2.5)).toEqual(record(kind, box, view, 2.5));
-        if (kind === 'hazard') expect(record(kind, box, view, 0)).not.toEqual(record(kind, box, view, 2.5));
-        else expect(record(kind, box, view, 0)).toEqual(record(kind, box, view, 2.5));
+        expect(record(kind, box, view, 0)).not.toEqual(record(kind, box, view, 2.5));
     });
+});
+
+it('static body, chips, circuit vertices and colours stay fixed while only edge dash phase advances', () => {
+    const box = Object.freeze({ x: 70, y: 120, w: 1600, h: 300 });
+    const a = record('static', box, view, 0), b = record('static', box, view, 3);
+    const architecture = (commands: unknown[][]) => commands.filter(c => c[0] !== 'set' || c[1] !== 'lineDashOffset');
+    expect(a).not.toEqual(b);
+    expect(architecture(a)).toEqual(architecture(b));
 });

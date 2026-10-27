@@ -163,7 +163,7 @@ export class PuzzleRenderer {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };
             if (b.kind === 'static') {
                 if (!p.solid.enabled) continue;
-                drawStaticPlatform(c, b, visible);
+                drawStaticPlatform(c, b, visible, this.heroes.time, energyMotion);
                 continue;
             }
             const crumble = b.kind === 'crumble-prototype' || b.kind === 'crumble-proven';

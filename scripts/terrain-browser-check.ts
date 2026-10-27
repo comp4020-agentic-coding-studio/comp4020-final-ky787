@@ -5,6 +5,7 @@ import { createServer } from 'vite';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser } from './coop-browser.ts';
+import { reviewTerrainMotion } from './terrain-motion-review.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? '/tmp/bn-terrain-shots', internalLabs: false });
 const vite = await createServer({ server: { host: '127.0.0.1', port: 0, open: false } });
@@ -21,14 +22,15 @@ try {
         function render(kind,box,view,zoom=1,time=2,motion=true,death=drawDeathZone){
             const canvas=document.createElement('canvas');canvas.width=480;canvas.height=320;
             const c=canvas.getContext('2d');c.scale(zoom,zoom);c.translate(-view.x,-view.y);
-            if(kind==='static')drawStaticPlatform(c,box,view);else death(c,box,view,time,motion);
+            if(kind==='static')drawStaticPlatform(c,box,view,time,motion);else death(c,box,view,time,motion);
             return c.getImageData(0,0,480,320).data;
         }
         const hash=data=>{let v=2166136261;for(const x of data)v=Math.imul(v^x,16777619);return v>>>0;};
         if(baseline)for(const motion of [true,false])for(const time of [0,.7,5]){
             const box={x:12,y:16,w:430,h:100},view={x:0,y:0,w:480,h:320};
             const now=render('hazard',box,view,1,time,motion),before=render('hazard',box,view,1,time,motion,baseline.drawDeathZone);
-            results.push({name:'approved death field is pixel-identical at '+time+'s, motion '+motion,pass:now.every((v,i)=>v===before[i])});
+            const same=now.every((v,i)=>v===before[i]);
+            results.push({name:'death field '+(motion?'adds flowing signals':'preserves the approved still frame')+' at '+time+'s',pass:motion?!same:same});
         }
         for(const kind of ['static','hazard']){
             for(const [w,height] of [[430,70],[165,22],[30,280],[315,270],[12,8],[2,2]]){
@@ -42,8 +44,7 @@ try {
                     results.push({name:kind+' '+w+'×'+height+' at '+zoom+' clips every painted pixel',pass:spill===0&&inside>0,detail:{spill,inside}});
                 }
             }
-            const box={x:-128,y:-72,w:1600,h:1000};
-            for(const zoom of [.5,1,2]){
+            for(const box of [{x:-128,y:-72,w:1600,h:1000},{x:20,y:80,w:430,h:230}])for(const zoom of [.5,1,2]){
                 const v1={x:0,y:0,w:480/zoom,h:320/zoom},v2={...v1,x:32,y:24};
                 const first=render(kind,box,v1,zoom),second=render(kind,box,v2,zoom);let maxDelta=0;
                 for(let y=2;y<320-24*zoom-2;y++)for(let x=2;x<480-32*zoom-2;x++){
@@ -52,12 +53,22 @@ try {
                 }
                 // Chromium gradient dithering is anchored to the raster, with a
                 // measured 1–2 channel-value variation after an integer pan.
-                results.push({name:kind+' world patterns stay anchored while panning at '+zoom,pass:maxDelta<=2,detail:{maxDelta,tolerance:2}});
+                results.push({name:kind+' world patterns and packets stay anchored while panning at '+zoom+' ('+box.w+' wide)',pass:maxDelta<=2,detail:{maxDelta,tolerance:2}});
             }
-            const view={x:0,y:0,w:480,h:320};
+            const box={x:12,y:16,w:430,h:260},view={x:0,y:0,w:480,h:320};
             results.push({name:kind+' reduced motion ignores elapsed time',pass:hash(render(kind,box,view,1,0,false))===hash(render(kind,box,view,1,99,false))});
             results.push({name:kind+' deterministic at the same time',pass:hash(render(kind,box,view))===hash(render(kind,box,view))});
-            results.push({name:kind+' '+(kind==='hazard'?'has gentle motion':'remains stationary'),pass:(hash(render(kind,box,view,1,0))===hash(render(kind,box,view,1,3)))===(kind==='static')});
+            const first=render(kind,box,view,1,0),later=render(kind,box,view,1,3);
+            const motionDelta=first.reduce((delta,value,i)=>Math.max(delta,Math.abs(value-later[i])),0);
+            results.push({name:kind+' signal decoration moves',pass:motionDelta>8,detail:{motionDelta}});
+            if(kind==='static'){
+                let bodyDelta=0;
+                for(let y=32;y<250;y++)for(let x=28;x<425;x++)for(let k=0;k<4;k++)
+                    bodyDelta=Math.max(bodyDelta,Math.abs(first[(y*480+x)*4+k]-later[(y*480+x)*4+k]));
+                // Separate Canvas rasters can differ by one channel value from
+                // gradient dithering; unit tests also compare exact body commands.
+                results.push({name:'static interior pixels remain stationary between edge animation frames',pass:bodyDelta<=1,detail:{bodyDelta,tolerance:1}});
+            }
         }
         return results;
     })()`);
@@ -85,6 +96,7 @@ try {
                 await h.shot(p, name);
                 h.check(name + ' is an ordinary player camera', state.camera.kind === 'follow' && !state.overviewVisible);
             }
+            if (chamber === 'crossfeed-vault' && width === 1920) await reviewTerrainMotion(h, a);
             await h.key(a, 'Tab', true); await h.sleep(1000);
             await h.shot(a, chamber + '-overview-' + width);
             h.check(chamber + ' overview ' + width, (await h.snapshot(a)).camera.kind === 'overview');

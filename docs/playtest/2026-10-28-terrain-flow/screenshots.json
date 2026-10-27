@@ -1,0 +1,87 @@
+[
+  {
+    "path": "screenshots/handshake-player-1-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/handshake-player-1-1920.png",
+    "sha256": "752c1c7730b86e3ba90c683b858a45e8989a00525786e13d74742fd86405e16a"
+  },
+  {
+    "path": "screenshots/handshake-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/handshake-player-1-1024.png",
+    "sha256": "e118a10dec3c3e218f6c0009b7a2ca4af05d221c81aa520941bfa2fac76b6e3a"
+  },
+  {
+    "path": "screenshots/race-condition-player-1-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/race-condition-player-1-1920.png",
+    "sha256": "99107429f883592422582ca2f17995411882d97529c11adde445ce207f9192c6"
+  },
+  {
+    "path": "screenshots/race-condition-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/race-condition-player-1-1024.png",
+    "sha256": "1d87b862242f53d9e52a0495c804d88f4b715d7e1085bee749bef469aa7b2f04"
+  },
+  {
+    "path": "screenshots/deadlock-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/deadlock-player-1-1024.png",
+    "sha256": "7d871b5f9094bae7d1bc86b9bdd9db5ef4e623b458122c9e93aec46e030bb96d"
+  },
+  {
+    "path": "screenshots/use-after-free-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/use-after-free-player-1-1024.png",
+    "sha256": "d36153a73eb0847d8b509eec305192979140a3107375c4192af7b019bc830b3e"
+  },
+  {
+    "path": "screenshots/handshake-overview-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/handshake-overview-1024.png",
+    "sha256": "a4e395b218c604009f344bc13385684ae6a9f10dbbb7ac31ca80d462f01df3e1"
+  },
+  {
+    "path": "screenshots/crossfeed-flow-frame-0.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/crossfeed-flow-frame-0.png",
+    "sha256": "a68056372dc65e85d196245b5391aa7535393d978d2635b4d02114f8cb7eaf0a"
+  },
+  {
+    "path": "screenshots/crossfeed-flow-frame-1.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/crossfeed-flow-frame-1.png",
+    "sha256": "ad96515b1b0e01cc68846bb675c65ead2aa50d0a66f871a700c659c831305b23"
+  },
+  {
+    "path": "screenshots/crossfeed-flow-frame-2.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/crossfeed-flow-frame-2.png",
+    "sha256": "54e4bb3257aa838a16703db921a8a6588540cce4a3e6afef893beb9b481c562f"
+  },
+  {
+    "path": "screenshots/crossfeed-reduced-motion-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/crossfeed-reduced-motion-1920.png",
+    "sha256": "b8236aba9c6cc54062bb840fa119aee3658cf39b3e93f7898cd6636a9a00b6bd"
+  },
+  {
+    "path": "screenshots/crossfeed-reduced-motion-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/crossfeed-reduced-motion-1024.png",
+    "sha256": "9eec53c85a859da1135b4c61d8f56c1e96a38fdaaa55242c0f9630de058a2001"
+  },
+  {
+    "path": "screenshots/crossfeed-paused-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/initial/crossfeed-paused-1920.png",
+    "sha256": "e931237ca2a5ae6be937917a50e79eca5e11cc6136abc8787ac86837a176ba42"
+  },
+  {
+    "path": "screenshots/crossfeed-lift-off-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/crossfeed/full-crossfeed-lift-off-1920.png",
+    "sha256": "4610ec59eb76961145111f0e2498213cfc09e57345fefc4615a3e4c29d796bb0"
+  },
+  {
+    "path": "screenshots/crossfeed-lift-off-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/crossfeed/full-crossfeed-lift-off-1024.png",
+    "sha256": "14e76ca1ed86902127d31bedbf9b206367cd7aed6262026b8112ebda4e74546b"
+  },
+  {
+    "path": "screenshots/crossfeed-lift-on-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/crossfeed/full-crossfeed-lift-on-1920.png",
+    "sha256": "758c38deebf4c4947ce67a56c64db9b7d600e7bf3d494c33bcb72d2c80cdda74"
+  },
+  {
+    "path": "screenshots/crossfeed-lift-on-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain-flow/crossfeed/full-crossfeed-lift-on-1024.png",
+    "sha256": "699135b999cf0ff8f8c776cd0961f308edcb0998b2c4e46053b65ac94d4c0aec"
+  }
+]
