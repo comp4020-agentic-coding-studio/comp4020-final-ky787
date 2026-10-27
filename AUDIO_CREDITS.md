@@ -1,14 +1,15 @@
 # Binary Ninja audio credits
 
-## Sound effects — updated 2026-10-26
+## Sound effects — updated 2026-10-27
 
 All 21 shipped effect files use **CC0 1.0**. Thirteen of the original 14 files
 remain byte-for-byte; landing now uses the human-approved Kenney Impact Sounds
-sample. Seven effects were added earlier on 2026-10-26. The retired generic
+sample. Seven effects were added earlier on 2026-10-26; completion was replaced
+with the explicitly selected SRG774 recording on 2026-10-27. The retired generic
 `confirm.ogg` remains credited and shipped, but
 is not loaded: 20 distinct effect buffers now decode at runtime.
 
-The effect files total 274,111 bytes; active effects total 250,646 bytes.
+The effect files total 335,751 bytes; active effects total 312,286 bytes.
 Runtime paths are under `public/audio/`;
 no runtime download from a third-party site or the research share is needed.
 
@@ -31,7 +32,7 @@ no runtime download from a third-party site or the research share is needed.
 | `checkpoint.ogg` | `Audio/confirmation_001.ogg` / Kenney | Interface Sounds. Short two-tone cue; 70 Hz high-pass / 1.8 kHz low-pass, edge fades, −8 dBFS target peak. |
 | `breakpoint-deploy.ogg` | `Audio/doorOpen_002.ogg` / Kenney | [Sci-Fi Sounds](https://kenney.nl/assets/sci-fi-sounds). Slowed to 82%, 60 Hz high-pass / 1.8 kHz low-pass, edge fades, −8 dBFS target peak. Deployment lasts about 0.65 seconds, before the existing flag-confirmation moment. |
 | `breakpoint-confirm.ogg` | `Audio/confirmation_004.ogg` / Kenney | Interface Sounds. Slowed to 85%, 70 Hz high-pass / 2.2 kHz low-pass, edge fades, −8 dBFS target peak. The existing 1.2-second flag timing emits it once. |
-| `room-complete.ogg` | `Audio/confirmation_002.ogg` / Kenney; Binary Ninja arrangement | Interface Sounds. One stable source-tone cycle is resampled into a simultaneous 220/330/495 Hz chord (root, fifth, ninth; no major third), with a 55 ms attack, 650 ms release and two quiet 75 ms digital accents. Mild saturation, 70 Hz high-pass / 1.5 kHz low-pass, −8 dBFS target peak. Duration 1.55 s; replaces the previous NES jingle. |
+| `room-complete.ogg` | **Victory.mp3 / SRG774** (`victory_4.mp3` download) | [Dark Sci-Fi Audio Pack](https://opengameart.org/content/dark-sci-fi-audio-pack), CC0 1.0. Complete 5.877551-second original stereo recording, constant +11.274436 dB gain, 44.1 kHz Vorbis q4. No EQ, compression, trimming, pitch changes, synthesis or replacement arrangement. |
 | `code-power.ogg` | `Audio/forceField_001.ogg` / Kenney | Sci-Fi Sounds. Trimmed to 0.8 seconds, 55 Hz high-pass / 2 kHz low-pass, edge fades, −9 dBFS target peak. A quiet activation bed separate from firewall contact. |
 
 Full per-file source URLs, exact FFmpeg filter chains, original/new-file hashes
@@ -45,31 +46,51 @@ The four original Kenney asset pages and embedded pack licences were verified
 on 2026-10-26. The credits JSON records official download URLs, archive hashes,
 individual original hashes, exact FFmpeg filter chains, output hashes and
 decoded levels/durations. Run `python3 scripts/audio/build-sfx.py` to reproduce
-only the approved landing from the pinned Impact Sounds archive.
+only the selected Victory recording from its pinned original download.
 `--effects <filename>...` selects specific managed effects; `--all` explicitly
-rebuilds all eight managed files. **Completion remains unchanged in this pass,
-pending human selection.** The Music
+rebuilds all eight managed files. `--effects landing.ogg` reproduces the approved
+landing independently. The Music
 Jingles archive and licence remain as provenance for the earlier completion
 sample preserved in the dated A/B review; it has no current runtime use.
 
 The former generic confirmation has a dominant frequency near 3.14 kHz and
 99.955% of its measured spectral energy above 1.8 kHz. The new switch, latch,
 checkpoint and breakpoint-confirmation files measure 0–2.621% above that threshold.
-The refined completion measures 0.000105% above 1.8 kHz, with a decoded peak of
-−8.027 dBFS and RMS of −18.757 dBFS. These are signal measurements, not subjective
-listening judgments. The seven added samples retain headroom; their decoded peaks
+These are signal measurements, not subjective listening judgments.
+The seven added samples retain headroom; their decoded peaks
 range from −10.213 to −7.934 dBFS before runtime gains and the effects-volume control.
 
 Switch, latch, checkpoint, deployment, flag confirmation and completion have
 separate samples. One observed state update emits each cue at most once and
 chooses one machinery activation (door, relay, lift, then code) when several
 outputs change together. The engine permits at most two concurrent machinery
-voices, reduces lift/relay activation gains, and gives completion its own chord
-above earlier effects. Its 1.55-second tail is covered by a finite 1.8-second
-music-duck hold; normal view-dependent music levels return afterward, including
+voices, reduces lift/relay activation gains, and gives completion one foreground
+voice. A finite music-duck hold covers the **actual decoded AudioBuffer duration**
+(5.888 seconds in the tested browser; file fallback 5.878 seconds). The existing
+**450 ms** ramp then restores normal view-dependent
+music levels, including
 while a co-op victory screen remains open. Grapple, cube and pressure-plate samples and gains remain
 unchanged. Hero timing still follows authored presentation state, including one
 deployment and one confirmation per newly activated breakpoint.
+
+The [original Victory download](https://opengameart.org/sites/default/files/victory_4.mp3)
+is 235,101 bytes. Its original submission explicitly identifies SRG774 and
+dedicates the pack to CC0 1.0; verified on **2026-10-27**. Attribution is optional,
+but the artist and source remain credited. Source masters stay outside the game
+bundle. The previous NES jingle and synthesized chord are rejected historical
+versions, not sources for the current effect.
+
+- Original SHA-256: `208916af7b2b26ee70171a964595ace1ccaf4534abfbfa816d340179e13fe289`.
+- Runtime SHA-256: `2a407d2107124ff7e7bae23b8d1228311a77f43028b24a7695781a28e6f1d743`.
+- Final output: 70,464 bytes, all 259,200 original samples per channel, stereo,
+  −21.16 LUFS integrated, −8.19 dB true peak. Existing completion gain 0.65 and
+  default Effects 65% yield approximately −28.64 LUFS / −15.67 dBTP. The existing
+  18% completion music mix remains; only its hold duration changes.
+
+Two builds with the recorded FFmpeg version produced identical bytes. All other
+20 effect files and all seven music files, their catalogue records and playback
+gains are unchanged. Human listening selected the recording; the agent assessed
+licensing, integrity, levels and actual browser triggering, not subjective sound.
 
 Lever-shaped toggles and lift latches now share the existing digital `switch`
 cue once per accepted interaction. Upper lift levers retain latch confirmation
@@ -87,8 +108,8 @@ Full-speed/full-Effects peak remains below −7.8 dBFS (about −11.6 dBFS at de
 on a newly pressed local plate uses the unchanged plate impact without layering
 another landing; unrelated remote/cube plate activity does not suppress it.
 
-The [focused toggle/completion A/B review](docs/playtest/2026-10-26-audio-refinement/sfx-ab.html)
-compares the previous mechanical toggle and NES jingle with their replacements
+The historical [toggle/completion A/B review](docs/playtest/2026-10-26-audio-refinement/sfx-ab.html)
+compares the previous mechanical toggle and NES jingle with the October 26 versions
 at the same runtime gains and default 65% Effects level. Its
 [manifest](docs/playtest/2026-10-26-audio-refinement/sfx-ab.json) retains both versions'
 source records, measurements, hashes, and proof that the other 19 effect files are
@@ -97,7 +118,8 @@ is historical: it contains the previous toggle and jingle alongside the still-cu
 deployment/confirmation pair and grapple/cube/plate references. Its original
 Ogg, timestamp manifest and [measurements](docs/playtest/2026-10-26-audio/sfx-measurements.json)
 remain unchanged. `python3 scripts/audio/review-sfx.py` creates a separate current-cue
-montage in the refinement folder. The agent cannot hear tool playback, so a
+montage in `docs/playtest/2026-10-27-victory-audio/`, leaving both historical reviews
+intact. The agent cannot hear tool playback, so a
 perceptual audition is not claimed.
 
 The original project and research share were read-only. The small named cue,

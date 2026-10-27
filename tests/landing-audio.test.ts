@@ -56,7 +56,7 @@ it('a remote or cube-driven plate transition cannot suppress a separate local la
     expect(audio.play.mock.calls.filter(([cue]) => cue === 'plate')).toHaveLength(1);
 });
 
-it('pins the approved landing source, raises its measured onset about 3 dB and leaves completion untouched', async () => {
+it('pins the approved landing source, unchanged runtime bytes and measured onset increase of about 3 dB', async () => {
     const { assets } = JSON.parse(await readFile('public/audio/credits.json', 'utf8'));
     const landing = assets.find((a: {file: string}) => a.file === SOUNDS.landing.file);
     expect(landing.original).toBe('Audio/impactSoft_medium_000.ogg');
@@ -66,6 +66,6 @@ it('pins the approved landing source, raises its measured onset about 3 dB and l
     expect(delta).toBeGreaterThan(2.8); expect(delta).toBeLessThan(3.2);
     expect(landing.decodedPeakDbfs + 20 * Math.log10(SOUNDS.landing.gain)).toBeLessThan(-7);
     expect(landing.durationSeconds).toBeLessThanOrEqual(SOUNDS.landing.cooldown);
-    const completion = await readFile('public/audio/room-complete.ogg');
-    expect(createHash('sha256').update(completion).digest('hex')).toBe('96de80a6cb5015c941eee0a51f76d7548f913d10492c8a8e5b359e78fb9e2ac8');
+    const bytes = await readFile('public/audio/landing.ogg');
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe('199a252e4605bf98130b2d15aa40f50915b826f0d1a58016e8250aebe2ffefd3');
 });

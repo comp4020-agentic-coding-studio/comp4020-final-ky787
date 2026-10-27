@@ -252,55 +252,33 @@
     },
     {
       "file": "room-complete.ogg",
-      "original": "Audio/confirmation_002.ogg",
-      "author": "Kenney",
-      "source": "https://kenney.nl/assets/interface-sounds",
-      "download": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip",
-      "pack": "interface-sounds",
+      "original": "Victory.mp3",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "download": "https://opengameart.org/sites/default/files/victory_4.mp3",
+      "pack": "dark-sci-fi-audio-pack",
       "license": "CC0-1.0",
-      "retrieved": "2026-10-26",
-      "sourceSha256": "33b17a9a9a2397c62b285c52c33a907fdffb476909c99e42dde603f6a7a8b12c",
-      "sourceArchiveSha256": "f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232",
-      "processing": "Cycle resampling and chord arrangement specified in arrangement and scripts/audio/build-sfx.py; aformat=channel_layouts=mono,aresample=44100,highpass=f=70,lowpass=f=1500,afade=t=in:d=0.015,afade=t=out:st=1.48:d=0.07,volume=-7.975043dB; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.",
+      "retrieved": "2026-10-27",
+      "sourceSha256": "208916af7b2b26ee70171a964595ace1ccaf4534abfbfa816d340179e13fe289",
+      "processing": "anull,volume=11.274436dB; 44.1kHz stereo Vorbis q4; FFmpeg bitexact flags.",
       "targetPeakDbfs": -8,
-      "decodedPeakDbfs": -8.027,
-      "durationSeconds": 1.55,
-      "sha256": "96de80a6cb5015c941eee0a51f76d7548f913d10492c8a8e5b359e78fb9e2ac8",
-      "bytes": 8824,
-      "arrangement": {
-        "method": "One-cycle resampling of the original CC0 tone; mild tanh saturation; simultaneous open-fifth/add9 chord; two quiet digital accents.",
-        "sourceCycleStartSample": 564.398561306618,
-        "sourceCycleEndSample": 601.9465315512846,
-        "chordFrequenciesHz": [
-          220,
-          330,
-          495
-        ],
-        "chordGains": [
-          0.63,
-          0.24,
-          0.13
-        ],
-        "durationSeconds": 1.55,
-        "attackSeconds": 0.055,
-        "releaseSeconds": 0.65,
-        "exponentialDecayPerSecond": 0.85,
-        "saturation": 1.15,
-        "accents": [
-          {
-            "offsetSeconds": 0.11,
-            "frequencyHz": 660,
-            "gain": 0.055,
-            "durationSeconds": 0.075
-          },
-          {
-            "offsetSeconds": 0.205,
-            "frequencyHz": 880,
-            "gain": 0.04,
-            "durationSeconds": 0.075
-          }
-        ]
-      }
+      "decodedPeakDbfs": -8.188,
+      "durationSeconds": 5.877551,
+      "sha256": "2a407d2107124ff7e7bae23b8d1228311a77f43028b24a7695781a28e6f1d743",
+      "bytes": 70464,
+      "title": "Victory",
+      "sourceFilename": "victory_4.mp3",
+      "channels": 2,
+      "sourceDecodedSamplesPerChannel": 259200,
+      "decodedSamplesPerChannel": 259200,
+      "fullOriginalRecording": true,
+      "dynamicCompression": false,
+      "constantGainDb": 11.274436,
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "selection": "Explicit human listening selection of SRG774 Victory.mp3; original recording, constant gain and OGG conversion only.",
+      "integratedLufs": -21.16,
+      "truePeakDbtp": -8.19,
+      "ffmpegVersion": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
     },
     {
       "file": "code-power.ogg",
@@ -321,7 +299,7 @@
       "bytes": 7224
     }
   ],
-  "updated": "2026-10-26",
+  "updated": "2026-10-27",
   "sourcePacks": {
     "sci-fi-sounds": {
       "page": "https://kenney.nl/assets/sci-fi-sounds",
@@ -354,6 +332,19 @@
       "licenseFile": "Kenney-Impact-License.txt",
       "sourceLicenseSha256": "b49aa9c56b04528b95913de13e506a0f7c5e807b9925db9bfef86af1f91120db",
       "verified": "2026-10-26"
+    },
+    "dark-sci-fi-audio-pack": {
+      "page": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "download": "https://opengameart.org/sites/default/files/victory_4.mp3",
+      "sha256": "208916af7b2b26ee70171a964595ace1ccaf4534abfbfa816d340179e13fe289",
+      "author": "SRG774",
+      "title": "Victory",
+      "original": "Victory.mp3",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "verified": "2026-10-27",
+      "attributionRequired": false,
+      "verification": "Original submission explicitly dedicates the pack to CC0 and lists Victory.mp3; its download is victory_4.mp3."
     }
   }
 }

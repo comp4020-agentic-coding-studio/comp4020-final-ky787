@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-OUTPUT = ROOT / 'docs/playtest/2026-10-26-audio-refinement'
+OUTPUT = ROOT / 'docs/playtest/2026-10-27-victory-audio'
 RATE = 44100
 MASTER = .65
 # Each event is (offset seconds, file, runtime gain, runtime playback rate).
@@ -17,7 +17,7 @@ SECTIONS = [
     ('New latch: low rising pulse', [(0, 'latch-confirm.ogg', .5, 1)]),
     ('New checkpoint: short two-tone confirmation', [(0, 'checkpoint.ogg', .48, 1)]),
     ('New breakpoint: deployment, then flag confirmation at 1.2s', [(0, 'breakpoint-deploy.ogg', .5, 1), (1.2, 'breakpoint-confirm.ogg', .54, 1)]),
-    ('Refined room completion: sustained synth chord and quiet digital accents', [(0, 'room-complete.ogg', .65, 1)]),
+    ('Human-selected completion: Victory by SRG774 (complete original recording)', [(0, 'room-complete.ogg', .65, 1)]),
     ('Previous simultaneous switch / code / relay activation', [(0, 'confirm.ogg', .32, 1.15), (0, 'firewall-open.ogg', .32 * .75, 1), (0, 'relay-on.ogg', .6, 1)]),
     ('New simultaneous switch / relay activation (one machinery cue)', [(0, 'switch-click.ogg', .48, 1), (0, 'relay-on.ogg', .36, 1)]),
     ('New isolated code activation', [(0, 'code-power.ogg', .3 * .75, 1)]),

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild the human-approved landing SFX from the pinned official CC0 archive.
+"""Rebuild the human-selected Victory recording from its pinned CC0 original.
 
 Requires Python 3 and FFmpeg. Existing grapple, cube, plate and other retained
 assets are never rewritten. Pass --effects for specific additions or --all to
@@ -36,80 +36,42 @@ EFFECTS = [
      'asetrate=36162,aresample=44100,highpass=f=60,lowpass=f=1800,afade=t=in:d=0.008,afade=t=out:st=0.55:d=0.10', -8),
     ('breakpoint-confirm.ogg', 'interface-sounds', 'Audio/confirmation_004.ogg',
      'asetrate=37485,aresample=44100,highpass=f=70,lowpass=f=2200,afade=t=in:d=0.006,afade=t=out:st=0.48:d=0.09', -8),
-    ('room-complete.ogg', 'interface-sounds', 'Audio/confirmation_002.ogg',
-     'highpass=f=70,lowpass=f=1500,afade=t=in:d=0.015,afade=t=out:st=1.48:d=0.07', -8),
+    ('room-complete.ogg', 'dark-sci-fi-audio-pack', 'victory_4.mp3', 'anull', -8),
     ('code-power.ogg', 'sci-fi-sounds', 'Audio/forceField_001.ogg',
      'atrim=end=0.8,highpass=f=55,lowpass=f=2000,afade=t=in:d=0.015,afade=t=out:st=0.65:d=0.15', -9),
 ]
-REFINED = ('landing.ogg',)
+REFINED = ('room-complete.ogg',)
+VICTORY = {
+    'page': 'https://opengameart.org/content/dark-sci-fi-audio-pack',
+    'download': 'https://opengameart.org/sites/default/files/victory_4.mp3',
+    'sha256': '208916af7b2b26ee70171a964595ace1ccaf4534abfbfa816d340179e13fe289',
+    'author': 'SRG774', 'title': 'Victory', 'original': 'Victory.mp3',
+    'license': 'CC0-1.0', 'licenseUrl': 'https://creativecommons.org/publicdomain/zero/1.0/',
+    'verified': '2026-10-27',
+}
 
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def pcm(path, filters=None):
+def pcm(path, filters=None, channels=1):
     command = ['ffmpeg', '-v', 'error', '-i', str(path)]
     if filters:
         command += ['-af', filters]
-    data = subprocess.check_output(command + ['-f', 'f32le', '-ac', '1', '-ar', '44100', '-'])
+    data = subprocess.check_output(command + ['-f', 'f32le', '-ac', str(channels), '-ar', '44100', '-'])
     samples = array.array('f')
     samples.frombytes(data)
     return samples
 
 
-def completion_chord(source, destination):
-    """Resample one CC0 tone cycle; never retain the source's rising melody.
-
-    Use the first complete upward-zero-crossing cycle after source time .012 s.
-    Its exact fractional-sample bounds are recorded in the credits. Three voices
-    sound together at 220/330/495 Hz (root, fifth, ninth; no major third), with a
-    soft attack and a fading tail. Two quiet 75 ms accents supply the digital
-    flourish. All voices use the same source cycle, not additional recordings.
-    """
-    samples = pcm(source)
-    crossings = [index - samples[index] / (samples[index + 1] - samples[index])
-                 for index in range(round(.012 * 44100), round(.030 * 44100))
-                 if samples[index] <= 0 < samples[index + 1]]
-    if len(crossings) < 2:
-        raise ValueError('Expected stable source tone was not found')
-    start, end = crossings[:2]
-    source_peak = max(abs(samples[index]) for index in range(math.floor(start), math.ceil(end) + 1))
-
-    def wave(phase):
-        position = start + phase % 1 * (end - start)
-        index = math.floor(position)
-        value = samples[index] + (samples[index + 1] - samples[index]) * (position - index)
-        # Gentle saturation adds low harmonics without a sharp square-wave edge.
-        return math.tanh(1.15 * value / source_peak) / math.tanh(1.15)
-
-    result = array.array('f')
-    duration = 1.55
-    for index in range(round(duration * 44100)):
-        time = index / 44100
-        attack = min(1, time / .055)
-        attack = attack * attack * (3 - 2 * attack)
-        release = min(1, max(0, (duration - time) / .65))
-        release = release * release * (3 - 2 * release)
-        envelope = attack * math.exp(-.85 * time) * release
-        chord = sum(gain * wave(time * frequency) for frequency, gain in [(220, .63), (330, .24), (495, .13)])
-        accent = 0
-        for offset, frequency, gain in [(.11, 660, .055), (.205, 880, .04)]:
-            local = (time - offset) / .075
-            if 0 < local < 1:
-                accent += gain * math.sin(math.pi * local) ** 2 * wave((time - offset) * frequency)
-        result.append(envelope * chord + accent)
-    # FFmpeg encodes this deterministic PCM intermediate, then applies the exact
-    # mastering chain recorded with the output. Keep all intermediates in cache.
-    subprocess.run(['ffmpeg', '-y', '-v', 'error', '-f', 'f32le', '-ar', '44100', '-ac', '1',
-                    '-i', '-', '-c:a', 'pcm_f32le', str(destination)], input=result.tobytes(), check=True)
-    return {'method': 'One-cycle resampling of the original CC0 tone; mild tanh saturation; simultaneous open-fifth/add9 chord; two quiet digital accents.',
-            'sourceCycleStartSample': start, 'sourceCycleEndSample': end,
-            'chordFrequenciesHz': [220, 330, 495], 'chordGains': [.63, .24, .13],
-            'durationSeconds': duration, 'attackSeconds': .055, 'releaseSeconds': .65,
-            'exponentialDecayPerSecond': .85, 'saturation': 1.15,
-            'accents': [{'offsetSeconds': .11, 'frequencyHz': 660, 'gain': .055, 'durationSeconds': .075},
-                        {'offsetSeconds': .205, 'frequencyHz': 880, 'gain': .04, 'durationSeconds': .075}]}
+def loudness(path):
+    report = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', str(path),
+                             '-af', 'loudnorm=I=-23:TP=-3:LRA=11:print_format=json', '-f', 'null', '-'],
+                            check=True, capture_output=True, text=True).stderr
+    measured = json.loads(report[report.rfind('{'):])
+    # Analysis only: loudnorm output is discarded; the shipped file uses constant gain.
+    return {'integratedLufs': float(measured['input_i']), 'truePeakDbtp': float(measured['input_tp'])}
 
 
 def main():
@@ -150,46 +112,62 @@ def main():
                        'sourceLicenseSha256': digest(license_bytes), 'verified': '2026-10-26'}
     new_assets = []
     for name, pack, original, chain, target in effects:
-        source_bytes = archives[pack].read(original)
-        source = args.cache / pack / original
-        source.parent.mkdir(parents=True, exist_ok=True)
-        source.write_bytes(source_bytes)
-        arrangement = None
         if name == 'room-complete.ogg':
-            arranged = args.cache / 'refined-completion-chord.wav'
-            arrangement = completion_chord(source, arranged)
-            source = arranged
-        base = 'aformat=channel_layouts=mono,aresample=44100,' + chain
-        samples = pcm(source, base)
+            source = args.cache / original
+            if not source.exists():
+                source.write_bytes(urllib.request.urlopen(VICTORY['download'], timeout=60).read())
+            source_bytes = source.read_bytes()
+            if digest(source_bytes) != VICTORY['sha256']:
+                raise ValueError('Original Victory recording hash changed; review its provenance before rebuilding.')
+            channels, base = 2, chain  # Retain the original stereo image and all samples, with no EQ.
+            packs[pack] = {**VICTORY, 'attributionRequired': False,
+                           'verification': 'Original submission explicitly dedicates the pack to CC0 and lists Victory.mp3; its download is victory_4.mp3.'}
+        else:
+            source_bytes = archives[pack].read(original)
+            source = args.cache / pack / original
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_bytes(source_bytes)
+            channels, base = 1, 'aformat=channel_layouts=mono,aresample=44100,' + chain
+        samples = pcm(source, base, channels)
         peak_db = 20 * math.log10(max(abs(n) for n in samples))
         adjustment = target - peak_db
         filters = base + f',volume={adjustment:.6f}dB'
         destination = output / name
         subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', str(source), '-af', filters,
-                        '-c:a', 'libvorbis', '-q:a', '4', '-ar', '44100', '-ac', '1',
+                        '-c:a', 'libvorbis', '-q:a', '4', '-ar', '44100', '-ac', str(channels),
                         '-fflags', '+bitexact', '-flags:a', '+bitexact', str(destination)], check=True)
         data = destination.read_bytes()
-        decoded = pcm(destination)
-        asset = {'file': name, 'original': original, 'author': 'Kenney',
-                           'source': packs[pack]['page'], 'download': packs[pack]['archive'],
-                           'pack': pack, 'license': 'CC0-1.0', 'retrieved': '2026-10-26',
-                           'sourceSha256': digest(source_bytes), 'sourceArchiveSha256': packs[pack]['archiveSha256'],
-                           'processing': filters + '; 44.1kHz mono Vorbis q4; FFmpeg bitexact flags.',
+        decoded = pcm(destination, channels=channels)
+        victory = name == 'room-complete.ogg'
+        asset = {'file': name, 'original': VICTORY['original'] if victory else original, 'author': VICTORY['author'] if victory else 'Kenney',
+                           'source': packs[pack]['page'], 'download': VICTORY['download'] if victory else packs[pack]['archive'],
+                           'pack': pack, 'license': 'CC0-1.0', 'retrieved': VICTORY['verified'] if victory else '2026-10-26',
+                           'sourceSha256': digest(source_bytes),
+                           **({} if victory else {'sourceArchiveSha256': packs[pack]['archiveSha256']}),
+                           'processing': filters + f'; 44.1kHz {"stereo" if victory else "mono"} Vorbis q4; FFmpeg bitexact flags.',
                            'targetPeakDbfs': target, 'decodedPeakDbfs': round(20 * math.log10(max(abs(n) for n in decoded)), 3),
-                           'durationSeconds': round(len(decoded) / 44100, 6),
+                           'durationSeconds': round(len(decoded) / (44100 * channels), 6),
                            'sha256': digest(data), 'bytes': len(data)}
         if name == 'landing.ogg':
             onset = decoded[:round(.05 * 44100)]
             asset['onsetRms50msDbfs'] = round(20 * math.log10(math.sqrt(sum(n * n for n in onset) / len(onset))), 3)
             asset['selection'] = 'Explicit human listening approval: Kenney impactSoft_medium_000.ogg; constant gain only, no compression.'
-        if arrangement:
-            asset['arrangement'] = arrangement
-            asset['processing'] = 'Cycle resampling and chord arrangement specified in arrangement and scripts/audio/build-sfx.py; ' + asset['processing']
+        if victory:
+            assert len(decoded) == len(samples) == 259200 * 2, 'Retain the complete original stereo recording'
+            asset.update({'title': VICTORY['title'], 'sourceFilename': original, 'channels': channels,
+                          'sourceDecodedSamplesPerChannel': len(samples) // channels,
+                          'decodedSamplesPerChannel': len(decoded) // channels,
+                          'fullOriginalRecording': True, 'dynamicCompression': False,
+                          'constantGainDb': round(adjustment, 6), 'licenseUrl': VICTORY['licenseUrl'],
+                          'selection': 'Explicit human listening selection of SRG774 Victory.mp3; original recording, constant gain and OGG conversion only.',
+                          **loudness(destination)})
+            asset['ffmpegVersion'] = subprocess.check_output(['ffmpeg', '-version'], text=True).splitlines()[0]
+            assert asset['truePeakDbtp'] < -7, 'Keep completion headroom before runtime volume'
         new_assets.append(asset)
-        print(name, len(data), 'bytes,', round(len(decoded) / 44100, 3), 'seconds')
+        print(name, len(data), 'bytes,', asset['durationSeconds'], 'seconds,', asset['sha256'])
     replacements = {asset['file']: asset for asset in new_assets}
     credits['assets'] = [replacements.pop(asset['file'], asset) for asset in credits['assets']] + list(replacements.values())
-    credits['updated'] = '2026-10-26'
+    credits['updated'] = '2026-10-27'
     credits.setdefault('sourcePacks', {}).update(packs)
     credits_path.write_text(json.dumps(credits, indent=2) + '\n')
     print('Credited files:', len(credits['assets']), 'Runtime files:', sum(asset.get('runtime', True) for asset in credits['assets']))

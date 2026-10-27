@@ -63,7 +63,7 @@ Requires Python 3, NumPy, SciPy and FFmpeg/ffprobe. Two runs with FFmpeg
 
 ```sh
 python3 scripts/prepare-music.py --cache /tmp/bn-approved-audio
-python3 scripts/audio/build-sfx.py --cache /tmp/bn-approved-audio
+python3 scripts/audio/build-sfx.py --cache /tmp/bn-approved-audio --effects landing.ogg
 ```
 
 The music command rebuilds **only the two approved replacements**, plus separate
@@ -71,8 +71,9 @@ eight-second seam excerpts (last four seconds followed by first four, with
 independent preview loudness matching). `--skip-review` omits those excerpts.
 It requires the committed seven-track catalogue and verifies the preserved five
 files before and after processing, without rewriting them or their metadata.
-`--output` and `--review-dir` can redirect outputs. The SFX command defaults to
-**landing only**; the current completion cue remains untouched pending selection.
+`--output` and `--review-dir` can redirect outputs. The SFX command above explicitly
+rebuilds **landing only**. Its current default builds the separately human-selected
+Victory recording, documented in [audio credits](../AUDIO_CREDITS.md).
 The runtime does not load any review artifacts.
 
 ## Historical initial selection (superseded for HANDSHAKE and CROSSFEED)

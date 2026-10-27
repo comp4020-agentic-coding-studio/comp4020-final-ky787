@@ -84,18 +84,29 @@ try {
     for (const [role, p] of [['host', a], ['guest', b]] as const)
         check(`${role} streams the selected Handshake recording`, playingFile(await music(p, 'handshake'), 'handshake.ogg'));
     await nativeLoop(a, 'handshake');
-    const beforeSolve = (await snapshot(a)).audio.played.complete ?? 0;
-    const stinger = wait(a, 'completion stinger survives victory transition', s => s.view === 'victory' && (s.audio.played.complete ?? 0) === beforeSolve + 1, 90000);
+    const beforeSolve = await Promise.all([a, b].map(async p => (await snapshot(p)).audio.played.complete ?? 0));
+    const stingers = [a, b].map((p, i) => wait(p, 'completion stinger survives victory transition', s => s.view === 'victory' && (s.audio.played.complete ?? 0) === beforeSolve[i] + 1, 90000));
     await campaignDraftRoute(h, 'handshake', [a, b]);
-    const completed = await stinger;
-    check('one completion stinger and quiet victory music after an actual two-player solve', completed.music.duck === 'complete' && completed.audio.voices > 0);
+    const completedPlayers = await Promise.all(stingers), completed = completedPlayers[0];
+    for (const [i, p] of [a, b].entries()) {
+        check(`${i === 0 ? 'host' : 'guest'} plays one completion stinger with quiet music after an actual two-player solve`, completedPlayers[i].music.duck === 'complete' && completedPlayers[i].audio.voices > 0);
+        const buffer = await p.read<{ duration: number; channels: number; hold: number }>("(()=>{const b=binaryNinja.audio.buffers.get('room-complete.ogg');return {duration:b.duration,channels:b.numberOfChannels,hold:binaryNinja.audio.completionDurationMs()}})()");
+        // Web Audio resampling/padding differs slightly from FFmpeg's 44.1 kHz decode.
+        check('decoded Victory is the complete stereo recording and duck covers its actual duration', buffer.channels === 2
+            && Math.abs(buffer.duration * 1000 - COMPLETION_DUCK_MS) < 20 && buffer.hold === Math.ceil(buffer.duration * 1000), JSON.stringify(buffer));
+    }
     await shot(a, '03-completion-mix');
     const victoryLoads = totalLoads(completed);
     await sleep(COMPLETION_DUCK_MS + 450);
     const settledVictory = await wait(a, 'completion duck ends while victory remains open', s => s.view === 'victory' && s.music.duck === 'pause' && s.music.duckGain >= .27 && s.music.duckGain <= .29);
     check('victory returns to its pause mix after the short stinger without reloading or replaying', totalLoads(settledVictory) === victoryLoads
-        && settledVictory.audio.played.complete === beforeSolve + 1
+        && settledVictory.audio.played.complete === beforeSolve[0] + 1 && settledVictory.audio.voices === 0
         && settledVictory.music.decks.every((d, i) => d.starts === completed.music.decks[i].starts));
+    await b.read('binaryNinja.coop.socket.close()');
+    await wait(b, 'victory transport interrupted', s => s.multiplayer?.websocket !== 'CONNECTED');
+    await wait(b, 'completed party reconnected', s => s.multiplayer?.websocket === 'CONNECTED' && s.view === 'victory');
+    check('reconnected completed party does not replay Victory or renew its duck', (await snapshot(b)).audio.played.complete === beforeSolve[1] + 1
+        && (await snapshot(b)).music.duck === 'pause' && (await snapshot(b)).audio.voices === 0);
     await click(a, '#next-chamber');
     for (const scene of ['crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free'] as const) {
         if (scene !== 'crossfeed-vault') {
@@ -181,6 +192,23 @@ try {
         check(`${room} retains the original quiet solo recording`, playingFile(await music(a, 'tutorial-relay'), 'tutorial-relay.ogg') && (await snapshot(a)).music.duck === 'tutorial');
     }
     await click(a, '#pause'); await click(a, '#main-menu'); await music(a, 'menu');
+    // A separate visitor completes PRESSURE with real carry, jump and movement
+    // inputs, so the solo assertion does not depend on injected exit/progress state.
+    const solo = await h.page(url, debug); await onboardNinja(solo, 'SoloVictory', 'cyan'); await click(solo, '#tutorial');
+    await wait(solo, 'fresh solo starts with decoded Victory', s => s.room === 'pressure' && s.started && s.audio.loaded === SOUND_ASSET_COUNT);
+    const beforeSolo = (await snapshot(solo)).audio.played.complete ?? 0;
+    await h.walk(solo, 260); await h.tap(solo, 'KeyE');
+    await h.walk(solo, 560); await h.tap(solo, 'KeyE');
+    await wait(solo, 'physical cube powers solo exit', s => s.inputs.cubeOnPlate);
+    await h.key(solo, 'KeyD', true); await h.tap(solo, 'Space');
+    let soloCompleted: GameSnapshot;
+    try { soloCompleted = await wait(solo, 'solo completes and progresses naturally', s => s.room === 'switch' && (s.audio.played.complete ?? 0) === beforeSolo + 1); }
+    finally { await h.key(solo, 'KeyD', false); }
+    check('solo completion plays Victory once while preserving automatic tutorial progression', soloCompleted.progress.completedRooms.includes('pressure')
+        && soloCompleted.music.duck === 'complete' && soloCompleted.audio.voices > 0);
+    await sleep(COMPLETION_DUCK_MS + 450);
+    const soloSettled = await wait(solo, 'solo music returns smoothly after the whole recording', s => s.music.duck === 'tutorial' && s.music.duckGain >= .379);
+    check('solo returns to tutorial music without repeating or cutting off completion', soloSettled.audio.played.complete === beforeSolo + 1 && soloSettled.audio.voices === 0);
     const broken = await h.page(url, debug);
     await broken.send('Network.enable');
     await broken.send('Network.setBlockedURLs', { urls: ['*audio/*.ogg'] });
@@ -190,7 +218,7 @@ try {
     const silentX = (await snapshot(broken)).player.x; await h.key(broken, 'KeyD', true); await sleep(180); await h.key(broken, 'KeyD', false);
     check('failed SFX and music downloads never block game input', (await snapshot(broken)).player.x > silentX && (await snapshot(broken)).started);
 
-    for (const p of [a, b]) check('browser audio loads without runtime or media failures', p.errors.length === 0 && (await snapshot(p)).music.failures.length === 0 && (await snapshot(p)).audio.failed.length === 0, p.errors.join('\n'));
+    for (const p of [a, b, solo]) check('browser audio loads without runtime or media failures', p.errors.length === 0 && (await snapshot(p)).music.failures.length === 0 && (await snapshot(p)).audio.failed.length === 0, p.errors.join('\n'));
     await writeFile(join(h.shots, 'snapshots.json'), JSON.stringify({ host: await snapshot(a), guest: await snapshot(b) }, null, 2));
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {

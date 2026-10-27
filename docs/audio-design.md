@@ -23,9 +23,9 @@ baseline it without replaying old milestones.
 A co-op completion stinger starts **after** entering victory, so menu cleanup
 cannot cut it off. An initial/reconnected completed snapshot does not replay it.
 Background completions remain silent. Solo completion preserves automatic room
-progression while briefly ducking music. The refined stinger is a 1.55-second
-simultaneous synth chord with quiet digital accents; the toggle is a separate
-0.197-second electronic cue. Completion remains unchanged pending human selection.
+progression while ducking music. Completion uses the human-selected **Victory by
+SRG774**, the complete 5.877551-second stereo recording with constant gain and
+OGG conversion only. The toggle remains a separate 0.197-second electronic cue.
 
 Lever-shaped controls share the digital toggle cue even when their accepted
 event is `lift-latch`. The solo `switch` + `lift-latch` pair coalesces into one
@@ -42,9 +42,12 @@ on an airborne-to-grounded transition; a newly pressed plate under the local
 player supplies its own impact instead. Distant/cube-driven plate changes do
 not suppress ordinary footfalls. Plate and cube samples/gains are unchanged.
 
-Completion sets a monotonic **1.8-second duck deadline** when the stinger is
-triggered. The regular music synchronization returns to the current view's mix
-after that deadline. A completed co-op chamber does not hold the completion duck
+Completion sets a monotonic duck deadline from the **loaded AudioBuffer duration**,
+rounded up to milliseconds (5.888 seconds in the tested 48 kHz browser).
+The file's **5.878-second** rounded duration is the fallback before decoding;
+an asset test keeps it tied to the recording. This accounts for browser codec/
+resampling padding. The regular music synchronization then returns to the current view's
+mix through the existing **450 ms ramp**. A completed co-op chamber does not hold the completion duck
 indefinitely: its victory/chamber-selection screen returns to the ordinary pause
 mix even while the result remains visible. Restored completed snapshots neither
 replay the stinger nor renew its deadline.

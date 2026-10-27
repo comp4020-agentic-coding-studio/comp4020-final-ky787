@@ -176,7 +176,9 @@ describe('streaming music scenes', () => {
         advance(225); expect(audible()[0].volume).toBeCloseTo(.168);
         player.setDucked('tutorial'); advance(450); expect(audible()[0].volume).toBeCloseTo(.228);
         player.setDucked('complete'); advance(450); expect(audible()[0].volume).toBeCloseTo(.108);
-        player.setDucked('none'); advance(450); expect(audible()[0].volume).toBe(.6);
+        player.setDucked('none'); expect(audible()[0].volume).toBeCloseTo(.108);
+        advance(225); expect(audible()[0].volume).toBeCloseTo(.354);
+        advance(225); expect(audible()[0].volume).toBe(.6);
         player.setPreferences({ musicVolume: 0 }); expect(audible()).toHaveLength(0);
         player.setPreferences({ musicVolume: 4 }); await flush(); expect(player.snapshot().preferences.musicVolume).toBe(1);
     });

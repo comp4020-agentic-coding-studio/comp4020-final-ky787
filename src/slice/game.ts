@@ -15,7 +15,7 @@ import { ROOMS, roomById } from './rooms.ts';
 import { freshProgress, tutorialProgress, restartRoomProgress } from './progress.ts';
 import { ProgressStore } from './storage.ts';
 import { connectionPowered } from './connections.ts';
-import { GameAudio, COMPLETION_DUCK_MS } from '../audio/game-audio.ts';
+import { GameAudio } from '../audio/game-audio.ts';
 import { MusicPlayer } from '../audio/music-player.ts';
 import { musicSceneForRoom } from '../audio/music-catalogue.ts';
 import { AudioPresentation } from './audio-presentation.ts';
@@ -601,7 +601,7 @@ export class SliceGame {
         });
     }
     private completionSound(): void {
-        this.completionMusicUntil = performance.now() + COMPLETION_DUCK_MS;
+        this.completionMusicUntil = performance.now() + this.audio.completionDurationMs();
         this.music.setDucked('complete');
         this.audio.play('complete');
     }

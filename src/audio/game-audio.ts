@@ -31,8 +31,8 @@ export const SOUNDS = {
     liftHum: { file: 'lift-hum.ogg', gain: .22, cooldown: 0, loop: true },
 } as const;
 export type SoundCue = keyof typeof SOUNDS;
-/** Short hold covers the completion chord's tail; normal pause/tutorial mix then returns. */
-export const COMPLETION_DUCK_MS = 1800;
+/** Fallback for the full SRG774 Victory recording (259200 / 44100 s). */
+export const COMPLETION_DUCK_MS = 5878;
 export const SOUND_ASSET_COUNT = new Set(Object.values(SOUNDS).map(sound => sound.file)).size;
 export const MACHINERY_CUES: readonly SoundCue[] = ['codePower', 'relayPower', 'liftPower', 'door'];
 export interface AudioPreferences { volume: number; musicVolume: number; muted: boolean }
@@ -106,6 +106,11 @@ export class GameAudio {
         }));
     }
     getPreferences(): AudioPreferences { return { ...this.preferences }; }
+    /** Browser decoding/resampling can add padding; cover the actual loaded tail. */
+    completionDurationMs(): number {
+        const seconds = this.buffers.get(SOUNDS.complete.file)?.duration;
+        return seconds && Number.isFinite(seconds) ? Math.ceil(seconds * 1000) : COMPLETION_DUCK_MS;
+    }
     setPreferences(patch: Partial<AudioPreferences>): void {
         this.preferences = { volume: patch.volume === undefined ? this.preferences.volume : clamp(patch.volume),
             musicVolume: patch.musicVolume === undefined ? this.preferences.musicVolume : clamp(patch.musicVolume),

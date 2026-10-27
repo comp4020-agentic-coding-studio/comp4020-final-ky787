@@ -112,6 +112,36 @@ it('bounds overlapping machinery and gives completion a single audible foregroun
     expect(audio.snapshot().played.complete).toBe(1);
     context.currentTime = .6; audio.play('complete');
     expect(audio.snapshot().played.complete).toBe(1);
+    context.currentTime = 5.5; audio.play('complete'); // Past cooldown, still within Victory's tail.
+    expect(audio.snapshot().played.complete).toBe(1); expect(audio.snapshot().voices).toBe(1);
+});
+
+it('uses the complete human-selected Victory recording with minimal processing and a duration-matched duck', async () => {
+    const credits = JSON.parse(await readFile('public/audio/credits.json', 'utf8'));
+    const victory = credits.assets.find((a: { file: string }) => a.file === SOUNDS.complete.file);
+    expect(victory.author).toBe('SRG774'); expect(victory.original).toBe('Victory.mp3');
+    expect(victory.source).toBe('https://opengameart.org/content/dark-sci-fi-audio-pack');
+    expect(victory.download).toBe('https://opengameart.org/sites/default/files/victory_4.mp3');
+    expect(victory.sourceSha256).toBe('208916af7b2b26ee70171a964595ace1ccaf4534abfbfa816d340179e13fe289');
+    expect(victory.license).toBe('CC0-1.0');
+    expect(victory.fullOriginalRecording).toBe(true); expect(victory.channels).toBe(2);
+    expect(victory.sourceDecodedSamplesPerChannel).toBe(259200);
+    expect(victory.decodedSamplesPerChannel).toBe(victory.sourceDecodedSamplesPerChannel);
+    expect(victory.durationSeconds).toBeCloseTo(259200 / 44100, 6);
+    expect(victory.arrangement).toBeUndefined(); expect(victory.dynamicCompression).toBe(false);
+    expect(victory.processing).toMatch(/^anull,volume=[0-9.]+dB;/);
+    expect(victory.truePeakDbtp).toBeLessThan(-7);
+    expect(victory.integratedLufs).toBeGreaterThan(-22); expect(victory.integratedLufs).toBeLessThan(-20);
+    expect(COMPLETION_DUCK_MS).toBe(Math.ceil(victory.durationSeconds * 1000));
+});
+
+it('covers the actual browser-decoded Victory duration, including resampling padding, with a safe unloaded fallback', async () => {
+    const { audio, context } = engine();
+    expect(audio.completionDurationMs()).toBe(COMPLETION_DUCK_MS);
+    context.decodeAudioData.mockResolvedValue({ duration: 282610 / 48000 });
+    await audio.unlock();
+    expect(audio.completionDurationMs()).toBe(5888);
+    expect(audio.completionDurationMs()).toBeGreaterThan(282610 / 48000 * 1000);
 });
 
 const world = () => new PuzzleWorld(roomById('uplink'), freshProgress().rooms.uplink);
@@ -187,11 +217,7 @@ it('ships every credited audio file with exact hashes, real Ogg bytes and an aud
                 expect(asset.sourceArchiveSha256).toBe(credits.sourcePacks[asset.pack].archiveSha256);
                 expect(asset.processing).toContain('lowpass=');
                 expect(asset.decodedPeakDbfs).toBeLessThan(-5.5);
-                expect(asset.durationSeconds).toBeLessThan(asset.file === SOUNDS.complete.file ? 1.8 : 1.2);
-                if (asset.file === SOUNDS.complete.file) {
-                    expect(COMPLETION_DUCK_MS).toBeGreaterThanOrEqual(asset.durationSeconds * 1000);
-                    expect(COMPLETION_DUCK_MS).toBeLessThanOrEqual(asset.durationSeconds * 1000 + 300);
-                }
+                expect(asset.durationSeconds).toBeLessThan(1.2);
             }
             const response = await fetch(`http://127.0.0.1:${port}/audio/${asset.file}`);
             expect(response.status).toBe(200); expect(response.headers.get('content-type')).toBe('audio/ogg');
