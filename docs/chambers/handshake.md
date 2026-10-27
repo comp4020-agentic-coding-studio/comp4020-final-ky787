@@ -62,9 +62,10 @@ Its presentation observes existing state only:
   catches. This appearance persists regardless of player proximity. Repeated E
   does not undo the commitment or replay its confirmation sound.
 
-The campaign-only renderer leaves authored geometry, drafts, controller outputs,
-completion/save logic and existing terminal audio unchanged. Other terminals keep
-their existing rendering. `pnpm check:maintenance` replays the canonical real-input
+The campaign-only renderer leaves authored geometry, controller outputs,
+completion/save logic and existing terminal audio unchanged. RACE's COMMIT now
+shares this renderer with its own caption; other terminals retain their rendering.
+`pnpm check:maintenance` replays the canonical real-input
 HANDSHAKE route with focused state checks and normal-camera captures at 1600×900,
 1024×768 and 800×600; use `BN_SHOTS` to choose the report directory.
 
@@ -150,7 +151,7 @@ behavior. The public integration check exercises graphical import, every saved
 State Preview, local physics, exact JSON export, IndexedDB reload and two distinct
 public-compatible custom-session identities.
 
-Current draft and campaign SHA-256: `e05842d86169d80ec3d1b8f2b9de6a73ca1671fb30d0ec3784ad4f8efcb5cf06`.
+Pre-polish draft and campaign SHA-256: `e05842d86169d80ec3d1b8f2b9de6a73ca1671fb30d0ec3784ad4f8efcb5cf06`.
 The automatic-checkpoint update removes only the checkpoint control device; the
 physical puzzle layout and its controller outputs are unchanged.
 
@@ -189,8 +190,13 @@ time. Campaign integration was requested separately; no human playtesting is cla
 
 ### Campaign regression after behaviour refinement
 
-The current hash above passed all 59 canonical scenario steps in the five-room
+The pre-polish hash above passed all 59 canonical scenario steps in the five-room
 campaign run, with both physical exit arrivals and zero deaths. Report:
 `.workbench/reports/2026-10-16-checkpoints/campaign/handshake-report.json`.
 The same persistent party completed all five rooms and passed reconnect and
 server-restart recovery. The HANDSHAKE checkpoint was earned by walking without E; maintenance remained a deliberate interaction.
+
+### Presentation spacing — 2026-10-27
+
+Current draft and campaign SHA-256: `7d3305c93425fecef0b1cadd61d9446921d82e7928e617bfb0aea7cccbf4de77`.
+The fixed boost hint moves above and left of the held-cube silhouette; the maintenance control keeps its approved art and interaction. Only `presentation.labels` changed, mirrored in the matching draft; geometry, controller bindings, checkpoints and native evidence are unchanged. See the [polish review](../playtest/2026-10-27-final-polish/README.md) for current browser captures and validation.

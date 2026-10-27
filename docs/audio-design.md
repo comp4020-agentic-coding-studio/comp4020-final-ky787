@@ -92,14 +92,16 @@ per request. The game's static path checks remain in force.
 
 The existing `binary-ninja/c8-audio/v1` key remains. `volume` is the Effects
 level; `musicVolume` is independent; `muted` silences both. Existing Effects and
-mute values survive. Missing Music defaults to 35%, except legacy `volume:0`
+mute values survive. Missing Music defaults to 25%, except legacy `volume:0`
 also initializes Music to zero to preserve intentional silence. Once the new
 Music value exists, zero Effects no longer mutes Music.
 
 New-user Effects defaults to 65%. All music masters are near −23 LUFS; the menu
-uses catalogue gain 1.2, chambers 1.0, yielding roughly −30.5/−32.1 LUFS at the
-35% default before ducking. These conservative defaults leave short effects
-foregrounded and can be adjusted in Settings or either pause menu.
+uses catalogue gain 1.2, chambers 1.0, yielding roughly −33.5/−35.0 LUFS at the
+25% default before ducking. These conservative defaults leave short effects
+foregrounded and can be adjusted in Settings or directly in either pause menu.
+Both pause sliders are visible immediately; saved Music values (including 35%)
+remain untouched. Resume, Escape and backdrop behavior use the existing handlers.
 
 ## Validation and provenance
 

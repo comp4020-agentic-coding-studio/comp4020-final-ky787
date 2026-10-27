@@ -1,0 +1,555 @@
+{
+  "selected": [
+    {
+      "file": "screenshots/coop-host-pause-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/menu/coop-host-pause-1024.png",
+      "sha256": "e534119f172913086ceb4d59ccc8bb85418dfa8b718cdf2f32366534f4a210c8"
+    },
+    {
+      "file": "screenshots/coop-host-pause-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/menu/coop-host-pause-1600.png",
+      "sha256": "4052846346aee1ed552bfb04e1236f5825379a759def1a3177c7b3dc1445ca84"
+    },
+    {
+      "file": "screenshots/coop-pause-sliders-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/menu/coop-pause-sliders-1024.png",
+      "sha256": "6f5c8d7253dbfecc4599a4bae4868cdd46a1e92a7d75956340cff8673c8d0453"
+    },
+    {
+      "file": "screenshots/coop-pause-sliders-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/menu/coop-pause-sliders-1600.png",
+      "sha256": "91a0838cb6c52b48cf268d200a37b3f484106d2465a777e938970ae0cc104ae7"
+    },
+    {
+      "file": "screenshots/crossfeed-player-2-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/crossfeed-vault-ordinary-player-2.png",
+      "sha256": "9750b5e08e9870cd8019397be87e73522254bf5dab596857c003663629f6aedf"
+    },
+    {
+      "file": "screenshots/crossfeed-powered-p1-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-crossfeed-vault-powered-player-1-1024.png",
+      "sha256": "310bcfd8a60e8dc036d1920a77a56fe0d672406338879155681fbef918b6fc78"
+    },
+    {
+      "file": "screenshots/crossfeed-powered-p2-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-crossfeed-vault-powered-player-2-1024.png",
+      "sha256": "6b0e9b43d265935b905046926269eff8b2d13458571769f8ecbf99ea8484fdb2"
+    },
+    {
+      "file": "screenshots/crossfeed-vault-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/crossfeed-vault-overview-1024.png",
+      "sha256": "ad25e95d1a72f23cd306bbc68f48784253b182dea9543ecf454c894f49c5b6d2"
+    },
+    {
+      "file": "screenshots/deadlock-entry-before-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-before/deadlock-ordinary-player-1.png",
+      "sha256": "9540a7a77f8f1c8a51414a945245c1c6045c8e5ab135c070422aae23cb5b78ca"
+    },
+    {
+      "file": "screenshots/deadlock-entry-p1-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/deadlock-ordinary-player-1-1024.png",
+      "sha256": "1039376cef0cce1226c7f8329ebbc143cb57e1189076881d807d37ed5332c74b"
+    },
+    {
+      "file": "screenshots/deadlock-entry-p1-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/deadlock-ordinary-player-1.png",
+      "sha256": "94f9f42f556ae3e46d7b0df718964c4c3efe5ae90fb89dbb45e11b6d71056dd0"
+    },
+    {
+      "file": "screenshots/deadlock-entry-p2-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/deadlock-ordinary-player-2-1024.png",
+      "sha256": "2d75bf44d5e9dba0f5f4c7b3b20f5d6ebd7c65b146b66b1ba2fabd32da9ee343"
+    },
+    {
+      "file": "screenshots/deadlock-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/deadlock-overview-1024.png",
+      "sha256": "83b371e47061145dd7925180d730af409e6c3d639b30ada214142375b8cacdd6"
+    },
+    {
+      "file": "screenshots/deadlock-powered-p1-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/deadlock-final/polish-deadlock-powered-player-1-1024.png",
+      "sha256": "4b15510e652ab22275c8e102956d3f0e59a9350fa92dbafea4fe52e58cf43ece"
+    },
+    {
+      "file": "screenshots/deadlock-powered-p2-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/deadlock-final/polish-deadlock-powered-player-2-1024.png",
+      "sha256": "62685793aacb698e44cc177075c8a68001543161cc9b5925c9dcc0dcfa1c0ef4"
+    },
+    {
+      "file": "screenshots/handshake-completed-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/maintenance-final/05-completed-departure.png",
+      "sha256": "bbe09d593667994b18184c43fdd27c065a229df2c3a6c59984d767a120b0b478"
+    },
+    {
+      "file": "screenshots/handshake-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/handshake-overview-1024.png",
+      "sha256": "fe2a226540300beeb1b17378ae2940e73b2b37a301d6ee23450a467fcbfb4f8c"
+    },
+    {
+      "file": "screenshots/handshake-ready-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/maintenance-final/02-ready-1024.png",
+      "sha256": "2f4bc2d4e3ac2897853e145fb05929d751a54196c416d35f044b385a75121b1c"
+    },
+    {
+      "file": "screenshots/handshake-ready-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/maintenance-final/02-ready-approach.png",
+      "sha256": "186d2fbbdcd00a6e287cd7603d52941b84cb75a150d12d721ee75136e3c1c0fb"
+    },
+    {
+      "file": "screenshots/race-cargo-caption-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/race-condition-ordinary-player-1-1024.png",
+      "sha256": "625b313b40902c07acc2ddfaaaf08b927074ede94d8cf3e660b72859f5dbcfcf"
+    },
+    {
+      "file": "screenshots/race-cargo-caption-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/race-condition-ordinary-player-1.png",
+      "sha256": "1981d40cb1a95b34bafeb5a54b2803e1b9eb901d3ef66312addaea2d56c7b676"
+    },
+    {
+      "file": "screenshots/race-commit-completed-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-completed-1024.png",
+      "sha256": "5d4ed25582520adf39b19d77d7d29baad538d5072be12c97e33526d6c7602610"
+    },
+    {
+      "file": "screenshots/race-commit-completed-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-completed-1600.png",
+      "sha256": "8d8a6f070b1f5eac4ac55a5ca0aa3245ce822cf6eb82f445a94aed4c965b683e"
+    },
+    {
+      "file": "screenshots/race-commit-departure-p1-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-departure-player-1-1600.png",
+      "sha256": "a2468e75c3484c0c9cf2bd39d6eb60b203e5722d799560592a90418f371cdfba"
+    },
+    {
+      "file": "screenshots/race-commit-departure-p2-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-departure-player-2-1024.png",
+      "sha256": "10865830bf1fc1d49bb877a8056fcf4d446b2fcf5b572fb3311584272b19a1e0"
+    },
+    {
+      "file": "screenshots/race-commit-dormant-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-dormant-1024.png",
+      "sha256": "2d4679b25065de6d409560745f783c83e070435e55cc87e74bbe26fca2f20c7f"
+    },
+    {
+      "file": "screenshots/race-commit-dormant-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-dormant-1600.png",
+      "sha256": "994bb145a6521dec64844917aa18d84ac8dc7ea31999b0042212697654534460"
+    },
+    {
+      "file": "screenshots/race-commit-ready-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-ready-1024.png",
+      "sha256": "b742632f022467e2f946abddd0eb150ea7030e1c106b75392d5fe4c54133886e"
+    },
+    {
+      "file": "screenshots/race-commit-ready-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-race-ready-1600.png",
+      "sha256": "94306fcd3f7dc73007f4b847ec82fbf55111d803e97fe04c5842fdf07e278beb"
+    },
+    {
+      "file": "screenshots/race-condition-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/race-condition-overview-1024.png",
+      "sha256": "0260dff1352337c4c0726a4b719ca8538aa3890d6829349cea0f71f3f185402a"
+    },
+    {
+      "file": "screenshots/solo-control-spine-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-control-spine-arrival-overview-1024.png",
+      "sha256": "467802afb23ee8cba8210a078756e8942a81b6df0fd444645c7ef90e3222cc6e"
+    },
+    {
+      "file": "screenshots/solo-control-spine-powered-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-control-spine-latched-1024.png",
+      "sha256": "26ed07cc58448be94ed4ced0e62310f89bd27ce98817a749ed0172fdb57d3c48"
+    },
+    {
+      "file": "screenshots/solo-control-spine-unpowered-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-control-spine-arrival-1600.png",
+      "sha256": "a246c5fd7b982bf268b1cddb5950f23a95ccef97934910de60c9a31f16058a06"
+    },
+    {
+      "file": "screenshots/solo-pause-sliders-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/menu/solo-pause-sliders-1024.png",
+      "sha256": "9dc16a36a730e327baed58934d754c4f5c41c564d43832efed1c815f76c24e38"
+    },
+    {
+      "file": "screenshots/solo-pause-sliders-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/menu/solo-pause-sliders-1600.png",
+      "sha256": "883c419223591cae3eba0be85a037b3688cbf1eb78d0377285a8d5d8bcb31d91"
+    },
+    {
+      "file": "screenshots/solo-pressure-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-pressure-unpowered-overview-1024.png",
+      "sha256": "e787c168d5ca054ae27e082337a31af706a0fb778123ad655309080f15ca4628"
+    },
+    {
+      "file": "screenshots/solo-pressure-powered-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-pressure-1024.png",
+      "sha256": "7ceff5162ad05097fbaecd74569ce71d9ba80b4a8ca4ade17ca998d323efd98a"
+    },
+    {
+      "file": "screenshots/solo-pressure-unpowered-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-pressure-unpowered-1600.png",
+      "sha256": "6a0762a47003f028fb34fe8a4924e5ddc93138859341031a5a1bf6dd5ab412bc"
+    },
+    {
+      "file": "screenshots/solo-relay-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-relay-unpowered-overview-1024.png",
+      "sha256": "b4b4e1808695aba61b92fb9e2720b25a2b98286d088e20c58ca86264a2cc908b"
+    },
+    {
+      "file": "screenshots/solo-relay-powered-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-relay-1024.png",
+      "sha256": "de5226675a265ab32f5f6e1dc5fc3befd301b4d4e32795b921dc9680b14b9fc9"
+    },
+    {
+      "file": "screenshots/solo-relay-unpowered-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-relay-unpowered-1600.png",
+      "sha256": "da221b2eaaa5ef6d1393e99c7e92dc919ad3b309911c084c34195d457de38d88"
+    },
+    {
+      "file": "screenshots/solo-switch-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-switch-unpowered-overview-1024.png",
+      "sha256": "686e00ebf63ae62953068dd5dc00e76fcf5b9fc654295e962085709523ef7563"
+    },
+    {
+      "file": "screenshots/solo-switch-powered-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-switch-1024.png",
+      "sha256": "85a85a3af2a4640c09cb5be8cd720d79fb5091be07ea1480745fb60d38241d36"
+    },
+    {
+      "file": "screenshots/solo-switch-unpowered-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/solo/polish-switch-unpowered-1600.png",
+      "sha256": "4c8600fe39c3d7c51472e4c7f903f24af21c022c96c78a33516687ca965c51cf"
+    },
+    {
+      "file": "screenshots/use-after-free-launch-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/use-after-free-ordinary-player-1-1024.png",
+      "sha256": "2d4cdfb10ceb6a7757e17237354891db5c224d9b64f1e3b308175c76beb04fa5"
+    },
+    {
+      "file": "screenshots/use-after-free-launch-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/use-after-free-ordinary-player-1.png",
+      "sha256": "8eb2325b6e45451c0515ff540b0915d095a784d671e416998ab4c19f57b5819d"
+    },
+    {
+      "file": "screenshots/use-after-free-launch-before-1600.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-before/use-after-free-ordinary-player-1.png",
+      "sha256": "586c528c9bc95181eb6d54fb46e14331e217cdcb4cdace4acea3ec4204300290"
+    },
+    {
+      "file": "screenshots/use-after-free-overview-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/spacing-verified/use-after-free-overview-1024.png",
+      "sha256": "b00098d52801bb21d18d8bee1ff3cd6e29366dca8e1b4e76e88cb40dc5332131"
+    },
+    {
+      "file": "screenshots/use-after-free-powered-1024.png",
+      "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/full-polish-use-after-free-powered-player-2-1024.png",
+      "sha256": "233873bc6e71691adc1d16904dc15ebda58bd7c715cc4dce720537a28fed4c10"
+    }
+  ],
+  "rawCoverage": {
+    "spacing-verified": [
+      "control-spine-existing-service-assembly.png",
+      "crossfeed-cargo-machinery.png",
+      "crossfeed-left-route-1024.png",
+      "crossfeed-left-route-pan-zoom.png",
+      "crossfeed-left-route.png",
+      "crossfeed-right-route-gallery.png",
+      "crossfeed-service-relay.png",
+      "crossfeed-vault-ordinary-player-1-1024.png",
+      "crossfeed-vault-ordinary-player-1.png",
+      "crossfeed-vault-ordinary-player-2-1024.png",
+      "crossfeed-vault-ordinary-player-2.png",
+      "crossfeed-vault-overview-1024.png",
+      "crossfeed-vault-overview.png",
+      "crossfeed-vault-return.png",
+      "deadlock-lower-lift-1024.png",
+      "deadlock-lower-lift-pan-zoom.png",
+      "deadlock-lower-lift.png",
+      "deadlock-ordinary-player-1-1024.png",
+      "deadlock-ordinary-player-1.png",
+      "deadlock-ordinary-player-2-1024.png",
+      "deadlock-ordinary-player-2.png",
+      "deadlock-overview-1024.png",
+      "deadlock-overview.png",
+      "deadlock-shaft-firewall.png",
+      "deadlock-upper-payload.png",
+      "handshake-both-players.png",
+      "handshake-crossing-active.png",
+      "handshake-crossing-inactive.png",
+      "handshake-evidence-alternatives.png",
+      "handshake-exit.png",
+      "handshake-gallery-lift.png",
+      "handshake-lift-1024.png",
+      "handshake-ordinary-player-1-1024.png",
+      "handshake-ordinary-player-1.png",
+      "handshake-ordinary-player-2-1024.png",
+      "handshake-ordinary-player-2.png",
+      "handshake-overview-1024.png",
+      "handshake-overview.png",
+      "handshake-pan-zoom.png",
+      "handshake-reduced-motion.png",
+      "handshake-relay-exit-1024.png",
+      "handshake-relay-exit.png",
+      "missing-asset-gameplay-fallback.png",
+      "public-custom-no-native-overlay.png",
+      "race-cargo-firewalls.png",
+      "race-condition-ordinary-player-1-1024.png",
+      "race-condition-ordinary-player-1.png",
+      "race-condition-ordinary-player-2-1024.png",
+      "race-condition-ordinary-player-2.png",
+      "race-condition-overview-1024.png",
+      "race-condition-overview.png",
+      "race-exit.png",
+      "race-phase-a-b.png",
+      "use-after-free-assist-inversion.png",
+      "use-after-free-final-lift-exit.png",
+      "use-after-free-launch-1024.png",
+      "use-after-free-launch-pan-zoom.png",
+      "use-after-free-launch.png",
+      "use-after-free-ordinary-player-1-1024.png",
+      "use-after-free-ordinary-player-1.png",
+      "use-after-free-ordinary-player-2-1024.png",
+      "use-after-free-ordinary-player-2.png",
+      "use-after-free-overview-1024.png",
+      "use-after-free-overview.png",
+      "use-after-free-route-a.png",
+      "use-after-free-route-b.png",
+      "use-after-free-route-c.png"
+    ],
+    "campaign-final": [
+      "full-boost-support.png",
+      "full-campaign-complete.png",
+      "full-commit.png",
+      "full-complete.png",
+      "full-crossfeed-victory-guest.png",
+      "full-crossfeed-victory-host.png",
+      "full-deadlock-stage-01-initial-carrier.png",
+      "full-deadlock-stage-01-initial-operator.png",
+      "full-deadlock-stage-02-two-weights-carrier.png",
+      "full-deadlock-stage-02-two-weights-operator.png",
+      "full-deadlock-stage-03-player-substitution-carrier.png",
+      "full-deadlock-stage-03-player-substitution-operator.png",
+      "full-deadlock-stage-04-final-hover-carrier.png",
+      "full-deadlock-stage-04-final-hover-operator.png",
+      "full-deadlock-stage-05-hatch-catch-carrier.png",
+      "full-deadlock-stage-05-hatch-catch-operator.png",
+      "full-deadlock-stage-06-three-payloads-carrier.png",
+      "full-deadlock-stage-06-three-payloads-operator.png",
+      "full-deadlock-stage-07-payload-service-carrier.png",
+      "full-deadlock-stage-07-payload-service-operator.png",
+      "full-deadlock-stage-08-complete-carrier.png",
+      "full-deadlock-stage-08-complete-operator.png",
+      "full-drop-b-camera.png",
+      "full-overview.png",
+      "full-polish-crossfeed-vault-powered-player-1-1024.png",
+      "full-polish-crossfeed-vault-powered-player-1-1600.png",
+      "full-polish-crossfeed-vault-powered-player-2-1024.png",
+      "full-polish-crossfeed-vault-powered-player-2-1600.png",
+      "full-polish-deadlock-powered-player-1-1024.png",
+      "full-polish-deadlock-powered-player-1-1600.png",
+      "full-polish-deadlock-powered-player-2-1024.png",
+      "full-polish-deadlock-powered-player-2-1600.png",
+      "full-polish-race-completed-1024.png",
+      "full-polish-race-completed-1600.png",
+      "full-polish-race-departure-player-1-1024.png",
+      "full-polish-race-departure-player-1-1600.png",
+      "full-polish-race-departure-player-2-1024.png",
+      "full-polish-race-departure-player-2-1600.png",
+      "full-polish-race-dormant-1024.png",
+      "full-polish-race-dormant-1600.png",
+      "full-polish-race-ready-1024.png",
+      "full-polish-race-ready-1600.png",
+      "full-polish-use-after-free-powered-player-1-1024.png",
+      "full-polish-use-after-free-powered-player-1-1600.png",
+      "full-polish-use-after-free-powered-player-2-1024.png",
+      "full-polish-use-after-free-powered-player-2-1600.png",
+      "full-return-camera.png",
+      "full-right-deck.png",
+      "full-trace-camera.png",
+      "full-upper-left-routing.png",
+      "full-upper-right-routing.png",
+      "full-use-after-free-a-powered-host.png",
+      "full-use-after-free-a-powered-partner.png",
+      "full-use-after-free-completed-host.png",
+      "full-use-after-free-completed-partner.png",
+      "full-use-after-free-first-chain-host.png",
+      "full-use-after-free-first-chain-partner.png",
+      "full-use-after-free-first-handover-host.png",
+      "full-use-after-free-first-handover-partner.png",
+      "full-use-after-free-initial-host.png",
+      "full-use-after-free-initial-partner.png",
+      "full-use-after-free-near-complete-host.png",
+      "full-use-after-free-near-complete-partner.png",
+      "full-use-after-free-second-chain-host.png",
+      "full-use-after-free-second-chain-partner.png",
+      "full-use-after-free-second-handover-host.png",
+      "full-use-after-free-second-handover-partner.png",
+      "full-use-after-free-summit-assist-host.png",
+      "full-use-after-free-summit-assist-partner.png",
+      "full-vault-unlocked.png",
+      "guest-lobby.png",
+      "handshake-completed-host.png",
+      "handshake-completed-partner.png",
+      "handshake-cube-alcove-host.png",
+      "handshake-cube-alcove-partner.png",
+      "handshake-cube-substitution-host.png",
+      "handshake-cube-substitution-partner.png",
+      "handshake-exit-unlocked-host.png",
+      "handshake-exit-unlocked-partner.png",
+      "handshake-gallery-lift-host.png",
+      "handshake-gallery-lift-partner.png",
+      "handshake-initial-host.png",
+      "handshake-initial-partner.png",
+      "handshake-maintenance-complete-host.png",
+      "handshake-maintenance-complete-partner.png",
+      "handshake-near-complete-host.png",
+      "handshake-near-complete-partner.png",
+      "handshake-partner-held-boost-host.png",
+      "handshake-partner-held-boost-partner.png",
+      "handshake-payload-return-host.png",
+      "handshake-payload-return-partner.png",
+      "handshake-powered-crossing-host.png",
+      "handshake-powered-crossing-partner.png",
+      "handshake-relay-linked-host.png",
+      "handshake-relay-linked-partner.png",
+      "host-lobby.png",
+      "polish-handshake-powered-player-1-1024.png",
+      "polish-handshake-powered-player-1-1600.png",
+      "polish-handshake-powered-player-2-1024.png",
+      "polish-handshake-powered-player-2-1600.png"
+    ],
+    "maintenance-final": [
+      "01-dormant-approach.png",
+      "02-ready-1024.png",
+      "02-ready-800.png",
+      "02-ready-approach.png",
+      "03-completed-green-1024.png",
+      "03-completed-green-800.png",
+      "03-completed-green.png",
+      "04-completed-reduced-motion.png",
+      "05-completed-departure.png"
+    ],
+    "deadlock-final": [
+      "deadlock-stage-01-initial-carrier.png",
+      "deadlock-stage-01-initial-operator.png",
+      "deadlock-stage-02-two-weights-carrier.png",
+      "deadlock-stage-02-two-weights-operator.png",
+      "deadlock-stage-03-player-substitution-carrier.png",
+      "deadlock-stage-03-player-substitution-operator.png",
+      "deadlock-stage-04-final-hover-carrier.png",
+      "deadlock-stage-04-final-hover-operator.png",
+      "deadlock-stage-05-hatch-catch-carrier.png",
+      "deadlock-stage-05-hatch-catch-operator.png",
+      "deadlock-stage-06-three-payloads-carrier.png",
+      "deadlock-stage-06-three-payloads-operator.png",
+      "deadlock-stage-07-payload-service-carrier.png",
+      "deadlock-stage-07-payload-service-operator.png",
+      "deadlock-stage-08-complete-carrier.png",
+      "deadlock-stage-08-complete-operator.png",
+      "polish-deadlock-powered-player-1-1024.png",
+      "polish-deadlock-powered-player-1-1600.png",
+      "polish-deadlock-powered-player-2-1024.png",
+      "polish-deadlock-powered-player-2-1600.png"
+    ],
+    "solo": [
+      "audio-lift-label-lower.png",
+      "audio-settings.png",
+      "compact-menu.png",
+      "continue-plate-b.png",
+      "continue-relay.png",
+      "continue-uplink.png",
+      "control-spine-anchor.png",
+      "control-spine-arrival.png",
+      "control-spine-assembly-inspector.png",
+      "control-spine-automatic-return-reveal.png",
+      "control-spine-bogus-inspector.png",
+      "control-spine-continue-relay.png",
+      "control-spine-final-overview.png",
+      "control-spine-held-overview.png",
+      "control-spine-latched.png",
+      "control-spine-lift-rider.png",
+      "control-spine-overview.png",
+      "control-spine-payload.png",
+      "control-spine-relay-cargo.png",
+      "control-spine-relay-enabled.png",
+      "control-spine-rope-collapse.png",
+      "control-spine-rope-jump.png",
+      "control-spine-rope-proven-clone.png",
+      "control-spine-rope-recovery.png",
+      "control-spine-rope-return-high.png",
+      "control-spine-rope-return-mid.png",
+      "control-spine-rope-return-near.png",
+      "control-spine-rope-upper-route.png",
+      "control-spine-service-assembly.png",
+      "crumble-warning.png",
+      "debug.png",
+      "end.png",
+      "last-state.png",
+      "level-select.png",
+      "ninja-on-cube.png",
+      "plate-b.png",
+      "polish-control-spine-arrival-1024.png",
+      "polish-control-spine-arrival-1600.png",
+      "polish-control-spine-arrival-overview-1024.png",
+      "polish-control-spine-arrival-overview-1600.png",
+      "polish-control-spine-latched-1024.png",
+      "polish-control-spine-latched-1600.png",
+      "polish-control-spine-latched-overview-1024.png",
+      "polish-control-spine-latched-overview-1600.png",
+      "polish-pressure-1024.png",
+      "polish-pressure-1600.png",
+      "polish-pressure-overview-1024.png",
+      "polish-pressure-overview-1600.png",
+      "polish-pressure-unpowered-1024.png",
+      "polish-pressure-unpowered-1600.png",
+      "polish-pressure-unpowered-overview-1024.png",
+      "polish-pressure-unpowered-overview-1600.png",
+      "polish-relay-1024.png",
+      "polish-relay-1600.png",
+      "polish-relay-overview-1024.png",
+      "polish-relay-overview-1600.png",
+      "polish-relay-unpowered-1024.png",
+      "polish-relay-unpowered-1600.png",
+      "polish-relay-unpowered-overview-1024.png",
+      "polish-relay-unpowered-overview-1600.png",
+      "polish-switch-1024.png",
+      "polish-switch-1600.png",
+      "polish-switch-overview-1024.png",
+      "polish-switch-overview-1600.png",
+      "polish-switch-unpowered-1024.png",
+      "polish-switch-unpowered-1600.png",
+      "polish-switch-unpowered-overview-1024.png",
+      "polish-switch-unpowered-overview-1600.png",
+      "pressure-unpowered.png",
+      "pressure.png",
+      "relay-unpowered.png",
+      "relay.png",
+      "reset-confirmation.png",
+      "reset-progress.png",
+      "start.png",
+      "swing-relay.png",
+      "swing-switch.png",
+      "swing-uplink.png",
+      "switch-unpowered.png",
+      "switch.png"
+    ],
+    "menu": [
+      "about.png",
+      "builder.png",
+      "coop-host-pause-1024.png",
+      "coop-host-pause-1600.png",
+      "coop-join-code.png",
+      "coop-pause-sliders-1024.png",
+      "coop-pause-sliders-1600.png",
+      "coop-start-or-join.png",
+      "settings.png",
+      "solo-pause-sliders-1024.png",
+      "solo-pause-sliders-1600.png",
+      "solo-pause.png",
+      "title-1024x768.png",
+      "title-1366x768.png",
+      "title-1600x900.png",
+      "title-390x844.png"
+    ]
+  }
+}

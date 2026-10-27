@@ -1,0 +1,4 @@
+PASS deadlock: two independent visitors retain one party
+PASS deadlock: authored-start physical solve with both arrivals
+PASS DEADLOCK final caption pass completes with zero deaths
+PASS DEADLOCK final caption pass completes with zero deaths

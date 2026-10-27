@@ -1,0 +1,39 @@
+$ node scripts/native/generate-tables.ts --check && pnpm check:native-world && pnpm check:race-cargo && pnpm check:race-machinery && pnpm check:environmental
+✓ server/native/tables/handshake.json
+✓ public/evidence/coop/handshake.evidence.json
+✓ public/evidence/coop/handshake.traces.json
+✓ public/evidence/coop/handshake.disasm.json
+✓ server/native/tables/deadlock.json
+✓ public/evidence/coop/deadlock.evidence.json
+✓ public/evidence/coop/deadlock.traces.json
+✓ public/evidence/coop/deadlock.disasm.json
+✓ server/native/tables/use-after-free.json
+✓ public/evidence/coop/use-after-free.evidence.json
+✓ public/evidence/coop/use-after-free.traces.json
+✓ public/evidence/coop/use-after-free.disasm.json
+✓ server/native/tables/crossfeed-vault.json
+✓ public/evidence/coop/crossfeed-vault.evidence.json
+✓ public/evidence/coop/crossfeed-vault.traces.json
+✓ public/evidence/coop/crossfeed-vault.disasm.json
+✓ server/native/tables/race-condition.json
+✓ public/evidence/coop/race-condition.evidence.json
+✓ public/evidence/coop/race-condition.traces.json
+✓ public/evidence/coop/race-condition.disasm.json
+✓ public/evidence/coop/manifest.json
+
+checked 21 artifacts, 8137.6 KB total
+$ node scripts/native/world-evidence.ts --check
+✓ public/evidence/coop/handshake.world.json (6502 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/deadlock.world.json (7710 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/use-after-free.world.json (10491 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/crossfeed-vault.world.json (24024 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/race-condition.world.json (20166 bytes; PE bytes, blocks, stores and targets verified)
+$ node scripts/native/race-cargo-evidence.ts --check
+✓ public/evidence/coop/race-condition.cargo.json: 25595 / 36000 bytes; 26 distinct fragments; catalogue, PE bytes, blocks, stores and targets verified
+$ node scripts/native/race-machinery-evidence.ts --check
+✓ public/evidence/coop/race-condition.machinery.json: 16753 / 24000 bytes; 20 separate fragments; exact PE bytes, blocks, ten observed stores and targets verified
+$ node scripts/native/environmental-evidence.ts --check
+✓ public/evidence/coop/handshake.environment.json: 12783 / 16000 bytes; 16 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/crossfeed-vault.environment.json: 31516 / 40000 bytes; 40 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/deadlock.environment.json: 15568 / 20000 bytes; 20 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/use-after-free.environment.json: 19044 / 24000 bytes; 24 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified

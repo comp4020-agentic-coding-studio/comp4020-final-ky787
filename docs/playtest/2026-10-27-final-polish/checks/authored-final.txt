@@ -1,0 +1,9 @@
+$ vitest run --config vitest.unit.config.ts tests/authored-campaign.test.ts
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  18:47:19
+   Duration  3.12s (tests 77%, transform 19%, import 5%)

@@ -1,0 +1,43 @@
+PASS outside click and Escape cannot dismiss initial setup
+PASS normal landing offers five clear destinations without tutorial or campaign grids
+PASS home preview paints selected profile through existing renderer
+PASS title screen cannot resume through backdrop or Escape
+PASS title 1600×900 fits and keeps main actions visible
+PASS title 1366×768 fits and keeps main actions visible
+PASS title 1024×768 fits and keeps main actions visible
+PASS title 390×844 fits and keeps main actions visible
+PASS reduced-motion title preview is static
+PASS leaving home disposes detached preview animation
+PASS saving customization immediately updates home preview
+PASS cancel customization returns home with saved colour
+PASS foreign pasted links show visible feedback and do not connect
+PASS both authoring destinations are accessible
+PASS returning visitor visibly continues current room
+PASS Tutorial resets puzzle rooms while retaining identity, completion, mechanics and history
+PASS solo pause is compact and contains no character or campaign UI
+PASS solo-pause: new-user music is 25% and Effects remains 65%
+PASS solo-pause 1600: both sliders are immediately visible in a compact, unscrolled pause panel
+PASS solo-pause 1024: both sliders are immediately visible in a compact, unscrolled pause panel
+PASS solo-pause: keyboard changes Music independently while remaining paused
+PASS solo-pause: zero music is persisted without muting Effects
+PASS pause releases held inputs and silences audio
+PASS outside dismissal resumes same room with canvas focus and no grapple
+PASS Escape pauses
+PASS Escape resumes same room
+PASS Space on Resume does not queue a jump or grapple
+PASS Restart Room preserves historical records
+PASS outside click cannot dismiss destructive confirmation
+PASS Escape cancels reset without discarding progress
+PASS main menu return persists tutorial restart and character
+PASS saved Music choice survives reload rather than reverting to the new default
+PASS coop-pause: new-user music is 25% and Effects remains 65%
+PASS coop-pause 1600: both sliders are immediately visible in a compact, unscrolled pause panel
+PASS coop-pause 1024: both sliders are immediately visible in a compact, unscrolled pause panel
+PASS coop-pause: keyboard changes Music independently while remaining paused
+PASS coop-pause: zero music is persisted without muting Effects
+PASS co-op Escape resumes after slider keyboard use
+PASS co-op backdrop resumes with canvas focus and no grapple
+PASS host pause 1600 fits with invitation and chamber actions
+PASS host pause 1024 fits with invitation and chamber actions
+PASS no browser runtime errors
+PASS no browser runtime errors

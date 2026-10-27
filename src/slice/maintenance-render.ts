@@ -4,12 +4,13 @@ import { heroMaterials } from './hero-render.ts';
 const { panel, polygon, line, dot, text } = heroMaterials;
 const COLOURS = { dormant: '#718b95', ready: '#64e6d5', complete: '#59ed93', metal: '#223440', dark: '#091821' };
 
-/** HANDSHAKE's floating, one-use control. Both booleans are observations of the
+/** Floating, one-use controls in HANDSHAKE and RACE. Both booleans observe the
  * existing interaction/latch, never new puzzle state. All motion is cosmetic.
  * The 56 × 48 housing floats above the authored contact point; four filaments
  * stay within 64 units either side and clear of the ledge. Players draw on top. */
-export function drawMaintenanceControl(c: CanvasRenderingContext2D, at: Vec2, completed: boolean,
-    ready: boolean, time: number, motion: boolean, zoom: number): void {
+export function drawFloatingControl(c: CanvasRenderingContext2D, at: Vec2, completed: boolean,
+    ready: boolean, time: number, motion: boolean, zoom: number, label: string,
+    caption: Vec2 = { x: 0, y: 34 }): void {
     const colour = completed ? COLOURS.complete : ready ? COLOURS.ready : COLOURS.dormant;
     const lit = completed || ready;
     const t = motion ? time : 0;
@@ -82,8 +83,8 @@ export function drawMaintenanceControl(c: CanvasRenderingContext2D, at: Vec2, co
     // World caption stays fixed while the housing hovers. A bounded type scale
     // keeps small desktop views readable without enlarging the actual object.
     const typeScale = Math.min(1.45, Math.max(1, .9 / zoom));
-    c.save(); c.translate(at.x, at.y + 34); c.scale(typeScale, typeScale);
-    text(c, 'MAINTENANCE COMPLETE', 0, 0, 12, lit ? colour : '#99acb4');
+    c.save(); c.translate(at.x + caption.x, at.y + caption.y); c.scale(typeScale, typeScale);
+    text(c, label, 0, 0, 12, lit ? colour : '#99acb4');
     text(c, completed ? 'LATCHED' : ready ? 'E · CONFIRM' : 'UNCONFIRMED', 0, 15, 10, colour);
     c.restore();
 }

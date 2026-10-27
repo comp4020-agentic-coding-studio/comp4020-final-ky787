@@ -1,0 +1,19 @@
+PASS all previews default to 25% independently of game preferences
+PASS preview 1 decodes and advances without overlapping players
+PASS preview 2 decodes and advances without overlapping players
+PASS preview 3 decodes and advances without overlapping players
+PASS preview 4 decodes and advances without overlapping players
+PASS preview 5 decodes and advances without overlapping players
+PASS preview 6 decodes and advances without overlapping players
+PASS preview 7 decodes and advances without overlapping players
+PASS preview 8 decodes and advances without overlapping players
+PASS preview 9 decodes and advances without overlapping players
+PASS preview 10 decodes and advances without overlapping players
+PASS preview 11 decodes and advances without overlapping players
+PASS candidate 1 loops without media error
+PASS candidate 3 loops without media error
+PASS candidate 5 loops without media error
+PASS candidate 7 loops without media error
+PASS candidate 9 loops without media error
+PASS comparison fits a 1024 desktop without horizontal overflow
+PASS no comparison browser errors

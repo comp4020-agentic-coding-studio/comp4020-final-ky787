@@ -105,7 +105,7 @@ The main and failed-then-retry scenarios are `full-room`, `coop`, with both auth
 
 Eight main unit tests cover the truth table, local-only contextual camera, physical operator collapse, two ordinary recovery jumps and three real-engine section routes. The isolated section tests explicitly use initial placement and a partner-contact override and are not two-player evidence. The ninth test retains the exact formerly-successful shortcut input sequence. Browser reports, detached trajectories, staged screenshots and render metadata live in the ignored report directory; they are diagnostics rather than authoritative design or binary evidence.
 
-Current draft and campaign hash: `bb55e4cb38d8516af629faad785ee0270818531dd5ab31c09545847b63dfaf3b`. The checkpoint-removal update changes no collision, anchor, plate, catch or route geometry. All three scenario variants now start directly at the authored spawns without a checkpoint interaction.
+Pre-polish draft and campaign hash: `bb55e4cb38d8516af629faad785ee0270818531dd5ab31c09545847b63dfaf3b`. The checkpoint-removal update changes no collision, anchor, plate, catch or route geometry. All three scenario variants now start directly at the authored spawns without a checkpoint interaction.
 
 The following earlier physical reports use hash `53d81f2cf3953a6997de93dae9947aacfaf0c4119132c0beff524b92d3851cac`, which still had the removed bottom checkpoint furniture:
 
@@ -134,8 +134,13 @@ Human two-player playtesting remains outstanding despite the separately requeste
 
 ### Campaign regression after behaviour refinement
 
-The current hash above passed all 43 canonical scenario steps in the five-room
+The pre-polish hash above passed all 43 canonical scenario steps in the five-room
 campaign run, with both physical exit arrivals and zero deaths. Report:
 `.workbench/reports/2026-10-16-checkpoints/campaign/use-after-free-report.json`.
 The same persistent party completed all five rooms and passed reconnect and
 server-restart recovery. USE AFTER FREE started without checkpoint machinery and retained every physical handover, including the pause/contact-release regression.
+
+### Presentation spacing — 2026-10-27
+
+Current draft and campaign SHA-256: `42276aa914c9df4b287dbd4082a208e0ba7a18879ea4ec174bd6800c6ccac41e`.
+The A → B instruction moves below the recovery shelf, clear of the native launch listing. Only `presentation.labels` changed, mirrored in the matching draft; geometry, controller bindings, checkpoints and native evidence are unchanged. See the [polish review](../playtest/2026-10-27-final-polish/README.md) for current browser captures and validation.

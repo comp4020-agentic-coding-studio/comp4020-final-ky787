@@ -43,7 +43,7 @@ it('keeps pause compact and escapes room labels instead of treating them as mark
     document.body.innerHTML = soloPauseMenu('<img src=x onerror=alert(1)>', '');
     expect(document.querySelector('.pause-room')?.textContent).toBe('<img src=x onerror=alert(1)>');
     expect(document.querySelector('img')).toBeNull();
-    expect([...document.querySelectorAll('.pause-card>button')].map(button => button.id)).toEqual(['continue', 'restart-room', 'main-menu']);
+    expect([...document.querySelectorAll('.pause-card>button')].map(button => button.id)).toEqual(['continue', 'main-menu', 'restart-room']);
     expect(document.querySelector('#customize-ninja')).toBeNull();
     document.body.innerHTML = homeMenu('<img src=x>');
     expect(document.querySelector('#continue')?.textContent).toContain('<img src=x>');

@@ -302,10 +302,27 @@ async function jumpTo(cdp: Cdp, x: number, groundId: string): Promise<void> {
         await sleep(150);
     }
 }
-async function shot(cdp: Cdp, name: string): Promise<void> { const res = await cdp.send('Page.captureScreenshot', { format: 'png' }) as {
-    data?: string;
-}; if (res.data)
-    writeFileSync(join(SHOTS, `${name}.png`), Buffer.from(res.data, 'base64')); }
+async function shot(cdp: Cdp, name: string): Promise<void> {
+    const capture = async (label: string) => {
+        const res = await cdp.send('Page.captureScreenshot', { format: 'png' }) as { data?: string };
+        if (res.data) writeFileSync(join(SHOTS, `${label}.png`), Buffer.from(res.data, 'base64'));
+    };
+    await capture(name);
+    // Optional spacing survey at stable grounded moments of the real route.
+    // Use the ordinary player camera and held Tab overview, never a world edit.
+    if (process.env.BN_POLISH_REVIEW === '1' && ['pressure-unpowered', 'switch-unpowered', 'relay-unpowered',
+        'pressure', 'switch', 'relay', 'control-spine-arrival', 'control-spine-latched'].includes(name)) {
+        for (const [width, height] of [[1600, 900], [1024, 768]]) {
+            await cdp.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
+            await sleep(850); await capture(`polish-${name}-${width}`);
+            await key(cdp, 'keyDown', 'Tab');
+            try { await sleep(850); await capture(`polish-${name}-overview-${width}`); }
+            finally { await key(cdp, 'keyUp', 'Tab'); }
+        }
+        await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false });
+        await sleep(850);
+    }
+}
 const checks: string[] = [];
 function check(label: string, ok: boolean, detail = ''): void { checks.push(`${ok ? 'PASS' : 'FAIL'} ${label}${detail ? ' — ' + detail : ''}`); if (!ok)
     throw new Error(label + ' ' + detail); }
@@ -597,6 +614,7 @@ async function main() {
         check('reload continues the selected room', await evaluate(cdp, "document.querySelector('#continue').textContent.includes('CONTINUE — CONTROL SPINE')"));
         await click(cdp, '[data-room="pressure"]');
         check('level select returns to an unfinished tutorial', (await snap(cdp)).room === 'pressure' && (await snap(cdp)).progress.completedRooms.length === 0);
+        if (process.env.BN_POLISH_REVIEW === '1') await shot(cdp, 'pressure-unpowered');
         await walkTo(cdp, 260);
         await tap(cdp, 'KeyE');
         check('cube carried', (await snap(cdp)).cube?.carried === true);
@@ -608,6 +626,7 @@ async function main() {
         check('cube and plate interactions play sounds', (await snap(cdp)).audio.played.pickup > 0 && (await snap(cdp)).audio.played.drop > 0 && (await snap(cdp)).audio.played.plate > 0);
         await shot(cdp, 'pressure');
         await exitRoom(cdp, 'switch');
+        if (process.env.BN_POLISH_REVIEW === '1') await shot(cdp, 'switch-unpowered');
         check('inactive anchor has no collision or hook', (await snap(cdp)).platforms.some(p => p.id === 'anchor' && !p.enabled && !p.grappleable));
         await walkTo(cdp, 275);
         await tap(cdp, 'KeyE');
@@ -627,6 +646,7 @@ async function main() {
         await walkTo(cdp, 415);
         await cross(cdp, 770, true);
         await exitRoom(cdp, 'relay');
+        if (process.env.BN_POLISH_REVIEW === '1') await shot(cdp, 'relay-unpowered');
         // Cube grapple is a physical pull, not a swing anchor.
         await mouseAt(cdp, 260, 542);
         await sleep(260);

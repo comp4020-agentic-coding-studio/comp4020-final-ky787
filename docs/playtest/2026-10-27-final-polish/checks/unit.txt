@@ -1,0 +1,11 @@
+$ vitest run --config vitest.unit.config.ts tests/audio.test.ts tests/music.test.ts tests/music-assets.test.ts tests/party-menu.test.ts tests/menu-views.test.ts tests/authored-campaign.test.ts tests/native-presentation.test.ts
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+{"id":1,"timestamp":"2026-10-27T07:38:20.228Z","level":"info","event":"server_started","port":38735}
+{"id":2,"timestamp":"2026-10-27T07:38:20.896Z","level":"info","event":"server_shutdown"}
+
+ Test Files  6 passed (6)
+      Tests  55 passed (55)
+   Start at  18:38:19
+   Duration  3.08s (tests 53%, transform 25%, import 13%, environment 8%)

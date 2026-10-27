@@ -197,7 +197,7 @@ central concept and was not introduced.
 
 ## Actual validation and remaining limits
 
-Current draft and campaign SHA-256: `45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0`.
+Pre-polish draft and campaign SHA-256: `45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0`.
 The current full scenario removes the checkpoint interaction and obsolete
 payload-return sequence. It asserts that both lower plates are empty while
 service remains powered by all three sockets, then requires the lower player
@@ -273,8 +273,13 @@ of all possible play.
 
 ### Campaign regression after behaviour refinement
 
-The current hash above passed all 71 canonical scenario steps in the five-room
+The pre-polish hash above passed all 71 canonical scenario steps in the five-room
 campaign run, with both physical exit arrivals and zero deaths. Report:
 `.workbench/reports/2026-10-16-checkpoints/campaign/deadlock-report.json`.
 The same persistent party completed all five rooms and passed reconnect and
 server-restart recovery. DEADLOCK retained all three socket cubes through the final personnel relay trip and both arrivals.
+
+### Presentation spacing — 2026-10-27
+
+Current draft and campaign SHA-256: `0a04a866ecfa8fcdb758394f3a8bf18762ff78fd1e4941ecbe8c6882ee840e96`.
+The shorter DEADLOCK heading fits inside the wall; SERVICE / PERSONNEL ONLY is split across two fixed lines above the entry gateway. Only `presentation.labels` changed in the JSON, mirrored in the matching draft. The renderer also raises HATCH's fixed caption 40 units to clear the nearby cube-use prompt. Geometry, controller bindings, checkpoints and native evidence are unchanged. See the [polish review](../playtest/2026-10-27-final-polish/README.md) for current browser captures and validation.

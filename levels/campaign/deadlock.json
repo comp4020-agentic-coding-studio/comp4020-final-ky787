@@ -371,9 +371,9 @@
     "labels": [
       {
         "id": "title",
-        "text": "DEADLOCK / AUTHORED MOCK",
-        "x": 60,
-        "y": 2750
+        "text": "DEADLOCK",
+        "x": 45,
+        "y": 2735
       },
       {
         "id": "lower-rule",
@@ -407,9 +407,15 @@
       },
       {
         "id": "service-hint",
-        "text": "SERVICE: PERSONNEL ONLY",
+        "text": "SERVICE:",
         "x": 45,
-        "y": 2860
+        "y": 2800
+      },
+      {
+        "id": "service-only",
+        "text": "PERSONNEL ONLY",
+        "x": 45,
+        "y": 2835
       },
       {
         "id": "catch-hint",

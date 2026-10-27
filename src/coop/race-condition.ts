@@ -64,7 +64,7 @@ export function raceCondition(slot: Slot): RoomDef<'race-condition'> {
             { id: 'safety-beam', x: 120, y: 860, length: 170, orientation: 'horizontal', signal: 'safetyFirewall' },
         ],
         wires, hazards: [], display: { x: 1320, y: 820 }, exit: { x: 4020, y: 580, w: 110, h: 140 },
-        regions: [{ at: { x: 80, y: 1090 }, label: 'CARGO CLOCK' }, { at: { x: 1600, y: 130 }, label: 'ALTERNATING TRACE' },
+        regions: [{ at: { x: 350, y: 1090 }, label: 'CARGO CLOCK' }, { at: { x: 1600, y: 130 }, label: 'ALTERNATING TRACE' },
             { at: { x: 3530, y: 860 }, label: 'RETURN / COMMIT' }, { at: { x: 2520, y: 1330 }, label: '← RECOVERY' }],
     };
 }

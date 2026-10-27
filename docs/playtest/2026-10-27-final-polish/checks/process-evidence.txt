@@ -1,0 +1,3 @@
+$ node scripts/check-evidence.ts
+✓ reflections/crit-8.md, reflections/crit-9.md, reflections/crit-10.md
+✓ PROCESS.md: no commit links to check

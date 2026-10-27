@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Binary Ninja — CROSSFEED listening comparison</title><style>
+body{max-width:900px;margin:32px auto;padding:0 20px;background:#0c1720;color:#e4f1f5;font:16px/1.5 system-ui}h1,h2,a{color:#64e6d5}h2{font-size:20px;margin:0}article{background:#152732;border:1px solid #365365;border-radius:12px;padding:18px;margin:16px 0}audio{width:100%;margin:6px 0}summary{cursor:pointer}p{margin:8px 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0 16px}label{display:flex;align-items:center;gap:12px;flex-wrap:wrap}small{color:#a6bdc9}
+</style><h1>CROSSFEED / listening comparison</h1>
+<p>Awaiting human selection. The game still uses <em>Through the Sewers</em>. Compare these short loops with DEADLOCK’s approved <em>Algate</em>: a restrained, steady background for a cooperative puzzle.</p>
+<label>Comparison volume <input id="volume" type="range" min="0" max="1" step=".01" value=".25"><output id="value">25%</output></label>
+<p><small>Common master loudness near −23 LUFS; playback starts at the new 25% music default. One recording plays at a time. Full candidate previews repeat; seam excerpts cross the join at 4 seconds.</small></p>
+<article><h2>Algate / DEADLOCK reference</h2><p>Approved master, copied byte-for-byte · <a href="https://opengameart.org/content/algate">CC0 source</a></p><audio controls loop preload="metadata" src="algate-reference.ogg"></audio></article>
+<div class="grid"><article><h2>Shadow / dark</h2>
+<p>52.29 s · -23.00 LUFS · <a href="https://opengameart.org/content/shadow-2">CC0 source</a></p>
+<audio controls loop preload="metadata" src="shadow-dark.ogg"></audio>
+<details><summary>Eight-second loop seam (wrap at 4 s)</summary><audio controls preload="none" src="shadow-dark-seam.ogg"></audio></details></article><article><h2>Shadow / light</h2>
+<p>52.29 s · -22.98 LUFS · <a href="https://opengameart.org/content/shadow-2">CC0 source</a></p>
+<audio controls loop preload="metadata" src="shadow-light.ogg"></audio>
+<details><summary>Eight-second loop seam (wrap at 4 s)</summary><audio controls preload="none" src="shadow-light-seam.ogg"></audio></details></article><article><h2>Shadow / original</h2>
+<p>52.29 s · -23.01 LUFS · <a href="https://opengameart.org/content/shadow-2">CC0 source</a></p>
+<audio controls loop preload="metadata" src="shadow-original.ogg"></audio>
+<details><summary>Eight-second loop seam (wrap at 4 s)</summary><audio controls preload="none" src="shadow-original-seam.ogg"></audio></details></article><article><h2>PYNCHON</h2>
+<p>32.49 s · -23.06 LUFS · <a href="https://opengameart.org/content/pynchon">CC0 source</a></p>
+<audio controls loop preload="metadata" src="pynchon.ogg"></audio>
+<details><summary>Eight-second loop seam (wrap at 4 s)</summary><audio controls preload="none" src="pynchon-seam.ogg"></audio></details></article><article><h2>Loaben</h2>
+<p>35.54 s · -23.01 LUFS · <a href="https://opengameart.org/content/loaben">CC0 source</a></p>
+<audio controls loop preload="metadata" src="loaben.ogg"></audio>
+<details><summary>Eight-second loop seam (wrap at 4 s)</summary><audio controls preload="none" src="loaben-seam.ogg"></audio></details></article></div>
+<p>Suggested comparison: Algate, Shadow dark, Shadow light, Shadow original, Loaben, then PYNCHON. Shadow is described by its author as ambient techno; PYNCHON as a short futuristic glitch/synth loop; Loaben as a mysterious futuristic loop. These descriptions guide the order, not a listening verdict.</p>
+<p>Choose by listening: Is the beat comfortable through repeated puzzle attempts? Does it leave room for conversation and effects? Does the loop join feel natural? All five previews are review edits; no candidate is approved or installed.</p>
+<p><small>James Gargette (cinameng), CC0. Previews use a 350 ms cyclic overlap and constant loudness matching, without tempo changes, compression or EQ. Source hashes, processing and measurements are in <a href="manifest.json">manifest.json</a>. Signal checks do not establish subjective musical fit.</small></p>
+<script>const players=[...document.querySelectorAll('audio')],volume=document.querySelector('#volume');for(const player of players){player.volume=.25;player.addEventListener('play',()=>players.filter(other=>other!==player).forEach(other=>other.pause()));}volume.addEventListener('input',()=>{players.forEach(player=>player.volume=Number(volume.value));document.querySelector('#value').value=Math.round(Number(volume.value)*100)+'%';});</script></html>

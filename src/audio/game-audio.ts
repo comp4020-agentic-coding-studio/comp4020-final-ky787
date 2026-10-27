@@ -37,7 +37,7 @@ export const SOUND_ASSET_COUNT = new Set(Object.values(SOUNDS).map(sound => soun
 export const MACHINERY_CUES: readonly SoundCue[] = ['codePower', 'relayPower', 'liftPower', 'door'];
 export interface AudioPreferences { volume: number; musicVolume: number; muted: boolean }
 export const AUDIO_STORAGE_KEY = 'binary-ninja/c8-audio/v1';
-const DEFAULTS: AudioPreferences = { volume: .65, musicVolume: .35, muted: false };
+const DEFAULTS: AudioPreferences = { volume: .65, musicVolume: .25, muted: false };
 const clamp = (n: number) => Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0));
 interface Voice { cue: SoundCue; source: AudioBufferSourceNode; gain: GainNode; loop: boolean }
 interface Options {

@@ -1,0 +1,13 @@
+$ vitest run --config vitest.unit.config.ts tests/native-world-render.test.ts tests/native-world-evidence.test.ts tests/native-world-provenance.test.ts tests/race-condition.test.ts tests/race-server.test.ts tests/race-machinery.test.ts tests/race-cargo.test.ts tests/audio-refinement.test.ts tests/landing-audio.test.ts tests/menu-input.test.ts
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  10 passed (10)
+      Tests  141 passed (141)
+   Start at  18:39:01
+   Duration  6.58s (tests 64%, transform 26%, import 5%, environment 5%)
+
+  Transform  transforming modules took 3.00s · 26% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns

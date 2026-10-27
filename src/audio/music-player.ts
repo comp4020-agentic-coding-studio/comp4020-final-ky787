@@ -37,7 +37,7 @@ export class MusicPlayer {
     private readonly request: (callback: FrameRequestCallback) => number;
     private readonly cancel: (handle: number) => void;
     private readonly cleanups: (() => void)[] = [];
-    private preferences: MusicPreferences = { musicVolume: .35, muted: false };
+    private preferences: MusicPreferences = { musicVolume: .25, muted: false };
     private scene: MusicScene | null = null;
     private target: number | null = null;
     private fade: Fade | null = null;

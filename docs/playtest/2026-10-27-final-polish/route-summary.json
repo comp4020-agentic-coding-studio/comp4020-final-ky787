@@ -1,0 +1,132 @@
+[
+  {
+    "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/handshake-report.json",
+    "room": "handshake",
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "hash": "0ff44c730a59a8fb6979c511f01c9b44d39a2aa57fa5fef0f0c9fbbb064fca54",
+    "steps": 59,
+    "final": {
+      "host": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      },
+      "partner": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  {
+    "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/deadlock-report.json",
+    "room": "deadlock",
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "hash": "0a04a866ecfa8fcdb758394f3a8bf18762ff78fd1e4941ecbe8c6882ee840e96",
+    "steps": 71,
+    "final": {
+      "operator": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      },
+      "carrier": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  {
+    "source": ".workbench/reports/2026-10-27-final-polish/campaign-final/use-after-free-report.json",
+    "room": "use-after-free",
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "hash": "42276aa914c9df4b287dbd4082a208e0ba7a18879ea4ec174bd6800c6ccac41e",
+    "steps": 43,
+    "final": {
+      "host": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      },
+      "partner": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  {
+    "source": ".workbench/reports/2026-10-27-final-polish/maintenance-final/handshake-report.json",
+    "room": "handshake",
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "hash": "7d3305c93425fecef0b1cadd61d9446921d82e7928e617bfb0aea7cccbf4de77",
+    "steps": 59,
+    "final": {
+      "host": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      },
+      "partner": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  {
+    "source": ".workbench/reports/2026-10-27-final-polish/deadlock-final/deadlock-report.json",
+    "room": "deadlock",
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "hash": "0a04a866ecfa8fcdb758394f3a8bf18762ff78fd1e4941ecbe8c6882ee840e96",
+    "steps": 71,
+    "final": {
+      "operator": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      },
+      "carrier": {
+        "deaths": 0,
+        "completed": true,
+        "reachedExit": [
+          true,
+          true
+        ]
+      }
+    }
+  }
+]

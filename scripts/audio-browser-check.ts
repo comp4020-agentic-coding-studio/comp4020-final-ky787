@@ -43,7 +43,7 @@ try {
     check('before interaction neither music nor SFX start', !(await snapshot(a)).music.unlocked && (await snapshot(a)).music.decks.every(d => d.paused) && (await snapshot(a)).audio.state === 'locked');
     await a.read(`localStorage.setItem(${JSON.stringify(AUDIO_STORAGE_KEY)},JSON.stringify({volume:.27,muted:false}))`);
     await a.send('Page.reload'); await wait(a, 'legacy preference reload', s => s.audio.preferences.volume === .27);
-    check('legacy Effects preference survives with quiet independent Music default', (await snapshot(a)).audio.preferences.musicVolume === .35);
+    check('legacy Effects preference survives with quiet independent Music default', (await snapshot(a)).audio.preferences.musicVolume === .25);
     await onboardNinja(a, 'AudioHost', 'purple'); await music(a, 'menu');
     await wait(a, 'SFX pool decodes only short cues', s => s.audio.loaded === SOUND_ASSET_COUNT);
     check('music plays after real character setup without joining the SFX pool', (await snapshot(a)).audio.loaded === SOUND_ASSET_COUNT && (await snapshot(a)).music.decks.length === 2);
@@ -71,7 +71,7 @@ try {
     await wait(a, 'quiet tutorial', s => s.started && audible(s) && s.music.duck === 'tutorial' && s.music.duckGain <= .39);
     check('PRESSURE retains the quiet menu recording', (await snapshot(a)).room === 'pressure' && playingFile(await snapshot(a), 'menu.ogg'));
     await click(a, '#pause'); await wait(a, 'tutorial pause ducks without game effects', s => s.music.duck === 'pause' && s.music.duckGain < .3 && !s.audio.active && s.audio.voices === 0);
-    await a.read("document.querySelector('.pause-settings').open=true"); await shot(a, '02-solo-pause-mix');
+    await shot(a, '02-solo-pause-mix');
     await click(a, '#main-menu'); await music(a, 'menu');
 
     const b = await h.page(url, debug); await onboardNinja(b, 'AudioGuest', 'orange');

@@ -1,0 +1,60 @@
+{
+  "baselineCommit": "590d899bf798aea61a0c586c9a8f70b3327fbfb5",
+  "runtimeMusic": {
+    "public/audio/music/catalogue.json": {
+      "sha256": "a024bae3bf33b8d13fe60ac84111f1f14f17f609f6ddd6f69753a315d5cd39ba",
+      "unchanged": true
+    },
+    "public/audio/music/crossfeed-vault.ogg": {
+      "sha256": "7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6",
+      "unchanged": true
+    },
+    "public/audio/music/deadlock.ogg": {
+      "sha256": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
+      "unchanged": true
+    },
+    "public/audio/music/handshake.ogg": {
+      "sha256": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
+      "unchanged": true
+    },
+    "public/audio/music/menu.ogg": {
+      "sha256": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
+      "unchanged": true
+    },
+    "public/audio/music/race-condition.ogg": {
+      "sha256": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
+      "unchanged": true
+    },
+    "public/audio/music/tutorial-relay.ogg": {
+      "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
+      "unchanged": true
+    },
+    "public/audio/music/use-after-free.ogg": {
+      "sha256": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
+      "unchanged": true
+    }
+  },
+  "authoredDocuments": {
+    "handshake": {
+      "onlyPresentationLabelsChanged": true,
+      "campaignEqualsDraft": true,
+      "geometryControllerBindingsWiresCameraCheckpointsUnchanged": true
+    },
+    "deadlock": {
+      "onlyPresentationLabelsChanged": true,
+      "campaignEqualsDraft": true,
+      "geometryControllerBindingsWiresCameraCheckpointsUnchanged": true
+    },
+    "use-after-free": {
+      "onlyPresentationLabelsChanged": true,
+      "campaignEqualsDraft": true,
+      "geometryControllerBindingsWiresCameraCheckpointsUnchanged": true
+    }
+  },
+  "protectedRuntimeFilesUnchanged": [
+    "src/coop/race-authority.ts",
+    "src/slice/environmental-layout.ts",
+    "src/audio/music-catalogue.ts",
+    ".github/workflows/checks.yml"
+  ]
+}

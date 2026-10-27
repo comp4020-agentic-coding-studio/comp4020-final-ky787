@@ -1,0 +1,5 @@
+PASS touching Music updates volume without dismissing solo pause or changing Effects
+PASS touch Resume preserves playable solo input
+PASS touching Music updates volume while co-op remains paused
+PASS touch Resume preserves playable co-op input
+PASS touch pause path has no browser errors

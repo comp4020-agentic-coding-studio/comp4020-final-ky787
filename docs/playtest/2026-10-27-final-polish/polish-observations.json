@@ -1,0 +1,666 @@
+[
+  {
+    "name": "polish-handshake-powered-player-1-1600",
+    "room": "handshake",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1529.0745501285346,
+      "y": 370,
+      "zoom": 1.0513513513513513
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-handshake-powered-player-1-1024",
+    "room": "handshake",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1668.8406779002612,
+      "y": 391.864181715265,
+      "zoom": 0.824265179292904
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-handshake-powered-player-2-1600",
+    "room": "handshake",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1529.0745501285337,
+      "y": 370.0000000000005,
+      "zoom": 1.05135135135135
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-handshake-powered-player-2-1024",
+    "room": "handshake",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1668.840677900261,
+      "y": 391.86418171526503,
+      "zoom": 0.8242651792929039
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-crossfeed-vault-powered-player-1-1600",
+    "room": "crossfeed-vault",
+    "camera": {
+      "kind": "plate",
+      "id": "routePower",
+      "frame": {
+        "x": 1060,
+        "y": 110,
+        "w": 3260,
+        "h": 700,
+        "padding": 45
+      },
+      "x": 2645.000000000001,
+      "y": 814.4687499999994,
+      "zoom": 0.4776119402985078
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": true,
+      "relayGates": true,
+      "codePlatformA": true,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "polish-crossfeed-vault-powered-player-1-1024",
+    "room": "crossfeed-vault",
+    "camera": {
+      "kind": "plate",
+      "id": "routePower",
+      "frame": {
+        "x": 1060,
+        "y": 110,
+        "w": 3260,
+        "h": 700,
+        "padding": 45
+      },
+      "x": 2665.3078219681856,
+      "y": 890,
+      "zoom": 0.3094231101092181
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": true,
+      "relayGates": true,
+      "codePlatformA": true,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "polish-crossfeed-vault-powered-player-2-1600",
+    "room": "crossfeed-vault",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 2581.0098560997276,
+      "y": 572.9999999998996,
+      "zoom": 1.0513513513482393
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": true,
+      "relayGates": true,
+      "codePlatformA": true,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "polish-crossfeed-vault-powered-player-2-1024",
+    "room": "crossfeed-vault",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 2581.0122866966635,
+      "y": 572.9999999999997,
+      "zoom": 0.8238984822708365
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": true,
+      "relayGates": true,
+      "codePlatformA": true,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "polish-race-dormant-1600",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3419.0745501285337,
+      "y": 635.6187359918995,
+      "zoom": 1.05135135135135
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": false,
+      "displayed": false,
+      "hint": "",
+      "groundId": "right-deck",
+      "latchSounds": 5
+    }
+  },
+  {
+    "name": "polish-race-dormant-1024",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3387.9989830557533,
+      "y": 642.9973711337286,
+      "zoom": 0.8242651792929039
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": false,
+      "displayed": false,
+      "hint": "",
+      "groundId": "right-deck",
+      "latchSounds": 5
+    }
+  },
+  {
+    "name": "polish-race-ready-1600",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3419.0703952607737,
+      "y": 452.9794579133494,
+      "zoom": 1.0513456107075285
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": false,
+      "displayed": false,
+      "hint": "E \u00b7 COMMIT",
+      "groundId": "commit-ledge",
+      "latchSounds": 5
+    }
+  },
+  {
+    "name": "polish-race-ready-1024",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3558.5657583592933,
+      "y": 452.9999926838549,
+      "zoom": 0.8239005283136973
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": false,
+      "displayed": false,
+      "hint": "E \u00b7 COMMIT",
+      "groundId": "commit-ledge",
+      "latchSounds": 5
+    }
+  },
+  {
+    "name": "polish-race-completed-1600",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3418.663158953571,
+      "y": 453.0002598909233,
+      "zoom": 1.0507832497642302
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": true,
+      "displayed": true,
+      "hint": "COMMITTED",
+      "groundId": "commit-ledge",
+      "latchSounds": 6
+    }
+  },
+  {
+    "name": "polish-race-completed-1024",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3558.837268825056,
+      "y": 453.00000009256115,
+      "zoom": 0.8242606555476052
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": true,
+      "displayed": true,
+      "hint": "COMMITTED",
+      "groundId": "commit-ledge",
+      "latchSounds": 6
+    }
+  },
+  {
+    "name": "polish-race-departure-player-1-1600",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3419.046944001611,
+      "y": 553.8913654692997,
+      "zoom": 1.0513132100512828
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": true,
+      "displayed": true,
+      "hint": "",
+      "groundId": "right-deck",
+      "latchSounds": 6
+    }
+  },
+  {
+    "name": "polish-race-departure-player-1-1024",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3558.842051587347,
+      "y": 642.9682379710842,
+      "zoom": 0.8242670021504159
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": true,
+      "displayed": true,
+      "hint": "",
+      "groundId": "right-deck",
+      "latchSounds": 6
+    }
+  },
+  {
+    "name": "polish-race-departure-player-2-1600",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3419.0745501285337,
+      "y": 643.0000000000003,
+      "zoom": 1.05135135135135
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": true,
+      "displayed": true,
+      "hint": "E \u00b7 put down cube",
+      "groundId": "right-deck",
+      "latchSounds": 6
+    }
+  },
+  {
+    "name": "polish-race-departure-player-2-1024",
+    "room": "race-condition",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3558.8406779002607,
+      "y": 643.0000000000003,
+      "zoom": 0.8242651792929038
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    },
+    "commit": {
+      "accepted": true,
+      "displayed": true,
+      "hint": "E \u00b7 put down cube",
+      "groundId": "right-deck",
+      "latchSounds": 6
+    }
+  },
+  {
+    "name": "polish-deadlock-powered-player-1-1600",
+    "room": "deadlock",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 976.4194942705834,
+      "y": 772.994873319051,
+      "zoom": 1.0512268063885364
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-deadlock-powered-player-1-1024",
+    "room": "deadlock",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 977.6909414499976,
+      "y": 773.1727238357014,
+      "zoom": 0.8242612932376052
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-deadlock-powered-player-2-1600",
+    "room": "deadlock",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:safe",
+      "frame": {
+        "x": 550,
+        "y": 2400,
+        "w": 1100,
+        "h": 640,
+        "padding": 70
+      },
+      "x": 997.9434447300777,
+      "y": 2710.0000000000005,
+      "zoom": 0.9974358974358981
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-deadlock-powered-player-2-1024",
+    "room": "deadlock",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:safe",
+      "frame": {
+        "x": 550,
+        "y": 2400,
+        "w": 1100,
+        "h": 640,
+        "padding": 70
+      },
+      "x": 1097.773285628323,
+      "y": 2707.5757696612723,
+      "zoom": 0.8230888284375228
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-use-after-free-powered-player-1-1600",
+    "room": "use-after-free",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:assist",
+      "frame": {
+        "x": 1270,
+        "y": 800,
+        "w": 480,
+        "h": 550,
+        "padding": 60
+      },
+      "x": 1039.0745501285337,
+      "y": 1074.9999694735816,
+      "zoom": 1.05135135135135
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-use-after-free-powered-player-1-1024",
+    "room": "use-after-free",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:assist",
+      "frame": {
+        "x": 1270,
+        "y": 800,
+        "w": 480,
+        "h": 550,
+        "padding": 60
+      },
+      "x": 1178.8406779002612,
+      "y": 1074.9999996607294,
+      "zoom": 0.824265179292904
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-use-after-free-powered-player-2-1600",
+    "room": "use-after-free",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:assist",
+      "frame": {
+        "x": 1270,
+        "y": 800,
+        "w": 480,
+        "h": 550,
+        "padding": 60
+      },
+      "x": 1039.0745500640248,
+      "y": 1074.9642000457998,
+      "zoom": 1.0513513512622197
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "polish-use-after-free-powered-player-2-1024",
+    "room": "use-after-free",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:assist",
+      "frame": {
+        "x": 1270,
+        "y": 800,
+        "w": 480,
+        "h": 550,
+        "padding": 60
+      },
+      "x": 1178.8406778995152,
+      "y": 1074.999602477358,
+      "zoom": 0.8242651792919142
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  }
+]

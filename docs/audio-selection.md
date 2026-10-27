@@ -7,6 +7,16 @@ recordings and the solo tutorial recording retain their exact bytes, metadata,
 scene assignments and playback gains. The current contract follows immediately;
 the earlier selection rounds below are historical.
 
+**2026-10-27 review pending:** human playtesting requested a quieter CROSSFEED
+choice. [Shadow (dark, light and original), PYNCHON and Loaben](playtest/2026-10-27-crossfeed-listening/index.html)
+are prepared beside the unchanged Algate reference, with loop-ready previews
+and separate seam excerpts. All candidates are James Gargette/cinameng CC0
+recordings from their linked OpenGameArt pages. The comparison starts at the new
+25% Music default; source hashes, exact edits and loudness measurements are in
+its [manifest](playtest/2026-10-27-crossfeed-listening/manifest.json).
+No replacement is approved: every runtime track, including Through the Sewers,
+and the runtime catalogue remain byte-for-byte unchanged.
+
 ## Human-approved recordings and preparation
 
 The user chose these tracks by listening. No further candidate ranking or

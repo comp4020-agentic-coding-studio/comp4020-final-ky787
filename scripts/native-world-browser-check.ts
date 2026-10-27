@@ -89,7 +89,13 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
     const view = await native(p), paints = await painted(p), expanded = view.panels.filter(panel => panel.expanded);
     const cargo = chamber === 'race-condition' ? await p.read<GameSnapshot['raceCargo']>('binaryNinja.snapshot().raceCargo') : null;
     const machinery = chamber === 'race-condition' ? await p.read<GameSnapshot['raceMachinery']>('binaryNinja.snapshot().raceMachinery') : null;
-    const environment = chamber in ENVIRONMENTAL_BLOCKS ? await p.read<GameSnapshot['environmentalAssembly']>('binaryNinja.snapshot().environmentalAssembly') : null;
+    // Read visibility and its camera in one browser turn. Separate CDP reads
+    // can straddle the transition from overview or a desktop viewport resize.
+    const environmentFrame = chamber in ENVIRONMENTAL_BLOCKS ? await p.read<{
+        assembly: GameSnapshot['environmentalAssembly']; visible: { x: number; y: number; w: number; h: number; zoom: number };
+    }>(`(()=>{const c=binaryNinja.renderer.camera;return {assembly:binaryNinja.snapshot().environmentalAssembly,
+        visible:{x:c.originX(),y:c.originY(),w:c.viewW/c.zoom,h:c.viewH/c.zoom,zoom:c.zoom}}})()`) : null;
+    const environment = environmentFrame?.assembly ?? null;
     check(`${label}: own specimen loaded`, view.chamber === chamber && view.status === 'ready' && view.specimen === source.evidence.specimen_id);
     check(`${label}: retained world provenance matches acquired instructions and recorded output stores`, (view.panels.length > 0 || !!environment?.sections.length || cargo?.visible === true && cargo.sections.length === 4 || machinery?.sections.some(s => s.visible) === true) && view.panels.every(panel => {
         const output = source.evidence.outputs.find(output => output.name === panel.output);
@@ -127,7 +133,7 @@ async function verify(p: Cdp, chamber: string, label: string, requireExpanded = 
                 && section.message === `${place.label} ${expected.physical ? place.on : place.off}`
                 && section.colour === ((place.hazard ? !expected.physical : expected.physical) ? '#77ba9e' : '#ca817e');
         }));
-        const visible = await p.read<{ x: number; y: number; w: number; h: number; zoom: number }>('(()=>{const c=binaryNinja.renderer.camera;return{x:c.originX(),y:c.originY(),w:c.viewW/c.zoom,h:c.viewH/c.zoom,zoom:c.zoom}})()');
+        const visible = environmentFrame!.visible;
         check(`${label}: culling uses each fixed rectangle without moving it`, environment.sections.every(section => {
             const b = section.bounds;
             return section.visible === (b.x < visible.x + visible.w && b.x + b.w > visible.x && b.y < visible.y + visible.h && b.y + b.h > visible.y);
@@ -206,7 +212,10 @@ async function capture(p: Cdp, chamber: string, name: string, camera?: { x: numb
 async function narrow(p: Cdp, chamber: string, name: string, camera?: { x: number; y: number; zoom: number }) {
     await p.send('Emulation.setDeviceMetricsOverride', { width: 1024, height: 768, deviceScaleFactor: 1, mobile: false });
     try { await sleep(350); await capture(p, chamber, `${name}-1024`, camera, !!camera); }
-    finally { await p.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false }); }
+    finally {
+        await p.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false });
+        await sleep(350);
+    }
 }
 async function inspectEnvironment(p: Cdp) {
     const data = JSON.parse(await readFile('public/evidence/coop/handshake.environment.json', 'utf8')) as EnvironmentalArtifact;
@@ -263,10 +272,14 @@ try {
         && (await snapshot(b)).multiplayer?.shared?.profiles?.map(p => p?.name).join(',') === 'ShadowByte,ZeroDay');
     await choose(a, b, 'handshake');
     await sleep(900); await capture(a, 'handshake', 'handshake-overview', undefined, false);
+    await narrow(a, 'handshake', 'handshake-overview');
     check('overview retains fixed environmental code without replacement name tags', (await native(a)).panels.length === 0
         && (await a.read<GameSnapshot['environmentalAssembly']>('binaryNinja.snapshot().environmentalAssembly')).detail === 'environmental');
     await start(a, b);
-    for (const [index, p] of [a, b].entries()) await capture(p, 'handshake', `handshake-ordinary-player-${index + 1}`, undefined, false);
+    for (const [index, p] of [a, b].entries()) {
+        await capture(p, 'handshake', `handshake-ordinary-player-${index + 1}`, undefined, false);
+        await narrow(p, 'handshake', `handshake-ordinary-player-${index + 1}`);
+    }
     await capture(a, 'handshake', 'handshake-crossing-inactive', { x: 930, y: 770, zoom: .95 });
     check('initial crossing has a confirmed inactive native output', (await a.read<GameSnapshot['environmentalAssembly']>('binaryNinja.snapshot().environmentalAssembly')).sections.some(panel => panel.output === 'crossingPower' && panel.raw === false));
     await h.walk(b, 1150);
@@ -297,14 +310,17 @@ try {
         ] as const;
         for (const { chamber, views } of reviews) {
             await choose(a, b, chamber); await sleep(900);
-            await capture(a, chamber, `${chamber}-overview`, undefined, false); await start(a, b);
-            for (const [index, p] of [a, b].entries()) await capture(p, chamber, `${chamber}-ordinary-player-${index + 1}`, undefined, false);
+            await capture(a, chamber, `${chamber}-overview`, undefined, false);
+            await narrow(a, chamber, `${chamber}-overview`); await start(a, b);
+            for (const [index, p] of [a, b].entries()) {
+                await capture(p, chamber, `${chamber}-ordinary-player-${index + 1}`, undefined, false);
+                await narrow(p, chamber, `${chamber}-ordinary-player-${index + 1}`);
+            }
             for (const [name, x, y, zoom] of views) await capture(a, chamber, name, { x, y, zoom });
             if (chamber in ENVIRONMENTAL_BLOCKS) {
                 const [name, x, y, zoom] = views[0];
                 await capture(a, chamber, `${name}-pan-zoom`, { x: x + 140, y: y + 70, zoom: .65 }, false);
                 await narrow(a, chamber, name, { x, y, zoom });
-                await narrow(b, chamber, `${chamber}-ordinary-player-2`);
             }
         }
     }

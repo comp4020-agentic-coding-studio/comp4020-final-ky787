@@ -528,6 +528,9 @@ body.menu-screen #coop-hud { visibility:hidden; }
 .pause-settings { border-top:1px solid #304a59; padding-top:16px; margin-top:22px; }
 .pause-settings .audio-settings { margin-top:12px; padding:10px; gap:10px; }
 .pause-settings .audio-settings button { font-size:10px; padding:8px; }
+.pause-card .pause-settings { border:0; padding:0; margin:14px 0; }
+.pause-card .audio-settings { margin:0; padding:9px 10px; gap:6px 12px; }
+.pause-card .audio-settings input { margin:0; min-height:20px; }
 .pause-hint { font:9px/1.6 ui-monospace,monospace; color:#7c99a7; text-align:center; margin:19px 0 0; }
 .party-card { width:min(780px,calc(100% - 32px)); padding:25px 30px; }
 .party-card h2 { font-size:34px; margin:15px 0 20px; }
@@ -555,9 +558,9 @@ body.menu-screen #coop-hud { visibility:hidden; }
 .party-card .pause-settings { margin-top:14px; padding-top:12px; }
 .party-card .fine { font-size:10px; line-height:1.6; margin:12px 0; }
 .party-pause-card { width:min(390px,calc(100% - 32px)); }
-.party-pause-card h2 { font-size:29px; line-height:1.16; margin-bottom:21px; overflow-wrap:anywhere; }
+.party-pause-card h2 { font-size:29px; line-height:1.16; margin-bottom:14px; overflow-wrap:anywhere; }
 .party-pause-card #party-status { font:10px/1.6 ui-monospace,monospace; }
-.party-pause-card .party-invitation { margin:18px 0; }
+.party-pause-card .party-invitation { margin:12px 0; }
 .party-pause-card .party-code { column-gap:8px; font-size:9px; }
 .party-pause-card .party-code strong { font-size:21px; letter-spacing:3px; }
 .party-pause-card .party-code button { font-size:9px; padding:8px; }

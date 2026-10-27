@@ -132,6 +132,17 @@ on the accepted held payload, then makes a normal second jump to the 190-unit
 ledge. A floor jump or a resting 44-unit cube is insufficient. The ledge has no
 hookable anchor. COMMIT is a visibly distinct one-shot terminal.
 
+COMMIT shares HANDSHAKE's floating screen/industrial pad renderer in
+`src/slice/maintenance-render.ts`, including four short signal filaments and
+reduced-motion handling. The existing authority hint `E · COMMIT` selects cyan
+ready; otherwise the uncommitted object stays muted. Accepted
+`levelState.inputs.finalControl`, exposed as `world.inputs.switchC`, selects the
+green checkmark, seated pad and closed catches. The fixed caption sits left of
+the control to clear the exit header. Position, grounded interaction range,
+cube priority and one-time confirmation audio remain the authority's existing
+rules. `BN_POLISH_REVIEW=1 pnpm check:campaign` captures these states through
+real movement and checks that a repeated E neither releases nor replays COMMIT.
+
 `exitCandidate = finalControl AND payloadDelivered`. The server permanently
 latches exit unlock when both are true; later cargo removal cannot close it.
 Both distinct players must then physically enter. One arrival never completes.

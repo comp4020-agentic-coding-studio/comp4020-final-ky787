@@ -25,10 +25,11 @@ export function partyMenu(room: SharedRoom, slot: Slot, connected: boolean, view
         <span class="eyebrow">CO-OP / PAUSED</span><h2>${level.title}</h2>
         <p id="party-status" role="status">${status}</p>
         <button id="continue" class="primary">RESUME</button>
+        <div class="pause-settings"><div id="party-audio"></div></div>
+        <button id="leave-coop">LEAVE PARTY / MAIN MENU</button>
         ${invitationControls(room.code)}
         ${host ? '<button id="choose-chamber" class="secondary">CHOOSE CHAMBER</button>' : ''}
-        <button id="leave-coop">LEAVE PARTY / MAIN MENU</button>
-        <details class="pause-settings"><summary>Sound settings</summary><div id="party-audio"></div></details>
+        <p class="pause-hint">ESC or click outside to resume</p>
     </div>`;
     return `<div class="menu-card party-card" ${view === 'victory' ? 'id="party-victory"' : 'id="party-menu"'}>
         <span class="eyebrow">${view === 'victory' ? 'CHAMBER CLEARED' : 'CO-OP CAMPAIGN'}</span>

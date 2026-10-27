@@ -71,7 +71,7 @@ export function settingsMenu(audioMarkup = '', resetMarkup = '', labsMarkup = ''
 }
 
 export function soloPauseMenu(roomTitle: string, audioMarkup: string, restartAllowed = true): string {
-    return `<section class="menu-card pause-card" aria-labelledby="pause-title"><span class="eyebrow">TAKE A BREATHER</span><h2 id="pause-title">Paused.</h2><p class="pause-room">${escape(roomTitle)}</p><button id="continue" class="primary" type="button">Resume <span aria-hidden="true">→</span></button>${restartAllowed ? '<button id="restart-room" type="button">Restart Room</button>' : ''}<button id="main-menu" type="button">Main Menu</button><details class="pause-settings"><summary>Sound settings</summary>${audioMarkup}</details><p class="pause-hint">ESC or click outside to resume</p></section>`;
+    return `<section class="menu-card pause-card" aria-labelledby="pause-title"><span class="eyebrow">TAKE A BREATHER</span><h2 id="pause-title">Paused.</h2><p class="pause-room">${escape(roomTitle)}</p><button id="continue" class="primary" type="button">Resume <span aria-hidden="true">→</span></button><div class="pause-settings">${audioMarkup}</div><button id="main-menu" type="button">Main Menu</button>${restartAllowed ? '<button id="restart-room" type="button">Restart Room</button>' : ''}<p class="pause-hint">ESC or click outside to resume</p></section>`;
 }
 
 export function connectionMenu(): string {

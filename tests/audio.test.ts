@@ -60,14 +60,14 @@ it('mute/zero volume stop voices immediately and browser preferences survive a n
     const { audio, storage } = engine(); await audio.unlock(); audio.setActive(true); audio.setLoop('liftHum', 1);
     audio.setPreferences({ muted: true, volume: .3 });
     expect(audio.snapshot().voices).toBe(0); audio.play('hookFire'); expect(audio.snapshot().played.hookFire).toBeUndefined();
-    expect(new GameAudio({ storage }).getPreferences()).toEqual({ volume: .3, musicVolume: .35, muted: true });
+    expect(new GameAudio({ storage }).getPreferences()).toEqual({ volume: .3, musicVolume: .25, muted: true });
     audio.setPreferences({ muted: false, volume: 0 }); audio.setLoop('liftHum', 1); expect(audio.snapshot().loops).toEqual([]);
-    expect(JSON.parse(storage.getItem()!)).toEqual({ muted: false, volume: 0, musicVolume: .35 });
+    expect(JSON.parse(storage.getItem()!)).toEqual({ muted: false, volume: 0, musicVolume: .25 });
     expect(AUDIO_STORAGE_KEY).toContain('audio');
 });
 it('invalid preferences, unavailable storage, failed downloads and blocked audio never break gameplay', async () => {
     expect(engine('oops').audio.getPreferences().volume).toBe(.65);
-    expect(engine('{"volume":99,"muted":"yes"}').audio.getPreferences()).toEqual({ volume: 1, musicVolume: .35, muted: false });
+    expect(engine('{"volume":99,"muted":"yes"}').audio.getPreferences()).toEqual({ volume: 1, musicVolume: .25, muted: false });
     const audio = new GameAudio({ context: () => { throw new Error('Unsupported'); }, storage: {
         getItem: () => { throw new Error('Unavailable'); }, setItem: () => { throw new Error('Unavailable'); } } });
     await expect(audio.unlock()).resolves.toBeUndefined(); expect(() => audio.setPreferences({ volume: .5 })).not.toThrow();
@@ -79,10 +79,12 @@ it('invalid preferences, unavailable storage, failed downloads and blocked audio
 });
 
 it('migrates legacy effect preferences and independently persists finite music and effects levels', () => {
+    expect(engine().audio.getPreferences()).toEqual({ volume: .65, musicVolume: .25, muted: false });
+    expect(engine('{"volume":0.65,"musicVolume":0.35,"muted":false}').audio.getPreferences().musicVolume).toBe(.35);
     expect(engine('{"volume":0,"muted":false}').audio.getPreferences()).toEqual({ volume: 0, musicVolume: 0, muted: false });
     expect(engine('{"volume":0,"musicVolume":0.4,"muted":false}').audio.getPreferences()).toEqual({ volume: 0, musicVolume: .4, muted: false });
     const { audio, storage } = engine('{"volume":0.23,"muted":true}');
-    expect(audio.getPreferences()).toEqual({ volume: .23, musicVolume: .35, muted: true });
+    expect(audio.getPreferences()).toEqual({ volume: .23, musicVolume: .25, muted: true });
     audio.setPreferences({ musicVolume: .18 });
     expect(audio.getPreferences()).toEqual({ volume: .23, musicVolume: .18, muted: true });
     audio.setPreferences({ volume: .7 });

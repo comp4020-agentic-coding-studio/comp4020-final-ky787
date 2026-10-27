@@ -72,8 +72,8 @@ describe('streaming music scenes', () => {
         const outgoing = audible()[0]; outgoing.currentTime = 34;
         player.setScene('handshake'); await flush(); advance(1000);
         expect(audible()).toHaveLength(2);
-        expect(outgoing.volume).toBeCloseTo(.21);
-        expect(audible().find(element => element !== outgoing)?.volume).toBeCloseTo(.175);
+        expect(outgoing.volume).toBeCloseTo(.25 * 1.2 * .5);
+        expect(audible().find(element => element !== outgoing)?.volume).toBeCloseTo(.25 * .5);
         expect(outgoing.currentTime).toBe(34);
         advance(1000);
         expect(audible()).toHaveLength(1);

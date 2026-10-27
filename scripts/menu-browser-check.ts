@@ -19,6 +19,25 @@ async function outside(p: Cdp) {
     for (const type of ['mousePressed', 'mouseReleased']) await p.send('Input.dispatchMouseEvent', { type, x: 15, y: 120, button: 'left', buttons: type === 'mousePressed' ? 1 : 0, clickCount: 1 });
     await h.sleep(100);
 }
+async function pauseAudio(p: Cdp, name: string) {
+    h.check(`${name}: new-user music is 25% and Effects remains 65%`, await p.read('binaryNinja.audio.getPreferences().musicVolume===.25 && binaryNinja.audio.getPreferences().volume===.65'));
+    for (const [width, height] of [[1600,900],[1024,768]]) {
+        await p.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false }); await h.sleep(150);
+        h.check(`${name} ${width}: both sliders are immediately visible in a compact, unscrolled pause panel`, await p.read(`(()=>{
+            const card=document.querySelector('.pause-card'),r=card.getBoundingClientRect();
+            return r.width<=400&&r.top>=0&&r.bottom<=innerHeight&&card.scrollHeight<=card.clientHeight+1
+                &&['audio-volume','music-volume'].every(id=>{const e=document.getElementById(id),b=e.getBoundingClientRect();
+                    return !e.closest('details')&&b.width>100&&b.top>=r.top&&b.bottom<=r.bottom&&b.left>=r.left&&b.right<=r.right});})()`));
+        await h.shot(p, `${name}-sliders-${width}`);
+    }
+    // Use the real range control's keyboard event, then check the saved preference.
+    await h.click(p, '#music-volume');
+    for (const type of ['rawKeyDown','keyUp']) await p.send('Input.dispatchKeyEvent', { type, key:'End', code:'End', windowsVirtualKeyCode:35 });
+    h.check(`${name}: keyboard changes Music independently while remaining paused`, await p.read('binaryNinja.audio.getPreferences().musicVolume===1 && binaryNinja.audio.getPreferences().volume===.65 && !binaryNinja.started'));
+    for (const type of ['rawKeyDown','keyUp']) await p.send('Input.dispatchKeyEvent', { type, key:'Home', code:'Home', windowsVirtualKeyCode:36 });
+    h.check(`${name}: zero music is persisted without muting Effects`, await p.read(`JSON.parse(localStorage.getItem('binary-ninja/c8-audio/v1')).musicVolume===0 && binaryNinja.audio.getPreferences().volume===.65`));
+    await p.send('Emulation.setDeviceMetricsOverride', { width:1600,height:900,deviceScaleFactor:1,mobile:false });
+}
 try {
     const url = await h.startServer(), browser = await h.launch(), p = await h.page(url, browser);
     await until(p, '!!document.querySelector("#initialize-ninja")');
@@ -65,6 +84,7 @@ try {
     await h.key(p,'KeyD',true); await h.sleep(100); await h.click(p,'#pause');
     h.check('solo pause is compact and contains no character or campaign UI', await p.read('document.querySelector(".pause-card").getBoundingClientRect().width<=400 && !document.querySelector("#customize-ninja,.campaign-select")'));
     await h.shot(p,'solo-pause');
+    await pauseAudio(p, 'solo-pause');
     h.check('pause releases held inputs and silences audio', await p.read('!binaryNinja.input.state.right && !binaryNinja.input.state.grappleHeld && binaryNinja.snapshot().audio.voices===0'));
     await outside(p); await h.key(p,'KeyD',false); await h.sleep(300);
     h.check('outside dismissal resumes same room with canvas focus and no grapple', await p.read('binaryNinja.started && binaryNinja.world.room.id==="pressure" && document.activeElement.id==="stage" && !binaryNinja.input.state.right && binaryNinja.world.player.rope.phase==="idle"'));
@@ -78,6 +98,23 @@ try {
     await escape(p); h.check('Escape cancels reset without discarding progress', await p.read('document.querySelector("#reset-confirmation").hidden && binaryNinja.store.progress.completedRooms.length===2'));
     await escape(p); await p.send('Page.reload'); await until(p,'globalThis.binaryNinja?.snapshot().character.ready');
     h.check('main menu return persists tutorial restart and character', (await h.snapshot(p)).room==='pressure' && (await h.snapshot(p)).character.profile?.colour==='orange');
+    h.check('saved Music choice survives reload rather than reverting to the new default', (await h.snapshot(p)).audio.preferences.musicVolume===0);
+    const guest=await h.page(url,browser); await onboardNinja(guest,'Guest','cyan');
+    await h.click(p,'#create-party'); const lobby=await h.wait(p,'party lobby',s=>s.multiplayer?.shared?.party?.phase==='lobby');
+    await h.click(guest,'#join-code'); await guest.send('Input.insertText',{text:lobby.multiplayer!.code!}); await h.click(guest,'#join-room');
+    await h.wait(p,'guest joins',s=>s.multiplayer?.shared?.connected.every(Boolean)===true);
+    await h.click(p,'[data-select-level="handshake"]');
+    for (const page of [p,guest]) { await h.wait(page,'Handshake overview',s=>s.overviewVisible&&s.room==='handshake'); await h.click(page,'#start-room'); }
+    await h.click(guest,'#pause'); await pauseAudio(guest,'coop-pause');
+    await escape(guest); h.check('co-op Escape resumes after slider keyboard use', (await h.snapshot(guest)).started);
+    await h.click(guest,'#pause'); await outside(guest);
+    h.check('co-op backdrop resumes with canvas focus and no grapple',await guest.read('binaryNinja.started&&document.activeElement.id==="stage"&&binaryNinja.world.player.rope.phase==="idle"'));
+    await h.click(p,'#pause');
+    for (const [width,height] of [[1600,900],[1024,768]]) {
+        await p.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false}); await h.sleep(150);
+        h.check(`host pause ${width} fits with invitation and chamber actions`,await p.read(`(()=>{const c=document.querySelector('.pause-card'),r=c.getBoundingClientRect();return !!document.querySelector('#choose-chamber')&&r.top>=0&&r.bottom<=innerHeight&&c.scrollHeight<=c.clientHeight+1})()`));
+        await h.shot(p,`coop-host-pause-${width}`);
+    }
     for (const page of h.clients) h.check('no browser runtime errors', page.errors.length===0,page.errors.join('\n'));
     await writeFile(join(shots,'checks.txt'), h.checks.join('\n')+'\n');
 } catch(error) { for(const [i,p] of h.clients.entries()) await h.shot(p,`failure-${i}`).catch(()=>{}); await writeFile(join(shots,'checks.txt'),h.checks.join('\n')+'\nFAIL '+error+'\n'); console.error(error); process.exitCode=1; }
