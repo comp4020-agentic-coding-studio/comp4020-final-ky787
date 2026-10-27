@@ -1,4 +1,9 @@
-# CROSSFEED listening comparison — awaiting human selection
+# Historical CROSSFEED listening comparison
+
+The user has now selected **Loaben for HANDSHAKE** and **regular Shadow for
+CROSSFEED VAULT**. See the [final complete masters](../2026-10-27-approved-soundtracks/index.html).
+The comparison and measurements below document the earlier review excerpts;
+their 350 ms cyclic edits are not used in the runtime masters.
 
 Open [the listening page](index.html). It includes the approved DEADLOCK
 **Algate** master, all three **Shadow** versions, **PYNCHON**, **Loaben**, and
@@ -20,7 +25,7 @@ Suggested listening order: Algate, the Shadow variants, Loaben, then PYNCHON.
 This is an order for comparison based on the source descriptions, not an acoustic
 ranking. Human listening should judge steady rhythm, repetition, room for
 conversation/effects, and whether the musical join feels natural over several
-cycles. No candidate has been selected or installed.
+cycles. At the time of this comparison, no candidate had been selected or installed.
 
 Each candidate retains its short source recording with a 350 ms smooth cyclic
 tail/head overlap and constant gain to approximately −23 LUFS. No tempo change,
@@ -40,6 +45,6 @@ python3 -m http.server 8787 --directory docs/playtest/2026-10-27-crossfeed-liste
 Then open `http://localhost:8787/`. The browser review decoded and played all
 eleven files, checked every candidate's native loop wrap, exclusive playback,
 25% initial volume and a 1024-pixel layout. Its [checks](browser-checks.txt) are
-retained. Every runtime music file **and catalogue** was hash-checked unchanged,
-including CROSSFEED's current Through the Sewers. This folder is review-only
+retained. During that review, every runtime music file **and catalogue** was hash-checked unchanged,
+including CROSSFEED's then-current Through the Sewers. This folder is review-only
 and is not loaded by the game.

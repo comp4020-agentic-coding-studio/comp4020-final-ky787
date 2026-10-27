@@ -127,61 +127,54 @@ cooldown, voice-limit and loop-mixing design adapts the original project's
 `src/audio/audio-manager.ts`; buffer playback and this chamber's event adapter
 are new. Sounds are authored game feedback, not retained OLLVM execution evidence.
 
-## Music — refined after human playtest, 2026-10-26
+## Music — final human selections, 2026-10-27
 
 All seven runtime soundtrack files use **CC0 1.0**, verified on their original
-OpenGameArt pages. They total **14,250,748 bytes** and retain the existing
-approximately −23 LUFS mastering target and runtime gains.
+OpenGameArt pages. They total **11,725,794 bytes** and retain the approximately
+−23 LUFS mastering target, existing runtime gains and current Music preferences.
 
 | Scene | Track / author | Original source |
 | --- | --- | --- |
 | Main menu; PRESSURE and SWITCH | Claimed by the Void — vitalezzz | [Original submission](https://opengameart.org/content/claimed-by-the-void) |
-| HANDSHAKE | Kuia — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/kuia) |
-| CROSSFEED VAULT | Through the Sewers — Alexander Ehlers (tricksntraps) | [Original submission](https://opengameart.org/content/t-t-free-cyberpunk-pack-2) |
+| HANDSHAKE | Loaben — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/loaben), [exact MP3](https://opengameart.org/sites/default/files/loaben_3.mp3) |
+| CROSSFEED VAULT | Shadow — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/shadow-2), [regular shadow.mp3 download](https://opengameart.org/sites/default/files/shadow_0.mp3) |
 | RACE CONDITION | Hyperton — Sudocolon | [Original submission](https://opengameart.org/content/hyperton) |
 | DEADLOCK | Algate — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/algate) |
 | USE AFTER FREE | Neural Malfunction — vitalezzz | [Original submission](https://opengameart.org/content/neural-malfunction) |
 | Solo RELAY and CONTROL SPINE (`uplink`) | Celestial Harmony — vitalezzz | [Original submission](https://opengameart.org/content/celestial-harmony) |
 
-The four human-approved recordings (menu, RACE, DEADLOCK and USE AFTER FREE)
-remain byte-for-byte identical, with unchanged mastering, scene assignments and
-gains. `tutorial-relay.ogg` is an exact copy of the previous HANDSHAKE file,
-so changing the first co-op chamber does not change either later solo tutorial.
-PRESSURE/SWITCH still use the menu theme. The existing quieter tutorial mix is
-unchanged. No WATCHDOG level or copyrighted television soundtrack is included.
+The user explicitly approved Loaben for HANDSHAKE and regular Shadow for
+CROSSFEED after listening. Both source pages identify cinameng / James Gargette
+and CC0, verified 2026-10-27. Shadow dark/light were not selected. Kuia and
+Through the Sewers are superseded historical choices.
 
-Human listening tests explicitly selected these recordings. HANDSHAKE uses the
-**complete 47.177-second original Kuia loop**, not the old 24-second comparison.
-CROSSFEED uses a 196.364-second loop from the exact original
-`through_the_sewers_1766bpm.ogg`; the filename does not establish tempo. An
-eight-second cyclic blend joins similar rhythmic envelopes, excluding the sparse
-opening and faded ending. Final levels are **−23.04 LUFS / −6.48 dBTP** and
-**−23.07 LUFS / −11.44 dBTP** respectively. Constant gain preserves dynamics;
-no time stretching, new notes or compression were introduced.
+Both new masters preserve the **complete original recordings**, respectively
+1,582,848 and 2,321,280 samples per channel (35.892245 / 52.636735 seconds).
+Only constant gain (+7.46 / +7.71 dB), a 128-sample-per-side boundary de-click
+(5.8 ms total, without shortening), and stereo 44.1 kHz Vorbis q4 encoding are
+applied. No trimming, cyclic overlap, EQ, compression, pitch/tempo changes,
+new notes or replacement arrangement. The earlier review excerpts are not
+runtime sources. Final levels are −23.01 / −23.03 LUFS integrated and
+−9.16 / −10.83 dBTP.
 
-The [music catalogue](public/audio/music/catalogue.json) records original URLs,
-source/output hashes, author, licence, exact edits, durations, encoded sizes and
-measured loudness. [Selection notes](docs/audio-selection.md) compare additional
-CC0 candidates and document source verification and structural evidence.
-CC0 permits redistribution and adaptation without mandatory attribution;
-artist credits are retained as provenance and courtesy.
+The other five recordings, their catalogue metadata and gains remain unchanged,
+particularly DEADLOCK's Algate. PRESSURE/SWITCH retain the menu theme;
+RELAY/CONTROL SPINE retain the exact Celestial Harmony tutorial file and quieter
+solo mix. The 25% new-user Music default, all saved volume preferences, Effects,
+mute, crossfades, loop playback and ducking are unchanged.
 
-The [current listening page](docs/playtest/2026-10-26-approved-audio/index.html)
-plays the complete runtime loops and separate seam excerpts. The
-[previous A/B page](docs/playtest/2026-10-26-audio-refinement/index.html) is a
-historical comparison containing Tower Defense Theme, Jumping Cyborg and the
-24-second Kuia alternative; it is not the runtime soundtrack. Review-only
-excerpts are outside the runtime bundle. The retired CROSSFEED
-source, [Stop For A Moment](https://opengameart.org/content/stop-for-a-moment) by
-vitalezzz, remains credited in the review provenance; the original full master
-stays outside the bundle. The [earlier montage](docs/playtest/2026-10-26-audio/music-review.ogg)
-is a historical record of the first selection.
+The [catalogue](public/audio/music/catalogue.json) records source/download URLs,
+source/output hashes, licenses, sample counts and measured levels. The
+[selection notes](docs/audio-selection.md) and
+[preservation report](docs/playtest/2026-10-27-approved-soundtracks/verification.json)
+record exact identity and reproducibility. CC0 permits redistribution and
+adaptation without mandatory attribution; credits remain as provenance and
+courtesy. Source masters stay in the external cache.
 
-[prepare-music.py](scripts/prepare-music.py) now rebuilds only the two replacements
-and their seam excerpts from pinned originals; it verifies and refuses to
-rewrite approved tracks or the preserved tutorial recording. Source masters
-remain in the external cache. Audio playback, licence verification and signal
-analysis were checked programmatically. The selections come from the user's
-listening tests; the agent cannot hear this environment's audio and does not
-claim a subjective audition. The final loop edits and landing mix remain
-available for human listening in the review page and live game.
+[prepare-music.py](scripts/prepare-music.py) rebuilds only the two selected
+recordings from hash-pinned originals and verifies the other five before and
+after preparation. Two builds produced identical bytes. The
+[current playback page](docs/playtest/2026-10-27-approved-soundtracks/index.html)
+contains the full runtime masters and separate seam checks; dated earlier
+listening pages remain historical. Human listening made the final selections;
+programmatic analysis checked identity, timing, levels and playback only.

@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-27",
+  "method": "Last four seconds followed by first four of each final runtime loop, at the runtime master level. Only preview start/stop edges fade 15 ms. Full originals were used for runtime generation, not these excerpts.",
+  "clips": [
+    {
+      "scene": "handshake",
+      "file": "handshake-seam.ogg",
+      "sha256": "dd1658fec528697d4cd13e47e1d434ae49a6899df44825a92709ae66ce5c211c",
+      "bytes": 126387,
+      "duration": 8,
+      "excerptStartSeconds": null,
+      "sequence": "last4s,first4s",
+      "constantGainDb": 0,
+      "runtimeMasterLevelPreserved": true,
+      "reviewFadeMilliseconds": 15,
+      "integratedLufs": -22.13,
+      "truePeakDbtp": -9.87,
+      "loudnessRangeLu": 3.2
+    },
+    {
+      "scene": "crossfeed-vault",
+      "file": "crossfeed-vault-seam.ogg",
+      "sha256": "e0e0b619df691f05c5fd077b5cd29766deeecb5bcc2103a7807bccd1fd014d26",
+      "bytes": 85736,
+      "duration": 8,
+      "excerptStartSeconds": null,
+      "sequence": "last4s,first4s",
+      "constantGainDb": 0,
+      "runtimeMasterLevelPreserved": true,
+      "reviewFadeMilliseconds": 15,
+      "integratedLufs": -24.93,
+      "truePeakDbtp": -11.7,
+      "loudnessRangeLu": 4.5
+    }
+  ]
+}

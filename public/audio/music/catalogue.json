@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-26",
+  "verifiedAt": "2026-10-27",
   "license": "CC0-1.0",
   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
   "reviewMethod": "Explicit human listening selections. Source licensing and decoded loop/loudness checks by the agent; no claim of agent acoustic audition.",
@@ -49,77 +49,79 @@
     {
       "file": "handshake.ogg",
       "scene": "handshake",
-      "title": "Kuia",
+      "title": "Loaben",
       "author": "James Gargette (cinameng)",
-      "source": "https://opengameart.org/content/kuia",
-      "download": "https://opengameart.org/sites/default/files/kuia.mp3",
+      "source": "https://opengameart.org/content/loaben",
+      "download": "https://opengameart.org/sites/default/files/loaben_3.mp3",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceSha256": "11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e",
-      "sha256": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
-      "bytes": 554860,
-      "duration": 47.177143,
-      "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
+      "sourceSha256": "9fdc98717a1e40393e79d44e177c7ebb13ff07663985ddf67cd157460bf6cd7c",
+      "sha256": "659f242908acc04d5ebf37b0fb16d9c8919cd1829d84732883c38ee6e9ccb691",
+      "bytes": 561613,
+      "duration": 35.892245,
+      "processing": "Complete original recording and sample count; constant gain to -23 LUFS; 128-sample wrap de-click per side (5.8 ms total), preserving cycle length; stereo 44.1 kHz Vorbis quality 4. No trimming, cyclic overlap, EQ, compression, time-stretching or added notes.",
       "edits": {
-        "sourceDecodedSamples": 2080512,
+        "sourceDecodedSamples": 1582848,
         "fullOriginalRecording": true,
         "nativeAuthorLoopPreserved": true,
         "trimStartSample": 0,
-        "trimEndSampleExclusive": 2080512,
+        "trimEndSampleExclusive": 1582848,
+        "cyclicCrossfadeSamples": 0,
+        "timeStretch": false,
         "boundaryDeclickSamplesPerSide": 128,
-        "filter": "highpass=f=28,lowpass=f=14000",
-        "constantGainDb": 0.51,
+        "filter": null,
+        "constantGainDb": 7.46,
         "dynamicCompression": false,
-        "finalBoundaryDeclickSamplesPerSide": 128,
-        "encodedSamples": 2080512
+        "finalBoundaryDeclickSamplesPerSide": 0,
+        "encodedSamples": 1582848
       },
-      "integratedLufs": -23.04,
-      "truePeakDbtp": -6.48,
-      "loudnessRangeLu": 0.7,
+      "integratedLufs": -23.01,
+      "truePeakDbtp": -9.16,
+      "loudnessRangeLu": 1.3,
       "loopAnalysis": {
         "longestSilenceBelowMinus60DbSeconds": 0.0,
-        "decodedBoundaryJump": 0.00264567,
-        "firstQuarterSecondRmsDb": -22.175,
-        "lastQuarterSecondRmsDb": -25.906
+        "decodedBoundaryJump": 0.0001893,
+        "firstQuarterSecondRmsDb": -20.027,
+        "lastQuarterSecondRmsDb": -30.448
       }
     },
     {
       "file": "crossfeed-vault.ogg",
       "scene": "crossfeed-vault",
-      "title": "Through the Sewers",
-      "author": "Alexander Ehlers (tricksntraps)",
-      "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
-      "download": "https://opengameart.org/sites/default/files/through_the_sewers_1766bpm.ogg",
+      "title": "Shadow",
+      "author": "James Gargette (cinameng)",
+      "source": "https://opengameart.org/content/shadow-2",
+      "download": "https://opengameart.org/sites/default/files/shadow_0.mp3",
       "license": "CC0-1.0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourceSha256": "a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99",
-      "sha256": "7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6",
-      "bytes": 3058280,
-      "duration": 196.364172,
-      "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
+      "sourceSha256": "e76a74cd3e163d349ce64d7ee4e0567c5711c8234afc9c5dc5a8b4421e9f4004",
+      "sha256": "4513cf1301894d113c7a0acb031ab1600f253c1140e801f58b3d0d68f225af76",
+      "bytes": 526573,
+      "duration": 52.636735,
+      "processing": "Complete original recording and sample count; constant gain to -23 LUFS; 128-sample wrap de-click per side (5.8 ms total), preserving cycle length; stereo 44.1 kHz Vorbis quality 4. No trimming, cyclic overlap, EQ, compression, time-stretching or added notes.",
       "edits": {
-        "sourceDecodedSamples": 12569596,
-        "trimStartSample": 1940400,
-        "trimEndSampleExclusive": 10952860,
-        "cyclicCrossfadeSamples": 352800,
-        "tempoBpm": null,
-        "tempoEvidence": "No verified tempo; 1766bpm is only part of the original filename.",
-        "seamSelection": "Eight-second overlap: 44.000s head and 240.364172s tail, selected by low/mid/high transient-envelope correlation (mean cosine similarity 0.664). No tempo assumption or time stretching.",
+        "sourceDecodedSamples": 2321280,
+        "fullOriginalRecording": true,
+        "nativeAuthorLoopPreserved": true,
+        "trimStartSample": 0,
+        "trimEndSampleExclusive": 2321280,
+        "cyclicCrossfadeSamples": 0,
+        "timeStretch": false,
         "boundaryDeclickSamplesPerSide": 128,
-        "filter": "highpass=f=28,lowpass=f=14000",
-        "constantGainDb": -15.34,
+        "filter": null,
+        "constantGainDb": 7.71,
         "dynamicCompression": false,
-        "finalBoundaryDeclickSamplesPerSide": 128,
-        "encodedSamples": 8659660
+        "finalBoundaryDeclickSamplesPerSide": 0,
+        "encodedSamples": 2321280
       },
-      "integratedLufs": -23.07,
-      "truePeakDbtp": -11.44,
-      "loudnessRangeLu": 5.2,
+      "integratedLufs": -23.03,
+      "truePeakDbtp": -10.83,
+      "loudnessRangeLu": 5.9,
       "loopAnalysis": {
         "longestSilenceBelowMinus60DbSeconds": 0.0,
-        "decodedBoundaryJump": 0.00021786,
-        "firstQuarterSecondRmsDb": -26.274,
-        "lastQuarterSecondRmsDb": -25.265
+        "decodedBoundaryJump": 0.00381363,
+        "firstQuarterSecondRmsDb": -38.685,
+        "lastQuarterSecondRmsDb": -25.711
       }
     },
     {
@@ -288,9 +290,9 @@
       }
     }
   ],
-  "totalBytes": 14250748,
+  "totalBytes": 11725794,
   "feedbackRevision": {
-    "date": "2026-10-26",
+    "date": "2026-10-27",
     "replacedScenes": [
       "handshake",
       "crossfeed-vault"
@@ -302,6 +304,6 @@
       "use-after-free": "d6f35d5d59662380eaa5b6cb1a9cd594d519041b79bbf4165afa5b80ca07e3b9",
       "tutorial-relay": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab"
     },
-    "selection": "Explicit human listening selections: complete Kuia and Through the Sewers."
+    "selection": "Final human listening selections: complete Loaben for HANDSHAKE and complete regular Shadow (shadow_0.mp3) for CROSSFEED VAULT."
   }
 }

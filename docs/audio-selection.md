@@ -1,90 +1,72 @@
-# Binary Ninja soundtrack selection — 2026-10-26
+# Binary Ninja soundtrack selections — 2026-10-27
 
-**Current revision: explicit human listening selections, 2026-10-26.**
-HANDSHAKE uses **Kuia** and CROSSFEED VAULT uses **Through the Sewers**.
-Seven runtime files total **14,250,748 bytes (14.25 MB)**. All four protected
-recordings and the solo tutorial recording retain their exact bytes, metadata,
-scene assignments and playback gains. The current contract follows immediately;
-the earlier selection rounds below are historical.
+**Final human listening decisions:** HANDSHAKE uses **Loaben** and CROSSFEED
+VAULT uses **Shadow**, both by James Gargette (cinameng). Shadow is the regular
+`shadow.mp3` recording, downloaded as `shadow_0.mp3`. The dark/light versions
+and the earlier review edits are not runtime sources. These selections replace
+Kuia and Through the Sewers respectively; no further candidate ranking applies.
 
-**2026-10-27 review pending:** human playtesting requested a quieter CROSSFEED
-choice. [Shadow (dark, light and original), PYNCHON and Loaben](playtest/2026-10-27-crossfeed-listening/index.html)
-are prepared beside the unchanged Algate reference, with loop-ready previews
-and separate seam excerpts. All candidates are James Gargette/cinameng CC0
-recordings from their linked OpenGameArt pages. The comparison starts at the new
-25% Music default; source hashes, exact edits and loudness measurements are in
-its [manifest](playtest/2026-10-27-crossfeed-listening/manifest.json).
-No replacement is approved: every runtime track, including Through the Sewers,
-and the runtime catalogue remain byte-for-byte unchanged.
+## Approved originals and preparation
 
-## Human-approved recordings and preparation
+The source pages and exact downloads were verified on 2026-10-27. Both specify
+[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Original MP3s stay
+in the source cache; only prepared OGG files ship with the game.
 
-The user chose these tracks by listening. No further candidate ranking or
-agent listening judgment is used for this pass. Source pages and direct
-downloads were verified on 2026-10-26. Both pages explicitly specify
-[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/), allowing public
-redistribution and adaptation without mandatory attribution. Credits are kept
-as provenance and courtesy. Original masters remain in an external cache.
-
-| Scene | Human-selected original | Final duration | LUFS-I | True peak | Bytes |
+| Scene | Approved original | Complete duration | LUFS-I | True peak | Bytes |
 | --- | --- | ---: | ---: | ---: | ---: |
-| HANDSHAKE | [Kuia](https://opengameart.org/content/kuia) — James Gargette (cinameng), `kuia.mp3` | 47.177143 s | −23.04 | −6.48 dBTP | 554,860 |
-| CROSSFEED VAULT | [Through the Sewers](https://opengameart.org/content/t-t-free-cyberpunk-pack-2) — Alexander Ehlers (tricksntraps), `through_the_sewers_1766bpm.ogg` | 196.364172 s | −23.07 | −11.44 dBTP | 3,058,280 |
+| HANDSHAKE | [Loaben](https://opengameart.org/content/loaben), [loaben_3.mp3](https://opengameart.org/sites/default/files/loaben_3.mp3) | 35.892245 s | −23.01 | −9.16 dBTP | 561,613 |
+| CROSSFEED VAULT | [Shadow](https://opengameart.org/content/shadow-2), [shadow_0.mp3](https://opengameart.org/sites/default/files/shadow_0.mp3) | 52.636735 s | −23.03 | −10.83 dBTP | 526,573 |
 
-- Kuia retains **all 2,080,512 decoded source samples**, including the complete
-  musical period. The old 24-second comparison excerpt is not used as a source.
-- Through the Sewers uses source samples `[1,940,400, 10,952,860)` at 44.1 kHz,
-  or 44.000–248.364172 s, with an eight-second/352,800-sample equal-power cyclic
-  overlap. Output: 8,659,660 samples. This preserves the central arrangement
-  while removing opening silence/sparse introduction and the faded ending.
-  The tail at 240.364172 s is matched to the head at 44 s by three-band transient
-  envelopes (mean cosine similarity 0.664). That match guides the edit, not track
-  selection. **The unusual filename is not a verified BPM measurement**;
-  `tempoBpm` is null. No time stretching is applied.
-- Both use the existing 28 Hz high-pass / 14 kHz low-pass, constant gain to
-  approximately −23 LUFS, 128-sample wrap de-click per side before and after
-  filtering, stereo 44.1 kHz Vorbis quality 4. Gains are +0.51 dB and −15.34 dB
-  respectively. No compression, new notes or runtime mix changes.
-- Final decoded files have no 100 ms window below −60 dBFS. Boundary jumps are
-  0.002646 and 0.000218 full-scale. These checks detect silence/discontinuities;
-  the agent cannot hear the final musical seam. Both complete loops and seam
-  excerpts are on the [current listening page](playtest/2026-10-26-approved-audio/index.html).
+Both retain their **entire decoded sample count and original musical timing**:
+Loaben 1,582,848 samples per channel; Shadow 2,321,280. Preparation applies a
+constant gain (+7.46/+7.71 dB) and smooths only 128 samples at each end of the
+cyclic boundary (5.8 ms total). Stereo 44.1 kHz Vorbis q4 preserves the full
+cycle length. There is no trimming, cyclic overlap, EQ, compression, pitch or
+tempo change, rearrangement or added notes. The earlier 350 ms-overlapped
+listening previews were not used to build these masters.
+
+Final decoded boundary jumps measure 0.00018930 and 0.00381363 full-scale; neither
+file contains a 100 ms window below −60 dBFS. These are technical continuity
+checks, not an automated music-selection judgment. The user selected the exact
+recordings by listening; the agent does not claim a subjective audition.
 
 | File | Original SHA-256 | Runtime SHA-256 |
 | --- | --- | --- |
-| `handshake.ogg` | `11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e` | `52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d` |
-| `crossfeed-vault.ogg` | `a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99` | `7a2a43c259b95f46cc95e88ea6fb86b45a496e70eb36c1a4a76ff85145457fd6` |
+| `handshake.ogg` | `9fdc98717a1e40393e79d44e177c7ebb13ff07663985ddf67cd157460bf6cd7c` | `659f242908acc04d5ebf37b0fb16d9c8919cd1829d84732883c38ee6e9ccb691` |
+| `crossfeed-vault.ogg` | `e76a74cd3e163d349ce64d7ee4e0567c5711c8234afc9c5dc5a8b4421e9f4004` | `4513cf1301894d113c7a0acb031ab1600f253c1140e801f58b3d0d68f225af76` |
 
-Direct originals: [kuia.mp3](https://opengameart.org/sites/default/files/kuia.mp3),
-[through_the_sewers_1766bpm.ogg](https://opengameart.org/sites/default/files/through_the_sewers_1766bpm.ogg).
-Complete metadata is in the [runtime catalogue](../public/audio/music/catalogue.json).
+The seven runtime tracks now total **11,725,794 bytes (11.73 MB)**. Menu, RACE,
+DEADLOCK's Algate, USE AFTER FREE and `tutorial-relay.ogg` remain byte-for-byte
+unchanged, including their catalogue entries and gains. PRESSURE/SWITCH still
+use the menu theme; RELAY/CONTROL SPINE still use Celestial Harmony at their
+existing quieter solo mix. Music defaults to 25%, Effects to 65%, and all saved
+preferences, mute state, fades and ducking retain their existing behavior.
 
-PRESSURE and SWITCH still use the menu theme. Solo RELAY and CONTROL SPINE
-still use `tutorial-relay.ogg` (Celestial Harmony), hash
-`06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab`.
-`MusicPlayer`, scene gains, crossfades, pause/visibility, preferences and reconnect
-code are unchanged. The [preservation report](playtest/2026-10-26-approved-audio/verification.json)
-records before/after hashes for all runtime audio and retained playback code.
+The [runtime catalogue](../public/audio/music/catalogue.json) contains exact
+source and output metadata. The [current playback page](playtest/2026-10-27-approved-soundtracks/index.html)
+plays the complete runtime masters and separate eight-second tail/head checks
+at the current 25% default. The seam clips keep the masters' levels; only their
+preview start/stop edges fade for 15 ms. They never feed runtime generation.
 
-### Reproduce the current approved assets
-
-Requires Python 3, NumPy, SciPy and FFmpeg/ffprobe. Two runs with FFmpeg
-6.1.1-3ubuntu5 produced identical hashes for both tracks and the landing sample.
+## Reproduction and validation
 
 ```sh
-python3 scripts/prepare-music.py --cache /tmp/bn-approved-audio
-python3 scripts/audio/build-sfx.py --cache /tmp/bn-approved-audio --effects landing.ogg
+python3 scripts/prepare-music.py --cache /tmp/bn-approved-soundtracks
 ```
 
-The music command rebuilds **only the two approved replacements**, plus separate
-eight-second seam excerpts (last four seconds followed by first four, with
-independent preview loudness matching). `--skip-review` omits those excerpts.
-It requires the committed seven-track catalogue and verifies the preserved five
-files before and after processing, without rewriting them or their metadata.
-`--output` and `--review-dir` can redirect outputs. The SFX command above explicitly
-rebuilds **landing only**. Its current default builds the separately human-selected
-Victory recording, documented in [audio credits](../AUDIO_CREDITS.md).
-The runtime does not load any review artifacts.
+Requires Python 3, NumPy, SciPy and FFmpeg/ffprobe. The generator downloads only
+the two pinned selected originals, preserves their exact sample counts, checks
+levels and silence, and refuses to rewrite the other five approved recordings
+or their catalogue metadata. `--skip-review` omits seam previews; `--output` and
+`--review-dir` redirect outputs. Two independent runs with FFmpeg 6.1.1-3ubuntu5
+produced identical runtime files, catalogue and seam outputs. See the
+[preservation and reproducibility report](playtest/2026-10-27-approved-soundtracks/verification.json).
+
+The [October 26 preparation](playtest/2026-10-26-approved-audio/index.html) and
+[October 27 candidate comparison](playtest/2026-10-27-crossfeed-listening/index.html)
+are historical. Their old selection notes and seam/candidate recordings remain
+as provenance; they do not determine the current soundtrack. The detailed
+October 26 current-selection document remains in Git history at `8dc02a7`.
 
 ## Historical initial selection (superseded for HANDSHAKE and CROSSFEED)
 

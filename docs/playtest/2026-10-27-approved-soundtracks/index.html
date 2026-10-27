@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Binary Ninja — final approved soundtracks, 27 October 2026</title>
+<style>
+  :root { color-scheme:dark; font:16px/1.55 system-ui,sans-serif; background:#0b1525; color:#e6edf5 }
+  body { max-width:850px; margin:3rem auto; padding:0 1.25rem }
+  h1 { line-height:1.2; font-size:2rem } h2,a { color:#83e9f5 }
+  section { padding:1rem 1.4rem; margin:1.4rem 0; border:1px solid #30445b; border-radius:12px; background:#112138 }
+  audio { display:block; width:100%; margin:.5rem 0 1rem } label { display:block }
+  small { color:#bac8d8 } code { overflow-wrap:anywhere }
+</style>
+<h1>Binary Ninja · final approved soundtracks</h1>
+<p>27 October 2026. The user selected Loaben for HANDSHAKE and regular Shadow for CROSSFEED VAULT. These players use the complete shipped OGG masters, with their original musical timing.</p>
+<p>Playback begins on request at the current 25% Music default, one recording at a time. Each full recording loops. Seam checks play the last four seconds followed by the first four, crossing the join at 0:04 at the same master level.</p>
+<section>
+  <h2>01 — HANDSHAKE · Loaben</h2>
+  <p>James Gargette (cinameng) · <a href="https://opengameart.org/content/loaben">CC0 source</a> · <a href="https://opengameart.org/sites/default/files/loaben_3.mp3">Original loaben.mp3</a></p>
+  <label for="loaben">Complete recording · 35.892245 s · −23.01 LUFS</label>
+  <audio id="loaben" controls loop preload="metadata" src="../../../public/audio/music/handshake.ogg"></audio>
+  <label for="loaben-seam">Eight-second loop seam check</label>
+  <audio id="loaben-seam" controls preload="none" src="handshake-seam.ogg"></audio>
+</section>
+<section>
+  <h2>02 — CROSSFEED VAULT · Shadow</h2>
+  <p>James Gargette (cinameng) · <a href="https://opengameart.org/content/shadow-2">CC0 source</a> · <a href="https://opengameart.org/sites/default/files/shadow_0.mp3">Original regular shadow.mp3</a></p>
+  <label for="shadow">Complete regular recording · 52.636735 s · −23.03 LUFS</label>
+  <audio id="shadow" controls loop preload="metadata" src="../../../public/audio/music/crossfeed-vault.ogg"></audio>
+  <label for="shadow-seam">Eight-second loop seam check</label>
+  <audio id="shadow-seam" controls preload="none" src="crossfeed-vault-seam.ogg"></audio>
+</section>
+<p><small>Full source sample counts are preserved. Preparation uses constant gain and a 128-sample de-click on each side of the loop boundary (5.8 ms total). No trimming, overlapping cycle, EQ, compression, pitch or tempo change. Earlier comparison excerpts and Shadow variants are not runtime sources. The other five approved tracks, tutorial mapping and saved preferences remain unchanged.</small></p>
+<p><a href="verification.json">Source hashes, mastering measurements and preservation proof</a> · <a href="README.md">Validation notes</a></p>
+<script>
+  const players = [...document.querySelectorAll('audio')];
+  for (const player of players) {
+    player.volume = .25;
+    player.addEventListener('play', () => players.filter(other => other !== player).forEach(other => other.pause()));
+  }
+</script>
+</html>

@@ -21,7 +21,7 @@ from scipy import ndimage, signal
 
 ROOT = Path(__file__).resolve().parents[1]
 RATE = 44100
-VERIFIED = "2026-10-26"
+VERIFIED = "2026-10-27"
 LICENSE_URL = "https://creativecommons.org/publicdomain/zero/1.0/"
 SOURCES = {
     "void": {"title": "Claimed by the Void", "author": "vitalezzz", "page": "https://opengameart.org/content/claimed-by-the-void", "file": "claimed_by_the_void_loop.flac", "hash": "067d1c0e0efb47548b3354b6d1293adfbffbfc24bc8eba1f0244a65110985e5d"},
@@ -32,9 +32,13 @@ SOURCES = {
     "neural": {"title": "Neural Malfunction", "author": "vitalezzz", "page": "https://opengameart.org/content/neural-malfunction", "file": "neural_malfunction.flac", "hash": "8d917f86038c0f284fc6220ba200a16f2be268e5375d5caa7419401dd1e1cee7"},
 }
 SCENES = [
-    ("handshake", "kuia"), ("crossfeed-vault", "sewers"),
+    ("handshake", "loaben"), ("crossfeed-vault", "shadow"),
 ]
+FULL_RECORDING_SAMPLES = {"handshake": 1582848, "crossfeed-vault": 2321280}
 SOURCES.update({
+    "loaben": {"title": "Loaben", "author": "James Gargette (cinameng)", "page": "https://opengameart.org/content/loaben", "file": "loaben_3.mp3", "hash": "9fdc98717a1e40393e79d44e177c7ebb13ff07663985ddf67cd157460bf6cd7c"},
+    # The regular shadow.mp3 download; never the dark/light alternatives or a review edit.
+    "shadow": {"title": "Shadow", "author": "James Gargette (cinameng)", "page": "https://opengameart.org/content/shadow-2", "file": "shadow_0.mp3", "hash": "e76a74cd3e163d349ce64d7ee4e0567c5711c8234afc9c5dc5a8b4421e9f4004"},
     "sewers": {"title": "Through the Sewers", "author": "Alexander Ehlers (tricksntraps)", "page": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2", "file": "through_the_sewers_1766bpm.ogg", "hash": "a248f7bd3b0260bacd3cf4eb5bc325c6b15cc359334527b9734c3d4b6ced5f99"},
     "tower": {"title": "Tower Defense Theme", "author": "DST (Deceased Superior Technician)", "page": "https://opengameart.org/content/tower-defense-theme", "file": "DST-TowerDefenseTheme_1.mp3", "hash": "07cc9cd797c8ea6738b1bd740526f2610fd2ec0115774294ebda3a5ed8e62a30"},
     "cyborg": {"title": "Jumping Cyborg", "author": "Alexander Ehlers (tricksntraps)", "page": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2", "file": "jumping_cyborg_110bpm.ogg", "hash": "7d768754fc82f5b41a6a33c682d3572b6824f3b69d95d080f6386c7fd2a25696"},
@@ -166,22 +170,14 @@ def arrange(scene: str, path: Path, work: Path, *, legacy: bool = False) -> tupl
                            "cyclicCrossfadeSamples": round(fade * RATE), "sourceTempoBpm": 129,
                            "tempoEvidence": "Author file name new_factory_129bpm.ogg", "reviewOnly": True})
             audio = crossfade_cycle(audio[start:end], fade)
-        elif scene == "handshake" and not legacy:
-            # Complete author-supplied Kuia loop, including its full musical
-            # period. Never substitute the dated 24-second comparison excerpt.
-            assert len(audio) == 2080512, "Unexpected original Kuia decode"
+        elif scene in FULL_RECORDING_SAMPLES and not legacy:
+            # Final human selections use every decoded source sample and the
+            # original cycle length. The earlier listening previews removed
+            # 350 ms at their joins; those edits are not runtime source files.
+            assert len(audio) == FULL_RECORDING_SAMPLES[scene], "Unexpected full original decode"
             detail.update({"fullOriginalRecording": True, "nativeAuthorLoopPreserved": True,
-                           "trimStartSample": 0, "trimEndSampleExclusive": len(audio)})
-        elif scene == "crossfeed-vault" and not legacy:
-            # Measured matching rhythmic envelopes, not the unusual filename,
-            # establish this overlap. Retain the long central arrangement and
-            # exclude opening silence/sparse intro and the quiet ending fade.
-            start, end, overlap = 1940400, 10952860, 352800
-            detail.update({"trimStartSample": start, "trimEndSampleExclusive": end,
-                           "cyclicCrossfadeSamples": overlap, "tempoBpm": None,
-                           "tempoEvidence": "No verified tempo; 1766bpm is only part of the original filename.",
-                           "seamSelection": "Eight-second overlap: 44.000s head and 240.364172s tail, selected by low/mid/high transient-envelope correlation (mean cosine similarity 0.664). No tempo assumption or time stretching."})
-            audio = crossfade_cycle(audio[start:end], overlap / RATE)
+                           "trimStartSample": 0, "trimEndSampleExclusive": len(audio),
+                           "cyclicCrossfadeSamples": 0, "timeStretch": False})
         elif scene == "handshake":
             # Inferred 130 BPM; retain the central 88 bars, crossfade four bars.
             start, end, fade = round(8 * 240 / 130 * RATE), round(96 * 240 / 130 * RATE), 4 * 240 / 130
@@ -211,21 +207,28 @@ def export_master(scene: str, source: dict, original: Path, output: Path, work: 
     audio, edits = arrange(scene, original, work, legacy=legacy)
     arranged, filtered = work / f"{scene}-arranged.wav", work / f"{scene}-filtered.wav"
     write_pcm(arranged, audio)
-    command(["ffmpeg", "-v", "error", "-y", "-i", str(arranged), "-af", "highpass=f=28,lowpass=f=14000", "-c:a", "pcm_f32le", str(filtered)])
-    gain = round(-23 - measure(filtered)["integratedLufs"], 3)
+    full_original = scene in FULL_RECORDING_SAMPLES and not legacy
+    filter_chain = None if full_original else "highpass=f=28,lowpass=f=14000"
+    if filter_chain:
+        command(["ffmpeg", "-v", "error", "-y", "-i", str(arranged), "-af", filter_chain, "-c:a", "pcm_f32le", str(filtered)])
+        audio = declick(decode(filtered))
+    gain = round(-23 - measure(filtered if filter_chain else arranged)["integratedLufs"], 3)
     master = work / f"{scene}-master.wav"
-    write_pcm(master, declick(decode(filtered)) * (10 ** (gain / 20)))
+    write_pcm(master, audio * (10 ** (gain / 20)))
     command(["ffmpeg", "-v", "error", "-y", "-i", str(master), "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:a", "+bitexact",
              "-c:a", "libvorbis", "-q:a", "4", "-metadata", f"title={source['title']} - Binary Ninja {scene} edit", "-metadata", f"artist={source['author']}",
              "-metadata", "license=CC0-1.0", "-metadata", f"source={source['page']}", str(output)])
     decoded = decode(output)
     loudness, seam = measure(output), analyse_pcm(decoded)
-    edits.update({"filter": "highpass=f=28,lowpass=f=14000", "constantGainDb": gain, "dynamicCompression": False,
-                  "finalBoundaryDeclickSamplesPerSide": 128, "encodedSamples": len(decoded)})
+    edits.update({"filter": filter_chain, "constantGainDb": gain, "dynamicCompression": False,
+                  "finalBoundaryDeclickSamplesPerSide": 0 if full_original else 128, "encodedSamples": len(decoded)})
+    if full_original:
+        assert len(decoded) == FULL_RECORDING_SAMPLES[scene], "Encoding changed the complete musical period"
     asset = {"file": output.name, "scene": scene, "title": source["title"], "author": source["author"], "source": source["page"], "download": source["download"],
              "license": "CC0-1.0", "licenseUrl": LICENSE_URL, "sourceSha256": source["hash"], "sha256": sha(output), "bytes": output.stat().st_size,
              "duration": round(len(decoded) / RATE, 6),
-             "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
+             "processing": ("Complete original recording and sample count; constant gain to -23 LUFS; 128-sample wrap de-click per side (5.8 ms total), preserving cycle length; stereo 44.1 kHz Vorbis quality 4. No trimming, cyclic overlap, EQ, compression, time-stretching or added notes."
+                            if full_original else "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes."),
              "edits": edits, **loudness, "loopAnalysis": seam}
     assert abs(loudness["integratedLufs"] + 23) < .35, (scene, loudness)
     assert loudness["truePeakDbtp"] < -3, (scene, loudness)
@@ -277,8 +280,8 @@ def analyse_groove(path: Path) -> dict:
             "continuousPulseWindowPercent": round(100 * len(passed) / max(1, len(full)), 1), "windows": windows}
 
 
-def excerpt(path: Path, output: Path, start: float, work: Path, *, seam: bool = False) -> dict:
-    """24s bodies / 8s seams, individually level-matched; no tempo edits."""
+def excerpt(path: Path, output: Path, start: float, work: Path, *, seam: bool = False, preserve_master: bool = False) -> dict:
+    """24s bodies / 8s seams; optionally retain runtime master level, never tempo-edit."""
     decoded = decode(path)
     original = (np.concatenate([decoded[-4 * RATE:], decoded[:4 * RATE]]) if seam
                 else decoded[round(start * RATE):round((start + 24) * RATE)])
@@ -287,21 +290,23 @@ def excerpt(path: Path, output: Path, start: float, work: Path, *, seam: bool = 
     clip = work / "excerpt.wav"
     write_pcm(clip, original)
     filtered = work / "excerpt-filtered.wav"
-    command(["ffmpeg", "-v", "error", "-y", "-i", str(clip), "-af", "highpass=f=28,lowpass=f=14000", "-c:a", "pcm_f32le", str(filtered)])
-    audio = decode(filtered)
+    if not preserve_master:
+        command(["ffmpeg", "-v", "error", "-y", "-i", str(clip), "-af", "highpass=f=28,lowpass=f=14000", "-c:a", "pcm_f32le", str(filtered)])
+    audio = original.copy() if preserve_master else decode(filtered)
     # Only review clips fade 15ms at each edge to avoid UI preview start/stop clicks.
     n = round(.015 * RATE)
     audio[:n] *= np.linspace(0, 1, n)[:, None]
     audio[-n:] *= np.linspace(1, 0, n)[:, None]
     write_pcm(clip, audio)
-    gain = round(-23 - measure(clip)["integratedLufs"], 3)
+    gain = 0 if preserve_master else round(-23 - measure(clip)["integratedLufs"], 3)
     write_pcm(clip, audio * 10 ** (gain / 20))
     command(["ffmpeg", "-v", "error", "-y", "-i", str(clip), "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:a", "+bitexact", "-c:a", "libvorbis", "-q:a", "4", str(output)])
     loudness = measure(output)
-    assert abs(loudness["integratedLufs"] + 23) < .35
+    if not preserve_master:
+        assert abs(loudness["integratedLufs"] + 23) < .35
     return {"file": output.name, "sha256": sha(output), "bytes": output.stat().st_size, "duration": duration,
             "excerptStartSeconds": None if seam else start, "sequence": "last4s,first4s" if seam else "body",
-            "constantGainDb": gain, "reviewFadeMilliseconds": 15, **loudness}
+            "constantGainDb": gain, "runtimeMasterLevelPreserved": preserve_master, "reviewFadeMilliseconds": 15, **loudness}
 
 
 def validate_preserved(output: Path, manifest: dict) -> dict:
@@ -319,7 +324,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache", type=Path, default=Path(tempfile.gettempdir()) / "bn-music-sources")
     parser.add_argument("--output", type=Path, default=ROOT / "public/audio/music", help="Existing seven-track catalogue; approved files must already exist")
-    parser.add_argument("--review-dir", type=Path, default=ROOT / "docs/playtest/2026-10-26-approved-audio")
+    parser.add_argument("--review-dir", type=Path, default=ROOT / "docs/playtest/2026-10-27-approved-soundtracks")
     parser.add_argument("--skip-review", action="store_true", help="Only rebuild the two runtime replacements")
     args = parser.parse_args()
     args.cache.mkdir(parents=True, exist_ok=True)
@@ -339,7 +344,7 @@ def main() -> None:
         manifest["reviewMethod"] = "Explicit human listening selections. Source licensing and decoded loop/loudness checks by the agent; no claim of agent acoustic audition."
         manifest["totalBytes"] = sum(a["bytes"] for a in manifest["assets"])
         manifest["feedbackRevision"] = {"date": VERIFIED, "replacedScenes": [s for s, _ in SCENES],
-                                        "preservedSha256": preserved, "selection": "Explicit human listening selections: complete Kuia and Through the Sewers."}
+                                        "preservedSha256": preserved, "selection": "Final human listening selections: complete Loaben for HANDSHAKE and complete regular Shadow (shadow_0.mp3) for CROSSFEED VAULT."}
         manifest["ffmpegVersion"] = command(["ffmpeg", "-version"], text=True).stdout.splitlines()[0]
         assert 8_000_000 <= manifest["totalBytes"] <= 18_000_000
         validate_preserved(args.output, manifest)
@@ -352,9 +357,9 @@ def main() -> None:
         seams = []
         for scene, _ in SCENES:
             path = args.output / f"{scene}.ogg"
-            seams.append({"scene": scene, **excerpt(path, args.review_dir / f"{scene}-seam.ogg", 0, work, seam=True)})
+            seams.append({"scene": scene, **excerpt(path, args.review_dir / f"{scene}-seam.ogg", 0, work, seam=True, preserve_master=True)})
         (args.review_dir / "seams.json").write_text(json.dumps({"date": VERIFIED,
-            "method": "Last four seconds followed by first four of each final runtime loop; review-only loudness match. Full originals were used for generation, not these excerpts.",
+            "method": "Last four seconds followed by first four of each final runtime loop, at the runtime master level. Only preview start/stop edges fade 15 ms. Full originals were used for runtime generation, not these excerpts.",
             "clips": seams}, indent=2) + "\n")
         validate_preserved(args.output, manifest)
         print(f"Two loop seam previews ready: {args.review_dir}")

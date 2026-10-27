@@ -1,0 +1,4 @@
+{"file": "handshake.ogg", "bytes": 561613, "duration": 35.892245, "integratedLufs": -23.01, "truePeakDbtp": -9.16, "sha256": "659f242908acc04d5ebf37b0fb16d9c8919cd1829d84732883c38ee6e9ccb691"}
+{"file": "crossfeed-vault.ogg", "bytes": 526573, "duration": 52.636735, "integratedLufs": -23.03, "truePeakDbtp": -10.83, "sha256": "4513cf1301894d113c7a0acb031ab1600f253c1140e801f58b3d0d68f225af76"}
+Runtime assets/catalogue ready: 11725794 bytes. Approved four + tutorial bytes unchanged.
+Two loop seam previews ready: .workbench/reports/2026-10-27-approved-soundtracks/rebuilt-seams

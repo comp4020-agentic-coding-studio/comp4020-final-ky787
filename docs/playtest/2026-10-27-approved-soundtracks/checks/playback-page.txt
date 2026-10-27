@@ -1,0 +1,12 @@
+PASS preview starts at the unchanged 25% Music default
+PASS audio 0: complete expected duration — {"expected":35.89224489795918,"actual":35.892245}
+PASS audio 0: playback advances and stays exclusive
+PASS audio 1: complete expected duration — {"expected":8,"actual":8}
+PASS audio 1: playback advances and stays exclusive
+PASS audio 2: complete expected duration — {"expected":52.63673469387755,"actual":52.636735}
+PASS audio 2: playback advances and stays exclusive
+PASS audio 3: complete expected duration — {"expected":8,"actual":8}
+PASS audio 3: playback advances and stays exclusive
+PASS loaben: full runtime recording wraps cleanly in the media player
+PASS shadow: full runtime recording wraps cleanly in the media player
+PASS no preview runtime/media errors
