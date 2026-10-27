@@ -1,0 +1,12 @@
+PASS use-after-free: two independent visitors retain one party
+PASS pausing the unstable operator releases route power; resume resamples contact without resetting its fuse
+PASS terrain-use-after-free-powered-player-1-1920: gameplay remains visible
+PASS terrain-use-after-free-powered-player-1-1024: gameplay remains visible
+PASS use-after-free: scenery review preserves the stable hold
+PASS terrain-use-after-free-powered-player-2-1920: gameplay remains visible
+PASS terrain-use-after-free-powered-player-2-1024: gameplay remains visible
+PASS use-after-free: scenery review preserves the stable hold
+PASS use-after-free: authored-start physical solve with both arrivals
+PASS terrain captured during 1 real-input chamber solves
+PASS UAF review has no browser errors
+PASS UAF review has no browser errors

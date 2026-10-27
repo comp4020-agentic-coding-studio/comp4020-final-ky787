@@ -1,0 +1,270 @@
+[
+  {
+    "label": "terrain-use-after-free-powered-player-1-1920",
+    "player": {
+      "x": 1481.0490614111047,
+      "y": 933,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "summit",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 983.6499999999994,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 1175,
+          "y": 706
+        },
+        "tip": {
+          "x": 1299.6159098455025,
+          "y": 836.9227968507445
+        },
+        "dir": {
+          "x": 0.18301980766360146,
+          "y": -0.9831092258761376
+        },
+        "origin": {
+          "x": 1083.0748365834984,
+          "y": 1205.7853204798748
+        },
+        "travelled": 481.6666666666666,
+        "length": 200,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "plate",
+      "id": "draft:assist",
+      "frame": {
+        "x": 1270,
+        "y": 800,
+        "w": 480,
+        "h": 550,
+        "padding": 60
+      },
+      "x": 1029.8677000893745,
+      "y": 1073.6179105290164,
+      "zoom": 1.2465390688215632
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "label": "terrain-use-after-free-powered-player-1-1024",
+    "player": {
+      "x": 1481.0490614111047,
+      "y": 933,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "summit",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 983.6499999999994,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 1175,
+          "y": 706
+        },
+        "tip": {
+          "x": 1299.6159098455025,
+          "y": 836.9227968507445
+        },
+        "dir": {
+          "x": 0.18301980766360146,
+          "y": -0.9831092258761376
+        },
+        "origin": {
+          "x": 1083.0748365834984,
+          "y": 1205.7853204798748
+        },
+        "travelled": 481.6666666666666,
+        "length": 200,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "plate",
+      "id": "draft:assist",
+      "frame": {
+        "x": 1270,
+        "y": 800,
+        "w": 480,
+        "h": 550,
+        "padding": 60
+      },
+      "x": 1180.651298384901,
+      "y": 1074.9877398797048,
+      "zoom": 0.8266748580643479
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "label": "terrain-use-after-free-powered-player-2-1920",
+    "player": {
+      "x": 1343.0236111111117,
+      "y": 1283,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "operatorC",
+      "facing": -1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 689.8015667061167,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 1235,
+          "y": 1096
+        },
+        "tip": {
+          "x": 1429,
+          "y": 1298.7190403845332
+        },
+        "dir": {
+          "x": 0.5070739217977548,
+          "y": -0.8619025686425609
+        },
+        "origin": {
+          "x": 984.8038432074032,
+          "y": 1527.2726678923316
+        },
+        "travelled": 453.33333333333326,
+        "length": 297.3267272310986,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "plate",
+      "id": "draft:plateC",
+      "frame": {
+        "x": 280,
+        "y": 620,
+        "w": 1320,
+        "h": 1180,
+        "padding": 60
+      },
+      "x": 900,
+      "y": 1209.9999999999986,
+      "zoom": 0.7345107481268394
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "label": "terrain-use-after-free-powered-player-2-1024",
+    "player": {
+      "x": 1343.0236111111117,
+      "y": 1283,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "operatorC",
+      "facing": -1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 689.8015667061167,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 1235,
+          "y": 1096
+        },
+        "tip": {
+          "x": 1429,
+          "y": 1298.7190403845332
+        },
+        "dir": {
+          "x": 0.5070739217977548,
+          "y": -0.8619025686425609
+        },
+        "origin": {
+          "x": 984.8038432074032,
+          "y": 1527.2726678923316
+        },
+        "travelled": 453.33333333333326,
+        "length": 297.3267272310986,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "plate",
+      "id": "draft:plateC",
+      "frame": {
+        "x": 280,
+        "y": 620,
+        "w": 1320,
+        "h": 1180,
+        "padding": 60
+      },
+      "x": 900,
+      "y": 1209.9999999999986,
+      "zoom": 0.5007786645942768
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  }
+]

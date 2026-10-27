@@ -1,0 +1,272 @@
+PASS public title screen exposes tutorial and co-op without room grids or internal labs
+PASS creator is host; lobby guest waits with no start controls
+PASS guest selection is refused locally
+PASS forged guest request leaves both in lobby
+PASS host-lobby: every local environmental block follows the accepted native result
+PASS host-lobby: messages retain accepted physical, inversion, grace and latch semantics
+PASS guest-lobby: every local environmental block follows the accepted native result
+PASS guest-lobby: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake: two independent visitors retain one party
+PASS handshake-initial-host: every local environmental block follows the accepted native result
+PASS handshake-initial-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-initial-partner: every local environmental block follows the accepted native result
+PASS handshake-initial-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-powered-crossing-host: every local environmental block follows the accepted native result
+PASS handshake-powered-crossing-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-powered-crossing-partner: every local environmental block follows the accepted native result
+PASS handshake-powered-crossing-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-cube-alcove-host: every local environmental block follows the accepted native result
+PASS handshake-cube-alcove-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-cube-alcove-partner: every local environmental block follows the accepted native result
+PASS handshake-cube-alcove-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-payload-return-host: every local environmental block follows the accepted native result
+PASS handshake-payload-return-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-payload-return-partner: every local environmental block follows the accepted native result
+PASS handshake-payload-return-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-cube-substitution-host: every local environmental block follows the accepted native result
+PASS handshake-cube-substitution-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-cube-substitution-partner: every local environmental block follows the accepted native result
+PASS handshake-cube-substitution-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-gallery-lift-host: every local environmental block follows the accepted native result
+PASS handshake-gallery-lift-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-gallery-lift-partner: every local environmental block follows the accepted native result
+PASS handshake-gallery-lift-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-relay-linked-host: every local environmental block follows the accepted native result
+PASS handshake-relay-linked-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-relay-linked-partner: every local environmental block follows the accepted native result
+PASS handshake-relay-linked-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-partner-held-boost-host: every local environmental block follows the accepted native result
+PASS handshake-partner-held-boost-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-partner-held-boost-partner: every local environmental block follows the accepted native result
+PASS handshake-partner-held-boost-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-maintenance-complete-host: every local environmental block follows the accepted native result
+PASS handshake-maintenance-complete-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-maintenance-complete-partner: every local environmental block follows the accepted native result
+PASS handshake-maintenance-complete-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS terrain-handshake-powered-player-1-1920: every local environmental block follows the accepted native result
+PASS terrain-handshake-powered-player-1-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS terrain-handshake-powered-player-1-1024: every local environmental block follows the accepted native result
+PASS terrain-handshake-powered-player-1-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake: scenery review preserves the stable hold
+PASS terrain-handshake-powered-player-2-1920: every local environmental block follows the accepted native result
+PASS terrain-handshake-powered-player-2-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS terrain-handshake-powered-player-2-1024: every local environmental block follows the accepted native result
+PASS terrain-handshake-powered-player-2-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake: scenery review preserves the stable hold
+PASS handshake-near-complete-host: every local environmental block follows the accepted native result
+PASS handshake-near-complete-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-near-complete-partner: every local environmental block follows the accepted native result
+PASS handshake-near-complete-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-exit-unlocked-host: every local environmental block follows the accepted native result
+PASS handshake-exit-unlocked-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-exit-unlocked-partner: every local environmental block follows the accepted native result
+PASS handshake-exit-unlocked-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-completed-host: every local environmental block follows the accepted native result
+PASS handshake-completed-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake-completed-partner: every local environmental block follows the accepted native result
+PASS handshake-completed-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS handshake: authored-start physical solve with both arrivals
+PASS fresh two-cube world on the existing socket
+PASS fresh two-cube world on the existing socket
+PASS [full chamber] overview: every local environmental block follows the accepted native result
+PASS [full chamber] overview: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] walking into the breakpoint does not operate SYSTEM ONLINE
+PASS [full chamber] shared checkpoint does not teleport the waiting partner
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] boost-support: every local environmental block follows the accepted native result
+PASS [full chamber] boost-support: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] upper-left-routing: every local environmental block follows the accepted native result
+PASS [full chamber] upper-left-routing: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] upper-right-routing: every local environmental block follows the accepted native result
+PASS [full chamber] upper-right-routing: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] terrain-crossfeed-vault-powered-player-1-1920: every local environmental block follows the accepted native result
+PASS [full chamber] terrain-crossfeed-vault-powered-player-1-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] terrain-crossfeed-vault-powered-player-1-1024: every local environmental block follows the accepted native result
+PASS [full chamber] terrain-crossfeed-vault-powered-player-1-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] crossfeed-vault: scenery review preserves the stable hold
+PASS [full chamber] terrain-crossfeed-vault-powered-player-2-1920: every local environmental block follows the accepted native result
+PASS [full chamber] terrain-crossfeed-vault-powered-player-2-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] terrain-crossfeed-vault-powered-player-2-1024: every local environmental block follows the accepted native result
+PASS [full chamber] terrain-crossfeed-vault-powered-player-2-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] crossfeed-vault: scenery review preserves the stable hold
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] vault-unlocked: every local environmental block follows the accepted native result
+PASS [full chamber] vault-unlocked: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] complete: every local environmental block follows the accepted native result
+PASS [full chamber] complete: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] victory overlay visible
+PASS [full chamber] victory overlay visible
+PASS [full chamber] host gets NEXT, guest waits
+PASS [full chamber] crossfeed-victory-host: every local environmental block follows the accepted native result
+PASS [full chamber] crossfeed-victory-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] crossfeed-victory-guest: every local environmental block follows the accepted native result
+PASS [full chamber] crossfeed-victory-guest: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full chamber] old chamber traffic cannot alter new machinery/cubes
+PASS [full] overview: all nine RACE blocks retain accepted output selection
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] drop-b-camera: all nine RACE blocks retain accepted output selection
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] trace-camera: all nine RACE blocks retain accepted output selection
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four deliberate transfers retain the airborne chain
+PASS [full] right-deck: all nine RACE blocks retain accepted output selection
+PASS [full] terrain-race-condition-powered-player-1-1920: all nine RACE blocks retain accepted output selection
+PASS [full] terrain-race-condition-powered-player-1-1024: all nine RACE blocks retain accepted output selection
+PASS [full] race-condition: scenery review preserves the stable hold
+PASS [full] terrain-race-condition-powered-player-2-1920: all nine RACE blocks retain accepted output selection
+PASS [full] terrain-race-condition-powered-player-2-1024: all nine RACE blocks retain accepted output selection
+PASS [full] race-condition: scenery review preserves the stable hold
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] return-camera: all nine RACE blocks retain accepted output selection
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] commit: all nine RACE blocks retain accepted output selection
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [full] complete: all nine RACE blocks retain accepted output selection
+PASS [full] Race now leads to DEADLOCK
+PASS [full] deadlock: two independent visitors retain one party
+PASS [full] deadlock-stage-01-initial-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-01-initial-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-01-initial-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-01-initial-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-02-two-weights-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-02-two-weights-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-02-two-weights-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-02-two-weights-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-03-player-substitution-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-03-player-substitution-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-03-player-substitution-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-03-player-substitution-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-04-final-hover-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-04-final-hover-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-04-final-hover-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-04-final-hover-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-05-hatch-catch-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-05-hatch-catch-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-05-hatch-catch-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-05-hatch-catch-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-06-three-payloads-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-06-three-payloads-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] terrain-deadlock-powered-player-1-1920: every local environmental block follows the accepted native result
+PASS [full] terrain-deadlock-powered-player-1-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] terrain-deadlock-powered-player-1-1024: every local environmental block follows the accepted native result
+PASS [full] terrain-deadlock-powered-player-1-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock: scenery review preserves the stable hold
+PASS [full] terrain-deadlock-powered-player-2-1920: every local environmental block follows the accepted native result
+PASS [full] terrain-deadlock-powered-player-2-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] terrain-deadlock-powered-player-2-1024: every local environmental block follows the accepted native result
+PASS [full] terrain-deadlock-powered-player-2-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock: scenery review preserves the stable hold
+PASS [full] deadlock-stage-06-three-payloads-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-06-three-payloads-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-07-payload-service-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-07-payload-service-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-07-payload-service-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-07-payload-service-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-08-complete-operator: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-08-complete-operator: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock-stage-08-complete-carrier: every local environmental block follows the accepted native result
+PASS [full] deadlock-stage-08-complete-carrier: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] deadlock: authored-start physical solve with both arrivals
+PASS [full] use-after-free: two independent visitors retain one party
+PASS [full] use-after-free-initial-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-initial-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-initial-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-initial-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] pausing the unstable operator releases route power; resume resamples contact without resetting its fuse
+PASS [full] use-after-free-a-powered-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-a-powered-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-a-powered-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-a-powered-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-first-chain-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-first-chain-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-first-chain-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-first-chain-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-first-handover-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-first-handover-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-first-handover-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-first-handover-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-second-chain-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-second-chain-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-second-chain-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-second-chain-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-second-handover-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-second-handover-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-second-handover-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-second-handover-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-summit-assist-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-summit-assist-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-summit-assist-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-summit-assist-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-near-complete-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-near-complete-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] terrain-use-after-free-powered-player-1-1920: every local environmental block follows the accepted native result
+PASS [full] terrain-use-after-free-powered-player-1-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] terrain-use-after-free-powered-player-1-1024: every local environmental block follows the accepted native result
+PASS [full] terrain-use-after-free-powered-player-1-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free: scenery review preserves the stable hold
+PASS [full] terrain-use-after-free-powered-player-2-1920: every local environmental block follows the accepted native result
+PASS [full] terrain-use-after-free-powered-player-2-1920: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] terrain-use-after-free-powered-player-2-1024: every local environmental block follows the accepted native result
+PASS [full] terrain-use-after-free-powered-player-2-1024: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free: scenery review preserves the stable hold
+PASS [full] use-after-free-near-complete-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-near-complete-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-completed-host: every local environmental block follows the accepted native result
+PASS [full] use-after-free-completed-host: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free-completed-partner: every local environmental block follows the accepted native result
+PASS [full] use-after-free-completed-partner: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] use-after-free: authored-start physical solve with both arrivals
+PASS [full] last chamber shows campaign complete without a fictitious next level
+PASS [full] all five badges saved on same party
+PASS [full] all five badges saved on same party
+PASS [full] campaign-complete: every local environmental block follows the accepted native result
+PASS [full] campaign-complete: messages retain accepted physical, inversion, grace and latch semantics
+PASS [full] restart restores victory and badges
+PASS [full] restart restores victory and badges
+PASS [full] guest has host-disconnected message and no selection
+PASS [full] completed badges remain in selector
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] no browser runtime errors
+PASS [full] no browser runtime errors
+PASS [full] full physical campaign route rendered each chamber’s own native assembly
+PASS [full] all 25 replacements were observed during ordinary two-visitor play
+PASS [full] terrain captured during all five real-input chamber solves

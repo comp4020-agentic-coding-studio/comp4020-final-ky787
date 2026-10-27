@@ -37,6 +37,7 @@ import { pressurePads } from './machinery-presentation.ts';
 import { drawPressurePad, drawPadOutputPulse } from './plate-render.ts';
 import { drawGravityLift } from './lift-render.ts';
 import { drawFloatingControl } from './maintenance-render.ts';
+import { drawDeathZone, drawStaticPlatform } from './terrain-render.ts';
 import { SwitchOnboarding } from './switch-onboarding.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
 export class PuzzleRenderer {
@@ -152,19 +153,7 @@ export class PuzzleRenderer {
         this.text(r.id === 'workbench' ? `DRAFT / ${r.title}` : isCoopLevel(r.id) ? `CO-OP / ${r.title}` : `0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
         this.text(r.instruction, 80, r.id === 'uplink' ? 1045 : 132, 27, C.ink);
         drawConnections(c, this.connections, w);
-        for (const h of r.hazards) {
-            c.fillStyle = '#552a32';
-            c.fillRect(h.x, h.y, h.w, h.h);
-            for (let x = h.x; x < h.x + h.w; x += 28) {
-                c.fillStyle = C.red;
-                c.beginPath();
-                c.moveTo(x, h.y + 15);
-                c.lineTo(x + 12, h.y);
-                c.lineTo(x + 24, h.y + 15);
-                c.fill();
-            }
-            this.text('RESET FIELD', h.x + 24, h.y + 43, 13, C.red);
-        }
+        for (const h of r.hazards) drawDeathZone(c, h, visible, this.heroes.time, energyMotion);
         this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, dt, energyMotion, running, performance.now());
         this.raceMachineryDisplay.draw(c, this.raceMachinery, r.id, visible, dt, energyMotion);
         this.environmentalDisplay.draw(c, this.environmental, r.id, visible, dt, energyMotion);
@@ -174,12 +163,7 @@ export class PuzzleRenderer {
             const b = p.def.kind === 'static' ? p.def : { ...p.def, h: Math.min(CODE_SLAB_HEIGHT, p.def.h) };
             if (b.kind === 'static') {
                 if (!p.solid.enabled) continue;
-                c.fillStyle = C.wall;
-                c.fillRect(b.x, b.y, b.w, b.h);
-                this.line(b.x, b.y, b.x + b.w, b.y, C.line, 3);
-                if (b.w >= 120) this.text('STATIC', b.x + 12, b.y + 27, 9, '#718996');
-                for (let x = b.x + 18; x < b.x + b.w; x += 75)
-                    this.line(x, b.y + 14, x + 20, b.y + 14, '#31444d', 2);
+                drawStaticPlatform(c, b, visible);
                 continue;
             }
             const crumble = b.kind === 'crumble-prototype' || b.kind === 'crumble-proven';

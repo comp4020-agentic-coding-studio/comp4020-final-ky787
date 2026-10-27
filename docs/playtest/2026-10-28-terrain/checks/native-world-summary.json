@@ -1,0 +1,216 @@
+{
+  "scope": "Existing five-chamber real-input solve; existing route reads and screenshot points; no camera or gameplay writes",
+  "chambers": [
+    "handshake",
+    "crossfeed-vault",
+    "race-condition",
+    "deadlock",
+    "use-after-free"
+  ],
+  "coverage": [
+    {
+      "chamber": "handshake",
+      "output": "crossingPower",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "handshake",
+      "output": "liftPower",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "handshake",
+      "output": "relayPower",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "handshake",
+      "output": "exitReady",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "grappleAnchor",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "bridge",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "liftField",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "relayGates",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "leftRoute",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "rightRoute",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "galleryAccess",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "vaultPower",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "vaultReturn",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "crossfeed-vault",
+      "output": "serviceAccess",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "deadlock",
+      "output": "cargoLift",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "deadlock",
+      "output": "shaftFirewall",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "deadlock",
+      "output": "serviceRelay",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "deadlock",
+      "output": "hatchOpen",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "deadlock",
+      "output": "payloadReady",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "use-after-free",
+      "output": "routeA",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "use-after-free",
+      "output": "routeB",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "use-after-free",
+      "output": "routeC",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "use-after-free",
+      "output": "launchPower",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "use-after-free",
+      "output": "assistBlocked",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "chamber": "use-after-free",
+      "output": "exitReady",
+      "values": [
+        false,
+        true
+      ]
+    }
+  ],
+  "observations": 96,
+  "transitions": 51,
+  "fullReport": ".workbench/reports/2026-10-28-terrain/campaign/native-world-physical-route.json",
+  "fullReportSha256": "e578e29a6fa67e0d54ee2f36575dd9e900462f704f4bec50ab8644dacaa43b4b"
+}

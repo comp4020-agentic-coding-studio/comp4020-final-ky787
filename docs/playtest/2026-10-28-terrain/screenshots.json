@@ -1,0 +1,127 @@
+[
+  {
+    "file": "screenshots/handshake-floor-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/handshake-player-1-1920.png",
+    "sha256": "9bf8fbee2ebc6fa647b37af86d4e3573cd42b5c961cce7b3ba54f14e89781337"
+  },
+  {
+    "file": "screenshots/handshake-overview-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/handshake-overview-1024.png",
+    "sha256": "e8e710a7a6f5ca81aa026e3e6d26e9d6f35cea068d50f22ae828a2c4b0f14662"
+  },
+  {
+    "file": "screenshots/crossfeed-death-field-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/crossfeed-vault-player-1-1920.png",
+    "sha256": "61cfc263a6525e21899db8aa0604671d188e28599df337915066b6045e78354b"
+  },
+  {
+    "file": "screenshots/crossfeed-death-field-reduced-motion-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/crossfeed-reduced-motion-1024.png",
+    "sha256": "d5af373de9c99c0c87f08bf8308f2bfc57141015b435a9feb7e09b1657fc6057"
+  },
+  {
+    "file": "screenshots/crossfeed-overview-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/crossfeed-vault-overview-1920.png",
+    "sha256": "095dda7505c4992cc3545e4618551c6132af3e9b2d39e90c2b158692aeb263f7"
+  },
+  {
+    "file": "screenshots/race-wall-and-ledges-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/race-condition-player-1-1920.png",
+    "sha256": "9f4e20d3a2b9a276337005e6eb3cba3b0e3342e08d858fe3e414403cbb070883"
+  },
+  {
+    "file": "screenshots/race-wall-and-ledges-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/race-condition-player-1-1024.png",
+    "sha256": "87a65788629aa4df8a57f269eda1b78f8b9d0cb19c8699d855410e8e9cde1d74"
+  },
+  {
+    "file": "screenshots/race-overview-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/race-condition-overview-1024.png",
+    "sha256": "68133688ee0bc1739b90fb3f5a56add1000641bf423e6abbb964cd19e9ebfc38"
+  },
+  {
+    "file": "screenshots/deadlock-service-wall-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/deadlock-player-1-1024.png",
+    "sha256": "eef69a8b39388fb2119c9099eafda03b63ec1d1e9912141b581f8925bf3f3f9c"
+  },
+  {
+    "file": "screenshots/deadlock-service-wall-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/deadlock-player-1-1920.png",
+    "sha256": "634b3734d55c6d8995da73e3d1cfe11930ca30eec31e2afdc781c21c9917730a"
+  },
+  {
+    "file": "screenshots/use-after-free-entry-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/use-after-free-player-1-1920.png",
+    "sha256": "37a02e0718b93e9ed4072a3feae110ff3f3ffef3619515afcea377711fa0957a"
+  },
+  {
+    "file": "screenshots/use-after-free-overview-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/initial/use-after-free-overview-1024.png",
+    "sha256": "bfb57f8eb8710881bf8d9097dde87540a449fba7e36cd2939713dcfb70a3e886"
+  },
+  {
+    "file": "screenshots/handshake-thin-ledges-powered-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/campaign/terrain-handshake-powered-player-1-1024.png",
+    "sha256": "b552464e440a7068c96da9a81afdd71e5d27300d2454f905cf6c190edfecc032"
+  },
+  {
+    "file": "screenshots/race-code-and-static-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/campaign/full-terrain-race-condition-powered-player-2-1920.png",
+    "sha256": "362d989972bfb7d6a16d6fbdbedec097a2efda3bad94bf17276f55d165bbf44a"
+  },
+  {
+    "file": "screenshots/race-code-and-static-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/campaign/full-terrain-race-condition-powered-player-2-1024.png",
+    "sha256": "642118c62493534e08459614050b4f9017ae65ca0af4dd86ed0b5e0dfa470b9b"
+  },
+  {
+    "file": "screenshots/deadlock-powered-gallery-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/campaign/full-terrain-deadlock-powered-player-1-1024.png",
+    "sha256": "52832eb12eab164f42f1c75c0730c3208103129c49cbc51178fc64496d129599"
+  },
+  {
+    "file": "screenshots/solo-pressure-floor-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-pressure-1920.png",
+    "sha256": "04ab1a0840848fc04fc0010b94d2c87b9a03b61d7c28a3b44a13d974e1d47784"
+  },
+  {
+    "file": "screenshots/solo-switch-death-field-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-switch-unpowered-1920.png",
+    "sha256": "420597588883ba399009e99f94a4b457286bc16ac222f2c322ea6ff79bf5edcb"
+  },
+  {
+    "file": "screenshots/solo-switch-death-field-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-switch-unpowered-1024.png",
+    "sha256": "8e889ca3e625ccae72429b66a6aab00092f6d667ee77904f09822b7c0a97c5ba"
+  },
+  {
+    "file": "screenshots/solo-relay-code-and-static-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-relay-1024.png",
+    "sha256": "65a7061f3689018d6dc56c552b660522f401e46e9241f91bf7f4d99e6a41598b"
+  },
+  {
+    "file": "screenshots/solo-relay-overview-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-relay-overview-1920.png",
+    "sha256": "1772a1f55e11589b93a17da7d23f3a47dbeb6a182b388f0ac9afe96e54347439"
+  },
+  {
+    "file": "screenshots/solo-control-spine-latched-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-control-spine-latched-1920.png",
+    "sha256": "0184baee5d26e4894029658426a3c7d62226511298f11ed4eab9d7592019bd8a"
+  },
+  {
+    "file": "screenshots/solo-control-spine-latched-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/solo/terrain-control-spine-latched-1024.png",
+    "sha256": "c753a82e7ea6a295f59b0058762c771a1bc4615060d3a407a4b87f14c42ab0e9"
+  },
+  {
+    "file": "screenshots/use-after-free-summit-1024.png",
+    "source": ".workbench/reports/2026-10-28-terrain/uaf/terrain-use-after-free-powered-player-1-1024.png",
+    "sha256": "6d95ea0fde6892ef7f5220f2f2934f6d13b70e34df4ecc0ccbd13daf5fea923f"
+  },
+  {
+    "file": "screenshots/use-after-free-refuge-1920.png",
+    "source": ".workbench/reports/2026-10-28-terrain/uaf/terrain-use-after-free-powered-player-2-1920.png",
+    "sha256": "6df8d89ec636d45ee65eaa0e940e69ef111a5c882a9062488ad193f45817090d"
+  }
+]

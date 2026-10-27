@@ -1,0 +1,1222 @@
+[
+  {
+    "name": "handshake-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1520.4330027179972,
+      "y": 723.004572297092,
+      "zoom": 1.24745474194005
+    },
+    "player": {
+      "x": 1600,
+      "y": 933,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "centralBay",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1600,
+          "y": 933
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1600,
+          "y": 933
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "handshake-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1520.6378434324058,
+      "y": 723.0000002510512,
+      "zoom": 1.2477868735874804
+    },
+    "player": {
+      "x": 1660,
+      "y": 933,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "centralBay",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 933
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 933
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "handshake-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1599.9938211464082,
+      "y": 723.1988385914657,
+      "zoom": 0.8239040108453816
+    },
+    "player": {
+      "x": 1600,
+      "y": 933,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "centralBay",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1600,
+          "y": 933
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1600,
+          "y": 933
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "handshake-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1659.9896704474543,
+      "y": 723.2060552783358,
+      "zoom": 0.8239857557035043
+    },
+    "player": {
+      "x": 1660,
+      "y": 933,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "centralBay",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 933
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 933
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1660.0023986754172,
+      "y": 1395.130119201161,
+      "zoom": 1.2445764760957234
+    },
+    "player": {
+      "x": 1660,
+      "y": 1483,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "central-floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": false,
+      "relayGates": false,
+      "codePlatformA": false,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1760.000000151224,
+      "y": 1395.3226877212396,
+      "zoom": 1.2451995080304803
+    },
+    "player": {
+      "x": 1760,
+      "y": 1483,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "central-floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1760,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1760,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": false,
+      "relayGates": false,
+      "codePlatformA": false,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1660.000002390419,
+      "y": 1387.7935669228766,
+      "zoom": 0.8235459002185345
+    },
+    "player": {
+      "x": 1660,
+      "y": 1483,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "central-floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": false,
+      "relayGates": false,
+      "codePlatformA": false,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1760.0000000000007,
+      "y": 1388.0029323723672,
+      "zoom": 0.823985755696584
+    },
+    "player": {
+      "x": 1760,
+      "y": 1483,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "central-floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1760,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1760,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "liftField": false,
+      "relayGates": false,
+      "codePlatformA": false,
+      "codePlatformB": false
+    }
+  },
+  {
+    "name": "race-condition-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 771.4894967043454,
+      "y": 1035.0588865402276,
+      "zoom": 1.244346169456532
+    },
+    "player": {
+      "x": 120,
+      "y": 1223,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 120,
+          "y": 1223
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 120,
+          "y": 1223
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "race-condition-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 770.9607099590233,
+      "y": 1035.3227290933623,
+      "zoom": 1.2451996419519538
+    },
+    "player": {
+      "x": 250,
+      "y": 1223,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 250,
+          "y": 1223
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 250,
+          "y": 1223
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "race-condition-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.4408086164041,
+      "y": 1027.9582398767607,
+      "zoom": 0.8238918218775065
+    },
+    "player": {
+      "x": 120,
+      "y": 1223,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 120,
+          "y": 1223
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 120,
+          "y": 1223
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "race-condition-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.3683403948492,
+      "y": 1028.0039571337181,
+      "zoom": 0.8239879097712784
+    },
+    "player": {
+      "x": 250,
+      "y": 1223,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "floor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 250,
+          "y": 1223
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 250,
+          "y": 1223
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "deadlock-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 771.6448507969568,
+      "y": 2714.981371321102,
+      "zoom": 1.2440956471212237
+    },
+    "player": {
+      "x": 350,
+      "y": 2983,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "lowerFloor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 350,
+          "y": 2983
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 350,
+          "y": 2983
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "deadlock-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1029.0393173490252,
+      "y": 2715.322742718941,
+      "zoom": 1.2451996860579286
+    },
+    "player": {
+      "x": 1730,
+      "y": 2983,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "lowerFloor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1730,
+          "y": 2983
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1730,
+          "y": 2983
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "deadlock-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.4532916316413,
+      "y": 2707.95036484957,
+      "zoom": 0.8238752725176355
+    },
+    "player": {
+      "x": 350,
+      "y": 2983,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "lowerFloor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 350,
+          "y": 2983
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 350,
+          "y": 2983
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "deadlock-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1178.3701609046984,
+      "y": 2707.8389882269876,
+      "zoom": 0.8236412858577491
+    },
+    "player": {
+      "x": 1730,
+      "y": 2983,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "lowerFloor",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1730,
+          "y": 2983
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1730,
+          "y": 2983
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "use-after-free-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 771.6059520175351,
+      "y": 2122.9282613548025,
+      "zoom": 1.2441583654064188
+    },
+    "player": {
+      "x": 240,
+      "y": 2333,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "bottom",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 240,
+          "y": 2333
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 240,
+          "y": 2333
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "use-after-free-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 770.9627721177886,
+      "y": 2122.9511122266886,
+      "zoom": 1.245196311312072
+    },
+    "player": {
+      "x": 340,
+      "y": 2333,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "bottom",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 340,
+          "y": 2333
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 340,
+          "y": 2333
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "use-after-free-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.7102672210555,
+      "y": 2123.1712996853066,
+      "zoom": 0.823534734738349
+    },
+    "player": {
+      "x": 240,
+      "y": 2333,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "bottom",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 240,
+          "y": 2333
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 240,
+          "y": 2333
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "use-after-free-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.3683403948555,
+      "y": 2123.2062199883376,
+      "zoom": 0.82398790977127
+    },
+    "player": {
+      "x": 340,
+      "y": 2333,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "bottom",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 0,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 340,
+          "y": 2333
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 340,
+          "y": 2333
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  }
+]

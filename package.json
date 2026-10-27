@@ -23,6 +23,7 @@
     "dev:server": "DATA_DIR=.local-data node server/app.ts",
     "check:crossfeed": "node scripts/crossfeed-browser-check.ts",
     "check:heroes": "node scripts/hero-browser-check.ts",
+    "check:terrain": "node scripts/terrain-browser-check.ts",
     "check:receivers": "node scripts/receiver-browser-check.ts",
     "check:multiplayer-pairing": "node scripts/multiplayer-browser-check.ts",
     "check:multiplayer-relay": "node scripts/labs-browser-check.ts relay-lab",
