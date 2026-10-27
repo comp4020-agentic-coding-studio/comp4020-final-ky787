@@ -1,0 +1,322 @@
+[
+  {
+    "name": "handshake-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1520.3819207628303,
+      "y": 723.0068469068281,
+      "zoom": 1.247371944473463
+    },
+    "player": {
+      "x": 1600,
+      "y": 933,
+      "groundId": "centralBay"
+    }
+  },
+  {
+    "name": "handshake-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1520.6385707129298,
+      "y": 723.0000006149709,
+      "zoom": 1.247788053125545
+    },
+    "player": {
+      "x": 1660,
+      "y": 933,
+      "groundId": "centralBay"
+    }
+  },
+  {
+    "name": "handshake-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1599.9938403698986,
+      "y": 723.199523666312,
+      "zoom": 0.8239121187487106
+    },
+    "player": {
+      "x": 1600,
+      "y": 933,
+      "groundId": "centralBay"
+    }
+  },
+  {
+    "name": "handshake-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1659.9911774674451,
+      "y": 723.180201456592,
+      "zoom": 0.8236412858662329
+    },
+    "player": {
+      "x": 1660,
+      "y": 933,
+      "groundId": "centralBay"
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1660.0023339599747,
+      "y": 1395.0554528088385,
+      "zoom": 1.2443350698045632
+    },
+    "player": {
+      "x": 1660,
+      "y": 1483,
+      "groundId": "central-floor"
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1760.000000119911,
+      "y": 1395.430317659818,
+      "zoom": 1.2455480033818342
+    },
+    "player": {
+      "x": 1760,
+      "y": 1483,
+      "groundId": "central-floor"
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1660.0000028040608,
+      "y": 1387.955009483692,
+      "zoom": 0.8238850331300537
+    },
+    "player": {
+      "x": 1660,
+      "y": 1483,
+      "groundId": "central-floor"
+    }
+  },
+  {
+    "name": "crossfeed-vault-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1760.0000000000007,
+      "y": 1388.0029323727824,
+      "zoom": 0.8239857556974568
+    },
+    "player": {
+      "x": 1760,
+      "y": 1483,
+      "groundId": "central-floor"
+    }
+  },
+  {
+    "name": "race-condition-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 771.4899471565737,
+      "y": 1035.0586617833346,
+      "zoom": 1.2443454429162746
+    },
+    "player": {
+      "x": 120,
+      "y": 1223,
+      "groundId": "floor"
+    }
+  },
+  {
+    "name": "race-condition-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 770.9607099590236,
+      "y": 1035.3227290933623,
+      "zoom": 1.2451996419519535
+    },
+    "player": {
+      "x": 250,
+      "y": 1223,
+      "groundId": "floor"
+    }
+  },
+  {
+    "name": "race-condition-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.4423666574619,
+      "y": 1027.9572569719528,
+      "zoom": 0.8238897562679592
+    },
+    "player": {
+      "x": 120,
+      "y": 1223,
+      "groundId": "floor"
+    }
+  },
+  {
+    "name": "race-condition-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.3699647858374,
+      "y": 1028.0029323714346,
+      "zoom": 0.8239857556946237
+    },
+    "player": {
+      "x": 250,
+      "y": 1223,
+      "groundId": "floor"
+    }
+  },
+  {
+    "name": "deadlock-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 771.1833847527251,
+      "y": 2715.2116236494217,
+      "zoom": 1.2448400976738077
+    },
+    "player": {
+      "x": 350,
+      "y": 2983,
+      "groundId": "lowerFloor"
+    }
+  },
+  {
+    "name": "deadlock-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1029.0379800897363,
+      "y": 2715.3220754822746,
+      "zoom": 1.24519752621762
+    },
+    "player": {
+      "x": 1730,
+      "y": 2983,
+      "groundId": "lowerFloor"
+    }
+  },
+  {
+    "name": "deadlock-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.7147816639422,
+      "y": 2707.785401411224,
+      "zoom": 0.8235287548249951
+    },
+    "player": {
+      "x": 350,
+      "y": 2983,
+      "groundId": "lowerFloor"
+    }
+  },
+  {
+    "name": "deadlock-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1178.6316596036668,
+      "y": 2708.003957132782,
+      "zoom": 0.8239879097693105
+    },
+    "player": {
+      "x": 1730,
+      "y": 2983,
+      "groundId": "lowerFloor"
+    }
+  },
+  {
+    "name": "use-after-free-player-1-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 771.6553054357952,
+      "y": 2122.9262931496073,
+      "zoom": 1.2440787917058853
+    },
+    "player": {
+      "x": 240,
+      "y": 2333,
+      "groundId": "bottom"
+    }
+  },
+  {
+    "name": "use-after-free-player-2-1920",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 770.9601058857556,
+      "y": 2122.9511973165177,
+      "zoom": 1.2452006176079067
+    },
+    "player": {
+      "x": 340,
+      "y": 2333,
+      "groundId": "bottom"
+    }
+  },
+  {
+    "name": "use-after-free-player-1-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.4549352907255,
+      "y": 2123.1960294428113,
+      "zoom": 0.8238730934858197
+    },
+    "player": {
+      "x": 240,
+      "y": 2333,
+      "groundId": "bottom"
+    }
+  },
+  {
+    "name": "use-after-free-player-2-1024",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 621.6313471535111,
+      "y": 2123.1800615125835,
+      "zoom": 0.8236392877297455
+    },
+    "player": {
+      "x": 340,
+      "y": 2333,
+      "groundId": "bottom"
+    }
+  }
+]

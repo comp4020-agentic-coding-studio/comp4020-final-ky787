@@ -1,0 +1,87 @@
+PASS approved death field is pixel-identical at 0s, motion true — ""
+PASS approved death field is pixel-identical at 0.7s, motion true — ""
+PASS approved death field is pixel-identical at 5s, motion true — ""
+PASS approved death field is pixel-identical at 0s, motion false — ""
+PASS approved death field is pixel-identical at 0.7s, motion false — ""
+PASS approved death field is pixel-identical at 5s, motion false — ""
+PASS static 430×70 at 0.5 clips every painted pixel — {"spill":0,"inside":7525}
+PASS static 430×70 at 1 clips every painted pixel — {"spill":0,"inside":30100}
+PASS static 430×70 at 2 clips every painted pixel — {"spill":0,"inside":63840}
+PASS static 165×22 at 0.5 clips every painted pixel — {"spill":0,"inside":913}
+PASS static 165×22 at 1 clips every painted pixel — {"spill":0,"inside":3630}
+PASS static 165×22 at 2 clips every painted pixel — {"spill":0,"inside":14520}
+PASS static 30×280 at 0.5 clips every painted pixel — {"spill":0,"inside":2100}
+PASS static 30×280 at 1 clips every painted pixel — {"spill":0,"inside":8400}
+PASS static 30×280 at 2 clips every painted pixel — {"spill":0,"inside":17280}
+PASS static 315×270 at 0.5 clips every painted pixel — {"spill":0,"inside":21330}
+PASS static 315×270 at 1 clips every painted pixel — {"spill":0,"inside":85050}
+PASS static 315×270 at 2 clips every painted pixel — {"spill":0,"inside":131328}
+PASS static 12×8 at 0.5 clips every painted pixel — {"spill":0,"inside":24}
+PASS static 12×8 at 1 clips every painted pixel — {"spill":0,"inside":96}
+PASS static 12×8 at 2 clips every painted pixel — {"spill":0,"inside":384}
+PASS static 2×2 at 0.5 clips every painted pixel — {"spill":0,"inside":1}
+PASS static 2×2 at 1 clips every painted pixel — {"spill":0,"inside":4}
+PASS static 2×2 at 2 clips every painted pixel — {"spill":0,"inside":16}
+PASS static world patterns stay anchored while panning at 0.5 — {"maxDelta":2,"tolerance":2}
+PASS static world patterns stay anchored while panning at 1 — {"maxDelta":1,"tolerance":2}
+PASS static world patterns stay anchored while panning at 2 — {"maxDelta":1,"tolerance":2}
+PASS static reduced motion ignores elapsed time — ""
+PASS static deterministic at the same time — ""
+PASS static remains stationary — ""
+PASS hazard 430×70 at 0.5 clips every painted pixel — {"spill":0,"inside":7525}
+PASS hazard 430×70 at 1 clips every painted pixel — {"spill":0,"inside":30100}
+PASS hazard 430×70 at 2 clips every painted pixel — {"spill":0,"inside":63840}
+PASS hazard 165×22 at 0.5 clips every painted pixel — {"spill":0,"inside":913}
+PASS hazard 165×22 at 1 clips every painted pixel — {"spill":0,"inside":3630}
+PASS hazard 165×22 at 2 clips every painted pixel — {"spill":0,"inside":14520}
+PASS hazard 30×280 at 0.5 clips every painted pixel — {"spill":0,"inside":2100}
+PASS hazard 30×280 at 1 clips every painted pixel — {"spill":0,"inside":8400}
+PASS hazard 30×280 at 2 clips every painted pixel — {"spill":0,"inside":17280}
+PASS hazard 315×270 at 0.5 clips every painted pixel — {"spill":0,"inside":21330}
+PASS hazard 315×270 at 1 clips every painted pixel — {"spill":0,"inside":85050}
+PASS hazard 315×270 at 2 clips every painted pixel — {"spill":0,"inside":131328}
+PASS hazard 12×8 at 0.5 clips every painted pixel — {"spill":0,"inside":24}
+PASS hazard 12×8 at 1 clips every painted pixel — {"spill":0,"inside":96}
+PASS hazard 12×8 at 2 clips every painted pixel — {"spill":0,"inside":384}
+PASS hazard 2×2 at 0.5 clips every painted pixel — {"spill":0,"inside":1}
+PASS hazard 2×2 at 1 clips every painted pixel — {"spill":0,"inside":4}
+PASS hazard 2×2 at 2 clips every painted pixel — {"spill":0,"inside":16}
+PASS hazard world patterns stay anchored while panning at 0.5 — {"maxDelta":2,"tolerance":2}
+PASS hazard world patterns stay anchored while panning at 1 — {"maxDelta":1,"tolerance":2}
+PASS hazard world patterns stay anchored while panning at 2 — {"maxDelta":1,"tolerance":2}
+PASS hazard reduced motion ignores elapsed time — ""
+PASS hazard deterministic at the same time — ""
+PASS hazard has gentle motion — ""
+PASS handshake-player-1-1920 is an ordinary player camera
+PASS handshake-player-2-1920 is an ordinary player camera
+PASS handshake overview 1920
+PASS handshake-player-1-1024 is an ordinary player camera
+PASS handshake-player-2-1024 is an ordinary player camera
+PASS handshake overview 1024
+PASS crossfeed-vault-player-1-1920 is an ordinary player camera
+PASS crossfeed-vault-player-2-1920 is an ordinary player camera
+PASS crossfeed-vault overview 1920
+PASS crossfeed-vault-player-1-1024 is an ordinary player camera
+PASS crossfeed-vault-player-2-1024 is an ordinary player camera
+PASS crossfeed-vault overview 1024
+PASS actual gameplay receives reduced-motion preference
+PASS race-condition-player-1-1920 is an ordinary player camera
+PASS race-condition-player-2-1920 is an ordinary player camera
+PASS race-condition overview 1920
+PASS race-condition-player-1-1024 is an ordinary player camera
+PASS race-condition-player-2-1024 is an ordinary player camera
+PASS race-condition overview 1024
+PASS deadlock-player-1-1920 is an ordinary player camera
+PASS deadlock-player-2-1920 is an ordinary player camera
+PASS deadlock overview 1920
+PASS deadlock-player-1-1024 is an ordinary player camera
+PASS deadlock-player-2-1024 is an ordinary player camera
+PASS deadlock overview 1024
+PASS use-after-free-player-1-1920 is an ordinary player camera
+PASS use-after-free-player-2-1920 is an ordinary player camera
+PASS use-after-free overview 1920
+PASS use-after-free-player-1-1024 is an ordinary player camera
+PASS use-after-free-player-2-1024 is an ordinary player camera
+PASS use-after-free overview 1024
+PASS no browser runtime errors
+PASS no browser runtime errors

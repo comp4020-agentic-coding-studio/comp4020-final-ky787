@@ -20,65 +20,91 @@ function cellPhase(x: number, y: number) {
     return ((Math.imul(x, 374761393) ^ Math.imul(y, 668265263)) >>> 0) / 0xffffffff;
 }
 
-/** Solid, unlit architecture. Small ledges keep the contact bevel and underside;
- * larger bodies add inset plates, while tall walls use upright reinforcement. */
+/** An etched circuit neighbourhood, not a tile outline. Its seed and bounds
+ * belong to the world; rotating the same vocabulary gives walls vertical buses. */
+function circuitCell(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, upright: boolean, phase: number) {
+    c.save(); c.translate(x, y);
+    if (upright) { c.translate(w, 0); c.rotate(Math.PI / 2); [w, h] = [h, w]; }
+    const variant = Math.floor(phase * 4), mid = w * (.36 + phase * .25);
+    const lane = Math.min(h - 3, Math.max(3, h * (.3 + (variant % 2) * .32)));
+    const offset = h < 16 ? 3 : Math.min(15, h * .23), branch = lane + (variant % 2 ? -offset : offset);
+    c.strokeStyle = variant === 2 ? '#2c4657' : '#29404e'; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(3, lane); c.lineTo(mid - 9, lane);
+    c.lineTo(mid - 9, branch); c.lineTo(w - 5, branch);
+    if (h >= 20) {
+        const split = Math.max(6, mid - 24), end = variant % 2 ? h - 5 : 4;
+        c.moveTo(split, lane); c.lineTo(split, end); c.lineTo(split + 13, end);
+    }
+    c.stroke();
+    // Flat contact pads, deliberately square and dim rather than luminous bolts.
+    c.fillStyle = '#3a5662'; c.fillRect(2, lane - 1, 2, 2); c.fillRect(w - 6, branch - 1, 2, 2);
+    if (w >= 48 && h >= 20 && variant !== 1) {
+        const chipW = h >= 48 ? 22 + variant * 4 : 13, chipH = h >= 48 ? 16 + variant * 2 : 7;
+        const cx = Math.min(mid + 6, w - chipW - 5), cy = Math.min(h - chipH - 3, Math.max(3, branch - chipH / 2));
+        c.fillStyle = '#0e1a27'; c.fillRect(cx - 2, cy - 2, chipW + 4, chipH + 4);
+        c.fillStyle = '#223744'; c.fillRect(cx, cy, chipW, chipH);
+        c.fillStyle = '#142532'; c.fillRect(cx + 2, cy + 2, chipW - 4, chipH - 4);
+        c.fillStyle = '#344c59';
+        for (let pin = 3; pin < chipH - 1; pin += 5) {
+            c.fillRect(cx - 3, cy + pin, 3, 1); c.fillRect(cx + chipW, cy + pin, 3, 1);
+        }
+        if (h >= 48) {
+            c.fillStyle = '#29424e'; c.fillRect(cx + 5, cy + 5, chipW - 10, chipH - 10);
+            c.fillStyle = '#49616a'; c.fillRect(cx + 3, cy + 3, 2, 1);
+        }
+    }
+    if (h >= 42 && w >= 72) {
+        // Short parallel contacts suggest a data bus, with generous blank substrate.
+        const bx = variant % 2 ? 10 : w - 37, by = variant % 2 ? 7 : h - 12;
+        c.fillStyle = '#2c424f';
+        for (let bit = 0; bit < 4; bit++) c.fillRect(bx + bit * 6, by, 3, 5);
+        line(c, bx, by + 8, bx + 21, by + 8, '#223845');
+    }
+    c.restore();
+}
+
+/** Permanently solid computational substrate: crisp contact edge, etched buses
+ * and embedded chips. No clock, powered outline, text or binary-evidence claims. */
 export function drawStaticPlatform(c: CanvasRenderingContext2D, b: Box, view: Box): void {
     const v = visiblePart(b, view); if (!v) return;
     const right = b.x + b.w, foot = b.y + b.h;
-    const upright = b.h > b.w * 1.5, inset = Math.min(7, b.w / 5, b.h / 4);
+    const upright = b.h > b.w, inset = Math.min(7, b.w / 5, b.h / 4);
     c.save(); clip(c, v);
-    const metal = c.createLinearGradient(0, b.y, 0, foot);
-    metal.addColorStop(0, '#2b3c49'); metal.addColorStop(.3, '#23333f'); metal.addColorStop(1, '#182630');
-    c.fillStyle = metal; c.fillRect(v.x, v.y, v.w, v.h);
+    const substrate = c.createLinearGradient(0, b.y, 0, foot);
+    substrate.addColorStop(0, '#1c2c3a'); substrate.addColorStop(.4, '#182735'); substrate.addColorStop(1, '#111f2c');
+    c.fillStyle = substrate; c.fillRect(v.x, v.y, v.w, v.h);
 
-    // Repeat plates rather than scaling a texture. Partial cells become endcaps.
+    // Fixed world cells contain different circuit topologies, with no panel seams.
+    // A shallow ledge gets one row; a narrow wall gets one column. Neither is stretched.
     if (b.w >= 16 && b.h >= 18) {
-        const pitchX = upright ? 104 : 192, pitchY = upright ? 144 : 96;
-        const top = b.y + Math.min(9, b.h / 3), bottom = foot - Math.min(7, b.h / 4);
-        for (let row = Math.floor(v.y / pitchY); row <= Math.floor((v.y + v.h) / pitchY); row++) {
-            const y = Math.max(top, row * pitchY + 5), endY = Math.min(bottom, (row + 1) * pitchY - 5);
+        const thin = b.h < 42, narrow = upright && b.w < 60;
+        const pitchX = upright ? 112 : 208, pitchY = upright ? 208 : 112;
+        const top = b.y + Math.min(7, b.h / 3), bottom = foot - Math.min(5, b.h / 4);
+        const firstRow = Math.floor((thin ? b.y : v.y) / pitchY), lastRow = thin ? firstRow : Math.floor((v.y + v.h) / pitchY);
+        for (let row = firstRow; row <= lastRow; row++) {
+            const y = thin ? top : Math.max(top, row * pitchY + 6);
+            const endY = thin ? bottom : Math.min(bottom, (row + 1) * pitchY - 6);
             if (endY - y < 5) continue;
             const stagger = upright ? 0 : (Math.abs(row) % 2) * pitchX / 2;
-            for (let col = Math.floor((v.x - stagger) / pitchX); col <= Math.floor((v.x + v.w - stagger) / pitchX); col++) {
-                const x = Math.max(b.x + inset, col * pitchX + stagger + 4);
-                const endX = Math.min(right - inset, (col + 1) * pitchX + stagger - 4);
+            const firstCol = Math.floor(((narrow ? b.x : v.x) - stagger) / pitchX);
+            const lastCol = narrow ? firstCol : Math.floor((v.x + v.w - stagger) / pitchX);
+            for (let col = firstCol; col <= lastCol; col++) {
+                const x = narrow ? b.x + inset : Math.max(b.x + inset, col * pitchX + stagger + 8);
+                const endX = narrow ? right - inset : Math.min(right - inset, (col + 1) * pitchX + stagger - 8);
                 const w = endX - x, h = endY - y;
-                if (w < 6) continue;
-                const cut = Math.min(4, w / 5, h / 3);
-                c.beginPath(); c.moveTo(x + cut, y); c.lineTo(endX, y); c.lineTo(endX, endY - cut);
-                c.lineTo(endX - cut, endY); c.lineTo(x, endY); c.lineTo(x, y + cut); c.closePath();
-                c.fillStyle = cellPhase(col, row) > .55 ? '#263641' : '#22313c'; c.fill();
-                line(c, x + cut, y + .5, endX - 1, y + .5, '#3a4c58');
-                line(c, x + .5, y + cut, x + .5, endY - 1, '#17232c');
-                line(c, x + 1, endY - .5, endX - cut, endY - .5, '#111d26');
-                if (w > 44 && h > 24) {
-                    c.fillStyle = '#111e27'; c.fillRect(endX - 10, y + 7, 4, 4);
-                    c.fillStyle = '#596a74'; c.fillRect(endX - 9, y + 7, 2, 2);
-                    if (w > 100 && h > 45) {
-                        c.fillStyle = '#111e27'; c.fillRect(x + 7, endY - 11, 4, 4);
-                        c.fillStyle = '#4a5d68'; c.fillRect(x + 8, endY - 11, 2, 2);
-                    }
-                }
-                if (upright && h > 35) {
-                    // Cross ties and longitudinal ribs read as a wall, even at 30 units wide.
-                    c.fillStyle = '#344652'; c.fillRect(x, y + 3, w, 3);
-                    line(c, endX - 3, y + 11, endX - 3, endY - 5, '#3b4d58');
-                }
+                if ((upright ? h >= 26 && w >= 6 : w >= 26 && h >= 6))
+                    circuitCell(c, x, y, w, h, upright, cellPhase(col + 17, row * 3 - 11));
             }
         }
     }
 
-    const bevel = Math.min(5, b.h / 3), under = Math.min(7, b.h / 4);
-    c.fillStyle = '#111d26'; c.fillRect(b.x, foot - under, b.w, under);
-    c.fillStyle = '#415563'; c.fillRect(b.x, b.y, b.w, bevel);
-    c.fillStyle = '#71818b'; c.fillRect(b.x, b.y, b.w, Math.min(1.5, bevel));
-    c.fillStyle = '#1b2933'; c.fillRect(b.x, b.y + bevel, b.w, Math.min(2, b.h / 6));
-    // Recessed vertical edges stay inside the collision box, with no glowing outline.
-    c.fillStyle = '#435560'; c.fillRect(b.x, b.y + bevel, Math.min(2, b.w / 4), Math.max(0, b.h - bevel - under));
-    c.fillStyle = '#101b24'; c.fillRect(right - Math.min(3, b.w / 4), b.y + bevel, Math.min(3, b.w / 4), Math.max(0, b.h - bevel));
-    if (upright && b.w >= 24) {
-        c.fillStyle = '#17242e'; c.fillRect(b.x + 4, b.y + bevel, 2, Math.max(0, b.h - bevel));
-    }
+    // A precise desaturated contact edge, not a powered cyan frame or metal bevel.
+    const edge = Math.min(1.25, b.h / 3), under = Math.min(3, b.h / 4);
+    c.fillStyle = '#0b1723'; c.fillRect(b.x, foot - under, b.w, under);
+    c.fillStyle = '#5e7383'; c.fillRect(b.x, b.y, b.w, edge);
+    c.fillStyle = '#2b4051'; c.fillRect(b.x, b.y + edge, b.w, Math.min(2, b.h / 6));
+    c.fillStyle = '#304654'; c.fillRect(b.x, b.y + edge, Math.min(1, b.w / 4), Math.max(0, b.h - edge - under));
+    c.fillStyle = '#0d1925'; c.fillRect(right - Math.min(2, b.w / 4), b.y + edge, Math.min(2, b.w / 4), Math.max(0, b.h - edge));
     c.restore();
 }
 

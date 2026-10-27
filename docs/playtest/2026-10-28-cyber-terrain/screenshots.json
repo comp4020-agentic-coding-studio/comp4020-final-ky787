@@ -1,0 +1,62 @@
+[
+  {
+    "file": "screenshots/handshake-player-1-1920.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/handshake-player-1-1920.png",
+    "sha256": "2e4c8fff25cdde7470cae8ec8a2ed768db60bcf8613c1ee2eeecd76422508356"
+  },
+  {
+    "file": "screenshots/handshake-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/handshake-player-1-1024.png",
+    "sha256": "568189aacf9fece43de6cd923cd061b1508e408369a01f2f44cb7b9ab895d701"
+  },
+  {
+    "file": "screenshots/handshake-overview-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/handshake-overview-1024.png",
+    "sha256": "aac2f5cd78807ae32daf482a5456ba9a2974032c3720c93761ead8708aae74f0"
+  },
+  {
+    "file": "screenshots/race-condition-player-1-1920.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/race-condition-player-1-1920.png",
+    "sha256": "798664dbd610f954df1b7ea929a2e215cd2022499f8e109c532315806feeed1c"
+  },
+  {
+    "file": "screenshots/race-condition-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/race-condition-player-1-1024.png",
+    "sha256": "890c551c62c923f61c4de6f8c3dff5c834b55079b0f93c74d091e34ee0d28e05"
+  },
+  {
+    "file": "screenshots/deadlock-player-1-1920.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/deadlock-player-1-1920.png",
+    "sha256": "e3f62edf376fd6d35c086f94ebe0ec7b650b569d21bbe703bc332a341fe7ccde"
+  },
+  {
+    "file": "screenshots/deadlock-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/deadlock-player-1-1024.png",
+    "sha256": "7934d50066d1d86cbdb3f9fb05e824ebc3feacde0dce9913a3d1dbcc1e4775cb"
+  },
+  {
+    "file": "screenshots/use-after-free-player-1-1920.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/use-after-free-player-1-1920.png",
+    "sha256": "75231818663df4d4e5a22f66ac1ea0ab8c763d67bc1219df294802a605894e2c"
+  },
+  {
+    "file": "screenshots/use-after-free-player-1-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/use-after-free-player-1-1024.png",
+    "sha256": "28fa668652718ee61be81731f9b3068486964739a3825e5003d08aed793cf109"
+  },
+  {
+    "file": "screenshots/crossfeed-reduced-motion-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/initial/crossfeed-reduced-motion-1024.png",
+    "sha256": "7c842127e2815fcc432cfce182f3bdbf0f07cdbb3f4f698e9660d5a687eee3d1"
+  },
+  {
+    "file": "screenshots/race-powered-code-1920.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/race/full-terrain-race-condition-powered-player-2-1920.png",
+    "sha256": "3f94e3a7a2583c4233c9cd3614c128e2b731c49e1cdd86acb28ce460a583a399"
+  },
+  {
+    "file": "screenshots/race-powered-code-1024.png",
+    "source": ".workbench/reports/2026-10-28-cyber-terrain/race/full-terrain-race-condition-powered-player-2-1024.png",
+    "sha256": "79d37359948643dae9daf90c94d32b51f0dbc4d762051a403a3f57fe75a2219b"
+  }
+]

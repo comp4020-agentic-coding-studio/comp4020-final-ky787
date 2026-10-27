@@ -4,12 +4,14 @@
 renderer, including the campaign, solo tutorials and custom-level preview.
 They receive rectangles and the current visible world bounds, not world state.
 
-- `drawStaticPlatform` gives enabled `kind: 'static'` boxes a desaturated metal
-  contact bevel, darker underside, clipped armour plates, seams and small bolts.
-  Horizontal plates repeat on a 192×96 world lattice with alternating row offsets.
-  Upright boxes use 104×144 cells, cross ties and longitudinal ribs. Insets and
-  decoration shrink or disappear on small/thin boxes. The old decorative `STATIC`
-  stencil is removed; native headers and authored text keep their existing code.
+- `drawStaticPlatform` gives enabled `kind: 'static'` boxes a dark computational
+  substrate, thin desaturated contact edge, etched right-angle circuit branches,
+  embedded chips and short segmented buses. Four seeded layouts vary chip size,
+  placement and routing; there are no plate seams, bolts, ribs or decorative text.
+  Horizontal circuitry uses 208×112 world cells with alternate row offsets;
+  upright structures rotate the same vocabulary in 112×208 cells. Thin ledges
+  use one simple trace row and narrow walls one vertical column. Very small
+  rectangles omit circuits. Native headers and authored text keep their code.
 - `drawDeathZone` gives `room.hazards` a near-black crimson interior, inset
   magenta perimeter, interrupted right-angle signals, sparse scanlines and small
   drifting packets. It adds no external glow, solid rail, spikes or labels.
@@ -38,6 +40,9 @@ its dangerous openings exposed.
   player cameras plus Tab overview in all five chambers, at 1920×1080/1024×768.
   The pan comparison allows two RGB channel values for Chromium gradient
   dithering; it does not allow a displaced seam or fragment.
+  Optional `BN_TERRAIN_BASELINE=<saved-source-path-relative-to-repo>` also
+  compares death-field pixels against a saved approved renderer at three times,
+  with motion on and off. The baseline is review input, not a runtime dependency.
 - `BN_TERRAIN_REVIEW=1 BN_NATIVE_WORLD_REVIEW=1 pnpm check:campaign`:
   ordinary-camera captures at stable powered holds during all five real-input
   solves. The original route, authority and completion assertions still run.
@@ -45,5 +50,6 @@ its dangerous openings exposed.
   all four solo rooms, powered/unpowered and held overview at both sizes,
   alongside the existing movement, grapple, reset and persistence regressions.
 
-Set `BN_SHOTS` to choose the co-op/raster output directory. Recorded review:
-[2026-10-28 terrain art](playtest/2026-10-28-terrain/README.md).
+Set `BN_SHOTS` to choose the co-op/raster output directory. Recorded reviews:
+[approved death-field art](playtest/2026-10-28-terrain/README.md) and
+[static cybernetic architecture](playtest/2026-10-28-cyber-terrain/README.md).

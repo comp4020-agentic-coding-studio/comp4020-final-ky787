@@ -15,14 +15,21 @@ try {
     const a = await h.page(url, debug), b = await h.page(url, debug);
     const raster = await a.read<{ name: string; pass: boolean; detail?: unknown }[]>(`(async()=>{
         const {drawStaticPlatform,drawDeathZone}=await import(${JSON.stringify(vite.resolvedUrls!.local[0] + 'src/slice/terrain-render.ts')});
+        const approved=${JSON.stringify(process.env.BN_TERRAIN_BASELINE ?? '')};
+        const baseline=approved?await import(${JSON.stringify(vite.resolvedUrls!.local[0])}+approved):null;
         const results=[];
-        function render(kind,box,view,zoom=1,time=2,motion=true){
+        function render(kind,box,view,zoom=1,time=2,motion=true,death=drawDeathZone){
             const canvas=document.createElement('canvas');canvas.width=480;canvas.height=320;
             const c=canvas.getContext('2d');c.scale(zoom,zoom);c.translate(-view.x,-view.y);
-            if(kind==='static')drawStaticPlatform(c,box,view);else drawDeathZone(c,box,view,time,motion);
+            if(kind==='static')drawStaticPlatform(c,box,view);else death(c,box,view,time,motion);
             return c.getImageData(0,0,480,320).data;
         }
         const hash=data=>{let v=2166136261;for(const x of data)v=Math.imul(v^x,16777619);return v>>>0;};
+        if(baseline)for(const motion of [true,false])for(const time of [0,.7,5]){
+            const box={x:12,y:16,w:430,h:100},view={x:0,y:0,w:480,h:320};
+            const now=render('hazard',box,view,1,time,motion),before=render('hazard',box,view,1,time,motion,baseline.drawDeathZone);
+            results.push({name:'approved death field is pixel-identical at '+time+'s, motion '+motion,pass:now.every((v,i)=>v===before[i])});
+        }
         for(const kind of ['static','hazard']){
             for(const [w,height] of [[430,70],[165,22],[30,280],[315,270],[12,8],[2,2]]){
                 for(const zoom of [.5,1,2]){
