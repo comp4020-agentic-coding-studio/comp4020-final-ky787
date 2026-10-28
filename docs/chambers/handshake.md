@@ -20,8 +20,9 @@ A separate plate operates the lift beside the upper service gallery. LINK opens
 both fixed relay gates, allowing the other player and the cube to regroup without
 repeating the lift. The gallery's 190-unit maintenance ledge requires the held
 cube. The final socket and two-arrival gate are back in the central bay. The room
-is 2290 × 1300; the additional bay width separates ENTRY POINT, BREAKPOINT, the
-relay, socket and exit instead of stacking their silhouettes.
+is 2450 × 1300; the bay width separates CROSSING, the lift, BREAKPOINT, LIFT,
+ENTRY POINT, the relay, socket and exit instead of stacking their silhouettes
+(see [chamber spacing](#chamber-spacing--2026-10-28)).
 
 ## Controller and objects
 
@@ -198,5 +199,57 @@ server-restart recovery. The HANDSHAKE checkpoint was earned by walking without 
 
 ### Presentation spacing — 2026-10-27
 
-Current draft and campaign SHA-256: `7d3305c93425fecef0b1cadd61d9446921d82e7928e617bfb0aea7cccbf4de77`.
+Draft and campaign SHA-256 after that pass: `7d3305c93425fecef0b1cadd61d9446921d82e7928e617bfb0aea7cccbf4de77`.
 The fixed boost hint moves above and left of the held-cube silhouette; the maintenance control keeps its approved art and interaction. Only `presentation.labels` changed, mirrored in the matching draft; geometry, controller bindings, checkpoints and native evidence are unchanged. See the [polish review](../playtest/2026-10-27-final-polish/README.md) for current browser captures and validation.
+
+### Chamber spacing — 2026-10-28
+
+Current draft and campaign SHA-256 (canonical `draftHash`): `788de3d6e6063687fe9d81b49bed40bb58b961f6d1a6983d1c62cdcb78302a67`.
+The redesigned breakpoint (164 units wide), pads (96) and lift emitter had grown
+into each other on the bay floor. Two coordinated insertions widen the room by 160:
+
+- **+60 at the lift's left side.** The lift, the whole upper gallery level
+  (gallery start, maintenance ledge and terminal, LINK, upper relay, gallery
+  label and boost hint) move together. The gallery stays flush with the lift's
+  right edge; its right end still meets the wall. Boost height, ledge height,
+  ledge/terminal spacing and lift top are unchanged.
+- **+160 on the bay floor right of the lift.** The lower relay, PAYLOAD socket
+  and exit move rigidly. BREAKPOINT, its two markers, LIFT and both spawns are
+  redistributed individually in the wider span.
+
+| Object | Before | After |
+| --- | --- | --- |
+| CROSSING | 1120 | 1120 (unchanged; cube-drop clearance from the bay edge) |
+| Gravity lift | 1140–1280 | 1200–1340 |
+| BREAKPOINT / markers | 1350 / 1330, 1410 | 1460 / 1440, 1520 |
+| LIFT pad | 1450 | 1630 |
+| Spawns / ENTRY POINT | 1600, 1660 | 1780, 1840 |
+| Gallery / ledge / terminal / LINK / upper relay | 1280 / 1780 / 1920 / 1450 / 1300 | 1340 / 1840 / 1980 / 1510 / 1360 |
+| Lower relay / PAYLOAD / exit | 1780 / 1970 / 2160 | 1940 / 2130 / 2320 |
+| Bay / gallery widths, room width | 1290 / 1010, 2290 | 1450 / 1110, 2450 |
+
+Visual footprints on the floor (pad base ±48, lift field, breakpoint footing
+±82, gateway pylons and flare) now read left to right with gaps of 32 (CROSSING →
+lift field), 38 (lift → BREAKPOINT), 40 (BREAKPOINT → LIFT) and 48 (LIFT → ENTRY
+POINT). Before, the first three overlapped by 28, 12 and 30 units. Order is preserved, so the LIFT pad
+remains well clear of the column it powers. That matters because campaign
+machinery follows server-accepted outputs, not local prediction.
+
+The LIFT wire rises from the moved pad and runs at y750, above the active
+breakpoint mast, into the lift. The lower LINK wire runs under the gallery,
+beside the relay snippet and above the ENTRY POINT header, entering the relay
+from the left, clear of its `GATE` label. CROSSING wires, anchors, alcove and
+recovery floor are untouched, so the 600-unit grapple crossing, recovery and
+cube-extraction defences are physically identical. Camera reveals: `liftView`
+1140–1810, `linkView` 1320–2040, `exitView` +160. Environmental snippets: lift
++60 (1080,290), relay and exit +160 (1788,610 and 2140,610); all clear every wire.
+Native bindings, evidence and controller outputs are unchanged.
+
+`levels/scenarios/handshake.json` keeps all 59 steps, waits and assertions; only
+16 coordinates follow moved objects (breakpoint approach, lift-side clearances,
+LIFT pad, lift entry, gallery/ledge/terminal positions, socket and exit). The
+real-input two-browser solve passed with both arrivals and zero deaths; the
+`tests/handshake-physics.test.ts` extraction, recovery and boost tests pass
+unchanged against the new draft. Saved parties store symbolic cube placements,
+device IDs and named checkpoints, so existing saves remain valid.
+See [the spacing review](../playtest/2026-10-28-chamber-spacing/README.md).

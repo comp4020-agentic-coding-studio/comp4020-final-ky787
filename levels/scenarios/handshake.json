@@ -26,7 +26,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1340
+          "x": 1450
         }
       ],
       "waitMs": 180
@@ -387,7 +387,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1300
+          "x": 1360
         }
       ],
       "waitMs": 200
@@ -427,7 +427,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1300
+          "x": 1360
         },
         {
           "type": "key",
@@ -438,7 +438,7 @@
         {
           "type": "walk",
           "actor": "partner",
-          "x": 1320
+          "x": 1380
         },
         {
           "type": "key",
@@ -505,7 +505,7 @@
         {
           "type": "walk",
           "actor": "partner",
-          "x": 1420
+          "x": 1600
         }
       ],
       "wait": {
@@ -524,7 +524,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1180
+          "x": 1240
         }
       ],
       "wait": {
@@ -550,7 +550,7 @@
         "actor": "host",
         "condition": {
           "path": "player.x",
-          "min": 1340
+          "min": 1400
         },
         "timeoutMs": 4000
       }
@@ -581,7 +581,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1700
+          "x": 1760
         }
       ],
       "waitMs": 250
@@ -610,7 +610,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1480
+          "x": 1540
         }
       ],
       "waitMs": 200
@@ -678,7 +678,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1710
+          "x": 1770
         }
       ],
       "waitMs": 200
@@ -707,7 +707,7 @@
         {
           "type": "walk",
           "actor": "partner",
-          "x": 1700
+          "x": 1760
         }
       ],
       "waitMs": 250
@@ -764,7 +764,7 @@
         "actor": "partner",
         "condition": {
           "path": "player.x",
-          "min": 1820
+          "min": 1880
         },
         "timeoutMs": 4000
       }
@@ -800,7 +800,7 @@
         {
           "type": "walk",
           "actor": "partner",
-          "x": 1880
+          "x": 1940
         }
       ],
       "waitMs": 200
@@ -888,7 +888,7 @@
         "actor": "partner",
         "condition": {
           "path": "player.x",
-          "max": 1660
+          "max": 1720
         },
         "timeoutMs": 4000
       }
@@ -938,7 +938,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1930
+          "x": 2090
         }
       ],
       "waitMs": 250
@@ -974,7 +974,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 2200
+          "x": 2360
         },
         {
           "type": "key",

@@ -73,7 +73,7 @@ h.shot = async (p, name) => {
         await p.send('Emulation.setEmulatedMedia', { features: [] });
         // Real movement away also shows the latched face without the avatar in
         // front of it; the canonical descent continues from the same ledge.
-        await h.walk(p, 1860); await sleep(700); await capture(p, '05-completed-departure');
+        await h.walk(p, 1920); await sleep(700); await capture(p, '05-completed-departure');
         check('the completed green latch persists after leaving interaction range', (await control(p)).completed && !(await control(p)).hint);
     }
 };

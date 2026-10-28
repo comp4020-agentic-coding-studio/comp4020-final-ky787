@@ -103,9 +103,9 @@ coordinates.
 | Chamber / output | Final x,y,w,h | Excerpt treatment | Local arrangement |
 | --- | --- | --- | --- |
 | HANDSHAKE crossingPower | 675,805,328,124 | comparison + store | Isolated crossing wall |
-| HANDSHAKE liftPower | 1020,290,328,124 | saved-Boolean branch + store | Separate wall above lift |
-| HANDSHAKE relayPower | 1628,610,280,124 | store | Separate wall above lower relay |
-| HANDSHAKE exitReady | 1980,610,280,124 | Boolean excerpt + store | Separate exit wall |
+| HANDSHAKE liftPower | 1080,290,328,124 | saved-Boolean branch + store | Separate wall above lift |
+| HANDSHAKE relayPower | 1788,610,280,124 | store | Separate wall above lower relay |
+| HANDSHAKE exitReady | 2140,610,280,124 | Boolean excerpt + store | Separate exit wall |
 | CROSSFEED grappleAnchor | 2580,1200,328,124 | comparison + store | Crossing/access wall, right of transfer wire |
 | CROSSFEED bridge | 2050,1540,328,124 | store | Pit return wall |
 | CROSSFEED liftField | 1760,1165,328,124 | Boolean excerpt + store | Local lift wall |
@@ -135,6 +135,12 @@ lift block therefore moved to x1020,y290 above the lift field, ending before the
 upper LINK wire at y415. Lift and relay now use separate local placements rather
 than forcing the planned pair. Relay and exit retain narrower blocks beneath
 the gallery. The wire, lift, camera and room geometry remain unchanged.
+
+The 2026-10-28 [HANDSHAKE chamber spacing](chambers/handshake.md#chamber-spacing--2026-10-28)
+widened the bay by 160 units. These HANDSHAKE blocks moved with their machinery:
+the lift block +60 with the lift and gallery level, relay and exit +160 with the
+floor. Crossing stays put. Dimensions, excerpts, bindings and native fragments
+are unchanged, and each block remains clear of every rerouted wire.
 
 Actual USE AFTER FREE handovers exposed two further wire crossings. Route B
 moved from x1180,y1760 to x1000,y1420, between its first and middle slabs and left

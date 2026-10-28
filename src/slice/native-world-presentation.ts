@@ -15,9 +15,9 @@ export interface NativeWorldPlacement {
 export const WORLD_ASSEMBLY_PLACEMENTS: Partial<Record<NativeChamberId, readonly NativeWorldPlacement[]>> = {
     handshake: [
         { output: 'crossingPower', target: 'nearAnchor', x: 715, y: 690 },
-        { output: 'liftPower', target: 'serviceLift', x: 1280, y: 610 },
-        { output: 'relayPower', target: 'lowerRelay', x: 1630, y: 610 },
-        { output: 'exitReady', target: 'exit', x: 1965, y: 610 },
+        { output: 'liftPower', target: 'serviceLift', x: 1340, y: 610 },
+        { output: 'relayPower', target: 'lowerRelay', x: 1790, y: 610 },
+        { output: 'exitReady', target: 'exit', x: 2125, y: 610 },
     ],
     'crossfeed-vault': [
         { output: 'grappleAnchor', target: 'crossing-anchor', x: 2240, y: 1210 },

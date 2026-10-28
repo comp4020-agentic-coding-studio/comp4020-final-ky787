@@ -18,11 +18,11 @@ export const ENVIRONMENTAL_BLOCKS: Record<EnvironmentalChamber, readonly Environ
     handshake: [
         { output: 'crossingPower', target: 'nearAnchor', group: 'crossing', x: 675, y: 805, w: 328, h: 124,
             label: 'CROSSING', on: 'POWERED', off: 'IDLE', excerpt: 'compare' },
-        { output: 'liftPower', target: 'serviceLift', group: 'service-lift', x: 1020, y: 290, w: 328, h: 124,
+        { output: 'liftPower', target: 'serviceLift', group: 'service-lift', x: 1080, y: 290, w: 328, h: 124,
             label: 'SERVICE LIFT', on: 'ACTIVE', off: 'INACTIVE', excerpt: 'branch' },
-        { output: 'relayPower', target: 'lowerRelay', group: 'service-relay', x: 1628, y: 610, w: 280, h: 124,
+        { output: 'relayPower', target: 'lowerRelay', group: 'service-relay', x: 1788, y: 610, w: 280, h: 124,
             label: 'SERVICE RELAY', on: 'AVAILABLE', off: 'UNAVAILABLE', excerpt: 'store' },
-        { output: 'exitReady', target: 'exit', group: 'exit', x: 1980, y: 610, w: 280, h: 124,
+        { output: 'exitReady', target: 'exit', group: 'exit', x: 2140, y: 610, w: 280, h: 124,
             label: 'EXIT', on: 'UNLOCKED', off: 'LOCKED', excerpt: 'boolean' },
     ],
     'crossfeed-vault': [

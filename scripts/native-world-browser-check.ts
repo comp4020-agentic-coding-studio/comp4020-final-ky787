@@ -286,17 +286,17 @@ try {
     await wait(a, 'CROSSING contact accepted', s => !!s.signals?.['draft:crossingPower']);
     await capture(a, 'handshake', 'handshake-crossing-active', { x: 930, y: 770, zoom: .95 });
     check('real pressure contact changes the confirmed native display', (await a.read<GameSnapshot['environmentalAssembly']>('binaryNinja.snapshot().environmentalAssembly')).sections.some(panel => panel.output === 'crossingPower' && panel.raw === true));
-    await capture(b, 'handshake', 'handshake-both-players', { x: 1280, y: 780, zoom: .95 });
+    await capture(b, 'handshake', 'handshake-both-players', { x: 1460, y: 780, zoom: .95 });
     check('both named players retain readable Canvas labels', (await painted(b)).some(paint => paint.text.includes('ShadowByte / P1'))
         && (await painted(b)).some(paint => paint.text.includes('ZeroDay / P2')));
-    await capture(a, 'handshake', 'handshake-gallery-lift', { x: 1180, y: 400, zoom: .95 });
-    await capture(a, 'handshake', 'handshake-relay-exit', { x: 1870, y: 720, zoom: .95 });
-    await capture(a, 'handshake', 'handshake-exit', { x: 1900, y: 770, zoom: .95 });
-    await capture(a, 'handshake', 'handshake-pan-zoom', { x: 1580, y: 800, zoom: .65 }, false);
-    await narrow(a, 'handshake', 'handshake-lift', { x: 1180, y: 400, zoom: .95 });
-    await narrow(a, 'handshake', 'handshake-relay-exit', { x: 1870, y: 720, zoom: .95 });
+    await capture(a, 'handshake', 'handshake-gallery-lift', { x: 1240, y: 400, zoom: .95 });
+    await capture(a, 'handshake', 'handshake-relay-exit', { x: 2030, y: 720, zoom: .95 });
+    await capture(a, 'handshake', 'handshake-exit', { x: 2060, y: 770, zoom: .95 });
+    await capture(a, 'handshake', 'handshake-pan-zoom', { x: 1740, y: 800, zoom: .65 }, false);
+    await narrow(a, 'handshake', 'handshake-lift', { x: 1240, y: 400, zoom: .95 });
+    await narrow(a, 'handshake', 'handshake-relay-exit', { x: 2030, y: 720, zoom: .95 });
     await a.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
-    await capture(a, 'handshake', 'handshake-reduced-motion', { x: 1500, y: 720, zoom: .95 });
+    await capture(a, 'handshake', 'handshake-reduced-motion', { x: 1600, y: 720, zoom: .95 });
     check('reduced motion completes authored strings and removes store pulses', (await snapshot(a)).environmentalAssembly.sections.every(section => section.revealed === section.message && section.pulse === 0));
     await a.send('Emulation.setEmulatedMedia', { features: [] });
     await measure(a, 'HANDSHAKE accepted active crossing frame intervals');
@@ -342,9 +342,9 @@ try {
                 const current = await snapshot(page);
                 check(`${name}: canonical route reaches accepted machinery state`, current.environmentalAssembly.sections.some(section =>
                     section.output === 'relayPower' && section.physical === true));
-                await capture(page, 'handshake', 'handshake-lift-linked-detail', { x: 1180, y: 400, zoom: .95 });
-                await narrow(page, 'handshake', 'handshake-lift-linked', { x: 1180, y: 400, zoom: .95 });
-                await capture(page, 'handshake', 'handshake-relay-linked-detail', { x: 1790, y: 720, zoom: .95 });
+                await capture(page, 'handshake', 'handshake-lift-linked-detail', { x: 1240, y: 400, zoom: .95 });
+                await narrow(page, 'handshake', 'handshake-lift-linked', { x: 1240, y: 400, zoom: .95 });
+                await capture(page, 'handshake', 'handshake-relay-linked-detail', { x: 1950, y: 720, zoom: .95 });
             } else if (name === 'use-after-free-first-handover-host') {
                 check(`${name}: real handover powers route B`, (await snapshot(page)).environmentalAssembly.sections.some(section =>
                     section.output === 'routeB' && section.physical === true));
