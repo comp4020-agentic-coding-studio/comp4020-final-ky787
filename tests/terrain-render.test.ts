@@ -62,20 +62,21 @@ function coverage(signals: RailSignal[], lo: number, hi: number) {
 const floor = Object.freeze({ x: 0, y: 1500, w: 1800, h: 280 }), camera = Object.freeze({ x: 300, y: 1100, w: 1300, h: 731 });
 
 describe('static contact-edge flow', () => {
-    it('keeps several luminous segments moving across the visible floor edge at gameplay speed', () => {
+    const top = (signals: RailSignal[]) => signals.filter(s => s.axis === 'x' && s.across === floor.y);
+    it('keeps many fine luminous segments moving across the visible floor edge at gameplay speed', () => {
         for (const time of [0, 1.7, 9.2, 60]) {
-            const signals = staticSignals(floor, camera, time).filter(s => s.axis === 'x');
-            const visible = signals.filter(s => Math.max(s.head, s.tail) > camera.x && Math.min(s.head, s.tail) < camera.x + camera.w);
-            // At least one bright head per 260 visible units, each 20–50 units bright.
-            expect(visible.length).toBeGreaterThanOrEqual(Math.floor(camera.w / 260));
+            const visible = top(staticSignals(floor, camera, time))
+                .filter(s => Math.max(s.head, s.tail) > camera.x && Math.min(s.head, s.tail) < camera.x + camera.w);
+            // At least one bright head per 110 visible units, each short (10–24 units) and thin.
+            expect(visible.length).toBeGreaterThanOrEqual(Math.floor(camera.w / 110));
             for (const s of visible) {
                 expect(Math.abs(s.velocity)).toBeGreaterThanOrEqual(100);
                 expect(Math.abs(s.velocity)).toBeLessThanOrEqual(160);
-                expect(s.bright).toBeGreaterThanOrEqual(20);
-                expect(s.bright).toBeLessThanOrEqual(50);
-                expect(s.across).toBe(floor.y);
+                expect(s.bright).toBeGreaterThanOrEqual(10);
+                expect(s.bright).toBeLessThanOrEqual(24);
+                expect(s.thick).toBeLessThanOrEqual(1.5);
             }
-            // Lit signals and trails cover a substantial share of the visible edge.
+            // Lit signals and trails still cover a substantial share of the visible edge.
             expect(coverage(visible, camera.x, camera.x + camera.w) / camera.w).toBeGreaterThan(.35);
         }
     });
@@ -83,36 +84,67 @@ describe('static contact-edge flow', () => {
         const a = staticSignals(floor, camera, 4), b = staticSignals(floor, camera, 4.25);
         let tracked = 0;
         for (const s of a) {
-            const next = b.find(n => n.velocity === s.velocity && Math.abs(n.head - s.head - s.velocity * .25) < 1e-6);
+            const next = b.find(n => n.axis === s.axis && n.across === s.across && n.velocity === s.velocity
+                && Math.abs(n.head - s.head - s.velocity * .25) < 1e-6);
             if (next) tracked++;
         }
         // Signals near the edges may enter or leave; the rest move ~25–40 units in 0.25s.
-        expect(tracked).toBeGreaterThanOrEqual(a.length - 3);
-        expect(tracked).toBeGreaterThanOrEqual(4);
+        expect(tracked).toBeGreaterThanOrEqual(a.length - 6);
+        expect(tracked).toBeGreaterThanOrEqual(8);
     });
     it('does not depend on the viewport for position or phase', () => {
         const wide = staticSignals(floor, { x: 0, y: 1100, w: 1800, h: 731 }, 3.3);
         const panned = staticSignals(floor, { x: 640, y: 1100, w: 500, h: 731 }, 3.3);
         for (const s of panned) expect(wide).toContainEqual(s);
     });
+    it('runs sparser thin signals along the sides and underside, flowing around the silhouette', () => {
+        const block = { x: 850, y: 1100, w: 400, h: 310 }, whole = { x: 600, y: 900, w: 900, h: 700 };
+        const per100 = (signals: RailSignal[], length: number) => signals.length / length * 100;
+        for (const time of [0, 2.5, 11]) {
+            const signals = staticSignals(block, whole, time);
+            const left = signals.filter(s => s.axis === 'y' && s.across === block.x);
+            const right = signals.filter(s => s.axis === 'y' && s.across > block.x + block.w - 3);
+            const under = signals.filter(s => s.axis === 'x' && s.across > block.y + block.h - 3);
+            const roof = signals.filter(s => s.axis === 'x' && s.across === block.y);
+            // Clockwise: down the right face, left along the underside, up the left face.
+            expect(right.every(s => s.velocity > 0) && under.every(s => s.velocity < 0) && left.every(s => s.velocity < 0)).toBe(true);
+            const perimeter = [...left, ...right, ...under];
+            expect(perimeter.length).toBeGreaterThanOrEqual(1);
+            for (const s of perimeter) {
+                expect(s.thick).toBeLessThanOrEqual(1.5);
+                expect(Math.abs(s.velocity)).toBeGreaterThanOrEqual(100);
+                // Each signal stays on and inside its own face of the box.
+                if (s.axis === 'y') expect(s.across >= block.x && s.across + s.thick <= block.x + block.w).toBe(true);
+                else expect(s.across + s.thick).toBeLessThanOrEqual(block.y + block.h);
+            }
+            // The top is the densest edge: under half the perimeter's density per unit length.
+            expect(per100(perimeter, block.w + 2 * block.h)).toBeLessThan(per100(roof, block.w) / 2);
+        }
+        // Over a long floor the underside carries far fewer segments than the top.
+        const allUnder = staticSignals(floor, { x: 0, y: 1400, w: 1800, h: 500 }, 3);
+        const floorTop = top(allUnder).length, floorUnder = allUnder.filter(s => s.axis === 'x' && s.across > floor.y).length;
+        expect(floorUnder).toBeGreaterThanOrEqual(3);
+        expect(floorUnder * 3).toBeLessThanOrEqual(floorTop);
+    });
     it('gives narrow walls vertical rails and short ledges a single moving signal', () => {
         const wall = { x: 90, y: 420, w: 30, h: 652 }, wallView = { x: 0, y: 300, w: 400, h: 900 };
         const rails = staticSignals(wall, wallView, 2).filter(s => s.axis === 'y');
         expect(new Set(rails.map(s => Math.sign(s.velocity))).size).toBe(2);
-        expect(rails.length).toBeGreaterThanOrEqual(4);
+        expect(rails.length).toBeGreaterThanOrEqual(2);
         for (const s of rails) expect(Math.abs(s.velocity)).toBeGreaterThanOrEqual(100);
         const ledge = { x: 300, y: 1136, w: 140, h: 22 };
         for (const time of [0, 1, 2, 3]) {
             const lit = staticSignals(ledge, { x: 0, y: 900, w: 900, h: 500 }, time)
                 .filter(s => Math.max(s.head, s.tail) > ledge.x && Math.min(s.head, s.tail) < ledge.x + ledge.w);
             expect(lit.length).toBeLessThanOrEqual(1);
+            expect(lit.every(s => s.axis === 'x' && s.across === ledge.y)).toBe(true);
         }
         expect(staticSignals({ x: 0, y: 0, w: 30, h: 8 }, view, 2)).toEqual([]);
     });
     it('keeps the static body plain: no chips, pins or dense circuitry', () => {
         const commands = record('static', floor, camera, 0, false);
         const rects = commands.filter(c => c[0] === 'fillRect').length, vertices = commands.filter(c => c[0] === 'lineTo').length;
-        // Substrate, sides, glow, contact strip and a handful of 2×2 etched vias.
+        // Substrate, edge tracks, glow, contact strip and a handful of 2×2 etched vias.
         expect(rects).toBeLessThan(20);
         expect(vertices).toBeLessThan(40);
     });

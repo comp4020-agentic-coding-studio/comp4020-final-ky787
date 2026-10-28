@@ -1,0 +1,35 @@
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] crossfeed-lift-off-1920 uses the accepted lift state and ordinary camera
+PASS [full chamber] crossfeed-lift-off-1024 uses the accepted lift state and ordinary camera
+PASS [full chamber] lift art capture preserves the grounded hold
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] crossfeed-lift-on-1920 uses the accepted lift state and ordinary camera
+PASS [full chamber] crossfeed-lift-on-1920 matches the unpowered camera — {"off":{"kind":"follow","id":null,"frame":null,"x":1709.8350439501348,"y":1396.728682818918,"zoom":1.2497674063454367},"on":{"kind":"follow","id":null,"frame":null,"x":1710.3111111111118,"y":1396.7286828189656,"zoom":1.249767406345592}}
+PASS [full chamber] crossfeed-lift-on-1024 uses the accepted lift state and ordinary camera
+PASS [full chamber] crossfeed-lift-on-1024 matches the unpowered camera — {"off":{"kind":"follow","id":null,"frame":null,"x":1710.3088112903445,"y":1385.9380039982593,"zoom":0.8196679793465118},"on":{"kind":"follow","id":null,"frame":null,"x":1710.311111111112,"y":1385.9554625184455,"zoom":0.8197042955204522}}
+PASS [full chamber] lift art capture preserves the grounded hold
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] walking into the breakpoint does not operate SYSTEM ONLINE
+PASS [full chamber] shared checkpoint does not teleport the waiting partner
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] browser has no runtime errors
+PASS [full chamber] browser has no runtime errors
+PASS [full chamber] captured both accepted gravity-lift states

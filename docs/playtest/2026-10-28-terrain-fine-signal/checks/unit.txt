@@ -1,0 +1,9 @@
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+
+ Test Files  3 passed (3)
+      Tests  30 passed (30)
+   Start at  12:45:15
+   Duration  630ms (transform 71%, import 16%, tests 11%, worker 1%)
+

@@ -183,7 +183,9 @@ Inactive controlled slabs remain 25% ghosts, unhookable/non-solid after grace.
 Wires show resolved destination power; inverse relay/left-route branches have
 NOT markers. Ordinary plates look alike and accept either kind of occupant.
 Payload sockets use compact tech [PAYLOAD RECEIVER interfaces](payload-receiver.md)
-with amber awaiting/cyan detected status; biometric scanners have body-height rails.
+with amber awaiting/cyan detected status. The two biometric vault scanners use the
+shared animated pressure-pad art, idle amber and pressed blue, plus body-height
+rails that turn cyan while occupied.
 Toggle levers and one-shot terminals have visibly different drawings.
 
 Room-owned `cameraReveal` metadata gives A the entry gap/anchor, B a brief transfer

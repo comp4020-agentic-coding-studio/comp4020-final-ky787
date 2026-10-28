@@ -263,13 +263,15 @@ export class PuzzleRenderer {
             if (isDeclarativeLevel(r.id) && 'kind' in plate) {
                 if (plate.kind === 'scanner') { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
             }
-            if (r.id === 'crossfeed-vault') {
-                if (!r.plates?.some(p => p.at === plate.at)) { this.line(x - 53, y, x - 53, y - 60, C.cyan); this.line(x + 53, y, x + 53, y - 60, C.cyan); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c'); }
-            }
             this.text(plate.label, x - 55, y + 49, 12, plate.active ? C.cyan : C.amber);
         }
         for (const pad of pads) {
             const state = this.heroes.machinery.pads.get(pad.id)!;
+            if (r.id === 'crossfeed-vault' && (pad.at === r.plateB || pad.at === r.plateC)) {
+                // Body-height biometric rails mark the two-player scanners behind the pad.
+                const { x, y } = pad.at, rail = pad.active ? C.cyan : '#43636c';
+                this.line(x - 53, y, x - 53, y - 60, rail); this.line(x + 53, y, x + 53, y - 60, rail); this.line(x - 53, y - 48, x + 53, y - 48, '#43636c');
+            }
             drawPressurePad(c, pad, state, this.heroes.time, energyMotion);
             drawPadOutputPulse(c, pad, state, this.connections, w, energyMotion);
         }

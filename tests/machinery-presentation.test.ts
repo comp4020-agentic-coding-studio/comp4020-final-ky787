@@ -46,12 +46,16 @@ it('keeps independent clocks and settles stopped editor or disconnected previews
     expect(p.snapshot().pads.every(p => p.age === null && p.depression === 1)).toBe(true);
     expect(p.snapshot().lifts.every(l => l.age === null && l.illumination === 1)).toBe(true);
 });
-it('audits ordinary legacy/declarative pads without relabelling receivers or personnel scanners', () => {
+it('audits ordinary legacy/declarative pads and CROSSFEED scanners without relabelling receivers', () => {
     const base = new PuzzleWorld(roomById('uplink'), freshProgress().rooms.uplink);
     expect(pressurePads(base).map(p => p.id)).toEqual(['plateA', 'plateB']);
     for (const id of ['pressure', 'relay'] as const) expect(pressurePads({ ...base, room: roomById(id) }).length).toBeGreaterThan(0);
     const crossfeed = { ...base, room: COOP_LABS['crossfeed-vault'].room(1) };
-    expect(pressurePads(crossfeed).map(p => p.id)).toEqual(['entry', 'routePower']);
+    // The vault's biometric scanners share the animated pad art; payload sockets stay receivers.
+    expect(pressurePads(crossfeed).map(p => [p.id, p.label, p.labelOffset])).toEqual([
+        ['plateB', 'LEFT / SCANNER', 49], ['plateC', 'RIGHT / SCANNER', 49], ['entry', 'A', 49], ['routePower', 'ROUTE POWER', 49]]);
+    expect(pressurePads({ ...crossfeed, inputs: { ...base.inputs, plateB: true } }).map(p => p.active)).toEqual([true, false, false, false]);
+    expect(payloadReceivers(crossfeed).map(p => p.id)).toEqual(['liftCargo', 'finalLeft', 'finalRight']);
     expect(pressurePads({ ...base, room: COOP_LABS['race-condition'].room(1) }).map(p => p.id)).toContain('receiver');
     const w = createRuntime(machineryReview()).world;
     expect(pressurePads(w).map(p => p.id)).toEqual(['draft:feed', 'draft:unstable']);

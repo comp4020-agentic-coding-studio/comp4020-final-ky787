@@ -29,12 +29,16 @@ export type RailSignal = { axis: 'x' | 'y'; across: number; thick: number; glow:
 type Train = { pitch: number; speed: number; bright: number; trail: number };
 type Palette = { head: string; body: string; fade: string; glow: string; clear: string };
 
-// Two interleaved trains at different speeds keep long floors visibly flowing.
-const EDGE_TRAINS: readonly Train[] = [{ pitch: 216, speed: 148, bright: 40, trail: 78 }, { pitch: 304, speed: 108, bright: 24, trail: 52 }];
-const LEDGE: Train = { pitch: 0, speed: 124, bright: 30, trail: 56 };
-const WALL: Train = { pitch: 264, speed: 122, bright: 30, trail: 64 };
+// Three interleaved trains of fine segments keep long floors visibly flowing.
+const EDGE_TRAINS: readonly Train[] = [{ pitch: 132, speed: 146, bright: 22, trail: 40 },
+    { pitch: 176, speed: 118, bright: 16, trail: 30 }, { pitch: 236, speed: 160, bright: 12, trail: 24 }];
+const LEDGE: Train = { pitch: 0, speed: 124, bright: 18, trail: 34 };
+// Sides carry one sparse train; undersides two co-prime trains, so streak spacing
+// never repeats evenly. Both stay well under a third of the top's density.
+const PERIMETER: Train = { pitch: 360, speed: 104, bright: 16, trail: 32 };
+const UNDERSIDE: readonly Train[] = [{ pitch: 520, speed: 102, bright: 16, trail: 32 }, { pitch: 740, speed: 112, bright: 12, trail: 26 }];
 const BOUNDARY: Train = { pitch: 232, speed: 228, bright: 48, trail: 92 };
-const CONTACT: Palette = { head: '#ffffff', body: '#b4baff', fade: '#b4baff00', glow: '#7480ff', clear: '#7480ff00' };
+const CONTACT: Palette = { head: '#ffffff', body: '#c9ceff', fade: '#c9ceff00', glow: '#8a94ff', clear: '#8a94ff00' };
 const LETHAL: Palette = { head: '#ffe0e8', body: '#ff5a8c', fade: '#ff5a8c00', glow: '#ff3d7a', clear: '#ff3d7a00' };
 const BACKFLOW: Palette = { head: '#ff9bb6', body: '#e0487a', fade: '#e0487a00', glow: '#c9306a', clear: '#c9306a00' };
 
@@ -72,31 +76,57 @@ function drawRail(c: CanvasRenderingContext2D, s: RailSignal, p: Palette) {
     c.fillStyle = core; band(s.glow >= 0 ? s.across : s.across - 1.5, s.thick + 1.5);
 }
 
-/** Static contact geometry: crisp strip, inner glow and, for narrow walls, side rails. */
-function contact(b: Box) {
-    return { edge: Math.min(2.5, b.h / 3), glow: Math.min(12, b.h * .4), halo: Math.min(11, b.h * .4),
-        wall: b.h >= b.w * 2 && b.w >= 10 && b.w <= 80, rail: Math.min(1.5, b.w / 8) };
+/** A fine static signal: a hairline core with a short white head and fading tail
+ * over a narrow inward glow. Brightness, not width, separates it from its track. */
+function drawFine(c: CanvasRenderingContext2D, s: RailSignal) {
+    const along = s.axis === 'x', lo = Math.min(s.tail, s.head), span = Math.abs(s.head - s.tail);
+    const band = (start: number, size: number) => along ? c.fillRect(lo, start, span, size) : c.fillRect(start, lo, size, span);
+    const ramp = () => along ? c.createLinearGradient(s.tail, 0, s.head, 0) : c.createLinearGradient(0, s.tail, 0, s.head);
+    const knee = Math.max(0, 1 - s.bright / span), inner = s.glow >= 0 ? s.across + s.thick : s.across;
+    const halo = ramp(); halo.addColorStop(0, CONTACT.clear); halo.addColorStop(1, CONTACT.glow);
+    c.fillStyle = halo; c.globalAlpha = .4; band(s.glow >= 0 ? inner : inner + s.glow, Math.abs(s.glow));
+    c.globalAlpha = 1;
+    const core = ramp();
+    core.addColorStop(0, CONTACT.fade); core.addColorStop(knee * .5, '#9aa3ff66'); core.addColorStop(knee, CONTACT.body); core.addColorStop(1, CONTACT.head);
+    c.fillStyle = core; band(s.across, s.thick);
+    // A 4-unit white tip, one rail wide, keeps each fine head crisp at gameplay zoom.
+    const tip = Math.min(4, span), at = s.velocity >= 0 ? s.head - tip : s.head;
+    c.fillStyle = CONTACT.head;
+    if (along) c.fillRect(at, s.across, tip, s.thick); else c.fillRect(s.across, at, s.thick, tip);
 }
 
-/** Moving signals on a static platform's top contact strip and narrow-wall rails.
- * Long surfaces carry interleaved world-anchored trains; short ledges one signal. */
+/** Static contact geometry: crisp strip, inner glow and, for narrow walls, side rails. */
+function contact(b: Box) {
+    return { edge: Math.min(2.5, b.h / 3), glow: Math.min(12, b.h * .4), halo: Math.min(2.5, b.h * .2),
+        wall: b.h >= b.w * 2 && b.w >= 10 && b.w <= 80, rail: Math.min(1.5, b.w / 8) };
+}
+/** Fine signal thickness and inner glow; never over a quarter of the box. */
+const FINE = 1.25, FINE_GLOW = 2;
+
+/** Moving signals on a static platform's contact edges. Long top surfaces carry
+ * three interleaved world-anchored trains; short ledges one signal. Sides and the
+ * underside carry a sparser train, flowing clockwise around the silhouette. */
 export function staticSignals(b: Box, view: Box, clock: number): RailSignal[] {
     const out: RailSignal[] = [], v = visiblePart(b, view);
     if (!v) return out;
     const k = contact(b), right = b.x + b.w, foot = b.y + b.h;
-    const dir = cellPhase(Math.floor(b.y), 5) < .5 ? 1 : -1;
-    if (b.w >= 48 && v.y <= b.y + k.edge + k.halo) {
-        if (b.w < 240) rail(out, { ...LEDGE, pitch: b.w + LEDGE.bright + LEDGE.trail + 40 }, 'x', b.y, k.edge, k.halo,
-            b.x, right, v.x, v.x + v.w, dir, cellPhase(Math.floor(b.x), Math.floor(b.y)), clock, b.x);
-        else EDGE_TRAINS.forEach((t, i) => rail(out, t, 'x', b.y, k.edge, k.halo,
-            b.x, right, v.x, v.x + v.w, dir, cellPhase(i * 7 + 1, Math.floor(b.y)), clock));
+    const thick = Math.min(FINE, b.h / 4, b.w / 4), glow = Math.min(FINE_GLOW, b.h / 4, b.w / 4);
+    if (b.w >= 48 && v.y <= b.y + thick + k.halo) {
+        if (b.w < 240) rail(out, { ...LEDGE, pitch: b.w + LEDGE.bright + LEDGE.trail + 40 }, 'x', b.y, thick, k.halo,
+            b.x, right, v.x, v.x + v.w, 1, cellPhase(Math.floor(b.x), Math.floor(b.y)), clock, b.x);
+        else EDGE_TRAINS.forEach((t, i) => rail(out, t, 'x', b.y, thick, k.halo,
+            b.x, right, v.x, v.x + v.w, i === 1 ? -1 : 1, cellPhase(i * 7 + 1, Math.floor(b.y)), clock));
     }
-    if (k.wall) {
-        // Data descends the left face and climbs the right one.
-        for (const [x, down, glow] of [[b.x + 1, 1, 4], [right - 1 - k.rail, -1, -4]])
-            if (x + k.rail + 4 >= v.x && x - 4 <= v.x + v.w)
-                rail(out, WALL, 'y', x, k.rail, glow, b.y + k.edge, foot, v.y, v.y + v.h, down, cellPhase(Math.floor(x), 11), clock);
+    // Down the right face, leftward along the underside, up the left face.
+    const inset = k.wall ? 1 : 0, seed = Math.floor(b.x) * 3 + Math.floor(b.y);
+    if (b.h >= 40 && b.w >= 8) {
+        if (right - inset - thick - glow <= v.x + v.w && right >= v.x)
+            rail(out, PERIMETER, 'y', right - inset - thick, thick, -glow, b.y + k.edge, foot, v.y, v.y + v.h, 1, cellPhase(seed, 11), clock);
+        if (b.x <= v.x + v.w && b.x + inset + thick + glow >= v.x)
+            rail(out, PERIMETER, 'y', b.x + inset, thick, glow, b.y + k.edge, foot, v.y, v.y + v.h, -1, cellPhase(seed, 13), clock);
     }
+    if (b.w >= 48 && b.h >= 24 && foot - thick - glow <= v.y + v.h)
+        UNDERSIDE.forEach((t, i) => rail(out, t, 'x', foot - thick, thick, -glow, b.x, right, v.x, v.x + v.w, -1, cellPhase(seed, 17 + i), clock));
     return out;
 }
 
@@ -139,23 +169,24 @@ export function drawStaticPlatform(c: CanvasRenderingContext2D, b: Box, view: Bo
     c.fillStyle = substrate; c.fillRect(v.x, v.y, v.w, v.h);
     etch(c, b, v);
 
-    // Faint blue-black sides and a dark foot; the lit top carries the silhouette.
+    // Dim indigo side and underside tracks for the sparse perimeter signals; the
+    // lit top still carries the silhouette.
     const side = Math.min(1, b.w / 4), under = Math.min(3, b.h / 4), cap = Math.min(2, b.w / 6);
     c.fillStyle = '#020509'; c.fillRect(b.x, foot - under, b.w, under);
-    c.fillStyle = '#1b2650'; c.fillRect(b.x, b.y, side, b.h);
-    c.fillStyle = '#121a38'; c.fillRect(right - side, b.y, side, b.h);
+    c.fillStyle = '#222e66'; c.fillRect(b.x, b.y, side, b.h); c.fillRect(right - side, b.y, side, b.h);
+    if (b.h >= 24) c.fillRect(b.x, foot - Math.min(1, b.h / 4), b.w, Math.min(1, b.h / 4));
     const glow = c.createLinearGradient(0, b.y + k.edge, 0, b.y + k.edge + k.glow);
     glow.addColorStop(0, '#5f6aff2c'); glow.addColorStop(1, '#5f6aff00');
     c.fillStyle = glow; c.fillRect(b.x, b.y + k.edge, b.w, k.glow);
-    c.fillStyle = '#6873f0'; c.fillRect(b.x, b.y, b.w, k.edge);
+    c.fillStyle = '#5560d8'; c.fillRect(b.x, b.y, b.w, k.edge);
     c.fillRect(b.x, b.y, cap, Math.min(9, b.h * .6)); c.fillRect(right - cap, b.y, cap, Math.min(9, b.h * .6));
-    c.fillStyle = '#a3aaff'; c.fillRect(b.x, b.y, b.w, Math.min(.75, k.edge / 3));
+    c.fillStyle = '#8f97f5'; c.fillRect(b.x, b.y, b.w, Math.min(.75, k.edge / 3));
     if (k.wall) {
         c.fillStyle = '#4653c8';
         c.fillRect(b.x + 1, b.y + k.edge, k.rail, b.h - k.edge);
         c.fillRect(right - 1 - k.rail, b.y + k.edge, k.rail, b.h - k.edge);
     }
-    if (motion) for (const s of staticSignals(b, view, time)) drawRail(c, s, CONTACT);
+    if (motion) for (const s of staticSignals(b, view, time)) drawFine(c, s);
     c.restore();
 }
 

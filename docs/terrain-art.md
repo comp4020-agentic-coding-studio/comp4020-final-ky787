@@ -6,17 +6,24 @@ They receive rectangles and the current visible world bounds, not world state.
 
 - `drawStaticPlatform` gives enabled `kind: 'static'` boxes a near-black
   `#080f16`→`#04080e` architectural mass defined by its contact edge: a crisp
-  2.5-unit violet-periwinkle strip (`#6873f0` with a `#a3aaff` hairline), short
-  end caps, faint blue-black sides and a soft inner glow. It is deliberately
-  distinct from cyan powered code and the sky-blue gravity lift. The interior
-  has no chips, pins, bus contacts or seams: only about one barely visible
-  etched run per 416×232 world cell, upright on tall blocks and omitted on
-  ledges and narrow walls. `staticSignals` returns the moving segments. Long
-  surfaces carry two interleaved world-anchored trains (pitch 216/304 units,
-  148/108 units/s, 40/24-unit blue-white heads and 78/52-unit trailing fades)
-  with an inward glow. Ledges under 240 units have one 124 units/s signal.
-  Narrow walls (`h ≥ 2w`, 10–80 wide) have static side rails, with signals
-  descending the left face and climbing the right at 122 units/s.
+  2.5-unit violet-periwinkle strip (`#5560d8`, with an `#8f97f5` hairline),
+  short end caps, faint indigo side/underside tracks (`#222e66`) and a soft
+  inner glow. It is deliberately distinct from cyan powered code and the
+  sky-blue gravity lift. The interior has no chips, pins, bus contacts or seams,
+  only about one barely visible etched run per 416×232 world cell. Runs are
+  upright on tall blocks and omitted on ledges and narrow walls.
+  `staticSignals` returns the moving segments, each a 1.25-unit hairline with a
+  4-unit white tip, a fading tail and a narrow inward glow.
+  - **Top surfaces:** three interleaved world-anchored trains (pitch
+    132/176/236 units, 146/118/160 units/s, 22/16/12-unit heads; the middle one
+    reversed). Ledges under 240 units carry one 124 units/s signal.
+  - **Sides:** boxes at least 40 tall carry one sparse train, 360-unit pitch at
+    104 units/s, down the right face and up the left.
+  - **Undersides:** boxes at least 24 tall carry two co-prime trains (520/740
+    units) flowing leftward, so flow runs clockwise around the silhouette.
+    Perimeter density stays under half the top's per unit length.
+  - **Narrow walls** (`h ≥ 2w`, 10–80 wide): keep static side rails, and
+    their perimeter signals ride them.
 - `drawDeathZone` keeps the approved crimson/magenta depth, rim, dim perimeter,
   interrupted bends and side ticks. Its top edge is a broken hot rail with
   world-fixed gaps, never a continuous walkable-looking line. Long stepped
@@ -50,9 +57,10 @@ its dangerous openings exposed.
 - `pnpm test:unit tests/terrain-render.test.ts`: offscreen rejection, bounded
   work for huge boxes, immutable inputs, clipping/state restoration and the
   still-then-signals draw order. Perceptual signal contracts cover segment count
-  per visible width, speed bands, 20–50-unit heads, lit coverage of a visible
-  floor edge, advancement by velocity, viewport independence, wall rails,
-  single ledge signals, a plain body and multiple fast hazard lanes.
+  per visible width, speed bands, 10–24-unit fine heads, lit coverage of a
+  visible floor edge, advancement by velocity, viewport independence, sparser
+  clockwise side/underside flow, wall rails, single ledge signals, a plain
+  body and multiple fast hazard lanes.
 - `pnpm build && pnpm check:terrain`: real Chromium raster checks and both
   player cameras plus Tab overview in all five chambers, at 1920×1080/1024×768.
   The pan comparison allows two RGB channel values for Chromium gradient
@@ -80,4 +88,5 @@ Set `BN_SHOTS` to choose the co-op/raster output directory. Recorded reviews:
 [approved death-field art](playtest/2026-10-28-terrain/README.md) and
 [static cybernetic architecture](playtest/2026-10-28-cyber-terrain/README.md), then
 [darker substrate and data flow](playtest/2026-10-28-terrain-flow/README.md), then
-[near-black architecture and obvious signal flow](playtest/2026-10-28-terrain-signal/README.md).
+[near-black architecture and obvious signal flow](playtest/2026-10-28-terrain-signal/README.md), then
+[fine contact signals and perimeter flow](playtest/2026-10-28-terrain-fine-signal/README.md).

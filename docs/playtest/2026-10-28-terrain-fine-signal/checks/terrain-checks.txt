@@ -1,0 +1,103 @@
+PASS static contact band: over 30% of columns visibly change in 0.25s — {"now":{"moving":0.60625,"lit":0.5291666666666667},"before":{"moving":0.025,"lit":0}}
+PASS static contact band: bright signal heads light over 8% of columns — {"now":{"moving":0.60625,"lit":0.5291666666666667},"before":{"moving":0.025,"lit":0}}
+PASS static contact band moves at least 4× as much as the previous renderer — {"now":{"moving":0.60625,"lit":0.5291666666666667},"before":{"moving":0.025,"lit":0}}
+PASS hazard contact band: over 30% of columns visibly change in 0.25s — {"now":{"moving":0.975,"lit":0.175},"before":{"moving":0,"lit":0}}
+PASS hazard contact band: bright signal heads light over 8% of columns — {"now":{"moving":0.975,"lit":0.175},"before":{"moving":0,"lit":0}}
+PASS hazard contact band moves at least 4× as much as the previous renderer — {"now":{"moving":0.975,"lit":0.175},"before":{"moving":0,"lit":0}}
+PASS static 430×70 at 0.5 clips every painted pixel — {"spill":0,"inside":7525}
+PASS static 430×70 at 1 clips every painted pixel — {"spill":0,"inside":30100}
+PASS static 430×70 at 2 clips every painted pixel — {"spill":0,"inside":63840}
+PASS static 165×22 at 0.5 clips every painted pixel — {"spill":0,"inside":913}
+PASS static 165×22 at 1 clips every painted pixel — {"spill":0,"inside":3630}
+PASS static 165×22 at 2 clips every painted pixel — {"spill":0,"inside":14520}
+PASS static 30×280 at 0.5 clips every painted pixel — {"spill":0,"inside":2100}
+PASS static 30×280 at 1 clips every painted pixel — {"spill":0,"inside":8400}
+PASS static 30×280 at 2 clips every painted pixel — {"spill":0,"inside":17280}
+PASS static 315×270 at 0.5 clips every painted pixel — {"spill":0,"inside":21330}
+PASS static 315×270 at 1 clips every painted pixel — {"spill":0,"inside":85050}
+PASS static 315×270 at 2 clips every painted pixel — {"spill":0,"inside":131328}
+PASS static 12×8 at 0.5 clips every painted pixel — {"spill":0,"inside":24}
+PASS static 12×8 at 1 clips every painted pixel — {"spill":0,"inside":96}
+PASS static 12×8 at 2 clips every painted pixel — {"spill":0,"inside":384}
+PASS static 2×2 at 0.5 clips every painted pixel — {"spill":0,"inside":1}
+PASS static 2×2 at 1 clips every painted pixel — {"spill":0,"inside":4}
+PASS static 2×2 at 2 clips every painted pixel — {"spill":0,"inside":16}
+PASS static world patterns and packets stay anchored while panning at 0.5 (1600 wide) — {"maxDelta":2,"tolerance":2}
+PASS static world patterns and packets stay anchored while panning at 1 (1600 wide) — {"maxDelta":1,"tolerance":2}
+PASS static world patterns and packets stay anchored while panning at 2 (1600 wide) — {"maxDelta":1,"tolerance":2}
+PASS static world patterns and packets stay anchored while panning at 0.5 (430 wide) — {"maxDelta":2,"tolerance":2}
+PASS static world patterns and packets stay anchored while panning at 1 (430 wide) — {"maxDelta":1,"tolerance":2}
+PASS static world patterns and packets stay anchored while panning at 2 (430 wide) — {"maxDelta":1,"tolerance":2}
+PASS static reduced motion ignores elapsed time — ""
+PASS static deterministic at the same time — ""
+PASS static signal decoration moves — {"motionDelta":221}
+PASS static interior pixels remain stationary between edge animation frames — {"bodyDelta":1,"tolerance":1}
+PASS static interior stays nearly black and visually quiet — {"peakRgbSum":96}
+PASS hazard 430×70 at 0.5 clips every painted pixel — {"spill":0,"inside":7525}
+PASS hazard 430×70 at 1 clips every painted pixel — {"spill":0,"inside":30100}
+PASS hazard 430×70 at 2 clips every painted pixel — {"spill":0,"inside":63840}
+PASS hazard 165×22 at 0.5 clips every painted pixel — {"spill":0,"inside":913}
+PASS hazard 165×22 at 1 clips every painted pixel — {"spill":0,"inside":3630}
+PASS hazard 165×22 at 2 clips every painted pixel — {"spill":0,"inside":14520}
+PASS hazard 30×280 at 0.5 clips every painted pixel — {"spill":0,"inside":2100}
+PASS hazard 30×280 at 1 clips every painted pixel — {"spill":0,"inside":8400}
+PASS hazard 30×280 at 2 clips every painted pixel — {"spill":0,"inside":17280}
+PASS hazard 315×270 at 0.5 clips every painted pixel — {"spill":0,"inside":21330}
+PASS hazard 315×270 at 1 clips every painted pixel — {"spill":0,"inside":85050}
+PASS hazard 315×270 at 2 clips every painted pixel — {"spill":0,"inside":131328}
+PASS hazard 12×8 at 0.5 clips every painted pixel — {"spill":0,"inside":24}
+PASS hazard 12×8 at 1 clips every painted pixel — {"spill":0,"inside":96}
+PASS hazard 12×8 at 2 clips every painted pixel — {"spill":0,"inside":384}
+PASS hazard 2×2 at 0.5 clips every painted pixel — {"spill":0,"inside":1}
+PASS hazard 2×2 at 1 clips every painted pixel — {"spill":0,"inside":4}
+PASS hazard 2×2 at 2 clips every painted pixel — {"spill":0,"inside":16}
+PASS hazard world patterns and packets stay anchored while panning at 0.5 (1600 wide) — {"maxDelta":2,"tolerance":2}
+PASS hazard world patterns and packets stay anchored while panning at 1 (1600 wide) — {"maxDelta":1,"tolerance":2}
+PASS hazard world patterns and packets stay anchored while panning at 2 (1600 wide) — {"maxDelta":1,"tolerance":2}
+PASS hazard world patterns and packets stay anchored while panning at 0.5 (430 wide) — {"maxDelta":2,"tolerance":2}
+PASS hazard world patterns and packets stay anchored while panning at 1 (430 wide) — {"maxDelta":1,"tolerance":2}
+PASS hazard world patterns and packets stay anchored while panning at 2 (430 wide) — {"maxDelta":1,"tolerance":2}
+PASS hazard reduced motion ignores elapsed time — ""
+PASS hazard deterministic at the same time — ""
+PASS hazard signal decoration moves — {"motionDelta":197}
+PASS handshake-player-1-1920 is an ordinary player camera
+PASS handshake-player-2-1920 is an ordinary player camera
+PASS handshake overview 1920
+PASS handshake-player-1-1024 is an ordinary player camera
+PASS handshake-player-2-1024 is an ordinary player camera
+PASS handshake overview 1024
+PASS crossfeed-vault-player-1-1920 is an ordinary player camera
+PASS crossfeed-vault-player-2-1920 is an ordinary player camera
+PASS ordinary-camera floor contact edge visibly flows within the first second — [{"columns":650,"moving":0.714,"runs":13},{"columns":650,"moving":0.658,"runs":10},{"columns":650,"moving":0.598,"runs":13}]
+PASS ordinary-camera lethal top edge visibly flows within the first second — [{"columns":512,"moving":0.84,"runs":4},{"columns":512,"moving":0.834,"runs":7},{"columns":512,"moving":0.777,"runs":3}]
+PASS ordinary-camera death signals visibly travel — [[189,0,152,198],[189,0,141,180]]
+PASS ordinary-camera floor interior stays fixed
+PASS reduced-motion freezes both terrain renderers in actual gameplay — [0,0,0,0]
+PASS reduced-motion keeps a legible illuminated surface and hazard boundary — {"floorEdge":1,"lethalEdge":1}
+PASS paused freezes both terrain renderers in actual gameplay — [0,0,0,0]
+PASS paused keeps a legible illuminated surface and hazard boundary — {"floorEdge":1,"lethalEdge":1}
+PASS crossfeed-vault overview 1920
+PASS crossfeed-vault-player-1-1024 is an ordinary player camera
+PASS crossfeed-vault-player-2-1024 is an ordinary player camera
+PASS crossfeed-vault overview 1024
+PASS actual gameplay receives reduced-motion preference
+PASS race-condition-player-1-1920 is an ordinary player camera
+PASS race-condition-player-2-1920 is an ordinary player camera
+PASS race-condition overview 1920
+PASS race-condition-player-1-1024 is an ordinary player camera
+PASS race-condition-player-2-1024 is an ordinary player camera
+PASS race-condition overview 1024
+PASS deadlock-player-1-1920 is an ordinary player camera
+PASS deadlock-player-2-1920 is an ordinary player camera
+PASS deadlock overview 1920
+PASS deadlock-player-1-1024 is an ordinary player camera
+PASS deadlock-player-2-1024 is an ordinary player camera
+PASS deadlock overview 1024
+PASS use-after-free-player-1-1920 is an ordinary player camera
+PASS use-after-free-player-2-1920 is an ordinary player camera
+PASS use-after-free overview 1920
+PASS use-after-free-player-1-1024 is an ordinary player camera
+PASS use-after-free-player-2-1024 is an ordinary player camera
+PASS use-after-free overview 1024
+PASS no browser runtime errors
+PASS no browser runtime errors

@@ -12,8 +12,9 @@ export function transitionPower(state: PowerState, on: number, off: number): num
 export const padDepression = (s: PowerState) => transitionPower(s, MACHINERY_TIMING.press, MACHINERY_TIMING.release);
 export const liftIllumination = (s: PowerState) => transitionPower(s, MACHINERY_TIMING.liftOn, MACHINERY_TIMING.liftOff);
 
-/** Read existing accepted inputs only. Dedicated sockets and scanners never enter
- * this list. Legacy personnel pads retain their room-owned occupancy contracts. */
+/** Read existing accepted inputs only. Dedicated payload sockets never enter this
+ * list. Legacy personnel pads retain their room-owned occupancy contracts; the
+ * CROSSFEED vault's two biometric scanners use the same pad art plus their rails. */
 export function pressurePads(w: Pick<PuzzleWorld, 'room' | 'inputs' | 'frame' | 'platforms'>): PressurePad[] {
     const r = w.room, pads: Omit<PressurePad, 'supported'>[] = [];
     const add = (id: string, at: Vec2 | undefined, active: boolean, label: string) => { if (at) pads.push({ id, at, active, label }); };
@@ -22,6 +23,9 @@ export function pressurePads(w: Pick<PuzzleWorld, 'room' | 'inputs' | 'frame' | 
             : ['pairing-bay', 'relay', 'uplink'].includes(r.id) ? 'PLATE A / ANCHOR' : 'BUTTON');
         add('plateB', r.plateB, w.inputs.plateB, r.id === 'pairing-bay' ? 'FINAL / LEFT' : r.id === 'uplink' ? 'PLATE B / LIFT' : 'PLATE B / EXIT');
         if (r.id === 'pairing-bay') add('plateC', r.plateC, w.inputs.plateC, 'FINAL / RIGHT');
+    } else {
+        add('plateB', r.plateB, w.inputs.plateB, 'LEFT / SCANNER');
+        add('plateC', r.plateC, w.inputs.plateC, 'RIGHT / SCANNER');
     }
     for (const p of r.plates ?? []) if (!p.kind || p.kind === 'plate') {
         const active = w.frame.plates?.[p.id] ?? (p.id === 'dropA' ? w.inputs.plateA : p.id === 'dropB' ? w.inputs.plateB
