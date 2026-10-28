@@ -22,7 +22,8 @@ export interface DraftBreakpoint extends ObjectBase { type: 'breakpoint'; checkp
 /** Cube centre, including imported named cube homes. */
 export interface DraftCube extends ObjectBase { type: 'cube'; mark: string }
 /** Device x is centre; y is its floor contact. Occupancy ports are `id.occupied`, controls `id.value`. */
-export interface DraftDevice extends ObjectBase { type: 'device'; kind: 'plate' | 'socket' | 'scanner' | 'toggle' | 'terminal'; initial?: boolean; checkpoint?: 'relay' | 'upper'; legacy?: 'plate' | 'plateB' | 'plateC' | 'cargoPlate' | 'lever' | 'upperLever' | 'cubePad' }
+/** `floating` terminals are hovering buttons pressed by touching the housing, including mid-jump. */
+export interface DraftDevice extends ObjectBase { type: 'device'; kind: 'plate' | 'socket' | 'scanner' | 'toggle' | 'terminal'; initial?: boolean; checkpoint?: 'relay' | 'upper'; floating?: boolean; legacy?: 'plate' | 'plateB' | 'plateC' | 'cargoPlate' | 'lever' | 'upperLever' | 'cubePad' }
 export interface DraftLift extends ObjectBase { type: 'lift'; w: number; h: number }
 export interface DraftRelay extends ObjectBase { type: 'relay'; w: number; h: number; pair: string; exitSide: -1 | 1; nativeId?: string }
 export interface DraftFirewall extends ObjectBase { type: 'firewall'; orientation: 'horizontal' | 'vertical'; length: number; thickness: number }

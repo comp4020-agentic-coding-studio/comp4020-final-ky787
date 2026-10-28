@@ -5,6 +5,7 @@ import type { PuzzleWorld, WorldAuthority } from '../slice/world.ts';
 import type { CoopClient } from './client.ts';
 import { SharedCubeAuthority } from './cube.ts';
 import { bodyOnPlate, sampleExit } from './authority.ts';
+import { touchesFloatingControl } from '../slice/maintenance-render.ts';
 import { CROSSFEED_HANDOVER_MS, type SharedRoom } from './protocol.ts';
 
 export class CrossfeedAuthority implements WorldAuthority {
@@ -54,7 +55,10 @@ export class CrossfeedAuthority implements WorldAuthority {
         return Object.values(this.cubes).sort((a, b) => Number(b.heldLocally) - Number(a.heldLocally)
             || Math.hypot(w.player.x - w.cubes[a.id]!.x, w.player.y - w.cubes[a.id]!.y) - Math.hypot(w.player.x - w.cubes[b.id]!.x, w.player.y - w.cubes[b.id]!.y));
     }
-    private control(w: PuzzleWorld) { return w.room.controls?.find(c => (c.kind !== 'terminal' || w.player.grounded && w.player.y + PLAYER.height / 2 <= c.at.y + 5) && Math.hypot(w.player.x - c.at.x, w.player.y - (c.at.y - 25)) < 72); }
+    private control(w: PuzzleWorld) {
+        return w.room.controls?.find(c => c.floating ? touchesFloatingControl(w.player, c.at)
+            : (c.kind !== 'terminal' || w.player.grounded && w.player.y + PLAYER.height / 2 <= c.at.y + 5) && Math.hypot(w.player.x - c.at.x, w.player.y - (c.at.y - 25)) < 72);
+    }
     interact(w: PuzzleWorld) {
         for (const cube of this.ordered(w)) if (cube.interact(w)) return;
         const control = this.control(w);

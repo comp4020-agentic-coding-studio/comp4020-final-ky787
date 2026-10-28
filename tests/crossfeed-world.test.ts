@@ -11,6 +11,7 @@ import { boxesOverlap } from '../src/engine/geometry.ts';
 import { cubeEntries, type CubeId, type Slot } from '../src/coop/protocol.ts';
 import { AudioPresentation } from '../src/slice/audio-presentation.ts';
 import { ReceiverPresentation, payloadReceivers } from '../src/slice/receiver-presentation.ts';
+import { floatingControlHousing } from '../src/slice/maintenance-render.ts';
 
 function setup(slot: Slot = 1) {
     const record = newRecord('ABCD', '11111111-1111-4111-8111-111111111111', 'crossfeed-vault'), cubes = freshCubes(record.level);
@@ -175,6 +176,44 @@ it('the powered right launch stays out of grapple reach below the boost ledge; t
     const action = vi.spyOn(f.client, 'control').mockReturnValue(true);
     w.player = createPlayer(4200, 790); w.player.grounded = false; w.interact(); expect(action).not.toHaveBeenCalled();
     w.player = createPlayer(4200, 733); w.player.grounded = true; w.interact(); expect(action).toHaveBeenCalledWith('switchD');
+});
+
+it('floating buttons: SYSTEM ONLINE needs a real catwalk jump, D still needs the boost ledge, and neither art overlaps nearby machinery', () => {
+    const f = setup(), w = f.world; f.record.checkpoint = 'upper'; f.sync();
+    const action = vi.spyOn(f.client, 'control').mockReturnValue(true);
+    const system = w.room.controls!.find(c => c.id === 'switchC')!, gallery = w.room.controls!.find(c => c.id === 'switchD')!;
+    expect(system.floating && gallery.floating && system.kind === 'terminal' && gallery.kind === 'terminal').toBe(true);
+    const catwalk = w.room.platforms.find(p => p.id === 'control-catwalk')!;
+    // Standing anywhere on the catwalk never reaches the hovering housing.
+    for (let x = catwalk.x + 15; x <= catwalk.x + catwalk.w - 15; x += 10) {
+        w.player = createPlayer(x, catwalk.y - PLAYER.height / 2); w.player.grounded = true;
+        expect(w.interactionHint()).not.toBe('E · SYSTEM ONLINE');
+    }
+    // A real tap jump from the catwalk beneath it, with physics stepping, offers and presses it mid-air.
+    for (const held of [false, true]) {
+        action.mockClear();
+        w.player = createPlayer(system.at.x, catwalk.y - PLAYER.height / 2); w.player.grounded = true;
+        step(w, 1, { ...emptyInput(), jumpPressed: true, jumpHeld: held });
+        let offered = false;
+        for (let i = 0; i < 40 && !offered; i++) { step(w, 1, { ...emptyInput(), jumpHeld: held }); offered = w.interactionHint() === 'E · SYSTEM ONLINE'; }
+        expect(offered, held ? 'held jump' : 'tap jump').toBe(true);
+        expect(w.player.grounded).toBe(false);
+        w.interact(); expect(action).toHaveBeenCalledWith('switchC');
+    }
+    // D keeps its boost puzzle: a full held floor jump from the gallery below never offers it.
+    for (const x of [4080, 4200, 4300]) {
+        w.player = createPlayer(x, 940 - PLAYER.height / 2); w.player.grounded = true;
+        step(w, 1, { ...emptyInput(), jumpPressed: true, jumpHeld: true });
+        for (let i = 0; i < 90; i++) { step(w, 1, { ...emptyInput(), jumpHeld: true }); expect(w.interactionHint()).not.toBe('E · D / GALLERY ACCESS'); }
+    }
+    // Housings stay clear of solid architecture, the breakpoint pedestal and the D launch slab.
+    const overlaps = (a: { x: number; y: number; w: number; h: number }, b: typeof a) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    for (const control of [system, gallery]) {
+        const housing = floatingControlHousing(control.at);
+        for (const p of w.room.platforms) expect(overlaps(housing, p), `${control.id} housing vs ${p.id}`).toBe(false);
+    }
+    const breakpoint = w.room.breakpoints![0].at;
+    expect(overlaps(floatingControlHousing(system.at), { x: breakpoint.x - 82, y: breakpoint.y - 102, w: 164, h: 102 })).toBe(false);
 });
 
 it.each(['left', 'right'] as const)('%s route cannot skip the unstable middle hook with a direct rope-jump transfer', side => {

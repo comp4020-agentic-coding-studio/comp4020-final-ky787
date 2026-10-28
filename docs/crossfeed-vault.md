@@ -74,8 +74,11 @@ follow relay power**, so changing B cannot seal a player inside the service bay.
 
 The `system-online` BREAKPOINT pedestal at (1120, 750) activates automatically
 when either player walks through at floor level. Its accepted `upper` checkpoint
-raises the existing flag independently of the SYSTEM ONLINE terminal at (1210,
-750). SYSTEM ONLINE still requires E and alone controls its real machinery.
+raises the existing flag independently of SYSTEM ONLINE, a floating one-use
+button at (1255, 662). Its housing (x 1227–1283, y 600–648) hovers above and right
+of the pedestal: a player standing on the catwalk cannot reach it, but any tap or
+held jump from beneath it can, and E pressed mid-jump commits it. SYSTEM ONLINE
+still requires E and alone controls its real machinery.
 Old saves where the switch and checkpoint were committed together remain valid;
 new saves permit either ordering. Each slot keeps its own upper respawn marker.
 
@@ -96,8 +99,9 @@ safe egress around resting shared cubes reuse the accepted implementation.
 Either partner holds B overhead while grounded; the other lands on it and makes
 a second normal jump to D. A normal or resting-cube jump is too low. Even a
 powered right route begins above grapple reach from a floor or resting-cube
-jump. D is a one-shot terminal providing **local gallery launch/regroup steps
-only**, including a short raised launch step that keeps the first high anchor
+jump. D is a floating one-use button standing over that ledge (4200, 750),
+pressed by touching its housing. Held floor jumps from the gallery stay short of it.
+It provides **local gallery launch/regroup steps only**, including a short raised launch step that keeps the first high anchor
 visible in the normal follow camera.
 
 ROUTE POWER is universal. ROUTE SELECT is a reversible lever within reach of
@@ -186,7 +190,15 @@ Payload sockets use compact tech [PAYLOAD RECEIVER interfaces](payload-receiver.
 with amber awaiting/cyan detected status. The two biometric vault scanners use the
 shared animated pressure-pad art, idle amber and pressed blue, plus body-height
 rails that turn cyan while occupied.
-Toggle levers and one-shot terminals have visibly different drawings.
+Toggle levers and one-use terminals have visibly different drawings. CROSSFEED's two
+terminals (`floating: true`) use the floating button asset shared with HANDSHAKE
+maintenance and RACE COMMIT (`drawFloatingControl`): muted until reachable, cyan
+`E · CONFIRM` when the local body touches the housing, green LATCHED afterwards.
+They are no longer drawn as orange boxes. Their reach is the 56 × 48 housing plus a
+10-unit margin, grounded or airborne (`touchesFloatingControl`). The server's
+control-id semantics, save keys and wire logic are unchanged. SYSTEM ONLINE's caption
+sits to the right of its housing; D's sits under its ledge. Their wires leave the
+housing roof, so neither crosses its caption.
 
 Room-owned `cameraReveal` metadata gives A the entry gap/anchor, B a brief transfer
 view, and ROUTE POWER both upper paths plus the vault. Repeated ROUTE SELECT

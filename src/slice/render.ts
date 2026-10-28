@@ -283,18 +283,21 @@ export class PuzzleRenderer {
         for (const lever of [
             { id: 'lever', at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
             { id: 'upperLever', at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
-            ...(r.controls ?? []).map(s => ({ id: s.id, at: s.at, active: w.frame.controls?.[s.id] ?? (s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id as 'switchB' | 'switchC']), name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle' })),
+            ...(r.controls ?? []).map(s => ({ id: s.id, at: s.at, active: w.frame.controls?.[s.id] ?? (s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id as 'switchB' | 'switchC']), name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle', floating: !!s.floating })),
         ]) {
             if (!lever.at || r.breakpoints?.some(b => b.activationControl === lever.id)) continue;
-            if ((r.id === 'handshake' && lever.id === 'draft:maintenance') || (r.id === 'race-condition' && lever.id === 'commit')) {
-                // Use the authority's existing hint, including grounded/range and
-                // cube-priority rules. A nearby airborne player is not yet ready.
+            if ((r.id === 'handshake' && lever.id === 'draft:maintenance') || (r.id === 'race-condition' && lever.id === 'commit') || ('floating' in lever && lever.floating)) {
+                // Use the authority's existing hint, including range and cube-priority
+                // rules: HANDSHAKE/RACE need a grounded player, CROSSFEED housing contact.
                 const ready = hint === `E · ${lever.name}`;
-                floatingControlOwnsHint = ready || !!lever.active && hint === 'COMMITTED';
+                floatingControlOwnsHint ||= ready || !!lever.active && (hint === 'COMMITTED' || hint === `${lever.name} · COMMITTED`);
                 drawFloatingControl(c, lever.at, !!lever.active, ready,
                     this.heroes.time, energyMotion, cam.zoom, lever.name,
-                    // RACE's exit header occupies the space below its ledge.
-                    r.id === 'race-condition' ? { x: -116, y: -22 } : undefined);
+                    // RACE's exit header occupies the space below its ledge. SYSTEM ONLINE's
+                    // caption sits beside its housing, clear of the catwalk player; D's
+                    // drops below its ledge's lit underside.
+                    r.id === 'race-condition' ? { x: -116, y: -22 } : r.id !== 'crossfeed-vault' ? undefined
+                        : lever.id === 'switchC' ? { x: 112, y: -42 } : { x: 0, y: 48 });
                 continue;
             }
             const { x, y } = lever.at;

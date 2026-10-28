@@ -171,6 +171,11 @@ and respawn timing. They are prototypes, never proof of bogus binary code.
 Ordinary plates accept grounded players or resting cubes. Sockets accept cubes.
 Scanners accept players. Toggle controls change Boolean value each interaction;
 terminals commit once. Their output ports are `id.occupied` and `id.value`.
+A terminal may set optional `"floating": true`; it then draws as the hovering
+floating button. Players press it by touching its 56 × 48 housing, 14–62 units above
+`at`, with a 10-unit reach margin, grounded or mid-jump. The validator rejects
+`floating` on any other device kind (`device.floating-role`). Imported CROSSFEED
+carries the field for both terminals.
 Reachable ordinary draft cubes have no progression gate on pickup. Existing trusted
 built-in controller requirements remain explicit in imported drafts.
 

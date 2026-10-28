@@ -1,0 +1,31 @@
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four deliberate transfers retain the airborne chain
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [reverse] named payloads and honest mock controller
+PASS [reverse] solo travel times out A without resetting B or either body
+PASS [reverse] DROP A immediately frames cargo for its local operator
+PASS [reverse] cargo delivered by timed A release / B press
+PASS [reverse] DROP B frames cargo, while leaving A restores local follow
+Error: Jump to launch landed on launch-step-3 at 583.6722222222223, 807

@@ -32,7 +32,7 @@ export function draftRoom(document: DraftDocument, slot: Slot = 1): RoomDef {
         else if (o.type === 'device') {
             if (o.legacy && o.legacy !== 'cubePad') room[o.legacy] = at(o);
             else if (o.legacy === 'cubePad') (room.cubePads ??= []).push({ id: placement(o.id), at: at(o), label: o.label ?? o.id });
-            else if (o.kind === 'toggle' || o.kind === 'terminal') (room.controls ??= []).push({ id: builtin ? nativeControl(o.id) : draftSignal(o.id), kind: o.kind, at: at(o), label: o.label ?? o.id, ...(reveal(o) ? { cameraReveal: reveal(o) } : {}) });
+            else if (o.kind === 'toggle' || o.kind === 'terminal') (room.controls ??= []).push({ id: builtin ? nativeControl(o.id) : draftSignal(o.id), kind: o.kind, ...(o.floating ? { floating: true } : {}), at: at(o), label: o.label ?? o.id, ...(reveal(o) ? { cameraReveal: reveal(o) } : {}) });
             else (room.plates ??= []).push({ id: builtin ? nativePlate(o.id) : draftSignal(o.id), ...(builtin ? {} : { kind: o.kind }), at: at(o), label: o.label ?? `${o.kind.toUpperCase()} / ${o.id}`, ...(reveal(o) ? { cameraReveal: reveal(o) } : {}) });
         }
         else if (o.type === 'lift') (room.lifts ??= []).push({ id: o.id, ...at(o), w: o.w, h: o.h, signal: feed(o.id, 'power')! });

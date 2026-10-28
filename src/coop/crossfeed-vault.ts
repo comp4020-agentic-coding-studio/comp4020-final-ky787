@@ -25,9 +25,11 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
             { id: 'finalLeft', at: { x: 2620, y: 650 }, label: 'E' }, { id: 'finalRight', at: { x: 2910, y: 650 }, label: 'F' }],
         controls: [{ id: 'switchB', kind: 'toggle', at: { x: 2560, y: 1500 }, label: 'TRANSFER MODE',
                 cameraReveal: { bounds: { x: 1950, y: 800, w: 2220, h: 720 }, padding: 45 } },
-            { id: 'switchC', kind: 'terminal', at: { x: 1210, y: 750 }, label: 'SYSTEM ONLINE' },
+            // Floating one-use buttons. SYSTEM ONLINE hovers above and right of the
+            // breakpoint, reachable only mid-jump from the catwalk; D stays on its ledge.
+            { id: 'switchC', kind: 'terminal', floating: true, at: { x: 1255, y: 662 }, label: 'SYSTEM ONLINE' },
             { id: 'routeMode', kind: 'toggle', at: { x: 1385, y: 750 }, label: 'ROUTE SELECT', cameraReveal: upperView },
-            { id: 'switchD', kind: 'terminal', at: { x: 4200, y: 750 }, label: 'D / GALLERY ACCESS' }],
+            { id: 'switchD', kind: 'terminal', floating: true, at: { x: 4200, y: 750 }, label: 'D / GALLERY ACCESS' }],
         display: { x: 1680, y: 1040 }, exit: { x: 2700, y: 210, w: 140, h: 140 },
         platforms: [
             stone('central-floor', 200, 1500, 1800, 280), stone('access-balcony', 2420, 1500, 1900, 280),
@@ -82,11 +84,12 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
     add('transfer-bridge', 'switchB', 'bridge', { x: 2560, y: 1464 }, { x: 2220, y: 1500 }, 1400);
     for (const gate of room.gates![0].gates) add(`transfer-${gate.id}`, 'switchB', 'relayGates', { x: 2560, y: 1464 }, { x: gate.x, y: gate.y }, 1070, true);
     add('cargo-lift', 'cubeOnPlate', 'liftField', { x: 1750, y: 1488 }, { x: 1550, y: 1460 }, 1410);
-    add('system-lift', 'switchC', 'liftField', { x: 1210, y: 714 }, { x: 1550, y: 710 }, 670);
-    add('system-service', 'switchC', 'serviceAccess', { x: 1210, y: 714 }, { x: 1318, y: 1120 }, 1060);
+    // The lift feed leaves the floating housing's roof, above its side caption.
+    add('system-lift', 'switchC', 'liftField', { x: 1255, y: 600 }, { x: 1550, y: 710 }, 575);
+    add('system-service', 'switchC', 'serviceAccess', { x: 1255, y: 648 }, { x: 1318, y: 1120 }, 1060);
     for (const p of room.platforms.filter(p => p.signal === 'leftRoute' || p.signal === 'rightRoute'))
         add(`route-${p.id}`, 'switchC', p.signal, { x: 1385, y: 714 }, { x: p.x + p.w / 2, y: p.y }, p.signal === 'leftRoute' ? 80 : 45, p.signal === 'leftRoute');
-    add('gallery-access', 'switchD', 'galleryAccess', { x: 4200, y: 714 }, { x: 3880, y: 850 }, 690);
+    add('gallery-access', 'switchD', 'galleryAccess', { x: 4200, y: 688 }, { x: 3880, y: 850 }, 676);
     for (const p of room.platforms.filter(p => p.signal === 'vaultPower' || p.signal === 'vaultReturn'))
         add(`vault-${p.id}`, 'cubeOnPlateB', p.signal, { x: 2770, y: 638 }, { x: p.x + p.w / 2, y: p.y }, 610);
     for (const [x, input] of [[2620, 'plateB'], [2910, 'plateC']] as const)

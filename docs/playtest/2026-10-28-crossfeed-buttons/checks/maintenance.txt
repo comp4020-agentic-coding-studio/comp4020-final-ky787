@@ -1,0 +1,37 @@
+PASS handshake: two independent visitors retain one party
+PASS before the upper jump, the maintenance latch is unconfirmed and unavailable
+PASS 01-dormant-approach: control, bounded filaments and caption fit the normal gameplay camera
+PASS 01-dormant-approach: housing and filaments clear the session panel
+PASS ready still requires a real landing on the authored maintenance ledge
+PASS 02-ready-approach: control, bounded filaments and caption fit the normal gameplay camera
+PASS 02-ready-approach: housing and filaments clear the session panel
+PASS 02-ready-1024: control, bounded filaments and caption fit the normal gameplay camera
+PASS 02-ready-1024: housing and filaments clear the session panel
+PASS 1024 desktop has no horizontal page overflow
+PASS 02-ready-800: control, bounded filaments and caption fit the normal gameplay camera
+PASS 02-ready-800: housing and filaments clear the session panel
+PASS 800 desktop has no horizontal page overflow
+PASS real E commits maintenance once while the exit still requires the payload
+PASS 03-completed-green: control, bounded filaments and caption fit the normal gameplay camera
+PASS 03-completed-green: housing and filaments clear the session panel
+PASS a second E cannot release the latch or replay its confirmation sound
+PASS both players observe the same accepted maintenance latch
+PASS both players observe the same accepted maintenance latch
+PASS 03-completed-green-1024: control, bounded filaments and caption fit the normal gameplay camera
+PASS 03-completed-green-1024: housing and filaments clear the session panel
+PASS 1024 desktop has no horizontal page overflow
+PASS 03-completed-green-800: control, bounded filaments and caption fit the normal gameplay camera
+PASS 03-completed-green-800: housing and filaments clear the session panel
+PASS 800 desktop has no horizontal page overflow
+PASS reduced motion retains the completed state
+PASS 04-completed-reduced-motion: control, bounded filaments and caption fit the normal gameplay camera
+PASS 04-completed-reduced-motion: housing and filaments clear the session panel
+PASS 05-completed-departure: control, bounded filaments and caption fit the normal gameplay camera
+PASS 05-completed-departure: housing and filaments clear the session panel
+PASS the completed green latch persists after leaving interaction range
+PASS handshake: authored-start physical solve with both arrivals
+PASS all three maintenance visual states were reached through real controls
+PASS ordinary two-arrival completion and zero-death route are preserved
+PASS no browser runtime errors
+PASS ordinary two-arrival completion and zero-death route are preserved
+PASS no browser runtime errors

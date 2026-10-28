@@ -1,10 +1,21 @@
-import type { Vec2 } from '../engine/geometry.ts';
+import type { Box, Vec2 } from '../engine/geometry.ts';
+import { PLAYER } from '../engine/constants.ts';
 import { heroMaterials } from './hero-render.ts';
 
 const { panel, polygon, line, dot, text } = heroMaterials;
 const COLOURS = { dormant: '#718b95', ready: '#64e6d5', complete: '#59ed93', metal: '#223440', dark: '#091821' };
 
-/** Floating, one-use controls in HANDSHAKE and RACE. Both booleans observe the
+/** The floating housing's world rectangle around its authored contact point. */
+export function floatingControlHousing(at: Vec2): Box { return { x: at.x - 28, y: at.y - 62, w: 56, h: 48 }; }
+/** CROSSFEED floating buttons: the player's body touches the housing (with a
+ * 10-unit reach margin), grounded or airborne. Hover never moves this box. */
+export function touchesFloatingControl(player: Vec2, at: Vec2): boolean {
+    const h = floatingControlHousing(at), reach = 10;
+    return Math.abs(player.x - (h.x + h.w / 2)) < h.w / 2 + PLAYER.width / 2 + reach
+        && Math.abs(player.y - (h.y + h.h / 2)) < h.h / 2 + PLAYER.height / 2 + reach;
+}
+
+/** Floating, one-use controls in HANDSHAKE, RACE and CROSSFEED. Both booleans observe the
  * existing interaction/latch, never new puzzle state. All motion is cosmetic.
  * The 56 × 48 housing floats above the authored contact point; four filaments
  * stay within 64 units either side and clear of the ledge. Players draw on top. */

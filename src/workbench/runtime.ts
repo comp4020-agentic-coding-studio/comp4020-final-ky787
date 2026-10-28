@@ -11,6 +11,7 @@ import { cloneDraft, objectBounds, objectPort, type DraftDocument, type DraftDev
 import { draftRoom } from './room-adapter.ts';
 import { requirePlayable } from './validation.ts';
 import { createBuiltinAuthority } from './builtin-local.ts';
+import { touchesFloatingControl } from '../slice/maintenance-render.ts';
 export { draftRoom, cubeRuntimeId } from './room-adapter.ts';
 export { draftFrame, evaluateDraft, initialDeviceValues } from './evaluate.ts';
 const blankInputs = (): ControllerInputs => ({ plateA: false, plateB: false, plateC: false, cubeOnPlate: false, cubeOnPlateB: false, cubeOnPlateC: false, switchB: false, switchC: false });
@@ -37,7 +38,8 @@ export function interactWithLocalCube(world: PuzzleWorld): boolean {
     nearest[1].carried = true; nearest[1].grounded = false; world.cancelGrapple(); world.events.push({ kind: 'carry', at: { x: world.player.x, y: world.player.y } }); return true;
 }
 export function nearDraftControl(world: PuzzleWorld, document: DraftDocument): DraftDevice | undefined {
-    return document.geometry.objects.find((o): o is DraftDevice => o.type === 'device' && (o.kind === 'toggle' || o.kind === 'terminal') && (o.kind !== 'terminal' || world.player.grounded && world.player.y + PLAYER.height / 2 <= o.y + 5) && Math.hypot(world.player.x - o.x, world.player.y - (o.y - 25)) < 72);
+    return document.geometry.objects.find((o): o is DraftDevice => o.type === 'device' && (o.kind === 'toggle' || o.kind === 'terminal') && (o.floating ? touchesFloatingControl(world.player, o)
+        : (o.kind !== 'terminal' || world.player.grounded && world.player.y + PLAYER.height / 2 <= o.y + 5) && Math.hypot(world.player.x - o.x, world.player.y - (o.y - 25)) < 72));
 }
 export interface LocalDraftAuthority extends WorldAuthority { preview(values: Record<string, boolean>, forced?: Record<string, boolean>): void; endPreview(): void; advance(dt: number): void; values: Record<string, boolean>; outputs: Record<string, boolean>; arrived: boolean }
 class DeclarativeAuthority implements LocalDraftAuthority {

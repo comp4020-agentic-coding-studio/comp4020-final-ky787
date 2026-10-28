@@ -1,0 +1,487 @@
+[
+  {
+    "name": "system-online-before",
+    "player": {
+      "x": 1250.1506944444443,
+      "y": 733,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "control-catwalk",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 201.98869179875578,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1270.6079442920197,
+      "y": 673.0004674147966,
+      "zoom": 1.0498425301060959
+    },
+    "controls": {
+      "inputs": {
+        "switchB": true,
+        "switchC": false,
+        "switchD": false,
+        "routeMode": false,
+        "plateAOccupied": false,
+        "routePowerOccupied": false,
+        "cubeOnLiftCargo": true,
+        "cubeOnFinalLeft": false,
+        "cubeOnFinalRight": false,
+        "finalPlateLeftOccupied": false,
+        "finalPlateRightOccupied": false
+      },
+      "outputs": {
+        "grappleAnchor": false,
+        "bridge": true,
+        "liftField": true,
+        "serviceAccess": false,
+        "relayGates": false,
+        "leftRoute": false,
+        "rightRoute": false,
+        "galleryAccess": false,
+        "vaultPower": false,
+        "vaultReturn": false,
+        "exitDoor": false
+      },
+      "physical": {
+        "leftRoute": false,
+        "rightRoute": false
+      },
+      "handoverMs": 0,
+      "platforms": {
+        "crumbleA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "crumbleB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        }
+      }
+    }
+  },
+  {
+    "name": "system-online-mid-jump",
+    "player": {
+      "x": 1250.1506944444443,
+      "y": 615.3533333333332,
+      "vx": 0,
+      "vy": -228.80000000000058,
+      "grounded": false,
+      "groundId": null,
+      "facing": 1,
+      "coyote": 0,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 201.98869179875578,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1264.775291332002,
+      "y": 596.5281905325392,
+      "zoom": 1.0508235162152713
+    },
+    "controls": {
+      "inputs": {
+        "switchB": true,
+        "switchC": false,
+        "switchD": false,
+        "routeMode": false,
+        "plateAOccupied": false,
+        "routePowerOccupied": false,
+        "cubeOnLiftCargo": true,
+        "cubeOnFinalLeft": false,
+        "cubeOnFinalRight": false,
+        "finalPlateLeftOccupied": false,
+        "finalPlateRightOccupied": false
+      },
+      "outputs": {
+        "grappleAnchor": false,
+        "bridge": true,
+        "liftField": true,
+        "serviceAccess": false,
+        "relayGates": false,
+        "leftRoute": false,
+        "rightRoute": false,
+        "galleryAccess": false,
+        "vaultPower": false,
+        "vaultReturn": false,
+        "exitDoor": false
+      },
+      "physical": {
+        "leftRoute": false,
+        "rightRoute": false
+      },
+      "handoverMs": 0,
+      "platforms": {
+        "crumbleA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "crumbleB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        }
+      }
+    }
+  },
+  {
+    "name": "system-online-latched",
+    "player": {
+      "x": 1250.1506944444443,
+      "y": 733,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "control-catwalk",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 1043.0833333333323,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1255.3496040750017,
+      "y": 614.9473356724521,
+      "zoom": 1.0512420854916122
+    },
+    "controls": {
+      "inputs": {
+        "switchB": true,
+        "switchC": true,
+        "switchD": false,
+        "routeMode": false,
+        "plateAOccupied": false,
+        "routePowerOccupied": false,
+        "cubeOnLiftCargo": true,
+        "cubeOnFinalLeft": false,
+        "cubeOnFinalRight": false,
+        "finalPlateLeftOccupied": false,
+        "finalPlateRightOccupied": false
+      },
+      "outputs": {
+        "grappleAnchor": false,
+        "bridge": true,
+        "liftField": true,
+        "serviceAccess": true,
+        "relayGates": false,
+        "leftRoute": false,
+        "rightRoute": false,
+        "galleryAccess": false,
+        "vaultPower": false,
+        "vaultReturn": false,
+        "exitDoor": false
+      },
+      "physical": {
+        "leftRoute": false,
+        "rightRoute": false
+      },
+      "handoverMs": 0,
+      "platforms": {
+        "crumbleA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "crumbleB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        }
+      }
+    }
+  },
+  {
+    "name": "system-online-latched-1024",
+    "player": {
+      "x": 1250.1506944444443,
+      "y": 733,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "control-catwalk",
+      "facing": 1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 1043.0833333333323,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 0,
+          "y": 0
+        },
+        "tip": {
+          "x": 1660,
+          "y": 1483
+        },
+        "dir": {
+          "x": 1,
+          "y": 0
+        },
+        "origin": {
+          "x": 1660,
+          "y": 1483
+        },
+        "travelled": 0,
+        "length": 0,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1250.343193589275,
+      "y": 672.9861813948535,
+      "zoom": 0.8229524576095126
+    },
+    "controls": {
+      "inputs": {
+        "switchB": true,
+        "switchC": true,
+        "switchD": false,
+        "routeMode": false,
+        "plateAOccupied": false,
+        "routePowerOccupied": false,
+        "cubeOnLiftCargo": true,
+        "cubeOnFinalLeft": false,
+        "cubeOnFinalRight": false,
+        "finalPlateLeftOccupied": false,
+        "finalPlateRightOccupied": false
+      },
+      "outputs": {
+        "grappleAnchor": false,
+        "bridge": true,
+        "liftField": true,
+        "serviceAccess": true,
+        "relayGates": false,
+        "leftRoute": false,
+        "rightRoute": false,
+        "galleryAccess": false,
+        "vaultPower": false,
+        "vaultReturn": false,
+        "exitDoor": false
+      },
+      "physical": {
+        "leftRoute": false,
+        "rightRoute": false
+      },
+      "handoverMs": 0,
+      "platforms": {
+        "crumbleA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "crumbleB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        }
+      }
+    }
+  },
+  {
+    "name": "gallery-latched",
+    "player": {
+      "x": 3975.4263888888895,
+      "y": 923,
+      "vx": 0,
+      "vy": 0,
+      "grounded": true,
+      "groundId": "boost-gallery",
+      "facing": -1,
+      "coyote": 0.11,
+      "jumpBuffer": 0,
+      "dropThrough": 0,
+      "dropIgnore": null,
+      "justLanded": false,
+      "landingSpeed": 1325.416666666667,
+      "airTime": 0,
+      "ropeJumpAnchors": [],
+      "rope": {
+        "phase": "idle",
+        "anchorId": null,
+        "anchor": {
+          "x": 2300,
+          "y": 1166
+        },
+        "tip": {
+          "x": 2160.082303639798,
+          "y": 1384.5375743368702
+        },
+        "dir": {
+          "x": -0.48527107171353745,
+          "y": -0.8743637612332722
+        },
+        "origin": {
+          "x": 2475.9347222222514,
+          "y": 1483
+        },
+        "travelled": 340,
+        "length": 261.4986001641746,
+        "taut": false,
+        "shrink": 0
+      }
+    },
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 3559.0745501285337,
+      "y": 863.0000000000115,
+      "zoom": 1.05135135135135
+    },
+    "controls": {
+      "inputs": {
+        "switchB": false,
+        "switchC": true,
+        "switchD": true,
+        "routeMode": false,
+        "plateAOccupied": true,
+        "routePowerOccupied": false,
+        "cubeOnLiftCargo": false,
+        "cubeOnFinalLeft": false,
+        "cubeOnFinalRight": false,
+        "finalPlateLeftOccupied": false,
+        "finalPlateRightOccupied": false
+      },
+      "outputs": {
+        "grappleAnchor": true,
+        "bridge": false,
+        "liftField": true,
+        "serviceAccess": true,
+        "relayGates": true,
+        "leftRoute": false,
+        "rightRoute": false,
+        "galleryAccess": true,
+        "vaultPower": false,
+        "vaultReturn": false,
+        "exitDoor": false
+      },
+      "physical": {
+        "leftRoute": false,
+        "rightRoute": false
+      },
+      "handoverMs": 0,
+      "platforms": {
+        "crumbleA": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        },
+        "crumbleB": {
+          "phase": "stable",
+          "remainingMs": 0,
+          "durationMs": 0
+        }
+      }
+    }
+  }
+]

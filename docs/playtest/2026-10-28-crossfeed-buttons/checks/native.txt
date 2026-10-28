@@ -1,0 +1,9 @@
+✓ public/evidence/coop/handshake.world.json (6502 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/deadlock.world.json (7710 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/use-after-free.world.json (10491 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/crossfeed-vault.world.json (24024 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/race-condition.world.json (20166 bytes; PE bytes, blocks, stores and targets verified)
+✓ public/evidence/coop/handshake.environment.json: 12783 / 16000 bytes; 16 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/crossfeed-vault.environment.json: 31516 / 40000 bytes; 40 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/deadlock.environment.json: 15568 / 20000 bytes; 20 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified
+✓ public/evidence/coop/use-after-free.environment.json: 19044 / 24000 bytes; 24 separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified

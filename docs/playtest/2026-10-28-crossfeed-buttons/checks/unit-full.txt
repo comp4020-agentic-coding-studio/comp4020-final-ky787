@@ -1,0 +1,66 @@
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+{"id":1,"timestamp":"2026-10-28T02:30:22.564Z","level":"info","event":"server_started","port":44601}
+{"id":2,"timestamp":"2026-10-28T02:30:22.626Z","level":"info","event":"character_created","visitorRef":"visitor-741aed46339d","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":1,"timestamp":"2026-10-28T02:30:22.617Z","level":"info","event":"server_started","port":41181}
+{"id":3,"timestamp":"2026-10-28T02:30:22.664Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:22.676Z","level":"info","event":"server_started","port":40517}
+{"id":2,"timestamp":"2026-10-28T02:30:22.745Z","level":"info","event":"character_created","visitorRef":"visitor-74ee99713952","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":2,"timestamp":"2026-10-28T02:30:22.753Z","level":"warn","event":"room_operation_rejected","visitorRef":"visitor-c5f05ccf7b70","code":"DRAFT_UNAVAILABLE"}
+{"id":3,"timestamp":"2026-10-28T02:30:22.763Z","level":"info","event":"party_created","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":4,"timestamp":"2026-10-28T02:30:22.763Z","level":"info","event":"player_connected","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":5,"timestamp":"2026-10-28T02:30:22.764Z","level":"info","event":"player_joined_party","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":6,"timestamp":"2026-10-28T02:30:22.764Z","level":"info","event":"chamber_started","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":7,"timestamp":"2026-10-28T02:30:22.775Z","level":"info","event":"player_connected","visitorRef":"visitor-dc1eff350fae","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":1}
+{"id":8,"timestamp":"2026-10-28T02:30:22.775Z","level":"info","event":"player_joined_party","visitorRef":"visitor-dc1eff350fae","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":1}
+{"id":9,"timestamp":"2026-10-28T02:30:22.791Z","level":"info","event":"checkpoint_activated","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"checkpointId":"draft:breakpoint","source":"accepted_action","levelInstance":1}
+{"id":10,"timestamp":"2026-10-28T02:30:22.794Z","level":"info","event":"chamber_started","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"reason":"custom_restart","levelInstance":2}
+{"id":3,"timestamp":"2026-10-28T02:30:22.811Z","level":"info","event":"character_updated","visitorRef":"visitor-74ee99713952","player":"ZeroDay","revision":2,"colour":"orange"}
+{"id":11,"timestamp":"2026-10-28T02:30:22.811Z","level":"warn","event":"room_operation_rejected","visitorRef":"visitor-75b0bbc74ae0","code":"SESSION_REPLACED"}
+{"id":12,"timestamp":"2026-10-28T02:30:22.813Z","level":"info","event":"player_reconnected","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":2}
+{"id":4,"timestamp":"2026-10-28T02:30:22.816Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:22.823Z","level":"info","event":"server_started","port":44435}
+{"id":13,"timestamp":"2026-10-28T02:30:22.836Z","level":"info","event":"party_created","visitorRef":"visitor-c5f05ccf7b70","sessionRef":"session-dd04ddf668d4","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":14,"timestamp":"2026-10-28T02:30:22.837Z","level":"info","event":"player_connected","visitorRef":"visitor-c5f05ccf7b70","sessionRef":"session-dd04ddf668d4","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":15,"timestamp":"2026-10-28T02:30:22.837Z","level":"info","event":"player_joined_party","visitorRef":"visitor-c5f05ccf7b70","sessionRef":"session-dd04ddf668d4","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":16,"timestamp":"2026-10-28T02:30:22.841Z","level":"info","event":"player_disconnected","visitorRef":"visitor-dc1eff350fae","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":2,"levelInstance":2}
+{"id":17,"timestamp":"2026-10-28T02:30:22.841Z","level":"info","event":"player_disconnected","visitorRef":"visitor-75b0bbc74ae0","sessionRef":"session-b70337e66155","chamber":"workbench","player":"Ninja","playerSlot":1,"levelInstance":2}
+{"id":2,"timestamp":"2026-10-28T02:30:22.844Z","level":"info","event":"character_created","visitorRef":"visitor-88667bc028f1","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":18,"timestamp":"2026-10-28T02:30:22.844Z","level":"info","event":"player_disconnected","visitorRef":"visitor-c5f05ccf7b70","sessionRef":"session-dd04ddf668d4","chamber":"handshake","player":"Ninja","playerSlot":1,"levelInstance":1}
+{"id":19,"timestamp":"2026-10-28T02:30:22.845Z","level":"info","event":"server_shutdown"}
+{"id":3,"timestamp":"2026-10-28T02:30:22.865Z","level":"info","event":"character_created","visitorRef":"visitor-eacd543c93dd","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":1,"timestamp":"2026-10-28T02:30:22.866Z","level":"info","event":"server_started","port":42035}
+{"id":1,"timestamp":"2026-10-28T02:30:22.879Z","level":"info","event":"server_started","port":44573}
+{"id":4,"timestamp":"2026-10-28T02:30:22.888Z","level":"info","event":"character_updated","visitorRef":"visitor-eacd543c93dd","player":"ZeroDay","revision":2,"colour":"orange"}
+{"id":5,"timestamp":"2026-10-28T02:30:22.894Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-28T02:30:22.894Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:22.900Z","level":"info","event":"server_started","port":46159}
+{"id":2,"timestamp":"2026-10-28T02:30:22.920Z","level":"info","event":"character_created","visitorRef":"visitor-482679ce4660","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-28T02:30:22.955Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:23.658Z","level":"info","event":"server_started","port":36177}
+{"id":2,"timestamp":"2026-10-28T02:30:23.684Z","level":"info","event":"character_created","visitorRef":"visitor-2246838ffbf6","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-28T02:30:23.729Z","level":"info","event":"character_created","visitorRef":"visitor-2246838ffbf6","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":4,"timestamp":"2026-10-28T02:30:23.765Z","level":"info","event":"character_created","visitorRef":"visitor-2246838ffbf6","player":"ShadowByte","revision":1,"colour":"purple"}
+{"id":5,"timestamp":"2026-10-28T02:30:23.772Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-28T02:30:24.284Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:25.261Z","level":"info","event":"server_started","port":46771}
+{"id":2,"timestamp":"2026-10-28T02:30:25.358Z","level":"info","event":"character_created","visitorRef":"visitor-2e541cccfde2","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-28T02:30:25.381Z","level":"info","event":"character_created","visitorRef":"visitor-21c0cf9448a9","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-28T02:30:25.482Z","level":"info","event":"character_updated","visitorRef":"visitor-2e541cccfde2","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-28T02:30:25.515Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:25.527Z","level":"info","event":"server_started","port":44613}
+{"id":1,"timestamp":"2026-10-28T02:30:25.560Z","level":"info","event":"server_started","port":43191}
+{"id":2,"timestamp":"2026-10-28T02:30:25.574Z","level":"info","event":"character_created","visitorRef":"visitor-43767aa99b74","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-28T02:30:25.585Z","level":"info","event":"character_created","visitorRef":"visitor-4efabe28594e","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-28T02:30:25.653Z","level":"info","event":"character_updated","visitorRef":"visitor-43767aa99b74","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-28T02:30:25.674Z","level":"info","event":"server_shutdown"}
+{"id":2,"timestamp":"2026-10-28T02:30:25.848Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:30:26.599Z","level":"info","event":"server_started","port":37491}
+{"id":2,"timestamp":"2026-10-28T02:30:26.628Z","level":"info","event":"server_shutdown"}
+
+ Test Files  92 passed (92)
+      Tests  920 passed | 2 skipped (922)
+   Start at  13:30:21
+   Duration  17.14s (tests 75%, transform 11%, import 10%, environment 4%)
+

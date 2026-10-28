@@ -1,0 +1,25 @@
+
+ RUN  v5.0.1 /home/ky/Documents/ANU/2026 Semester 2/COMP8020 - Agentic Coding Studio/comp4020-final-ky787
+
+{"id":1,"timestamp":"2026-10-28T02:46:41.288Z","level":"info","event":"server_started","port":37677}
+{"id":2,"timestamp":"2026-10-28T02:46:41.301Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:46:41.308Z","level":"info","event":"server_started","port":41103}
+{"id":2,"timestamp":"2026-10-28T02:46:41.368Z","level":"info","event":"character_created","visitorRef":"visitor-818182c8c3d7","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-28T02:46:41.392Z","level":"info","event":"character_created","visitorRef":"visitor-f788294d272c","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-28T02:46:41.475Z","level":"info","event":"character_updated","visitorRef":"visitor-818182c8c3d7","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-28T02:46:41.509Z","level":"info","event":"server_shutdown"}
+{"id":1,"timestamp":"2026-10-28T02:46:41.517Z","level":"info","event":"server_started","port":32823}
+{"id":2,"timestamp":"2026-10-28T02:46:41.553Z","level":"info","event":"character_created","visitorRef":"visitor-ab8dd4f08e8d","player":"WorkbenchHost","revision":1,"colour":"purple"}
+{"id":3,"timestamp":"2026-10-28T02:46:41.570Z","level":"info","event":"character_created","visitorRef":"visitor-5a35f9c103ab","player":"WorkbenchGuest","revision":1,"colour":"orange"}
+{"id":4,"timestamp":"2026-10-28T02:46:41.637Z","level":"info","event":"character_updated","visitorRef":"visitor-ab8dd4f08e8d","player":"ChangedInGame","revision":2,"colour":"pink"}
+{"id":5,"timestamp":"2026-10-28T02:46:41.662Z","level":"info","event":"server_shutdown"}
+
+ Test Files  14 passed (14)
+      Tests  104 passed (104)
+   Start at  13:46:40
+   Duration  3.97s (transform 49%, tests 38%, import 12%, worker 1%)
+
+  Transform  transforming modules took 5.78s · 49% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+

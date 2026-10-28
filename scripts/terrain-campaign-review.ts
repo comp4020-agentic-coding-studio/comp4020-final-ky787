@@ -85,3 +85,33 @@ export function reviewCampaignTerrain(h: Awaited<ReturnType<typeof coopBrowser>>
         await writeFile(join(h.shots, 'terrain-observations.json'), JSON.stringify(observations, null, 2) + '\n');
     };
 }
+
+/** Ordinary-camera close-ups of CROSSFEED's floating buttons around their real presses:
+ * just before, at the mid-jump/ledge press and after commitment, at two viewport sizes. */
+export function reviewCrossfeedControls(h: Awaited<ReturnType<typeof coopBrowser>>) {
+    const wait = h.wait, observations: unknown[] = [], seen = new Set<string>();
+    async function capture(p: Parameters<typeof h.snapshot>[0], name: string) {
+        if (seen.has(name)) return;
+        seen.add(name);
+        const state = await h.snapshot(p);
+        observations.push({ name, player: state.player, camera: state.camera, controls: state.multiplayer?.shared?.levelState });
+        await h.shot(p, 'control-' + name);
+    }
+    h.wait = async (p, label, predicate, timeout) => {
+        if (label === 'mid-jump reach of SYSTEM ONLINE') await capture(p, 'system-online-before');
+        const result = await wait(p, label, predicate, timeout);
+        if (label === 'mid-jump reach of SYSTEM ONLINE') await capture(p, 'system-online-mid-jump');
+        if (label === 'lands back on the catwalk after the mid-jump press') {
+            await capture(p, 'system-online-latched');
+            await p.send('Emulation.setDeviceMetricsOverride', { width: 1024, height: 768, deviceScaleFactor: 1, mobile: false });
+            try { await h.sleep(900); await capture(p, 'system-online-latched-1024'); }
+            finally { await p.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 900, deviceScaleFactor: 1, mobile: false }); await h.sleep(600); }
+        }
+        if (label === 'D opens local gallery access') await capture(p, 'gallery-latched');
+        return result;
+    };
+    return async () => {
+        h.check('captured both floating CROSSFEED buttons', seen.has('system-online-mid-jump') && seen.has('gallery-latched'));
+        await writeFile(join(h.shots, 'control-observations.json'), JSON.stringify(observations, null, 2) + '\n');
+    };
+}

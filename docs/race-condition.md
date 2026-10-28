@@ -132,7 +132,7 @@ on the accepted held payload, then makes a normal second jump to the 190-unit
 ledge. A floor jump or a resting 44-unit cube is insufficient. The ledge has no
 hookable anchor. COMMIT is a visibly distinct one-shot terminal.
 
-COMMIT shares HANDSHAKE's floating screen/industrial pad renderer in
+COMMIT shares HANDSHAKE's (and CROSSFEED's) floating screen/industrial pad renderer in
 `src/slice/maintenance-render.ts`, including four short signal filaments and
 reduced-motion handling. The existing authority hint `E · COMMIT` selects cyan
 ready; otherwise the uncommitted object stays muted. Accepted

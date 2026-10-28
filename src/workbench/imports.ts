@@ -33,7 +33,7 @@ export function importDraft(factory: string): DraftDocument {
     }
     for (const p of first.plates ?? []) { objects.push({ type: 'device', id: p.id, kind: 'plate', ...p.at, label: p.label }); reveal(p.id, p.cameraReveal); }
     for (const p of first.cubePads ?? []) objects.push({ type: 'device', id: p.id, kind: 'socket', legacy: 'cubePad', ...p.at, label: p.label });
-    for (const c of first.controls ?? []) { objects.push({ type: 'device', id: c.id, kind: c.kind ?? 'terminal', ...c.at, label: c.label }); reveal(c.id, c.cameraReveal); }
+    for (const c of first.controls ?? []) { objects.push({ type: 'device', id: c.id, kind: c.kind ?? 'terminal', ...c.at, label: c.label, ...(c.floating ? { floating: true } : {}) }); reveal(c.id, c.cameraReveal); }
     for (const l of first.lifts ?? []) { const { signal, ...geometry } = l; objects.push({ type: 'lift', ...geometry }); bind(l.id, signal, 'power'); }
     for (const pair of first.gates ?? []) for (const g of pair.gates) { const gateId = `${pair.id}-${g.id}`; objects.push({ type: 'relay', ...g, id: gateId, pair: pair.id, nativeId: g.id }); bind(gateId, pair.signal, 'power'); }
     for (const f of first.firewalls ?? []) { const { signal, ...geometry } = f; objects.push({ type: 'firewall', ...geometry, thickness: f.thickness ?? 12 }); if (signal) bind(f.id, signal, 'active'); }

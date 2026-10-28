@@ -9,6 +9,7 @@ import type { CoopClient } from '../coop/client.ts';
 import { cubeEntries, type CubeMap, type SharedRoom, type DeclarativeLevelId } from '../coop/protocol.ts';
 import { draftFrame, draftSignal } from './evaluate.ts';
 import { objectPort, type DraftDocument, type DraftDevice } from './model.ts';
+import { touchesFloatingControl } from '../slice/maintenance-render.ts';
 
 export class DeclarativeAuthority implements WorldAuthority {
     cubes: CubeMap<SharedCubeAuthority> = {};
@@ -49,9 +50,9 @@ export class DeclarativeAuthority implements WorldAuthority {
             || Math.hypot(w.player.x - w.cubes[a.id]!.x, w.player.y - w.cubes[a.id]!.y) - Math.hypot(w.player.x - w.cubes[b.id]!.x, w.player.y - w.cubes[b.id]!.y));
     }
     private control(w: PuzzleWorld) {
-        return this.devices.find(o => (o.kind === 'toggle' || o.kind === 'terminal')
-            && (o.kind !== 'terminal' || w.player.grounded && w.player.y + PLAYER.height / 2 <= o.y + 5)
-            && Math.hypot(w.player.x - o.x, w.player.y - (o.y - 25)) < 72);
+        return this.devices.find(o => (o.kind === 'toggle' || o.kind === 'terminal') && (o.floating ? touchesFloatingControl(w.player, o)
+            : (o.kind !== 'terminal' || w.player.grounded && w.player.y + PLAYER.height / 2 <= o.y + 5)
+            && Math.hypot(w.player.x - o.x, w.player.y - (o.y - 25)) < 72));
     }
     interact(w: PuzzleWorld) {
         for (const cube of this.ordered(w)) if (cube.interact(w)) return;

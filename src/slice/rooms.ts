@@ -60,7 +60,9 @@ export interface RoomDef<Id extends WorldRoomId = WorldRoomId> {
     cube?: Vec2;
     cubes?: { id: CubeId; spawn: Vec2; mark: string }[];
     cubePads?: { id: Exclude<CubePlacement, 'spawn'>; at: Vec2; label: string }[];
-    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit' | `draft:${string}`; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; cameraReveal?: CameraReveal }[];
+    /** `floating` one-use terminals draw as hovering buttons, pressed by touching the
+     * housing above `at`, including mid-jump. Server semantics are unchanged. */
+    controls?: { id: 'switchB' | 'switchC' | 'switchD' | 'routeMode' | 'phase' | 'commit' | `draft:${string}`; at: Vec2; label: string; kind?: 'toggle' | 'terminal'; floating?: boolean; cameraReveal?: CameraReveal }[];
     plates?: { id: PressurePlateId | `draft:${string}`; kind?: 'plate' | 'socket' | 'scanner'; at: Vec2; label: string; cameraReveal?: CameraReveal }[];
     wires?: import('./connections.ts').MachineConnection[];
     regions?: { at: Vec2; label: string }[];

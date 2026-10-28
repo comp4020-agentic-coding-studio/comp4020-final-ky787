@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
-import { reviewCrossfeedLift } from './terrain-campaign-review.ts';
+import { reviewCrossfeedControls, reviewCrossfeedLift } from './terrain-campaign-review.ts';
 import type { CubeId, SharedRoom } from '../src/coop/protocol.ts';
 type Snapshot = GameSnapshot;
 export async function crossfeedRoute(h: Awaited<ReturnType<typeof coopBrowser<Snapshot>>>, url: string, debug: string, reverse = false, partyPlayers?: [Cdp, Cdp]) {
@@ -206,8 +206,15 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
             return;
         }
     }
-    await align(holder, 1210); await tap(holder, 'KeyE');
+    // SYSTEM ONLINE floats above the catwalk: standing beneath it is never enough,
+    // so the real route jumps and presses E at the top of the jump.
+    await align(holder, 1255);
+    check('standing beneath the floating SYSTEM ONLINE button cannot press it', (await holder.read<string>('binaryNinja.world.interactionHint()')) !== 'E · SYSTEM ONLINE');
+    await key(holder, 'Space', true);
+    try { await wait(holder, 'mid-jump reach of SYSTEM ONLINE', s => !s.player.grounded && s.player.vy > -260, 2000); await tap(holder, 'KeyE'); }
+    finally { await key(holder, 'Space', false); }
     await wait(runner, 'SYSTEM ONLINE powers lift independently of transfer mode', s => state(s).levelState.inputs.switchC && s.outputs.liftField && !s.outputs.relayGates);
+    await wait(holder, 'lands back on the catwalk after the mid-jump press', s => s.player.groundId === 'control-catwalk');
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1840);
     check('C leaves lift on after cargo removal without moving partner', (await snapshot(runner)).outputs.liftField && (await snapshot(runner)).player.y > 1400);
     // Reconfigure B live: the upper player returns to A while the partner
@@ -310,6 +317,7 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
 async function main() {
 const h = await coopBrowser<Snapshot>({ shots: process.env.BN_SHOTS ?? '/tmp/bn-crossfeed-shots' });
 const finishTerrainReview = process.env.BN_TERRAIN_REVIEW === '1' ? reviewCrossfeedLift(h) : null;
+const finishControlReview = process.env.BN_CONTROL_REVIEW === '1' ? reviewCrossfeedControls(h) : null;
 const { check, shot, snapshot } = h;
 
 try {
@@ -326,6 +334,7 @@ try {
     }
     for (const c of h.clients) check('browser has no runtime errors', c.errors.length === 0, c.errors.join('\n'));
     await finishTerrainReview?.();
+    await finishControlReview?.();
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {
     for (let i = 0; i < h.clients.length; i++) {
