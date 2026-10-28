@@ -26,11 +26,27 @@ try {
             return c.getImageData(0,0,480,320).data;
         }
         const hash=data=>{let v=2166136261;for(const x of data)v=Math.imul(v^x,16777619);return v>>>0;};
-        if(baseline)for(const motion of [true,false])for(const time of [0,.7,5]){
-            const box={x:12,y:16,w:430,h:100},view={x:0,y:0,w:480,h:320};
-            const now=render('hazard',box,view,1,time,motion),before=render('hazard',box,view,1,time,motion,baseline.drawDeathZone);
-            const same=now.every((v,i)=>v===before[i]);
-            results.push({name:'death field '+(motion?'adds flowing signals':'preserves the approved still frame')+' at '+time+'s',pass:motion?!same:same});
+        // Perceptual comparison with the previous renderer: fraction of columns along
+        // the floor's top contact band whose brightest pixel changes clearly in 0.25s.
+        const edgeMotion=(fn,kind)=>{
+            const box=kind==='static'?{x:0,y:40,w:480,h:240}:{x:0,y:40,w:480,h:70},view={x:0,y:0,w:480,h:320};
+            const draw=t=>{const canvas=document.createElement('canvas');canvas.width=480;canvas.height=320;const c=canvas.getContext('2d');
+                c.fillStyle='#0c131a';c.fillRect(0,0,480,320);(kind==='static'?fn.drawStaticPlatform:fn.drawDeathZone)(c,box,view,t,true);
+                return c.getImageData(0,0,480,320).data;};
+            const a=draw(4),b=draw(4.25);let moving=0,lit=0;
+            for(let x=0;x<480;x++){let changed=0,peak=0;
+                for(let y=40;y<(kind==='static'?52:110);y++){const i=(y*480+x)*4;
+                    changed=Math.max(changed,Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2]));
+                    peak=Math.max(peak,a[i]+a[i+1]+a[i+2]);}
+                if(changed>90)moving++;if(peak>540)lit++;}
+            return {moving:moving/480,lit:lit/480};
+        };
+        const current={drawStaticPlatform,drawDeathZone};
+        for(const kind of ['static','hazard']){
+            const now=edgeMotion(current,kind),before=baseline?edgeMotion(baseline,kind):null;
+            results.push({name:kind+' contact band: over 30% of columns visibly change in 0.25s',pass:now.moving>.3,detail:{now,before}});
+            results.push({name:kind+' contact band: bright signal heads light over 8% of columns',pass:now.lit>.08,detail:{now,before}});
+            if(before)results.push({name:kind+' contact band moves at least 4× as much as the previous renderer',pass:now.moving>=Math.max(.05,before.moving*4),detail:{now,before}});
         }
         for(const kind of ['static','hazard']){
             for(const [w,height] of [[430,70],[165,22],[30,280],[315,270],[12,8],[2,2]]){
@@ -62,12 +78,15 @@ try {
             const motionDelta=first.reduce((delta,value,i)=>Math.max(delta,Math.abs(value-later[i])),0);
             results.push({name:kind+' signal decoration moves',pass:motionDelta>8,detail:{motionDelta}});
             if(kind==='static'){
-                let bodyDelta=0;
-                for(let y=32;y<250;y++)for(let x=28;x<425;x++)for(let k=0;k<4;k++)
-                    bodyDelta=Math.max(bodyDelta,Math.abs(first[(y*480+x)*4+k]-later[(y*480+x)*4+k]));
+                // Below the contact glow (16 units) and inside the side rails, the body is still.
+                let bodyDelta=0,peak=0;
+                for(let y=40;y<270;y++)for(let x=16;x<438;x++){const i=(y*480+x)*4;
+                    for(let k=0;k<4;k++)bodyDelta=Math.max(bodyDelta,Math.abs(first[i+k]-later[i+k]));
+                    peak=Math.max(peak,first[i]+first[i+1]+first[i+2]);}
                 // Separate Canvas rasters can differ by one channel value from
                 // gradient dithering; unit tests also compare exact body commands.
                 results.push({name:'static interior pixels remain stationary between edge animation frames',pass:bodyDelta<=1,detail:{bodyDelta,tolerance:1}});
+                results.push({name:'static interior stays nearly black and visually quiet',pass:peak<=3*48,detail:{peakRgbSum:peak}});
             }
         }
         return results;

@@ -1,0 +1,242 @@
+{
+  "handshake": {
+    "camera": [
+      753.9999999855327,
+      339.7999999963911,
+      1.2499999999882265
+    ],
+    "boxes": [
+      [
+        1000,
+        949,
+        1270,
+        9
+      ]
+    ],
+    "pairs": [
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.534,
+            "runs": 8
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.621,
+            "runs": 21
+          }
+        ]
+      },
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.51,
+            "runs": 16
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.487,
+            "runs": 13
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.519,
+            "runs": 15
+          }
+        ]
+      },
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.512,
+            "runs": 14
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.491,
+            "runs": 9
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1587,
+            "moving": 0.518,
+            "runs": 10
+          }
+        ]
+      }
+    ]
+  },
+  "crossfeed-vault": {
+    "camera": [
+      891.9999999894803,
+      1013.5999999895016,
+      1.249999999982877
+    ],
+    "boxes": [
+      [
+        911.999756433078,
+        1499,
+        1088.000243566922,
+        9
+      ],
+      [
+        2005,
+        1709,
+        410,
+        14
+      ]
+    ],
+    "pairs": [
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.432,
+            "runs": 14
+          },
+          {
+            "columns": 512,
+            "moving": 0.748,
+            "runs": 6
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.451,
+            "runs": 9
+          },
+          {
+            "columns": 512,
+            "moving": 0.84,
+            "runs": 5
+          }
+        ]
+      },
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.478,
+            "runs": 11
+          },
+          {
+            "columns": 512,
+            "moving": 0.865,
+            "runs": 4
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.484,
+            "runs": 11
+          },
+          {
+            "columns": 512,
+            "moving": 0.828,
+            "runs": 3
+          }
+        ]
+      },
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.538,
+            "runs": 9
+          },
+          {
+            "columns": 512,
+            "moving": 0.762,
+            "runs": 7
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.546,
+            "runs": 8
+          },
+          {
+            "columns": 512,
+            "moving": 0.768,
+            "runs": 3
+          }
+        ]
+      },
+      {
+        "dt": 0.283,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.524,
+            "runs": 12
+          },
+          {
+            "columns": 512,
+            "moving": 0.953,
+            "runs": 3
+          }
+        ]
+      },
+      {
+        "dt": 0.267,
+        "bands": [
+          {
+            "columns": 1360,
+            "moving": 0.474,
+            "runs": 9
+          },
+          {
+            "columns": 512,
+            "moving": 0.768,
+            "runs": 5
+          }
+        ]
+      }
+    ]
+  }
+}

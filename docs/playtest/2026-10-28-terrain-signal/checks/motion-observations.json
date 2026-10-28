@@ -1,0 +1,118 @@
+[
+  {
+    "name": "quarter-second contact flow",
+    "camera": [
+      891.9999871865069,
+      1013.5999872132011,
+      1.2499999791447045
+    ],
+    "flow": [
+      {
+        "dt": 0.3,
+        "floorEdge": {
+          "columns": 650,
+          "moving": 0.762,
+          "runs": 4
+        },
+        "lethalEdge": {
+          "columns": 512,
+          "moving": 0.84,
+          "runs": 3
+        }
+      },
+      {
+        "dt": 0.3,
+        "floorEdge": {
+          "columns": 650,
+          "moving": 0.84,
+          "runs": 10
+        },
+        "lethalEdge": {
+          "columns": 512,
+          "moving": 0.873,
+          "runs": 7
+        }
+      },
+      {
+        "dt": 0.3,
+        "floorEdge": {
+          "columns": 650,
+          "moving": 0.857,
+          "runs": 6
+        },
+        "lethalEdge": {
+          "columns": 512,
+          "moving": 0.783,
+          "runs": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "crossfeed-flow-frame-0",
+    "time": 4.933100000000011,
+    "camera": [
+      891.9999998217382,
+      1013.5999998221096,
+      1.24999999970986
+    ]
+  },
+  {
+    "name": "crossfeed-flow-frame-1",
+    "time": 6.716300000000033,
+    "camera": [
+      891.9999999999417,
+      1013.5999999999417,
+      1.2499999999999047
+    ]
+  },
+  {
+    "name": "crossfeed-flow-frame-2",
+    "time": 8.49970000000004,
+    "camera": [
+      891.9999999999994,
+      1013.5999999999993,
+      1.2499999999999987
+    ]
+  },
+  {
+    "mode": "reduced-motion",
+    "time": 9.249700000000027,
+    "later": 10.699600000000006,
+    "camera": [
+      891.9999999999995,
+      1013.5999999999995,
+      1.249999999999999
+    ],
+    "deltas": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "legible": {
+      "floorEdge": 1,
+      "lethalEdge": 1
+    }
+  },
+  {
+    "mode": "paused",
+    "time": 11.3329,
+    "later": 12.9495,
+    "camera": [
+      891.9999999999998,
+      1013.5999999999995,
+      1.2499999999999993
+    ],
+    "deltas": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "legible": {
+      "floorEdge": 1,
+      "lethalEdge": 1
+    }
+  }
+]
