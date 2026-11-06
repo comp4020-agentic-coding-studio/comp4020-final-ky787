@@ -274,3 +274,16 @@ opposite scanners; leave scanners and enter separately; replay, reconnect and
 restart; disconnect a holder/operator while the partner is on a route.
 
 Stop for two-computer acceptance. No next chamber or binary generation in this pass.
+
+### Targeted entry spacing — 2026-11-06
+
+The central floor now ends at x=2260 (+260). The 420-unit entry gap,
+anchor, return bridge, TRANSFER MODE and initial cube A translate together by
+260; the access balcony still ends at x=4320. Entry/checkpoint markers move
+from x=1660/1760 to 1890/1990 and A moves from 1870 to 2130. The lift and
+PAYLOAD/LIFT receiver stay fixed, with clear space between each footprint and
+the shared gateway. Upper transport, boost, scanner and exit geometry is unchanged.
+SYSTEM ONLINE's caption offset is now (+112, -80), separating its status row
+from ROUTE SELECT. The real-input route walks back to the original cube-hop
+launch point before jumping; all physical and completion assertions remain.
+See the [targeted spacing report](playtest/2026-11-06-targeted-spacing/README.md).

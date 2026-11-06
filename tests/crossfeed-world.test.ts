@@ -253,7 +253,7 @@ it('the visible vault bulkhead prevents one cargo route from serving both socket
 
 it('a solo runner cannot jump the first gap and two resting destination cubes leave a safe player relay lane', () => {
     const f = setup(), w = f.world;
-    w.player = createPlayer(1980, 1483); w.player.grounded = true;
+    w.player = createPlayer(2240, 1483); w.player.grounded = true;
     step(w, 1, { ...emptyInput(), jumpPressed: true, jumpHeld: true, right: true });
     step(w, 120, { ...emptyInput(), jumpHeld: true, right: true });
     expect(w.deaths).toBeGreaterThan(0); expect(w.frame.outputs.bridge).toBe(false);

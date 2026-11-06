@@ -169,7 +169,11 @@ export async function coopBrowser<S extends GameSnapshot = GameSnapshot>(options
         const at = await p.read<{ x: number; y: number }>(`(()=>{const c=binaryNinja.renderer.camera,r=binaryNinja.canvas.getBoundingClientRect();return {x:(${x}-c.originX())*c.zoom+r.left,y:(${y}-c.originY())*c.zoom+r.top};})()`);
         await p.send('Input.dispatchMouseEvent', { type: down ? 'mousePressed' : 'mouseReleased', ...at, button: 'left', buttons: down ? 1 : 0, clickCount: 1 });
     }
-    async function shot(p: Cdp, name: string) { const data = await p.send('Page.captureScreenshot', { format: 'png' }); await writeFile(join(shots, h.shotPrefix + name + '.png'), Buffer.from(data.data, 'base64')); }
+    async function shot(p: Cdp, name: string) {
+        if (process.env.BN_SHOT_FILTER && !new RegExp(process.env.BN_SHOT_FILTER).test(name)) return;
+        const data = await p.send('Page.captureScreenshot', { format: 'png' });
+        await writeFile(join(shots, h.shotPrefix + name + '.png'), Buffer.from(data.data, 'base64'));
+    }
     async function cleanup() {
         // Brave's launcher may exit before its browser process; close the owned CDP browser too.
         await root?.send('Browser.close').catch(() => {});

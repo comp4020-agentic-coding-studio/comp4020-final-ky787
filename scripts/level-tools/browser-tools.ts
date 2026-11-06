@@ -21,6 +21,7 @@ async function environment(document: DraftDocument, reports: string) {
     } catch (error) { process.off('SIGINT', signal); process.off('SIGTERM', signal); await close(); throw error; }
 }
 async function screenshot(page: Cdp, path: string) {
+    if (process.env.BN_SHOT_FILTER && !new RegExp(process.env.BN_SHOT_FILTER).test(path)) return;
     const capture = await page.send('Page.captureScreenshot', { format: 'png' });
     const bytes = Buffer.from(capture.data, 'base64');
     if (bytes.length < 2000) throw new Error('Screenshot unexpectedly empty');

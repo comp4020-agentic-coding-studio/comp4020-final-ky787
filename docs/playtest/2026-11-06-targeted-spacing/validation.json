@@ -1,0 +1,96 @@
+{
+  "deadlock": {
+    "pass": true,
+    "scope": "full-room",
+    "scenario": "deadlock",
+    "draftHash": "8a14402a80f7862aa9b67213641c476b9410490bbb6c68a579161580e2e56494",
+    "engineRevision": "eb30226daaa1091e5bb742152324913bee804196-dirty",
+    "failedStep": null,
+    "error": null,
+    "steps": 71,
+    "actors": {
+      "operator": {
+        "completed": true,
+        "deaths": 0,
+        "arrivals": [
+          true,
+          true
+        ]
+      },
+      "carrier": {
+        "completed": true,
+        "deaths": 0,
+        "arrivals": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  "uaf": {
+    "pass": true,
+    "scope": "full-room",
+    "scenario": "use-after-free",
+    "draftHash": "2a9f11af81b6b289786e23c9226ece5233aeb03ee1e93cdd07cb671ac9961554",
+    "engineRevision": "eb30226daaa1091e5bb742152324913bee804196-dirty",
+    "failedStep": null,
+    "error": null,
+    "steps": 43,
+    "actors": {
+      "host": {
+        "completed": true,
+        "deaths": 0,
+        "arrivals": [
+          true,
+          true
+        ]
+      },
+      "partner": {
+        "completed": true,
+        "deaths": 0,
+        "arrivals": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  "unchangedArtifacts": {
+    "levels/campaign/handshake.json": "8eb7f62e77440b1b353d22000d2787b98478eb09d0ae49002691a09d35c36388",
+    "levels/drafts/handshake.json": "8eb7f62e77440b1b353d22000d2787b98478eb09d0ae49002691a09d35c36388",
+    "levels/scenarios/handshake.json": "2e21a18aa60d23e5a54be70dfc11ea6acc319becad4c41eb0609828f06d40624",
+    "public/evidence/coop/crossfeed-vault.disasm.json": "c14636956c47c82ff0b264e8beb91004faf2561c414f43426cea90334d3f7d7c",
+    "public/evidence/coop/crossfeed-vault.environment.json": "66be647d2d062aed0fea2538d84ec8ac6df936f6647f11361111ab88050e0115",
+    "public/evidence/coop/crossfeed-vault.evidence.json": "28164a5720ecb34de87f352bd2b18d2cea0b1a68b73f4feb24daa5984512a26a",
+    "public/evidence/coop/crossfeed-vault.traces.json": "8b91b821caf89b17a214b675f0476255cf0431f07d493d28a208bc2f4ec2d121",
+    "public/evidence/coop/crossfeed-vault.world.json": "17b010b77fc31c81d658f8270da7e54ad39518dea7e2093f452299c33b45159b",
+    "public/evidence/coop/deadlock.disasm.json": "5035f541c57364d920af6b52ea731d9f5db1f68822d51a75b2ccfd2eeff93d1c",
+    "public/evidence/coop/deadlock.environment.json": "b4f3361745e559ce0f22574fe0db3c28c61fe92ee1b82f7663fee953f3a283b0",
+    "public/evidence/coop/deadlock.evidence.json": "de7bc47667bb2b09ad5ac58aaeb49e7d6404e4939dea4023a20746eb80c12567",
+    "public/evidence/coop/deadlock.traces.json": "aa2bb51840018147627a32b1c930383ff878867419d88ea4b094b5080a74318e",
+    "public/evidence/coop/deadlock.world.json": "7be358478feb7e06cb82cddd5c73084456addca780ba3183fbb7b8859fb0e99f",
+    "public/evidence/coop/handshake.disasm.json": "490f74d2bb938ad0399eb6c4ca552dfbec6a63ea9dbd83e4a4833b2c5b48b4d9",
+    "public/evidence/coop/handshake.environment.json": "1fa3b9ef65da1c48a14043f43a6f13574ebaa987462a639ef41c8942ba85e22b",
+    "public/evidence/coop/handshake.evidence.json": "d3cf261625ca78e9cbd75ee3c322f44320f2a74deea55bfaadcadd0ee6c634ef",
+    "public/evidence/coop/handshake.traces.json": "12342dd4c976ee07f73cd6279bfd425b5861af121e7e82fde34e48d6963ab4b0",
+    "public/evidence/coop/handshake.world.json": "7df5004f1e8f883a7501a259e969a8a734c6b6960eba3ece22ebdd47b578a9d8",
+    "public/evidence/coop/manifest.json": "1c51f262e66a82e06e21ef67881605dbc6237321efdd80ef1123c901ab5606e7",
+    "public/evidence/coop/race-condition.cargo.json": "59f9eee8d01faa3fc3316b3359fa43f9506a53b2309c8149b2ac449ba43ef34d",
+    "public/evidence/coop/race-condition.disasm.json": "28efce31d4f08f44294a3001af29fa39a3123440e605cd801c6c2d30d7074dc5",
+    "public/evidence/coop/race-condition.evidence.json": "4fc65928e9562afb0199cd15bc62481b94811b7069bb6246a6b1f4c781a8e18c",
+    "public/evidence/coop/race-condition.machinery.json": "d482c61777646055e89933c161133f7e6afe361a364d5c9ea9bd6f632fd8ca4f",
+    "public/evidence/coop/race-condition.traces.json": "d7bc8b4e42fb8da2896f5bf9b8bc73d71c69ca9f7fb3aa9394a00bd32389a090",
+    "public/evidence/coop/race-condition.world.json": "583ac731da50b3418a375e1dd86e4382cad5347b5bdf3c7f03bba111d61ffbab",
+    "public/evidence/coop/use-after-free.disasm.json": "d76b5b53d2ff415e71102c87cd2081873065edea89c530b858273afc7ee2bff8",
+    "public/evidence/coop/use-after-free.environment.json": "37e7306d30d1380d31c4f66e2f430ae6856359af92ac0dd31f18c1889621e95f",
+    "public/evidence/coop/use-after-free.evidence.json": "4b0902298b3fb4f928e1ed51f63ccdbb118775bc8c7435cf96776d832961edf1",
+    "public/evidence/coop/use-after-free.traces.json": "e0f3827bf9cae9abe44c3c92a76dbf2d207d54812de810a77878361d30240d56",
+    "public/evidence/coop/use-after-free.world.json": "5be6bc9f9e38ad7965962c91ddd0610bc12858fe25a484a94d9e7509a82deb94"
+  },
+  "campaign": {
+    "runs": 1,
+    "pass": true,
+    "checksPassed": 79,
+    "checksFailed": 0
+  }
+}

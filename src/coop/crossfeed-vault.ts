@@ -12,19 +12,19 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
     const room: RoomDef<'crossfeed-vault'> = {
         id: 'crossfeed-vault', title: 'CROSSFEED VAULT', instruction: 'ROUTE BOTH PAYLOADS TO THE VAULT',
         width: 4320, height: 1780,
-        spawn: { x: slot === 1 ? 1660 : 1760, y: 1483 }, checkpoint: { x: slot === 1 ? 1660 : 1760, y: 1483 },
+        spawn: { x: slot === 1 ? 1890 : 1990, y: 1483 }, checkpoint: { x: slot === 1 ? 1890 : 1990, y: 1483 },
         upperCheckpoint: { x: slot === 1 ? 1120 : 1220, y: 733 },
-        entryPoints: [{ x: 1660, y: 1483 }, { x: 1760, y: 1483 }],
+        entryPoints: [{ x: 1890, y: 1483 }, { x: 1990, y: 1483 }],
         breakpoints: [{ id: 'system-online', at: { x: 1120, y: 750 }, checkpoint: 'upper',
             label: 'AUTO CHECKPOINT', automatic: true }],
-        cubes: [{ id: 'cubeA', spawn: { x: 2760, y: 1478 }, mark: 'A' }, { id: 'cubeB', spawn: { x: 510, y: 1478 }, mark: 'B' }],
+        cubes: [{ id: 'cubeA', spawn: { x: 3020, y: 1478 }, mark: 'A' }, { id: 'cubeB', spawn: { x: 510, y: 1478 }, mark: 'B' }],
         plateB: { x: 2620, y: 350 }, plateC: { x: 2910, y: 350 },
-        plates: [{ id: 'entry', at: { x: 1870, y: 1500 }, label: 'A', cameraReveal: { platformIds: ['crossing-anchor', 'return-bridge'], padding: 100 } },
+        plates: [{ id: 'entry', at: { x: 2130, y: 1500 }, label: 'A', cameraReveal: { platformIds: ['crossing-anchor', 'return-bridge'], padding: 100 } },
             { id: 'routePower', at: { x: 1330, y: 750 }, label: 'ROUTE POWER', cameraReveal: upperView }],
         cubePads: [{ id: 'liftCargo', at: { x: 1750, y: 1500 }, label: 'PAYLOAD / LIFT' },
             { id: 'finalLeft', at: { x: 2620, y: 650 }, label: 'E' }, { id: 'finalRight', at: { x: 2910, y: 650 }, label: 'F' }],
-        controls: [{ id: 'switchB', kind: 'toggle', at: { x: 2560, y: 1500 }, label: 'TRANSFER MODE',
-                cameraReveal: { bounds: { x: 1950, y: 800, w: 2220, h: 720 }, padding: 45 } },
+        controls: [{ id: 'switchB', kind: 'toggle', at: { x: 2820, y: 1500 }, label: 'TRANSFER MODE',
+                cameraReveal: { bounds: { x: 2210, y: 800, w: 1960, h: 720 }, padding: 45 } },
             // Floating one-use buttons. SYSTEM ONLINE hovers above and right of the
             // breakpoint, reachable only mid-jump from the catwalk; D stays on its ledge.
             { id: 'switchC', kind: 'terminal', floating: true, at: { x: 1255, y: 662 }, label: 'SYSTEM ONLINE' },
@@ -32,7 +32,7 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
             { id: 'switchD', kind: 'terminal', floating: true, at: { x: 4200, y: 750 }, label: 'D / GALLERY ACCESS' }],
         display: { x: 1680, y: 1040 }, exit: { x: 2700, y: 210, w: 140, h: 140 },
         platforms: [
-            stone('central-floor', 200, 1500, 1800, 280), stone('access-balcony', 2420, 1500, 1900, 280),
+            stone('central-floor', 200, 1500, 2060, 280), stone('access-balcony', 2680, 1500, 1640, 280),
             stone('service-roof', 850, 1100, 400, 310),
             { ...stone('service-door', 1300, 1120, 36, 380), openWhen: 'serviceAccess', label: 'SERVICE' },
             stone('control-catwalk', 1010, 750, 430),
@@ -43,8 +43,8 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
             { ...stone('vault-divider', 2744, 382, 40, 300), openWhen: 'exitDoor', blocksCubeInteraction: true },
             // A low, unhookable recovery deck cannot power or bypass the upper routes.
             stone('route-recovery', 1660, 1120, 1940), stone('gallery-recovery-step', 3450, 1030, 160),
-            { ...code('crossing-anchor', 2220, 1160, 160, 'grappleAnchor', 'A'), h: 60, anchor: true },
-            code('return-bridge', 2000, 1500, 420, 'bridge', 'B'),
+            { ...code('crossing-anchor', 2480, 1160, 160, 'grappleAnchor', 'A'), h: 60, anchor: true },
+            code('return-bridge', 2260, 1500, 420, 'bridge', 'B'),
             // Local regrouping only: D does not energize either transport route.
             code('gallery-return-low', 3800, 850, 170, 'galleryAccess', 'D'),
             code('gallery-return-high', 3920, 770, 180, 'galleryAccess', 'D'),
@@ -72,7 +72,7 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
         // payload intersects it. The long roofed passage prevents jumping cargo over.
         firewalls: [{ id: 'service-filter', x: 850, y: 1452, orientation: 'horizontal', length: 400, thickness: 12 }],
         hazards: [{ x: 0, y: 1710, w: 4320, h: 70 }],
-        regions: [{ at: { x: 1600, y: 1300 }, label: 'CROSSFEED' }, { at: { x: 2510, y: 1390 }, label: 'ACCESS' },
+        regions: [{ at: { x: 1600, y: 1300 }, label: 'CROSSFEED' }, { at: { x: 2770, y: 1390 }, label: 'ACCESS' },
             { at: { x: 360, y: 1270 }, label: 'SERVICE' }, { at: { x: 1080, y: 500 }, label: 'CONTROL' },
             { at: { x: 3690, y: 690 }, label: 'GALLERY' }, { at: { x: 2690, y: 105 }, label: 'VAULT' }],
     };
@@ -80,9 +80,9 @@ export function crossfeedVault(slot: Slot): RoomDef<'crossfeed-vault'> {
     const add = (id: string, input: import('../slice/connections.ts').MachineConnection['input'], output: Platform['signal'], from: { x: number; y: number }, to: { x: number; y: number }, y: number, inverted = false) =>
         room.wires!.push({ id, input, output: output!, points: elbow(from, to, y), inverted });
     room.wires = [];
-    add('entry-anchor', 'plateA', 'grappleAnchor', { x: 1870, y: 1488 }, { x: 2300, y: 1160 }, 1350);
-    add('transfer-bridge', 'switchB', 'bridge', { x: 2560, y: 1464 }, { x: 2220, y: 1500 }, 1400);
-    for (const gate of room.gates![0].gates) add(`transfer-${gate.id}`, 'switchB', 'relayGates', { x: 2560, y: 1464 }, { x: gate.x, y: gate.y }, 1070, true);
+    add('entry-anchor', 'plateA', 'grappleAnchor', { x: 2130, y: 1488 }, { x: 2560, y: 1160 }, 1350);
+    add('transfer-bridge', 'switchB', 'bridge', { x: 2820, y: 1464 }, { x: 2480, y: 1500 }, 1400);
+    for (const gate of room.gates![0].gates) add(`transfer-${gate.id}`, 'switchB', 'relayGates', { x: 2820, y: 1464 }, { x: gate.x, y: gate.y }, 1070, true);
     add('cargo-lift', 'cubeOnPlate', 'liftField', { x: 1750, y: 1488 }, { x: 1550, y: 1460 }, 1410);
     // The lift feed leaves the floating housing's roof, above its side caption.
     add('system-lift', 'switchC', 'liftField', { x: 1255, y: 600 }, { x: 1550, y: 710 }, 575);

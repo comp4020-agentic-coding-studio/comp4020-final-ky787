@@ -97,8 +97,30 @@
       "waitMs": 180
     },
     {
-      "label": "Operator walks through personnel passage while SAFE alone powers service",
+      "label": "Operator clears A, then uses personnel service while SAFE alone powers it",
       "actions": [
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 560
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": true
+        },
+        {
+          "type": "walk",
+          "actor": "operator",
+          "x": 340
+        },
+        {
+          "type": "key",
+          "actor": "operator",
+          "code": "Space",
+          "down": false
+        },
         {
           "type": "key",
           "actor": "operator",

@@ -297,7 +297,7 @@ export class PuzzleRenderer {
                     // caption sits beside its housing, clear of the catwalk player; D's
                     // drops below its ledge's lit underside.
                     r.id === 'race-condition' ? { x: -116, y: -22 } : r.id !== 'crossfeed-vault' ? undefined
-                        : lever.id === 'switchC' ? { x: 112, y: -42 } : { x: 0, y: 48 });
+                        : lever.id === 'switchC' ? { x: 112, y: -80 } : { x: 0, y: 48 });
                 continue;
             }
             const { x, y } = lever.at;
@@ -311,9 +311,10 @@ export class PuzzleRenderer {
             const dx = lever.active ? 19 : -19;
             this.line(x, y - 33, x + dx, y - 72, lever.active ? C.cyan : C.amber, 6);
             this.ring(x + dx, y - 72, 7, C.ink);
-            // HATCH sits beside a payload socket: leave the ordinary cube-use
-            // prompt a separate row, with a fixed authored-world caption offset.
-            const captionY = r.id === 'deadlock' && lever.id === 'draft:hatchToggle' ? y - 130
+            // HATCH and PHASE need a separate row above nearby interaction hints.
+            // Caption offsets are presentation only; control reach stays fixed.
+            const captionY = (r.id === 'deadlock' && lever.id === 'draft:hatchToggle')
+                || (r.id === 'race-condition' && lever.id === 'phase') ? y - 130
                 : r.id === 'race-condition' || 'terminal' in lever && !lever.terminal ? y - 90 : y + 40;
             this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, captionY, 13, lever.active ? C.cyan : C.amber);
         }

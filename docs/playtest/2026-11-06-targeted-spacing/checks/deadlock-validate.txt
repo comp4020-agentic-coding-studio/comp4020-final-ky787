@@ -1,0 +1,2 @@
+$ node scripts/level-tools/cli.ts validate levels/drafts/deadlock.json
+PLAYABLE levels/drafts/deadlock.json

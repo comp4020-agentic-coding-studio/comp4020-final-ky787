@@ -97,6 +97,7 @@ async function launchDeck(p: Cdp) {
     await wait(operator, 'local lever reveal off TRACE', s => s.camera.kind === 'control' && s.camera.id === 'phase');
     check('local lever reveal does not hijack the runner', (await snapshot(runner)).camera.kind === 'follow');
     await wait(operator, 'brief reveal expires despite ongoing snapshots', s => s.camera.kind === 'follow');
+    await sleep(900); await shot(operator, 'phase-hint');
     await align(operator, 615); await tap(operator, 'KeyE');
     await wait(runner, 'trace powers phase A', s => state(s).levelState.outputs.phaseA);
     await key(operator, 'Tab', true); await wait(operator, 'manual overview has priority', s => s.camera.kind === 'overview');

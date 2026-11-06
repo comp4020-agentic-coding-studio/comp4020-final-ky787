@@ -144,3 +144,13 @@ server-restart recovery. USE AFTER FREE started without checkpoint machinery and
 
 Current draft and campaign SHA-256: `42276aa914c9df4b287dbd4082a208e0ba7a18879ea4ec174bd6800c6ccac41e`.
 The A → B instruction moves below the recovery shelf, clear of the native launch listing. Only `presentation.labels` changed, mirrored in the matching draft; geometry, controller bindings, checkpoints and native evidence are unchanged. See the [polish review](../playtest/2026-10-27-final-polish/README.md) for current browser captures and validation.
+
+## Summit ASSIST spacing — 2026-11-06
+
+ASSIST moves from (1440, 950) to (1350, 950), on the existing permanent
+baffle top adjoining the summit. Its wire origin follows it. The exit at
+(1480, 810), summit landing, final lift and all timed route geometry remain
+unchanged. Both normal and recovery scenarios walk to x=1350 for the hold;
+all timing and completion assertions are retained. The pad's right edge
+(x=1398) clears the gateway's left flare (x=1451) by 53 units. See the
+[targeted report](../playtest/2026-11-06-targeted-spacing/README.md).

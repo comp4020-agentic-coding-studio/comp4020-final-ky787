@@ -97,7 +97,7 @@
       "waitMs": 180
     },
     {
-      "label": "Operator hops A and approaches loose cargo C",
+      "label": "Operator approaches loose cargo C from the new entry",
       "actions": [
         {
           "type": "key",

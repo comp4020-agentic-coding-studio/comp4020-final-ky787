@@ -726,7 +726,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 1440
+          "x": 1350
         }
       ],
       "wait": {

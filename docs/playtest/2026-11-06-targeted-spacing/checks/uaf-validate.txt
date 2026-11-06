@@ -1,0 +1,2 @@
+$ node scripts/level-tools/cli.ts validate levels/drafts/use-after-free.json
+PLAYABLE levels/drafts/use-after-free.json

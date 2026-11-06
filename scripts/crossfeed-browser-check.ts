@@ -126,20 +126,20 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
         await sleep(1000); await shot(a, 'entry-point');
         check('attach sequence runs after overview then settles', (await snapshot(a)).heroAssets.entryAge! >= .85);
     }
-    await align(holder, 1870); await wait(runner, 'A powers partner anchor', s => s.outputs.grappleAnchor);
-    await walk(runner, 1950);
-    await key(runner, 'KeyD', true); await mouse(runner, 2300, 1166, true);
+    await align(holder, 2130); await wait(runner, 'A powers partner anchor', s => s.outputs.grappleAnchor);
+    await walk(runner, 2210);
+    await key(runner, 'KeyD', true); await mouse(runner, 2560, 1166, true);
     try {
         await wait(runner, 'real grapple attaches', s => s.player.rope.phase === 'attached');
-        await wait(runner, 'grapple crosses first gap', s => s.player.x > 2340 && s.player.y < 1450 && s.player.vx > 0);
+        await wait(runner, 'grapple crosses first gap', s => s.player.x > 2600 && s.player.y < 1450 && s.player.vx > 0);
         await tap(runner, 'Space');
-        await mouse(runner, 2300, 1166, false);
-        await wait(runner, 'right balcony landing', s => s.player.x > 2440 && s.player.groundId === 'access-balcony');
-    } finally { await key(runner, 'KeyD', false); await mouse(runner, 2300, 1166, false); }
+        await mouse(runner, 2560, 1166, false);
+        await wait(runner, 'right balcony landing', s => s.player.x > 2700 && s.player.groundId === 'access-balcony');
+    } finally { await key(runner, 'KeyD', false); await mouse(runner, 2560, 1166, false); }
     await pickup(runner, 'cubeA'); await sleep(500);
     check('reachable A pickup accepted and retained before B', !state(await snapshot(runner)).levelState.inputs.switchB && (await snapshot(runner)).cubes.cubeA!.carried);
-    await place(runner, 'cubeA', 2760);
-    await align(runner, 2560); await tap(runner, 'KeyE'); await wait(holder, 'B return bridge', s => s.outputs.bridge);
+    await place(runner, 'cubeA', 3020);
+    await align(runner, 2820); await tap(runner, 'KeyE'); await wait(holder, 'B return bridge', s => s.outputs.bridge);
     await walk(holder, 1780); check('B bridge lets the entry holder leave A', !(await snapshot(holder)).outputs.grappleAnchor && (await snapshot(holder)).outputs.bridge);
     await pickup(runner, 'cubeA'); await place(runner, 'cubeA', 1750, 'liftCargo');
     await wait(holder, 'cargo powers lift', s => s.outputs.liftField); check('Cube A temporarily powers lift', !state(await snapshot(holder)).levelState.inputs.switchC);
@@ -220,14 +220,14 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     // Reconfigure B live: the upper player returns to A while the partner
     // switches back to relay mode and uses the initial anchor in reverse.
     await walk(holder, 700); await wait(holder, 'service bay floor', s => s.player.groundId === 'central-floor');
-    await walk(holder,1740); await hop(holder,1900); await align(holder, 1900); await hop(runner,1940); await walk(runner, 2560); await tap(runner, 'KeyE');
+    await walk(holder,1740); await hop(holder,1900); await align(holder, 2160); await hop(runner,1940); await walk(runner, 2820); await tap(runner, 'KeyE');
     await wait(holder, 'B back to relay mode without closing service', s => s.outputs.relayGates && !s.outputs.bridge && !!s.signals?.serviceAccess);
-    await align(runner, 2470); await key(runner, 'KeyA', true); await mouse(runner, 2300, 1166, true);
-    await wait(runner, 'reverse entry swing', s => s.player.x < 2210 && s.player.vx < 0 && s.player.vy < 0);
-    await tap(runner,'Space'); await mouse(runner, 2300,1166,false);
-    await wait(runner, 'return to central floor', s => s.player.x < 1980 && s.player.groundId === 'central-floor'); await key(runner,'KeyA',false);
+    await align(runner, 2730); await key(runner, 'KeyA', true); await mouse(runner, 2560, 1166, true);
+    await wait(runner, 'reverse entry swing', s => s.player.x < 2470 && s.player.vx < 0 && s.player.vy < 0);
+    await tap(runner,'Space'); await mouse(runner, 2560,1166,false);
+    await wait(runner, 'return to central floor', s => s.player.x < 2240 && s.player.groundId === 'central-floor'); await key(runner,'KeyA',false);
     check('reverse transfer crossing uses rope jump without death', (await snapshot(runner)).deaths === 0);
-    await hop(runner,1740); await hop(holder,1740);
+    await align(runner,1900); await hop(runner,1740); await align(holder,1900); await hop(holder,1740);
     await walk(holder,1370); await wait(holder,'land after crossing powered lift',s=>s.player.groundId==='central-floor'); await walk(holder,700);
     await pickup(holder, 'cubeB');
     const untouchedA = { ...((await snapshot(runner)).cubes.cubeA!) }, epochB = state(await snapshot(holder)).cubes.cubeB!.epoch;

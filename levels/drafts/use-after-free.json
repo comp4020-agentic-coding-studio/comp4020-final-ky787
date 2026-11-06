@@ -319,7 +319,7 @@
         "kind": "plate",
         "label": "ASSIST / RELEASE C",
         "type": "device",
-        "x": 1440,
+        "x": 1350,
         "y": 950
       },
       {
@@ -910,7 +910,7 @@
         "invertedLabel": true,
         "points": [
           {
-            "x": 1440,
+            "x": 1350,
             "y": 938
           },
           {

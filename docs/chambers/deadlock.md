@@ -283,3 +283,15 @@ server-restart recovery. DEADLOCK retained all three socket cubes through the fi
 
 Current draft and campaign SHA-256: `0a04a866ecfa8fcdb758394f3a8bf18762ff78fd1e4941ecbe8c6882ee840e96`.
 The shorter DEADLOCK heading fits inside the wall; SERVICE / PERSONNEL ONLY is split across two fixed lines above the entry gateway. Only `presentation.labels` changed in the JSON, mirrored in the matching draft. The renderer also raises HATCH's fixed caption 40 units to clear the nearby cube-use prompt. Geometry, controller bindings, checkpoints and native evidence are unchanged. See the [polish review](../playtest/2026-10-27-final-polish/README.md) for current browser captures and validation.
+
+## Targeted lower entry spacing — 2026-11-06
+
+P1's spawn/entry moves from (350, 2983) to (850, 2983), clear of FEED
+and the low personnel passage. P2 moves from (1730, 2983) to (1870, 2983),
+clear of cube B. Only the lower floor and room width grow, 1800 to 1980.
+The lift's assembly-text placement moves from (760, 2840) to (760, 2550)
+to leave the new P1 gateway clear; the retained native text is unchanged.
+FEED, SAFE, all cargo homes, relay endpoints, hatch and upper gallery stay fixed.
+The full-room scenario hops A on the initial walk to service; the timed final
+catch and delivery assertions are unchanged. See the
+[targeted report](../playtest/2026-11-06-targeted-spacing/README.md).

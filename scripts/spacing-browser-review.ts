@@ -72,23 +72,37 @@ try {
     await click(a, '#create-party'); const lobby = await wait(a, 'party lobby', s => s.multiplayer?.shared?.party?.phase === 'lobby');
     await click(b, '#join-code'); await b.send('Input.insertText', { text: lobby.multiplayer!.code! }); await click(b, '#join-room');
     await wait(a, 'partner joined', s => s.multiplayer?.shared?.connected.every(Boolean) === true);
-    await choose(a, b, 'handshake');
-    await sleep(600);
-    await fixed(a, 'handshake-01-start-both-players', views.start);
-    await follow(a, 'handshake-01b-follow-player-1');
-    await fixed(a, 'handshake-02-breakpoint-lift-pads', views.cluster);
-    await overview(a, 'handshake-05-overview');
-    // Real input: Player 2 walks onto LIFT; the accepted output powers the lift.
-    await h.walk(b, liftPlateX);
-    await wait(a, 'LIFT contact accepted', s => !!s.signals?.['draft:liftPower'], 6000);
-    await sleep(1400);
-    await fixed(a, 'handshake-03-lift-powered', views.cluster);
-    check('lift powered through real plate contact', !!(await snapshot(a)).signals?.['draft:liftPower']);
-    await fixed(a, 'handshake-04-crossing', views.crossing);
-    for (const chamber of ['crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free']) {
-        await choose(a, b, chamber); await sleep(600);
-        for (const [i, p] of [a, b].entries()) await follow(p, `${chamber}-player-${i + 1}`);
-        await overview(a, `${chamber}-overview`);
+    if (process.env.BN_SPACING_ROOM) {
+        const room = process.env.BN_SPACING_ROOM;
+        await choose(a, b, room); await sleep(1000);
+        if (process.env.BN_SPACING_WALK) await h.walk(a, Number(process.env.BN_SPACING_WALK));
+        await size(a, Number(process.env.BN_SPACING_WIDTH ?? 1600), 900);
+        const targetedViews = JSON.parse(process.env.BN_SPACING_TARGET_VIEWS ?? '{"follow":null}') as Record<string, View | null>;
+        for (const [name, camera] of Object.entries(targetedViews)) {
+            await a.read(`binaryNinja.renderer.editorCamera=${JSON.stringify(camera ?? undefined)}`);
+            await sleep(1100);
+            observations.push({ name, state: await brief(a) });
+            await h.shot(a, `${room}-${name}`);
+        }
+    } else {
+        await choose(a, b, 'handshake');
+        await sleep(600);
+        await fixed(a, 'handshake-01-start-both-players', views.start);
+        await follow(a, 'handshake-01b-follow-player-1');
+        await fixed(a, 'handshake-02-breakpoint-lift-pads', views.cluster);
+        await overview(a, 'handshake-05-overview');
+        // Real input: Player 2 walks onto LIFT; the accepted output powers the lift.
+        await h.walk(b, liftPlateX);
+        await wait(a, 'LIFT contact accepted', s => !!s.signals?.['draft:liftPower'], 6000);
+        await sleep(1400);
+        await fixed(a, 'handshake-03-lift-powered', views.cluster);
+        check('lift powered through real plate contact', !!(await snapshot(a)).signals?.['draft:liftPower']);
+        await fixed(a, 'handshake-04-crossing', views.crossing);
+        for (const chamber of ['crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free']) {
+            await choose(a, b, chamber); await sleep(600);
+            for (const [i, p] of [a, b].entries()) await follow(p, `${chamber}-player-${i + 1}`);
+            await overview(a, `${chamber}-overview`);
+        }
     }
     for (const p of [a, b]) check('no browser runtime errors', p.errors.length === 0, p.errors.join('\n'));
 } catch (e) {

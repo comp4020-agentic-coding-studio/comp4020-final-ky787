@@ -257,3 +257,10 @@ instead of annoying? Is 1.55 s enough for deliberate movement? Does B on RETURN
 produce an aha? Is the boost finish too familiar? Does faster running help? Does
 this feel like one harder puzzle rather than stages? Which cooperative shortcuts
 are worth keeping? Record human feedback before changing or freezing the contract.
+
+### PHASE caption spacing — 2026-11-06
+
+PHASE remains at (655, 720). Its caption baseline moves from y=630 to y=590,
+leaving 40 units above the ordinary nearby interaction hint. This is a renderer
+offset only; room geometry, control reach, timing and real-input route are unchanged.
+See the [targeted spacing report](playtest/2026-11-06-targeted-spacing/README.md).

@@ -121,14 +121,14 @@
         "id": "player1",
         "slot": 1,
         "type": "spawn",
-        "x": 350,
+        "x": 850,
         "y": 2983
       },
       {
         "id": "player2",
         "slot": 2,
         "type": "spawn",
-        "x": 1730,
+        "x": 1870,
         "y": 2983
       },
       {
@@ -138,7 +138,7 @@
         "kind": "static",
         "label": "LOWER ALLOCATION FLOOR",
         "type": "platform",
-        "w": 1800,
+        "w": 1980,
         "x": 0,
         "y": 3000
       },
@@ -309,7 +309,7 @@
         "y": 860
       }
     ],
-    "width": 1800
+    "width": 1980
   },
   "id": "deadlock",
   "instruction": "ALLOCATE THREE CUBES. LIFT THE FINAL LOAD. RELAY TO CLOSE THE HATCH.",

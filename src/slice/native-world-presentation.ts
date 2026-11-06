@@ -20,8 +20,8 @@ export const WORLD_ASSEMBLY_PLACEMENTS: Partial<Record<NativeChamberId, readonly
         { output: 'exitReady', target: 'exit', x: 2125, y: 610 },
     ],
     'crossfeed-vault': [
-        { output: 'grappleAnchor', target: 'crossing-anchor', x: 2240, y: 1210 },
-        { output: 'bridge', target: 'return-bridge', x: 2050, y: 1540 },
+        { output: 'grappleAnchor', target: 'crossing-anchor', x: 2500, y: 1210 },
+        { output: 'bridge', target: 'return-bridge', x: 2310, y: 1540 },
         { output: 'liftField', target: 'central-lift', x: 1760, y: 1165 },
         { output: 'relayGates', target: 'transfer', x: 340, y: 1320 },
         { output: 'leftRoute', target: 'left1', x: 1420, y: 405 },
@@ -43,7 +43,7 @@ export const WORLD_ASSEMBLY_PLACEMENTS: Partial<Record<NativeChamberId, readonly
         { output: 'exitDoor', target: 'exit', x: 3500, y: 570 },
     ],
     deadlock: [
-        { output: 'cargoLift', target: 'cargoField', x: 760, y: 2840 },
+        { output: 'cargoLift', target: 'cargoField', x: 760, y: 2550 },
         { output: 'shaftFirewall', target: 'shaftBeam', x: 180, y: 2320 },
         { output: 'serviceRelay', target: 'serviceUpper', x: 760, y: 740 },
         { output: 'hatchOpen', target: 'hatch', x: 250, y: 1060 },

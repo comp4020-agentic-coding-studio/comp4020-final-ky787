@@ -26,9 +26,9 @@ export const ENVIRONMENTAL_BLOCKS: Record<EnvironmentalChamber, readonly Environ
             label: 'EXIT', on: 'UNLOCKED', off: 'LOCKED', excerpt: 'boolean' },
     ],
     'crossfeed-vault': [
-        { output: 'grappleAnchor', target: 'crossing-anchor', group: 'crossing', x: 2580, y: 1200, w: 328, h: 124,
+        { output: 'grappleAnchor', target: 'crossing-anchor', group: 'crossing', x: 2840, y: 1200, w: 328, h: 124,
             label: 'CROSSING ANCHOR', on: 'POWERED', off: 'IDLE', excerpt: 'compare' },
-        { output: 'bridge', target: 'return-bridge', group: 'lower-return', x: 2050, y: 1540, w: 328, h: 124,
+        { output: 'bridge', target: 'return-bridge', group: 'lower-return', x: 2310, y: 1540, w: 328, h: 124,
             label: 'RETURN CROSSING', on: 'ACTIVE', off: 'INACTIVE', excerpt: 'store' },
         { output: 'liftField', target: 'central-lift', group: 'cargo-lift', x: 1760, y: 1165, w: 328, h: 124,
             label: 'CARGO LIFT', on: 'ACTIVE', off: 'INACTIVE', excerpt: 'boolean' },
@@ -48,7 +48,7 @@ export const ENVIRONMENTAL_BLOCKS: Record<EnvironmentalChamber, readonly Environ
             label: 'SERVICE PASSAGE', on: 'OPEN', off: 'CLOSED', excerpt: 'boolean' },
     ],
     deadlock: [
-        { output: 'cargoLift', target: 'cargoField', group: 'lower-cargo', x: 780, y: 2830, w: 328, h: 124,
+        { output: 'cargoLift', target: 'cargoField', group: 'lower-cargo', x: 780, y: 2550, w: 328, h: 124,
             label: 'CARGO LIFT', on: 'ACTIVE', off: 'INACTIVE', excerpt: 'branch' },
         { output: 'shaftFirewall', target: 'shaftBeam', group: 'shaft-interlock', x: 220, y: 2320, w: 328, h: 124,
             label: 'SHAFT', on: 'BLOCKED', off: 'CLEAR', hazard: true, excerpt: 'compare' },
