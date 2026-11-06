@@ -1,0 +1,29 @@
+{
+  "base": "f7c732381348fdfdcd40e0291fdbcf55f03ba6cf",
+  "scope": "presentation only; no geometry, controller, evidence, music or physics edits",
+  "focusedUnitTests": 91,
+  "typecheck": "pass",
+  "build": "pass",
+  "browserChecks": {
+    "focused": {
+      "passed": 60,
+      "failed": 0
+    },
+    "switch": {
+      "passed": 18,
+      "failed": 0
+    },
+    "handshake": {
+      "passed": 37,
+      "failed": 0
+    },
+    "race": {
+      "passed": 27,
+      "failed": 0
+    }
+  },
+  "handshakeScenarioSteps": 59,
+  "pausedAndReducedMotionMaxPixelDelta": 0,
+  "fixtureScope": "Body placement for isolated lever checks; no physical solve claim. SWITCH, HANDSHAKE and forward RACE routes use existing real-input tools.",
+  "rawReports": ".workbench/reports/control-art/"
+}

@@ -1,0 +1,18 @@
+PASS PRESSURE uses real carry input
+PASS unpowered SWITCH has no premature grapple instruction
+PASS tap and hold instructions are visible above the jump path
+PASS 1366×768 instructions stay inside the canvas
+PASS 1024×768 instructions stay inside the canvas
+PASS reduced motion keeps the instructions visible
+PASS automatic highlight alone does not mark grappling learned
+PASS no gameplay pointer movement was needed
+PASS first Space tap jumps without firing the rope
+PASS attached instructions teach swing and release
+PASS actual grapple is persisted by existing mechanic events
+PASS keyup produces the bounded rope jump without a third press
+PASS complete SWITCH gap traversal has no deaths
+PASS retired onboarding does not leave its text behind
+PASS touch jump/hold/swing/release crosses without a death
+PASS paused release neither moves the player nor spends a rope jump
+PASS resume cannot replay the paused release as a jump
+PASS browser reports no errors

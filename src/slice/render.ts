@@ -37,6 +37,8 @@ import { pressurePads } from './machinery-presentation.ts';
 import { drawPressurePad, drawPadOutputPulse } from './plate-render.ts';
 import { drawGravityLift } from './lift-render.ts';
 import { drawFloatingControl } from './maintenance-render.ts';
+import { drawSignalSwitch } from './signal-switch-render.ts';
+import { drawOnboardingHints } from './onboarding-render.ts';
 import { drawDeathZone, drawStaticPlatform } from './terrain-render.ts';
 import { SwitchOnboarding } from './switch-onboarding.ts';
 const C = { bg: '#0c131a', grid: '#15232c', wall: '#21303a', line: '#43545d', ink: '#e2edf1', dim: '#8399a5', cyan: '#64e6d5', amber: '#f9ba68', red: '#fa817e' };
@@ -211,7 +213,7 @@ export class PuzzleRenderer {
             }
         }
         if (r.id === 'uplink') {
-            this.text('CONTROL WING', 1030, 1100, 19, C.dim);
+            this.text('CONTROL WING', 1030, 1075, 19, C.dim);
             this.text('SERVICE BAY', 2360, 815, 16, C.dim);
             this.text('CORE NODE', 3080, 450, 22, C.cyan);
             this.text('RECOVERY DECK', 2900, 895, 14, C.dim);
@@ -219,7 +221,9 @@ export class PuzzleRenderer {
             for (const p of w.platforms.filter(p => p.def.signal === 'codePlatformB'))
                 this.text(p.def.label!, p.def.x + p.def.w / 2 - 70, p.def.y - 24, 12, p.solid.enabled ? C.cyan : C.dim);
         }
+        drawOnboardingHints(c, r.id);
         for (const region of r.regions ?? []) {
+            if (r.id === 'handshake' && region.label === 'TWO HANDS. ONE STEP HIGHER.') continue;
             const label = this.nativeWorld.state?.chamber === r.id ? nativeWorldRegionLabel(region.label) : region.label;
             this.text(label, region.at.x, region.at.y, 24, C.dim);
         }
@@ -280,8 +284,10 @@ export class PuzzleRenderer {
         }
         const hint = w.interactionHint();
         let floatingControlOwnsHint = false;
+        let signalSwitchHintAt: Vec2 | undefined;
+        const signalSwitches: Vec2[] = [];
         for (const lever of [
-            { id: 'lever', at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: r.id === 'relay' || r.id === 'pairing-bay' || r.id === 'relay-lab' },
+            { id: 'lever', at: r.lever, active: w.inputs.switchB, name: r.id === 'relay-lab' ? 'RELAY POWER' : r.id === 'pairing-bay' ? 'SWITCH B' : r.id === 'relay' ? 'BRIDGE' : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH', latch: ['relay', 'pairing-bay', 'relay-lab', 'boost-lab', 'firewall-lab'].includes(r.id) },
             { id: 'upperLever', at: r.upperLever, active: w.inputs.switchC, name: 'LIFT LATCH', latch: true },
             ...(r.controls ?? []).map(s => ({ id: s.id, at: s.at, active: w.frame.controls?.[s.id] ?? (s.id === 'switchD' ? w.frame.outputs.codePlatformA : s.id === 'phase' ? w.inputs.switchB : s.id === 'commit' ? w.inputs.switchC : w.inputs[s.id as 'switchB' | 'switchC']), name: s.label, latch: s.kind !== 'toggle', terminal: s.kind !== 'toggle', floating: !!s.floating })),
         ]) {
@@ -301,21 +307,32 @@ export class PuzzleRenderer {
                 continue;
             }
             const { x, y } = lever.at;
-            c.fillStyle = C.wall;
-            c.fillRect(x - 24, y - 36, 48, 36);
-            if ('terminal' in lever && lever.terminal) {
-                c.fillStyle = lever.active ? C.cyan : C.amber; c.fillRect(x - 17, y - 31, 34, 19);
-                this.text(lever.name + (lever.active ? ' / COMMITTED' : ''), x - 55, y + 40, 13, lever.active ? C.cyan : C.amber); continue;
+            signalSwitches.push(lever.at);
+            const terminal = 'terminal' in lever && lever.terminal;
+            // Use the offered interaction, including the legacy solo control names.
+            const legacyName = r.id === 'pairing-bay' ? 'LATCH RETURN BRIDGE'
+                : r.id === 'relay-lab' ? 'POWER RELAY' : r.id === 'boost-lab' ? 'OPEN RETURN ROUTE'
+                : r.id === 'firewall-lab' ? 'SAVE CHECKPOINT + OPEN EXIT'
+                : r.id === 'uplink' ? 'RELAY POWER' : 'SWITCH';
+            const interactionName = lever.id === 'lever' ? legacyName
+                : lever.id === 'upperLever' ? r.id === 'lift-lab' ? 'LATCH LIFT + CHECKPOINT' : 'LIFT LATCH' : lever.name;
+            const offered = hint.toUpperCase(), prefix = `E · ${interactionName}`;
+            const ready = offered === prefix || offered.startsWith(prefix + ' ');
+            const committedHint = lever.active && lever.latch && !offered.startsWith('E · ')
+                && /COMMITTED|LATCHED|LOCKED|LIFT LATCHED|UPPER ROUTE OPEN|CHECKPOINT SAVED/.test(offered)
+                && Math.hypot(w.player.x - x, w.player.y - (y - 25)) < 72;
+            if (ready || committedHint) signalSwitchHintAt = lever.at;
+            drawSignalSwitch(c, lever.at, { active: !!lever.active, ready, latched: lever.latch, terminal },
+                this.heroes.time, energyMotion);
+            if (terminal) {
+                this.text(lever.name + (lever.active ? ' / COMMITTED' : ''), x - 55, y + 40, 13, lever.active ? C.cyan : C.amber);
+                continue;
             }
-            this.ring(x, y - 33, 8, C.line);
-            const dx = lever.active ? 19 : -19;
-            this.line(x, y - 33, x + dx, y - 72, lever.active ? C.cyan : C.amber, 6);
-            this.ring(x + dx, y - 72, 7, C.ink);
             // HATCH and PHASE need a separate row above nearby interaction hints.
             // Caption offsets are presentation only; control reach stays fixed.
             const captionY = (r.id === 'deadlock' && lever.id === 'draft:hatchToggle')
                 || (r.id === 'race-condition' && lever.id === 'phase') ? y - 130
-                : r.id === 'race-condition' || 'terminal' in lever && !lever.terminal ? y - 90 : y + 40;
+                : r.id === 'race-condition' || 'terminal' in lever && !lever.terminal ? y - 140 : y + 40;
             this.text(`${lever.name} / ${lever.active ? lever.latch ? 'LOCKED' : 'ON' : 'OFF'}`, x - 55, captionY, 13, lever.active ? C.cyan : C.amber);
         }
         if (this.nativeWorld.state?.chamber !== r.id && r.id !== 'uplink' && r.id !== 'crossfeed-vault' && r.id !== 'race-condition') {
@@ -371,7 +388,8 @@ export class PuzzleRenderer {
         drawEntryProjection(c, r, this.heroes);
         if (hint && !floatingControlOwnsHint) {
             const station = r.breakpoints?.find(b => Math.hypot(p.x - b.at.x, p.y - (b.at.y - 25)) < 90);
-            if (station) this.text(hint, station.at.x - hint.length * 3.6, station.at.y + 78, 12, C.ink);
+            if (signalSwitchHintAt) this.text(hint, signalSwitchHintAt.x - hint.length * 3.6, signalSwitchHintAt.y - 108, 12, C.ink);
+            else if (station) this.text(hint, station.at.x - hint.length * 3.6, station.at.y + 78, 12, C.ink);
             else this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
         }
         const target = w.selectedTarget(aim);
@@ -428,9 +446,13 @@ export class PuzzleRenderer {
             this.text('SAFE RECOVERY FLOOR · JUMP BACK UP', 1220, 700, 13, C.dim);
         this.particles.update(dt);
         this.particles.draw(c);
+        // Both names clear a nearby wall actuator, even when the other player is
+        // not interacting. This changes only nameplate placement, never reach.
+        const switchNameLift = (player: PlayerState) => signalSwitches.some(at =>
+            Math.abs(player.x - at.x) < 120 && Math.abs(player.y - (at.y - 25)) < 80) ? 155 : undefined;
         this.drawCharacterLabels([
-            { player: p, profile: localProfile, slot: players?.localSlot, local: true, prompt: !!hint || rope.phase === 'attached' || w.keyboardGrapple || !!target && !p.grounded },
-            ...(players?.remote ? [{ player: players.remote, profile: remoteProfile, slot: remoteSlot as Slot, local: false, prompt: false }] : []),
+            { player: p, profile: localProfile, slot: players?.localSlot, local: true, promptLift: switchNameLift(p), prompt: !!hint || rope.phase === 'attached' || w.keyboardGrapple || !!target && !p.grounded },
+            ...(players?.remote ? [{ player: players.remote, profile: remoteProfile, slot: remoteSlot as Slot, local: false, prompt: false, promptLift: switchNameLift(players.remote) }] : []),
         ], dpr);
         if (w.deathFlash > 0) {
             c.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -487,7 +509,7 @@ export class PuzzleRenderer {
         this.text(detail, 96, 238, 12, C.dim);
         c.restore();
     }
-    private drawCharacterLabels(entries: { player: PlayerState; profile: PublicCharacterProfile; slot?: Slot; local: boolean; prompt: boolean }[], dpr: number): void {
+    private drawCharacterLabels(entries: { player: PlayerState; profile: PublicCharacterProfile; slot?: Slot; local: boolean; prompt: boolean; promptLift?: number }[], dpr: number): void {
         const c = this.ctx, cam = this.camera;
         c.save(); c.setTransform(dpr, 0, 0, dpr, 0, 0);
         // CSS-pixel text remains readable during room overview and never changes camera or collision bounds.
@@ -500,7 +522,8 @@ export class PuzzleRenderer {
             const anchorY = (entry.player.y - cam.originY()) * cam.zoom;
             if (anchorX < -w || anchorX > cam.viewW + w || anchorY < -60 || anchorY > cam.viewH + 80) continue;
             const x = Math.max(4, Math.min(cam.viewW - w - 4, anchorX - w / 2));
-            let y = Math.max(4, anchorY - (entry.prompt ? Math.max(88 * cam.zoom, 46) : Math.max(25 * cam.zoom, 19)) - h);
+            let y = Math.max(4, anchorY - (entry.promptLift !== undefined ? Math.max(entry.promptLift * cam.zoom, 46)
+                : entry.prompt ? Math.max(88 * cam.zoom, 46) : Math.max(25 * cam.zoom, 19)) - h);
             for (const other of placed) if (x < other.x + other.w + 4 && x + w + 4 > other.x && y < other.y + other.h + 4 && y + h + 4 > other.y) {
                 y = other.y - h - 4;
                 if (y < 4) y = other.y + other.h + 4;

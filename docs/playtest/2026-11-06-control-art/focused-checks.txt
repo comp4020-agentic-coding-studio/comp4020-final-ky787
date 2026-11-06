@@ -1,0 +1,60 @@
+PASS PRESS E TO PICK UP CUBE fits the normal gameplay canvas
+PASS review uses the normal game camera
+PASS PRESS E TO PICK UP CUBE fits the normal gameplay canvas
+PASS review uses the normal game camera
+PASS PRESSURE hint corresponds to an actual cube pickup
+PASS PRESS SPACE TO JUMP / PRESS AND HOLD SPACE AGAIN TO SWING fits the normal gameplay canvas
+PASS review uses the normal game camera
+PASS PRESS SPACE TO JUMP / PRESS AND HOLD SPACE AGAIN TO SWING fits the normal gameplay canvas
+PASS review uses the normal game camera
+PASS new SWITCH lever activates with real E input
+PASS new SWITCH lever stays reversible
+PASS [isolated fixture] BRIDGE exposes its existing E interaction — E · switch ON
+PASS [isolated fixture] BRIDGE changes through real E input
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] BRIDGE stays latched
+PASS [isolated fixture] RELAY POWER exposes its existing E interaction — E · relay power ON
+PASS [isolated fixture] RELAY POWER changes through real E input
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] RELAY POWER still toggles back
+PASS [isolated fixture] LIFT LATCH exposes its existing E interaction — E · lift latch ON
+PASS [isolated fixture] LIFT LATCH changes through real E input
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] LIFT LATCH stays latched
+PASS [isolated fixture] LINK exposes its existing E interaction — E · LINK
+PASS [isolated fixture] LINK changes through real E input
+PASS [isolated fixture] both clients agree on LINK
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] LINK still toggles back
+PASS [isolated fixture] BOOST YOUR PARTNER fits the normal gameplay canvas
+PASS review uses the normal game camera
+PASS [isolated fixture] TRANSFER MODE exposes its existing E interaction — E · TRANSFER MODE
+PASS [isolated fixture] TRANSFER MODE changes through real E input
+PASS [isolated fixture] both clients agree on TRANSFER MODE
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] TRANSFER MODE still toggles back
+PASS [isolated fixture] ROUTE SELECT exposes its existing E interaction — E · ROUTE SELECT
+PASS [isolated fixture] ROUTE SELECT changes through real E input
+PASS [isolated fixture] both clients agree on ROUTE SELECT
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] ROUTE SELECT still toggles back
+PASS [isolated fixture] PHASE exposes its existing E interaction — E · PHASE A → B
+PASS [isolated fixture] PHASE changes through real E input
+PASS [isolated fixture] both clients agree on PHASE
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] PHASE still toggles back
+PASS both P1/P2 labels clear the PHASE housing
+PASS PHASE housing has 18 units of vertical clearance above TRACE tread without moving controls
+PASS device interaction hint clears the local player label
+PASS both P1/P2 labels clear the PHASE housing
+PASS compact RACE view has no horizontal page overflow
+PASS reduced motion keeps switch housing pixels still (2-channel raster tolerance) — 0
+PASS paused switch housing pixels remain still (2-channel raster tolerance) — 0
+PASS [isolated fixture] HATCH / OPEN-CLOSE exposes its existing E interaction — E · HATCH / OPEN-CLOSE
+PASS [isolated fixture] HATCH / OPEN-CLOSE changes through real E input
+PASS [isolated fixture] both clients agree on HATCH / OPEN-CLOSE
+PASS device interaction hint clears the local player label
+PASS [isolated fixture] HATCH / OPEN-CLOSE still toggles back
+PASS focused review has no browser runtime errors
+PASS focused review has no browser runtime errors
+PASS focused review has no browser runtime errors
