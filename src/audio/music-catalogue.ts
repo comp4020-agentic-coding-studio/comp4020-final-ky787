@@ -8,6 +8,8 @@ export const MUSIC_TRACKS = {
     'race-condition': { file: 'race-condition.ogg', title: 'Race Condition', gain: 1 },
     deadlock: { file: 'deadlock.ogg', title: 'Deadlock', gain: 1 },
     'use-after-free': { file: 'use-after-free.ogg', title: 'Use After Free', gain: 1 },
+    // Explicit draft presentation choice; does not register a campaign chamber.
+    kuia: { file: 'kuia.ogg', title: 'Kuia', gain: 1 },
 } as const;
 
 export type MusicScene = keyof typeof MUSIC_TRACKS;

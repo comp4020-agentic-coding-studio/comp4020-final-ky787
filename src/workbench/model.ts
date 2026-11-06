@@ -1,6 +1,7 @@
 import { PLAYER } from '../engine/constants.ts';
 import { CUBE_SIZE } from '../slice/tuning.ts';
 import type { Vec2, Box } from '../engine/geometry.ts';
+import type { MusicScene } from '../audio/music-catalogue.ts';
 
 /** v1 world units are game pixels: +x right, +y down. Array order is preserved within the existing renderer layers. */
 export const DRAFT_VERSION = 1;
@@ -42,7 +43,7 @@ export interface DraftDocument {
     geometry: { width: number; height: number; objects: DraftObject[] };
     controller: DraftController;
     bindings: DraftBinding[];
-    presentation: { wires: DraftWire[]; labels: DraftLabel[]; cameraReveals: DraftReveal[]; display: Vec2 };
+    presentation: { wires: DraftWire[]; labels: DraftLabel[]; cameraReveals: DraftReveal[]; display: Vec2; /** Bundled soundtrack key; omitted retains silent custom-session music. */ music?: MusicScene };
     /** Explicit device port values, NOT forced outputs. */
     previewStates: Record<string, Record<string, boolean>>;
     editor: { hidden: string[]; locked: string[]; grid: number; snap: boolean };

@@ -46,6 +46,8 @@ SOURCES.update({
     "factory": {"title": "New Factory", "author": "Alexander Ehlers (tricksntraps)", "page": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2", "file": "new_factory_129bpm_0.ogg", "hash": "3365dd3d25697a54e843678d75f49732cd0bc88bfd3ccb574b39f0ed65fa7291"},
 })
 PRESERVED = {
+    # Restored byte-for-byte from 60c04fc for explicit BYPASS draft playback.
+    "kuia": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
     "menu": "94271d7fac43f54c4240c354b7415ee26b94bcbe93346aed83108a3cca73679e",
     "race-condition": "028f5d98da1a3d1f3d396abd66ac94bca37194316e85b90895a228c59b1073c1",
     "deadlock": "f31f389b69d48b9bbb386ccd40f8cbbae6075034ff5a8a04bdffc35621dd4648",
@@ -323,7 +325,7 @@ def validate_preserved(output: Path, manifest: dict) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache", type=Path, default=Path(tempfile.gettempdir()) / "bn-music-sources")
-    parser.add_argument("--output", type=Path, default=ROOT / "public/audio/music", help="Existing seven-track catalogue; approved files must already exist")
+    parser.add_argument("--output", type=Path, default=ROOT / "public/audio/music", help="Existing bundled catalogue; approved files must already exist")
     parser.add_argument("--review-dir", type=Path, default=ROOT / "docs/playtest/2026-10-27-approved-soundtracks")
     parser.add_argument("--skip-review", action="store_true", help="Only rebuild the two runtime replacements")
     args = parser.parse_args()

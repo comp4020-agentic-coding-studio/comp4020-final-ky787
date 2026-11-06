@@ -32,7 +32,7 @@ it('preserves the original Celestial Harmony bytes and level only for RELAY and 
     for (const room of ['pressure', 'switch']) expect(musicSceneForRoom(room)).toBe('menu');
 });
 
-it('ships exactly the seven scene tracks with verified provenance, hashes and bounded encoded size', async () => {
+it('ships the bundled scene and optional draft tracks with verified provenance, hashes and bounded encoded size', async () => {
     const catalogue = JSON.parse(await readFile('public/audio/music/catalogue.json', 'utf8'));
     expect(catalogue.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(new Set(catalogue.assets.map((a: {file: string}) => a.file))).toEqual(new Set(Object.values(MUSIC_TRACKS).map(t => t.file)));
@@ -47,12 +47,22 @@ it('ships exactly the seven scene tracks with verified provenance, hashes and bo
         expect(asset.download).toMatch(/^https:\/\/opengameart.org\/sites\/default\/files\//);
         expect(asset.sourceSha256).toMatch(/^[a-f0-9]{64}$/); expect(asset.author.length).toBeGreaterThan(2);
         expect(asset.processing.length).toBeGreaterThan(30);
-        expect(asset.duration).toBeGreaterThanOrEqual(asset.scene === 'handshake' ? 35 : asset.scene === 'crossfeed-vault' ? 52 : 90);
+        expect(asset.duration).toBeGreaterThanOrEqual(asset.scene === 'handshake' ? 35 : asset.scene === 'crossfeed-vault' ? 52 : asset.scene === 'kuia' ? 47 : 90);
         expect(asset.duration).toBeLessThanOrEqual(240); expect(asset.truePeakDbtp).toBeLessThan(-6);
         expect(asset.integratedLufs).toBeGreaterThan(-24); expect(asset.integratedLufs).toBeLessThan(-22);
         expect(asset.loopAnalysis.longestSilenceBelowMinus60DbSeconds).toBe(0);
     }
     expect(total).toBe(catalogue.totalBytes); expect(total).toBeLessThan(18_000_000);
+});
+
+it('reuses the complete previously approved Kuia loop rather than a listening preview', async () => {
+    const { assets } = JSON.parse(await readFile('public/audio/music/catalogue.json', 'utf8'));
+    const asset = assets.find((a: { scene: string }) => a.scene === 'kuia');
+    expect(asset.title).toBe('Kuia'); expect(asset.author).toBe('James Gargette (cinameng)');
+    expect(asset.sourceSha256).toBe('11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e');
+    expect(asset.sha256).toBe('52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d');
+    expect(asset.edits).toMatchObject({ fullOriginalRecording: true, sourceDecodedSamples: 2080512, encodedSamples: 2080512, trimStartSample: 0, trimEndSampleExclusive: 2080512 });
+    expect(asset.duration).toBeCloseTo(2080512 / 44100, 5);
 });
 
 it('uses the complete approved Loaben and regular Shadow recordings without shortening or changing their musical timing', async () => {

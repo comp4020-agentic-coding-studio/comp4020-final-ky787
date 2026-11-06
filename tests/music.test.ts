@@ -38,8 +38,8 @@ function setup() {
 }
 
 describe('streaming music scenes', () => {
-    it('contains seven local tracks and keeps solo tutorial music separate from co-op', () => {
-        expect(Object.keys(MUSIC_TRACKS)).toHaveLength(7);
+    it('contains eight bundled tracks and keeps solo tutorial music separate from co-op', () => {
+        expect(Object.keys(MUSIC_TRACKS)).toHaveLength(8);
         expect(musicSceneForRoom('pressure')).toBe('menu');
         expect(musicSceneForRoom('switch')).toBe('menu');
         expect(musicSceneForRoom('relay')).toBe('tutorial-relay');
@@ -48,6 +48,21 @@ describe('streaming music scenes', () => {
         expect(musicSceneForRoom('crossfeed-vault')).toBe('crossfeed-vault');
         expect(musicSceneForRoom('race-condition')).toBe('race-condition');
         expect(musicSceneForRoom('__proto__')).toBe('menu');
+        expect(musicSceneForRoom('workbench')).toBe('menu');
+        expect(musicSceneForRoom('bypass')).toBe('menu'); // A draft title never selects music.
+        expect(MUSIC_TRACKS.kuia.file).toBe('kuia.ogg');
+    });
+
+    it('keeps an explicit draft soundtrack running across repeated snapshots and honors saved mute/volume', async () => {
+        const { player, advance, audible } = setup();
+        player.setScene('kuia'); player.setPreferences({ musicVolume: .19, muted: false });
+        await player.unlock(); await flush(); advance(2000);
+        const current = audible()[0], before = player.snapshot(); current.currentTime = 16;
+        for (let revision = 0; revision < 100; revision++) player.setScene('kuia');
+        expect(current.src).toBe('/audio/music/kuia.ogg'); expect(current.volume).toBeCloseTo(.19);
+        expect(current.currentTime).toBe(16); expect(player.snapshot().decks).toMatchObject(before.decks.map(d => ({ loads: d.loads, starts: d.starts })));
+        player.setPreferences({ muted: true }); expect(audible()).toHaveLength(0);
+        player.setPreferences({ muted: false }); await flush(); expect(audible()[0]).toBe(current); expect(current.currentTime).toBe(16);
     });
 
     it('waits for a gesture, streams only the requested track, and never restarts an unchanged scene', async () => {

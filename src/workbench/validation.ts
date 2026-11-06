@@ -1,4 +1,5 @@
 import { importDraft } from './imports.ts';
+import { MUSIC_TRACKS } from '../audio/music-catalogue.ts';
 import { draftFrame, draftSignal, evaluateDraft, initialDeviceValues } from './evaluate.ts';
 import { boxesOverlap } from '../engine/geometry.ts';
 import { DRAFT_ID, DRAFT_LIMITS, codeActivation, serializeDraft, objectBounds, objectPort, type DraftDocument, type DraftDiagnostic, type DraftExpression, type DraftValidation } from './model.ts';
@@ -72,7 +73,8 @@ export function validateDraft(value: unknown): DraftValidation {
         else error('controller.kind', 'controller.kind must be declarative or builtin.');
     }
     if (array(value.bindings, 'bindings', DRAFT_LIMITS.bindings)) value.bindings.forEach((b, i) => { const p = `bindings[${i}]`; if (record(b, p, ['id', 'output', 'target', 'property', 'invert'])) { id(b.id, `${p}.id`); id(b.output, `${p}.output`); id(b.target, `${p}.target`); oneOf(b.property, ['active', 'open', 'power', 'unlock'], `${p}.property`); if (b.invert !== undefined) bool(b.invert, `${p}.invert`); } });
-    if (record(value.presentation, 'presentation', ['wires', 'labels', 'cameraReveals', 'display'])) {
+    if (record(value.presentation, 'presentation', ['wires', 'labels', 'cameraReveals', 'display', 'music'])) {
+        if (value.presentation.music !== undefined) oneOf(value.presentation.music, Object.keys(MUSIC_TRACKS), 'presentation.music');
         point(value.presentation.display, 'presentation.display');
         if (array(value.presentation.wires, 'presentation.wires', DRAFT_LIMITS.wires)) value.presentation.wires.forEach((w, i) => { const p = `wires[${i}]`; if (record(w, p, ['id', 'binding', 'output', 'points', 'invertedLabel', 'legacyInput', 'sourcePowered'])) { id(w.id, `${p}.id`); for (const k of ['binding', 'output']) if (w[k] !== undefined) id(w[k], `${p}.${k}`); if (w.legacyInput !== undefined) text(w.legacyInput, `${p}.legacyInput`, 64); for (const k of ['invertedLabel', 'sourcePowered']) if (w[k] !== undefined) bool(w[k], `${p}.${k}`); if (array(w.points, `${p}.points`, DRAFT_LIMITS.wirePoints)) { if (w.points.length < 2) error('wire.points', `${p}: a wire needs two points.`); w.points.forEach((v, n) => point(v, `${p}.points[${n}]`)); } } });
         if (array(value.presentation.labels, 'presentation.labels', 128)) value.presentation.labels.forEach((l, i) => { const p = `labels[${i}]`; if (record(l, p, ['id', 'x', 'y', 'text'])) { id(l.id, `${p}.id`); number(l.x, `${p}.x`); number(l.y, `${p}.y`); text(l.text, `${p}.text`); } });

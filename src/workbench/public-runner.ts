@@ -5,6 +5,7 @@ import { InputManager } from '../ui/input.ts';
 import { PuzzleRenderer } from '../slice/render.ts';
 import { FIXED_DT, MAX_FRAME_TIME } from '../engine/constants.ts';
 import { GameAudio } from '../audio/game-audio.ts';
+import { MusicPlayer } from '../audio/music-player.ts';
 import { AudioPresentation } from '../slice/audio-presentation.ts';
 import { cubeEntries } from '../coop/protocol.ts';
 
@@ -12,6 +13,8 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 const query = new URL(location.href).searchParams, testing = query.get('mode') === 'test';
 const canvas = $<HTMLCanvasElement>('stage'), renderer = new PuzzleRenderer(canvas), input = new InputManager(true);
 const audio = new GameAudio(), sound = new AudioPresentation(audio);
+const music = new MusicPlayer();
+let completionMusicUntil = 0;
 let completed = false, diagnostics = false, lastWorld: DraftSession['world'] = null, last = 0, accumulated = 0;
 const session = new DraftSession(update, error => { $('status').textContent = error; }, room => `/api/custom/rooms/${room.code}/snapshot`, true);
 const participants = document.createElement('div'); participants.id = 'custom-players'; participants.setAttribute('aria-label', 'Players'); $('invitation').after(participants);
@@ -37,11 +40,11 @@ function update() {
     $('replay-current').hidden = !c.isHost;
     $<HTMLButtonElement>('replay-current').disabled = !c.connected;
     $<HTMLButtonElement>('replay').disabled = !c.connected;
-    if (room?.completed && !completed) { audio.play('complete'); input.releaseAll(); }
+    if (room?.completed && !completed) { completionMusicUntil = performance.now() + audio.completionDurationMs(); audio.play('complete'); input.releaseAll(); }
     completed = !!room?.completed;
 }
 function leave() {
-    session.stop(); audio.stopAll(); input.dispose();
+    session.stop(); audio.stopAll(); music.dispose(); input.dispose();
     if (query.get('return') === 'editor') {
         try { if (window.opener && !window.opener.closed && window.opener.location.origin === location.origin) { window.opener.focus(); window.close(); return; } } catch { /* Use recovery on the builder if the original tab closed. */ }
         location.assign('/workbench.html');
@@ -55,13 +58,13 @@ $('replay').onclick = () => { if (session.client.room?.draft) session.restart(se
 $('replay-current').onclick = $('replay').onclick;
 $('copy').onclick = () => { void navigator.clipboard.writeText($<HTMLInputElement>('invite').value).then(() => { $('status').textContent = 'Invitation copied. Your friend needs a separate browser identity.'; }).catch(() => { $<HTMLInputElement>('invite').select(); $('status').textContent = 'Select and copy the invitation link.'; }); };
 function soundLabel() { $('sound').textContent = audio.getPreferences().muted ? 'Sound off' : 'Sound on'; }
-$('sound').onclick = () => { audio.setPreferences({ muted: !audio.getPreferences().muted }); soundLabel(); };
+$('sound').onclick = () => { audio.setPreferences({ muted: !audio.getPreferences().muted }); music.setPreferences(audio.getPreferences()); soundLabel(); };
 soundLabel();
 $('diagnostics-toggle').hidden = !testing;
 $('diagnostics-toggle').onclick = () => { diagnostics = !diagnostics; $('diagnostics').hidden = !diagnostics; canvas.focus(); };
-window.addEventListener('pointerdown', () => { void audio.unlock(); });
-window.addEventListener('keydown', () => { void audio.unlock(); });
-window.addEventListener('pagehide', () => { session.stop(); input.dispose(); audio.stopAll(); });
+window.addEventListener('pointerdown', () => { void audio.unlock(); void music.unlock(); });
+window.addEventListener('keydown', () => { void audio.unlock(); void music.unlock(); });
+window.addEventListener('pagehide', () => { session.stop(); input.dispose(); audio.stopAll(); music.dispose(); });
 window.addEventListener('blur', () => { input.releaseAll(); audio.setActive(false); });
 function observe() {
     const w = session.world, c = session.client;
@@ -69,7 +72,7 @@ function observe() {
         player: w ? { x: w.player.x, y: w.player.y, grounded: w.player.grounded, groundId: w.player.groundId, deaths: w.deaths, rope: w.player.rope } : null,
         cubes: w?.cubes, signals: w?.frame.signals, inputs: c.room?.levelState, checkpoint: w?.checkpoint,
         plates: w?.frame.plates, exitUnlocked: c.room?.exitUnlocked,
-        heroAssets: renderer.heroes.snapshot(), audio: audio.snapshot(),
+        heroAssets: renderer.heroes.snapshot(), audio: audio.snapshot(), music: music.snapshot(),
         completed: c.room?.completed, session: { code: c.room?.code, visitor: c.visitor, slot: c.slot, generation: c.room?.levelInstance, peers: c.room?.connected, reachedExit: c.room?.reachedExit, sharedCubes: c.room?.cubes, room: c.room },
         platforms: w?.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled })), camera: { x: renderer.camera.originX(), y: renderer.camera.originY(), zoom: renderer.camera.zoom },
     });
@@ -80,6 +83,12 @@ let wasActive = false;
 function frame(now: number) {
     const dt = Math.min(MAX_FRAME_TIME, Math.max(0, (now - (last || now)) / 1000)); last = now;
     const w = session.world, c = session.client;
+    // Frozen presentation identity is independent of deaths, checkpoints and snapshots.
+    // Missing music preserves the previous silent custom-session behavior.
+    music.setScene(session.document?.presentation.music ?? null);
+    music.setPreferences(audio.getPreferences());
+    music.setActive(!!w && c.playing);
+    music.setDucked(performance.now() < completionMusicUntil ? 'complete' : c.playing ? 'none' : 'pause');
     if (w) {
         if (w !== lastWorld) { lastWorld = w; renderer.room(w); sound.reset(w); accumulated = 0; input.releaseAll(); canvas.focus(); }
         const active = c.playing && !completed;

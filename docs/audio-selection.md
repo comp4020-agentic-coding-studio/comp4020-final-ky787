@@ -6,6 +6,39 @@ VAULT uses **Shadow**, both by James Gargette (cinameng). Shadow is the regular
 and the earlier review edits are not runtime sources. These selections replace
 Kuia and Through the Sewers respectively; no further candidate ranking applies.
 
+**2026-11-06 draft addition:** BYPASS explicitly selects **Kuia**, the previously
+approved James Gargette (cinameng) loop, through `presentation.music: "kuia"`.
+Its [source page](https://opengameart.org/content/kuia) was rechecked and lists CC0.
+The complete 47.177143-second runtime master from commit `60c04fc` is reused
+byte-for-byte as `public/audio/music/kuia.ogg`: 2,080,512 samples per channel,
+554,860 bytes, SHA-256
+`52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d`.
+Its pinned original `kuia.mp3` SHA-256 remains
+`11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e`.
+The retained master includes 28 Hz high-pass / 14 kHz low-pass filtering, +0.51 dB
+constant gain and 128-sample boundary de-clicks before and after filtering;
+it measures −23.04 LUFS-I and −6.48 dBTP. No listening preview or new remaster is
+used, and no new acoustic audition is claimed. The eight bundled files total
+12,280,654 bytes. All seven released soundtrack files and their entries remain
+unchanged. BYPASS remains a draft; adding the key does not register it in the campaign.
+
+Restore the exact retained loop, if needed, with:
+
+```sh
+git show 60c04fc:public/audio/music/handshake.ogg > public/audio/music/kuia.ogg
+sha256sum public/audio/music/kuia.ogg
+```
+
+`prepare-music.py` now verifies Kuia alongside its preserved assets. The focused
+public custom-session audio check reuses the existing browser harness:
+
+```sh
+BN_TEST_AUDIO=1 BN_AUDIO_DRAFT=levels/drafts/bypass.json \
+  BN_SHOTS=.workbench/reports/bypass/audio pnpm check:audio
+```
+
+This is an isolated playback/settings fixture, not a physical room solve.
+
 ## Approved originals and preparation
 
 The source pages and exact downloads were verified on 2026-10-27. Both specify

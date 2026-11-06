@@ -127,10 +127,10 @@ cooldown, voice-limit and loop-mixing design adapts the original project's
 `src/audio/audio-manager.ts`; buffer playback and this chamber's event adapter
 are new. Sounds are authored game feedback, not retained OLLVM execution evidence.
 
-## Music — final human selections, 2026-10-27
+## Music — released selections, 2026-10-27; BYPASS draft addition, 2026-11-06
 
-All seven runtime soundtrack files use **CC0 1.0**, verified on their original
-OpenGameArt pages. They total **11,725,794 bytes** and retain the approximately
+All eight bundled soundtrack files use **CC0 1.0**, verified on their original
+OpenGameArt pages. They total **12,280,654 bytes** and retain the approximately
 −23 LUFS mastering target, existing runtime gains and current Music preferences.
 
 | Scene | Track / author | Original source |
@@ -142,13 +142,22 @@ OpenGameArt pages. They total **11,725,794 bytes** and retain the approximately
 | DEADLOCK | Algate — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/algate) |
 | USE AFTER FREE | Neural Malfunction — vitalezzz | [Original submission](https://opengameart.org/content/neural-malfunction) |
 | Solo RELAY and CONTROL SPINE (`uplink`) | Celestial Harmony — vitalezzz | [Original submission](https://opengameart.org/content/celestial-harmony) |
+| BYPASS draft (`presentation.music: "kuia"`) | Kuia — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/kuia), [exact MP3](https://opengameart.org/sites/default/files/kuia.mp3) |
 
 The user explicitly approved Loaben for HANDSHAKE and regular Shadow for
 CROSSFEED after listening. Both source pages identify cinameng / James Gargette
-and CC0, verified 2026-10-27. Shadow dark/light were not selected. Kuia and
-Through the Sewers are superseded historical choices.
+and CC0, verified 2026-10-27. Shadow dark/light were not selected. Kuia is now
+reused for the BYPASS draft; Through the Sewers remains a historical choice.
 
-Both new masters preserve the **complete original recordings**, respectively
+Kuia's source page was rechecked on 2026-11-06. Its complete approved master is
+restored byte-for-byte from commit `60c04fc`, not from a listening preview:
+47.177143 seconds, 2,080,512 samples per channel, 554,860 bytes. The runtime hash
+is `52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d`;
+the original hash is `11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e`.
+The catalogue retains its original filtering/gain/de-click metadata. No released
+track or effect is changed, and no new agent acoustic audition is claimed.
+
+The Loaben and Shadow masters preserve the **complete original recordings**, respectively
 1,582,848 and 2,321,280 samples per channel (35.892245 / 52.636735 seconds).
 Only constant gain (+7.46 / +7.71 dB), a 128-sample-per-side boundary de-click
 (5.8 ms total, without shortening), and stereo 44.1 kHz Vorbis q4 encoding are

@@ -20,6 +20,7 @@ async function app() {
 it('public uploads are validated and owner-granted, snapshots require membership, replay is host-only and no custom files persist', async () => {
     const { dir, url } = await app(), host = await identity(url), guest = await identity(url), stranger = await identity(url);
     const document = newDraft('public'), station = createEntity(document, 'breakpoint', { x: 700, y: 680 });
+    document.presentation.music = 'kuia'; // Both members receive the same validated, frozen presentation choice.
     const upload = await fetch(url + '/api/custom/snapshots', { method: 'POST', headers: { Cookie: host.cookie, Origin: url }, body: JSON.stringify({ document }) });
     expect(upload.status).toBe(201); const { hash } = await upload.json(); expect(hash).toBe(await draftHash(document));
     const unknown = await connect<'workbench'>(url, stranger.cookie); unknown.send({ type: 'create-draft', hash }); expect((await unknown.wait('error')).code).toBe('DRAFT_UNAVAILABLE');

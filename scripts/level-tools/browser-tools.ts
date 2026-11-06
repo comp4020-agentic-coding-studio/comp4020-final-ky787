@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { coopBrowser, type Cdp } from '../coop-browser.ts';
+import { startEnergyRecording, stopEnergyRecording } from '../energy-browser-review.ts';
 import { startWorkbench } from './service.ts';
 import { draftHash, type DraftDocument } from '../../src/workbench/model.ts';
 import { conditionMatches, parseScenario, type ScenarioCondition, type ScenarioAction } from './scenario.ts';
@@ -43,6 +44,7 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
     const scenario = parseScenario(value), directory = resolve(report);
     await mkdir(directory, { recursive: true });
     const env = await environment(document, directory), actors = new Map<string, Cdp>();
+    const recordings = new Set<string>();
     const results: { label: string; pass: boolean; observed?: unknown; error?: string }[] = [];
     let pass = false, failedStep: string | null = null, error: string | null = null;
     const deadline = Date.now() + scenario.timeoutMs;
@@ -80,6 +82,11 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
             const identities = await Promise.all([...actors.values()].map(p => p.read<string>('draftRunner.observe().session.visitor')));
             if (new Set(identities).size !== 2) throw new Error('Co-op scenario requires two isolated browser identities');
         }
+        // Opt-in capture of actual canvas play through the existing recording helper.
+        for (const id of (process.env.BN_RECORD_ACTORS ?? '').split(',').filter(Boolean)) {
+            const page = actors.get(id); if (!page) throw new Error(`Unknown recording actor '${id}'`);
+            await startEnergyRecording(page); recordings.add(id);
+        }
         for (const step of scenario.steps) {
             failedStep = step.label; checkDeadline();
             // Actions in one step may hold controls for both actors concurrently.
@@ -107,7 +114,8 @@ export async function runScenario(document: DraftDocument, value: unknown, repor
     }
     finally {
         for (const [id, p] of actors) {
-            try { await screenshot(p, join(directory, `${pass ? 'final' : 'failure'}-${id}.png`)); await writeFile(join(directory, `trajectory-${id}.json`), JSON.stringify(await p.read('draftRunner.recording()'), null, 2) + '\n'); }
+            try { if (recordings.has(id)) await stopEnergyRecording(p, join(directory, `gameplay-${id}.webm`));
+                await screenshot(p, join(directory, `${pass ? 'final' : 'failure'}-${id}.png`)); await writeFile(join(directory, `trajectory-${id}.json`), JSON.stringify(await p.read('draftRunner.recording()'), null, 2) + '\n'); }
             catch (caught) { pass = false; error ??= String(caught); }
         }
         try { await env.close(); } catch (caught) { pass = false; error ??= `Cleanup failed: ${String(caught)}`; }

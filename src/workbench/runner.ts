@@ -1,4 +1,6 @@
 import { CharacterProfileClient } from '../character/client.ts';
+import { GameAudio } from '../audio/game-audio.ts';
+import { MusicPlayer } from '../audio/music-player.ts';
 /** Dedicated local diagnostic page; excluded from the production Vite input. */
 import { InputManager } from '../ui/input.ts';
 import { PuzzleRenderer } from '../slice/render.ts';
@@ -14,6 +16,8 @@ const status = document.querySelector<HTMLElement>('#status')!;
 const errorPanel = document.querySelector<HTMLElement>('#error')!;
 const query = new URL(location.href).searchParams;
 const input = new InputManager(true), renderer = new PuzzleRenderer(canvas);
+// Reuse saved game preferences; diagnostic physics never loads the effects pool.
+const audioPreferences = new GameAudio(), music = new MusicPlayer();
 const bootstrap = await fetch('/api/workbench/bootstrap').then(r => r.json()) as { token: string; engineRevision: string; files: string[] };
 void new CharacterProfileClient().load().then(profile => { if (profile) renderer.profile = profile; }).catch(() => {});
 const latest = document.querySelector<HTMLSelectElement>('#latest')!;
@@ -46,7 +50,7 @@ function observe() {
         player: w ? { x: w.player.x, y: w.player.y, vx: w.player.vx, vy: w.player.vy, grounded: w.player.grounded, groundId: w.player.groundId, rope: structuredClone(w.player.rope), deaths: w.deaths } : null,
         cubes: w ? structuredClone(w.cubes) : {}, signals: w ? { ...w.frame.outputs, ...w.frame.signals } : {},
         controls: w?.frame.controls ?? {}, plates: w?.frame.plates ?? {}, exitUnlocked: w?.frame.outputs.exitDoor ?? false,
-        checkpoint: w?.checkpoint, heroAssets: renderer.heroes.snapshot(),
+        checkpoint: w?.checkpoint, heroAssets: renderer.heroes.snapshot(), music: music.snapshot(),
         completed: client?.room?.completed ?? w?.exited ?? false, platforms: w?.platforms.map(p => ({ id: p.def.id, enabled: p.solid.enabled, x: p.def.x, y: p.def.y, w: p.def.w, h: p.def.h })) ?? [],
         session: client ? { code: client.room?.code, slot: client.slot, visitor: client.visitor, connected: client.connected, peers: client.room?.connected,
             generation: client.room?.levelInstance, reachedExit: client.room?.reachedExit, sharedCubes: client.room?.cubes, room: client.room } : null };
@@ -102,7 +106,9 @@ const api = { load, observe, render, start, stop: () => { running = false; input
     session: () => session, renderer, get ready() { return ready; } };
 Object.assign(globalThis, { draftRunner: api });
 input.attach(canvas, window.document.body);
-window.addEventListener('pagehide', () => { session?.stop(); input.dispose(); });
+window.addEventListener('pointerdown', () => { void music.unlock(); });
+window.addEventListener('keydown', () => { void music.unlock(); });
+window.addEventListener('pagehide', () => { session?.stop(); input.dispose(); music.dispose(); audioPreferences.stopAll(); });
 window.document.querySelector('#join')!.addEventListener('click', () => { connect(undefined, window.document.querySelector<HTMLInputElement>('#code')!.value.trim().toUpperCase()); });
 window.document.querySelector('#overview')!.addEventListener('click', () => { overview = !overview; });
 window.document.querySelector('#recording')!.addEventListener('click', () => download(recording(), `draft-recording-${hash.slice(0, 10)}.json`));
@@ -121,6 +127,10 @@ function frame(now: number) {
     const dt = Math.min(MAX_FRAME_TIME, Math.max(0, (now - (last || now)) / 1000)); last = now;
     try {
         const w = world();
+        music.setScene(draftDoc?.presentation.music ?? null);
+        music.setPreferences(audioPreferences.getPreferences());
+        music.setActive(!!w && running && (!session || session.client.playing));
+        music.setDucked(running ? 'none' : 'pause');
         if (w) {
             if (w !== lastWorld) { input.releaseAll(); lastWorld = w; renderer.room(w); resetRecording(); }
             const active = running && (!session || session.client.playing);

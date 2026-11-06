@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /** Real gestures, streaming media, independent co-op visitors and a physical Handshake solve. */
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { coopBrowser, type Cdp, type GameSnapshot } from './coop-browser.ts';
 import { onboardNinja } from './character-onboarding.ts';
 import { campaignDraftRoute } from './campaign-draft-route.ts';
 import { AUDIO_STORAGE_KEY, COMPLETION_DUCK_MS, SOUND_ASSET_COUNT } from '../src/audio/game-audio.ts';
+import { parseDraft } from '../src/workbench/validation.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? '/tmp/bn-audio-shots', internalLabs: false, onboarding: false });
 const { check, click, snapshot, wait, sleep, shot } = h;
@@ -37,8 +38,68 @@ async function nativeLoop(p: Cdp, scene: string) {
         && wrapped.music.decks.every((d, i) => d.starts === before.music.decks[i].starts)
         && wrapped.music.decks.filter(d => !d.paused).length === 1);
 }
+/** Isolated audio fixture, not a physical solve. Reuses public upload/join and saved settings UI. */
+async function draftAudio(path: string, url: string, debug: string) {
+    const document = parseDraft(JSON.parse(await readFile(path, 'utf8')));
+    if (document.presentation.music !== 'kuia') throw new Error('Draft music check expects the selected Kuia soundtrack');
+    type Observation = Pick<GameSnapshot, 'music' | 'audio'> & { ready: boolean; status: string; player: { deaths: number }; session: { code: string; visitor: string; peers: boolean[]; room: { level: string } } };
+    const observe = (p: Cdp) => p.read<Observation>('customLevel.observe()');
+    async function until(p: Cdp, label: string, predicate: (s: Observation) => boolean, timeout = 20000): Promise<Observation> {
+        const end = Date.now() + timeout;
+        while (Date.now() < end) {
+            if (await p.read('!!globalThis.customLevel')) { const s = await observe(p); if (s.ready && predicate(s)) return s; }
+            await sleep(30);
+        }
+        throw new Error(`Draft audio timeout: ${label}`);
+    }
+    const playing = (s: Observation) => s.music.scene === 'kuia' && !s.music.crossfading && s.music.decks.some(d => d.scene === 'kuia' && !d.paused && d.volume > 0 && d.currentTime > 0 && d.readyState >= 2 && new URL(d.src).pathname === '/audio/music/kuia.ogg');
+    const a = await h.page(url, debug), b = await h.page(url, debug);
+    for (const [p, name, effects, level] of [[a, 'DraftAudioHost', 0, 19], [b, 'DraftAudioGuest', 31, 35]] as const) {
+        await onboardNinja(p, name); await click(p, '#settings');
+        await slider(p, '#audio-volume', effects); await slider(p, '#music-volume', level);
+    }
+    const upload = await a.read<{ hash: string }>(`fetch('/api/custom/snapshots',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({document:${JSON.stringify(document)}})}).then(async r=>{const b=await r.json();if(!r.ok)throw Error(b.error);return b})`);
+    await a.send('Page.navigate', { url: `${url}custom-level.html?host=${upload.hash}&mode=test` });
+    const first = await until(a, 'host ready', () => true);
+    await b.send('Page.navigate', { url: `${url}custom-level.html?code=${first.session.code}&mode=test` });
+    await until(b, 'guest ready', () => true); await until(a, 'both independent clients', s => s.session.peers.every(Boolean));
+    check('frozen draft music uses two independent visitors in generic workbench room', (await observe(a)).session.visitor !== (await observe(b)).session.visitor && first.session.room.level === 'workbench');
+    for (const [p, role, effects, volume] of [[a, 'host', 0, .19], [b, 'guest', .31, .35]] as const) {
+        await h.tap(p, 'KeyA'); const before = await until(p, `${role} Kuia streams`, playing);
+        check(`${role} streams the complete Kuia recording with independent saved levels`, before.audio.preferences.volume === effects && before.music.preferences.musicVolume === volume && before.music.decks.some(d => Math.abs((d.duration ?? 0) - 47.177143) < .01));
+        const deck = before.music.decks.find(d => d.scene === 'kuia')!;
+        await h.tap(p, 'KeyR'); await until(p, `${role} respawn`, s => s.player.deaths > before.player.deaths); await sleep(350);
+        const after = await observe(p), next = after.music.decks.find(d => d.scene === 'kuia')!;
+        check(`${role} death and ordinary snapshots retain Kuia without reload or restart`, next.loads === deck.loads && next.starts === deck.starts && next.currentTime > deck.currentTime);
+        await click(p, '#sound'); await until(p, `${role} mute`, s => s.music.decks.every(d => d.paused && d.volume === 0));
+        check(`${role} saved Sound off mutes both music and effects`, (await observe(p)).audio.preferences.muted);
+        await click(p, '#sound'); await until(p, `${role} unmute`, playing);
+        check(`${role} unmute resumes the same track`, (await observe(p)).music.decks.find(d => d.scene === 'kuia')!.loads === deck.loads);
+        const foreground = (await observe(p)).music.decks.find(d => d.scene === 'kuia')!;
+        await p.read("window.dispatchEvent(new Event('blur'))");
+        await until(p, `${role} focus pause`, s => s.music.suspended && s.music.decks.every(d => d.paused));
+        await p.read("window.dispatchEvent(new Event('focus'))"); await until(p, `${role} focus resume`, playing);
+        const resumed = (await observe(p)).music.decks.find(d => d.scene === 'kuia')!;
+        check(`${role} focus pause/resume retains source and playback position`, resumed.loads === foreground.loads && resumed.currentTime >= foreground.currentTime);
+        check(`${role} has no media or runtime failures`, p.errors.length === 0 && (await observe(p)).music.failures.length === 0);
+    }
+    const reconnect = (await observe(b)).music.decks.find(d => d.scene === 'kuia')!;
+    // Interrupt only transport through CDP; no puzzle state or gameplay API is exposed.
+    const prototype = await b.send('Runtime.evaluate', { expression: 'WebSocket.prototype' });
+    const sockets = await b.send('Runtime.queryObjects', { prototypeObjectId: prototype.result.objectId });
+    await b.send('Runtime.callFunctionOn', { objectId: sockets.objects.objectId, functionDeclaration: 'function(){this.forEach(socket => socket.close());}' });
+    await until(b, 'transport interrupted', s => s.status !== 'CONNECTED');
+    await until(b, 'same custom session reconnects', s => s.status === 'CONNECTED' && playing(s));
+    const rejoined = (await observe(b)).music.decks.find(d => d.scene === 'kuia')!;
+    check('custom-session reconnect preserves Kuia source and playback position', rejoined.loads === reconnect.loads && rejoined.currentTime >= reconnect.currentTime);
+    await writeFile(join(h.shots, 'draft-snapshots.json'), JSON.stringify({ fixture: 'audio only; no traversal claim', draft: path, host: await observe(a), guest: await observe(b) }, null, 2));
+    await click(a, '#return'); await wait(a, 'return to menu', s => s.view === 'home'); await click(a, '#settings'); await music(a, 'menu');
+    check('returning from draft restores menu soundtrack and saved sliders', (await snapshot(a)).audio.preferences.musicVolume === .19 && (await snapshot(a)).audio.preferences.volume === 0 && playingFile(await snapshot(a), 'menu.ogg'));
+}
 try {
     const url = await h.startServer(), debug = await h.launch();
+    if (process.env.BN_AUDIO_DRAFT) await draftAudio(process.env.BN_AUDIO_DRAFT, url, debug);
+    else {
     const a = await h.page(url, debug);
     check('before interaction neither music nor SFX start', !(await snapshot(a)).music.unlocked && (await snapshot(a)).music.decks.every(d => d.paused) && (await snapshot(a)).audio.state === 'locked');
     await a.read(`localStorage.setItem(${JSON.stringify(AUDIO_STORAGE_KEY)},JSON.stringify({volume:.27,muted:false}))`);
@@ -220,8 +281,9 @@ try {
 
     for (const p of [a, b, solo]) check('browser audio loads without runtime or media failures', p.errors.length === 0 && (await snapshot(p)).music.failures.length === 0 && (await snapshot(p)).audio.failed.length === 0, p.errors.join('\n'));
     await writeFile(join(h.shots, 'snapshots.json'), JSON.stringify({ host: await snapshot(a), guest: await snapshot(b) }, null, 2));
+    }
     await writeFile(join(h.shots, 'checks.txt'), h.checks.join('\n') + '\n');
 } catch (e) {
-    for (const [i, p] of h.clients.entries()) { await shot(p, `failure-${i}`).catch(() => {}); await writeFile(join(h.shots, `failure-${i}.json`), JSON.stringify(await snapshot(p).catch(() => null), null, 2)); }
+    for (const [i, p] of h.clients.entries()) { await shot(p, `failure-${i}`).catch(() => {}); await writeFile(join(h.shots, `failure-${i}.json`), JSON.stringify(await p.read('globalThis.customLevel?.observe() ?? globalThis.binaryNinja?.snapshot()').catch(() => null), null, 2)); }
     console.error(String(e).split(': {')[0]); process.exitCode = 1;
 } finally { await h.cleanup(); }

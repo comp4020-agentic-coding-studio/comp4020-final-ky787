@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-06",
+  "base": "7bf93b2071e233e49271eee9db33455ad7059f42",
+  "routes": [
+    {
+      "scenario": "bypass",
+      "pass": true,
+      "scope": "full-room",
+      "mode": "coop",
+      "draftHash": "22b3c4843a98eecaec7e3b17d0a2f96f59aadf9fe374f0952429f55e88dd7709",
+      "engineRevision": "7bf93b2071e233e49271eee9db33455ad7059f42-dirty",
+      "steps": 69,
+      "final": {
+        "p1": {
+          "deaths": 4,
+          "completed": true,
+          "arrivals": [
+            true,
+            true
+          ]
+        },
+        "p2": {
+          "deaths": 4,
+          "completed": true,
+          "arrivals": [
+            true,
+            true
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "bypass-swapped-roles",
+      "pass": true,
+      "scope": "full-room",
+      "mode": "coop",
+      "draftHash": "22b3c4843a98eecaec7e3b17d0a2f96f59aadf9fe374f0952429f55e88dd7709",
+      "engineRevision": "7bf93b2071e233e49271eee9db33455ad7059f42-dirty",
+      "steps": 63,
+      "final": {
+        "p2": {
+          "deaths": 2,
+          "completed": true,
+          "arrivals": [
+            true,
+            true
+          ]
+        },
+        "p1": {
+          "deaths": 4,
+          "completed": true,
+          "arrivals": [
+            true,
+            true
+          ]
+        }
+      }
+    }
+  ],
+  "focusedTests": 62,
+  "typecheck": "pass",
+  "build": "pass",
+  "publicAudioChecks": [
+    "PASS frozen draft music uses two independent visitors in generic workbench room",
+    "PASS host streams the complete Kuia recording with independent saved levels",
+    "PASS host death and ordinary snapshots retain Kuia without reload or restart",
+    "PASS host saved Sound off mutes both music and effects",
+    "PASS host unmute resumes the same track",
+    "PASS host focus pause/resume retains source and playback position",
+    "PASS host has no media or runtime failures",
+    "PASS guest streams the complete Kuia recording with independent saved levels",
+    "PASS guest death and ordinary snapshots retain Kuia without reload or restart",
+    "PASS guest saved Sound off mutes both music and effects",
+    "PASS guest unmute resumes the same track",
+    "PASS guest focus pause/resume retains source and playback position",
+    "PASS guest has no media or runtime failures",
+    "PASS custom-session reconnect preserves Kuia source and playback position",
+    "PASS returning from draft restores menu soundtrack and saved sliders"
+  ],
+  "localAudioReport": ".workbench/reports/bypass/local-audio/report.json",
+  "limitations": [
+    "Authored draft, no native evidence",
+    "Automated route time is not human completion time",
+    "No universal shortcut proof",
+    "Human two-player and touch/small-screen acceptance pending"
+  ],
+  "reports": ".workbench/reports/bypass/"
+}

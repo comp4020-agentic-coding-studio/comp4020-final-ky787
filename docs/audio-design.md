@@ -71,6 +71,16 @@ file byte-for-byte at its existing gain for solo RELAY (`relay`) and CONTROL
 SPINE (`uplink`); those tutorials do not inherit the new co-op HANDSHAKE selection.
 PRESSURE and SWITCH continue using the unchanged menu track.
 
+BYPASS adds an eighth bundled file, `kuia.ogg`, without changing those seven
+recordings or their scene assignments. Public custom sessions optionally select
+a bundled key through `presentation.music`; their existing `GameAudio` saved
+preferences feed the same `MusicPlayer`. Omitted keys preserve silent draft music.
+The frozen document selects the track, not the shared `workbench` room ID or title.
+Deaths, checkpoints and replicated snapshots leave scene identity unchanged.
+Completion ducks the track for the existing cue, and focus/mute/failure behavior
+is inherited from the player. The local diagnostic runner also reads this optional
+key and saved Music preferences, while retaining its unloaded effects pool.
+
 `SliceGame.syncMusic()` maps navigation to menu or chamber identity, independent
 of multiplayer revisions. Menu destinations and waiting lobbies share the title
 track. Pauses, inspectors, overviews and chamber selection keep the current

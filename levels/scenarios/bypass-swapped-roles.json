@@ -1,0 +1,1319 @@
+{
+  "version": 1,
+  "id": "bypass-swapped-roles",
+  "scope": "full-room",
+  "mode": "coop",
+  "timeoutMs": 180000,
+  "actors": [
+    {
+      "id": "p1",
+      "slot": 2
+    },
+    {
+      "id": "p2",
+      "slot": 1
+    }
+  ],
+  "steps": [
+    {
+      "label": "P1 holds the anchor scanner",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 270
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "signals.draft:anchorPower",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "controls.draft:link",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Retry opening with automatic targeting",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 515
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "Tap Space to jump, then press and hold Space in air",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "Space"
+        }
+      ],
+      "waitMs": 25
+    },
+    {
+      "label": "Automatic Space hook really attaches",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "Space",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.rope.phase",
+          "equals": "attached"
+        },
+        "timeoutMs": 5000
+      },
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.rope.anchorId",
+            "equals": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Hold D and Space to swing over the gap",
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.x",
+          "min": 960
+        },
+        "timeoutMs": 5000
+      },
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.rope.phase",
+            "equals": "attached"
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "Release Space to perform the rope jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "Space",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "middleBank"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "Stop on the broad permanent landing",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 200
+    },
+    {
+      "label": "Approach LINK on safe ground",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 1100
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "Commit LINK",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "signals.draft:bridgePower",
+          "equals": true
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "LINK survives an ordinary reset",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "KeyR"
+        }
+      ],
+      "waitMs": 250,
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "controls.draft:link",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 1
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.groundId",
+            "equals": "middleBank"
+          }
+        }
+      ]
+    },
+    {
+      "label": "P1 leaves HOLD and stands on the latched bridge",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 770
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "player.groundId",
+            "equals": "bridge"
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "plates.draft:anchorHold",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "P1 can leave HOLD and walk across",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 1260
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "Automatic breakpoint is accepted for both",
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "session.room.checkpoint",
+          "equals": "reunion"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "Both reset to safe slot-specific checkpoint markers",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "KeyR"
+        },
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "KeyR"
+        }
+      ],
+      "waitMs": 300,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "player.x",
+            "min": 1345,
+            "max": 1355
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.x",
+            "min": 1215,
+            "max": 1225
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "player.groundId",
+            "equals": "middleBank"
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.groundId",
+            "equals": "middleBank"
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "plates.draft:bypassHold",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Swap roles: P2 holds BYPASS",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 1460
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "signals.draft:barrierA",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "signals.draft:barrierB",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "P1 walks between the disabled barriers",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 1650
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "Early release restores BOTH barriers",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 1390
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "signals.draft:barrierA",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "signals.draft:barrierB",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "controls.draft:override",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Traveller touches restored second firewall",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.deaths",
+          "equals": 2
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "Only traveller dies; operator remains safe",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "player.x",
+            "min": 1345,
+            "max": 1355
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 2
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.x",
+            "min": 1330,
+            "max": 1390
+          }
+        }
+      ]
+    },
+    {
+      "label": "P2 holds for a safe retry",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 1460
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "P1 walks beyond both barriers to OVERRIDE",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 1910
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "OVERRIDE permanently clears both barriers",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "KeyE"
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "controls.draft:override",
+          "equals": true
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "Operator follows through after releasing HOLD",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 2010
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "OVERRIDE survives death and checkpoint retry",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "KeyR"
+        }
+      ],
+      "waitMs": 250,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "player.deaths",
+            "equals": 3
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "controls.draft:link",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "controls.draft:override",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "First crumble contact / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 2050
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "First crumble contact / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.x",
+          "min": 2280
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "First crumble contact / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "unstableA"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "Standing produces a shared visible warning",
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:unstableA.phase",
+          "equals": "warning"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "Wait deliberately for collapse and fall",
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.deaths",
+          "equals": 4
+        },
+        "timeoutMs": 5000
+      },
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "session.room.levelState.platforms.draft:unstableA.phase",
+            "equals": "broken"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Respawn is safe; follower waits on permanent ground",
+      "waitMs": 200,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "player.x",
+            "min": 1345,
+            "max": 1355
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "player.groundId",
+            "equals": "middleBank"
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "controls.draft:override",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "Wait for shared platform recovery",
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:unstableA.phase",
+          "equals": "stable"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 crosses first gap / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 2050
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p1 crosses first gap / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.x",
+          "min": 2280
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 crosses first gap / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "unstableA"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 reaches permanent resting island / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 2335
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p1 reaches permanent resting island / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.x",
+          "min": 2560
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 reaches permanent resting island / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "restIsland"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 crosses second unstable / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 2615
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p1 crosses second unstable / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.x",
+          "min": 2860
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 crosses second unstable / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "unstableB"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 reaches permanent final landing / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 2915
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p1 reaches permanent final landing / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p1",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.x",
+          "min": 3140
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p1 reaches permanent final landing / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p1",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "finishBank"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "P1 touches LEFT alone",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 3250
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "P1 touches RIGHT alone after LEFT",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 3430
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "plates.draft:leftScan",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "plates.draft:rightScan",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "P2 waits for both slabs to recover",
+      "waitMs": 3000,
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "session.room.levelState.platforms.draft:unstableA.phase",
+            "equals": "stable"
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "session.room.levelState.platforms.draft:unstableB.phase",
+            "equals": "stable"
+          }
+        }
+      ]
+    },
+    {
+      "label": "p2 crosses first gap / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 2050
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p2 crosses first gap / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.x",
+          "min": 2280
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 crosses first gap / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "unstableA"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 reaches permanent resting island / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 2335
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p2 reaches permanent resting island / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.x",
+          "min": 2560
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 reaches permanent resting island / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "restIsland"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 crosses second unstable / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 2615
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p2 crosses second unstable / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.x",
+          "min": 2860
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 crosses second unstable / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "unstableB"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 reaches permanent final landing / takeoff",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 2915
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "p2 reaches permanent final landing / tap ordinary jump",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "p2",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.x",
+          "min": 3140
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "p2 reaches permanent final landing / land",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "p2",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "finishBank"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "label": "P2 occupies LEFT while P1 holds RIGHT",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 3250
+        }
+      ],
+      "waitMs": 220
+    },
+    {
+      "label": "Simultaneous current occupancy latches exit",
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "exitUnlocked",
+          "equals": true
+        },
+        "timeoutMs": 5000
+      },
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "plates.draft:leftScan",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "plates.draft:rightScan",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "P1 physically enters the exit",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p1",
+          "x": 3710
+        }
+      ],
+      "waitMs": 220,
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Exit stays unlocked after scanners clear",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 3550
+        }
+      ],
+      "waitMs": 200,
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "plates.draft:leftScan",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "plates.draft:rightScan",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "P2 physically enters for the second arrival",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "p2",
+          "x": 3710
+        }
+      ],
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "completed",
+          "equals": true
+        },
+        "timeoutMs": 5000
+      },
+      "assert": [
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "completed",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "session.reachedExit.1",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "session.reachedExit.0",
+            "equals": true
+          }
+        }
+      ]
+    }
+  ]
+}

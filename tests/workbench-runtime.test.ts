@@ -11,6 +11,17 @@ import { FIXED_DT } from '../src/engine/constants.ts';
 import { roomConnections } from '../src/slice/connections.ts';
 const step = (runtime: ReturnType<typeof createRuntime>, n: number, input = emptyInput()) => { for (let i = 0; i < n; i++) runtime.step(input); };
 describe('canonical draft schema and typed logic', () => {
+    test('optional bundled music survives canonical import/export without changing controller or geometry', async () => {
+        const plain = newDraft('music'), selected = structuredClone(plain); selected.presentation.music = 'kuia';
+        expect(validateDraft(selected).playable).toBe(true);
+        expect(parseDraft(JSON.parse(serializeDraft(selected)))).toEqual(selected);
+        expect(await draftHash(selected)).not.toBe(await draftHash(plain));
+        expect(draftRoom(selected)).toEqual(draftRoom(plain));
+        expect(parseDraft(JSON.parse(serializeDraft(plain))).presentation.music).toBeUndefined();
+        for (const music of ['https://example.com/music.ogg', '../kuia.ogg', '__proto__', 'bypass', '', null, 1]) {
+            expect(validateDraft({ ...plain, presentation: { ...plain.presentation, music } }).structural).toBe(false);
+        }
+    });
     test('canonical JSON hashing preserves drawing order and ignores object-key insertion order', async () => {
         const draft = newDraft('canonical'), reversed = { ...draft, geometry: { objects: draft.geometry.objects, height: draft.geometry.height, width: draft.geometry.width } };
         expect(serializeDraft(reversed)).toBe(serializeDraft(draft)); expect(await draftHash(reversed)).toBe(await draftHash(draft));

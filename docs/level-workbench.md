@@ -144,13 +144,24 @@ plate floor contact y=680. Entry gateways and breakpoint pedestals reuse the gam
 assets; they do not define collision geometry themselves.
 
 The document separates `geometry.objects`, `controller`, functional `bindings`,
-`presentation` (wires, labels, camera reveals/display) and `editor` metadata. Array
+`presentation` (wires, labels, camera reveals/display and optional music) and `editor` metadata. Array
 order is preserved as intentional drawing order. Canonical serialization sorts
 object keys, uses two-space indentation and a final newline, and has no changing
 save timestamps. SHA-256 of canonical serialization is shared by CLI and browser.
 Stable IDs begin with a letter and contain up to 64 letters/digits/underscores/
 hyphens. Renaming or duplicating groups updates their internal references; external
 connections remain explicit. Unsupported imported factory fields block import.
+
+`presentation.music` optionally selects a bundled soundtrack for public custom
+sessions. The Draft properties **Music in co-op** selector offers `None`, `menu`,
+`handshake`, `tutorial-relay`, `crossfeed-vault`, `race-condition`, `deadlock`,
+`use-after-free` and `kuia`. `None` omits the key and retains the previous silent
+custom-session music. URLs, filenames and unknown keys are rejected. The validated
+choice is included in canonical import/export and the frozen document received by
+both clients; titles and the generic `workbench` room ID never choose a track.
+Saved Music/Effects levels and Sound on/off still apply. Both the local two-player
+runner and public TEST WITH FRIEND / PLAY WITH FRIEND sessions play the selected
+music after a gesture. The embedded single-player editor preview remains silent.
 
 ## Objects, logic and connections
 
@@ -309,6 +320,10 @@ Co-op scenarios always use authored spawns in two isolated browser contexts.
   }]
 }
 ```
+
+Optional `BN_RECORD_ACTORS=host,partner` records those scenario actors through the
+existing actual-canvas capture helper, saving `gameplay-<actor>.webm` beside the
+report. `BN_SHOT_FILTER` can restrict screenshots independently.
 
 Conditions use a path under player/cubes/signals/controls/plates/session or
 exitUnlocked/completed plus `equals`, `min`, `max`. All waits have a deadline; the

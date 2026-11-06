@@ -288,9 +288,53 @@
         "sha256": "06557728c1d6dfd813857807f1c6fd7fe6eedfbe0ff8b0bf6a91b5b444dd69ab",
         "reason": "Human feedback: retain the original HANDSHAKE music for tutorial RELAY without re-encoding."
       }
+    },
+    {
+      "file": "kuia.ogg",
+      "scene": "kuia",
+      "title": "Kuia",
+      "author": "James Gargette (cinameng)",
+      "source": "https://opengameart.org/content/kuia",
+      "download": "https://opengameart.org/sites/default/files/kuia.mp3",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceSha256": "11a5d1a983a7d0d134aea3e9264acf923ca5eea0591ba722642a43724d73fd7e",
+      "sha256": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
+      "bytes": 554860,
+      "duration": 47.177143,
+      "processing": "Source passage/loop arrangement described exactly in edits; 28 Hz high-pass and 14 kHz low-pass; constant gain to -23 LUFS; 128-sample wrap de-click on each side before and after filtering; stereo 44.1 kHz Vorbis quality 4. No time-stretching, compression or added notes.",
+      "edits": {
+        "sourceDecodedSamples": 2080512,
+        "fullOriginalRecording": true,
+        "nativeAuthorLoopPreserved": true,
+        "trimStartSample": 0,
+        "trimEndSampleExclusive": 2080512,
+        "boundaryDeclickSamplesPerSide": 128,
+        "filter": "highpass=f=28,lowpass=f=14000",
+        "constantGainDb": 0.51,
+        "dynamicCompression": false,
+        "finalBoundaryDeclickSamplesPerSide": 128,
+        "encodedSamples": 2080512
+      },
+      "integratedLufs": -23.04,
+      "truePeakDbtp": -6.48,
+      "loudnessRangeLu": 0.7,
+      "loopAnalysis": {
+        "longestSilenceBelowMinus60DbSeconds": 0.0,
+        "decodedBoundaryJump": 0.00264567,
+        "firstQuarterSecondRmsDb": -22.175,
+        "lastQuarterSecondRmsDb": -25.906
+      },
+      "preservedFrom": {
+        "commit": "60c04fc",
+        "file": "public/audio/music/handshake.ogg",
+        "sha256": "52e97ddbd7f41873b4d9bb324b91767a6ef6f319cc50635457ff094659ca707d",
+        "reason": "Complete previously approved Kuia loop reused byte-for-byte for explicit draft music selection; released HANDSHAKE remains Loaben."
+      },
+      "verifiedAt": "2026-11-06"
     }
   ],
-  "totalBytes": 11725794,
+  "totalBytes": 12280654,
   "feedbackRevision": {
     "date": "2026-10-27",
     "replacedScenes": [
