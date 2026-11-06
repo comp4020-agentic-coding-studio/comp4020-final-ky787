@@ -23,7 +23,9 @@ import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { CHAMBER_CONTRACTS, NATIVE_CHAMBERS, caseIdForInputs, type NativeChamberId } from '../../server/native/contracts.ts';
 import { encodeTable, type NativeTable } from '../../server/native/table-format.ts';
-import { loadChamberEvidence, readGzipJson, readJson, readBytes, sha256, type NativeContract, BYPASS_REFERENCE_COMMIT, BYPASS_REQUEST_SHA256, BYPASS_MANIFEST_SHA256 } from './package.ts';
+import { loadChamberEvidence, readGzipJson, readJson, readBytes, sha256, type NativeContract, chamberAcquisitionId, chamberSpecimenId,
+    BYPASS_REFERENCE_COMMIT, BYPASS_REQUEST_SHA256, BYPASS_MANIFEST_SHA256,
+    HANDSHAKE_V2_REFERENCE_COMMIT, HANDSHAKE_V2_REQUEST_SHA256, HANDSHAKE_V2_MANIFEST_SHA256 } from './package.ts';
 
 const CHECK = process.argv.includes('--check');
 const TABLES_DIR = join('server', 'native', 'tables');
@@ -97,9 +99,10 @@ function buildTable(chamber: NativeChamberId): NativeTable {
 
     return encodeTable({
         schema: 'coop-native-table/v1', chamber_id: chamber,
+        ...(chamber === 'handshake' ? { acquisition_id: chamberAcquisitionId(chamber) } : {}),
         native_results_sha256: nativeResultsSha256, contract_sha256: contractSha,
         bcf_pe_sha256: bcfBuild.binary_sha256, clean_pe_sha256: cleanBuild.binary_sha256,
-        specimen_id: `${chamber}_ollvm_bcf`,
+        specimen_id: chamberSpecimenId(chamber),
         input_names: contract.inputs,
         input_game_ports: contract.inputs.map(name => acquired.inputs.find(i => i.name === name)?.game_port ?? null),
         output_names: contract.outputs,
@@ -117,6 +120,7 @@ function compactDisasm(chamber: NativeChamberId) {
     }>(chamber, 'evidence', 'disassembly-bcf.json.gz');
     return {
         schema: 'coop-native-disasm/v1', chamber_id: chamber,
+        ...(chamber === 'handshake' ? { acquisition_id: chamberAcquisitionId(chamber) } : {}),
         source_file: 'evidence/disassembly-bcf.json.gz', source_sha256: fileSha256,
         binary_sha256: dis.binary.sha256, image_base: dis.binary.image_base,
         function: { name: dis.function.name, start_va: dis.function.start_va, end_va: dis.function.end_va, bytes_sha256: dis.function.bytes_sha256 },
@@ -157,6 +161,7 @@ function compactTraces(chamber: NativeChamberId) {
     for (const t of traces) if (typeof t.state_id === 'number') byState[t.state_id] = t.trace_id;
     return {
         schema: 'coop-native-traces/v1', chamber_id: chamber,
+        ...(chamber === 'handshake' ? { acquisition_id: chamberAcquisitionId(chamber) } : {}),
         source_file: 'evidence/representative-traces.json.gz', source_sha256: fileSha256,
         exhaustive_coverage: pack.selection.exhaustive_cases, state_to_trace: byState, traces,
     };
@@ -185,7 +190,9 @@ function buildEvidence(chamber: NativeChamberId, contractSha: string) {
         schema: 'coop-native-evidence/v1', chamber_id: chamber, kind: contract.kind,
         contract_sha256: contractSha,
         ...(chamber === 'bypass' ? { reference_commit: BYPASS_REFERENCE_COMMIT, request_sha256: BYPASS_REQUEST_SHA256, manifest_sha256: BYPASS_MANIFEST_SHA256 } : {}),
-        specimen_id: `${chamber}_ollvm_bcf`, bcf_pe_sha256: proof.binary_sha256,
+        ...(chamber === 'handshake' ? { acquisition_id: chamberAcquisitionId(chamber), reference_commit: HANDSHAKE_V2_REFERENCE_COMMIT,
+            request_sha256: HANDSHAKE_V2_REQUEST_SHA256, manifest_sha256: HANDSHAKE_V2_MANIFEST_SHA256 } : {}),
+        specimen_id: chamberSpecimenId(chamber), bcf_pe_sha256: proof.binary_sha256,
         obfuscation: {
             compiler: 'OLLVM Clang 16.0.6 (x86_64-pc-windows-msvc)',
             pass: 'Bogus Control Flow (bcf_prob=100, bcf_loop=1)',
@@ -201,7 +208,12 @@ function buildEvidence(chamber: NativeChamberId, contractSha: string) {
             })),
         })),
         server_owned: integration.server_owned,
-        mapping_limits: chamber === 'bypass' ? [
+        mapping_limits: chamber === 'handshake' ? [
+            'This is the separate HANDSHAKE v2 specimen: five uint32 outputs; offset 12 is firewallActive and offset 16 is exitReady.',
+            'firewallActive is NOT maintenance; exitReady depends only on PAYLOAD. Bindings are not inverted a second time.',
+            'State-linked stores describe accepted results, not a live CPU execution; separated fragments are not adjacent CFG blocks.',
+            'Accepted occupancy, one-use maintenance, checkpoint recovery, exit latch and both physical arrivals remain game-owned.',
+        ] : chamber === 'bypass' ? [
             'exitReady is constant one for all 16 canonical input vectors; no zero alternative or conditional exit check exists.',
             'State-linked store selections describe accepted results, not a live CPU execution; separate fragments are not adjacent CFG blocks.',
             'Both firewalls manifest one firewallActive output. Occupancy, commitments, checkpoint, crumble, latch and both arrivals remain server-owned.',
@@ -242,6 +254,8 @@ function main() {
 
         manifest.chambers[chamber] = {
             kind: CHAMBER_CONTRACTS[chamber].kind,
+            ...(chamber === 'handshake' ? { acquisition_id: chamberAcquisitionId(chamber), reference_commit: HANDSHAKE_V2_REFERENCE_COMMIT,
+                request_sha256: HANDSHAKE_V2_REQUEST_SHA256, manifest_sha256: HANDSHAKE_V2_MANIFEST_SHA256 } : {}),
             status_label: 'VALIDATED OLLVM BCF',
             bcf_pe_sha256: table.bcf_pe_sha256, specimen_id: table.specimen_id,
             table_sha256: table.table_sha256, native_results_sha256: table.native_results_sha256,

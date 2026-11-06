@@ -80,7 +80,7 @@ describe('all 28 accepted environmental machinery bindings (semantic fixtures)',
             expect(d.diagnostic.sections).toHaveLength(ENVIRONMENTAL_OUTPUTS[chamber].length);
             for (const value of d.diagnostic.sections) {
                 const inverted = chamber === 'use-after-free' && value.output === 'assistBlocked';
-                const hazard = (chamber === 'deadlock' && value.output === 'shaftFirewall') || (chamber === 'bypass' && value.output === 'firewallActive');
+                const hazard = (chamber === 'deadlock' && value.output === 'shaftFirewall') || (['bypass', 'handshake'].includes(chamber) && value.output === 'firewallActive');
                 const powered = inverted ? !bit : bit;
                 expect(value.raw).toBe(bit); expect(value.powered).toBe(powered);
                 expect(value.storeId).toBe(`${value.output}.write-${Number(bit)}`);
@@ -108,7 +108,7 @@ describe('all 28 accepted environmental machinery bindings (semantic fixtures)',
     });
 
     it('uses persisted exit unlocks independently of native candidate bits', () => {
-        for (const [chamber, output] of [['handshake', 'exitReady'], ['deadlock', 'payloadReady'], ['use-after-free', 'exitReady']] as const) {
+        for (const [chamber, output] of [['deadlock', 'payloadReady'], ['use-after-free', 'exitReady']] as const) {
             const data = asset(chamber), state = accepted(chamber); state.exitUnlocked = true;
             const section = data.sections.find(s => s.name === output)!;
             expect(environmentalState(state, section)).toMatchObject({ raw: false, powered: true, latched: true });

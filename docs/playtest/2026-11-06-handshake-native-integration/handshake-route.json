@@ -1,0 +1,773 @@
+{
+  "pass": true,
+  "scope": "full-room campaign; real controls from authored starts",
+  "hash": "8da7a3b65cf6b93fa33b43e6de420f0f39ed004c5522e60b905fc6b215985cbc",
+  "failedStep": null,
+  "error": null,
+  "results": [
+    {
+      "label": "Authored initial state",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach central breakpoint",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Central breakpoint activates automatically from grounded walking",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach live payload firewall before maintenance",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Running jump into firewall respawns at earned checkpoint",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Brake safely after firewall death",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner holds CROSSING",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber approaches the gap",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Attach to the near address bar",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Swing left across the recovery well",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Release first rope for transfer",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Transfer to far address bar",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Carry swing toward alcove",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Rope jump toward alcove",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Brake and land above alcove",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Settle on alcove floor",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach shared cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Pick up the shared payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Move to return launch",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Attach far address bar with payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Swing payload back to central bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Release far rope with payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Transfer payload swing to near address bar",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Cross back over bay edge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Rope jump back to bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Brake and land with the payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Clear bay edge before placing payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Set payload beside CROSSING",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Rest payload on ordinary CROSSING plate",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Both people leave CROSSING while cube keeps it powered",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Crossing remains live from the resting cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Recover shared cube for gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Carry cube again",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner powers LIFT after cube recovery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Enter powered lift",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Move from hover onto gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Land on permanent gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Bring payload below maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Stage payload away from LINK lever",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Return to LINK",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Enable reversible service link",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner leaves lift and enters lower relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Partner lands at service gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Holder approaches staged cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Hold payload beneath maintenance access",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber stands below held cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber jumps onto partner-held cube",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Settle on cube before upper jump",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Jump from held cube toward maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Land on maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Approach maintenance terminal",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Commit MAINTENANCE COMPLETE",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Exit still needs payload",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Holder returns cube through upper relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Holder brakes in central bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber descends safely from maintenance ledge",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber uses service relay to regroup",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Climber lands in bay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Checkpoint retry after committed maintenance",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Recovered climber takes the still-powered lower relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Recovered climber brakes on gallery",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Recovered climber returns through upper relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Recovered climber lands past the lower relay",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Place payload beside final socket",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Drop cube into live PAYLOAD socket",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "First physical exit arrival",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "One arrival alone cannot finish",
+      "pass": true,
+      "campaignVictory": false
+    },
+    {
+      "label": "Second physical exit arrival",
+      "pass": true,
+      "campaignVictory": true
+    }
+  ],
+  "final": {
+    "host": {
+      "player": {
+        "x": 2402.1583333333297,
+        "y": 933,
+        "vx": 0,
+        "vy": 0,
+        "grounded": true,
+        "groundId": "centralBay",
+        "facing": 1,
+        "coyote": 0.11,
+        "jumpBuffer": 0,
+        "groundJumpAscent": false,
+        "dropThrough": 0,
+        "dropIgnore": null,
+        "justLanded": false,
+        "landingSpeed": 1043.0833333333323,
+        "airTime": 0,
+        "ropeJumpAnchors": [],
+        "rope": {
+          "phase": "idle",
+          "anchorId": null,
+          "anchor": {
+            "x": 854.4146792813083,
+            "y": 674
+          },
+          "tip": {
+            "x": 950.8549961748492,
+            "y": 835.9065199484054
+          },
+          "dir": {
+            "x": 0.697697431143233,
+            "y": -0.7163925561981599
+          },
+          "origin": {
+            "x": 762.3560340346207,
+            "y": 793.0642450946282
+          },
+          "travelled": 141.66666666666666,
+          "length": 200,
+          "taut": false,
+          "shrink": 0
+        },
+        "deaths": 1
+      },
+      "cubes": {
+        "draft:payload": {
+          "x": 2170,
+          "y": 928,
+          "vx": 0,
+          "vy": 0,
+          "carried": false,
+          "grounded": true,
+          "groundId": "centralBay"
+        }
+      },
+      "signals": {
+        "exitDoor": true,
+        "grappleAnchor": false,
+        "bridge": false,
+        "codePlatformA": false,
+        "codePlatformB": false,
+        "relayGates": false,
+        "liftField": false,
+        "draft:activation:on": true,
+        "draft:activation:off": false,
+        "draft:crossingPower": false,
+        "draft:liftPower": false,
+        "draft:relayPower": true,
+        "draft:firewallActive": false,
+        "draft:exitReady": true,
+        "draft:nearPower": false,
+        "draft:farPower": false,
+        "draft:lowerLink": true,
+        "draft:upperLink": true,
+        "draft:exitPower": true,
+        "draft:payloadFirewallPower": false
+      },
+      "controls": {
+        "draft:link": true,
+        "draft:maintenance": true
+      },
+      "plates": {
+        "draft:crossing": false,
+        "draft:liftPlate": false,
+        "draft:exitSocket": true
+      },
+      "exitUnlocked": true,
+      "completed": true,
+      "camera": {
+        "x": 1689.0745501285337,
+        "y": 722.9645469389827,
+        "zoom": 1.05135135135135
+      },
+      "session": {
+        "code": "J2JZ",
+        "slot": 1,
+        "visitor": "aba010ae-fae5-4efb-a3a7-8053fd6a30d6",
+        "peers": [
+          true,
+          true
+        ],
+        "generation": 2,
+        "reachedExit": [
+          true,
+          true
+        ],
+        "sharedCubes": {
+          "draft:payload": {
+            "holder": null,
+            "physicsAuthority": 1,
+            "pulling": false,
+            "epoch": 7,
+            "seq": 31,
+            "transform": {
+              "x": 2170,
+              "y": 928,
+              "vx": 0,
+              "vy": 0,
+              "grounded": true
+            }
+          }
+        },
+        "room": {
+          "party": {
+            "phase": "victory",
+            "completedLevels": [
+              "handshake"
+            ]
+          },
+          "levelInstance": 2,
+          "code": "J2JZ",
+          "level": "handshake",
+          "revision": 43,
+          "assigned": [
+            true,
+            true
+          ],
+          "connected": [
+            true,
+            true
+          ],
+          "levelState": {
+            "devices": {
+              "crossing.occupied": false,
+              "liftPlate.occupied": false,
+              "link.value": true,
+              "maintenance.value": true,
+              "exitSocket.occupied": true
+            },
+            "outputs": {
+              "crossingPower": false,
+              "liftPower": false,
+              "relayPower": true,
+              "firewallActive": false,
+              "exitReady": true
+            },
+            "platforms": {
+              "crumbleA": {
+                "phase": "stable",
+                "remainingMs": 0,
+                "durationMs": 0
+              },
+              "crumbleB": {
+                "phase": "stable",
+                "remainingMs": 0,
+                "durationMs": 0
+              }
+            }
+          },
+          "cubes": {
+            "draft:payload": {
+              "holder": null,
+              "physicsAuthority": 1,
+              "pulling": false,
+              "epoch": 7,
+              "seq": 31,
+              "transform": {
+                "x": 2170,
+                "y": 928,
+                "vx": 0,
+                "vy": 0,
+                "grounded": true
+              }
+            }
+          },
+          "cubePlacements": {
+            "draft:payload": "draft:exitSocket"
+          },
+          "cube": null,
+          "cubePlacement": null,
+          "checkpoint": "reunion",
+          "exitUnlocked": true,
+          "reachedExit": [
+            true,
+            true
+          ],
+          "completed": true,
+          "profiles": [
+            {
+              "name": "TestNinja",
+              "colour": "cyan"
+            },
+            {
+              "name": "TestNinja",
+              "colour": "cyan"
+            }
+          ]
+        }
+      }
+    },
+    "partner": {
+      "player": {
+        "x": 2316.5236111111108,
+        "y": 933,
+        "vx": 426,
+        "vy": 0,
+        "grounded": true,
+        "groundId": "centralBay",
+        "facing": 1,
+        "coyote": 0.11,
+        "jumpBuffer": 0,
+        "groundJumpAscent": false,
+        "dropThrough": 0,
+        "dropIgnore": null,
+        "justLanded": false,
+        "landingSpeed": 595,
+        "airTime": 0,
+        "ropeJumpAnchors": [],
+        "rope": {
+          "phase": "idle",
+          "anchorId": null,
+          "anchor": {
+            "x": 0,
+            "y": 0
+          },
+          "tip": {
+            "x": 1520,
+            "y": 933
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "origin": {
+            "x": 1520,
+            "y": 933
+          },
+          "travelled": 0,
+          "length": 0,
+          "taut": false,
+          "shrink": 0
+        },
+        "deaths": 1
+      },
+      "cubes": {
+        "draft:payload": {
+          "x": 2170,
+          "y": 928,
+          "vx": 0,
+          "vy": 0,
+          "carried": false,
+          "grounded": true,
+          "groundId": null
+        }
+      },
+      "signals": {
+        "exitDoor": true,
+        "grappleAnchor": false,
+        "bridge": false,
+        "codePlatformA": false,
+        "codePlatformB": false,
+        "relayGates": false,
+        "liftField": false,
+        "draft:activation:on": true,
+        "draft:activation:off": false,
+        "draft:crossingPower": false,
+        "draft:liftPower": false,
+        "draft:relayPower": true,
+        "draft:firewallActive": false,
+        "draft:exitReady": true,
+        "draft:nearPower": false,
+        "draft:farPower": false,
+        "draft:lowerLink": true,
+        "draft:upperLink": true,
+        "draft:exitPower": true,
+        "draft:payloadFirewallPower": false
+      },
+      "controls": {
+        "draft:link": true,
+        "draft:maintenance": true
+      },
+      "plates": {
+        "draft:crossing": false,
+        "draft:liftPlate": false,
+        "draft:exitSocket": true
+      },
+      "exitUnlocked": true,
+      "completed": true,
+      "camera": {
+        "x": 1689.0745501285337,
+        "y": 711.3379241189307,
+        "zoom": 1.05135135135135
+      },
+      "session": {
+        "code": "J2JZ",
+        "slot": 2,
+        "visitor": "13288f37-7883-4c9a-8867-ce39881f22c9",
+        "peers": [
+          true,
+          true
+        ],
+        "generation": 2,
+        "reachedExit": [
+          true,
+          true
+        ],
+        "sharedCubes": {
+          "draft:payload": {
+            "holder": null,
+            "physicsAuthority": 1,
+            "pulling": false,
+            "epoch": 7,
+            "seq": 31,
+            "transform": {
+              "x": 2170,
+              "y": 928,
+              "vx": 0,
+              "vy": 0,
+              "grounded": true
+            }
+          }
+        },
+        "room": {
+          "party": {
+            "phase": "victory",
+            "completedLevels": [
+              "handshake"
+            ]
+          },
+          "levelInstance": 2,
+          "code": "J2JZ",
+          "level": "handshake",
+          "revision": 43,
+          "assigned": [
+            true,
+            true
+          ],
+          "connected": [
+            true,
+            true
+          ],
+          "levelState": {
+            "devices": {
+              "crossing.occupied": false,
+              "liftPlate.occupied": false,
+              "link.value": true,
+              "maintenance.value": true,
+              "exitSocket.occupied": true
+            },
+            "outputs": {
+              "crossingPower": false,
+              "liftPower": false,
+              "relayPower": true,
+              "firewallActive": false,
+              "exitReady": true
+            },
+            "platforms": {
+              "crumbleA": {
+                "phase": "stable",
+                "remainingMs": 0,
+                "durationMs": 0
+              },
+              "crumbleB": {
+                "phase": "stable",
+                "remainingMs": 0,
+                "durationMs": 0
+              }
+            }
+          },
+          "cubes": {
+            "draft:payload": {
+              "holder": null,
+              "physicsAuthority": 1,
+              "pulling": false,
+              "epoch": 7,
+              "seq": 31,
+              "transform": {
+                "x": 2170,
+                "y": 928,
+                "vx": 0,
+                "vy": 0,
+                "grounded": true
+              }
+            }
+          },
+          "cubePlacements": {
+            "draft:payload": "draft:exitSocket"
+          },
+          "cube": null,
+          "cubePlacement": null,
+          "checkpoint": "reunion",
+          "exitUnlocked": true,
+          "reachedExit": [
+            true,
+            true
+          ],
+          "completed": true,
+          "profiles": [
+            {
+              "name": "TestNinja",
+              "colour": "cyan"
+            },
+            {
+              "name": "TestNinja",
+              "colour": "cyan"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "full_local_report": ".workbench/reports/handshake-v2-native/handshake-report.json",
+  "full_report_sha256": "f8463397fad69a48fb259e45baa59528d6ea090a9e4ba1ef62d277539be67741"
+}

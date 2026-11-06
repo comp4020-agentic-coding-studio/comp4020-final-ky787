@@ -1,5 +1,5 @@
 /** Cosmetic static evidence and accepted room outputs. Never feeds physics or the controller. */
-import { CHAMBER_CONTRACTS, isNativeChamber, type NativeChamberId } from '../../server/native/contracts.ts';
+import { CHAMBER_CONTRACTS, chamberSpecimenId, isNativeChamber, type NativeChamberId } from '../../server/native/contracts.ts';
 import type { SharedRoom } from './protocol.ts';
 import type { NativeWorldArtifact, NativeWorldBinding, NativeWorldOutput } from './native-world-types.ts';
 export type { NativeWorldArtifact, NativeWorldBinding, NativeWorldOutput } from './native-world-types.ts';
@@ -73,7 +73,7 @@ const object = (value: unknown): value is Record<string, unknown> => !!value && 
 export function validateNativeWorldArtifact(value: unknown, chamber: NativeChamberId): NativeWorldArtifact {
     const invalid = () => { throw new Error('Native world evidence does not match this chamber'); };
     if (!object(value) || value.schema !== 'coop-native-world/v1' || value.chamber_id !== chamber
-        || value.specimen_id !== `${chamber}_ollvm_bcf` || value.presentation !== 'static-output-store'
+        || value.specimen_id !== chamberSpecimenId(chamber) || value.presentation !== 'static-output-store'
         || !sha256(value.bcf_pe_sha256) || !sha256(value.contract_sha256) || !integer(value.image_base)
         || !object(value.sources) || !sha256(value.sources.integration_sha256) || !sha256(value.sources.disassembly_sha256)
         || !Array.isArray(value.outputs) || value.outputs.length > 14) return invalid();

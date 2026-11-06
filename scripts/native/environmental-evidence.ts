@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
-import { readBytes, readJson, readGzipJson, sha256, chamberPackagePath } from './package.ts';
+import { readBytes, readJson, readGzipJson, sha256, chamberPackagePath, chamberAcquisitionId, chamberSpecimenId } from './package.ts';
 import { buildNativeWorldArtifact, peBytesAt } from './world-evidence.ts';
 import { WORLD_ASSEMBLY_PLACEMENTS } from '../../src/slice/native-world-presentation.ts';
 import type { NativeDisasmInstruction } from '../../src/coop/native-evidence.ts';
@@ -24,8 +24,7 @@ type Trace = { variant: string; state_id: number | string; binary_sha256: string
 // CROSSFEED vault checks read its local derived Boolean; DEADLOCK service/payload
 // checks read the completion Boolean. Other selectors read real input fields,
 // sometimes the second operand of a short-circuited expression.
-const contexts: Record<Exclude<EnvironmentalChamber, 'bypass'>, Record<string, readonly [number, number]>> = {
-    handshake: { crossingPower: [0x107c, 0x10b3], liftPower: [0x11c7, 0x11ff], relayPower: [0x1315, 0x134d], exitReady: [0x14dc, 0x1514] },
+const contexts: Record<Exclude<EnvironmentalChamber, 'bypass' | 'handshake'>, Record<string, readonly [number, number]>> = {
     'crossfeed-vault': { grappleAnchor: [0x132b, 0x1362], bridge: [0x1476, 0x14ad], liftField: [0x15c3, 0x15fb], relayGates: [0x194e, 0x1985],
         leftRoute: [0x1b10, 0x1b48], rightRoute: [0x1cd3, 0x1d0b], galleryAccess: [0x1e21, 0x1e59], vaultPower: [0x1f6c, 0x1fa3], vaultReturn: [0x20b6, 0x20ed], serviceAccess: [0x1787, 0x17bf] },
     deadlock: { cargoLift: [0x1290, 0x12c8], shaftFirewall: [0x13dc, 0x1414], serviceRelay: [0x1612, 0x1649], hatchOpen: [0x175f, 0x1797], payloadReady: [0x18aa, 0x18e1] },
@@ -33,10 +32,11 @@ const contexts: Record<Exclude<EnvironmentalChamber, 'bypass'>, Record<string, r
 };
 
 export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): EnvironmentalArtifact {
+    const curated = chamber === 'bypass' || chamber === 'handshake';
     const manifest = readJson<{ chamber_id: string; files: Record<string, string> }>(chamber, 'manifest.json');
-    fact(manifest.chamber_id === chamber, 'manifest chamber identity');
+    fact(manifest.chamber_id === chamberAcquisitionId(chamber), 'manifest chamber identity');
     const sources: Record<string, string> = {};
-    for (const file of ['contract.json', 'integration.json', 'src/controller.c', 'src/controller.h', 'evidence/disassembly-bcf.json.gz', 'bin/obfuscated_x64.exe', 'evidence/representative-traces.json.gz', ...(chamber === 'bypass' ? ['fragments.json'] : [])]) {
+    for (const file of ['contract.json', 'integration.json', 'src/controller.c', 'src/controller.h', 'evidence/disassembly-bcf.json.gz', 'bin/obfuscated_x64.exe', 'evidence/representative-traces.json.gz', ...(curated ? ['fragments.json'] : [])]) {
         const hash = sha256(readBytes(chamber, file));
         fact(hash === manifest.files[file], `${chamber} source hash ${file}`);
         sources[chamberPackagePath(chamber, file)] = hash;
@@ -47,23 +47,25 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
     fact(dis.binary.sha256 === ENVIRONMENTAL_PE[chamber] && dis.binary.image_base === ENVIRONMENTAL_BASE, 'disassembly identity');
     const integration = readJson<{ outputs: { name: string; offset: number; verified_bcf_store_sites: Site[] }[] }>(chamber, 'integration.json');
     const traces = readGzipJson<{ chamber_id: string; contract_sha256: string; traces: Trace[] }>(chamber, 'evidence/representative-traces.json.gz').value;
-    fact(traces.chamber_id === chamber && traces.contract_sha256 === manifest.files['contract.json'], 'trace identity');
+    fact(traces.chamber_id === chamberAcquisitionId(chamber) && traces.contract_sha256 === manifest.files['contract.json'], 'trace identity');
     const world = buildNativeWorldArtifact(chamber); // proves existing bindings and targets against the released room
     const placements = WORLD_ASSEMBLY_PLACEMENTS[chamber]!;
     fact(isDeepStrictEqual(placements.map(p => p.output), ENVIRONMENTAL_OUTPUTS[chamber]), 'representative placement accounting');
-    // BYPASS's independently curated contexts contain pointer setup and multiple
-    // short-circuit operands. Preserve their real fragment boundaries; do not
+    // The independent acquisitions retain pointer setup and (for BYPASS)
+    // multiple short-circuit operands. Preserve their real fragment boundaries; do not
     // coerce them into the historical three-instruction CMP/SETNE shape.
-    const catalogue = chamber === 'bypass' ? readJson<{
+    const catalogue = curated ? readJson<{
         binary_sha256: string;
-        sections: { output: string; condition_fragment_ids: string[]; store_alternatives: Record<string, string>; constant: number | null }[];
+        sections: { output: string; condition_fragment_ids: string[]; store_alternatives: Record<string, string>; constant?: number | null }[];
         fragments: { id: string; output: string; role: string; instructions: NativeDisasmInstruction[] }[];
     }>(chamber, 'fragments.json') : null;
     if (catalogue) {
         fact(catalogue.binary_sha256 === ENVIRONMENTAL_PE[chamber], 'curated specimen');
-        const exit = catalogue.sections.find(s => s.output === 'exitReady');
-        fact(exit?.constant === 1 && exit.condition_fragment_ids.length === 0
-            && isDeepStrictEqual(exit.store_alternatives, { '1': 'exitReady.write-1' }), 'constant exit has no zero alternative');
+        if (chamber === 'bypass') {
+            const exit = catalogue.sections.find(s => s.output === 'exitReady');
+            fact(exit?.constant === 1 && exit.condition_fragment_ids.length === 0
+                && isDeepStrictEqual(exit.store_alternatives, { '1': 'exitReady.write-1' }), 'constant exit has no zero alternative');
+        }
     }
     const fragments: EnvironmentalFragment[] = [];
     const sections = ENVIRONMENTAL_OUTPUTS[chamber].map(name => {
@@ -83,14 +85,14 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
                 const bytes = Buffer.from(i.bytes.replaceAll(' ', ''), 'hex');
                 fact(bytes.length === i.size && bytes.equals(peBytesAt(pe, i.rva, i.size)), 'PE bytes');
             }
-            const last = instructions.at(-1)!, id = chamber === 'bypass' ? suffix : `${name}.${suffix}`;
+            const last = instructions.at(-1)!, id = curated ? suffix : `${name}.${suffix}`;
             fragments.push({ id, output: name, role, block_id: block.id, start_rva: start, end_rva_exclusive: last.rva + last.size, instructions, store });
             return id;
         };
         let context: string[];
         if (catalogue) {
             const selected = catalogue.sections.find(s => s.output === name);
-            fact(selected && selected.constant === null && selected.condition_fragment_ids.length === (name === 'bridgePower' ? 2 : 4), 'curated dynamic context');
+            fact(selected && selected.constant == null && selected.condition_fragment_ids.length === (chamber === 'handshake' || name === 'bridgePower' ? 2 : 4), 'curated dynamic context');
             context = selected.condition_fragment_ids.map(id => {
                 const f = catalogue.fragments.find(f => f.id === id);
                 fact(f && f.output === name && ['input_check', 'puzzle_branch'].includes(f.role), 'curated context role');
@@ -99,7 +101,7 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
                 return result;
             });
         } else {
-            const [read, branch] = contexts[chamber as Exclude<EnvironmentalChamber, 'bypass'>][name];
+            const [read, branch] = contexts[chamber as Exclude<EnvironmentalChamber, 'bypass' | 'handshake'>][name];
             context = [add('read', 'gameplay_check', read), add('branch', 'saved_boolean_branch', branch)];
             const readCode = fragments.at(-2)!.instructions, branchCode = fragments.at(-1)!.instructions;
             fact(isDeepStrictEqual(readCode.map(i => i.mnemonic), ['cmp', 'setne', 'mov']) && isDeepStrictEqual(branchCode.map(i => i.mnemonic), ['mov', 'test', 'jne']), 'gameplay context form');
@@ -127,7 +129,7 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
                 }
             }
             fact(isDeepStrictEqual(observed.map(String).sort(), site.case_ids.map(String).sort()), 'recorded store case association');
-            stores[bit] = add(chamber === 'bypass' ? `${name}.write-${bit}` : `write-${bit}`, 'output_store', dis.instructions[index - 2].rva,
+            stores[bit] = add(curated ? `${name}.write-${bit}` : `write-${bit}`, 'output_store', dis.instructions[index - 2].rva,
                 { value: bit, rva: site.instruction_rva, byte_offset: output.byte_offset, observed_case_count: observed.length });
         }
         if (catalogue) for (const bit of [0, 1] as const) {
@@ -139,7 +141,7 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
         const { excerpt: _excerpt, ...definition } = output;
         return { ...definition, target: place.target, context, stores };
     });
-    return { schema: 'coop-environmental-presentation/v1', chamber_id: chamber, specimen_id: `${chamber}_ollvm_bcf`,
+    return { schema: 'coop-environmental-presentation/v1', chamber_id: chamber, specimen_id: chamberSpecimenId(chamber),
         bcf_pe_sha256: ENVIRONMENTAL_PE[chamber], image_base: ENVIRONMENTAL_BASE, sources,
         separation: 'omitted-code-not-cfg-edges', sections, fragments };
 }

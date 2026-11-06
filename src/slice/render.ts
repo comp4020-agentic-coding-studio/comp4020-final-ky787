@@ -223,7 +223,9 @@ export class PuzzleRenderer {
         }
         drawOnboardingHints(c, r.id);
         for (const region of r.regions ?? []) {
-            if (r.id === 'handshake' && region.label === 'TWO HANDS. ONE STEP HIGHER.') continue;
+            // Released HANDSHAKE supplies the boost pictogram and accepted native
+            // firewall caption. Preserve the frozen draft's fallback labels there.
+            if (r.id === 'handshake' && ['TWO HANDS. ONE STEP HIGHER.', 'PAYLOAD FIREWALL'].includes(region.label)) continue;
             const label = this.nativeWorld.state?.chamber === r.id ? nativeWorldRegionLabel(region.label) : region.label;
             this.text(label, region.at.x, region.at.y, 24, C.dim);
         }

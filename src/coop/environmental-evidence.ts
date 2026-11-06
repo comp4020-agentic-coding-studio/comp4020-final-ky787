@@ -1,5 +1,5 @@
 /** Accepted presentation snapshots and independently failing compact evidence loads. */
-import { CHAMBER_CONTRACTS } from '../../server/native/contracts.ts';
+import { CHAMBER_CONTRACTS, chamberSpecimenId } from '../../server/native/contracts.ts';
 import type { SharedRoom } from './protocol.ts';
 import { nativeWorldState, type NativeWorldState } from './native-world-evidence.ts';
 import { ENVIRONMENTAL_SHA256 } from './environmental-integrity.ts';
@@ -18,24 +18,29 @@ export function validateEnvironmentalArtifact(value: unknown, chamber: Environme
     function fact(ok: unknown): asserts ok { if (!ok) throw Error('Environmental evidence mismatch'); }
     const a = value as EnvironmentalArtifact;
     fact(isEnvironmentalChamber(chamber) && a?.schema === 'coop-environmental-presentation/v1' && a.chamber_id === chamber
-        && a.specimen_id === `${chamber}_ollvm_bcf` && a.bcf_pe_sha256 === ENVIRONMENTAL_PE[chamber]
+        && a.specimen_id === chamberSpecimenId(chamber) && a.bcf_pe_sha256 === ENVIRONMENTAL_PE[chamber]
         && a.image_base === ENVIRONMENTAL_BASE && a.separation === 'omitted-code-not-cfg-edges');
     const names = ENVIRONMENTAL_OUTPUTS[chamber];
     const bypass = chamber === 'bypass';
-    const bypassContext: Record<string, string[]> = {
+    const curated = bypass || chamber === 'handshake';
+    const curatedContext: Record<string, string[]> = bypass ? {
         anchorPower: ['anchor-hold.read', 'anchor-hold.branch', 'anchor-link.read', 'anchor-link.branch'],
         bridgePower: ['bridge-link.read', 'bridge-link.branch'],
         firewallActive: ['firewall-hold.read', 'firewall-hold.branch', 'firewall-override.read', 'firewall-override.branch'],
+    } : {
+        crossingPower: ['crossing.read', 'crossing.branch'], liftPower: ['lift.read', 'lift.branch'],
+        relayPower: ['relay.read', 'relay.branch'], firewallActive: ['firewall.read', 'firewall.branch'],
     };
-    const sourceRoot = bypass ? 'experiments/coop-controller-studies/bypass-v1/' : `experiments/coop-controllers/${chamber}/`;
-    fact(a.sources && Object.keys(a.sources).length === (bypass ? 8 : 7) && Object.entries(a.sources).every(([p, s]) =>
+    const sourceRoot = bypass ? 'experiments/coop-controller-studies/bypass-v1/' : chamber === 'handshake'
+        ? 'experiments/coop-controller-studies/handshake-v2/' : `experiments/coop-controllers/${chamber}/`;
+    fact(a.sources && Object.keys(a.sources).length === (curated ? 8 : 7) && Object.entries(a.sources).every(([p, s]) =>
         p.startsWith(sourceRoot) && /^[a-f0-9]{64}$/.test(s)));
     fact(Array.isArray(a.sections) && a.sections.length === names.length && Array.isArray(a.fragments) && a.fragments.length === (bypass ? 16 : names.length * 4));
     const ids = new Set<string>();
     for (const f of a.fragments) {
         fact(f && typeof f.id === 'string' && !ids.has(f.id) && names.includes(f.output) && /^bb_[0-9A-F]{8}$/.test(f.block_id));
         ids.add(f.id);
-        fact(['gameplay_check', 'saved_boolean_branch', 'output_store'].includes(f.role) && Array.isArray(f.instructions) && (bypass && f.role === 'gameplay_check' ? f.instructions.length === (f.id === 'anchor-hold.read' ? 4 : 5) : f.instructions.length === 3));
+        fact(['gameplay_check', 'saved_boolean_branch', 'output_store'].includes(f.role) && Array.isArray(f.instructions) && (curated && f.role === 'gameplay_check' ? f.instructions.length === (f.id === 'anchor-hold.read' || f.id === 'crossing.read' ? 4 : 5) : f.instructions.length === 3));
         let next = f.start_rva;
         fact(Number.isSafeInteger(next) && next >= 0);
         for (const i of f.instructions) {
@@ -52,8 +57,8 @@ export function validateEnvironmentalArtifact(value: unknown, chamber: Environme
             fact(f.instructions.every(i => i.mnemonic === 'mov') && f.instructions[2].op_str === `dword ptr [rax${offset ? ` + ${offset < 10 ? offset : `0x${offset.toString(16)}`}` : ''}], ${s.value}`);
         } else {
             fact(f.store === null);
-            if (bypass) {
-                fact(bypassContext[f.output]?.includes(f.id));
+            if (curated) {
+                fact(curatedContext[f.output]?.includes(f.id));
                 const form = f.instructions.map(i => i.mnemonic).join(',');
                 if (f.role === 'gameplay_check') fact(f.id.endsWith('.read') && form === (f.instructions.length === 4 ? 'mov,cmp,setne,mov' : 'mov,mov,cmp,setne,mov'));
                 else fact(f.id.endsWith('.branch') && form === 'mov,test,jne' && f.instructions[1].op_str === 'al, 1');
@@ -64,8 +69,8 @@ export function validateEnvironmentalArtifact(value: unknown, chamber: Environme
     for (const [n, s] of a.sections.entries()) {
         fact(s && s.name === names[n] && s.byte_offset === CHAMBER_CONTRACTS[chamber].outputs.indexOf(s.name) * 4 && s.kind === 'raw_combinational'
             && (s.game_signal === null || typeof s.game_signal === 'string') && typeof s.target === 'string'
-            && Array.isArray(s.context) && s.context.length === (bypass ? bypassContext[s.name]?.length : 2) && Array.isArray(s.bindings) && s.bindings.length > 0 && s.bindings.length <= 32);
-        if (bypass) fact(s.context.join(',') === bypassContext[s.name].join(','));
+            && Array.isArray(s.context) && s.context.length === (curated ? curatedContext[s.name]?.length : 2) && Array.isArray(s.bindings) && s.bindings.length > 0 && s.bindings.length <= 32);
+        if (curated) fact(s.context.join(',') === curatedContext[s.name].join(','));
         for (const [k, id] of s.context.entries()) fact(a.fragments.some(f => f.id === id && f.output === s.name
             && f.role === (k % 2 === 0 ? 'gameplay_check' : 'saved_boolean_branch')));
         for (const bit of [0, 1] as const) fact(s.stores?.[bit] === `${s.name}.write-${bit}` && ids.has(s.stores[bit]));

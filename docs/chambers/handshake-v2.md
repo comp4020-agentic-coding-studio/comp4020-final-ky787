@@ -1,9 +1,9 @@
-# HANDSHAKE v2 — staged firewall prototype
+# HANDSHAKE v2 — frozen firewall acquisition source
 
-This AUTHORED draft makes maintenance clear a visible payload firewall. Resting
-cargo alone supplies the exit Boolean. The released HANDSHAKE JSON, original
-draft, native lookup/evidence and campaign navigation remain unchanged. No v2
-assembly or native acquisition has been performed on Linux.
+This frozen AUTHORED draft was acquired by Windows and is now promoted to the
+released campaign with verified native decisions. See the [current integration
+record](handshake.md). This file retains the approved request, geometry and
+bounded prototype checks; Linux did not generate assembly or execute the PEs.
 
 - [Draft](../../levels/drafts/handshake-v2.json)
 - [Full-room two-visitor scenario](../../levels/scenarios/handshake-v2.json)
@@ -54,13 +54,13 @@ binding, initial values and true/false meanings. The two anchors share
 crossingPower; the two relay ends share relayPower. Bindings are not inverted:
 NOT is in the firewall expression and its wire annotation reflects it once.
 
-Windows must fetch the exact committed snapshot in the shared handoff, verify
-these hashes, and acquire a **separate HANDSHAKE v2** clean/BCF package. Retain
-source/PE hashes, ABI, exhaustive native results, authentic disassembly and a
-portable read-only verifier against the pinned TS evaluator. Do not overwrite or
-relabel the released five-input/four-output package or change its historical
-reference pin. Return a dated evidence handoff. Campaign integration is a later
-task after review.
+Windows delivered the separate package at
+`experiments/coop-controller-studies/handshake-v2/` in commit
+`1b9aa192fa26017ca67c46e21a79d2a18c55a25d`, based on source
+`2532b50e729463f67d2afef700b1830ca6cb7753`. Its portable verifier passes all 32
+vectors. The original five-input/four-output specimen and historical pin remain
+intact; the [current integration record](handshake.md) pins the v2 hashes and
+explains the consumer boundary. Do not reacquire or relabel the original package.
 
 ## Local geometry and presentation
 

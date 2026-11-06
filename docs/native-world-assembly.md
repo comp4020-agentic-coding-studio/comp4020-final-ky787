@@ -17,8 +17,10 @@ belongs in normal gameplay.
 BYPASS adds three [fixed excerpts](chambers/bypass-native.md) from its independent
 four-input package, with the constant exit kept in Evidence.
 
-The five original `coop-native-world/v1` assets and their strict validator remain
-unchanged. They supply static platform address identities and binding evidence;
+HANDSHAKE now uses its separate [five-output v2 package](chambers/handshake.md).
+Its four environmental panels end with firewallActive; exitReady remains in
+Evidence. Other chambers’ acquired assets and strict validations are unchanged.
+The `coop-native-world/v1` assets retain their schema. They supply static platform address identities and binding evidence;
 their write-one addresses are not the selected state-linked store address.
 The sections below document that retained asset contract, not the superseded
 three-MOV diagnostic-card design.
@@ -54,12 +56,12 @@ RVA, size, exact bytes, mnemonic, operands and block ID. The schema is defined i
 
 | Artifact in `public/evidence/coop/` | Uncompressed bytes |
 | --- | ---: |
-| `handshake.world.json` | 6,502 |
+| `handshake.world.json` | 7,844 |
 | `crossfeed-vault.world.json` | 24,024 |
 | `race-condition.world.json` | 20,166 |
 | `deadlock.world.json` | 7,710 |
 | `use-after-free.world.json` | 10,491 |
-| Total | 68,893 |
+| Total | 70,235 |
 
 The generator verifies acquired source hashes against their retained manifests,
 reads the actual PE section table to compare instruction bytes, and checks

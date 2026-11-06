@@ -21,6 +21,12 @@ export const NATIVE_CHAMBERS: readonly NativeChamberId[] =
 export const isNativeChamber = (value: unknown): value is NativeChamberId =>
     NATIVE_CHAMBERS.includes(value as NativeChamberId);
 
+/** Runtime room identity is stable; acquired specimens have independent versions. */
+export type NativeAcquisitionId = NativeChamberId | 'handshake-v2';
+export const chamberAcquisitionId = (chamber: NativeChamberId): NativeAcquisitionId =>
+    chamber === 'handshake' ? 'handshake-v2' : chamber;
+export const chamberSpecimenId = (chamber: NativeChamberId): string => `${chamberAcquisitionId(chamber)}_ollvm_bcf`;
+
 /** How a case id is derived from an ordered canonical input vector. */
 export interface ChamberContract {
     id: NativeChamberId;
@@ -73,7 +79,7 @@ export const CHAMBER_CONTRACTS: Record<NativeChamberId, ChamberContract> = {
     handshake: {
         id: 'handshake', kind: 'declarative', booleanInputs: 5, caseCount: 32,
         inputs: ['crossing', 'liftPlate', 'link', 'maintenance', 'exitSocket'],
-        outputs: ['crossingPower', 'liftPower', 'relayPower', 'exitReady'],
+        outputs: ['crossingPower', 'liftPower', 'relayPower', 'firewallActive', 'exitReady'],
     },
     bypass: {
         id: 'bypass', kind: 'declarative', booleanInputs: 4, caseCount: 16,

@@ -3,7 +3,7 @@
   "id": "handshake",
   "scope": "full-room",
   "mode": "coop",
-  "timeoutMs": 180000,
+  "timeoutMs": 240000,
   "actors": [
     {
       "id": "host",
@@ -17,8 +17,23 @@
   "steps": [
     {
       "label": "Authored initial state",
-      "capture": "initial",
-      "waitMs": 200
+      "waitMs": 200,
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": true
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        }
+      ]
     },
     {
       "label": "Approach central breakpoint",
@@ -43,6 +58,84 @@
       }
     },
     {
+      "label": "Approach live payload firewall before maintenance",
+      "actions": [
+        {
+          "type": "walk",
+          "actor": "host",
+          "x": 1960
+        }
+      ],
+      "waitMs": 180,
+      "capture": "firewall-active"
+    },
+    {
+      "label": "Running jump into firewall respawns at earned checkpoint",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": true
+        },
+        {
+          "type": "tap",
+          "actor": "host",
+          "code": "Space"
+        }
+      ],
+      "wait": {
+        "actor": "host",
+        "condition": {
+          "path": "player.x",
+          "max": 1600
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Brake safely after firewall death",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 200,
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "session.room.checkpoint",
+            "equals": "reunion"
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "controls.draft:maintenance",
+            "equals": false
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": true
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
       "label": "Partner holds CROSSING",
       "actions": [
         {
@@ -59,7 +152,6 @@
         },
         "timeoutMs": 4000
       },
-      "capture": "powered-crossing",
       "waitMs": 200
     },
     {
@@ -201,8 +293,7 @@
           "equals": "cubeAlcove"
         },
         "timeoutMs": 4000
-      },
-      "capture": "cube-alcove"
+      }
     },
     {
       "label": "Settle on alcove floor",
@@ -378,8 +469,7 @@
           "equals": "centralBay"
         },
         "timeoutMs": 4000
-      },
-      "capture": "payload-return"
+      }
     },
     {
       "label": "Clear bay edge before placing payload",
@@ -455,7 +545,6 @@
         },
         "timeoutMs": 4000
       },
-      "capture": "cube-substitution",
       "waitMs": 250
     },
     {
@@ -572,8 +661,7 @@
           "equals": "serviceGallery"
         },
         "timeoutMs": 4000
-      },
-      "capture": "gallery-lift"
+      }
     },
     {
       "label": "Bring payload below maintenance ledge",
@@ -631,8 +719,7 @@
           "equals": true
         },
         "timeoutMs": 4000
-      },
-      "capture": "relay-linked"
+      }
     },
     {
       "label": "Partner leaves lift and enters lower relay",
@@ -822,7 +909,7 @@
         },
         "timeoutMs": 4000
       },
-      "capture": "maintenance-complete"
+      "capture": "maintenance-committed"
     },
     {
       "label": "Exit still needs payload",
@@ -831,6 +918,20 @@
           "actor": "host",
           "condition": {
             "path": "exitUnlocked",
+            "equals": false
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": false
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "signals.draft:exitReady",
             "equals": false
           }
         }
@@ -929,8 +1030,142 @@
           "equals": "centralBay"
         },
         "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Checkpoint retry after committed maintenance",
+      "actions": [
+        {
+          "type": "tap",
+          "actor": "partner",
+          "code": "KeyR"
+        }
+      ],
+      "waitMs": 350,
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "controls.draft:maintenance",
+            "equals": true
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": false
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "session.room.checkpoint",
+            "equals": "reunion"
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.x",
+            "min": 1500,
+            "max": 1540
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
+      "label": "Recovered climber takes the still-powered lower relay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.y",
+          "max": 600
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Recovered climber brakes on gallery",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyD",
+          "down": false
+        }
+      ],
+      "waitMs": 850
+    },
+    {
+      "label": "Recovered climber returns through upper relay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyA",
+          "down": true
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.y",
+          "min": 900
+        },
+        "timeoutMs": 4000
+      }
+    },
+    {
+      "label": "Recovered climber lands past the lower relay",
+      "actions": [
+        {
+          "type": "key",
+          "actor": "partner",
+          "code": "KeyA",
+          "down": false
+        }
+      ],
+      "wait": {
+        "actor": "partner",
+        "condition": {
+          "path": "player.groundId",
+          "equals": "centralBay"
+        },
+        "timeoutMs": 4000
       },
-      "capture": "near-complete"
+      "assert": [
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "signals.draft:firewallActive",
+            "equals": false
+          }
+        },
+        {
+          "actor": "partner",
+          "condition": {
+            "path": "player.x",
+            "min": 2000,
+            "max": 2100
+          }
+        }
+      ]
     },
     {
       "label": "Place payload beside final socket",
@@ -938,7 +1173,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 2090
+          "x": 2130
         }
       ],
       "waitMs": 250
@@ -960,7 +1195,7 @@
         },
         "timeoutMs": 4000
       },
-      "capture": "exit-unlocked"
+      "capture": "payload-delivered"
     },
     {
       "label": "First physical exit arrival",
@@ -991,6 +1226,32 @@
         },
         "timeoutMs": 4000
       }
+    },
+    {
+      "label": "One arrival alone cannot finish",
+      "assert": [
+        {
+          "actor": "host",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "session.reachedExit.0",
+            "equals": true
+          }
+        },
+        {
+          "actor": "host",
+          "condition": {
+            "path": "session.reachedExit.1",
+            "equals": false
+          }
+        }
+      ]
     },
     {
       "label": "Second physical exit arrival",

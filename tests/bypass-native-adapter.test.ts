@@ -1,18 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { CHAMBER_CONTRACTS, NATIVE_CHAMBERS } from '../server/native/contracts.ts';
 import { NativeControllerTable, nativeController } from '../server/native/adapter.ts';
 import { BYPASS_REFERENCE_COMMIT, REFERENCE_COMMIT, chamberPackagePath, chamberReferenceCommit, loadChamberEvidence } from '../scripts/native/package.ts';
 
 describe('BYPASS native acquisition isolation', () => {
-    it('keeps the five historical package roots/reference pins independent', () => {
+    it('keeps other acquisitions and the original historical package reference independent', () => {
         expect(chamberPackagePath('bypass')).toBe('experiments/coop-controller-studies/bypass-v1');
         expect(chamberReferenceCommit('bypass')).toBe(BYPASS_REFERENCE_COMMIT);
         expect(BYPASS_REFERENCE_COMMIT).toBe('a209122ba1e3b54c6d329a94c01276b9550c9189');
         expect(REFERENCE_COMMIT).toBe('1315c3616ce5ac939baf913f9b09b4ebad34132a');
-        for (const chamber of NATIVE_CHAMBERS.filter(id => id !== 'bypass')) {
+        for (const chamber of NATIVE_CHAMBERS.filter(id => id !== 'bypass' && id !== 'handshake')) {
             expect(chamberPackagePath(chamber)).toBe(`experiments/coop-controllers/${chamber}`);
             expect(chamberReferenceCommit(chamber)).toBe(REFERENCE_COMMIT);
         }
+        const originalHandshake = JSON.parse(readFileSync('experiments/coop-controllers/handshake/contract.json', 'utf8'));
+        expect(originalHandshake.reference_commit).toBe(REFERENCE_COMMIT);
+        expect(originalHandshake.outputs.map((o: { name: string }) => o.name)).toEqual(['crossingPower', 'liftPower', 'relayPower', 'exitReady']);
     });
 
     it('verifies manifest, frozen/current request and documents, and actual TS versus all 16 clean/BCF vectors', () => {

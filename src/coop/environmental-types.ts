@@ -8,7 +8,7 @@ export const isEnvironmentalChamber = (value: unknown): value is EnvironmentalCh
 /** Existing representative placements, in their established order. */
 export const ENVIRONMENTAL_OUTPUTS: Readonly<Record<EnvironmentalChamber, readonly string[]>> = {
     bypass: ['anchorPower', 'bridgePower', 'firewallActive'],
-    handshake: ['crossingPower', 'liftPower', 'relayPower', 'exitReady'],
+    handshake: ['crossingPower', 'liftPower', 'relayPower', 'firewallActive'],
     'crossfeed-vault': ['grappleAnchor', 'bridge', 'liftField', 'relayGates', 'leftRoute', 'rightRoute', 'galleryAccess', 'vaultPower', 'vaultReturn', 'serviceAccess'],
     deadlock: ['cargoLift', 'shaftFirewall', 'serviceRelay', 'hatchOpen', 'payloadReady'],
     'use-after-free': ['routeA', 'routeB', 'routeC', 'launchPower', 'assistBlocked', 'exitReady'],
@@ -19,7 +19,7 @@ export const ENVIRONMENTAL_BUDGETS: Readonly<Record<EnvironmentalChamber, number
 };
 export const ENVIRONMENTAL_PE: Readonly<Record<EnvironmentalChamber, string>> = {
     bypass: 'af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74',
-    handshake: '002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8',
+    handshake: '57f7951f364594ebc417e5d93b15ef694595c7ad06ff9fe2d148fd0531cbcda1',
     'crossfeed-vault': '8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b',
     deadlock: '0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6',
     'use-after-free': '733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb',

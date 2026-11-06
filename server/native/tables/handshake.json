@@ -1,10 +1,11 @@
 {
-  "bcf_pe_sha256": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8",
-  "bits_per_case": 4,
+  "acquisition_id": "handshake-v2",
+  "bcf_pe_sha256": "57f7951f364594ebc417e5d93b15ef694595c7ad06ff9fe2d148fd0531cbcda1",
+  "bits_per_case": 5,
   "case_count": 32,
   "chamber_id": "handshake",
-  "clean_pe_sha256": "b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9",
-  "contract_sha256": "2dab247f69198e05eda52cca23e3514e50b0446699b4284231863fff8689f171",
+  "clean_pe_sha256": "a2edb2a7084c142005dc8273f61736c86be478b8510e7a0cd2234db513ccf33b",
+  "contract_sha256": "08ccba38195b3466bfff5fef37e1ede555865de2a1e468cdaa426e5c2f0000e8",
   "input_game_ports": [
     "crossing.occupied",
     "liftPlate.occupied",
@@ -19,15 +20,16 @@
     "maintenance",
     "exitSocket"
   ],
-  "native_results_sha256": "61c9e1ce062a535fc55547901793c5709914bd9b80a7fc2e91bb680af5e61760",
+  "native_results_sha256": "900d13cd41744e93b5dba94972c29f81ded3231909658f85af0a2e43ab8be70c",
   "output_names": [
     "crossingPower",
     "liftPower",
     "relayPower",
+    "firewallActive",
     "exitReady"
   ],
-  "packed": "AAECAwQFBgcAAQIDBAUGBwABAgMEBQYHCAkKCwwNDg8=",
+  "packed": "CAkKCwwNDg8AAQIDBAUGBxgZGhscHR4fEBESExQVFhc=",
   "schema": "coop-native-table/v1",
-  "specimen_id": "handshake_ollvm_bcf",
-  "table_sha256": "41f0d9cf3bef31f3beac8faf200b26cda8bd3e34eb4b60145efb2dd20e52b647"
+  "specimen_id": "handshake-v2_ollvm_bcf",
+  "table_sha256": "844c527872fbfcd68f3a476d4ea2c4949c08718143620bd71a776a533a4a1375"
 }

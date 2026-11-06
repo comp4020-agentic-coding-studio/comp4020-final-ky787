@@ -35,6 +35,12 @@
       "output": "exitReady",
       "property": "unlock",
       "target": "exit"
+    },
+    {
+      "id": "payloadFirewallPower",
+      "output": "firewallActive",
+      "property": "active",
+      "target": "payloadFirewall"
     }
   ],
   "controller": {
@@ -45,17 +51,15 @@
         "op": "ref"
       },
       "exitReady": {
-        "args": [
-          {
-            "id": "maintenance.value",
-            "op": "ref"
-          },
-          {
-            "id": "exitSocket.occupied",
-            "op": "ref"
-          }
-        ],
-        "op": "and"
+        "id": "exitSocket.occupied",
+        "op": "ref"
+      },
+      "firewallActive": {
+        "arg": {
+          "id": "maintenance.value",
+          "op": "ref"
+        },
+        "op": "not"
       },
       "liftPower": {
         "id": "liftPlate.occupied",
@@ -100,14 +104,14 @@
         "y": 950
       },
       {
+        "blocksCubeInteraction": true,
         "h": 350,
         "id": "cubeAlcove",
         "kind": "static",
         "type": "platform",
         "w": 400,
         "x": 0,
-        "y": 950,
-        "blocksCubeInteraction": true
+        "y": 950
       },
       {
         "h": 110,
@@ -212,6 +216,7 @@
         "exitSide": 1,
         "h": 110,
         "id": "lowerRelay",
+        "nativeId": "B",
         "pair": "service",
         "type": "relay",
         "w": 56,
@@ -222,6 +227,7 @@
         "exitSide": 1,
         "h": 110,
         "id": "upperRelay",
+        "nativeId": "A",
         "pair": "service",
         "type": "relay",
         "w": 56,
@@ -229,6 +235,7 @@
         "y": 440
       },
       {
+        "floating": true,
         "id": "maintenance",
         "kind": "terminal",
         "label": "MAINTENANCE COMPLETE",
@@ -241,7 +248,7 @@
         "kind": "socket",
         "label": "PAYLOAD",
         "type": "device",
-        "x": 2130,
+        "x": 2170,
         "y": 950
       },
       {
@@ -276,6 +283,15 @@
         "type": "checkpoint",
         "x": 1520,
         "y": 933
+      },
+      {
+        "id": "payloadFirewall",
+        "length": 365,
+        "orientation": "vertical",
+        "thickness": 26,
+        "type": "firewall",
+        "x": 2060,
+        "y": 585
       }
     ],
     "width": 2450
@@ -322,10 +338,10 @@
       },
       {
         "bounds": {
-          "x": 2040,
-          "y": 760,
-          "w": 400,
-          "h": 220
+          "h": 420,
+          "w": 510,
+          "x": 1930,
+          "y": 560
         },
         "duration": 1.2,
         "id": "exitView",
@@ -358,7 +374,7 @@
       },
       {
         "id": "recoveryLabel",
-        "text": "RECOVERY  \u2192",
+        "text": "RECOVERY  →",
         "x": 570,
         "y": 1130
       },
@@ -367,8 +383,15 @@
         "text": "AUTHORED CO-OP / NO NATIVE EVIDENCE",
         "x": 30,
         "y": 180
+      },
+      {
+        "id": "firewallLabel",
+        "text": "PAYLOAD FIREWALL",
+        "x": 2150,
+        "y": 700
       }
     ],
+    "music": "handshake",
     "wires": [
       {
         "binding": "nearPower",
@@ -497,11 +520,11 @@
         "id": "exitWire",
         "points": [
           {
-            "x": 2130,
+            "x": 2170,
             "y": 938
           },
           {
-            "x": 2130,
+            "x": 2170,
             "y": 780
           },
           {
@@ -511,6 +534,29 @@
           {
             "x": 2370,
             "y": 810
+          }
+        ]
+      },
+      {
+        "binding": "payloadFirewallPower",
+        "id": "maintenanceFirewallWire",
+        "invertedLabel": true,
+        "points": [
+          {
+            "x": 1980,
+            "y": 348
+          },
+          {
+            "x": 2140,
+            "y": 348
+          },
+          {
+            "x": 2140,
+            "y": 620
+          },
+          {
+            "x": 2069,
+            "y": 620
           }
         ]
       }
@@ -529,6 +575,9 @@
     "maintenance": {
       "link.value": true,
       "maintenance.value": true
+    },
+    "payload-only": {
+      "exitSocket.occupied": true
     },
     "service": {
       "crossing.occupied": true,

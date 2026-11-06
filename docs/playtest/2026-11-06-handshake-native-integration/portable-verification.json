@@ -1,0 +1,79 @@
+{
+  "schema": "handshake-v2-portable-verification/v1",
+  "status": "PASS",
+  "read_only": true,
+  "reference_commit": "2532b50e729463f67d2afef700b1830ca6cb7753",
+  "manifest_sha256": "8b692223d641d1d443d537df2619a473f40662fea9a0d16ca5a72673fbb4d879",
+  "verifier_sha256": "85f78cbd3986d93043381f4b9c07b2f0443ac2d989168c4aac7e90ea816d427a",
+  "inventory_files": 69,
+  "exhaustive_vectors": 32,
+  "ordered_snapshots_per_variant": 0,
+  "native_evaluations": 64,
+  "emulator_traces": 32,
+  "output_commits": 160,
+  "store_sites": 10,
+  "fragments": 20,
+  "opaque_guards": 32,
+  "proven_clones": 16,
+  "sole_input_dependencies": {
+    "crossingPower": "crossing",
+    "liftPower": "liftPlate",
+    "relayPower": "link",
+    "firewallActive": "maintenance",
+    "exitReady": "exitSocket"
+  },
+  "inverted_outputs": [
+    "firewallActive"
+  ],
+  "historical_five_chamber_receipt": "PASS",
+  "unchanged_bypass_receipt": "PASS",
+  "negative_checks": [
+    {
+      "case": "bad_event",
+      "rejected": true,
+      "reason": "Output event differs from actual write or game reference"
+    },
+    {
+      "case": "bad_instruction",
+      "rejected": true,
+      "reason": "Output instruction bytes/descriptor differs from PE"
+    },
+    {
+      "case": "wrong_occurrence",
+      "rejected": true,
+      "reason": "Next occurrence is not chronological"
+    },
+    {
+      "case": "wrong_register",
+      "rejected": true,
+      "reason": "Register delta before-value breaks chronology"
+    },
+    {
+      "case": "missing_exhaustive_case",
+      "rejected": true,
+      "reason": "Reference lacks unique exhaustive mixed-domain coverage"
+    },
+    {
+      "case": "missing_firewall_inversion",
+      "rejected": true,
+      "reason": "Actual TS result contradicts finalized draft AST"
+    },
+    {
+      "case": "hidden_exit_maintenance_gate",
+      "rejected": true,
+      "reason": "Actual TS result contradicts finalized draft AST"
+    },
+    {
+      "case": "double_binding_inversion",
+      "rejected": true,
+      "reason": "Binding/raw unlock mismatch"
+    }
+  ],
+  "limits": [
+    "Retained-evidence audit only: no fresh PE, Node, compiler, emulator, Git or SMT execution.",
+    "Hashes establish consistency, not independent authentication of native capture or toolchain supply chain.",
+    "Original COFF objects are disposable; their byte/relocation comparison report is retained and hash-bound.",
+    "Proof assumes normal ABI entry, intact code/flags, successful loads and valid distinct buffers; non-observation is not proof.",
+    "No campaign registration, physics, occupancy authorization, commitment reducer, arrival count or persistence is certified."
+  ]
+}

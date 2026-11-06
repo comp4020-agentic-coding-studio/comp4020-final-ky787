@@ -13,7 +13,7 @@ import { crossfeedVault } from '../../src/coop/crossfeed-vault.ts';
 import { raceCondition } from '../../src/coop/race-condition.ts';
 import type { NativeDisasmInstruction } from '../../src/coop/native-evidence.ts';
 import type { NativeWorldArtifact, NativeWorldBinding, NativeWorldOutput } from '../../src/coop/native-world-types.ts';
-import { readBytes, readJson, readGzipJson, sha256, loadChamberEvidence } from './package.ts';
+import { readBytes, readJson, readGzipJson, sha256, loadChamberEvidence, chamberAcquisitionId, chamberSpecimenId } from './package.ts';
 
 type Store = {
     output: string; byte_offset: number; instruction_rva: number; instruction_address: number;
@@ -21,7 +21,7 @@ type Store = {
     raw_block_id: string; observed_values: number[]; case_ids: (string | number)[];
 };
 type IntegrationOutput = {
-    name: string; kind: NativeWorldOutput['kind']; game_signal?: string; offset: number;
+    name: string; kind?: NativeWorldOutput['kind']; game_signal?: string; offset: number;
     bindings: NativeWorldBinding[]; verified_bcf_store_sites: Store[];
 };
 type Integration = { chamber_id: NativeChamberId; contract_sha256: string; outputs: IntegrationOutput[] };
@@ -37,6 +37,15 @@ type DraftSource = {
 
 function requireFact(condition: unknown, message: string): asserts condition {
     if (!condition) throw new Error(`native world evidence: ${message}`);
+}
+
+/** HANDSHAKE v2's frozen schema omits this consumer presentation category.
+ * Its verified stateless Boolean outputs have no temporal/native-latch category.
+ * Keep the acquired document untouched and all older schema checks intact. */
+function presentationKind(chamber: NativeChamberId, output: IntegrationOutput): NativeWorldOutput['kind'] {
+    if (chamber === 'handshake' && output.kind === undefined) return 'raw_combinational';
+    requireFact(output.kind === 'raw_combinational' || output.kind === 'physical_projection' || output.kind === 'persisted_latch_projection' || output.kind === 'unlock_candidate', `${chamber}/${output.name}: missing output category`);
+    return output.kind;
 }
 
 function compactBinding(b: NativeWorldBinding): NativeWorldBinding {
@@ -76,14 +85,14 @@ const sourceCache = new Map<NativeChamberId, ReturnType<typeof readSources>>();
 function readSources(chamber: NativeChamberId) {
     loadChamberEvidence(chamber); // Retain per-package source/reference identity checks.
     const manifest = readJson<{ chamber_id: string; files: Record<string, string> }>(chamber, 'manifest.json');
-    requireFact(manifest.chamber_id === chamber, `${chamber}: manifest specimen mismatch`);
+    requireFact(manifest.chamber_id === chamberAcquisitionId(chamber), `${chamber}: manifest specimen mismatch`);
     const files = ['contract.json', 'integration.json', 'evidence/disassembly-bcf.json.gz', 'bin/obfuscated_x64.exe'];
     for (const path of files) requireFact(sha256(readBytes(chamber, path)) === manifest.files[path], `${chamber}: acquired source hash mismatch: ${path}`);
     const integration = readJson<Integration>(chamber, 'integration.json');
     const dis = readGzipJson<Disassembly>(chamber, 'evidence/disassembly-bcf.json.gz');
     const pe = readBytes(chamber, 'bin/obfuscated_x64.exe');
     const contractSha = manifest.files['contract.json'];
-    requireFact(integration.chamber_id === chamber, `${chamber}: integration specimen mismatch`);
+    requireFact(integration.chamber_id === chamberAcquisitionId(chamber), `${chamber}: integration specimen mismatch`);
     requireFact(integration.contract_sha256 === contractSha && dis.value.contract_sha256 === contractSha, `${chamber}: contract mismatch`);
     requireFact(dis.value.binary.sha256 === sha256(pe), `${chamber}: PE/disassembly identity mismatch`);
     const header = pe.readUInt32LE(0x3c);
@@ -139,13 +148,13 @@ export function buildNativeWorldArtifact(chamber: NativeChamberId): NativeWorldA
             return compactInstruction(instruction);
         });
         return {
-            name: output.name, kind: output.kind, game_signal: output.game_signal ?? null, byte_offset: output.offset,
+            name: output.name, kind: presentationKind(chamber, output), game_signal: output.game_signal ?? null, byte_offset: output.offset,
             bindings: output.bindings.map(compactBinding),
             excerpt: { block_id: block.id, store_address: site.instruction_address, observed_values: [...site.observed_values], instructions: excerpt },
         };
     });
     const artifact: NativeWorldArtifact = {
-        schema: 'coop-native-world/v1', chamber_id: chamber, specimen_id: `${chamber}_ollvm_bcf`,
+        schema: 'coop-native-world/v1', chamber_id: chamber, specimen_id: chamberSpecimenId(chamber),
         bcf_pe_sha256: source.dis.binary.sha256, contract_sha256: source.contractSha, image_base: source.dis.binary.image_base,
         presentation: 'static-output-store', sources: { integration_sha256: source.integrationSha, disassembly_sha256: source.disassemblySha }, outputs,
     };
@@ -157,7 +166,7 @@ export function buildNativeWorldArtifact(chamber: NativeChamberId): NativeWorldA
 export function validateNativeWorldArtifact(artifact: NativeWorldArtifact, chamber: NativeChamberId): void {
     const source = sources(chamber);
     requireFact(artifact.schema === 'coop-native-world/v1' && artifact.presentation === 'static-output-store', `${chamber}: unsupported presentation`);
-    requireFact(artifact.chamber_id === chamber && artifact.specimen_id === `${chamber}_ollvm_bcf`, `${chamber}: specimen mismatch`);
+    requireFact(artifact.chamber_id === chamber && artifact.specimen_id === chamberSpecimenId(chamber), `${chamber}: specimen mismatch`);
     requireFact(artifact.bcf_pe_sha256 === source.dis.binary.sha256 && artifact.contract_sha256 === source.contractSha
         && artifact.image_base === source.dis.binary.image_base, `${chamber}: PE/contract identity mismatch`);
     requireFact(artifact.sources.integration_sha256 === source.integrationSha && artifact.sources.disassembly_sha256 === source.disassemblySha,
@@ -165,7 +174,7 @@ export function validateNativeWorldArtifact(artifact: NativeWorldArtifact, chamb
     requireFact(isDeepStrictEqual(artifact.outputs.map(o => o.name), source.integration.outputs.map(o => o.name)), `${chamber}: output association mismatch`);
     for (const output of artifact.outputs) {
         const acquired = source.integration.outputs.find(o => o.name === output.name)!;
-        requireFact(output.kind === acquired.kind && output.game_signal === (acquired.game_signal ?? null) && output.byte_offset === acquired.offset,
+        requireFact(output.kind === presentationKind(chamber, acquired) && output.game_signal === (acquired.game_signal ?? null) && output.byte_offset === acquired.offset,
             `${chamber}/${output.name}: output metadata mismatch`);
         requireFact(isDeepStrictEqual(output.bindings, acquired.bindings.map(compactBinding)), `${chamber}/${output.name}: binding mismatch`);
         for (const binding of output.bindings) validateTarget(chamber, binding);

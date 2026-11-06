@@ -22,7 +22,7 @@ export const WORLD_ASSEMBLY_PLACEMENTS: Partial<Record<NativeChamberId, readonly
         { output: 'crossingPower', target: 'nearAnchor', x: 715, y: 690 },
         { output: 'liftPower', target: 'serviceLift', x: 1340, y: 610 },
         { output: 'relayPower', target: 'lowerRelay', x: 1790, y: 610 },
-        { output: 'exitReady', target: 'exit', x: 2125, y: 610 },
+        { output: 'firewallActive', target: 'payloadFirewall', x: 2140, y: 610 },
     ],
     'crossfeed-vault': [
         { output: 'grappleAnchor', target: 'crossing-anchor', x: 2500, y: 1210 },

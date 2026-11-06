@@ -18,7 +18,7 @@ const settle = (r: ReturnType<typeof createRuntime>, n = 60) => { for (let i = 0
 const gallery = object('serviceGallery');
 
 describe('HANDSHAKE v2 authored prototype (isolated physics fixtures, not full-room evidence)', () => {
-    it('validates a separate draft/scenario and preserves released geometry except the stated local changes', () => {
+    it('validates the frozen v2 draft and its exact campaign promotion', () => {
         expect(validateDraft(draft).diagnostics).toEqual([]);
         const scenario = parseScenario(JSON.parse(readFileSync('levels/scenarios/handshake-v2.json', 'utf8')));
         expect(scenario).toMatchObject({ mode: 'coop', scope: 'full-room' });
@@ -26,12 +26,7 @@ describe('HANDSHAKE v2 authored prototype (isolated physics fixtures, not full-r
         expect(draft.id).toBe('handshake-v2');
         expect(draft.presentation.music).toBe('handshake');
         expect(released).toEqual(JSON.parse(readFileSync('levels/drafts/handshake.json', 'utf8')));
-        for (const old of released.geometry.objects) {
-            expect(object(old.id)).toEqual({ ...old, ...(old.id === 'exitSocket' ? { x: 2170 } : {}),
-                ...(old.id === 'maintenance' ? { floating: true } : {}),
-                ...(old.type === 'relay' ? { nativeId: old.id === 'lowerRelay' ? 'B' : 'A' } : {}) });
-        }
-        expect(released.geometry.objects.some(o => o.type === 'firewall')).toBe(false);
+        expect(released).toEqual({ ...draft, id: 'handshake', title: 'HANDSHAKE' });
         expect(object('exit')).toMatchObject({ latch: true, arrivals: 2 });
     });
 
@@ -42,7 +37,7 @@ describe('HANDSHAKE v2 authored prototype (isolated physics fixtures, not full-r
                 'maintenance.value': maintenance, 'exitSocket.occupied': payload };
             expect(evaluateDraft(draft, values)).toEqual({ crossingPower: crossing, liftPower: lift, relayPower: link,
                 firewallActive: !maintenance, exitReady: payload });
-            expect(evaluateDraft(released, values).exitReady).toBe(maintenance && payload);
+            expect(evaluateDraft(released, values)).toEqual(evaluateDraft(draft, values));
         }
         const r = createRuntime(draft);
         expect(r.world.firewalls[0].enabled).toBe(true);

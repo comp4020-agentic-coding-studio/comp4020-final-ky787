@@ -116,6 +116,12 @@ it.each(AUTHORED_CAMPAIGN_LEVELS)('%s persists semantic controls/checkpoint and 
     const socket = document.geometry.objects.find(o => o.type === 'device' && o.kind === 'socket');
     const cubeId = Object.keys(r.cubes)[0] as `draft:${string}` | undefined;
     if (socket && cubeId) expect((await f.act(1, { type: 'draft-cube-occupancy', cubeId, epoch: r.cubes[cubeId].epoch, devices: [`draft:${socket.id}`] })).accepted).toBe(true);
+    if (level === 'handshake') {
+        const committed = await f.act(2, { type: 'control', control: 'draft:maintenance' });
+        expect(committed.room.levelState.outputs.firewallActive).toBe(false);
+        const repeated = await f.act(2, { type: 'control', control: 'draft:maintenance' });
+        expect(repeated.room.levelState.devices['maintenance.value']).toBe(true);
+    }
     if (level === 'bypass') {
         // Isolated protocol fixture: persistence, not a physical solve.
         await f.act(1, { type: 'control', control: 'draft:link' });
@@ -134,6 +140,11 @@ it.each(AUTHORED_CAMPAIGN_LEVELS)('%s persists semantic controls/checkpoint and 
     guest.send({ type: 'join', code: r.code }); const back = await guest.wait('snapshot');
     expect(back.slot).toBe(2); expect(back.room).toMatchObject({ level, checkpoint, levelInstance: started.levelInstance, party: { phase: 'playing', completedLevels: [] } });
     expect(back.room.levelState.devices[`${sensor.id}.occupied`]).toBe(false);
+    if (level === 'handshake') {
+        expect(back.room.levelState.devices['maintenance.value']).toBe(true);
+        expect(back.room.levelState.outputs).toMatchObject({ firewallActive: false, exitReady: true });
+        expect(back.room.exitUnlocked).toBe(true);
+    }
     if (level === 'bypass') {
         expect(back.room.levelState.devices).toMatchObject({ 'link.value': true, 'override.value': true, 'anchorHold.occupied': false, 'bypassHold.occupied': false });
         expect(back.room.levelState.outputs).toEqual({ anchorPower: true, bridgePower: true, firewallActive: false, exitReady: true });
@@ -160,6 +171,25 @@ it.each(AUTHORED_CAMPAIGN_LEVELS)('%s persists semantic controls/checkpoint and 
     expect(readRoomRecord(disk, r.code)).not.toBeNull();
     for (const key of ['draft', 'draftHeld', 'draftCubeContacts', 'crumble', 'cubes', 'transform']) expect(disk).not.toHaveProperty(key);
     expect(readRoomRecord({ ...disk, levelState: { devices: { injected: true } } }, r.code)).toBeNull();
+});
+
+it('HANDSHAKE v2 accepts payload-only unlock while retaining two arrivals and cargo authority (protocol fixture)', async () => {
+    const f = await party();
+    let r = (await f.act(1, { type: 'select-level', level: 'handshake' })).room;
+    expect(r.levelState.outputs).toMatchObject({ firewallActive: true, exitReady: false });
+    expect((await f.act(1, { type: 'draft-occupancy', devices: ['draft:exitSocket'] })).accepted).toBe(false);
+    expect((await f.act(2, { type: 'draft-cube-occupancy', cubeId: 'draft:payload', epoch: r.cubes['draft:payload'].epoch, devices: ['draft:exitSocket'] })).accepted).toBe(false);
+    // Abstract server fixture, intentionally not a claimed pre-maintenance physical delivery.
+    r = (await f.act(1, { type: 'draft-cube-occupancy', cubeId: 'draft:payload', epoch: r.cubes['draft:payload'].epoch, devices: ['draft:exitSocket'] })).room;
+    expect(r.levelState.devices['maintenance.value']).toBe(false);
+    expect(r.levelState.outputs).toMatchObject({ firewallActive: true, exitReady: true });
+    expect(r.exitUnlocked).toBe(true);
+    r = (await f.act(1, { type: 'exit' })).room;
+    expect(r.completed).toBe(false); expect(r.reachedExit).toEqual([true, false]);
+    r = (await f.act(1, { type: 'exit' })).room;
+    expect(r.completed).toBe(false); expect(r.reachedExit).toEqual([true, false]);
+    r = (await f.act(2, { type: 'exit' })).room;
+    expect(r.completed).toBe(true); expect(r.reachedExit).toEqual([true, true]);
 });
 
 it('campaign plate/cube arbitration, reversible machinery, two arrivals and generation resets use the shared declarative implementation', async () => {

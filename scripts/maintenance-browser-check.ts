@@ -51,17 +51,37 @@ h.tap = async (p, code) => {
     await tap(p, code);
 };
 h.shot = async (p, name) => {
+    if (name === 'handshake-firewall-active-host' || name === 'handshake-payload-delivered-host') {
+        const active = name === 'handshake-firewall-active-host';
+        for (const peer of h.clients) {
+            const state = await peer.read<any>(`(()=>{const g=binaryNinja;return {beam:g.world.firewalls[0].enabled,
+                exit:g.world.frame.outputs.exitDoor,specimen:g.renderer.nativeWorld.data?.specimen_id,
+                pe:g.renderer.environmental.data?.bcf_pe_sha256,panels:g.renderer.environmentalDisplay.diagnostic.sections}})()`);
+            check('accepted HANDSHAKE v2 beam and exit state on both visitors', state.beam === active && state.exit === !active);
+            check('world/assembly identify the acquired v2 PE', state.specimen === 'handshake-v2_ollvm_bcf'
+                && state.pe === '57f7951f364594ebc417e5d93b15ef694595c7ad06ff9fe2d148fd0531cbcda1');
+            const firewall = state.panels.find((s: any) => s.output === 'firewallActive');
+            check('firewall panel uses its actual accepted zero/one store', firewall?.raw === active
+                && firewall.storeRva === (active ? 0x1545 : 0x14d9));
+            check('crossing, lift, relay and firewall are the four world snippets', state.panels.map((s: any) => s.output).join(',')
+                === 'crossingPower,liftPower,relayPower,firewallActive');
+            observations.push({ name, state });
+        }
+        await shot(p, active ? 'firewall-active' : 'payload-delivered');
+    }
     if (name === 'handshake-partner-held-boost-partner') {
         dormantCaptured = true;
         check('before the upper jump, the maintenance latch is unconfirmed and unavailable', !(await control(p)).completed && (await control(p)).hint !== 'E · MAINTENANCE COMPLETE');
         await capture(p, '01-dormant-approach');
     }
-    if (name === 'handshake-maintenance-complete-partner') {
+    if (name === 'handshake-maintenance-committed-partner') {
         completedCaptured = true;
         await sleep(400);
         const before = await control(p);
         check('real E commits maintenance once while the exit still requires the payload', before.completed && !before.exit && before.hint === 'COMMITTED' && before.latchSounds === 1);
         await capture(p, '03-completed-green');
+        for (const peer of h.clients) check('maintenance disables the firewall without opening an empty exit', await peer.read('!binaryNinja.world.firewalls[0].enabled && !binaryNinja.world.frame.outputs.exitDoor'));
+        await shot(h.clients[0], 'maintenance-firewall-disabled');
         await tap(p, 'KeyE'); await sleep(250);
         const after = await control(p);
         check('a second E cannot release the latch or replay its confirmation sound', after.completed && after.latchSounds === before.latchSounds);
@@ -89,7 +109,7 @@ try {
     check('all three maintenance visual states were reached through real controls', dormantCaptured && readyCaptured && completedCaptured);
     for (const p of [a, b]) {
         const s = await snapshot(p);
-        check('ordinary two-arrival completion and zero-death route are preserved', s.multiplayer?.shared?.completed === true && s.deaths === 0);
+        check('two-arrival completion survives one deliberate recovery per player', s.multiplayer?.shared?.completed === true && s.deaths === 1);
         check('no browser runtime errors', p.errors.length === 0, p.errors.join('\n'));
     }
 } catch (e) {

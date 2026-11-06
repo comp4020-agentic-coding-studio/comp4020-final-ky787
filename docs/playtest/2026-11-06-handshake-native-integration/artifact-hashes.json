@@ -1,0 +1,13 @@
+{
+  "levels/campaign/handshake.json": "8da7a3b65cf6b93fa33b43e6de420f0f39ed004c5522e60b905fc6b215985cbc",
+  "levels/drafts/handshake.json": "8da7a3b65cf6b93fa33b43e6de420f0f39ed004c5522e60b905fc6b215985cbc",
+  "levels/drafts/handshake-v2.json": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+  "docs/native-requests/handshake-v2.json": "5faa53318e3f6f4c19431a9be54657fdec139de18119c1b94838af5ac4bc9d36",
+  "experiments/coop-controller-studies/handshake-v2/manifest.json": "8b692223d641d1d443d537df2619a473f40662fea9a0d16ca5a72673fbb4d879",
+  "server/native/tables/handshake.json": "0c6a580e04bfb740f0d86da0622aa58362e9def8ad62392134386041cc9a4359",
+  "public/evidence/coop/handshake.evidence.json": "741c486ab97bd9de7ea9bad674b02be3a4897c5f75f349bfb26ef15d8e2e8edb",
+  "public/evidence/coop/handshake.traces.json": "9773166939a01b1e00c5acdc6299e355bbfae5f97d3fb1b25b04986588fb6556",
+  "public/evidence/coop/handshake.disasm.json": "ce45022c1b09234ddf925f36355405b5ca44f86fc77f677f7d0b88e3916bbfad",
+  "public/evidence/coop/handshake.world.json": "4dc1e701f0ee73f382864ac1cbd73aa21e3dcad5805d67721b7ceaba627d3345",
+  "public/evidence/coop/handshake.environment.json": "e62039080c3d0c7aabe5286ed85c763b047d2cb54bb4204e305066e10cba919c"
+}

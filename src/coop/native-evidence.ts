@@ -12,8 +12,8 @@
  * verifier. Values shown are the retained Windows-native results; the status
  * label states the Linux server reads a verified lookup table.
  */
-import { CHAMBER_CONTRACTS, caseIdForInputs, isNativeChamber } from '../../server/native/contracts.ts';
-import type { NativeChamberId } from '../../server/native/contracts.ts';
+import { CHAMBER_CONTRACTS, caseIdForInputs, isNativeChamber, chamberAcquisitionId, chamberSpecimenId } from '../../server/native/contracts.ts';
+import type { NativeChamberId, NativeAcquisitionId } from '../../server/native/contracts.ts';
 export type { NativeChamberId };
 
 export interface NativeStoreSite {
@@ -31,6 +31,7 @@ export interface NativeBogusClone {
 export interface NativeEvidence {
     schema: string; chamber_id: NativeChamberId; kind: 'declarative' | 'temporal'; contract_sha256: string;
     specimen_id: string; bcf_pe_sha256: string;
+    acquisition_id?: NativeAcquisitionId;
     reference_commit?: string; request_sha256?: string; manifest_sha256?: string;
     obfuscation: { compiler: string; pass: string; status_label: string; note: string };
     outputs: NativeEvidenceOutput[]; server_owned: string[]; mapping_limits: string[];
@@ -47,11 +48,12 @@ export interface NativeTrace {
     semantic_events: { id: string; output: string; value: number; bool_value: boolean; instruction_address: number; instruction_rva: number; instruction_text: string; raw_block_id: string; raw_occurrence_id: string; step_index: number }[];
     final_outputs: Record<string, number>; native_outputs: Record<string, number>; expected_outputs: Record<string, number>;
 }
-export interface NativeTraces { chamber_id: NativeChamberId; source_file: string; source_sha256: string; exhaustive_coverage: boolean; state_to_trace: Record<number, string>; traces: NativeTrace[] }
+export interface NativeTraces { chamber_id: NativeChamberId; acquisition_id?: NativeAcquisitionId; source_file: string; source_sha256: string; exhaustive_coverage: boolean; state_to_trace: Record<number, string>; traces: NativeTrace[] }
 export interface NativeDisasmInstruction { address: number; rva: number; size: number; bytes: string; mnemonic: string; op_str: string; block_id: string }
-export interface NativeDisasm { chamber_id: NativeChamberId; binary_sha256: string; image_base: number; function: { name: string; start_va: number; end_va: number; bytes_sha256: string }; instructions: NativeDisasmInstruction[]; blocks: { id: string; start_va: number; end_va: number; instruction_addresses: number[] }[] }
+export interface NativeDisasm { chamber_id: NativeChamberId; acquisition_id?: NativeAcquisitionId; binary_sha256: string; image_base: number; function: { name: string; start_va: number; end_va: number; bytes_sha256: string }; instructions: NativeDisasmInstruction[]; blocks: { id: string; start_va: number; end_va: number; instruction_addresses: number[] }[] }
 export interface NativeManifestEntry {
     kind: 'declarative' | 'temporal'; status_label: string; bcf_pe_sha256: string; specimen_id: string;
+    acquisition_id?: NativeAcquisitionId; reference_commit?: string; request_sha256?: string; manifest_sha256?: string;
     table_sha256: string; native_results_sha256: string; retained_trace_count: number; trace_coverage_exhaustive: boolean;
     evidence_file: string; traces_file: string; disasm_file: string;
 }
@@ -68,9 +70,24 @@ function fetchJson<T>(path: string): Promise<T> {
 }
 
 export const loadManifest = () => fetchJson<NativeManifest>('manifest.json');
-export const loadEvidence = (chamber: NativeChamberId) => fetchJson<NativeEvidence>(`${chamber}.evidence.json`);
-export const loadTraces = (chamber: NativeChamberId) => fetchJson<NativeTraces>(`${chamber}.traces.json`);
-export const loadDisasm = (chamber: NativeChamberId) => fetchJson<NativeDisasm>(`${chamber}.disasm.json`);
+export const loadEvidence = async (chamber: NativeChamberId): Promise<NativeEvidence> => {
+    const evidence = await fetchJson<NativeEvidence>(`${chamber}.evidence.json`);
+    if (evidence.chamber_id !== chamber || evidence.specimen_id !== chamberSpecimenId(chamber)
+        || chamber === 'handshake' && evidence.acquisition_id !== chamberAcquisitionId(chamber)) throw new Error('native evidence specimen identity mismatch');
+    return evidence;
+};
+export const loadTraces = async (chamber: NativeChamberId): Promise<NativeTraces> => {
+    const traces = await fetchJson<NativeTraces>(`${chamber}.traces.json`);
+    if (traces.chamber_id !== chamber || chamber === 'handshake' && traces.acquisition_id !== chamberAcquisitionId(chamber))
+        throw new Error('native traces acquisition identity mismatch');
+    return traces;
+};
+export const loadDisasm = async (chamber: NativeChamberId): Promise<NativeDisasm> => {
+    const disasm = await fetchJson<NativeDisasm>(`${chamber}.disasm.json`);
+    if (disasm.chamber_id !== chamber || chamber === 'handshake' && disasm.acquisition_id !== chamberAcquisitionId(chamber))
+        throw new Error('native disassembly acquisition identity mismatch');
+    return disasm;
+};
 
 export const hex = (n: number) => `0x${n.toString(16).toUpperCase()}`;
 
@@ -78,9 +95,11 @@ export const hex = (n: number) => `0x${n.toString(16).toUpperCase()}`;
 export function declarativeInputVector(chamber: NativeChamberId, devices: Readonly<Record<string, boolean>>): number[] | null {
     const contract = CHAMBER_CONTRACTS[chamber];
     if (contract.kind !== 'declarative') return null;
-    // BYPASS's exhaustive recording is exact only with all four canonical ports.
-    if (chamber === 'bypass' && ['anchorHold.occupied', 'link.value', 'bypassHold.occupied', 'override.value']
-        .some(port => typeof devices[port] !== 'boolean')) return null;
+    // Independently acquired exhaustive recordings require every canonical port;
+    // missing values must not turn into a claimed exact all-zero execution.
+    const exactPorts = chamber === 'bypass' ? ['anchorHold.occupied', 'link.value', 'bypassHold.occupied', 'override.value']
+        : chamber === 'handshake' ? ['crossing.occupied', 'liftPlate.occupied', 'link.value', 'maintenance.value', 'exitSocket.occupied'] : [];
+    if (exactPorts.some(port => typeof devices[port] !== 'boolean')) return null;
     // Device port = input name + .occupied/.value; the port-suffix set is small, so probe both.
     return contract.inputs.map(name => {
         const occ = devices[`${name}.occupied`];

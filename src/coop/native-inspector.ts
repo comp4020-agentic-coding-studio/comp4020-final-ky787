@@ -125,11 +125,11 @@ export class NativeEvidenceInspector {
         if (this.view.devices) {
             const caseId = declarativeCaseId(this.view.chamber, this.view.devices);
             const trace = caseId === null ? null : traceForState(this.traces, caseId);
-            const completeBypass = this.view.chamber !== 'bypass' || !!trace
+            const completeFrame = !['bypass', 'handshake'].includes(this.view.chamber) || !!trace
                 && Object.entries(trace.final_outputs).every(([name, value]) =>
                     typeof this.view!.outputs[name] === 'boolean' && Number(this.view!.outputs[name]) === value)
                 && this.view.environmental?.state?.connected !== false;
-            return { trace, caseId, exact: trace !== null && completeBypass };
+            return { trace, caseId, exact: trace !== null && completeFrame };
         }
         return { trace: null, caseId: null, exact: false };
     }

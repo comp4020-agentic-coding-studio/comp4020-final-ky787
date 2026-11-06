@@ -5,10 +5,18 @@ structure communicate the puzzle; detailed native evidence remains available
 on demand. This pass extends the accepted RACE visual language to HANDSHAKE,
 CROSSFEED VAULT, DEADLOCK and USE AFTER FREE, preserving RACE and CONTROL SPINE.
 
+## HANDSHAKE v2 — 6 November 2026
+
+The [firewall integration](chambers/handshake.md) replaces only HANDSHAKE's
+specimen and final mechanism panel. Crossing, lift and relay still have local
+snippets, now from the v2 PE; the fourth uses `firewallActive` and its real zero/one
+stores. `exitReady` remains in Evidence. The prior placement plan below is
+historical; the implemented table and native-site table reflect v2.
+
 ## BYPASS addition — 6 November 2026
 
 The independent [BYPASS package](chambers/bypass-native.md) adds three snippets;
-all 25 historical placements/assets remain unchanged. SHARED ANCHOR uses bounds
+the 25 historical placements/assets were unchanged by that BYPASS addition. SHARED ANCHOR uses bounds
 (350,380,328,124), LINK BRIDGE (1020,350,328,124), and FIREWALL CONTROL
 (1960,370,328,124). The firewall section retains both bindings to one native output.
 The initial constant-one exit remains available in Evidence, without an in-world
@@ -110,18 +118,18 @@ handling establish a new baseline rather than inventing a transition from zero.
 
 ## Implemented placement accounting
 
-All 25 baseline output/target associations remain one-for-one. The plan above is
+There are 25 baseline panels; HANDSHAKE v2 replaces its exit association with the firewall. The plan above is
 retained as the preimplementation record; this table records refinements and
 the final authored configuration. Dimensions are 328×124 except HANDSHAKE's
-relay/exit blocks and USE AFTER FREE's assist block. All positions are world
+relay/firewall blocks and USE AFTER FREE's assist block. All positions are world
 coordinates.
 
 | Chamber / output | Final x,y,w,h | Excerpt treatment | Local arrangement |
 | --- | --- | --- | --- |
 | HANDSHAKE crossingPower | 675,805,328,124 | comparison + store | Isolated crossing wall |
 | HANDSHAKE liftPower | 1080,290,328,124 | saved-Boolean branch + store | Separate wall above lift |
-| HANDSHAKE relayPower | 1788,610,280,124 | store | Separate wall above lower relay |
-| HANDSHAKE exitReady | 2140,610,280,124 | Boolean excerpt + store | Separate exit wall |
+| HANDSHAKE relayPower | 1776,610,260,124 | store | Separate wall above lower relay |
+| HANDSHAKE firewallActive | 2140,610,280,124 | comparison + store | Beside the payload firewall |
 | CROSSFEED grappleAnchor | 2580,1200,328,124 | comparison + store | Crossing/access wall, right of transfer wire |
 | CROSSFEED bridge | 2050,1540,328,124 | store | Pit return wall |
 | CROSSFEED liftField | 1760,1165,328,124 | Boolean excerpt + store | Local lift wall |
@@ -152,7 +160,7 @@ upper LINK wire at y415. Lift and relay now use separate local placements rather
 than forcing the planned pair. Relay and exit retain narrower blocks beneath
 the gallery. The wire, lift, camera and room geometry remain unchanged.
 
-The 2026-10-28 [HANDSHAKE chamber spacing](chambers/handshake.md#chamber-spacing--2026-10-28)
+The 2026-10-28 [HANDSHAKE chamber spacing](chambers/handshake-v1.md#chamber-spacing--2026-10-28)
 widened the bay by 160 units. These HANDSHAKE blocks moved with their machinery:
 the lift block +60 with the lift and gallery level, relay and exit +160 with the
 floor. Crossing stays put. Dimensions, excerpts, bindings and native fragments
@@ -186,7 +194,7 @@ drafts and custom rooms acquire no campaign-native evidence.
 ## Compact native evidence
 
 Each chamber loads one separate `coop-environmental-presentation/v1` asset.
-It contains four explicit fragments per represented output: CMP/SETNE/spill,
+For the original specimens it contains four explicit fragments per represented output: CMP/SETNE/spill,
 saved-Boolean reload/TEST/JNE, real write-zero and real write-one. Gameplay
 selects a short subset according to the table above. The 100 retained fragments
 are each contiguous within one acquired block; the 50 store alternatives are
@@ -194,11 +202,11 @@ all established, so there are no static-only fallback exceptions.
 
 | Asset in `public/evidence/coop/` | Bytes | Budget |
 | --- | ---: | ---: |
-| handshake.environment.json | 12,783 | 16,000 |
+| handshake.environment.json | 13,944 | 16,000 |
 | crossfeed-vault.environment.json | 31,516 | 40,000 |
 | deadlock.environment.json | 15,568 | 20,000 |
 | use-after-free.environment.json | 19,044 | 24,000 |
-| Total (only current chamber loads) | 78,911 | 100,000 |
+| Total (only current chamber loads) | 80,072 | 100,000 |
 
 `pnpm gen:environmental` writes only those compact assets and their integrity
 pins; `pnpm check:environmental` compares deterministic output without writing.
@@ -231,15 +239,15 @@ is preserved. No execution replay is added.
 ### Native sites
 
 RVA columns are hexadecimal; all four images use base `0x140000000`. Each read
-and branch column identifies a separate three-instruction acquired fragment.
+and branch column identifies a separate acquired fragment (HANDSHAKE v2 reads have 4/5 instructions; other reads and branches have three).
 The store columns identify the final MOV within each three-MOV store fragment.
 
 | Chamber / output | Read | Saved branch | Write 0 | Write 1 |
 | --- | --- | --- | --- | --- |
-| handshake / crossingPower | 107C | 10B3 | 115C | 10F1 |
-| handshake / liftPower | 11C7 | 11FF | 12A9 | 123D |
-| handshake / relayPower | 1315 | 134D | 13F7 | 138B |
-| handshake / exitReady | 14DC | 1514 | 15BE | 1552 |
+| handshake / crossingPower | 1079 | 10B3 | 115C | 10F1 |
+| handshake / liftPower | 11C0 | 11FF | 12A9 | 123D |
+| handshake / relayPower | 130E | 134D | 13F7 | 138B |
+| handshake / firewallActive | 145C | 149B | 14D9 | 1545 |
 | crossfeed-vault / grappleAnchor | 132B | 1362 | 140B | 13A0 |
 | crossfeed-vault / bridge | 1476 | 14AD | 1557 | 14EB |
 | crossfeed-vault / liftField | 15C3 | 15FB | 171B | 16AF |

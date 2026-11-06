@@ -28,10 +28,10 @@ export const ENVIRONMENTAL_BLOCKS: Record<EnvironmentalChamber, readonly Environ
             label: 'CROSSING', on: 'POWERED', off: 'IDLE', excerpt: 'compare' },
         { output: 'liftPower', target: 'serviceLift', group: 'service-lift', x: 1080, y: 290, w: 328, h: 124,
             label: 'SERVICE LIFT', on: 'ACTIVE', off: 'INACTIVE', excerpt: 'branch' },
-        { output: 'relayPower', target: 'lowerRelay', group: 'service-relay', x: 1788, y: 610, w: 280, h: 124,
+        { output: 'relayPower', target: 'lowerRelay', group: 'service-relay', x: 1776, y: 610, w: 260, h: 124,
             label: 'SERVICE RELAY', on: 'AVAILABLE', off: 'UNAVAILABLE', excerpt: 'store' },
-        { output: 'exitReady', target: 'exit', group: 'exit', x: 2140, y: 610, w: 280, h: 124,
-            label: 'EXIT', on: 'UNLOCKED', off: 'LOCKED', excerpt: 'boolean' },
+        { output: 'firewallActive', target: 'payloadFirewall', group: 'payload-firewall', x: 2140, y: 610, w: 280, h: 124,
+            label: 'PAYLOAD FIREWALL', on: 'ACTIVE', off: 'DISABLED', hazard: true, excerpt: 'compare' },
     ],
     'crossfeed-vault': [
         { output: 'grappleAnchor', target: 'crossing-anchor', group: 'crossing', x: 2840, y: 1200, w: 328, h: 124,

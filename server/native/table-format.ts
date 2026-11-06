@@ -11,11 +11,13 @@
  * It is intentionally server-only; it is never imported into the browser graph.
  */
 import { createHash } from 'node:crypto';
-import type { ChamberContract, NativeChamberId } from './contracts.ts';
+import { chamberAcquisitionId, chamberSpecimenId, type ChamberContract, type NativeChamberId, type NativeAcquisitionId } from './contracts.ts';
 
 export interface NativeTable {
     schema: 'coop-native-table/v1';
     chamber_id: NativeChamberId;
+    /** Acquisition identity is independent of the stable campaign room ID. */
+    acquisition_id?: NativeAcquisitionId;
     /** SHA-256 of the acquired native-results.json.gz this table was generated from. */
     native_results_sha256: string;
     /** SHA-256 of the acquired contract.json. */
@@ -86,6 +88,8 @@ export interface LoadedTable {
 /** Decode and self-verify a table against its own matrix hash and contract shape. */
 export function loadTable(meta: NativeTable, contract: ChamberContract): LoadedTable {
     if (meta.chamber_id !== contract.id) throw new Error(`Native table identity mismatch: ${meta.chamber_id} vs ${contract.id}`);
+    if (meta.specimen_id !== chamberSpecimenId(contract.id)
+        || contract.id === 'handshake' && meta.acquisition_id !== chamberAcquisitionId(contract.id)) throw new Error(`${contract.id}: native specimen identity mismatch`);
     if (meta.case_count !== contract.caseCount) throw new Error(`${contract.id}: case count ${meta.case_count} != ${contract.caseCount}`);
     if (meta.bits_per_case !== contract.outputs.length) throw new Error(`${contract.id}: bits_per_case ${meta.bits_per_case} != ${contract.outputs.length}`);
     if (meta.output_names.length !== contract.outputs.length

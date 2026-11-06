@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
+import { CHAMBER_CONTRACTS } from '../server/native/contracts.ts';
 import { chamberPackagePath } from '../scripts/native/package.ts';
 import { buildEnvironmentalArtifact, serializeEnvironmentalArtifact, verifyEnvironmentalArtifact } from '../scripts/native/environmental-evidence.ts';
 import { ENVIRONMENTAL_BUDGETS, ENVIRONMENTAL_CHAMBERS, ENVIRONMENTAL_OUTPUTS, type EnvironmentalArtifact, type EnvironmentalChamber } from '../src/coop/environmental-types.ts';
@@ -13,7 +14,7 @@ const content = (chamber: EnvironmentalChamber) => readFileSync(`public/evidence
 const asset = (chamber: EnvironmentalChamber): EnvironmentalArtifact => JSON.parse(content(chamber));
 function room(chamber: EnvironmentalChamber = 'handshake'): SharedRoom {
     return { code: 'ENVR', level: chamber, levelInstance: 1, revision: 1, exitUnlocked: false,
-        levelState: { outputs: Object.fromEntries(ENVIRONMENTAL_OUTPUTS[chamber].map(o => [o, false])), physical: { leftRoute: false, rightRoute: false } },
+        levelState: { outputs: Object.fromEntries(CHAMBER_CONTRACTS[chamber].outputs.map(o => [o, false])), physical: { leftRoute: false, rightRoute: false } },
     } as unknown as SharedRoom;
 }
 const settle = async () => { for (let i = 0; i < 8; i++) await new Promise(r => setTimeout(r, 5)); };
@@ -27,7 +28,7 @@ describe('compact environmental evidence assets', () => {
         expect(await parseEnvironmentalAsset(text, chamber)).toEqual(a);
         expect(a.sections.map(s => ({ output: s.name, target: s.target }))).toEqual(WORLD_ASSEMBLY_PLACEMENTS[chamber]!.map(p => ({ output: p.output, target: p.target })));
         expect(a.fragments).toHaveLength(chamber === 'bypass' ? 16 : a.sections.length * 4);
-        expect(Object.keys(a.sources)).toHaveLength(chamber === 'bypass' ? 8 : 7);
+        expect(Object.keys(a.sources)).toHaveLength(chamber === 'bypass' || chamber === 'handshake' ? 8 : 7);
         expect(text).not.toMatch(/step_indices|register_values|raw_occurrence|machine_model|final_outputs/);
     });
     it.each(ENVIRONMENTAL_CHAMBERS)('%s retains authentic separate blocks and both independently recorded stores', chamber => {
@@ -35,7 +36,7 @@ describe('compact environmental evidence assets', () => {
         const integration = JSON.parse(readFileSync(chamberPackagePath(chamber, 'integration.json'), 'utf8'));
         const dis = JSON.parse(gunzipSync(readFileSync(chamberPackagePath(chamber, 'evidence/disassembly-bcf.json.gz'))).toString());
         for (const f of a.fragments) {
-            expect(f.instructions).toHaveLength(chamber === 'bypass' && f.role === 'gameplay_check' ? f.id === 'anchor-hold.read' ? 4 : 5 : 3);
+            expect(f.instructions).toHaveLength((chamber === 'bypass' || chamber === 'handshake') && f.role === 'gameplay_check' ? ['anchor-hold.read', 'crossing.read'].includes(f.id) ? 4 : 5 : 3);
             for (const [n, i] of f.instructions.entries()) {
                 expect(dis.instructions.find((v: { address: number }) => v.address === i.address)).toMatchObject(i);
                 expect(i.block_id).toBe(f.block_id);
@@ -105,7 +106,7 @@ describe('accepted environmental state and failure boundaries', () => {
         expect(nativeWorldBindingState(uaf, assist, assist.bindings[0])).toMatchObject({ raw: false, physical: true, inverted: true });
         for (const chamber of ['handshake', 'deadlock', 'use-after-free'] as const) {
             const s = environmentalAccepted(room(chamber), true)!; s.exitUnlocked = true;
-            const exit = asset(chamber).sections.find(section => section.target === 'exit')!;
+            const exit = JSON.parse(readFileSync(`public/evidence/coop/${chamber}.world.json`, 'utf8')).outputs.find((o: { bindings: { target: string }[] }) => o.bindings.some(b => b.target === 'exit'))!;
             expect(nativeWorldBindingState(s, exit, exit.bindings[0])).toMatchObject({ raw: false, physical: true, latched: true });
         }
         const r = room('deadlock'); Object.assign(r.levelState, { outputs: { serviceRelay: true }, devices: { 'feed.value': true, 'safe.value': false } });

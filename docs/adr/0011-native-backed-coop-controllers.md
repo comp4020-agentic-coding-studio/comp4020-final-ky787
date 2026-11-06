@@ -30,6 +30,16 @@ Its `exitReady` output is constant one; server latching and two physical arrival
 remain unchanged. This addendum supersedes only the original five-room scope;
 the original acquisition and architecture record below remains historical.
 
+## Addendum — HANDSHAKE firewall v2, 6 November 2026
+
+HANDSHAKE now resolves to the separate verified `handshake-v2` acquisition, source
+`2532b50e729463f67d2afef700b1830ca6cb7753`, with five Boolean inputs and five
+outputs. `firewallActive = NOT maintenance.value`; `exitReady = exitSocket.occupied`.
+See [the integration contract](../chambers/handshake.md). The original HANDSHAKE
+5/4 specimen remains historical and byte-unchanged; other chamber pins remain
+unchanged. Current campaign regression includes all six rooms. Inspector and
+world assets identify v2 and never relabel v1 store claims as v2 evidence.
+
 ## Generation pipeline
 
 `scripts/native/generate-tables.ts` (run with `pnpm gen:native`, checked with
