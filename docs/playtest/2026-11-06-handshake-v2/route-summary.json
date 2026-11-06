@@ -4,8 +4,8 @@
   "scope": "full-room",
   "mode": "coop",
   "scenario": "handshake-v2",
-  "draftHash": "49f1ef8a0543f71d7b76ffbe187fcde0801d037ef7bc0eaf2728a32fae3990c6",
-  "engineRevision": "fb7d5ce7ba2fd5a3dc6cab3ee82284eb08149b10-dirty",
+  "draftHash": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+  "engineRevision": "4ae7ecd997c48d5d87b75420c6fc4d54ef1d44fd",
   "failedStep": null,
   "error": null,
   "conclusion": "The specified route/assertions worked in this tested configuration; reachability and shortcut absence outside this route are not tested.",
@@ -106,7 +106,7 @@
           false
         ],
         "completed": false,
-        "time": 3.8416666666666557
+        "time": 3.9249999999999887
       },
       "partner": {
         "player": {
@@ -133,13 +133,13 @@
           false
         ],
         "completed": false,
-        "time": 3.408333333333324
+        "time": 3.4583333333333237
       }
     },
     "Exit still needs payload": {
       "host": {
         "player": {
-          "x": 1806.8987331986145,
+          "x": 1807.6020029361873,
           "y": 533,
           "groundId": "serviceGallery",
           "deaths": 1
@@ -162,11 +162,11 @@
           false
         ],
         "completed": false,
-        "time": 25.391666666665866
+        "time": 25.708333333332515
       },
       "partner": {
         "player": {
-          "x": 1969.6999999999998,
+          "x": 1976.7999999999997,
           "y": 343,
           "groundId": "maintenanceLedge",
           "deaths": 0
@@ -189,13 +189,13 @@
           false
         ],
         "completed": false,
-        "time": 24.958333333332558
+        "time": 25.241666666665875
       }
     },
     "Checkpoint retry after committed maintenance": {
       "host": {
         "player": {
-          "x": 2045.6180555555557,
+          "x": 2046.8472222222222,
           "y": 933,
           "groundId": "centralBay",
           "deaths": 1
@@ -218,7 +218,7 @@
           false
         ],
         "completed": false,
-        "time": 28.10833333333238
+        "time": 28.474999999999024
       },
       "partner": {
         "player": {
@@ -245,13 +245,13 @@
           false
         ],
         "completed": false,
-        "time": 27.67499999999907
+        "time": 28.008333333332384
       }
     },
     "One arrival alone cannot finish": {
       "host": {
         "player": {
-          "x": 2373.02083333333,
+          "x": 2360.0499999999956,
           "y": 933,
           "groundId": "centralBay",
           "deaths": 1
@@ -274,11 +274,11 @@
           false
         ],
         "completed": false,
-        "time": 31.508333333332185
+        "time": 31.858333333332165
       },
       "partner": {
         "player": {
-          "x": 2035.8472222222222,
+          "x": 2034.6180555555557,
           "y": 933,
           "groundId": "centralBay",
           "deaths": 1
@@ -301,13 +301,13 @@
           false
         ],
         "completed": false,
-        "time": 31.074999999998877
+        "time": 31.391666666665525
       }
     },
     "Second physical exit arrival": {
       "host": {
         "player": {
-          "x": 2402.5583333333293,
+          "x": 2389.587499999995,
           "y": 933,
           "groundId": "centralBay",
           "deaths": 1
@@ -330,11 +330,11 @@
           true
         ],
         "completed": true,
-        "time": 32.35833333333214
+        "time": 32.70833333333212
       },
       "partner": {
         "player": {
-          "x": 2330.1736111111095,
+          "x": 2336.0444444444433,
           "y": 933,
           "groundId": "centralBay",
           "deaths": 1
@@ -357,7 +357,7 @@
           true
         ],
         "completed": true,
-        "time": 31.92499999999883
+        "time": 32.24166666666548
       }
     }
   }

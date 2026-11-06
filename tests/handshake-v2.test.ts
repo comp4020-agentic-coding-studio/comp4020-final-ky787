@@ -113,6 +113,18 @@ describe('HANDSHAKE v2 authored prototype (isolated physics fixtures, not full-r
         expect(r.recording.events.some(e => e.kind === 'cube-firewall')).toBe(true);
     });
 
+    it.each([2098, 2101, 2108, 2115])('even a far-side avatar at x=%i cannot pick cargo across the active beam', x => {
+        // Combine the known gallery avatar squeeze with a strongest-case cargo
+        // position on the near side. E must not transfer cargo over a thin beam.
+        const r = createRuntime(draft, 1, { start: { x, y: 933 } }); settle(r, 3);
+        const cube = r.world.cubes['draft:payload']!;
+        Object.assign(cube, { x: 2037, y: 928, vx: 0, vy: 0, grounded: true, groundId: 'centralBay' });
+        tick(r, {}, true); settle(r, 3);
+        expect(cube.carried).toBe(false);
+        expect(cube.x).toBeLessThan(2060);
+        expect(r.world.frame.outputs.exitDoor).toBe(false);
+    });
+
     it('even the far-wall avatar squeeze leaves cargo above the solid gallery and cannot deliver it', () => {
         const r = createRuntime(draft, 1, { start: { x: 2190, y: gallery.y - PLAYER.height / 2 } }); settle(r, 3);
         const cube = r.world.cubes['draft:payload']!;

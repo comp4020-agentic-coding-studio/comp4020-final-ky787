@@ -11,9 +11,9 @@ assembly or native acquisition has been performed on Linux.
 - [Validation and captures](../playtest/2026-11-06-handshake-v2/README.md)
 
 Canonical draft SHA-256:
-`49f1ef8a0543f71d7b76ffbe187fcde0801d037ef7bc0eaf2728a32fae3990c6`.
+`47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341`.
 Request SHA-256:
-`56d3a93059a5821ae12fa0309493d709f5bb12e1fc42d5d6fb3d234f127a603d`.
+`5faa53318e3f6f4c19431a9be54657fdec139de18119c1b94838af5ac4bc9d36`.
 The resulting source commit is in the dated shared handoff, avoiding a
 self-referential commit hash in the committed request.
 
@@ -66,7 +66,7 @@ task after review.
 
 | Object | Change |
 | --- | --- |
-| payloadFirewall | New vertical beam `(2060,585)`, length 365, thickness 18, ending at floor y950 |
+| payloadFirewall | New vertical beam `(2060,585)`, length 365, thickness 26, ending at floor y950 |
 | exitSocket | `(2130,950)` → `(2170,950)`; matching wire follows |
 | maintenance | Same `(1980,360)` terminal/ledge; explicit `floating:true` retains the floating artwork in custom sessions |
 | maintenanceFirewallWire | `(1980,348) → (2140,348) → (2140,620) → (2069,620)`, with inverted annotation |
@@ -105,6 +105,10 @@ Unit tests are labelled isolated fixtures, including bounded jump/drop/pull
 attempts, upper-gallery cargo obstruction, button reach and miss/recovery. An
 existing corner case remains: dropping cargo against the far gallery wall can
 squeeze the unladen avatar below the gallery. Cargo stays upstairs; sustained
-pulling/jumping/E from below did not deliver it. Physics was not changed for this
-separate edge case. These checks do not establish universal shortcut freedom or
-human playtest acceptance.
+pulling/jumping/E from below did not deliver it. Combining a far-side avatar with
+near-side cargo exposed an E-pickup bypass through the initial 18-unit beam. The
+final 26-unit beam closes that reach gap: two clear cargo centres must be at least
+70 units apart, beyond the existing 66-unit pickup reach. Four far-side pickup
+fixtures now reject/reset the attempted transfer. Physics was not changed for
+the separate avatar squeeze. These checks do not establish universal shortcut
+freedom or human playtest acceptance.

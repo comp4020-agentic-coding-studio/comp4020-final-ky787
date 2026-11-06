@@ -288,7 +288,7 @@
         "id": "payloadFirewall",
         "length": 365,
         "orientation": "vertical",
-        "thickness": 18,
+        "thickness": 26,
         "type": "firewall",
         "x": 2060,
         "y": 585
