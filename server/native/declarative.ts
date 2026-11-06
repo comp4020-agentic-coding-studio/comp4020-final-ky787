@@ -1,6 +1,6 @@
 /**
  * Bridges the verified native lookup table to the declarative controller's
- * output layer for the three declarative campaign chambers (HANDSHAKE,
+ * output layer for the declarative campaign chambers (HANDSHAKE, BYPASS,
  * DEADLOCK, USE AFTER FREE).
  *
  * The returned evaluator has the exact signature the declarative controller

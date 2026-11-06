@@ -1,5 +1,18 @@
 {
   "chambers": {
+    "bypass": {
+      "bcf_pe_sha256": "af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74",
+      "disasm_file": "bypass.disasm.json",
+      "evidence_file": "bypass.evidence.json",
+      "kind": "declarative",
+      "native_results_sha256": "8eacdb95205ea238c829cb7c2ec2b8addeeb2d739558b814f031835d6873e226",
+      "retained_trace_count": 16,
+      "specimen_id": "bypass_ollvm_bcf",
+      "status_label": "VALIDATED OLLVM BCF",
+      "table_sha256": "e95e4e003b22a4f50e0c7e2278b09eeb576cab8529e4c2123c65d523493e8f58",
+      "trace_coverage_exhaustive": true,
+      "traces_file": "bypass.traces.json"
+    },
     "crossfeed-vault": {
       "bcf_pe_sha256": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b",
       "disasm_file": "crossfeed-vault.disasm.json",

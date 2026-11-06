@@ -5,6 +5,22 @@ structure communicate the puzzle; detailed native evidence remains available
 on demand. This pass extends the accepted RACE visual language to HANDSHAKE,
 CROSSFEED VAULT, DEADLOCK and USE AFTER FREE, preserving RACE and CONTROL SPINE.
 
+## BYPASS addition — 6 November 2026
+
+The independent [BYPASS package](chambers/bypass-native.md) adds three snippets;
+all 25 historical placements/assets remain unchanged. SHARED ANCHOR uses bounds
+(350,380,328,124), LINK BRIDGE (1020,350,328,124), and FIREWALL CONTROL
+(1960,370,328,124). The firewall section retains both bindings to one native output.
+The initial constant-one exit remains available in Evidence, without an in-world
+panel or invented zero alternative. No final scanners or solution captions return.
+
+BYPASS uses its own hash-bound `fragments.json`: 4/5-instruction input contexts,
+3-instruction later branches and 3-instruction store blocks. Full context stays in
+Evidence; ordinary play shows 3–4 real instructions per section with bare `...`
+separating independent excerpts. Historical CMP/SETNE/branch validation is retained
+unchanged. BYPASS's complete 16-case native table selects each real zero/one store;
+colours and decoded strings associate accepted results, never claim live execution.
+
 ## Placement plan recorded before implementation — 22 October 2026
 
 Reviewed current released geometry and baseline overview/detail captures, plus

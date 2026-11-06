@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
-import { readBytes, readJson, readGzipJson, sha256 } from './package.ts';
+import { readBytes, readJson, readGzipJson, sha256, chamberPackagePath } from './package.ts';
 import { buildNativeWorldArtifact, peBytesAt } from './world-evidence.ts';
 import { WORLD_ASSEMBLY_PLACEMENTS } from '../../src/slice/native-world-presentation.ts';
 import type { NativeDisasmInstruction } from '../../src/coop/native-evidence.ts';
@@ -24,7 +24,7 @@ type Trace = { variant: string; state_id: number | string; binary_sha256: string
 // CROSSFEED vault checks read its local derived Boolean; DEADLOCK service/payload
 // checks read the completion Boolean. Other selectors read real input fields,
 // sometimes the second operand of a short-circuited expression.
-const contexts: Record<EnvironmentalChamber, Record<string, readonly [number, number]>> = {
+const contexts: Record<Exclude<EnvironmentalChamber, 'bypass'>, Record<string, readonly [number, number]>> = {
     handshake: { crossingPower: [0x107c, 0x10b3], liftPower: [0x11c7, 0x11ff], relayPower: [0x1315, 0x134d], exitReady: [0x14dc, 0x1514] },
     'crossfeed-vault': { grappleAnchor: [0x132b, 0x1362], bridge: [0x1476, 0x14ad], liftField: [0x15c3, 0x15fb], relayGates: [0x194e, 0x1985],
         leftRoute: [0x1b10, 0x1b48], rightRoute: [0x1cd3, 0x1d0b], galleryAccess: [0x1e21, 0x1e59], vaultPower: [0x1f6c, 0x1fa3], vaultReturn: [0x20b6, 0x20ed], serviceAccess: [0x1787, 0x17bf] },
@@ -36,10 +36,10 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
     const manifest = readJson<{ chamber_id: string; files: Record<string, string> }>(chamber, 'manifest.json');
     fact(manifest.chamber_id === chamber, 'manifest chamber identity');
     const sources: Record<string, string> = {};
-    for (const file of ['contract.json', 'integration.json', 'src/controller.c', 'src/controller.h', 'evidence/disassembly-bcf.json.gz', 'bin/obfuscated_x64.exe', 'evidence/representative-traces.json.gz']) {
+    for (const file of ['contract.json', 'integration.json', 'src/controller.c', 'src/controller.h', 'evidence/disassembly-bcf.json.gz', 'bin/obfuscated_x64.exe', 'evidence/representative-traces.json.gz', ...(chamber === 'bypass' ? ['fragments.json'] : [])]) {
         const hash = sha256(readBytes(chamber, file));
         fact(hash === manifest.files[file], `${chamber} source hash ${file}`);
-        sources[`experiments/coop-controllers/${chamber}/${file}`] = hash;
+        sources[chamberPackagePath(chamber, file)] = hash;
     }
     const pe = readBytes(chamber, 'bin/obfuscated_x64.exe');
     fact(sha256(pe) === ENVIRONMENTAL_PE[chamber] && Number(pe.readBigUInt64LE(pe.readUInt32LE(0x3c) + 48)) === ENVIRONMENTAL_BASE, 'PE identity');
@@ -51,17 +51,31 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
     const world = buildNativeWorldArtifact(chamber); // proves existing bindings and targets against the released room
     const placements = WORLD_ASSEMBLY_PLACEMENTS[chamber]!;
     fact(isDeepStrictEqual(placements.map(p => p.output), ENVIRONMENTAL_OUTPUTS[chamber]), 'representative placement accounting');
+    // BYPASS's independently curated contexts contain pointer setup and multiple
+    // short-circuit operands. Preserve their real fragment boundaries; do not
+    // coerce them into the historical three-instruction CMP/SETNE shape.
+    const catalogue = chamber === 'bypass' ? readJson<{
+        binary_sha256: string;
+        sections: { output: string; condition_fragment_ids: string[]; store_alternatives: Record<string, string>; constant: number | null }[];
+        fragments: { id: string; output: string; role: string; instructions: NativeDisasmInstruction[] }[];
+    }>(chamber, 'fragments.json') : null;
+    if (catalogue) {
+        fact(catalogue.binary_sha256 === ENVIRONMENTAL_PE[chamber], 'curated specimen');
+        const exit = catalogue.sections.find(s => s.output === 'exitReady');
+        fact(exit?.constant === 1 && exit.condition_fragment_ids.length === 0
+            && isDeepStrictEqual(exit.store_alternatives, { '1': 'exitReady.write-1' }), 'constant exit has no zero alternative');
+    }
     const fragments: EnvironmentalFragment[] = [];
     const sections = ENVIRONMENTAL_OUTPUTS[chamber].map(name => {
         const output = world.outputs.find(o => o.name === name)!;
         const place = placements.find(p => p.output === name)!;
         fact(output && place && output.bindings.some(b => b.target === place.target), `target ${name}`);
-        const add = (suffix: string, role: EnvironmentalFragment['role'], start: number, store: EnvironmentalFragment['store'] = null) => {
+        const add = (suffix: string, role: EnvironmentalFragment['role'], start: number, store: EnvironmentalFragment['store'] = null, count = 3) => {
             const first = dis.instructions.findIndex(i => i.rva === start);
             fact(first >= 0, `missing instruction ${start}`);
-            const instructions = dis.instructions.slice(first, first + 3).map(compact);
+            const instructions = dis.instructions.slice(first, first + count).map(compact);
             const block = dis.blocks.find(b => b.id === instructions[0].block_id)!;
-            fact(block && instructions.length === 3, 'missing block/instructions');
+            fact(block && instructions.length === count && count >= 3 && count <= 5, 'missing block/instructions');
             const offset = block.instruction_addresses.indexOf(instructions[0].address);
             for (const [k, i] of instructions.entries()) {
                 fact(i.block_id === block.id && block.instruction_addresses[offset + k] === i.address, 'block order');
@@ -69,15 +83,28 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
                 const bytes = Buffer.from(i.bytes.replaceAll(' ', ''), 'hex');
                 fact(bytes.length === i.size && bytes.equals(peBytesAt(pe, i.rva, i.size)), 'PE bytes');
             }
-            const last = instructions.at(-1)!, id = `${name}.${suffix}`;
+            const last = instructions.at(-1)!, id = chamber === 'bypass' ? suffix : `${name}.${suffix}`;
             fragments.push({ id, output: name, role, block_id: block.id, start_rva: start, end_rva_exclusive: last.rva + last.size, instructions, store });
             return id;
         };
-        const [read, branch] = contexts[chamber][name];
-        const context = [add('read', 'gameplay_check', read), add('branch', 'saved_boolean_branch', branch)];
-        const readCode = fragments.at(-2)!.instructions, branchCode = fragments.at(-1)!.instructions;
-        fact(isDeepStrictEqual(readCode.map(i => i.mnemonic), ['cmp', 'setne', 'mov']) && isDeepStrictEqual(branchCode.map(i => i.mnemonic), ['mov', 'test', 'jne']), 'gameplay context form');
-        fact(readCode[2].op_str.replace(/, al$/, '') === branchCode[0].op_str.replace(/^al, /, '') && branchCode[1].op_str === 'al, 1', 'saved Boolean reload');
+        let context: string[];
+        if (catalogue) {
+            const selected = catalogue.sections.find(s => s.output === name);
+            fact(selected && selected.constant === null && selected.condition_fragment_ids.length === (name === 'bridgePower' ? 2 : 4), 'curated dynamic context');
+            context = selected.condition_fragment_ids.map(id => {
+                const f = catalogue.fragments.find(f => f.id === id);
+                fact(f && f.output === name && ['input_check', 'puzzle_branch'].includes(f.role), 'curated context role');
+                const result = add(id, f.role === 'input_check' ? 'gameplay_check' : 'saved_boolean_branch', f.instructions[0].rva, null, f.instructions.length);
+                fact(isDeepStrictEqual(fragments.at(-1)!.instructions, f.instructions.map(compact)), 'curated context bytes');
+                return result;
+            });
+        } else {
+            const [read, branch] = contexts[chamber as Exclude<EnvironmentalChamber, 'bypass'>][name];
+            context = [add('read', 'gameplay_check', read), add('branch', 'saved_boolean_branch', branch)];
+            const readCode = fragments.at(-2)!.instructions, branchCode = fragments.at(-1)!.instructions;
+            fact(isDeepStrictEqual(readCode.map(i => i.mnemonic), ['cmp', 'setne', 'mov']) && isDeepStrictEqual(branchCode.map(i => i.mnemonic), ['mov', 'test', 'jne']), 'gameplay context form');
+            fact(readCode[2].op_str.replace(/, al$/, '') === branchCode[0].op_str.replace(/^al, /, '') && branchCode[1].op_str === 'al, 1', 'saved Boolean reload');
+        }
         const stores = {} as { '0': string; '1': string };
         for (const bit of [0, 1] as const) {
             const acquired = integration.outputs.find(o => o.name === name)!;
@@ -100,8 +127,14 @@ export function buildEnvironmentalArtifact(chamber: EnvironmentalChamber): Envir
                 }
             }
             fact(isDeepStrictEqual(observed.map(String).sort(), site.case_ids.map(String).sort()), 'recorded store case association');
-            stores[bit] = add(`write-${bit}`, 'output_store', dis.instructions[index - 2].rva,
+            stores[bit] = add(chamber === 'bypass' ? `${name}.write-${bit}` : `write-${bit}`, 'output_store', dis.instructions[index - 2].rva,
                 { value: bit, rva: site.instruction_rva, byte_offset: output.byte_offset, observed_case_count: observed.length });
+        }
+        if (catalogue) for (const bit of [0, 1] as const) {
+            const id = catalogue.sections.find(s => s.output === name)!.store_alternatives[bit];
+            const original = catalogue.fragments.find(f => f.id === id);
+            fact(original?.role === 'output_store' && original.output === name && stores[bit] === id
+                && isDeepStrictEqual(original.instructions.map(compact), fragments.find(f => f.id === id)?.instructions), 'curated store association');
         }
         const { excerpt: _excerpt, ...definition } = output;
         return { ...definition, target: place.target, context, stores };
@@ -128,7 +161,7 @@ function main() {
             verifyEnvironmentalArtifact(JSON.parse(readFileSync(path, 'utf8')), chamber);
             fact(readFileSync(path, 'utf8') === content, `stale ${path}`);
         } else writeFileSync(path, content);
-        console.log(`✓ ${path}: ${Buffer.byteLength(content)} / ${ENVIRONMENTAL_BUDGETS[chamber]} bytes; ${ENVIRONMENTAL_OUTPUTS[chamber].length * 4} separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified`);
+        console.log(`✓ ${path}: ${Buffer.byteLength(content)} / ${ENVIRONMENTAL_BUDGETS[chamber]} bytes; ${JSON.parse(content).fragments.length} separate fragments; exact PE bytes, blocks, bindings and observed zero/one stores verified`);
     }
     const pinPath = 'src/coop/environmental-integrity.ts';
     const pin = `// Generated by scripts/native/environmental-evidence.ts.\nexport const ENVIRONMENTAL_SHA256 = ${JSON.stringify(pins, null, 4)} as const;\n`;

@@ -31,7 +31,7 @@ describe('native world presentation is bounded static decoration', () => {
     });
     it('suppresses all 25 superseded diagnostics even at overview zoom or evidence failure', () => {
         const f = fixture();
-        for (const chamber of ['handshake', 'crossfeed-vault', 'deadlock', 'use-after-free'] as const) {
+        for (const chamber of ['handshake', 'crossfeed-vault', 'deadlock', 'use-after-free', 'bypass'] as const) {
             f.evidence.data = JSON.parse(readFileSync(`public/evidence/coop/${chamber}.world.json`, 'utf8'));
             f.evidence.state!.chamber = chamber;
             for (const zoom of [.25, .8, 1.2]) {

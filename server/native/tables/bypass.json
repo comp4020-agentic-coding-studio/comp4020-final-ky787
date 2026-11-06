@@ -1,0 +1,31 @@
+{
+  "bcf_pe_sha256": "af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74",
+  "bits_per_case": 4,
+  "case_count": 16,
+  "chamber_id": "bypass",
+  "clean_pe_sha256": "85ec3623042a89256e89d89fa028b1cc8019ada2c33ead04761c67ccf6371343",
+  "contract_sha256": "b065d789591a2882a055c43ab2c41352323e5d93316781584db3a677f8d6060b",
+  "input_game_ports": [
+    "anchorHold.occupied",
+    "link.value",
+    "bypassHold.occupied",
+    "override.value"
+  ],
+  "input_names": [
+    "anchorHold",
+    "link",
+    "bypassHold",
+    "override"
+  ],
+  "native_results_sha256": "8eacdb95205ea238c829cb7c2ec2b8addeeb2d739558b814f031835d6873e226",
+  "output_names": [
+    "anchorPower",
+    "bridgePower",
+    "firewallActive",
+    "exitReady"
+  ],
+  "packed": "DA0PDwgJCwsICQsLCAkLCw==",
+  "schema": "coop-native-table/v1",
+  "specimen_id": "bypass_ollvm_bcf",
+  "table_sha256": "e95e4e003b22a4f50e0c7e2278b09eeb576cab8529e4c2123c65d523493e8f58"
+}

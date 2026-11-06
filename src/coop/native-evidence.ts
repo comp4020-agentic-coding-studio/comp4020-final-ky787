@@ -2,7 +2,7 @@
  * Browser-side loader and presenter for the verified native co-op evidence.
  *
  * Reuses the CONTROL SPINE evidence philosophy without touching its modules:
- * this is a separate, self-contained adapter for the five native-backed co-op
+ * this is a separate, self-contained adapter for the verified native-backed co-op
  * chambers. It lazy-loads the compact evidence files from /evidence/coop/ only
  * when the inspector is opened, so the default gameplay download stays small.
  *
@@ -31,6 +31,7 @@ export interface NativeBogusClone {
 export interface NativeEvidence {
     schema: string; chamber_id: NativeChamberId; kind: 'declarative' | 'temporal'; contract_sha256: string;
     specimen_id: string; bcf_pe_sha256: string;
+    reference_commit?: string; request_sha256?: string; manifest_sha256?: string;
     obfuscation: { compiler: string; pass: string; status_label: string; note: string };
     outputs: NativeEvidenceOutput[]; server_owned: string[]; mapping_limits: string[];
     bogus: {
@@ -77,6 +78,9 @@ export const hex = (n: number) => `0x${n.toString(16).toUpperCase()}`;
 export function declarativeInputVector(chamber: NativeChamberId, devices: Readonly<Record<string, boolean>>): number[] | null {
     const contract = CHAMBER_CONTRACTS[chamber];
     if (contract.kind !== 'declarative') return null;
+    // BYPASS's exhaustive recording is exact only with all four canonical ports.
+    if (chamber === 'bypass' && ['anchorHold.occupied', 'link.value', 'bypassHold.occupied', 'override.value']
+        .some(port => typeof devices[port] !== 'boolean')) return null;
     // Device port = input name + .occupied/.value; the port-suffix set is small, so probe both.
     return contract.inputs.map(name => {
         const occ = devices[`${name}.occupied`];

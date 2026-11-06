@@ -13,7 +13,7 @@ import { crossfeedVault } from '../../src/coop/crossfeed-vault.ts';
 import { raceCondition } from '../../src/coop/race-condition.ts';
 import type { NativeDisasmInstruction } from '../../src/coop/native-evidence.ts';
 import type { NativeWorldArtifact, NativeWorldBinding, NativeWorldOutput } from '../../src/coop/native-world-types.ts';
-import { readBytes, readJson, readGzipJson, sha256 } from './package.ts';
+import { readBytes, readJson, readGzipJson, sha256, loadChamberEvidence } from './package.ts';
 
 type Store = {
     output: string; byte_offset: number; instruction_rva: number; instruction_address: number;
@@ -74,6 +74,7 @@ export function peBytesAt(pe: Buffer, rva: number, size: number): Buffer {
 
 const sourceCache = new Map<NativeChamberId, ReturnType<typeof readSources>>();
 function readSources(chamber: NativeChamberId) {
+    loadChamberEvidence(chamber); // Retain per-package source/reference identity checks.
     const manifest = readJson<{ chamber_id: string; files: Record<string, string> }>(chamber, 'manifest.json');
     requireFact(manifest.chamber_id === chamber, `${chamber}: manifest specimen mismatch`);
     const files = ['contract.json', 'integration.json', 'evidence/disassembly-bcf.json.gz', 'bin/obfuscated_x64.exe'];

@@ -35,7 +35,8 @@ export class EnvironmentalRenderer {
             };
             if (section && data && place.excerpt !== 'store') {
                 const f = data.fragments.find(f => f.id === section.context[place.excerpt === 'branch' ? 1 : 0])!;
-                part(f, place.excerpt === 'compare' ? f.instructions.slice(0, 1) : f.instructions, 20);
+                const compare = f.instructions.findIndex(i => i.mnemonic === 'cmp');
+                part(f, place.excerpt === 'compare' ? f.instructions.slice(compare, compare + 1) : f.instructions, 20);
             }
             if (selected) {
                 const short = place.excerpt === 'branch' || place.excerpt === 'boolean';

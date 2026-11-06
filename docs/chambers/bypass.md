@@ -1,16 +1,19 @@
 # BYPASS — cooperative chamber
 
 BYPASS remains public chamber 02: **HANDSHAKE → BYPASS → CROSSFEED VAULT**.
-It is **AUTHORED** until verified native evidence is integrated. The four-input
-[Windows request](../native-requests/bypass.md) supersedes the earlier six-input
-draft/promotion handoffs; no binary evidence has been fabricated or integrated.
+Its released controller uses **verified Windows x64 OLLVM BCF results** through the
+existing server lookup adapter. The four-input [request](../native-requests/bypass.md)
+supersedes the earlier six-input draft/promotion handoffs. See the pinned
+[acquisition and integration record](bypass-native.md). The matching builder draft
+remains authored and does not inherit campaign evidence.
 
 The [released room](../../levels/campaign/bypass.json) and
 [matching draft](../../levels/drafts/bypass.json) are byte-identical canonical v1
 JSON, SHA-256 `38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb`.
 The neutral room objective is **REACH THE EXIT TOGETHER**. Large solution captions
 are removed; control labels, E prompts, breakpoint feedback, grapple prompts and
-UNSTABLE/fuse warnings remain. Freed space contains no invented assembly.
+UNSTABLE/fuse warnings remain. Three quiet native excerpts occupy fixed background
+positions; no geometry, controller JSON or soundtrack bytes changed.
 
 ## Route and recovery
 
@@ -70,7 +73,8 @@ actual shared stable state; both original stability assertions remain.
 the released campaign. Isolated tests cover all 16 vectors, body-only occupancy,
 save migration and arrival behavior without substituting for those physical routes.
 
-[Current validation](../playtest/2026-11-06-bypass-native/README.md) records checks
+[Native integration validation](../playtest/2026-11-06-bypass-native-integration/README.md)
+and the prior [contract validation](../playtest/2026-11-06-bypass-native/README.md) records checks
 actually run. Earlier [draft](../playtest/2026-11-06-bypass/README.md) and
 [promotion](../playtest/2026-11-06-bypass-campaign/results.json) evidence remains
 historical: the original 87-check six-chamber regression used the superseded final

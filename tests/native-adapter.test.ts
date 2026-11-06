@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { gunzipSync } from 'node:zlib';
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { chamberPackagePath } from '../scripts/native/package.ts';
 import { CHAMBER_CONTRACTS, NATIVE_CHAMBERS, caseIdForInputs, type NativeChamberId } from '../server/native/contracts.ts';
 import { nativeController } from '../server/native/adapter.ts';
 import { evaluateDraft } from '../src/workbench/evaluate.ts';
@@ -9,9 +9,8 @@ import { crossfeedOutputs } from '../server/crossfeed-state.ts';
 import { raceInputs, raceOutputs, freshRace } from '../server/race-state.ts';
 import { CAMPAIGN_DOCUMENTS } from '../src/coop/authored-campaign.ts';
 
-const PKG = join(process.cwd(), 'experiments', 'coop-controllers');
 function nativeRows(chamber: NativeChamberId) {
-    const bytes = readFileSync(join(PKG, chamber, 'evidence', 'native-results.json.gz'));
+    const bytes = readFileSync(chamberPackagePath(chamber, 'evidence', 'native-results.json.gz'));
     return JSON.parse(gunzipSync(bytes).toString('utf8')) as {
         rows: { id: number | string; inputs: number[]; expected: number[]; clean: number[]; bcf: number[] }[];
     };
@@ -51,7 +50,7 @@ describe('native adapter: every table entry equals retained native BCF results',
 });
 
 describe('native adapter: differential vs independent TypeScript oracle', () => {
-    for (const chamber of ['handshake', 'deadlock', 'use-after-free'] as const) {
+    for (const chamber of ['handshake', 'bypass', 'deadlock', 'use-after-free'] as const) {
         it(`${chamber}: native table equals declarative evaluateDraft for all cases`, () => {
             const ctrl = nativeController(chamber);
             const contract = CHAMBER_CONTRACTS[chamber];

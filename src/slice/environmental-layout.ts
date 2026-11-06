@@ -15,6 +15,14 @@ export interface EnvironmentalBlock extends Box {
 
 /** Stable local rectangles. A shared group name adds no frame, links or runtime layout. */
 export const ENVIRONMENTAL_BLOCKS: Record<EnvironmentalChamber, readonly EnvironmentalBlock[]> = {
+    bypass: [
+        { output: 'anchorPower', target: 'anchor', group: 'opening', x: 350, y: 380, w: 328, h: 124,
+            label: 'SHARED ANCHOR', on: 'POWERED', off: 'IDLE', excerpt: 'compare' },
+        { output: 'bridgePower', target: 'bridge', group: 'link', x: 1020, y: 350, w: 328, h: 124,
+            label: 'LINK BRIDGE', on: 'ACTIVE', off: 'INACTIVE', excerpt: 'store' },
+        { output: 'firewallActive', target: 'firewallA', group: 'firewalls', x: 1960, y: 370, w: 328, h: 124,
+            label: 'FIREWALL CONTROL', on: 'ACTIVE', off: 'DISABLED', hazard: true, excerpt: 'compare' },
+    ],
     handshake: [
         { output: 'crossingPower', target: 'nearAnchor', group: 'crossing', x: 675, y: 805, w: 328, h: 124,
             label: 'CROSSING', on: 'POWERED', off: 'IDLE', excerpt: 'compare' },

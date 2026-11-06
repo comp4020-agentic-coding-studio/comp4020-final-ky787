@@ -1,5 +1,5 @@
 /**
- * Paused co-op evidence inspector for the five native-backed chambers.
+ * Paused co-op evidence inspector for the verified native-backed chambers.
  *
  * Renders into the existing #evidence aside. It is a separate adapter from the
  * CONTROL SPINE EvidenceInspector so that single-player evidence is untouched.
@@ -125,7 +125,11 @@ export class NativeEvidenceInspector {
         if (this.view.devices) {
             const caseId = declarativeCaseId(this.view.chamber, this.view.devices);
             const trace = caseId === null ? null : traceForState(this.traces, caseId);
-            return { trace, caseId, exact: trace !== null };
+            const completeBypass = this.view.chamber !== 'bypass' || !!trace
+                && Object.entries(trace.final_outputs).every(([name, value]) =>
+                    typeof this.view!.outputs[name] === 'boolean' && Number(this.view!.outputs[name]) === value)
+                && this.view.environmental?.state?.connected !== false;
+            return { trace, caseId, exact: trace !== null && completeBypass };
         }
         return { trace: null, caseId: null, exact: false };
     }
@@ -162,6 +166,7 @@ export class NativeEvidenceInspector {
             `${e.obfuscation.status_label} — NATIVE-VERIFIED OUTPUTS`,
             `Chamber: ${e.chamber_id} (${e.kind})   Specimen: ${e.specimen_id}`,
             `Obfuscated PE SHA-256: ${e.bcf_pe_sha256}`,
+            ...(e.reference_commit ? [`Reference commit: ${e.reference_commit}`, `Request SHA-256: ${e.request_sha256}`, `Acquisition manifest SHA-256: ${e.manifest_sha256}`] : []),
             `${e.obfuscation.compiler} · ${e.obfuscation.pass}`,
             e.obfuscation.note,
             '',

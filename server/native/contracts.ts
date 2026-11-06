@@ -1,5 +1,5 @@
 /**
- * Coordinate-free identity of the five verified native co-op controllers.
+ * Coordinate-free identity of the verified native co-op controllers.
  *
  * This file is the single source of truth for each chamber's canonical input
  * ordering, output ordering and case-id encoding. The offline generator
@@ -13,10 +13,10 @@
  */
 
 export type NativeChamberId =
-    | 'handshake' | 'deadlock' | 'use-after-free' | 'crossfeed-vault' | 'race-condition';
+    | 'handshake' | 'bypass' | 'deadlock' | 'use-after-free' | 'crossfeed-vault' | 'race-condition';
 
 export const NATIVE_CHAMBERS: readonly NativeChamberId[] =
-    ['handshake', 'deadlock', 'use-after-free', 'crossfeed-vault', 'race-condition'] as const;
+    ['handshake', 'bypass', 'deadlock', 'use-after-free', 'crossfeed-vault', 'race-condition'] as const;
 
 export const isNativeChamber = (value: unknown): value is NativeChamberId =>
     NATIVE_CHAMBERS.includes(value as NativeChamberId);
@@ -74,6 +74,11 @@ export const CHAMBER_CONTRACTS: Record<NativeChamberId, ChamberContract> = {
         id: 'handshake', kind: 'declarative', booleanInputs: 5, caseCount: 32,
         inputs: ['crossing', 'liftPlate', 'link', 'maintenance', 'exitSocket'],
         outputs: ['crossingPower', 'liftPower', 'relayPower', 'exitReady'],
+    },
+    bypass: {
+        id: 'bypass', kind: 'declarative', booleanInputs: 4, caseCount: 16,
+        inputs: ['anchorHold', 'link', 'bypassHold', 'override'],
+        outputs: ['anchorPower', 'bridgePower', 'firewallActive', 'exitReady'],
     },
     deadlock: {
         id: 'deadlock', kind: 'declarative', booleanInputs: 6, caseCount: 64,

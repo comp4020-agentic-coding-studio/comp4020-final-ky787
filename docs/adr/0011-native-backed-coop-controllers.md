@@ -18,6 +18,18 @@ verified results inside the existing server controllers. The interface states
 this honestly: `VALIDATED OLLVM BCF` / `NATIVE-VERIFIED OUTPUTS`, with the note
 that the Linux server reads a verified lookup table and does not execute the PE.
 
+## Addendum — independent BYPASS acquisition, 6 November 2026
+
+The released BYPASS controller now uses the same declarative native lookup path.
+Its [integration record](../chambers/bypass-native.md) pins the four-input request,
+16 vectors and separate `experiments/coop-controller-studies/bypass-v1` package.
+Source resolution is per chamber: the historical five retain reference
+`1315c3616ce5ac939baf913f9b09b4ebad34132a`; BYPASS retains
+`a209122ba1e3b54c6d329a94c01276b9550c9189`. No global pin is replaced.
+Its `exitReady` output is constant one; server latching and two physical arrivals
+remain unchanged. This addendum supersedes only the original five-room scope;
+the original acquisition and architecture record below remains historical.
+
 ## Generation pipeline
 
 `scripts/native/generate-tables.ts` (run with `pnpm gen:native`, checked with

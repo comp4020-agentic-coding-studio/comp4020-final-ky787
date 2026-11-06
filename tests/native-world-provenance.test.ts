@@ -24,7 +24,10 @@ describe('world assembly authentic frozen native evidence', () => {
         });
     }
     it('keeps all five assets below 75 KB total', () => {
-        expect(NATIVE_CHAMBERS.reduce((sum, chamber) => sum + statSync(`public/evidence/coop/${chamber}.world.json`).size, 0)).toBeLessThan(75_000);
+        expect(NATIVE_CHAMBERS.filter(chamber => chamber !== 'bypass').reduce((sum, chamber) => sum + statSync(`public/evidence/coop/${chamber}.world.json`).size, 0)).toBeLessThan(75_000);
+    });
+    it('adds BYPASS below 10 KB without expanding historical budgets', () => {
+        expect(statSync('public/evidence/coop/bypass.world.json').size).toBeLessThan(10_000);
     });
     it('rejects the wrong chamber, specimen, PE hash or source hash', () => {
         expect(() => validateNativeWorldArtifact(artifact('deadlock'), 'handshake')).toThrow(/specimen/);

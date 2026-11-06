@@ -77,8 +77,14 @@ describe('BYPASS authored draft contract (isolated fixtures, not full-room evide
       draft.controller.kind === 'declarative' ? draft.controller.outputs[o.name] : undefined));
     expect(request.bindings.map(({ invert, resolved_signal, resolution, ...b }: any) => b)).toEqual(draft.bindings);
     expect(request.bindings.every((b: any) => b.invert === false)).toBe(true);
-    for (const [path, hash] of Object.entries(request.reference_source_sha256))
-      expect(createHash('sha256').update(readFileSync(path)).digest('hex'), path).toBe(hash);
+    for (const [path, hash] of Object.entries(request.reference_source_sha256)) {
+      // The acquisition snapshot stays frozen; native registration intentionally
+      // changes only the current level-definitions adapter selection.
+      const frozen = `experiments/coop-controller-studies/bypass-v1/reference/${path}`;
+      expect(createHash('sha256').update(readFileSync(frozen)).digest('hex'), frozen).toBe(hash);
+      if (path !== 'server/level-definitions.ts')
+        expect(createHash('sha256').update(readFileSync(path)).digest('hex'), path).toBe(hash);
+    }
   });
 
   it('keeps every occupied operator position outside manual and assisted anchor range', () => {

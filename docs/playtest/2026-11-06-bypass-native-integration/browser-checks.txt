@@ -1,0 +1,29 @@
+PASS bypass: first accepted state already opens exit with no commitments
+PASS bypass: first accepted state already opens exit with no commitments
+PASS bypass: two independent visitors retain one party
+PASS bypass-initial-open-p1: only three compact native sections; no exit panel or old dashboard
+PASS bypass-initial-open-p1: genuine zero/one stores follow accepted output values
+PASS bypass-initial-open-p1: exactly two accepted scanner states use modern pad presentation
+PASS bypass-initial-open-p1: initial portal is physically unlocked
+PASS 1024 reduced motion preserves fixed assembly bounds without effects
+PASS pausing preserves open portal and inactive scanner state
+PASS Evidence retains only the real constant-one exit store
+PASS bypass-anchor-held-p1: only three compact native sections; no exit panel or old dashboard
+PASS bypass-anchor-held-p1: genuine zero/one stores follow accepted output values
+PASS bypass-anchor-held-p1: exactly two accepted scanner states use modern pad presentation
+PASS bypass-anchor-held-p1: initial portal is physically unlocked
+PASS bypass-section-2-p1: only three compact native sections; no exit panel or old dashboard
+PASS bypass-section-2-p1: genuine zero/one stores follow accepted output values
+PASS bypass-exit-one-arrival-p1: only three compact native sections; no exit panel or old dashboard
+PASS bypass-exit-one-arrival-p1: genuine zero/one stores follow accepted output values
+PASS bypass: authored-start physical solve with both arrivals
+PASS bypass: both physical arrivals complete the native-backed room
+PASS bypass: both physical arrivals complete the native-backed room
+PASS bypass-swapped-roles: first accepted state already opens exit with no commitments
+PASS bypass-swapped-roles: first accepted state already opens exit with no commitments
+PASS bypass: two independent visitors retain one party
+PASS bypass: authored-start physical solve with both arrivals
+PASS bypass-swapped-roles: both physical arrivals complete the native-backed room
+PASS bypass-swapped-roles: both physical arrivals complete the native-backed room
+PASS no browser runtime errors
+PASS no browser runtime errors

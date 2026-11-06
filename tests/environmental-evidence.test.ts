@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
+import { chamberPackagePath } from '../scripts/native/package.ts';
 import { buildEnvironmentalArtifact, serializeEnvironmentalArtifact, verifyEnvironmentalArtifact } from '../scripts/native/environmental-evidence.ts';
 import { ENVIRONMENTAL_BUDGETS, ENVIRONMENTAL_CHAMBERS, ENVIRONMENTAL_OUTPUTS, type EnvironmentalArtifact, type EnvironmentalChamber } from '../src/coop/environmental-types.ts';
 import { environmentalAccepted, EnvironmentalEvidence, parseEnvironmentalAsset, validateEnvironmentalArtifact } from '../src/coop/environmental-evidence.ts';
@@ -18,23 +19,23 @@ function room(chamber: EnvironmentalChamber = 'handshake'): SharedRoom {
 const settle = async () => { for (let i = 0; i < 8; i++) await new Promise(r => setTimeout(r, 5)); };
 afterEach(() => vi.unstubAllGlobals());
 
-describe('four compact environmental evidence assets', () => {
+describe('compact environmental evidence assets', () => {
     it.each(ENVIRONMENTAL_CHAMBERS)('%s is deterministic, separately bounded and accounts for every existing placement', async chamber => {
         const a = asset(chamber), text = content(chamber);
         expect(text).toBe(serializeEnvironmentalArtifact(buildEnvironmentalArtifact(chamber)));
         expect(Buffer.byteLength(text)).toBeLessThan(ENVIRONMENTAL_BUDGETS[chamber]);
         expect(await parseEnvironmentalAsset(text, chamber)).toEqual(a);
         expect(a.sections.map(s => ({ output: s.name, target: s.target }))).toEqual(WORLD_ASSEMBLY_PLACEMENTS[chamber]!.map(p => ({ output: p.output, target: p.target })));
-        expect(a.fragments).toHaveLength(a.sections.length * 4);
-        expect(Object.keys(a.sources)).toHaveLength(7);
+        expect(a.fragments).toHaveLength(chamber === 'bypass' ? 16 : a.sections.length * 4);
+        expect(Object.keys(a.sources)).toHaveLength(chamber === 'bypass' ? 8 : 7);
         expect(text).not.toMatch(/step_indices|register_values|raw_occurrence|machine_model|final_outputs/);
     });
     it.each(ENVIRONMENTAL_CHAMBERS)('%s retains authentic separate blocks and both independently recorded stores', chamber => {
         const a = asset(chamber);
-        const integration = JSON.parse(readFileSync(`experiments/coop-controllers/${chamber}/integration.json`, 'utf8'));
-        const dis = JSON.parse(gunzipSync(readFileSync(`experiments/coop-controllers/${chamber}/evidence/disassembly-bcf.json.gz`)).toString());
+        const integration = JSON.parse(readFileSync(chamberPackagePath(chamber, 'integration.json'), 'utf8'));
+        const dis = JSON.parse(gunzipSync(readFileSync(chamberPackagePath(chamber, 'evidence/disassembly-bcf.json.gz'))).toString());
         for (const f of a.fragments) {
-            expect(f.instructions).toHaveLength(3);
+            expect(f.instructions).toHaveLength(chamber === 'bypass' && f.role === 'gameplay_check' ? f.id === 'anchor-hold.read' ? 4 : 5 : 3);
             for (const [n, i] of f.instructions.entries()) {
                 expect(dis.instructions.find((v: { address: number }) => v.address === i.address)).toMatchObject(i);
                 expect(i.block_id).toBe(f.block_id);
@@ -44,7 +45,7 @@ describe('four compact environmental evidence assets', () => {
         for (const section of a.sections) {
             const contexts = section.context.map(id => a.fragments.find(f => f.id === id)!);
             expect(contexts[0].block_id).not.toBe(contexts[1].block_id);
-            expect(contexts[0].instructions[2].op_str.replace(/, al$/, '')).toBe(contexts[1].instructions[0].op_str.replace(/^al, /, ''));
+            expect(contexts[0].instructions.at(-1)!.op_str.replace(/, al$/, '')).toBe(contexts[1].instructions[0].op_str.replace(/^al, /, ''));
             for (const bit of [0, 1] as const) {
                 const f = a.fragments.find(f => f.id === section.stores[bit])!;
                 const output = integration.outputs.find((o: { name: string }) => o.name === section.name);
@@ -72,9 +73,9 @@ describe('four compact environmental evidence assets', () => {
             (a: EnvironmentalArtifact) => { a.sections[0].stores['0'] = a.sections[1].stores['0']; },
             (a: EnvironmentalArtifact) => { a.sections[0].bindings[0].invert = !a.sections[0].bindings[0].invert; },
             (a: EnvironmentalArtifact) => { a.sections[0].target = 'wrong-platform'; },
-            (a: EnvironmentalArtifact) => { a.fragments[2].store!.value = 1; },
-            (a: EnvironmentalArtifact) => { a.fragments[2].store!.byte_offset += 4; },
-            (a: EnvironmentalArtifact) => { a.fragments[2].store!.observed_case_count = 0; },
+            (a: EnvironmentalArtifact) => { a.fragments.find(f => f.store?.value === 0)!.store!.value = 1; },
+            (a: EnvironmentalArtifact) => { a.fragments.find(f => f.store?.value === 0)!.store!.byte_offset += 4; },
+            (a: EnvironmentalArtifact) => { a.fragments.find(f => f.store?.value === 0)!.store!.observed_case_count = 0; },
             (a: EnvironmentalArtifact) => { a.fragments[0].end_rva_exclusive++; },
             (a: EnvironmentalArtifact) => { a.fragments[0].instructions[1] = a.fragments[1].instructions[1]; },
             (a: EnvironmentalArtifact) => { a.fragments.pop(); },
@@ -125,13 +126,13 @@ describe('accepted environmental state and failure boundaries', () => {
             e.update(room(chamber), true, 1); await settle(); expect(e.status).toBe('ready'); expect(e.data?.chamber_id).toBe(chamber);
         }
         expect(fetch.mock.calls.map(([url]) => url)).toEqual(ENVIRONMENTAL_CHAMBERS.map(chamber => `/evidence/coop/${chamber}.environment.json`));
-        const r = room(); e.update(r, true, 2); expect(e.status).toBe('ready'); expect(fetch).toHaveBeenCalledTimes(4);
+        const r = room(); e.update(r, true, 2); expect(e.status).toBe('ready'); expect(fetch).toHaveBeenCalledTimes(ENVIRONMENTAL_CHAMBERS.length);
         e.update(r, false, 2); expect(e.state?.connected).toBe(false);
         e.update(r, true, 2); expect(e.state?.connected).toBe(false);
         e.update(r, true, 3); expect(e.state?.connected).toBe(true);
         e.update({ ...r, levelInstance: 2 }, true, 4); expect(e.state?.key).toBe('ENVR:2:handshake');
         e.update({ ...r, code: 'NEXT' }, true, 5); expect(e.state?.key).toBe('NEXT:1:handshake');
-        expect(fetch).toHaveBeenCalledTimes(4);
+        expect(fetch).toHaveBeenCalledTimes(ENVIRONMENTAL_CHAMBERS.length);
         const mountedOffline = new EnvironmentalEvidence(); mountedOffline.update(r, false, 6);
         mountedOffline.update(r, true, 6); expect(mountedOffline.state?.connected).toBe(false);
         mountedOffline.update(r, true, 7); expect(mountedOffline.state?.connected).toBe(true);

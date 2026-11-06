@@ -23,7 +23,7 @@ import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { CHAMBER_CONTRACTS, NATIVE_CHAMBERS, caseIdForInputs, type NativeChamberId } from '../../server/native/contracts.ts';
 import { encodeTable, type NativeTable } from '../../server/native/table-format.ts';
-import { loadChamberEvidence, readGzipJson, readJson, readBytes, sha256, type NativeContract } from './package.ts';
+import { loadChamberEvidence, readGzipJson, readJson, readBytes, sha256, type NativeContract, BYPASS_REFERENCE_COMMIT, BYPASS_REQUEST_SHA256, BYPASS_MANIFEST_SHA256 } from './package.ts';
 
 const CHECK = process.argv.includes('--check');
 const TABLES_DIR = join('server', 'native', 'tables');
@@ -184,6 +184,7 @@ function buildEvidence(chamber: NativeChamberId, contractSha: string) {
     return {
         schema: 'coop-native-evidence/v1', chamber_id: chamber, kind: contract.kind,
         contract_sha256: contractSha,
+        ...(chamber === 'bypass' ? { reference_commit: BYPASS_REFERENCE_COMMIT, request_sha256: BYPASS_REQUEST_SHA256, manifest_sha256: BYPASS_MANIFEST_SHA256 } : {}),
         specimen_id: `${chamber}_ollvm_bcf`, bcf_pe_sha256: proof.binary_sha256,
         obfuscation: {
             compiler: 'OLLVM Clang 16.0.6 (x86_64-pc-windows-msvc)',
@@ -200,7 +201,12 @@ function buildEvidence(chamber: NativeChamberId, contractSha: string) {
             })),
         })),
         server_owned: integration.server_owned,
-        mapping_limits: integration.mapping_limits,
+        mapping_limits: chamber === 'bypass' ? [
+            'exitReady is constant one for all 16 canonical input vectors; no zero alternative or conditional exit check exists.',
+            'State-linked store selections describe accepted results, not a live CPU execution; separate fragments are not adjacent CFG blocks.',
+            'Both firewalls manifest one firewallActive output. Occupancy, commitments, checkpoint, crumble, latch and both arrivals remain server-owned.',
+            'Prototype crumble is authored gameplay; the native bogus-clone proof does not classify its platforms.',
+        ] : integration.mapping_limits,
         bogus: {
             source_file: 'evidence/bogus-proof.json.gz', source_sha256: proofSha,
             guard_count: proof.guard_count, clone_count: proof.clone_count,

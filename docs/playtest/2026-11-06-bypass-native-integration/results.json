@@ -1,0 +1,83 @@
+{
+  "bypass": {
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "document_hash": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "steps": 65,
+    "failed_step": null,
+    "error": null,
+    "final": {
+      "p1": {
+        "deaths": 4,
+        "arrivals": [
+          true,
+          true
+        ],
+        "completed": true
+      },
+      "p2": {
+        "deaths": 4,
+        "arrivals": [
+          true,
+          true
+        ],
+        "completed": true
+      }
+    }
+  },
+  "bypass-swapped-roles": {
+    "pass": true,
+    "scope": "full-room campaign; real controls from authored starts",
+    "document_hash": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "steps": 59,
+    "failed_step": null,
+    "error": null,
+    "final": {
+      "p1": {
+        "deaths": 4,
+        "arrivals": [
+          true,
+          true
+        ],
+        "completed": true
+      },
+      "p2": {
+        "deaths": 2,
+        "arrivals": [
+          true,
+          true
+        ],
+        "completed": true
+      }
+    }
+  },
+  "consumer_sha256": {
+    "server/native/tables/bypass.json": "3da502d61a89a1b9e14c8cdcf971361e68492b4fad897d26070c86f45872e177",
+    "public/evidence/coop/bypass.evidence.json": "e743c22b20f97179e0aa2ac84b36aa84c45c8383c326f13b9bdf90069e155735",
+    "public/evidence/coop/bypass.traces.json": "fcc9eb02cee39f4b70f0eed280b2f906181d85971b6d295e8b9b0bfa2070bac3",
+    "public/evidence/coop/bypass.disasm.json": "dadf3db470e1263f7cf9d0c9273030d51308407f467cdd16e1c34f2f71c250d8",
+    "public/evidence/coop/bypass.world.json": "b5fbf781bcf0e3749291fea4f0935698be8140b1f5ae7ae073602c26253f4a12",
+    "public/evidence/coop/bypass.environment.json": "ce433d008a032e9544820d6da49039ec999168eeadeb444cb19b540afe3c14f5"
+  },
+  "screenshots": [
+    "bypass-initial-1920.png",
+    "bypass-initial-1024-reduced.png",
+    "bypass-anchor-held-p1.png",
+    "bypass-section-2-p1.png",
+    "bypass-exit-one-arrival-p1.png"
+  ],
+  "campaign": {
+    "pass": true,
+    "runs": 1,
+    "checks": 87,
+    "chambers": [
+      "handshake",
+      "bypass",
+      "crossfeed-vault",
+      "race-condition",
+      "deadlock",
+      "use-after-free"
+    ],
+    "restart_and_reconnect": true
+  }
+}

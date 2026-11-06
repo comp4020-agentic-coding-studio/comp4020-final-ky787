@@ -8,14 +8,14 @@ import { crumbleView, freshCrumble } from './crumble-state.ts';
 import { LAB_DEFINITIONS } from './lab-definitions.ts';
 import { pairingDefinition } from './pairing-state.ts';
 
-/** The original five chambers use verified native result tables. BYPASS explicitly
- * retains its authored Boolean controller, as do lab/pairing/workbench definitions. */
+/** Released chambers use verified native result tables. Lab/pairing/workbench
+ * definitions keep their existing authored controller authority. */
 export const LEVEL_DEFINITIONS: { [K in SessionLevelId]: LevelDefinition<K> } = {
     // Frozen custom-session registries supply the real rules; this fallback cannot create a room.
     workbench: { cubeIds: [], defaults: () => ({ devices: {} }), valid: () => false, acceptsPlate: p => p === null,
         action: () => false, project: () => ({ devices: {}, outputs: {}, platforms: crumbleView(freshCrumble(), 0) }), unlock: () => false, cubeEnabled: () => false },
     handshake: declarativeDefinition<'handshake'>(CAMPAIGN_DOCUMENTS.handshake, nativeDeclarativeEvaluator('handshake')),
-    bypass: declarativeDefinition<'bypass'>(CAMPAIGN_DOCUMENTS.bypass),
+    bypass: declarativeDefinition<'bypass'>(CAMPAIGN_DOCUMENTS.bypass, nativeDeclarativeEvaluator('bypass')),
     deadlock: declarativeDefinition<'deadlock'>(CAMPAIGN_DOCUMENTS.deadlock, nativeDeclarativeEvaluator('deadlock')),
     'use-after-free': declarativeDefinition<'use-after-free'>(CAMPAIGN_DOCUMENTS['use-after-free'], nativeDeclarativeEvaluator('use-after-free')),
     'race-condition': nativeRaceDefinition,

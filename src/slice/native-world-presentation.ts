@@ -13,6 +13,11 @@ export interface NativeWorldPlacement {
     y: number;
 }
 export const WORLD_ASSEMBLY_PLACEMENTS: Partial<Record<NativeChamberId, readonly NativeWorldPlacement[]>> = {
+    bypass: [
+        { output: 'anchorPower', target: 'anchor', x: 350, y: 380 },
+        { output: 'bridgePower', target: 'bridge', x: 1020, y: 350 },
+        { output: 'firewallActive', target: 'firewallA', x: 1960, y: 370 },
+    ],
     handshake: [
         { output: 'crossingPower', target: 'nearAnchor', x: 715, y: 690 },
         { output: 'liftPower', target: 'serviceLift', x: 1340, y: 610 },

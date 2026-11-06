@@ -1,9 +1,11 @@
 # BYPASS native acquisition request — four inputs, always-open exit
 
 **This supersedes the six-input controller in the 2026-11-06 draft and campaign
-handoffs. Do not acquire/compile that old contract.** BYPASS stays released as
-chamber 02 and labelled AUTHORED until independently verified native evidence is
-integrated. This request contains no native disassembly or binary claims.
+handoffs. Do not acquire/compile that old contract.** This is the frozen acquisition
+request for source `a209122ba1e3b54c6d329a94c01276b9550c9189`. Its machine-readable
+bytes remain unchanged. The delivered specimen now has a separate
+[verified integration record](../chambers/bypass-native.md); this request itself
+contains no native disassembly or binary claims.
 
 Machine-readable request: [`bypass.json`](bypass.json), using the existing
 `coop-native-contract/v1` vocabulary. SHA-256 of its exact bytes:
@@ -70,8 +72,9 @@ remain in their existing layers. Crumble warns 1.4 s and recovers 2.6 s; it is a
 mechanics, not a bogus-code claim. No scanner or terminal gate remains on exit
 completion. Both physical arrivals are still required.
 
-Windows should validate all 16 vectors against this exact source snapshot, retain
+Acquisition requirements (fulfilled by the linked integration record): validate
+all 16 vectors against this exact source snapshot, retain
 compiler/toolchain/binary hashes and output stores, and report the source commit
 and request hash with acquisition artifacts. Integration, native labelling and
-assembly placement are separate later work. No existing chamber evidence may be
+assembly placement are recorded separately from this historical request. No existing chamber evidence may be
 borrowed to fill this room's background.

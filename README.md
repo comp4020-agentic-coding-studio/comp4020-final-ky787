@@ -6,7 +6,7 @@
 
 ![RACE CONDITION chamber overview, including its grapple route and control machinery](docs/playtest/2026-10-12-hero-assets/race-overview-compact.png)
 
-Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The six playable co-op chambers use server-authoritative puzzle state. Five retain lookup tables verified against Windows x64 OLLVM-16 BCF binaries; BYPASS uses its authored Boolean controller. The server does not execute those PEs. The single-player CONTROL SPINE showcase retains its separate validated evidence, and the public Level Builder saves authored drafts in your browser.
+Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The six playable co-op chambers use server-authoritative puzzle state. All six use lookup tables verified against Windows x64 OLLVM-16 BCF binaries, including the independently acquired four-input BYPASS controller. The server does not execute those PEs. The single-player CONTROL SPINE showcase retains its separate validated evidence, and the public Level Builder saves authored drafts in your browser.
 
 ## Play the game
 
@@ -77,9 +77,9 @@ The fourth tutorial chamber, **CONTROL SPINE** (internally `uplink`), uses a val
 
 One optional unstable region is associated with a separately supported bogus-code classification: a cloned block with proven infeasible incoming paths. The block's physical collapse timing remains an **authored gameplay metaphor**, not literal processor behavior. Displayed authored string effects and the other tutorial controllers are likewise not presented as native binary evidence.
 
-HANDSHAKE, CROSSFEED VAULT, RACE CONDITION, DEADLOCK and USE AFTER FREE use server-authoritative decisions from [verified Windows x64 OLLVM-16 BCF results](docs/adr/0011-native-backed-coop-controllers.md). The Linux server reads verified lookup tables; it does not execute the PEs. Compact [environmental assembly](docs/native-world-assembly.md) shows genuine state-linked zero/one stores beside the machinery, with subdued colours and short authored decoding strings. The [four-chamber presentation](docs/coop-environmental-assembly.md) follows RACE’s fixed world-space style; detailed provenance stays in Evidence. Shared platforms reuse the same native region. Server-owned timers, latches and authored instability remain distinct from the binary evidence.
+HANDSHAKE, BYPASS, CROSSFEED VAULT, RACE CONDITION, DEADLOCK and USE AFTER FREE use server-authoritative decisions from [verified Windows x64 OLLVM-16 BCF results](docs/adr/0011-native-backed-coop-controllers.md). The Linux server reads verified lookup tables; it does not execute the PEs. Compact [environmental assembly](docs/native-world-assembly.md) shows genuine state-linked zero/one stores beside the machinery, with subdued colours and short authored decoding strings. The [environmental presentation](docs/coop-environmental-assembly.md) follows RACE’s fixed world-space style; detailed provenance stays in Evidence. Shared platforms reuse the same native region. Server-owned timers, latches and authored instability remain distinct from the binary evidence.
 
-**Evidence boundary:** BYPASS is an **AUTHORED** campaign chamber with no native binary evidence. Its Boolean controller and prototype crumble are authored gameplay. Workbench drafts and public custom levels also retain authored/mock controllers. A static listing is not a current execution trace, and unobserved execution alone is never proof that a block is bogus.
+**Evidence boundary:** [BYPASS’s verified native integration](docs/chambers/bypass-native.md) covers its four stateless outputs, including the constant-open exit. Its prototype crumble, recovery and two-player arrival rules remain authored gameplay. Workbench drafts and public custom levels also retain authored/mock controllers. A static listing is not a current execution trace, and unobserved execution alone is never proof that a block is bogus.
 
 See [CONTROL SPINE's design and evidence notes](docs/c8-vertical-slice.md) and the checked data in `game_data/`.
 

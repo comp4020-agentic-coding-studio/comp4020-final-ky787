@@ -46,3 +46,23 @@ it('keeps compact alternatives available when the separate on-demand trace packa
     expect(document.querySelector('pre')?.textContent).toContain('CROSSING OFFLINE');
     document.querySelector('button')!.click(); expect(close).toHaveBeenCalledOnce();
 });
+
+it('BYPASS exact traces require a complete canonical accepted frame; incomplete/mismatched frames remain samples', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => ({ ok: true, json: async () => json(url.split('/').at(-1)!) })));
+    const { NativeEvidenceInspector } = await import('../src/coop/native-inspector.ts');
+    const inspector = new NativeEvidenceInspector(() => {});
+    const complete: NativeInspectorView = { chamber: 'bypass', devices: {
+        'anchorHold.occupied': false, 'link.value': false, 'bypassHold.occupied': false, 'override.value': false,
+    }, outputs: { anchorPower: false, bridgePower: false, firewallActive: true, exitReady: true } };
+    await inspector.open(complete);
+    expect(document.querySelector('pre')?.textContent).toContain('Matching retained trace for this exact state');
+    for (const frame of [{ ...complete, devices: {} }, { ...complete, outputs: { ...complete.outputs, exitReady: false } }]) {
+        inspector.update(frame);
+        expect(document.querySelector('pre')?.textContent).toContain('Representative trace (sample, not the current execution)');
+        expect(document.querySelector('pre')?.textContent).not.toContain('Matching retained trace for this exact state');
+    }
+    const select = document.querySelector('select')!;
+    select.value = 'output:exitReady'; select.dispatchEvent(new Event('change'));
+    expect(document.querySelector('pre')?.textContent).toContain('writes exitReady = 1');
+    expect(document.querySelector('pre')?.textContent).not.toContain('writes exitReady = 0');
+});

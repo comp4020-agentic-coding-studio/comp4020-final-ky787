@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
+import { chamberPackagePath } from '../scripts/native/package.ts';
 import type { Box } from '../src/engine/geometry.ts';
 import type { SharedRoom } from '../src/coop/protocol.ts';
 import { crossfeedVault } from '../src/coop/crossfeed-vault.ts';
@@ -33,7 +34,7 @@ function canvas() {
     return { c: context as unknown as CanvasRenderingContext2D, painted };
 }
 
-describe('all 25 accepted environmental machinery bindings (semantic fixtures)', () => {
+describe('all 28 accepted environmental machinery bindings (semantic fixtures)', () => {
     it('retains every old representative target once, with independent local rectangles', () => {
         let total = 0;
         for (const chamber of ENVIRONMENTAL_CHAMBERS) {
@@ -49,7 +50,7 @@ describe('all 25 accepted environmental machinery bindings (semantic fixtures)',
             }
             total += places.length;
         }
-        expect(total).toBe(25);
+        expect(total).toBe(28);
         expect(Object.keys(ENVIRONMENTAL_BLOCKS)).not.toContain('race-condition');
         expect(Object.keys(ENVIRONMENTAL_BLOCKS)).not.toContain('uplink');
     });
@@ -79,7 +80,7 @@ describe('all 25 accepted environmental machinery bindings (semantic fixtures)',
             expect(d.diagnostic.sections).toHaveLength(ENVIRONMENTAL_OUTPUTS[chamber].length);
             for (const value of d.diagnostic.sections) {
                 const inverted = chamber === 'use-after-free' && value.output === 'assistBlocked';
-                const hazard = chamber === 'deadlock' && value.output === 'shaftFirewall';
+                const hazard = (chamber === 'deadlock' && value.output === 'shaftFirewall') || (chamber === 'bypass' && value.output === 'firewallActive');
                 const powered = inverted ? !bit : bit;
                 expect(value.raw).toBe(bit); expect(value.powered).toBe(powered);
                 expect(value.storeId).toBe(`${value.output}.write-${Number(bit)}`);
@@ -192,7 +193,7 @@ describe('environmental message lifecycle', () => {
 describe('fixed native Canvas decoration', () => {
     it.each(ENVIRONMENTAL_CHAMBERS)('%s paints genuine subsets at stable world line slots across state and view changes', chamber => {
         const e = evidence(chamber), d = new EnvironmentalRenderer(), { c, painted } = canvas();
-        const dis = JSON.parse(gunzipSync(readFileSync(`experiments/coop-controllers/${chamber}/evidence/disassembly-bcf.json.gz`)).toString());
+        const dis = JSON.parse(gunzipSync(readFileSync(chamberPackagePath(chamber, 'evidence/disassembly-bcf.json.gz'))).toString());
         const lineSlots = new Map<string, number[]>();
         const places = ENVIRONMENTAL_BLOCKS[chamber], focused = places.at(-1)!;
         // Overview, nearby pan, narrow view, partial edge cull and offscreen. Camera zoom is

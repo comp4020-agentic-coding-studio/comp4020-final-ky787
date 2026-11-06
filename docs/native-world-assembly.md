@@ -6,13 +6,16 @@ they do not execute native code, evaluate a controller, or participate in physic
 The server continues using the existing verified native lookup tables described
 in [ADR 0011](adr/0011-native-backed-coop-controllers.md).
 
-All 34 existing campaign placements now use fixed environmental code: the nine
+The original 34 campaign placements use fixed environmental code: the nine
 RACE [cargo](race-cargo-panel.md)/[machinery](race-machinery-panels.md) blocks and
 25 [other co-op blocks](coop-environmental-assembly.md). They select genuine
 zero/one stores, use short authored strings and expose detailed evidence on
 demand. Assembly supplies atmosphere; machinery and geometry communicate the
 puzzle. No dashboard, technical status footer or zoom-dependent floating label
 belongs in normal gameplay.
+
+BYPASS adds three [fixed excerpts](chambers/bypass-native.md) from its independent
+four-input package, with the constant exit kept in Evidence.
 
 The five original `coop-native-world/v1` assets and their strict validator remain
 unchanged. They supply static platform address identities and binding evidence;

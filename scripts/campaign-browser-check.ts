@@ -40,7 +40,7 @@ try {
     check('HANDSHAKE NEXT leads to BYPASS', await a.read("document.querySelector('#next-chamber').dataset.selectLevel === 'bypass'"));
     await click(a, '#next-chamber');
     for (const p of [a, b]) await wait(p, 'same-party BYPASS overview', s => s.room === 'bypass' && s.overviewVisible && s.multiplayer?.code === code && s.multiplayer.levelInstance === 3);
-    for (const p of [a, b]) check('BYPASS is labelled AUTHORED with no native evidence button', await p.read("document.querySelector('#controller-source').textContent === 'AUTHORED' && document.querySelector('#evidence-toggle').hidden"));
+    for (const p of [a, b]) check('BYPASS exposes its verified native source and Evidence', await p.read("document.querySelector('#controller-source').textContent === 'VALIDATED OLLVM BCF' && !document.querySelector('#evidence-toggle').hidden"));
     await campaignDraftRoute(h, 'bypass', [a, b]);
     for (const p of [a, b]) check('BYPASS uses Kuia and awards its own completion badge', (await snapshot(p)).music.scene === 'kuia' && (await snapshot(p)).multiplayer!.shared!.party!.completedLevels.includes('bypass'));
     check('BYPASS NEXT leads to CROSSFEED', await a.read("document.querySelector('#next-chamber').dataset.selectLevel === 'crossfeed-vault'"));

@@ -1,0 +1,66 @@
+{
+  "schema": "bypass-portable-verification/v1",
+  "status": "PASS",
+  "read_only": true,
+  "reference_commit": "a209122ba1e3b54c6d329a94c01276b9550c9189",
+  "manifest_sha256": "72ab82a3bdf5c24e2091903993b77a55524b4b98d2f1471d4dc0d90683ced9c9",
+  "verifier_sha256": "137f822ddfc31bae5279263c4ae6253cb3a18f7145903a7818f28d3949b34f33",
+  "inventory_files": 71,
+  "native_evaluations": 50,
+  "exhaustive_vectors": 16,
+  "ordered_snapshots_per_variant": 9,
+  "emulator_traces": 16,
+  "output_commits": 64,
+  "store_sites": 7,
+  "fragments": 17,
+  "opaque_guards": 24,
+  "proven_clones": 12,
+  "constant_outputs": {
+    "exitReady": 1
+  },
+  "historical_five_chamber_receipt": "PASS",
+  "negative_checks": [
+    {
+      "case": "bad_event",
+      "rejected": true,
+      "reason": "Output event differs from actual write or game reference"
+    },
+    {
+      "case": "bad_instruction",
+      "rejected": true,
+      "reason": "Output instruction bytes/descriptor differs from PE"
+    },
+    {
+      "case": "wrong_occurrence",
+      "rejected": true,
+      "reason": "Next occurrence is not chronological"
+    },
+    {
+      "case": "wrong_register",
+      "rejected": true,
+      "reason": "Register delta before-value breaks chronology"
+    },
+    {
+      "case": "missing_exhaustive_case",
+      "rejected": true,
+      "reason": "Reference lacks unique exhaustive mixed-domain coverage"
+    },
+    {
+      "case": "fabricated_exit_zero_alternative",
+      "rejected": true,
+      "reason": "Invented conditional or zero exit alternative"
+    },
+    {
+      "case": "fabricated_exit_input_requirement",
+      "rejected": true,
+      "reason": "Invented conditional or zero exit alternative"
+    }
+  ],
+  "limits": [
+    "Retained-evidence audit only: no fresh PE, Node, compiler, emulator, Git or SMT execution.",
+    "Hashes establish consistency, not independent authentication of native capture or toolchain supply chain.",
+    "Original COFF objects are disposable; their byte/relocation comparison report is retained and hash-bound.",
+    "Proof requires normal ABI entry, intact code/flags, successful loads and valid distinct buffers; non-observation is not proof.",
+    "No live registration, physics, timing, occupancy authorization, commitment reducer, arrival count or persistence is certified."
+  ]
+}
