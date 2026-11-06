@@ -1,0 +1,525 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "bypass",
+  "request_revision": "four-input-always-open-2026-11-06",
+  "integration_status": "acquisition_only_no_live_integration",
+  "supersedes": [
+    "2026-11-06T035920Z-bypass-draft-codex.md six-input contract",
+    "2026-11-06T042857Z-bypass-campaign-codex.md six-input contract"
+  ],
+  "reference_kind": "actual_declarative_evaluator",
+  "reference_snapshot": "Use the source commit in the matching *-bypass-native-request-linux.md shared handoff. This committed request deliberately contains no self-referential resulting commit SHA.",
+  "reference_source_sha256": {
+    "levels/campaign/bypass.json": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "levels/drafts/bypass.json": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+    "src/workbench/runtime.ts": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99",
+    "server/declarative-state.ts": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73",
+    "server/coop-state.ts": "c0bf71f60c2d26ecf7525ccee603bf391b180def9e97eac7f034bbeb0f73c14b",
+    "server/level-definitions.ts": "6e0a6fa4d624eab79c418177bce8c0ed5c9979bf67584b02d64a8535df00863d"
+  },
+  "canonical_document_sha256": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 16,
+    "output_size": 16,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "anchorHold",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "anchorHold.occupied",
+      "bit": 0,
+      "initial": 0,
+      "false_meaning": "No accepted body occupies HOLD / ANCHOR",
+      "true_meaning": "Grounded accepted body occupies HOLD / ANCHOR; cubes cannot activate it"
+    },
+    {
+      "name": "link",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "link.value",
+      "bit": 1,
+      "initial": 0,
+      "false_meaning": "LINK has not been committed",
+      "true_meaning": "One-use LINK terminal has been accepted and committed"
+    },
+    {
+      "name": "bypassHold",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "bypassHold.occupied",
+      "bit": 2,
+      "initial": 0,
+      "false_meaning": "No accepted body occupies HOLD / BYPASS",
+      "true_meaning": "Grounded accepted body occupies HOLD / BYPASS; cubes cannot activate it"
+    },
+    {
+      "name": "override",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "game_port": "override.value",
+      "bit": 3,
+      "initial": 0,
+      "false_meaning": "OVERRIDE has not been committed",
+      "true_meaning": "One-use OVERRIDE terminal has been accepted and committed"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "anchorPower",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:anchorPower",
+      "true_meaning": "Stable shared anchor is solid/powered and grappleable",
+      "false_meaning": "Anchor is inactive/ghosted and not hookable",
+      "expression": {
+        "args": [
+          {
+            "id": "anchorHold.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "link.value",
+            "op": "ref"
+          }
+        ],
+        "op": "or"
+      }
+    },
+    {
+      "name": "bridgePower",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:bridgePower",
+      "true_meaning": "LINK bridge is solid/powered but never hookable",
+      "false_meaning": "LINK bridge is inactive/ghosted",
+      "expression": {
+        "id": "link.value",
+        "op": "ref"
+      }
+    },
+    {
+      "name": "firewallActive",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:firewallActive",
+      "true_meaning": "Both firewallA and firewallB are lethal/active",
+      "false_meaning": "Both firewalls are disabled/passable",
+      "expression": {
+        "arg": {
+          "args": [
+            {
+              "id": "bypassHold.occupied",
+              "op": "ref"
+            },
+            {
+              "id": "override.value",
+              "op": "ref"
+            }
+          ],
+          "op": "or"
+        },
+        "op": "not"
+      }
+    },
+    {
+      "name": "exitReady",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:exitReady",
+      "true_meaning": "Exit unlock request is always asserted, including all-zero input",
+      "false_meaning": "Unreachable for every valid input; do not synthesize a false condition",
+      "expression": {
+        "op": "const",
+        "value": true
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "id": "anchorFeed",
+      "output": "anchorPower",
+      "property": "active",
+      "target": "anchor",
+      "invert": false,
+      "resolved_signal": "draft:anchorFeed",
+      "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+    },
+    {
+      "id": "bridgeFeed",
+      "output": "bridgePower",
+      "property": "active",
+      "target": "bridge",
+      "invert": false,
+      "resolved_signal": "draft:bridgeFeed",
+      "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+    },
+    {
+      "id": "barrierA",
+      "output": "firewallActive",
+      "property": "active",
+      "target": "firewallA",
+      "invert": false,
+      "resolved_signal": "draft:barrierA",
+      "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+    },
+    {
+      "id": "barrierB",
+      "output": "firewallActive",
+      "property": "active",
+      "target": "firewallB",
+      "invert": false,
+      "resolved_signal": "draft:barrierB",
+      "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+    },
+    {
+      "id": "exitFeed",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit",
+      "invert": false,
+      "resolved_signal": "draft:exitFeed",
+      "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 4,
+    "row_count": 16,
+    "encoding": "case_id = bit0(anchorHold) | bit1(link) | bit2(bypassHold) | bit3(override)",
+    "domain_note": "Only uint32 0 and 1 are valid. Every abstract vector is tested, regardless of physical reachability."
+  },
+  "initial_state": {
+    "inputs": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "outputs": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "native_outputs": "Write all four outputs on every invocation; no retained state",
+    "harness_output_sentinel": 2779096485
+  },
+  "reference_vectors": [
+    {
+      "case_id": 0,
+      "inputs": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "outputs": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 1,
+      "inputs": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 2,
+      "inputs": [
+        0,
+        1,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 3,
+      "inputs": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 4,
+      "inputs": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 5,
+      "inputs": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 6,
+      "inputs": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 7,
+      "inputs": [
+        1,
+        1,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 8,
+      "inputs": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 9,
+      "inputs": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 10,
+      "inputs": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 11,
+      "inputs": [
+        1,
+        1,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 12,
+      "inputs": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 13,
+      "inputs": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 14,
+      "inputs": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 15,
+      "inputs": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1
+      ]
+    }
+  ],
+  "server_owned": [
+    "Body-only occupancy arbitration; no cube activation for either scanner",
+    "One-use LINK and OVERRIDE commitment and persistence",
+    "Exit latch=true, two distinct arrivals and campaign completion; no extra LINK/OVERRIDE gate",
+    "Checkpoint/respawn and death recovery",
+    "Shared crumble foot/hook warning1.4s, recovery2.6s, scheduling and existing fuse rules",
+    "Movement, jump/grapple physics and hazard contacts"
+  ],
+  "exit_semantics": {
+    "raw_output": "exitReady",
+    "binding": "exitFeed",
+    "constant": true,
+    "latch": true,
+    "required_arrivals": 2,
+    "note": "Physically and visibly open in the initial accepted state. Completion requires both physical arrivals, with no scanner or terminal prerequisite."
+  },
+  "manifestation_notes": {
+    "firewallActive": [
+      "firewallA.active",
+      "firewallB.active"
+    ],
+    "note": "Two physical barriers manifest ONE raw output, not separate Boolean outputs. Crumble is authored mechanics, not proven bogus code."
+  },
+  "reference_commit": "a209122ba1e3b54c6d329a94c01276b9550c9189",
+  "request_sha256": "af24de094de2926bf47e4ea8d01536ff999f69b58030ff88993acb06792fb469",
+  "constant_outputs": {
+    "exitReady": 1
+  }
+}

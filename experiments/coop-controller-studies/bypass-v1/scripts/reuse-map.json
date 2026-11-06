@@ -1,0 +1,130 @@
+{
+  "schema": "bypass-tool-reuse/v1",
+  "adaptation_generator_sha256": "1a89392239abff08ecc12f097d7f86bcd17433fba3de9a8ae9597794f48ebd63",
+  "tools": {
+    "build.py": {
+      "source": "experiments/coop-controllers/shared/build.py",
+      "source_sha256": "69bd67623f1bf40cd5f1374d85522ed891500c6305f368adea46f7877325f36e",
+      "adapted_sha256": "895e6f4b530f469e5317a60211b29c37106429de38dca99fb1e6b5a816da8d5d",
+      "replacements": [
+        {
+          "old": "ap=argparse.ArgumentParser();ap.add_argument('chamber');args=ap.parse_args()",
+          "new": "ap=argparse.ArgumentParser();ap.add_argument('chamber',nargs='?',default='bypass',choices=['bypass']);args=ap.parse_args()",
+          "matches": 1
+        },
+        {
+          "old": "root=AREA/args.chamber; contract=",
+          "new": "from common import verify_reference\n    verify_reference()\n    root=AREA; contract=",
+          "matches": 1
+        },
+        {
+          "old": "assert root.parent==AREA and contract['chamber_id']==args.chamber",
+          "new": "assert root==Path(__file__).resolve().parents[1] and contract['chamber_id']=='bypass'",
+          "matches": 1
+        },
+        {
+          "old": "for name in ['libcmt.lib','oldnames.lib','legacy_stdio_definitions.lib']:",
+          "new": "for name in ['libcmt.lib','oldnames.lib','legacy_stdio_definitions.lib','libvcruntime.lib','libucrt.lib','kernel32.lib']:",
+          "matches": 1
+        },
+        {
+          "old": "runtime=dict(environment=",
+          "new": "runtime=dict(environment_setup_exit_code=vs.returncode,environment_setup_stderr=vs.stderr,environment=",
+          "matches": 1
+        }
+      ]
+    },
+    "validate_native.py": {
+      "source": "experiments/coop-controllers/shared/validate_native.py",
+      "source_sha256": "1bdafadd28438b497c574c40536499dc74673c953a25c412b666a71ad1924eca",
+      "adapted_sha256": "d5d476bb0ef9825bd11a3b0bbe758f2cf07c6ba9850851001b57664f448b5915",
+      "replacements": [
+        {
+          "old": "ap=argparse.ArgumentParser();ap.add_argument('chamber');args=ap.parse_args()",
+          "new": "ap=argparse.ArgumentParser();ap.add_argument('chamber',nargs='?',default='bypass',choices=['bypass']);ap.add_argument('--environment',choices=['sandbox','windows-host'],required=True);args=ap.parse_args()",
+          "matches": 1
+        },
+        {
+          "old": "root=AREA/args.chamber;ev=",
+          "new": "root=AREA;ev=",
+          "matches": 1
+        },
+        {
+          "old": "f'native-{variant}-stdout.jsonl.gz'",
+          "new": "f'native-{variant}-{args.environment}-stdout.jsonl.gz'",
+          "matches": 1
+        },
+        {
+          "old": "status.update(binary_sha256=sha(exe)",
+          "new": "status.update(execution_environment=args.environment,input_stream=stdin,binary_sha256=sha(exe)",
+          "matches": 1
+        },
+        {
+          "old": "if not report['all_valid']:raise SystemExit('Native failures retained; build not accepted.')",
+          "new": "if not report['all_valid']:\n        save(ev/f'native-failed-{args.environment}.json',report)\n        raise SystemExit('Native failures retained; build not accepted.')",
+          "matches": 1
+        }
+      ]
+    },
+    "analyze.py": {
+      "source": "experiments/coop-controllers/shared/analyze.py",
+      "source_sha256": "de08eaecbdb16fb57e092b0532feb799e0494b63e679eae378585b2982781f5e",
+      "adapted_sha256": "77018874fba8e5e5a68019a12d79522396aac22f7658caee039289d5520b3234",
+      "replacements": [
+        {
+          "old": "assert ROOT.parent==area and ROOT.name in ('handshake','deadlock','use-after-free','crossfeed-vault','race-condition'), 'Only a new co-op controller experiment may be written'",
+          "new": "assert ROOT==Path(__file__).resolve().parents[1], 'Only this independent BYPASS package may be written'",
+          "matches": 1
+        }
+      ]
+    },
+    "prove_bogus.py": {
+      "source": "experiments/coop-controllers/shared/prove_bogus.py",
+      "source_sha256": "ebe13356627f47872c3c9b53d1f652f074655555da073e8c2847ebc5cffbc3da",
+      "adapted_sha256": "d437fc80a74e9908dd0b88c4ece53feab6588820d7f2a298d4f660fe4b2655e9",
+      "replacements": [
+        {
+          "old": "require(ROOT.parent==area and ROOT.name in ('handshake','deadlock','use-after-free','crossfeed-vault','race-condition'),'Only new co-op experiments allowed')",
+          "new": "require(ROOT==Path(__file__).resolve().parents[1],'Only this independent BYPASS package allowed')",
+          "matches": 1
+        },
+        {
+          "old": "ROOT.parent / 'shared' / 'ollvm_source' / 'manifest.json'",
+          "new": "ROOT.parents[1] / 'coop-controllers/shared/ollvm_source/manifest.json'",
+          "matches": 1
+        },
+        {
+          "old": "'../shared/ollvm_source/",
+          "new": "'../../coop-controllers/shared/ollvm_source/",
+          "matches": 2
+        }
+      ]
+    },
+    "verify_proof.py": {
+      "source": "experiments/coop-controllers/shared/verify_proof.py",
+      "source_sha256": "da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731",
+      "adapted_sha256": "900afbbac94f266aa8ae7b3cdbee730f69507b493a4529e2a685bec54791fbef",
+      "replacements": [
+        {
+          "old": "root.parent/'shared/ollvm_source'",
+          "new": "root.parents[1]/'coop-controllers/shared/ollvm_source'",
+          "matches": 1
+        },
+        {
+          "old": "root.parent / 'shared/ollvm_source/manifest.json'",
+          "new": "root.parents[1] / 'coop-controllers/shared/ollvm_source/manifest.json'",
+          "matches": 1
+        },
+        {
+          "old": "'../shared/ollvm_source/'",
+          "new": "'../../coop-controllers/shared/ollvm_source/'",
+          "matches": 1
+        }
+      ]
+    }
+  },
+  "read_only_portable_helper": {
+    "path": "experiments/coop-controllers/shared/verify_portable.py",
+    "sha256": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e"
+  }
+}

@@ -1,0 +1,1843 @@
+{
+  "schema": "bypass-decisions/v1",
+  "binary_sha256": "af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74",
+  "conditions": [
+    {
+      "id": "anchor-hold",
+      "output": "anchorPower",
+      "input": {
+        "name": "anchorHold",
+        "offset": 0,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "read_rva": 4220
+      },
+      "predicate": "uint32_input != 0",
+      "spill_offset_from_rbp": -17,
+      "read_fragment_id": "anchor-hold.read",
+      "branch_fragment_id": "anchor-hold.branch",
+      "guard_between_read_and_branch": "opaque_guard_02",
+      "native_successors": [
+        {
+          "target": "bb_00001132",
+          "kind": "branch_taken"
+        },
+        {
+          "target": "bb_000010BA",
+          "kind": "fallthrough"
+        }
+      ],
+      "ir_checks": {
+        "originalBB": [
+          {
+            "line": 26,
+            "text": "%outputs.addr = alloca ptr, align 8"
+          },
+          {
+            "line": 27,
+            "text": "%inputs.addr = alloca ptr, align 8"
+          },
+          {
+            "line": 28,
+            "text": "store ptr %outputs, ptr %outputs.addr, align 8"
+          },
+          {
+            "line": 29,
+            "text": "store ptr %inputs, ptr %inputs.addr, align 8"
+          },
+          {
+            "line": 30,
+            "text": "%8 = load ptr, ptr %inputs.addr, align 8"
+          },
+          {
+            "line": 31,
+            "text": "%anchorHold = getelementptr inbounds %struct.ControllerInputs, ptr %8, i32 0, i32 0"
+          },
+          {
+            "line": 32,
+            "text": "%9 = load i32, ptr %anchorHold, align 4"
+          },
+          {
+            "line": 33,
+            "text": "%tobool = icmp ne i32 %9, 0"
+          },
+          {
+            "line": 34,
+            "text": "%10 = load i32, ptr @x, align 4"
+          },
+          {
+            "line": 35,
+            "text": "%11 = load i32, ptr @y, align 4"
+          },
+          {
+            "line": 36,
+            "text": "%12 = sub i32 %10, 1"
+          },
+          {
+            "line": 37,
+            "text": "%13 = mul i32 %10, %12"
+          },
+          {
+            "line": 38,
+            "text": "%14 = urem i32 %13, 2"
+          },
+          {
+            "line": 39,
+            "text": "%15 = icmp eq i32 %14, 0"
+          },
+          {
+            "line": 40,
+            "text": "%16 = icmp slt i32 %11, 10"
+          },
+          {
+            "line": 41,
+            "text": "%17 = or i1 %15, %16"
+          },
+          {
+            "line": 42,
+            "text": "br i1 %17, label %originalBBpart2, label %originalBBalteredBB"
+          }
+        ],
+        "originalBBpart2": [
+          {
+            "line": 45,
+            "text": "br i1 %tobool, label %if.then, label %lor.lhs.false"
+          }
+        ]
+      },
+      "support": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713402,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "comparison_step": 62,
+          "input_address": 1895825408,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709823,
+          "spill_step": 64,
+          "reload_step": 78,
+          "branch_step": 80,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713402,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "anchor-link",
+      "output": "anchorPower",
+      "input": {
+        "name": "link",
+        "offset": 4,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "read_rva": 4337
+      },
+      "predicate": "uint32_input != 0",
+      "spill_offset_from_rbp": -49,
+      "read_fragment_id": "anchor-link.read",
+      "branch_fragment_id": "anchor-link.branch",
+      "guard_between_read_and_branch": "opaque_guard_04",
+      "native_successors": [
+        {
+          "target": "bb_00001132",
+          "kind": "branch_taken"
+        },
+        {
+          "target": "bb_00001130",
+          "kind": "fallthrough"
+        }
+      ],
+      "ir_checks": {
+        "originalBB16": [
+          {
+            "line": 59,
+            "text": "%26 = load ptr, ptr %inputs.addr, align 8"
+          },
+          {
+            "line": 60,
+            "text": "%link = getelementptr inbounds %struct.ControllerInputs, ptr %26, i32 0, i32 1"
+          },
+          {
+            "line": 61,
+            "text": "%27 = load i32, ptr %link, align 4"
+          },
+          {
+            "line": 62,
+            "text": "%tobool1 = icmp ne i32 %27, 0"
+          },
+          {
+            "line": 63,
+            "text": "%28 = load i32, ptr @x, align 4"
+          },
+          {
+            "line": 64,
+            "text": "%29 = load i32, ptr @y, align 4"
+          },
+          {
+            "line": 65,
+            "text": "%30 = sub i32 %28, 1"
+          },
+          {
+            "line": 66,
+            "text": "%31 = mul i32 %28, %30"
+          },
+          {
+            "line": 67,
+            "text": "%32 = urem i32 %31, 2"
+          },
+          {
+            "line": 68,
+            "text": "%33 = icmp eq i32 %32, 0"
+          },
+          {
+            "line": 69,
+            "text": "%34 = icmp slt i32 %29, 10"
+          },
+          {
+            "line": 70,
+            "text": "%35 = or i1 %33, %34"
+          },
+          {
+            "line": 71,
+            "text": "br i1 %35, label %originalBBpart218, label %originalBB16alteredBB"
+          }
+        ],
+        "originalBBpart218": [
+          {
+            "line": 74,
+            "text": "br i1 %tobool1, label %if.then, label %if.else"
+          }
+        ]
+      },
+      "support": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713520,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713520,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713520,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713520,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "comparison_step": 97,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709791,
+          "spill_step": 99,
+          "reload_step": 113,
+          "branch_step": 115,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713522,
+            "fallthrough_address": 5368713520,
+            "next_address": 5368713522,
+            "taken": true,
+            "flags_used": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "bridge-link",
+      "output": "bridgePower",
+      "input": {
+        "name": "link",
+        "offset": 4,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "read_rva": 4669
+      },
+      "predicate": "uint32_input != 0",
+      "spill_offset_from_rbp": -50,
+      "read_fragment_id": "bridge-link.read",
+      "branch_fragment_id": "bridge-link.branch",
+      "guard_between_read_and_branch": "opaque_guard_10",
+      "native_successors": [
+        {
+          "target": "bb_0000127E",
+          "kind": "branch_taken"
+        },
+        {
+          "target": "bb_0000127C",
+          "kind": "fallthrough"
+        }
+      ],
+      "ir_checks": {
+        "originalBB28": [
+          {
+            "line": 144,
+            "text": "%78 = load ptr, ptr %inputs.addr, align 8"
+          },
+          {
+            "line": 145,
+            "text": "%link3 = getelementptr inbounds %struct.ControllerInputs, ptr %78, i32 0, i32 1"
+          },
+          {
+            "line": 146,
+            "text": "%79 = load i32, ptr %link3, align 4"
+          },
+          {
+            "line": 147,
+            "text": "%tobool4 = icmp ne i32 %79, 0"
+          },
+          {
+            "line": 148,
+            "text": "%80 = load i32, ptr @x, align 4"
+          },
+          {
+            "line": 149,
+            "text": "%81 = load i32, ptr @y, align 4"
+          },
+          {
+            "line": 150,
+            "text": "%82 = sub i32 %80, 1"
+          },
+          {
+            "line": 151,
+            "text": "%83 = mul i32 %80, %82"
+          },
+          {
+            "line": 152,
+            "text": "%84 = urem i32 %83, 2"
+          },
+          {
+            "line": 153,
+            "text": "%85 = icmp eq i32 %84, 0"
+          },
+          {
+            "line": 154,
+            "text": "%86 = icmp slt i32 %81, 10"
+          },
+          {
+            "line": 155,
+            "text": "%87 = or i1 %85, %86"
+          },
+          {
+            "line": 156,
+            "text": "br i1 %87, label %originalBBpart230, label %originalBB28alteredBB"
+          }
+        ],
+        "originalBBpart230": [
+          {
+            "line": 159,
+            "text": "br i1 %tobool4, label %if.then5, label %if.else6"
+          }
+        ]
+      },
+      "support": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "comparison_step": 162,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 164,
+          "reload_step": 178,
+          "branch_step": 180,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "comparison_step": 161,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 163,
+          "reload_step": 177,
+          "branch_step": 179,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "comparison_step": 162,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 164,
+          "reload_step": 178,
+          "branch_step": 180,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "comparison_step": 161,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 163,
+          "reload_step": 177,
+          "branch_step": 179,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "comparison_step": 162,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 164,
+          "reload_step": 178,
+          "branch_step": 180,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "comparison_step": 161,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 163,
+          "reload_step": 177,
+          "branch_step": 179,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "comparison_step": 162,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 164,
+          "reload_step": 178,
+          "branch_step": 180,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713852,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "comparison_step": 161,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 163,
+          "reload_step": 177,
+          "branch_step": 179,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "comparison_step": 126,
+          "input_address": 1895825412,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709790,
+          "spill_step": 128,
+          "reload_step": 142,
+          "branch_step": 144,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368713854,
+            "fallthrough_address": 5368713852,
+            "next_address": 5368713854,
+            "taken": true,
+            "flags_used": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "firewall-hold",
+      "output": "firewallActive",
+      "input": {
+        "name": "bypassHold",
+        "offset": 8,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "read_rva": 5003
+      },
+      "predicate": "uint32_input != 0",
+      "spill_offset_from_rbp": -51,
+      "read_fragment_id": "firewall-hold.read",
+      "branch_fragment_id": "firewall-hold.branch",
+      "guard_between_read_and_branch": "opaque_guard_16",
+      "native_successors": [
+        {
+          "target": "bb_00001442",
+          "kind": "branch_taken"
+        },
+        {
+          "target": "bb_000013CA",
+          "kind": "fallthrough"
+        }
+      ],
+      "ir_checks": {
+        "originalBB40": [
+          {
+            "line": 229,
+            "text": "%130 = load ptr, ptr %inputs.addr, align 8"
+          },
+          {
+            "line": 230,
+            "text": "%bypassHold = getelementptr inbounds %struct.ControllerInputs, ptr %130, i32 0, i32 2"
+          },
+          {
+            "line": 231,
+            "text": "%131 = load i32, ptr %bypassHold, align 4"
+          },
+          {
+            "line": 232,
+            "text": "%tobool9 = icmp ne i32 %131, 0"
+          },
+          {
+            "line": 233,
+            "text": "%132 = load i32, ptr @x, align 4"
+          },
+          {
+            "line": 234,
+            "text": "%133 = load i32, ptr @y, align 4"
+          },
+          {
+            "line": 235,
+            "text": "%134 = sub i32 %132, 1"
+          },
+          {
+            "line": 236,
+            "text": "%135 = mul i32 %132, %134"
+          },
+          {
+            "line": 237,
+            "text": "%136 = urem i32 %135, 2"
+          },
+          {
+            "line": 238,
+            "text": "%137 = icmp eq i32 %136, 0"
+          },
+          {
+            "line": 239,
+            "text": "%138 = icmp slt i32 %133, 10"
+          },
+          {
+            "line": 240,
+            "text": "%139 = or i1 %137, %138"
+          },
+          {
+            "line": 241,
+            "text": "br i1 %139, label %originalBBpart242, label %originalBB40alteredBB"
+          }
+        ],
+        "originalBBpart242": [
+          {
+            "line": 244,
+            "text": "br i1 %tobool9, label %if.then12, label %lor.lhs.false10"
+          }
+        ]
+      },
+      "support": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "comparison_step": 227,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 229,
+          "reload_step": 243,
+          "branch_step": 245,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "comparison_step": 191,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 193,
+          "reload_step": 207,
+          "branch_step": 209,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "comparison_step": 225,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 227,
+          "reload_step": 241,
+          "branch_step": 243,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "comparison_step": 190,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 192,
+          "reload_step": 206,
+          "branch_step": 208,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "comparison_step": 227,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 229,
+          "reload_step": 243,
+          "branch_step": 245,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "comparison_step": 191,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 193,
+          "reload_step": 207,
+          "branch_step": 209,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "comparison_step": 225,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 227,
+          "reload_step": 241,
+          "branch_step": 243,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "comparison_step": 190,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 192,
+          "reload_step": 206,
+          "branch_step": 208,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "comparison_step": 227,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 229,
+          "reload_step": 243,
+          "branch_step": 245,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "comparison_step": 191,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 193,
+          "reload_step": 207,
+          "branch_step": 209,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "comparison_step": 225,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 227,
+          "reload_step": 241,
+          "branch_step": 243,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "comparison_step": 190,
+          "input_address": 1895825416,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709789,
+          "spill_step": 192,
+          "reload_step": 206,
+          "branch_step": 208,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714186,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "comparison_step": 227,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 229,
+          "reload_step": 243,
+          "branch_step": 245,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "comparison_step": 191,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 193,
+          "reload_step": 207,
+          "branch_step": 209,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "comparison_step": 225,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 227,
+          "reload_step": 241,
+          "branch_step": 243,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "comparison_step": 190,
+          "input_address": 1895825416,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709789,
+          "spill_step": 192,
+          "reload_step": 206,
+          "branch_step": 208,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714186,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "firewall-override",
+      "output": "firewallActive",
+      "input": {
+        "name": "override",
+        "offset": 12,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "read_rva": 5121
+      },
+      "predicate": "uint32_input != 0",
+      "spill_offset_from_rbp": -52,
+      "read_fragment_id": "firewall-override.read",
+      "branch_fragment_id": "firewall-override.branch",
+      "guard_between_read_and_branch": "opaque_guard_18",
+      "native_successors": [
+        {
+          "target": "bb_00001442",
+          "kind": "branch_taken"
+        },
+        {
+          "target": "bb_00001440",
+          "kind": "fallthrough"
+        }
+      ],
+      "ir_checks": {
+        "originalBB44": [
+          {
+            "line": 258,
+            "text": "%148 = load ptr, ptr %inputs.addr, align 8"
+          },
+          {
+            "line": 259,
+            "text": "%override = getelementptr inbounds %struct.ControllerInputs, ptr %148, i32 0, i32 3"
+          },
+          {
+            "line": 260,
+            "text": "%149 = load i32, ptr %override, align 4"
+          },
+          {
+            "line": 261,
+            "text": "%tobool11 = icmp ne i32 %149, 0"
+          },
+          {
+            "line": 262,
+            "text": "%150 = load i32, ptr @x, align 4"
+          },
+          {
+            "line": 263,
+            "text": "%151 = load i32, ptr @y, align 4"
+          },
+          {
+            "line": 264,
+            "text": "%152 = sub i32 %150, 1"
+          },
+          {
+            "line": 265,
+            "text": "%153 = mul i32 %150, %152"
+          },
+          {
+            "line": 266,
+            "text": "%154 = urem i32 %153, 2"
+          },
+          {
+            "line": 267,
+            "text": "%155 = icmp eq i32 %154, 0"
+          },
+          {
+            "line": 268,
+            "text": "%156 = icmp slt i32 %151, 10"
+          },
+          {
+            "line": 269,
+            "text": "%157 = or i1 %155, %156"
+          },
+          {
+            "line": 270,
+            "text": "br i1 %157, label %originalBBpart246, label %originalBB44alteredBB"
+          }
+        ],
+        "originalBBpart246": [
+          {
+            "line": 273,
+            "text": "br i1 %tobool11, label %if.then12, label %if.else13"
+          }
+        ]
+      },
+      "support": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "comparison_step": 262,
+          "input_address": 1895825420,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709788,
+          "spill_step": 264,
+          "reload_step": 278,
+          "branch_step": 280,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714304,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "comparison_step": 226,
+          "input_address": 1895825420,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709788,
+          "spill_step": 228,
+          "reload_step": 242,
+          "branch_step": 244,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714304,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "comparison_step": 260,
+          "input_address": 1895825420,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709788,
+          "spill_step": 262,
+          "reload_step": 276,
+          "branch_step": 278,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714304,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "comparison_step": 225,
+          "input_address": 1895825420,
+          "input_value": 0,
+          "predicate_value": 0,
+          "spill_address": 1612709788,
+          "spill_step": 227,
+          "reload_step": 241,
+          "branch_step": 243,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714304,
+            "taken": false,
+            "flags_used": 70
+          }
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "comparison_step": 262,
+          "input_address": 1895825420,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709788,
+          "spill_step": 264,
+          "reload_step": 278,
+          "branch_step": 280,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "comparison_step": 226,
+          "input_address": 1895825420,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709788,
+          "spill_step": 228,
+          "reload_step": 242,
+          "branch_step": 244,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "comparison_step": 260,
+          "input_address": 1895825420,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709788,
+          "spill_step": 262,
+          "reload_step": 276,
+          "branch_step": 278,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "comparison_step": 225,
+          "input_address": 1895825420,
+          "input_value": 1,
+          "predicate_value": 1,
+          "spill_address": 1612709788,
+          "spill_step": 227,
+          "reload_step": 241,
+          "branch_step": 243,
+          "branch_observation": {
+            "kind": "conditional",
+            "mnemonic": "jne",
+            "target_address": 5368714306,
+            "fallthrough_address": 5368714304,
+            "next_address": 5368714306,
+            "taken": true,
+            "flags_used": 2
+          }
+        }
+      ]
+    }
+  ],
+  "constant_output": {
+    "output": "exitReady",
+    "value": 1,
+    "input_requirements": [],
+    "condition_fragment_ids": [],
+    "valid_store_rvas": [
+      5455
+    ],
+    "zero_alternative": null,
+    "scope": "All 16 canonical Boolean vectors and all nine ordered snapshots; ordinary ABI entry, valid distinct buffers and intact code. Output is a constant unlock request, not arrival/latch state."
+  },
+  "scope": "Five field predicates implement the first three outputs with short-circuit control flow. Firewall true input predicates reach its zero store. Entry/prologue establishes RCX/RDX pointer slots; assumptions are not arbitrary corrupted machine states."
+}

@@ -1,0 +1,200 @@
+{
+  "schema": "bypass-historical-preservation/v1",
+  "historical_acquisition_commit": "7e510dbdad54ac2b09ff0021a1067561738d5fa2",
+  "historical_reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+  "historical_manifest_sha256": "d5b89badb1f442fe91a96a151708962eca81695de769797a7af235c06bcf8da5",
+  "verifier_sha256": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e",
+  "unchanged_files": 192,
+  "reference_files": {
+    "levels/campaign/handshake.json": "9e44dd3d61c6d653b0dce8c2fa56b46760e31ff6ad569c75fb98f01193900371",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "5d3500b6a62cb96ebde6ab51a1f3ae886925fe38737eea18dd819f10ffdd146c",
+    "src/engine/constants.ts": "28803c2f2d5e3a9c12b278a4e52a96e21a0a0a57ee261bed0321b25a8cc18b94",
+    "src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "server/declarative-state.ts": "c19452466be6f8c507be99161aa85ee31de1c7ecfeb9a3ad3df548bc9d51d480",
+    "src/coop/authored-campaign.ts": "a164ac67409dc7fc2259044a5aed957bfc0dfbb0aa86134486e2e4bab680fe93",
+    "src/coop/campaign.ts": "61b423066034f8314c80356c5b63ce53fba5f28ade417ad368264e7ac65be2a3",
+    "levels/campaign/deadlock.json": "45fe70810ec108ee6671f97056024642f0491c68c08bccfbde078bda4d1b3fc0",
+    "levels/campaign/use-after-free.json": "b459b5c4b011aa3a1733b6d4e5629d97539c768d4ba2062bb1b6ea4848ef8571",
+    "server/crossfeed-state.ts": "10562c8ee0da1fb509b93bc0f39675b56aa312cade55454e787c0687cfb53f50",
+    "server/crumble-state.ts": "83ccc4a60e81e351fb8c286cebced6e46372f9ef4f1f92976f0495b5b2ad9665",
+    "server/coop-state.ts": "246476aef5571e43c1f24bd827dff8c5c4cf86ae52c6e3fc4272930cccbe771f",
+    "server/multiplayer.ts": "7d3ed8eacdc3c3281d581c27eb6b29fe89cb563bd00592d4c5d6d70fc90ee272",
+    "src/coop/protocol.ts": "a810956e0dc5936c953bbd047917bcc6b3ec4a51a2fda89bc5d4795eb57024f2",
+    "src/coop/crossfeed-vault.ts": "fe961ec556acfda31cf06291a1cb3c9c49be9bd492377865d4cd2794debe8d22",
+    "docs/crossfeed-vault.md": "ceb10a0d08ba7c399235d6d8180b516ae462d99d70c36bc30a524690cd86766a",
+    "docs/adr/0008-reversible-coop-machinery.md": "5fcb5ea2883ff82f03cb8c5356524cb38e9eb9d63993049fe95d6dbcc9558cd4",
+    "server/race-state.ts": "cc8ace95015f1220ea9bc9765ed214282aa60cf56849091ed92777049843b7e6",
+    "src/coop/race-condition.ts": "e748db991bb5d50bb6d07a042373d2268e46ce3e274afd44ac0d430048a76190",
+    "docs/race-condition.md": "51a86c418e8be950af0de3724efe0c6e647fc40cc27dc548324f64b9f1c4db75"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "argv": [
+    "C:\\Users\\royga\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-I",
+    "-B",
+    "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controller-studies\\bypass-v1\\_scratch\\historical-reference\\experiments\\coop-controllers\\shared\\verify_portable.py"
+  ],
+  "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controller-studies\\bypass-v1\\_scratch\\historical-reference",
+  "exit_code": 0,
+  "stderr": "",
+  "stdout": "{\n  \"schema\": \"coop-native-portable-verification/v1\",\n  \"status\": \"PASS\",\n  \"read_only\": true,\n  \"reference_commit\": \"1315c3616ce5ac939baf913f9b09b4ebad34132a\",\n  \"manifest_sha256\": \"d5b89badb1f442fe91a96a151708962eca81695de769797a7af235c06bcf8da5\",\n  \"verifier_sha256\": \"669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e\",\n  \"proof_verifier_sha256\": \"da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731\",\n  \"chambers\": [\n    {\n      \"chamber_id\": \"handshake\",\n      \"status\": \"PASS\",\n      \"inputs\": 5,\n      \"outputs\": 4,\n      \"exhaustive_cases\": 32,\n      \"reference_cases\": 32,\n      \"ordered_sequence_snapshots\": 33,\n      \"native_frames\": 130,\n      \"retained_traces\": 32,\n      \"trace_coverage_exhaustive\": true,\n      \"output_commits\": 128,\n      \"opaque_guards\": 28,\n      \"proven_clones\": 14,\n      \"binary_sha256\": {\n        \"clean\": \"b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9\",\n        \"bcf\": \"002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8\"\n      }\n    },\n    {\n      \"chamber_id\": \"crossfeed-vault\",\n      \"status\": \"PASS\",\n      \"inputs\": 14,\n      \"outputs\": 14,\n      \"exhaustive_cases\": 16384,\n      \"reference_cases\": 16419,\n      \"ordered_sequence_snapshots\": 35,\n      \"native_frames\": 32908,\n      \"retained_traces\": 32,\n      \"trace_coverage_exhaustive\": false,\n      \"output_commits\": 448,\n      \"opaque_guards\": 112,\n      \"proven_clones\": 56,\n      \"binary_sha256\": {\n        \"clean\": \"be975d9287cf756d09c1f52aebea820c0f02ae90a8068f77852048052d9c418c\",\n        \"bcf\": \"8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b\"\n      }\n    },\n    {\n      \"chamber_id\": \"race-condition\",\n      \"status\": \"PASS\",\n      \"inputs\": 11,\n      \"outputs\": 13,\n      \"exhaustive_cases\": 4096,\n      \"reference_cases\": 4137,\n      \"ordered_sequence_snapshots\": 41,\n      \"native_frames\": 8356,\n      \"retained_traces\": 32,\n      \"trace_coverage_exhaustive\": false,\n      \"output_commits\": 416,\n      \"opaque_guards\": 108,\n      \"proven_clones\": 54,\n      \"binary_sha256\": {\n        \"clean\": \"2eb161048cac1f2734838ed3a87e601e6e990e311a6c316eacf88696928b8487\",\n        \"bcf\": \"371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a\"\n      }\n    },\n    {\n      \"chamber_id\": \"deadlock\",\n      \"status\": \"PASS\",\n      \"inputs\": 6,\n      \"outputs\": 5,\n      \"exhaustive_cases\": 64,\n      \"reference_cases\": 64,\n      \"ordered_sequence_snapshots\": 39,\n      \"native_frames\": 206,\n      \"retained_traces\": 32,\n      \"trace_coverage_exhaustive\": false,\n      \"output_commits\": 160,\n      \"opaque_guards\": 44,\n      \"proven_clones\": 22,\n      \"binary_sha256\": {\n        \"clean\": \"089e084593c95318dd160e50a8d2eb04b7b5cd74f354047bf3f48849b1790135\",\n        \"bcf\": \"0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6\"\n      }\n    },\n    {\n      \"chamber_id\": \"use-after-free\",\n      \"status\": \"PASS\",\n      \"inputs\": 5,\n      \"outputs\": 6,\n      \"exhaustive_cases\": 32,\n      \"reference_cases\": 32,\n      \"ordered_sequence_snapshots\": 33,\n      \"native_frames\": 130,\n      \"retained_traces\": 32,\n      \"trace_coverage_exhaustive\": true,\n      \"output_commits\": 192,\n      \"opaque_guards\": 44,\n      \"proven_clones\": 22,\n      \"binary_sha256\": {\n        \"clean\": \"454a024ff15eef8414f6a651a7b909842539bbc254dcf7a5dbad36b9eb0e5028\",\n        \"bcf\": \"733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb\"\n      }\n    }\n  ],\n  \"negative_checks\": [\n    {\n      \"case\": \"bad_event\",\n      \"rejected\": true,\n      \"reason\": \"Output event differs from actual write or game reference\"\n    },\n    {\n      \"case\": \"bad_instruction\",\n      \"rejected\": true,\n      \"reason\": \"Output instruction bytes/descriptor differs from PE\"\n    },\n    {\n      \"case\": \"wrong_occurrence\",\n      \"rejected\": true,\n      \"reason\": \"Next occurrence is not chronological\"\n    },\n    {\n      \"case\": \"wrong_register\",\n      \"rejected\": true,\n      \"reason\": \"Register delta before-value breaks chronology\"\n    },\n    {\n      \"case\": \"missing_exhaustive_case\",\n      \"rejected\": true,\n      \"reason\": \"Reference lacks unique exhaustive mixed-domain coverage\"\n    }\n  ],\n  \"checks\": [\n    \"Exact retained-file inventories and SHA-256 manifests\",\n    \"Authoritative game source hashes, native ABI and raw/resolved bindings\",\n    \"Unique exhaustive canonical input products and independent retained declarative AST evaluation\",\n    \"Actual server sequence snapshot chronology and projection references\",\n    \"Clean/BCF native stdout and every named expected output, including ordered invocation streams\",\n    \"PE export/.pdata boundaries, exact instruction bytes, block partitions and encoded CFG edges\",\n    \"Trace register/flag/memory chronology, actual linked helpers, raw occurrences and committed native output stores\",\n    \"Retained output-site/value coverage summaries\",\n    \"Exact BCF native guard patterns, analytical parity proof and clone/IR/incoming-transfer provenance\",\n    \"BCF instruction and CFG growth relative to clean baseline\"\n  ],\n  \"limitations\": [\n    \"Read-only consistency audit: does not execute Windows PEs, re-run the game oracle, rebuild, emulate instructions, or invoke SMT.\",\n    \"Windows native execution remains the authority for observed native outputs; retained file checks alone cannot independently authenticate observation capture.\",\n    \"Trace executions are Unicorn runs of exact linked PE bytes and are separate from native Windows process observations.\",\n    \"Recorded object byte/relocation equivalence is hash-bound; disposable COFF objects are not required.\",\n    \"Temporal native controllers implement stateless projection only. Ordered server reducer observations do not mean the PE implements timer scheduling, persistence, occupancy arbitration or event acceptance.\",\n    \"Bogus-code proof is conditional on ordinary entry, intact code/flags, successful loads and normal calls; unobserved blocks alone are not proof.\",\n    \"No live campaign integration, authored geometry or physics change is certified by this package.\"\n  ]\n}\n",
+  "report": {
+    "schema": "coop-native-portable-verification/v1",
+    "status": "PASS",
+    "read_only": true,
+    "reference_commit": "1315c3616ce5ac939baf913f9b09b4ebad34132a",
+    "manifest_sha256": "d5b89badb1f442fe91a96a151708962eca81695de769797a7af235c06bcf8da5",
+    "verifier_sha256": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e",
+    "proof_verifier_sha256": "da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731",
+    "chambers": [
+      {
+        "chamber_id": "handshake",
+        "status": "PASS",
+        "inputs": 5,
+        "outputs": 4,
+        "exhaustive_cases": 32,
+        "reference_cases": 32,
+        "ordered_sequence_snapshots": 33,
+        "native_frames": 130,
+        "retained_traces": 32,
+        "trace_coverage_exhaustive": true,
+        "output_commits": 128,
+        "opaque_guards": 28,
+        "proven_clones": 14,
+        "binary_sha256": {
+          "clean": "b81345375a3b5b7dfa7f67a7fd0fa4bb9245b8fc6cce3d66148cf26ad53299c9",
+          "bcf": "002b39f41eaa83daf6c21881e4140800d5b1a3c2fe302570994db2e15d0cc4e8"
+        }
+      },
+      {
+        "chamber_id": "crossfeed-vault",
+        "status": "PASS",
+        "inputs": 14,
+        "outputs": 14,
+        "exhaustive_cases": 16384,
+        "reference_cases": 16419,
+        "ordered_sequence_snapshots": 35,
+        "native_frames": 32908,
+        "retained_traces": 32,
+        "trace_coverage_exhaustive": false,
+        "output_commits": 448,
+        "opaque_guards": 112,
+        "proven_clones": 56,
+        "binary_sha256": {
+          "clean": "be975d9287cf756d09c1f52aebea820c0f02ae90a8068f77852048052d9c418c",
+          "bcf": "8cc4b8f4a989461afb15f8c957a7fa51816a12859df8cd4b8260a9956c7b282b"
+        }
+      },
+      {
+        "chamber_id": "race-condition",
+        "status": "PASS",
+        "inputs": 11,
+        "outputs": 13,
+        "exhaustive_cases": 4096,
+        "reference_cases": 4137,
+        "ordered_sequence_snapshots": 41,
+        "native_frames": 8356,
+        "retained_traces": 32,
+        "trace_coverage_exhaustive": false,
+        "output_commits": 416,
+        "opaque_guards": 108,
+        "proven_clones": 54,
+        "binary_sha256": {
+          "clean": "2eb161048cac1f2734838ed3a87e601e6e990e311a6c316eacf88696928b8487",
+          "bcf": "371d0217e00d8662430df701ab2f8b34d4192a9b574534b5b32099dddc6c491a"
+        }
+      },
+      {
+        "chamber_id": "deadlock",
+        "status": "PASS",
+        "inputs": 6,
+        "outputs": 5,
+        "exhaustive_cases": 64,
+        "reference_cases": 64,
+        "ordered_sequence_snapshots": 39,
+        "native_frames": 206,
+        "retained_traces": 32,
+        "trace_coverage_exhaustive": false,
+        "output_commits": 160,
+        "opaque_guards": 44,
+        "proven_clones": 22,
+        "binary_sha256": {
+          "clean": "089e084593c95318dd160e50a8d2eb04b7b5cd74f354047bf3f48849b1790135",
+          "bcf": "0ac0c12e5999cc17cc319bddbc2d20a3653a4c53b3cbb715b8b53bf808c506f6"
+        }
+      },
+      {
+        "chamber_id": "use-after-free",
+        "status": "PASS",
+        "inputs": 5,
+        "outputs": 6,
+        "exhaustive_cases": 32,
+        "reference_cases": 32,
+        "ordered_sequence_snapshots": 33,
+        "native_frames": 130,
+        "retained_traces": 32,
+        "trace_coverage_exhaustive": true,
+        "output_commits": 192,
+        "opaque_guards": 44,
+        "proven_clones": 22,
+        "binary_sha256": {
+          "clean": "454a024ff15eef8414f6a651a7b909842539bbc254dcf7a5dbad36b9eb0e5028",
+          "bcf": "733e5c0aeb6e3ef0fa92271e2f37df649ecf7f888b720ba17807b7f99cb283cb"
+        }
+      }
+    ],
+    "negative_checks": [
+      {
+        "case": "bad_event",
+        "rejected": true,
+        "reason": "Output event differs from actual write or game reference"
+      },
+      {
+        "case": "bad_instruction",
+        "rejected": true,
+        "reason": "Output instruction bytes/descriptor differs from PE"
+      },
+      {
+        "case": "wrong_occurrence",
+        "rejected": true,
+        "reason": "Next occurrence is not chronological"
+      },
+      {
+        "case": "wrong_register",
+        "rejected": true,
+        "reason": "Register delta before-value breaks chronology"
+      },
+      {
+        "case": "missing_exhaustive_case",
+        "rejected": true,
+        "reason": "Reference lacks unique exhaustive mixed-domain coverage"
+      }
+    ],
+    "checks": [
+      "Exact retained-file inventories and SHA-256 manifests",
+      "Authoritative game source hashes, native ABI and raw/resolved bindings",
+      "Unique exhaustive canonical input products and independent retained declarative AST evaluation",
+      "Actual server sequence snapshot chronology and projection references",
+      "Clean/BCF native stdout and every named expected output, including ordered invocation streams",
+      "PE export/.pdata boundaries, exact instruction bytes, block partitions and encoded CFG edges",
+      "Trace register/flag/memory chronology, actual linked helpers, raw occurrences and committed native output stores",
+      "Retained output-site/value coverage summaries",
+      "Exact BCF native guard patterns, analytical parity proof and clone/IR/incoming-transfer provenance",
+      "BCF instruction and CFG growth relative to clean baseline"
+    ],
+    "limitations": [
+      "Read-only consistency audit: does not execute Windows PEs, re-run the game oracle, rebuild, emulate instructions, or invoke SMT.",
+      "Windows native execution remains the authority for observed native outputs; retained file checks alone cannot independently authenticate observation capture.",
+      "Trace executions are Unicorn runs of exact linked PE bytes and are separate from native Windows process observations.",
+      "Recorded object byte/relocation equivalence is hash-bound; disposable COFF objects are not required.",
+      "Temporal native controllers implement stateless projection only. Ordered server reducer observations do not mean the PE implements timer scheduling, persistence, occupancy arbitration or event acceptance.",
+      "Bogus-code proof is conditional on ordinary entry, intact code/flags, successful loads and normal calls; unobserved blocks alone are not proof.",
+      "No live campaign integration, authored geometry or physics change is certified by this package."
+    ]
+  },
+  "scope": "Exact unmodified historical package bytes, audited against exact historical Git reference blobs in isolated scratch; no original evidence or current game source was rewritten."
+}

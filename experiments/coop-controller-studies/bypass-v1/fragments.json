@@ -1,0 +1,3514 @@
+{
+  "schema": "bypass-fragments/v1",
+  "binary_sha256": "af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74",
+  "image_base": 5368709120,
+  "controller_bounds": {
+    "name": "bn_evaluate",
+    "start_va": 5368713216,
+    "start_rva": 4096,
+    "end_va": 5368714838,
+    "end_rva": 5718,
+    "boundary_source": "Exact exported entry + PE x64 exception directory BeginAddress/EndAddress",
+    "bytes_sha256": "da3dbf80143866c8c7d1173fb2afa288fa016e01b35905283c464ae9fe26587f",
+    "complete_decoding": true
+  },
+  "fragments": [
+    {
+      "id": "anchor-hold.read",
+      "output": "anchorPower",
+      "role": "input_check",
+      "source_block_id": "bb_00001040",
+      "address_range": {
+        "start_rva": 4217,
+        "end_rva_exclusive": 4229,
+        "start_va": 5368713337,
+        "end_va_exclusive": 5368713349
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_1",
+          "assembly_label": ".LBB0_1",
+          "ir_block": "originalBB",
+          "va": 5368713280,
+          "object_offset": 64
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713337,
+          "rva": 4217,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_00001079",
+          "block_id": "bb_00001040"
+        },
+        {
+          "address": 5368713340,
+          "rva": 4220,
+          "size": 3,
+          "bytes": "83 38 00",
+          "mnemonic": "cmp",
+          "op_str": "dword ptr [rax], 0",
+          "id": "insn_0000107C",
+          "block_id": "bb_00001040"
+        },
+        {
+          "address": 5368713343,
+          "rva": 4223,
+          "size": 3,
+          "bytes": "0f 95 c0",
+          "mnemonic": "setne",
+          "op_str": "al",
+          "id": "insn_0000107F",
+          "block_id": "bb_00001040"
+        },
+        {
+          "address": 5368713346,
+          "rva": 4226,
+          "size": 3,
+          "bytes": "88 45 ef",
+          "mnemonic": "mov",
+          "op_str": "byte ptr [rbp - 0x11], al",
+          "id": "insn_00001082",
+          "block_id": "bb_00001040"
+        }
+      ],
+      "context": "Compare the actual uint32 input with zero, SETNE AL, then preserve it in a stack byte. RAX already points to the saved input-pointer slot; 0x1076 stored original RCX there.",
+      "input_fields": [
+        {
+          "name": "anchorHold",
+          "offset": 0,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 4220
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:001"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:001"
+        }
+      ]
+    },
+    {
+      "id": "anchor-hold.branch",
+      "output": "anchorPower",
+      "role": "puzzle_branch",
+      "source_block_id": "bb_000010B3",
+      "address_range": {
+        "start_rva": 4275,
+        "end_rva_exclusive": 4282,
+        "start_va": 5368713395,
+        "end_va_exclusive": 5368713402
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_2",
+          "assembly_label": ".LBB0_2",
+          "ir_block": "originalBBpart2",
+          "va": 5368713395,
+          "object_offset": 179
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713395,
+          "rva": 4275,
+          "size": 3,
+          "bytes": "8a 45 ef",
+          "mnemonic": "mov",
+          "op_str": "al, byte ptr [rbp - 0x11]",
+          "id": "insn_000010B3",
+          "block_id": "bb_000010B3"
+        },
+        {
+          "address": 5368713398,
+          "rva": 4278,
+          "size": 2,
+          "bytes": "a8 01",
+          "mnemonic": "test",
+          "op_str": "al, 1",
+          "id": "insn_000010B6",
+          "block_id": "bb_000010B3"
+        },
+        {
+          "address": 5368713400,
+          "rva": 4280,
+          "size": 2,
+          "bytes": "75 78",
+          "mnemonic": "jne",
+          "op_str": "0x140001132",
+          "id": "insn_000010B8",
+          "block_id": "bb_000010B3"
+        }
+      ],
+      "context": "Reload the saved Boolean from RBP-0x11; TEST AL,1 provides JNE flags. Intervening opaque guards clobber AL/flags; they are not player inputs.",
+      "input_fields": [
+        {
+          "name": "anchorHold",
+          "offset": 0,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 4220
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:002"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            78,
+            79,
+            80
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:002"
+        }
+      ]
+    },
+    {
+      "id": "anchor-link.read",
+      "output": "anchorPower",
+      "role": "input_check",
+      "source_block_id": "bb_000010EA",
+      "address_range": {
+        "start_rva": 4330,
+        "end_rva_exclusive": 4347,
+        "start_va": 5368713450,
+        "end_va_exclusive": 5368713467
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_4",
+          "assembly_label": ".LBB0_4",
+          "ir_block": "originalBB16",
+          "va": 5368713450,
+          "object_offset": 234
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713450,
+          "rva": 4330,
+          "size": 4,
+          "bytes": "48 8b 45 e0",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x20]",
+          "id": "insn_000010EA",
+          "block_id": "bb_000010EA"
+        },
+        {
+          "address": 5368713454,
+          "rva": 4334,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_000010EE",
+          "block_id": "bb_000010EA"
+        },
+        {
+          "address": 5368713457,
+          "rva": 4337,
+          "size": 4,
+          "bytes": "83 78 04 00",
+          "mnemonic": "cmp",
+          "op_str": "dword ptr [rax + 4], 0",
+          "id": "insn_000010F1",
+          "block_id": "bb_000010EA"
+        },
+        {
+          "address": 5368713461,
+          "rva": 4341,
+          "size": 3,
+          "bytes": "0f 95 c0",
+          "mnemonic": "setne",
+          "op_str": "al",
+          "id": "insn_000010F5",
+          "block_id": "bb_000010EA"
+        },
+        {
+          "address": 5368713464,
+          "rva": 4344,
+          "size": 3,
+          "bytes": "88 45 cf",
+          "mnemonic": "mov",
+          "op_str": "byte ptr [rbp - 0x31], al",
+          "id": "insn_000010F8",
+          "block_id": "bb_000010EA"
+        }
+      ],
+      "context": "Compare the actual uint32 input with zero, SETNE AL, then preserve it in a stack byte. Two MOVs restore the input pointer through [RBP-0x20].",
+      "input_fields": [
+        {
+          "name": "link",
+          "offset": 4,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 4337
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:005"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            95,
+            96,
+            97,
+            98,
+            99
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:005"
+        }
+      ]
+    },
+    {
+      "id": "anchor-link.branch",
+      "output": "anchorPower",
+      "role": "puzzle_branch",
+      "source_block_id": "bb_00001129",
+      "address_range": {
+        "start_rva": 4393,
+        "end_rva_exclusive": 4400,
+        "start_va": 5368713513,
+        "end_va_exclusive": 5368713520
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_5",
+          "assembly_label": ".LBB0_5",
+          "ir_block": "originalBBpart218",
+          "va": 5368713513,
+          "object_offset": 297
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713513,
+          "rva": 4393,
+          "size": 3,
+          "bytes": "8a 45 cf",
+          "mnemonic": "mov",
+          "op_str": "al, byte ptr [rbp - 0x31]",
+          "id": "insn_00001129",
+          "block_id": "bb_00001129"
+        },
+        {
+          "address": 5368713516,
+          "rva": 4396,
+          "size": 2,
+          "bytes": "a8 01",
+          "mnemonic": "test",
+          "op_str": "al, 1",
+          "id": "insn_0000112C",
+          "block_id": "bb_00001129"
+        },
+        {
+          "address": 5368713518,
+          "rva": 4398,
+          "size": 2,
+          "bytes": "75 02",
+          "mnemonic": "jne",
+          "op_str": "0x140001132",
+          "id": "insn_0000112E",
+          "block_id": "bb_00001129"
+        }
+      ],
+      "context": "Reload the saved Boolean from RBP-0x31; TEST AL,1 provides JNE flags. Intervening opaque guards clobber AL/flags; they are not player inputs.",
+      "input_fields": [
+        {
+          "name": "link",
+          "offset": 4,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 4337
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:006"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            113,
+            114,
+            115
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:006"
+        }
+      ]
+    },
+    {
+      "id": "bridge-link.read",
+      "output": "bridgePower",
+      "role": "input_check",
+      "source_block_id": "bb_00001236",
+      "address_range": {
+        "start_rva": 4662,
+        "end_rva_exclusive": 4679,
+        "start_va": 5368713782,
+        "end_va_exclusive": 5368713799
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_13",
+          "assembly_label": ".LBB0_13",
+          "ir_block": "originalBB28",
+          "va": 5368713782,
+          "object_offset": 566
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713782,
+          "rva": 4662,
+          "size": 4,
+          "bytes": "48 8b 45 e0",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x20]",
+          "id": "insn_00001236",
+          "block_id": "bb_00001236"
+        },
+        {
+          "address": 5368713786,
+          "rva": 4666,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_0000123A",
+          "block_id": "bb_00001236"
+        },
+        {
+          "address": 5368713789,
+          "rva": 4669,
+          "size": 4,
+          "bytes": "83 78 04 00",
+          "mnemonic": "cmp",
+          "op_str": "dword ptr [rax + 4], 0",
+          "id": "insn_0000123D",
+          "block_id": "bb_00001236"
+        },
+        {
+          "address": 5368713793,
+          "rva": 4673,
+          "size": 3,
+          "bytes": "0f 95 c0",
+          "mnemonic": "setne",
+          "op_str": "al",
+          "id": "insn_00001241",
+          "block_id": "bb_00001236"
+        },
+        {
+          "address": 5368713796,
+          "rva": 4676,
+          "size": 3,
+          "bytes": "88 45 ce",
+          "mnemonic": "mov",
+          "op_str": "byte ptr [rbp - 0x32], al",
+          "id": "insn_00001244",
+          "block_id": "bb_00001236"
+        }
+      ],
+      "context": "Compare the actual uint32 input with zero, SETNE AL, then preserve it in a stack byte. Two MOVs restore the input pointer through [RBP-0x20].",
+      "input_fields": [
+        {
+          "name": "link",
+          "offset": 4,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 4669
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            160,
+            161,
+            162,
+            163,
+            164
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            159,
+            160,
+            161,
+            162,
+            163
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            160,
+            161,
+            162,
+            163,
+            164
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            159,
+            160,
+            161,
+            162,
+            163
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            160,
+            161,
+            162,
+            163,
+            164
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            159,
+            160,
+            161,
+            162,
+            163
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            160,
+            161,
+            162,
+            163,
+            164
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:007"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            159,
+            160,
+            161,
+            162,
+            163
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            124,
+            125,
+            126,
+            127,
+            128
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:007"
+        }
+      ]
+    },
+    {
+      "id": "bridge-link.branch",
+      "output": "bridgePower",
+      "role": "puzzle_branch",
+      "source_block_id": "bb_00001275",
+      "address_range": {
+        "start_rva": 4725,
+        "end_rva_exclusive": 4732,
+        "start_va": 5368713845,
+        "end_va_exclusive": 5368713852
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_14",
+          "assembly_label": ".LBB0_14",
+          "ir_block": "originalBBpart230",
+          "va": 5368713845,
+          "object_offset": 629
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713845,
+          "rva": 4725,
+          "size": 3,
+          "bytes": "8a 45 ce",
+          "mnemonic": "mov",
+          "op_str": "al, byte ptr [rbp - 0x32]",
+          "id": "insn_00001275",
+          "block_id": "bb_00001275"
+        },
+        {
+          "address": 5368713848,
+          "rva": 4728,
+          "size": 2,
+          "bytes": "a8 01",
+          "mnemonic": "test",
+          "op_str": "al, 1",
+          "id": "insn_00001278",
+          "block_id": "bb_00001275"
+        },
+        {
+          "address": 5368713850,
+          "rva": 4730,
+          "size": 2,
+          "bytes": "75 02",
+          "mnemonic": "jne",
+          "op_str": "0x14000127e",
+          "id": "insn_0000127A",
+          "block_id": "bb_00001275"
+        }
+      ],
+      "context": "Reload the saved Boolean from RBP-0x32; TEST AL,1 provides JNE flags. Intervening opaque guards clobber AL/flags; they are not player inputs.",
+      "input_fields": [
+        {
+          "name": "link",
+          "offset": 4,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 4669
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            178,
+            179,
+            180
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            177,
+            178,
+            179
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            178,
+            179,
+            180
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            177,
+            178,
+            179
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            178,
+            179,
+            180
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            177,
+            178,
+            179
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            178,
+            179,
+            180
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            177,
+            178,
+            179
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:012"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            142,
+            143,
+            144
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:008"
+        }
+      ]
+    },
+    {
+      "id": "firewall-hold.read",
+      "output": "firewallActive",
+      "role": "input_check",
+      "source_block_id": "bb_00001384",
+      "address_range": {
+        "start_rva": 4996,
+        "end_rva_exclusive": 5013,
+        "start_va": 5368714116,
+        "end_va_exclusive": 5368714133
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_22",
+          "assembly_label": ".LBB0_22",
+          "ir_block": "originalBB40",
+          "va": 5368714116,
+          "object_offset": 900
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714116,
+          "rva": 4996,
+          "size": 4,
+          "bytes": "48 8b 45 e0",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x20]",
+          "id": "insn_00001384",
+          "block_id": "bb_00001384"
+        },
+        {
+          "address": 5368714120,
+          "rva": 5000,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_00001388",
+          "block_id": "bb_00001384"
+        },
+        {
+          "address": 5368714123,
+          "rva": 5003,
+          "size": 4,
+          "bytes": "83 78 08 00",
+          "mnemonic": "cmp",
+          "op_str": "dword ptr [rax + 8], 0",
+          "id": "insn_0000138B",
+          "block_id": "bb_00001384"
+        },
+        {
+          "address": 5368714127,
+          "rva": 5007,
+          "size": 3,
+          "bytes": "0f 95 c0",
+          "mnemonic": "setne",
+          "op_str": "al",
+          "id": "insn_0000138F",
+          "block_id": "bb_00001384"
+        },
+        {
+          "address": 5368714130,
+          "rva": 5010,
+          "size": 3,
+          "bytes": "88 45 cd",
+          "mnemonic": "mov",
+          "op_str": "byte ptr [rbp - 0x33], al",
+          "id": "insn_00001392",
+          "block_id": "bb_00001384"
+        }
+      ],
+      "context": "Compare the actual uint32 input with zero, SETNE AL, then preserve it in a stack byte. Two MOVs restore the input pointer through [RBP-0x20].",
+      "input_fields": [
+        {
+          "name": "bypassHold",
+          "offset": 8,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 5003
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            225,
+            226,
+            227,
+            228,
+            229
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            189,
+            190,
+            191,
+            192,
+            193
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            223,
+            224,
+            225,
+            226,
+            227
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            188,
+            189,
+            190,
+            191,
+            192
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            225,
+            226,
+            227,
+            228,
+            229
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            189,
+            190,
+            191,
+            192,
+            193
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            223,
+            224,
+            225,
+            226,
+            227
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            188,
+            189,
+            190,
+            191,
+            192
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            225,
+            226,
+            227,
+            228,
+            229
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            189,
+            190,
+            191,
+            192,
+            193
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            223,
+            224,
+            225,
+            226,
+            227
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            188,
+            189,
+            190,
+            191,
+            192
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:013"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            225,
+            226,
+            227,
+            228,
+            229
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            189,
+            190,
+            191,
+            192,
+            193
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            223,
+            224,
+            225,
+            226,
+            227
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            188,
+            189,
+            190,
+            191,
+            192
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:013"
+        }
+      ]
+    },
+    {
+      "id": "firewall-hold.branch",
+      "output": "firewallActive",
+      "role": "puzzle_branch",
+      "source_block_id": "bb_000013C3",
+      "address_range": {
+        "start_rva": 5059,
+        "end_rva_exclusive": 5066,
+        "start_va": 5368714179,
+        "end_va_exclusive": 5368714186
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_23",
+          "assembly_label": ".LBB0_23",
+          "ir_block": "originalBBpart242",
+          "va": 5368714179,
+          "object_offset": 963
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714179,
+          "rva": 5059,
+          "size": 3,
+          "bytes": "8a 45 cd",
+          "mnemonic": "mov",
+          "op_str": "al, byte ptr [rbp - 0x33]",
+          "id": "insn_000013C3",
+          "block_id": "bb_000013C3"
+        },
+        {
+          "address": 5368714182,
+          "rva": 5062,
+          "size": 2,
+          "bytes": "a8 01",
+          "mnemonic": "test",
+          "op_str": "al, 1",
+          "id": "insn_000013C6",
+          "block_id": "bb_000013C3"
+        },
+        {
+          "address": 5368714184,
+          "rva": 5064,
+          "size": 2,
+          "bytes": "75 78",
+          "mnemonic": "jne",
+          "op_str": "0x140001442",
+          "id": "insn_000013C8",
+          "block_id": "bb_000013C3"
+        }
+      ],
+      "context": "Reload the saved Boolean from RBP-0x33; TEST AL,1 provides JNE flags. Intervening opaque guards clobber AL/flags; they are not player inputs.",
+      "input_fields": [
+        {
+          "name": "bypassHold",
+          "offset": 8,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 5003
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            243,
+            244,
+            245
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            207,
+            208,
+            209
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:015"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            241,
+            242,
+            243
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            206,
+            207,
+            208
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            243,
+            244,
+            245
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            207,
+            208,
+            209
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:015"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            241,
+            242,
+            243
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            206,
+            207,
+            208
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            243,
+            244,
+            245
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            207,
+            208,
+            209
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:015"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            241,
+            242,
+            243
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            206,
+            207,
+            208
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            243,
+            244,
+            245
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            207,
+            208,
+            209
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:015"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            241,
+            242,
+            243
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            206,
+            207,
+            208
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:014"
+        }
+      ]
+    },
+    {
+      "id": "firewall-override.read",
+      "output": "firewallActive",
+      "role": "input_check",
+      "source_block_id": "bb_000013FA",
+      "address_range": {
+        "start_rva": 5114,
+        "end_rva_exclusive": 5131,
+        "start_va": 5368714234,
+        "end_va_exclusive": 5368714251
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_25",
+          "assembly_label": ".LBB0_25",
+          "ir_block": "originalBB44",
+          "va": 5368714234,
+          "object_offset": 1018
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714234,
+          "rva": 5114,
+          "size": 4,
+          "bytes": "48 8b 45 e0",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x20]",
+          "id": "insn_000013FA",
+          "block_id": "bb_000013FA"
+        },
+        {
+          "address": 5368714238,
+          "rva": 5118,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_000013FE",
+          "block_id": "bb_000013FA"
+        },
+        {
+          "address": 5368714241,
+          "rva": 5121,
+          "size": 4,
+          "bytes": "83 78 0c 00",
+          "mnemonic": "cmp",
+          "op_str": "dword ptr [rax + 0xc], 0",
+          "id": "insn_00001401",
+          "block_id": "bb_000013FA"
+        },
+        {
+          "address": 5368714245,
+          "rva": 5125,
+          "size": 3,
+          "bytes": "0f 95 c0",
+          "mnemonic": "setne",
+          "op_str": "al",
+          "id": "insn_00001405",
+          "block_id": "bb_000013FA"
+        },
+        {
+          "address": 5368714248,
+          "rva": 5128,
+          "size": 3,
+          "bytes": "88 45 cc",
+          "mnemonic": "mov",
+          "op_str": "byte ptr [rbp - 0x34], al",
+          "id": "insn_00001408",
+          "block_id": "bb_000013FA"
+        }
+      ],
+      "context": "Compare the actual uint32 input with zero, SETNE AL, then preserve it in a stack byte. Two MOVs restore the input pointer through [RBP-0x20].",
+      "input_fields": [
+        {
+          "name": "override",
+          "offset": 12,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 5121
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            260,
+            261,
+            262,
+            263,
+            264
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:023"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            224,
+            225,
+            226,
+            227,
+            228
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            258,
+            259,
+            260,
+            261,
+            262
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:021"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            223,
+            224,
+            225,
+            226,
+            227
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            260,
+            261,
+            262,
+            263,
+            264
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:023"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            224,
+            225,
+            226,
+            227,
+            228
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            258,
+            259,
+            260,
+            261,
+            262
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:021"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            223,
+            224,
+            225,
+            226,
+            227
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:017"
+        }
+      ]
+    },
+    {
+      "id": "firewall-override.branch",
+      "output": "firewallActive",
+      "role": "puzzle_branch",
+      "source_block_id": "bb_00001439",
+      "address_range": {
+        "start_rva": 5177,
+        "end_rva_exclusive": 5184,
+        "start_va": 5368714297,
+        "end_va_exclusive": 5368714304
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_26",
+          "assembly_label": ".LBB0_26",
+          "ir_block": "originalBBpart246",
+          "va": 5368714297,
+          "object_offset": 1081
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714297,
+          "rva": 5177,
+          "size": 3,
+          "bytes": "8a 45 cc",
+          "mnemonic": "mov",
+          "op_str": "al, byte ptr [rbp - 0x34]",
+          "id": "insn_00001439",
+          "block_id": "bb_00001439"
+        },
+        {
+          "address": 5368714300,
+          "rva": 5180,
+          "size": 2,
+          "bytes": "a8 01",
+          "mnemonic": "test",
+          "op_str": "al, 1",
+          "id": "insn_0000143C",
+          "block_id": "bb_00001439"
+        },
+        {
+          "address": 5368714302,
+          "rva": 5182,
+          "size": 2,
+          "bytes": "75 02",
+          "mnemonic": "jne",
+          "op_str": "0x140001442",
+          "id": "insn_0000143E",
+          "block_id": "bb_00001439"
+        }
+      ],
+      "context": "Reload the saved Boolean from RBP-0x34; TEST AL,1 provides JNE flags. Intervening opaque guards clobber AL/flags; they are not player inputs.",
+      "input_fields": [
+        {
+          "name": "override",
+          "offset": 12,
+          "width_bits": 32,
+          "domain": [
+            0,
+            1
+          ],
+          "read_rva": 5121
+        }
+      ],
+      "verified_output_store": null,
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            278,
+            279,
+            280
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:024"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            242,
+            243,
+            244
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            276,
+            277,
+            278
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:022"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            241,
+            242,
+            243
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:018"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            278,
+            279,
+            280
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:024"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            242,
+            243,
+            244
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            276,
+            277,
+            278
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:022"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            241,
+            242,
+            243
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:018"
+        }
+      ]
+    },
+    {
+      "id": "anchorPower.write-1",
+      "output": "anchorPower",
+      "role": "output_store",
+      "source_block_id": "bb_00001160",
+      "address_range": {
+        "start_rva": 4448,
+        "end_rva_exclusive": 4461,
+        "start_va": 5368713568,
+        "end_va_exclusive": 5368713581
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_7",
+          "assembly_label": ".LBB0_7",
+          "ir_block": "originalBB20",
+          "va": 5368713568,
+          "object_offset": 352
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713568,
+          "rva": 4448,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_00001160",
+          "block_id": "bb_00001160"
+        },
+        {
+          "address": 5368713572,
+          "rva": 4452,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_00001164",
+          "block_id": "bb_00001160"
+        },
+        {
+          "address": 5368713575,
+          "rva": 4455,
+          "size": 6,
+          "bytes": "c7 00 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax], 1",
+          "id": "insn_00001167",
+          "block_id": "bb_00001160"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. This is a genuine observed result alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "anchorPower",
+        "byte_offset": 0,
+        "instruction_rva": 4455,
+        "instruction_address": 5368713575,
+        "instruction": {
+          "id": "insn_00001167",
+          "address": 5368713575,
+          "rva": 4455,
+          "size": 6,
+          "bytes": "c7 00 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax], 1"
+        },
+        "raw_block_id": "bb_00001160",
+        "observed_values": [
+          1
+        ],
+        "case_ids": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          9,
+          10,
+          11,
+          13,
+          14,
+          15
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            129,
+            130,
+            131
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            129,
+            130,
+            131
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            129,
+            130,
+            131
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:004"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            129,
+            130,
+            131
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:008"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            94,
+            95,
+            96
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:004"
+        }
+      ]
+    },
+    {
+      "id": "anchorPower.write-0",
+      "output": "anchorPower",
+      "role": "output_store",
+      "source_block_id": "bb_000011CB",
+      "address_range": {
+        "start_rva": 4555,
+        "end_rva_exclusive": 4568,
+        "start_va": 5368713675,
+        "end_va_exclusive": 5368713688
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_10",
+          "assembly_label": ".LBB0_10",
+          "ir_block": "originalBB24",
+          "va": 5368713675,
+          "object_offset": 459
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713675,
+          "rva": 4555,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_000011CB",
+          "block_id": "bb_000011CB"
+        },
+        {
+          "address": 5368713679,
+          "rva": 4559,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_000011CF",
+          "block_id": "bb_000011CB"
+        },
+        {
+          "address": 5368713682,
+          "rva": 4562,
+          "size": 6,
+          "bytes": "c7 00 00 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax], 0",
+          "id": "insn_000011D2",
+          "block_id": "bb_000011CB"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. This is a genuine observed result alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "anchorPower",
+        "byte_offset": 0,
+        "instruction_rva": 4562,
+        "instruction_address": 5368713682,
+        "instruction": {
+          "id": "insn_000011D2",
+          "address": 5368713682,
+          "rva": 4562,
+          "size": 6,
+          "bytes": "c7 00 00 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax], 0"
+        },
+        "raw_block_id": "bb_000011CB",
+        "observed_values": [
+          0
+        ],
+        "case_ids": [
+          0,
+          4,
+          8,
+          12
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            130,
+            131,
+            132
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:009"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            130,
+            131,
+            132
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:009"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            130,
+            131,
+            132
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:009"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            130,
+            131,
+            132
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:009"
+        }
+      ]
+    },
+    {
+      "id": "bridgePower.write-1",
+      "output": "bridgePower",
+      "role": "output_store",
+      "source_block_id": "bb_000012AC",
+      "address_range": {
+        "start_rva": 4780,
+        "end_rva_exclusive": 4794,
+        "start_va": 5368713900,
+        "end_va_exclusive": 5368713914
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_16",
+          "assembly_label": ".LBB0_16",
+          "ir_block": "originalBB32",
+          "va": 5368713900,
+          "object_offset": 684
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368713900,
+          "rva": 4780,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_000012AC",
+          "block_id": "bb_000012AC"
+        },
+        {
+          "address": 5368713904,
+          "rva": 4784,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_000012B0",
+          "block_id": "bb_000012AC"
+        },
+        {
+          "address": 5368713907,
+          "rva": 4787,
+          "size": 7,
+          "bytes": "c7 40 04 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 4], 1",
+          "id": "insn_000012B3",
+          "block_id": "bb_000012AC"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. This is a genuine observed result alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "bridgePower",
+        "byte_offset": 4,
+        "instruction_rva": 4787,
+        "instruction_address": 5368713907,
+        "instruction": {
+          "id": "insn_000012B3",
+          "address": 5368713907,
+          "rva": 4787,
+          "size": 7,
+          "bytes": "c7 40 04 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 4], 1"
+        },
+        "raw_block_id": "bb_000012AC",
+        "observed_values": [
+          1
+        ],
+        "case_ids": [
+          2,
+          3,
+          6,
+          7,
+          10,
+          11,
+          14,
+          15
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            193,
+            194,
+            195
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            158,
+            159,
+            160
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:010"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            193,
+            194,
+            195
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            158,
+            159,
+            160
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:010"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            193,
+            194,
+            195
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            158,
+            159,
+            160
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:010"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            193,
+            194,
+            195
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:014"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            158,
+            159,
+            160
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:010"
+        }
+      ]
+    },
+    {
+      "id": "bridgePower.write-0",
+      "output": "bridgePower",
+      "role": "output_store",
+      "source_block_id": "bb_00001318",
+      "address_range": {
+        "start_rva": 4888,
+        "end_rva_exclusive": 4902,
+        "start_va": 5368714008,
+        "end_va_exclusive": 5368714022
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_19",
+          "assembly_label": ".LBB0_19",
+          "ir_block": "originalBB36",
+          "va": 5368714008,
+          "object_offset": 792
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714008,
+          "rva": 4888,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_00001318",
+          "block_id": "bb_00001318"
+        },
+        {
+          "address": 5368714012,
+          "rva": 4892,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_0000131C",
+          "block_id": "bb_00001318"
+        },
+        {
+          "address": 5368714015,
+          "rva": 4895,
+          "size": 7,
+          "bytes": "c7 40 04 00 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 4], 0",
+          "id": "insn_0000131F",
+          "block_id": "bb_00001318"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. This is a genuine observed result alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "bridgePower",
+        "byte_offset": 4,
+        "instruction_rva": 4895,
+        "instruction_address": 5368714015,
+        "instruction": {
+          "id": "insn_0000131F",
+          "address": 5368714015,
+          "rva": 4895,
+          "size": 7,
+          "bytes": "c7 40 04 00 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 4], 0"
+        },
+        "raw_block_id": "bb_00001318",
+        "observed_values": [
+          0
+        ],
+        "case_ids": [
+          0,
+          1,
+          4,
+          5,
+          8,
+          9,
+          12,
+          13
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            195,
+            196,
+            197
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:016"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            159,
+            160,
+            161
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            195,
+            196,
+            197
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:016"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            159,
+            160,
+            161
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            195,
+            196,
+            197
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:016"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            159,
+            160,
+            161
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:011"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            195,
+            196,
+            197
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:016"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            159,
+            160,
+            161
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:011"
+        }
+      ]
+    },
+    {
+      "id": "firewallActive.write-0",
+      "output": "firewallActive",
+      "role": "output_store",
+      "source_block_id": "bb_00001470",
+      "address_range": {
+        "start_rva": 5232,
+        "end_rva_exclusive": 5246,
+        "start_va": 5368714352,
+        "end_va_exclusive": 5368714366
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_28",
+          "assembly_label": ".LBB0_28",
+          "ir_block": "originalBB48",
+          "va": 5368714352,
+          "object_offset": 1136
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714352,
+          "rva": 5232,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_00001470",
+          "block_id": "bb_00001470"
+        },
+        {
+          "address": 5368714356,
+          "rva": 5236,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_00001474",
+          "block_id": "bb_00001470"
+        },
+        {
+          "address": 5368714359,
+          "rva": 5239,
+          "size": 7,
+          "bytes": "c7 40 08 00 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 8], 0",
+          "id": "insn_00001477",
+          "block_id": "bb_00001470"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. This is a genuine observed result alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "firewallActive",
+        "byte_offset": 8,
+        "instruction_rva": 5239,
+        "instruction_address": 5368714359,
+        "instruction": {
+          "id": "insn_00001477",
+          "address": 5368714359,
+          "rva": 5239,
+          "size": 7,
+          "bytes": "c7 40 08 00 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 8], 0"
+        },
+        "raw_block_id": "bb_00001470",
+        "observed_values": [
+          0
+        ],
+        "case_ids": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            259,
+            260,
+            261
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:022"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            223,
+            224,
+            225
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            257,
+            258,
+            259
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            222,
+            223,
+            224
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:016"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            294,
+            295,
+            296
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:026"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            258,
+            259,
+            260
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:021"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            292,
+            293,
+            294
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:024"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            257,
+            258,
+            259
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            259,
+            260,
+            261
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:022"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            223,
+            224,
+            225
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:017"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            257,
+            258,
+            259
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            222,
+            223,
+            224
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:016"
+        }
+      ]
+    },
+    {
+      "id": "firewallActive.write-1",
+      "output": "firewallActive",
+      "role": "output_store",
+      "source_block_id": "bb_000014DC",
+      "address_range": {
+        "start_rva": 5340,
+        "end_rva_exclusive": 5354,
+        "start_va": 5368714460,
+        "end_va_exclusive": 5368714474
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_31",
+          "assembly_label": ".LBB0_31",
+          "ir_block": "originalBB52",
+          "va": 5368714460,
+          "object_offset": 1244
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714460,
+          "rva": 5340,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_000014DC",
+          "block_id": "bb_000014DC"
+        },
+        {
+          "address": 5368714464,
+          "rva": 5344,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_000014E0",
+          "block_id": "bb_000014DC"
+        },
+        {
+          "address": 5368714467,
+          "rva": 5347,
+          "size": 7,
+          "bytes": "c7 40 08 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 8], 1",
+          "id": "insn_000014E3",
+          "block_id": "bb_000014DC"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. This is a genuine observed result alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "firewallActive",
+        "byte_offset": 8,
+        "instruction_rva": 5347,
+        "instruction_address": 5368714467,
+        "instruction": {
+          "id": "insn_000014E3",
+          "address": 5368714467,
+          "rva": 5347,
+          "size": 7,
+          "bytes": "c7 40 08 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 8], 1"
+        },
+        "raw_block_id": "bb_000014DC",
+        "observed_values": [
+          1
+        ],
+        "case_ids": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            295,
+            296,
+            297
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:027"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            259,
+            260,
+            261
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:022"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            293,
+            294,
+            295
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:025"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            258,
+            259,
+            260
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:021"
+        }
+      ]
+    },
+    {
+      "id": "exitReady.write-1",
+      "output": "exitReady",
+      "role": "output_store",
+      "source_block_id": "bb_00001548",
+      "address_range": {
+        "start_rva": 5448,
+        "end_rva_exclusive": 5462,
+        "start_va": 5368714568,
+        "end_va_exclusive": 5368714582
+      },
+      "compiler_labels": [
+        {
+          "symbol": "audit_LBB0_34",
+          "assembly_label": ".LBB0_34",
+          "ir_block": "originalBB56",
+          "va": 5368714568,
+          "object_offset": 1352
+        }
+      ],
+      "instructions": [
+        {
+          "address": 5368714568,
+          "rva": 5448,
+          "size": 4,
+          "bytes": "48 8b 45 d8",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rbp - 0x28]",
+          "id": "insn_00001548",
+          "block_id": "bb_00001548"
+        },
+        {
+          "address": 5368714572,
+          "rva": 5452,
+          "size": 3,
+          "bytes": "48 8b 00",
+          "mnemonic": "mov",
+          "op_str": "rax, qword ptr [rax]",
+          "id": "insn_0000154C",
+          "block_id": "bb_00001548"
+        },
+        {
+          "address": 5368714575,
+          "rva": 5455,
+          "size": 7,
+          "bytes": "c7 40 0c 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 0xc], 1",
+          "id": "insn_0000154F",
+          "block_id": "bb_00001548"
+        }
+      ],
+      "context": "Restore original RDX output pointer through [RBP-0x28] and write this exact immediate. Constant-one assignment; no input predicate or zero alternative.",
+      "input_fields": [],
+      "verified_output_store": {
+        "output": "exitReady",
+        "byte_offset": 12,
+        "instruction_rva": 5455,
+        "instruction_address": 5368714575,
+        "instruction": {
+          "id": "insn_0000154F",
+          "address": 5368714575,
+          "rva": 5455,
+          "size": 7,
+          "bytes": "c7 40 0c 01 00 00 00",
+          "mnemonic": "mov",
+          "op_str": "dword ptr [rax + 0xc], 1"
+        },
+        "raw_block_id": "bb_00001548",
+        "observed_values": [
+          1
+        ],
+        "case_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "supporting_traces": [
+        {
+          "trace_id": "bcf_case_0",
+          "case_id": 0,
+          "step_indices": [
+            325,
+            326,
+            327
+          ],
+          "raw_occurrence_id": "bcf_case_0:raw:030"
+        },
+        {
+          "trace_id": "bcf_case_1",
+          "case_id": 1,
+          "step_indices": [
+            289,
+            290,
+            291
+          ],
+          "raw_occurrence_id": "bcf_case_1:raw:025"
+        },
+        {
+          "trace_id": "bcf_case_2",
+          "case_id": 2,
+          "step_indices": [
+            323,
+            324,
+            325
+          ],
+          "raw_occurrence_id": "bcf_case_2:raw:028"
+        },
+        {
+          "trace_id": "bcf_case_3",
+          "case_id": 3,
+          "step_indices": [
+            288,
+            289,
+            290
+          ],
+          "raw_occurrence_id": "bcf_case_3:raw:024"
+        },
+        {
+          "trace_id": "bcf_case_4",
+          "case_id": 4,
+          "step_indices": [
+            289,
+            290,
+            291
+          ],
+          "raw_occurrence_id": "bcf_case_4:raw:025"
+        },
+        {
+          "trace_id": "bcf_case_5",
+          "case_id": 5,
+          "step_indices": [
+            253,
+            254,
+            255
+          ],
+          "raw_occurrence_id": "bcf_case_5:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_6",
+          "case_id": 6,
+          "step_indices": [
+            287,
+            288,
+            289
+          ],
+          "raw_occurrence_id": "bcf_case_6:raw:023"
+        },
+        {
+          "trace_id": "bcf_case_7",
+          "case_id": 7,
+          "step_indices": [
+            252,
+            253,
+            254
+          ],
+          "raw_occurrence_id": "bcf_case_7:raw:019"
+        },
+        {
+          "trace_id": "bcf_case_8",
+          "case_id": 8,
+          "step_indices": [
+            324,
+            325,
+            326
+          ],
+          "raw_occurrence_id": "bcf_case_8:raw:029"
+        },
+        {
+          "trace_id": "bcf_case_9",
+          "case_id": 9,
+          "step_indices": [
+            288,
+            289,
+            290
+          ],
+          "raw_occurrence_id": "bcf_case_9:raw:024"
+        },
+        {
+          "trace_id": "bcf_case_10",
+          "case_id": 10,
+          "step_indices": [
+            322,
+            323,
+            324
+          ],
+          "raw_occurrence_id": "bcf_case_10:raw:027"
+        },
+        {
+          "trace_id": "bcf_case_11",
+          "case_id": 11,
+          "step_indices": [
+            287,
+            288,
+            289
+          ],
+          "raw_occurrence_id": "bcf_case_11:raw:023"
+        },
+        {
+          "trace_id": "bcf_case_12",
+          "case_id": 12,
+          "step_indices": [
+            289,
+            290,
+            291
+          ],
+          "raw_occurrence_id": "bcf_case_12:raw:025"
+        },
+        {
+          "trace_id": "bcf_case_13",
+          "case_id": 13,
+          "step_indices": [
+            253,
+            254,
+            255
+          ],
+          "raw_occurrence_id": "bcf_case_13:raw:020"
+        },
+        {
+          "trace_id": "bcf_case_14",
+          "case_id": 14,
+          "step_indices": [
+            287,
+            288,
+            289
+          ],
+          "raw_occurrence_id": "bcf_case_14:raw:023"
+        },
+        {
+          "trace_id": "bcf_case_15",
+          "case_id": 15,
+          "step_indices": [
+            252,
+            253,
+            254
+          ],
+          "raw_occurrence_id": "bcf_case_15:raw:019"
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "output": "anchorPower",
+      "condition_fragment_ids": [
+        "anchor-hold.read",
+        "anchor-hold.branch",
+        "anchor-link.read",
+        "anchor-link.branch"
+      ],
+      "store_alternatives": {
+        "1": "anchorPower.write-1",
+        "0": "anchorPower.write-0"
+      },
+      "required_accepted_inputs": [
+        "anchorHold",
+        "link"
+      ],
+      "constant": null
+    },
+    {
+      "output": "bridgePower",
+      "condition_fragment_ids": [
+        "bridge-link.read",
+        "bridge-link.branch"
+      ],
+      "store_alternatives": {
+        "1": "bridgePower.write-1",
+        "0": "bridgePower.write-0"
+      },
+      "required_accepted_inputs": [
+        "link"
+      ],
+      "constant": null
+    },
+    {
+      "output": "firewallActive",
+      "condition_fragment_ids": [
+        "firewall-hold.read",
+        "firewall-hold.branch",
+        "firewall-override.read",
+        "firewall-override.branch"
+      ],
+      "store_alternatives": {
+        "0": "firewallActive.write-0",
+        "1": "firewallActive.write-1"
+      },
+      "required_accepted_inputs": [
+        "bypassHold",
+        "override"
+      ],
+      "constant": null
+    },
+    {
+      "output": "exitReady",
+      "condition_fragment_ids": [],
+      "store_alternatives": {
+        "1": "exitReady.write-1"
+      },
+      "required_accepted_inputs": [],
+      "constant": 1
+    }
+  ],
+  "constant_output": {
+    "output": "exitReady",
+    "value": 1,
+    "input_requirements": [],
+    "condition_fragment_ids": [],
+    "valid_store_rvas": [
+      5455
+    ],
+    "zero_alternative": null,
+    "scope": "All 16 canonical Boolean vectors and all nine ordered snapshots; ordinary ABI entry, valid distinct buffers and intact code. Output is a constant unlock request, not arrival/latch state."
+  },
+  "identity_rule": "Each fragment is one contiguous subsequence of a real raw block. Separate fragments must retain separate address labels and explicit gaps.",
+  "presentation_rule": "Accepted output selects a real store as STATE-LINKED. Only an exact four-input retained trace may animate EMULATED REPLAY. Neither mode is live native execution; missing inputs disable replay. Bogus clones are never valid result alternatives."
+}

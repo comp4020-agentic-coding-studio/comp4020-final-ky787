@@ -1,0 +1,400 @@
+{
+  "schema": "coop-native-integration/v1",
+  "chamber_id": "bypass",
+  "status": "proposal_only_no_live_integration",
+  "contract_sha256": "b065d789591a2882a055c43ab2c41352323e5d93316781584db3a677f8d6060b",
+  "trace_summary_sha256": "d784125c5440dca85e948177faedfa07b8be9cbb2549deb26d09842a3e3f445b",
+  "constant_outputs": {
+    "exitReady": 1
+  },
+  "server_owned": [
+    "Body-only occupancy arbitration; no cube activation for either scanner",
+    "One-use LINK and OVERRIDE commitment and persistence",
+    "Exit latch=true, two distinct arrivals and campaign completion; no extra LINK/OVERRIDE gate",
+    "Checkpoint/respawn and death recovery",
+    "Shared crumble foot/hook warning1.4s, recovery2.6s, scheduling and existing fuse rules",
+    "Movement, jump/grapple physics and hazard contacts"
+  ],
+  "outputs": [
+    {
+      "name": "anchorPower",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:anchorPower",
+      "true_meaning": "Stable shared anchor is solid/powered and grappleable",
+      "false_meaning": "Anchor is inactive/ghosted and not hookable",
+      "expression": {
+        "args": [
+          {
+            "id": "anchorHold.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "link.value",
+            "op": "ref"
+          }
+        ],
+        "op": "or"
+      },
+      "memory": "uint32_t at the output buffer supplied in RDX + 0 bytes",
+      "bindings": [
+        {
+          "id": "anchorFeed",
+          "output": "anchorPower",
+          "property": "active",
+          "target": "anchor",
+          "invert": false,
+          "resolved_signal": "draft:anchorFeed",
+          "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "anchorPower",
+          "byte_offset": 0,
+          "instruction_rva": 4455,
+          "instruction_address": 5368713575,
+          "instruction": {
+            "id": "insn_00001167",
+            "address": 5368713575,
+            "rva": 4455,
+            "size": 6,
+            "bytes": "c7 00 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 1"
+          },
+          "raw_block_id": "bb_00001160",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            9,
+            10,
+            11,
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "output": "anchorPower",
+          "byte_offset": 0,
+          "instruction_rva": 4562,
+          "instruction_address": 5368713682,
+          "instruction": {
+            "id": "insn_000011D2",
+            "address": 5368713682,
+            "rva": 4562,
+            "size": 6,
+            "bytes": "c7 00 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 0"
+          },
+          "raw_block_id": "bb_000011CB",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            4,
+            8,
+            12
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "bridgePower",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:bridgePower",
+      "true_meaning": "LINK bridge is solid/powered but never hookable",
+      "false_meaning": "LINK bridge is inactive/ghosted",
+      "expression": {
+        "id": "link.value",
+        "op": "ref"
+      },
+      "memory": "uint32_t at the output buffer supplied in RDX + 4 bytes",
+      "bindings": [
+        {
+          "id": "bridgeFeed",
+          "output": "bridgePower",
+          "property": "active",
+          "target": "bridge",
+          "invert": false,
+          "resolved_signal": "draft:bridgeFeed",
+          "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "bridgePower",
+          "byte_offset": 4,
+          "instruction_rva": 4787,
+          "instruction_address": 5368713907,
+          "instruction": {
+            "id": "insn_000012B3",
+            "address": 5368713907,
+            "rva": 4787,
+            "size": 7,
+            "bytes": "c7 40 04 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 1"
+          },
+          "raw_block_id": "bb_000012AC",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            2,
+            3,
+            6,
+            7,
+            10,
+            11,
+            14,
+            15
+          ]
+        },
+        {
+          "output": "bridgePower",
+          "byte_offset": 4,
+          "instruction_rva": 4895,
+          "instruction_address": 5368714015,
+          "instruction": {
+            "id": "insn_0000131F",
+            "address": 5368714015,
+            "rva": 4895,
+            "size": 7,
+            "bytes": "c7 40 04 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 0"
+          },
+          "raw_block_id": "bb_00001318",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            1,
+            4,
+            5,
+            8,
+            9,
+            12,
+            13
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "firewallActive",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:firewallActive",
+      "true_meaning": "Both firewallA and firewallB are lethal/active",
+      "false_meaning": "Both firewalls are disabled/passable",
+      "expression": {
+        "arg": {
+          "args": [
+            {
+              "id": "bypassHold.occupied",
+              "op": "ref"
+            },
+            {
+              "id": "override.value",
+              "op": "ref"
+            }
+          ],
+          "op": "or"
+        },
+        "op": "not"
+      },
+      "memory": "uint32_t at the output buffer supplied in RDX + 8 bytes",
+      "bindings": [
+        {
+          "id": "barrierA",
+          "output": "firewallActive",
+          "property": "active",
+          "target": "firewallA",
+          "invert": false,
+          "resolved_signal": "draft:barrierA",
+          "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+        },
+        {
+          "id": "barrierB",
+          "output": "firewallActive",
+          "property": "active",
+          "target": "firewallB",
+          "invert": false,
+          "resolved_signal": "draft:barrierB",
+          "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "firewallActive",
+          "byte_offset": 8,
+          "instruction_rva": 5239,
+          "instruction_address": 5368714359,
+          "instruction": {
+            "id": "insn_00001477",
+            "address": 5368714359,
+            "rva": 5239,
+            "size": 7,
+            "bytes": "c7 40 08 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 0"
+          },
+          "raw_block_id": "bb_00001470",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "output": "firewallActive",
+          "byte_offset": 8,
+          "instruction_rva": 5347,
+          "instruction_address": 5368714467,
+          "instruction": {
+            "id": "insn_000014E3",
+            "address": 5368714467,
+            "rva": 5347,
+            "size": 7,
+            "bytes": "c7 40 08 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 1"
+          },
+          "raw_block_id": "bb_000014DC",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "exitReady",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "kind": "raw_combinational",
+      "game_signal": "draft:exitReady",
+      "true_meaning": "Exit unlock request is always asserted, including all-zero input",
+      "false_meaning": "Unreachable for every valid input; do not synthesize a false condition",
+      "expression": {
+        "op": "const",
+        "value": true
+      },
+      "memory": "uint32_t at the output buffer supplied in RDX + 12 bytes",
+      "bindings": [
+        {
+          "id": "exitFeed",
+          "output": "exitReady",
+          "property": "unlock",
+          "target": "exit",
+          "invert": false,
+          "resolved_signal": "draft:exitFeed",
+          "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "exitReady",
+          "byte_offset": 12,
+          "instruction_rva": 5455,
+          "instruction_address": 5368714575,
+          "instruction": {
+            "id": "insn_0000154F",
+            "address": 5368714575,
+            "rva": 5455,
+            "size": 7,
+            "bytes": "c7 40 0c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 1"
+          },
+          "raw_block_id": "bb_00001548",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        }
+      ],
+      "observed_values": [
+        1
+      ]
+    }
+  ]
+}

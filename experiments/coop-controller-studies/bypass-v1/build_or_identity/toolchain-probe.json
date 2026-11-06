@@ -1,0 +1,33 @@
+{
+  "schema": "bypass-toolchain-probe/v1",
+  "compiler": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+  "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+  "observations": [
+    {
+      "name": "version",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "--version"
+      ],
+      "exit_code": 0,
+      "full_output_sha256": "5a1501683f3bfae47cb96ba36934c3927d223bc38bd5a17b3e64c1b2166d0dd1",
+      "output": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n"
+    },
+    {
+      "name": "capabilities",
+      "argv": [
+        "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+        "-mllvm",
+        "--help-hidden",
+        "-x",
+        "c",
+        "-fsyntax-only",
+        "NUL"
+      ],
+      "exit_code": 0,
+      "full_output_sha256": "bf332fe758f9d4f4377800ac2854b0ce93d4eadd88ef1494f7776eef38903b84",
+      "output": "  --aesSeed=<string>                                                - seed for the AES-CTR PRNG\n  --bcf                                                             - Enable bogus control flow\n  --bcf_loop=<number of times>                                      - Choose how many time the -bcf pass loop on a function\n  --bcf_prob=<probability rate>                                     - Choose the probability [%] each basic blocks will be obfuscated by the -bcf pass"
+    }
+  ],
+  "python": "3.13.9"
+}

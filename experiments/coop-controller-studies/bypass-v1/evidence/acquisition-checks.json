@@ -1,0 +1,30 @@
+{
+  "schema": "bypass-acquisition-checks/v1",
+  "status": "PASS",
+  "checked_utc": "2026-11-06T06:02:06.601125+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "baseline_commit": "a209122ba1e3b54c6d329a94c01276b9550c9189",
+  "pre_existing_files_unchanged": 1964,
+  "changed_files": [],
+  "snapshot_git_blobs_rechecked": 12,
+  "fresh_ts_evaluator": {
+    "argv": [
+      "node",
+      "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controller-studies\\bypass-v1\\scripts\\reference.mjs"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "stdout_sha256": "b949f1bdff8cde93b92ae4b78814ee6c7ded7136093e303408a211fa9ee66d92",
+    "byte_equal_to_retained_capture": true
+  },
+  "native_failures": [],
+  "compiler_failures": [],
+  "verifier_development_corrections": [
+    {
+      "failure": "Missing poisoned-output harness",
+      "cause": "Initial checker expected a u-suffixed literal; existing harness correctly used UINT32_C(0xA5A5A5A5).",
+      "fix": "Check each actual UINT32_C assignment before the call; no specimen or observed result changed."
+    }
+  ],
+  "scope": "Preservation receipt before delivery; current game/frontend/runtime assets and historical evidence remained unchanged."
+}

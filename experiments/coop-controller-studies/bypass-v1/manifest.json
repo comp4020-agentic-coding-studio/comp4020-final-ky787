@@ -1,0 +1,458 @@
+{
+  "schema": "coop-native-manifest/v1",
+  "chamber_id": "bypass",
+  "reference_commit": "a209122ba1e3b54c6d329a94c01276b9550c9189",
+  "request_sha256": "af24de094de2926bf47e4ea8d01536ff999f69b58030ff88993acb06792fb469",
+  "canonical_document_sha256": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+  "contract_sha256": "b065d789591a2882a055c43ab2c41352323e5d93316781584db3a677f8d6060b",
+  "reference_source_sha256": {
+    "levels/campaign/bypass.json": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "levels/drafts/bypass.json": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+    "src/workbench/runtime.ts": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99",
+    "server/declarative-state.ts": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73",
+    "server/coop-state.ts": "c0bf71f60c2d26ecf7525ccee603bf391b180def9e97eac7f034bbeb0f73c14b",
+    "server/level-definitions.ts": "6e0a6fa4d624eab79c418177bce8c0ed5c9979bf67584b02d64a8535df00863d"
+  },
+  "native_source_sha256": {
+    "controller.c": "2caa374f709dae3edc3047cc42d28d65bef25c076a1dff18235d9fee83002cca",
+    "controller.h": "e10e9fd32f9d429041d85d0cca15c5728c04f08951a6c7827ab6f103a9e32773",
+    "harness.c": "6e1a3464386b068ab91ee8e862209c9066af7b0996b9aab7ee2154041487ff30"
+  },
+  "compiler": {
+    "path": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+    "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+    "version": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n"
+  },
+  "linker": {
+    "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+    "sha256": "e8c524347b8bc87fba790d254c8a3b902bf1a4b63807093b816d992940af3791"
+  },
+  "seed": "00112233445566778899AABBCCDDEEFF",
+  "builds": [
+    {
+      "variant": "clean",
+      "optimization": "O0",
+      "transformations": [],
+      "frontend_extra_flags": [],
+      "binary_path": "bin/clean_x64.exe",
+      "binary_sha256": "85ec3623042a89256e89d89fa028b1cc8019ada2c33ead04761c67ccf6371343",
+      "ir_sha256": "be38e176a587014fd64c09b3f89230219ae621c469ff118211388c8f27789ceb",
+      "compiler_assembly_sha256": "e50d7a75a39095bea5693e2b818e5f2f7f631ceb45d6d3bce8e728ebd4256af8",
+      "labelled_assembly_sha256": "69ac9f2d67126513933b8aa839f160d4fe1d5875eb1d964c81e916c1f3248b7c",
+      "link_map_sha256": "7c0e59615840b37c3701c39ec41801a8f15fa2a8cdb1531d3d6d82976986da3a",
+      "label_manifest_sha256": "bf5689c0302a4d814d7c7b114044a2f99bcd69297768c36cc96baba5db733ccd"
+    },
+    {
+      "variant": "bcf",
+      "optimization": "O0",
+      "transformations": [
+        "bcf"
+      ],
+      "frontend_extra_flags": [
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF"
+      ],
+      "binary_path": "bin/obfuscated_x64.exe",
+      "binary_sha256": "af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74",
+      "ir_sha256": "b6c6870403576159da6e7610b844f6308a35ae03cfa2cc0f8a21278406ce1a7e",
+      "compiler_assembly_sha256": "5d19e8a9037da0d0545cac81b690d704a22fa741dd3c2e86bcb1daf7ccfbb1b7",
+      "labelled_assembly_sha256": "f11ed6f66692d18be69686faa7662fa3c49bf9f779539fac1bcf1c03c3834587",
+      "link_map_sha256": "8c42f32fc466b4a3e865ab7ba2b7604b4fe57d12d7fa260236f9b5513b7c9d24",
+      "label_manifest_sha256": "adfb891c5ed77d8b922598d0cf35c1059d9b7b59552cf8be21ac705e15880d37"
+    }
+  ],
+  "exact_commands": {
+    "path": "build_or_identity/commands.json",
+    "sha256": "271a0276da574535c658ecd0ec24144bdaa7e850cfc4001c858e09ce0964298d"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 16,
+    "output_size": 16,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "input_output_mapping": {
+    "inputs": [
+      {
+        "name": "anchorHold",
+        "offset": 0,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "game_port": "anchorHold.occupied",
+        "bit": 0,
+        "initial": 0,
+        "false_meaning": "No accepted body occupies HOLD / ANCHOR",
+        "true_meaning": "Grounded accepted body occupies HOLD / ANCHOR; cubes cannot activate it"
+      },
+      {
+        "name": "link",
+        "offset": 4,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "game_port": "link.value",
+        "bit": 1,
+        "initial": 0,
+        "false_meaning": "LINK has not been committed",
+        "true_meaning": "One-use LINK terminal has been accepted and committed"
+      },
+      {
+        "name": "bypassHold",
+        "offset": 8,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "game_port": "bypassHold.occupied",
+        "bit": 2,
+        "initial": 0,
+        "false_meaning": "No accepted body occupies HOLD / BYPASS",
+        "true_meaning": "Grounded accepted body occupies HOLD / BYPASS; cubes cannot activate it"
+      },
+      {
+        "name": "override",
+        "offset": 12,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "game_port": "override.value",
+        "bit": 3,
+        "initial": 0,
+        "false_meaning": "OVERRIDE has not been committed",
+        "true_meaning": "One-use OVERRIDE terminal has been accepted and committed"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "anchorPower",
+        "offset": 0,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "kind": "raw_combinational",
+        "game_signal": "draft:anchorPower",
+        "true_meaning": "Stable shared anchor is solid/powered and grappleable",
+        "false_meaning": "Anchor is inactive/ghosted and not hookable",
+        "expression": {
+          "args": [
+            {
+              "id": "anchorHold.occupied",
+              "op": "ref"
+            },
+            {
+              "id": "link.value",
+              "op": "ref"
+            }
+          ],
+          "op": "or"
+        }
+      },
+      {
+        "name": "bridgePower",
+        "offset": 4,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "kind": "raw_combinational",
+        "game_signal": "draft:bridgePower",
+        "true_meaning": "LINK bridge is solid/powered but never hookable",
+        "false_meaning": "LINK bridge is inactive/ghosted",
+        "expression": {
+          "id": "link.value",
+          "op": "ref"
+        }
+      },
+      {
+        "name": "firewallActive",
+        "offset": 8,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "kind": "raw_combinational",
+        "game_signal": "draft:firewallActive",
+        "true_meaning": "Both firewallA and firewallB are lethal/active",
+        "false_meaning": "Both firewalls are disabled/passable",
+        "expression": {
+          "arg": {
+            "args": [
+              {
+                "id": "bypassHold.occupied",
+                "op": "ref"
+              },
+              {
+                "id": "override.value",
+                "op": "ref"
+              }
+            ],
+            "op": "or"
+          },
+          "op": "not"
+        }
+      },
+      {
+        "name": "exitReady",
+        "offset": 12,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "kind": "raw_combinational",
+        "game_signal": "draft:exitReady",
+        "true_meaning": "Exit unlock request is always asserted, including all-zero input",
+        "false_meaning": "Unreachable for every valid input; do not synthesize a false condition",
+        "expression": {
+          "op": "const",
+          "value": true
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "id": "anchorFeed",
+        "output": "anchorPower",
+        "property": "active",
+        "target": "anchor",
+        "invert": false,
+        "resolved_signal": "draft:anchorFeed",
+        "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+      },
+      {
+        "id": "bridgeFeed",
+        "output": "bridgePower",
+        "property": "active",
+        "target": "bridge",
+        "invert": false,
+        "resolved_signal": "draft:bridgeFeed",
+        "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+      },
+      {
+        "id": "barrierA",
+        "output": "firewallActive",
+        "property": "active",
+        "target": "firewallA",
+        "invert": false,
+        "resolved_signal": "draft:barrierA",
+        "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+      },
+      {
+        "id": "barrierB",
+        "output": "firewallActive",
+        "property": "active",
+        "target": "firewallB",
+        "invert": false,
+        "resolved_signal": "draft:barrierB",
+        "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+      },
+      {
+        "id": "exitFeed",
+        "output": "exitReady",
+        "property": "unlock",
+        "target": "exit",
+        "invert": false,
+        "resolved_signal": "draft:exitFeed",
+        "resolution": "resolved = bool(raw_output) != invert; apply once in draftFrame"
+      }
+    ]
+  },
+  "coverage": {
+    "exhaustive_vectors": 16,
+    "ordered_snapshots_per_variant": 9,
+    "native_evaluations": 50,
+    "emulator_traces": 16
+  },
+  "constant_outputs": {
+    "exitReady": 1
+  },
+  "native_verification": {
+    "path": "evidence/native-results.json.gz",
+    "sha256": "8eacdb95205ea238c829cb7c2ec2b8addeeb2d739558b814f031835d6873e226"
+  },
+  "trace_provenance": {
+    "tools": {
+      "pefile": "2024.8.26",
+      "capstone": "5.0.7",
+      "unicorn": "2.1.4"
+    },
+    "trace_artifact": {
+      "path": "evidence/representative-traces.json.gz",
+      "sha256": "065c4d69183d50bc9a187042be098afa78c0239e93200d83ff702623632c8a94"
+    },
+    "cfg_artifacts": {
+      "clean": {
+        "path": "evidence/disassembly-clean.json.gz",
+        "sha256": "9d44b23270927c90c93fe653fee1e598daf047a5039d248958fc4de41f5c754d"
+      },
+      "bcf": {
+        "path": "evidence/disassembly-bcf.json.gz",
+        "sha256": "71eead6be0ba4c7c8062895222eb3a3d214c286ffb70426d02160eca124c69a1"
+      }
+    },
+    "selection": {
+      "method": "Every retained reference/native case",
+      "exhaustive_cases": true,
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "available_case_count": 16,
+      "retained_trace_count": 16,
+      "trace_limit": 16
+    },
+    "cfg_metrics": {
+      "clean": {
+        "blocks": 12,
+        "edges": 16,
+        "instructions": 37,
+        "function_bytes": 155,
+        "clone_origin_blocks": 0
+      },
+      "bcf": {
+        "blocks": 77,
+        "edges": 105,
+        "instructions": 476,
+        "function_bytes": 1622,
+        "clone_origin_blocks": 12
+      }
+    }
+  },
+  "integration_status": "proposal_only_no_live_integration",
+  "external_read_only_files": {
+    "experiments/coop-controllers/shared/analyze.py": "de08eaecbdb16fb57e092b0532feb799e0494b63e679eae378585b2982781f5e",
+    "experiments/coop-controllers/shared/build.py": "69bd67623f1bf40cd5f1374d85522ed891500c6305f368adea46f7877325f36e",
+    "experiments/coop-controllers/shared/ollvm_source/BogusControlFlow.cpp": "87b108b3aec92f6684904795206862e626589c6e312cdde8330f3177b00ed72d",
+    "experiments/coop-controllers/shared/ollvm_source/CryptoUtils.cpp": "ad08e77bedc3c66ba365eb36aa214b2e276d4aa333632d10b6a8eb87db672569",
+    "experiments/coop-controllers/shared/ollvm_source/LICENSE-OBFUSCATOR.TXT": "0c9be6145c13ee8fee9a806f9e1dbfbed054b6c0084732694869255535006d1b",
+    "experiments/coop-controllers/shared/ollvm_source/manifest.json": "2ef3827decc2ae1f35af7539d72c16c8923c8c60f9f04166be887a16c4ca5622",
+    "experiments/coop-controllers/shared/ollvm_source/Plugin.cpp": "d4e19793a80b8b3ada6bac320fdf284c68e5a1b3ef48b6b94e4e7b85571e3d79",
+    "experiments/coop-controllers/shared/ollvm_source/Utils.cpp": "874ffe25f1e154d4dd9e8a1f9f6b6c648aa4d637154a1885dbdd1f1a3619a561",
+    "experiments/coop-controllers/shared/prove_bogus.py": "ebe13356627f47872c3c9b53d1f652f074655555da073e8c2847ebc5cffbc3da",
+    "experiments/coop-controllers/shared/validate_native.py": "1bdafadd28438b497c574c40536499dc74673c953a25c412b666a71ad1924eca",
+    "experiments/coop-controllers/shared/verify_portable.py": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e",
+    "experiments/coop-controllers/shared/verify_proof.py": "da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731"
+  },
+  "inventory_policy": "Every package file except manifest.json itself, _build/, _scratch/, __pycache__/ and .pyc; exact bytes preserved by package .gitattributes.",
+  "known_limits": [
+    "Stateless decision layer only; game owns commitments, timers, occupancy, latches and arrivals.",
+    "Portable audit verifies retained observations; it does not rerun Windows PEs or the TypeScript evaluator.",
+    "Only canonical 0/1 inputs and valid distinct buffers are covered; no arbitrary-pointer claim.",
+    "Linux OS execution of the verifier is a delivery follow-up; isolated standard-library Windows execution is retained in the handoff.",
+    "Crumble lifecycle remains authored gameplay; no connection to proven bogus clones is implied."
+  ],
+  "files": {
+    ".gitattributes": "b850af899dcd6a1ec43ba9cf2e39f98679549044b6ae1db14377c20d0bb12b1e",
+    ".gitignore": "d3778c09bec22ac798c2a1f47e01b79e19b3bc1f1cfd06bbcb2bc28060fa4b59",
+    "contract.json": "b065d789591a2882a055c43ab2c41352323e5d93316781584db3a677f8d6060b",
+    "fragments.json": "9450aed620e3186b3d70183dbe076e52dfda0f8558c7bcb828c7e4a478f4874e",
+    "integration.json": "243908216c7112944aa93d7c098e09b9952ca2c804c71f79a6f16fa65e63a555",
+    "README.md": "54b5b36b741397fbd330c2aaab550f00b7111bdaac645e7f67ddf6acf49cb9ab",
+    "bin/clean_x64.exe": "85ec3623042a89256e89d89fa028b1cc8019ada2c33ead04761c67ccf6371343",
+    "bin/clean_x64.exp": "f11ba733e97317f97cb45097d037f1f3389f8a16288291e3b002e4093d6aab01",
+    "bin/obfuscated_x64.exe": "af1ad2ec9562728c94f21a764bb0be450bad5541a0cb1b0d6eb696087d4b2e74",
+    "bin/obfuscated_x64.exp": "8f62d158662ab9178cfcec702008690e1cd8c28387bfa47e5071f7e49cb671e0",
+    "build_or_identity/commands.json": "271a0276da574535c658ecd0ec24144bdaa7e850cfc4001c858e09ce0964298d",
+    "build_or_identity/identity.json": "fbb652bcb274f11a5a8af8ea5c4c757defdcb5bd708e58da69576cc9cbc59fac",
+    "build_or_identity/toolchain-probe.json": "934a1d648f0f0968f2d2ca1f87beea5ba6bbf696bf15e1fc06bb2ca6d594a4da",
+    "evidence/acquisition-checks.json": "15e3acfbab5ceaa969e9f16a080d67f88497d5d94c80e94b0de8c2437027bb11",
+    "evidence/bogus-proof.json.gz": "9153261e236aef6e33ee96b8ed3e7abf21a599d46e63b5525edc747d04ef0013",
+    "evidence/decision-mappings.json": "7326d6648d907773f69b03ac920ef931665dfde22881997234b1524aec452792",
+    "evidence/disassembly-bcf.json.gz": "71eead6be0ba4c7c8062895222eb3a3d214c286ffb70426d02160eca124c69a1",
+    "evidence/disassembly-clean.json.gz": "9d44b23270927c90c93fe653fee1e598daf047a5039d248958fc4de41f5c754d",
+    "evidence/fragment-compositions.json.gz": "0589a172c59128b9470e8c36802445635b27ae2e9354c2f8afef1ec46c11ddeb",
+    "evidence/historical-package-verification.json": "c7beeb3a6d00099cc7ac8ef11009134557818336a2daf6494d6fb2b429773bc4",
+    "evidence/native-bcf-windows-host-stdout.jsonl.gz": "3d5848761c612eb4d923340e4a902bf8f395e67bf52d8e41f8f275c5fd0df5d4",
+    "evidence/native-clean-windows-host-stdout.jsonl.gz": "3d5848761c612eb4d923340e4a902bf8f395e67bf52d8e41f8f275c5fd0df5d4",
+    "evidence/native-results.json.gz": "8eacdb95205ea238c829cb7c2ec2b8addeeb2d739558b814f031835d6873e226",
+    "evidence/native-summary.json": "306833d874fecd8a742744e758a4b0f87e461037db241a48afb98f6078fb6bde",
+    "evidence/preservation-baseline.json": "2a9a067b369b5f9dbb4647324d25070376e2575eb1ac5df2b3cd1f771293652a",
+    "evidence/reference-process.json": "17d069d2982da9bad552d5aa09e83248ca88f8c8af13c5a5d1d0a192f74389b9",
+    "evidence/reference-vectors.json": "b949f1bdff8cde93b92ae4b78814ee6c7ded7136093e303408a211fa9ee66d92",
+    "evidence/representative-traces.json.gz": "065c4d69183d50bc9a187042be098afa78c0239e93200d83ff702623632c8a94",
+    "evidence/trace-summary.json": "d784125c5440dca85e948177faedfa07b8be9cbb2549deb26d09842a3e3f445b",
+    "reference/identity.json": "7433aae22c0e31cb274b542de3a586f0aa30f1a7dcc72be936c214984e3355a2",
+    "reference/request.json": "af24de094de2926bf47e4ea8d01536ff999f69b58030ff88993acb06792fb469",
+    "scripts/adapt-tools.py": "1a89392239abff08ecc12f097d7f86bcd17433fba3de9a8ae9597794f48ebd63",
+    "scripts/analyze.py": "77018874fba8e5e5a68019a12d79522396aac22f7658caee039289d5520b3234",
+    "scripts/build.py": "895e6f4b530f469e5317a60211b29c37106429de38dca99fb1e6b5a816da8d5d",
+    "scripts/check-historical.py": "7d52dadfc35a49d296c0eeeefce1c92a7ae2eb9645d9eb152de26640c0216b32",
+    "scripts/check-preservation.py": "18a330bfcfab4d6c18ac24de48db066c9aa9698dd45d89d37d1b2d5b74699ff0",
+    "scripts/common.py": "f7eb5b0d8578304f6ae00145bae4eb7bca423886f66ddf44ca5eedd3c06cfa64",
+    "scripts/curate.py": "6cad3e67469383c1f6dca8001e07d211c57889ac76950d9891cd59cc04b6e19b",
+    "scripts/freeze.py": "3b55f804084565333eac9b305aa26e443e0690a75df579bf50f453848429c127",
+    "scripts/pin-reference.py": "4f162c3597a65f98e9cf319da71ec5af932743ba9f33ba17a168aef38d3d24bf",
+    "scripts/prepare.py": "086329c8760fc61e3f0efbe71fe17e532b16740406cf8ec383317361821475da",
+    "scripts/prove_bogus.py": "d437fc80a74e9908dd0b88c4ece53feab6588820d7f2a298d4f660fe4b2655e9",
+    "scripts/reference.mjs": "a6a5b100a051af0d1cb5fd8154d88249fd9eadb66c323bad9b7bee3b8ca93023",
+    "scripts/reuse-map.json": "c4344cea67a16d0819de5ec60d28e7bd261e7d1a70652d80928feb14f1601340",
+    "scripts/validate_native.py": "d5d476bb0ef9825bd11a3b0bbe758f2cf07c6ba9850851001b57664f448b5915",
+    "scripts/verify_portable.py": "137f822ddfc31bae5279263c4ae6253cb3a18f7145903a7818f28d3949b34f33",
+    "scripts/verify_proof.py": "900afbbac94f266aa8ae7b3cdbee730f69507b493a4529e2a685bec54791fbef",
+    "src/controller.c": "2caa374f709dae3edc3047cc42d28d65bef25c076a1dff18235d9fee83002cca",
+    "src/controller.h": "e10e9fd32f9d429041d85d0cca15c5728c04f08951a6c7827ab6f103a9e32773",
+    "src/harness.c": "6e1a3464386b068ab91ee8e862209c9066af7b0996b9aab7ee2154041487ff30",
+    "build_or_identity/bcf/assembly_labels.json": "adfb891c5ed77d8b922598d0cf35c1059d9b7b59552cf8be21ac705e15880d37",
+    "build_or_identity/bcf/controller.labelled.s": "f11ed6f66692d18be69686faa7662fa3c49bf9f779539fac1bcf1c03c3834587",
+    "build_or_identity/bcf/controller.ll": "b6c6870403576159da6e7610b844f6308a35ae03cfa2cc0f8a21278406ce1a7e",
+    "build_or_identity/bcf/controller.map": "8c42f32fc466b4a3e865ab7ba2b7604b4fe57d12d7fa260236f9b5513b7c9d24",
+    "build_or_identity/bcf/controller.s": "5d19e8a9037da0d0545cac81b690d704a22fa741dd3c2e86bcb1daf7ccfbb1b7",
+    "build_or_identity/clean/assembly_labels.json": "bf5689c0302a4d814d7c7b114044a2f99bcd69297768c36cc96baba5db733ccd",
+    "build_or_identity/clean/controller.labelled.s": "69ac9f2d67126513933b8aa839f160d4fe1d5875eb1d964c81e916c1f3248b7c",
+    "build_or_identity/clean/controller.ll": "be38e176a587014fd64c09b3f89230219ae621c469ff118211388c8f27789ceb",
+    "build_or_identity/clean/controller.map": "7c0e59615840b37c3701c39ec41801a8f15fa2a8cdb1531d3d6d82976986da3a",
+    "build_or_identity/clean/controller.s": "e50d7a75a39095bea5693e2b818e5f2f7f631ceb45d6d3bce8e728ebd4256af8",
+    "reference/server/coop-state.ts": "c0bf71f60c2d26ecf7525ccee603bf391b180def9e97eac7f034bbeb0f73c14b",
+    "reference/server/declarative-state.ts": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73",
+    "reference/server/level-definitions.ts": "6e0a6fa4d624eab79c418177bce8c0ed5c9979bf67584b02d64a8535df00863d",
+    "reference/docs/native-requests/bypass.md": "24cb793d4c1aab6cddb1da52431d34b9737ac52d6d8ebf18556933ed4331af2e",
+    "reference/levels/campaign/bypass.json": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "reference/levels/drafts/bypass.json": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+    "reference/src/engine/constants.ts": "a8e54a7c554b29abf1b586521c870e02488e3aaca94a765af005c3f93010d69a",
+    "reference/src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "reference/src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "reference/src/workbench/model.ts": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+    "reference/src/workbench/runtime.ts": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99"
+  }
+}
