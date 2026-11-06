@@ -28,6 +28,41 @@ const pointer = (element: HTMLElement, type: string): void => {
 };
 const submit = (): void => { host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); };
 
+it('initializes with one click using the suggested name and default colour', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    creator.open({ mode: 'initialize', onSave });
+    const name = host.querySelector<HTMLInputElement>('#operative-name')!.value;
+    expect(name).toMatch(/^Ninja-\d{4}$/);
+    expect(host.querySelector('#character-preview-name')!.textContent).toBe(name);
+    expect(swatch('cyan').getAttribute('aria-pressed')).toBe('true');
+    host.querySelector<HTMLButtonElement>('#initialize-ninja')!.click();
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalledExactlyOnceWith({ name, colour: 'cyan' }));
+});
+
+it('keeps the suggestion and subsequent edits stable through colour preview and selection', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    creator.open({ mode: 'initialize', onSave });
+    const name = host.querySelector<HTMLInputElement>('#operative-name')!;
+    const suggestion = name.value;
+    pointer(swatch('orange'), 'pointerenter');
+    pointer(swatch('orange'), 'pointerleave');
+    swatch('purple').focus(); swatch('purple').click();
+    expect(name.value).toBe(suggestion);
+    name.value = 'My Ninja'; name.dispatchEvent(new Event('input'));
+    swatch('cyan').focus(); swatch('cyan').click();
+    expect(name.value).toBe('My Ninja');
+    expect(host.querySelector('#character-preview-name')!.textContent).toBe('My Ninja');
+    submit();
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalledWith({ name: 'My Ninja', colour: 'cyan' }));
+});
+
+it.each(['initialize', 'customize'] as const)('%s always displays a supplied saved name', mode => {
+    creator.open({ mode, profile: { name: 'Saved Operative', colour: 'lime' }, onSave: vi.fn() });
+    expect(host.querySelector<HTMLInputElement>('#operative-name')!.value).toBe('Saved Operative');
+    expect(host.querySelector('#character-preview-name')!.textContent).toBe('Saved Operative');
+    expect(swatch('lime').getAttribute('aria-pressed')).toBe('true');
+});
+
 it('keeps saved, selected and temporary colour separate when submitting', async () => {
     const saved = { name: 'ShadowByte', colour: 'cyan' } as const;
     const onSave = vi.fn().mockResolvedValue(undefined);
@@ -90,16 +125,18 @@ it('renders entered markup as plain text and rejects it with a clear validation 
 it('offers a clearly unsaved fallback only after save failure and uses selected colour', async () => {
     const onGuest = vi.fn();
     creator.open({
-        mode: 'initialize', profile: { name: 'ShadowByte', colour: 'cyan' },
+        mode: 'initialize',
         onSave: vi.fn().mockRejectedValue(new Error('Offline. Retry saving.')), onGuest,
     });
+    const name = host.querySelector<HTMLInputElement>('#operative-name')!.value;
     const guest = host.querySelector<HTMLButtonElement>('#guest-character')!;
     expect(guest.hidden).toBe(true);
     swatch('purple').click();
     submit();
     await vi.waitFor(() => expect(guest.hidden).toBe(false));
+    expect(host.querySelector<HTMLInputElement>('#operative-name')!.value).toBe(name);
     expect(host.querySelector('#character-error')!.textContent).toBe('Offline. Retry saving.');
     pointer(swatch('orange'), 'pointerenter');
     guest.click();
-    expect(onGuest).toHaveBeenCalledWith({ name: 'ShadowByte', colour: 'purple' });
+    expect(onGuest).toHaveBeenCalledWith({ name, colour: 'purple' });
 });

@@ -58,8 +58,13 @@ try {
     await until(guest, "!!document.querySelector('#initialize-ninja')", 'invited first-time character setup');
     check('exact invitation remains intact during first-time ninja setup with no co-op connection', await guest.read(`location.href===${JSON.stringify(copied)}&&!binaryNinja.coop.active&&!binaryNinja.snapshot().character.ready`));
     await shot(guest, '05-invitation-character-setup');
-    await onboardNinja(guest, 'LinkGuest', 'orange');
+    const suggestedName = await guest.read<string>("document.querySelector('#operative-name').value");
+    check('invited first-time player has a valid suggested operative name', /^Ninja-\d{4}$/.test(suggestedName));
+    // One real click, with no typing or colour selection, saves and joins.
+    await click(guest, '#initialize-ninja');
     const joined = await wait(guest, 'invitation guest joins correct lobby', s => s.multiplayer?.code === code && s.multiplayer?.shared?.connected.every(Boolean) === true);
+    check('one-click initialization persists the suggested name and default cyan', joined.character.persisted
+        && joined.character.profile?.name === suggestedName && joined.character.profile.colour === 'cyan');
     check('independent profile joins as guest and preserves server-owned host', joined.multiplayer!.slot === 2 && !joined.multiplayer!.host
         && joined.persistence.visitor !== hosted.persistence.visitor && (await snapshot(host)).multiplayer!.host === true);
     check('accepted join consumes only the invitation query', await guest.read("!new URL(location.href).searchParams.has('join') && sessionStorage.getItem('bn_coop_room') === binaryNinja.coop.room.code"));

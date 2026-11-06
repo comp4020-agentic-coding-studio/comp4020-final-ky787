@@ -1,15 +1,24 @@
 import { once } from 'node:events';
 import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { createApp } from '../server/app.ts';
 import { ProfileStore } from '../server/profiles.ts';
-import { CHARACTER_COLOURS, colourHex, parseCharacterProfile, validateCharacterProfile, type PublicCharacterProfile } from '../src/character/profile.ts';
+import { CHARACTER_COLOURS, colourHex, parseCharacterProfile, suggestCharacterName, validateCharacterProfile, type PublicCharacterProfile } from '../src/character/profile.ts';
 import { freshProgress } from '../src/slice/progress.ts';
 import { directory, identity, cleanups, launch, kill } from './helpers/coop-server.ts';
 
 const purple: PublicCharacterProfile = { name: 'ShadowByte', colour: 'purple' };
 const orange: PublicCharacterProfile = { name: 'ZeroDay', colour: 'orange' };
+
+it.each([0, .5, 1 - Number.EPSILON])('suggests a valid cosmetic name at random sample %s', sample => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(sample);
+    try {
+        const name = suggestCharacterName();
+        expect(name).toMatch(/^Ninja-\d{4}$/);
+        expect(validateCharacterProfile({ name, colour: 'cyan' })).toEqual({ ok: true, profile: { name, colour: 'cyan' } });
+    } finally { random.mockRestore(); }
+});
 async function app() {
     const dir = await directory(), server = await createApp(dir);
     server.listen(0, '127.0.0.1'); await once(server, 'listening');

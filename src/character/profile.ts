@@ -15,6 +15,11 @@ export interface PublicCharacterProfile { name: string; colour: CharacterColour 
 export const DEFAULT_CHARACTER_PROFILE: Readonly<PublicCharacterProfile> = Object.freeze({ name: 'Ninja', colour: 'cyan' });
 export interface ProfileRecord { profile: PublicCharacterProfile | null; revision: number }
 
+/** A valid cosmetic suggestion, not a unique identity or credential. */
+export function suggestCharacterName(): string {
+    return `Ninja-${1000 + Math.floor(Math.random() * 9000)}`;
+}
+
 export function isCharacterColour(value: unknown): value is CharacterColour {
     return CHARACTER_COLOURS.some(colour => colour.id === value);
 }

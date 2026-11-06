@@ -8,6 +8,8 @@ The main game establishes its cookie by loading progress, then requests the prof
 
 Names trim outer spaces and accept 2–16 ASCII letters, digits, spaces, underscores and hyphens. Controls and markup are rejected. DOM names use `textContent`; lobby templates escape names. The eight approved colour IDs and hex accents are defined in `src/character/profile.ts`. The server accepts IDs only.
 
+First-time setup prefills a random `Ninja-1000`–`Ninja-9999` suggestion and keeps cyan selected, so a player can click INITIALIZE NINJA immediately. The suggestion is generated once when a new setup form opens; preview animation, colour changes and failed saves do not replace it. Players can edit or clear it, with the same name validation on submission. A supplied profile always displays its saved name, including customization and guest-profile editing. Suggestions are cosmetic and may repeat: visitor cookies still distinguish players, and multiplayer retains P1/P2 and YOU labels. No profile is saved until the player submits.
+
 The creator keeps saved, selected, and temporary colours separate. Its actual displayed colour is `previewColour ?? selectedColour`; only selection is submitted. Pointer hover and keyboard focus preview immediately, pointer leave/blur restore selection, and click/Enter/Space/tap select. Cancel discards draft edits. An enlarged Canvas uses the production `drawNinja()` with a presentation-only PlayerState for idle, run, jump and landing. It never steps physics. Hidden/disposed views stop their animation, and reduced motion shows a stationary pose while still updating colours immediately.
 
 Failed profile loads offer retry or a guest creator. Failed saves preserve inputs and offer retry; initial/guest creators can continue without saving. Guest profiles live only in page memory and are visibly labelled NOT SAVED. Co-op always renders the server's last saved profile, or the safe Ninja/cyan default. Clearing cookies loses the association with a saved profile; there is no account recovery or device synchronization.
@@ -34,6 +36,8 @@ Solo tutorials and builder physics previews use the renderer's cosmetic `profile
 
 Run `pnpm check:character` after `pnpm build` for real browser onboarding, pointer/focus/touch colour preview, persistence/cancel, multiplayer appearances and screenshots. Focused tests cover profile validation, malformed data, atomic writes/concurrent revision conflicts, process restart, client errors, UI state/lifecycle, room propagation, public/local custom sessions and host authority. Existing campaign, public co-op, workbench and public-builder routes still use actual onboarding before gameplay.
 
+`pnpm check:menu-invitations` also exercises a first-time invited visitor accepting the suggested name and default cyan with one INITIALIZE NINJA click, then joining the intended party. Creator tests cover immediate submission, editable/stable suggestions, saved names and the unsaved fallback; profile tests check generated names against the existing validator, including random-range boundaries.
+
 Server-side code can later associate its existing visitor ID, sanitized display name/colour, room membership and slot. This feature adds no Crit 10 logging, account identifiers, authentication, cosmetics inventory, physics or binary-evidence changes. Public profiles never contain the cookie or visitor UUID. Screenshot evidence and the dated handoff record the checks for this implementation.
 
 ## Visual evidence
@@ -44,3 +48,16 @@ Server-side code can later associate its existing visitor ID, sanitized display 
 - [Name entry](playtest/2026-10-20-characters/06-name-entry.png), [returning visitor](playtest/2026-10-20-characters/07-returning-saved-character.png), [menu customization](playtest/2026-10-20-characters/08-customization-from-menu.png).
 - [Two coloured ninjas](playtest/2026-10-20-characters/09-two-coloured-ninjas.png), [partner perspective](playtest/2026-10-20-characters/09b-partner-perspective.png), [named lobby](playtest/2026-10-20-characters/10-coop-lobby-two-names.png), [overview labels](playtest/2026-10-20-characters/11-low-zoom-name-readability.png).
 - [Reduced motion](playtest/2026-10-20-characters/12-reduced-motion.png), [mobile touch](playtest/2026-10-20-characters/13-mobile-touch-creator.png), [mobile form actions](playtest/2026-10-20-characters/13b-mobile-form-actions.png), [live profile update](playtest/2026-10-20-characters/14-live-profile-update.png), [public custom session](playtest/2026-10-20-characters/15-public-custom-profiles.png), [unsaved guest](playtest/2026-10-20-characters/16-unsaved-guest.png), [internal lab](playtest/2026-10-20-characters/17-internal-lab-profiles.png).
+
+### One-click setup — 2026-11-06
+
+37 focused tests, typecheck and production build passed. The existing browser
+checks passed 83 character checks and 35 invitation checks, including submitting
+the suggested name/default cyan with one click, saved-name customization,
+guest recovery, progress preservation, mobile layout and reduced motion.
+[Check results](playtest/2026-11-06-one-click-character/checks.txt),
+[first-time suggestion](playtest/2026-11-06-one-click-character/first-time-creation.png)
+and [one-click party join](playtest/2026-11-06-one-click-character/one-click-lobby.png)
+are retained. Additional mobile and reduced-motion captures remain under
+`.workbench/reports/2026-11-06-one-click-character/`. This is automated validation
+and agent visual inspection, not a claim of human playtest acceptance.

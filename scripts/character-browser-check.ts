@@ -4,7 +4,7 @@ import { readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { coopBrowser, type Cdp } from './coop-browser.ts';
 import { onboardNinja } from './character-onboarding.ts';
-import { colourHex, type CharacterColour } from '../src/character/profile.ts';
+import { colourHex, validateCharacterProfile, type CharacterColour } from '../src/character/profile.ts';
 import { freshProgress } from '../src/slice/progress.ts';
 
 const h = await coopBrowser({ shots: process.env.BN_SHOTS ?? resolve('docs/playtest/2026-10-20-characters'), internalLabs: false, onboarding: false });
@@ -117,6 +117,9 @@ try {
     const a = await h.page(`${url}?debug=1`, debug); await instrument(a);
     await until(a, "!!document.querySelector('#initialize-ninja')");
     check('new visitor is gated by INITIALIZE NINJA', !(await snapshot(a)).character.ready && !await a.read("!!document.querySelector('#create-party')"));
+    const suggestedName = await a.read<string>("document.querySelector('#operative-name').value");
+    check('first-time setup suggests a valid name with cyan already selected', /^Ninja-\d{4}$/.test(suggestedName)
+        && validateCharacterProfile({ name: suggestedName, colour: 'cyan' }).ok && await selected(a, 'cyan'));
     await shot(a, '01-first-time-creation');
     await preview(a, 'cyan', 'initial cyan selection reaches the actual renderer');
     await shot(a, '02-cyan-selected');
@@ -140,6 +143,7 @@ try {
     await key(a, 'Tab', 'Tab', 9); await preview(a, 'blue', 'keyboard can preview the next colour');
     await key(a, ' ', 'Space', 32); check('Space commits focused electric blue locally', await selected(a, 'blue'));
     await click(a, '[data-colour="purple"]');
+    check('colour preview, keyboard focus and selection preserve the suggested name', await a.read("document.querySelector('#operative-name').value") === suggestedName);
     await typeName(a, ''); await click(a, '#initialize-ninja');
     check('empty name receives a visible validation message', await a.read("!document.querySelector('#character-error').hidden && document.querySelector('#operative-name').getAttribute('aria-invalid')==='true'"));
     await typeName(a, '<svg>'); await click(a, '#initialize-ninja');
@@ -169,6 +173,7 @@ try {
     await shot(a, '07-returning-saved-character');
     check('title screen renders the saved purple ninja using the shared renderer', await a.read("document.querySelector('#menu').dataset.view==='home' && document.querySelector('#home-ninja-preview').dataset.previewColour==='purple' && __characterPaint.counts['home-ninja-preview']>0"));
     await click(a, '#customize-ninja'); await preview(a, 'purple', 'customization loads the saved colour');
+    check('customization displays the saved name rather than another suggestion', await a.read("document.querySelector('#operative-name').value==='ShadowByte'"));
     await shot(a, '08-customization-from-menu');
     await typeName(a, 'DiscardMe'); await click(a, '[data-colour="red"]'); await hover(a, '[data-colour="lime"]'); await click(a, '#cancel-character');
     check('cancel discards selected and previewed colours plus edited name', JSON.stringify((await profile(a)).profile) === JSON.stringify({ name: 'ShadowByte', colour: 'purple' }) && (await snapshot(a)).character.profile?.name === 'ShadowByte');

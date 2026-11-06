@@ -1,4 +1,4 @@
-import { CHARACTER_COLOURS, DEFAULT_CHARACTER_PROFILE, colourHex, validateCharacterProfile, type CharacterColour, type PublicCharacterProfile } from './profile.ts';
+import { CHARACTER_COLOURS, DEFAULT_CHARACTER_PROFILE, colourHex, suggestCharacterName, validateCharacterProfile, type CharacterColour, type PublicCharacterProfile } from './profile.ts';
 import { NinjaPreview } from './preview.ts';
 
 export interface CharacterCreatorOptions {
@@ -67,7 +67,7 @@ export class CharacterCreator {
         const error = this.container.querySelector<HTMLElement>('#character-error')!;
         const submit = this.container.querySelector<HTMLButtonElement>('button[type="submit"]')!;
         const guest = this.container.querySelector<HTMLButtonElement>('#guest-character');
-        name.value = creating && !options.profile ? '' : saved.name;
+        name.value = creating && !options.profile ? suggestCharacterName() : saved.name;
         name.placeholder = 'ShadowByte';
         this.preview = new NinjaPreview(canvas, selectedColour);
 
