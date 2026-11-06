@@ -1,0 +1,364 @@
+{
+  "version": 1,
+  "pass": true,
+  "scope": "full-room",
+  "mode": "coop",
+  "scenario": "handshake-v2",
+  "draftHash": "49f1ef8a0543f71d7b76ffbe187fcde0801d037ef7bc0eaf2728a32fae3990c6",
+  "engineRevision": "fb7d5ce7ba2fd5a3dc6cab3ee82284eb08149b10-dirty",
+  "failedStep": null,
+  "error": null,
+  "conclusion": "The specified route/assertions worked in this tested configuration; reachability and shortcut absence outside this route are not tested.",
+  "passed_steps": [
+    "Authored initial state",
+    "Approach central breakpoint",
+    "Central breakpoint activates automatically from grounded walking",
+    "Approach live payload firewall before maintenance",
+    "Running jump into firewall respawns at earned checkpoint",
+    "Brake safely after firewall death",
+    "Partner holds CROSSING",
+    "Climber approaches the gap",
+    "Attach to the near address bar",
+    "Swing left across the recovery well",
+    "Release first rope for transfer",
+    "Transfer to far address bar",
+    "Carry swing toward alcove",
+    "Rope jump toward alcove",
+    "Brake and land above alcove",
+    "Settle on alcove floor",
+    "Approach shared cube",
+    "Pick up the shared payload",
+    "Move to return launch",
+    "Attach far address bar with payload",
+    "Swing payload back to central bay",
+    "Release far rope with payload",
+    "Transfer payload swing to near address bar",
+    "Cross back over bay edge",
+    "Rope jump back to bay",
+    "Brake and land with the payload",
+    "Clear bay edge before placing payload",
+    "Set payload beside CROSSING",
+    "Rest payload on ordinary CROSSING plate",
+    "Both people leave CROSSING while cube keeps it powered",
+    "Crossing remains live from the resting cube",
+    "Recover shared cube for gallery",
+    "Carry cube again",
+    "Partner powers LIFT after cube recovery",
+    "Enter powered lift",
+    "Move from hover onto gallery",
+    "Land on permanent gallery",
+    "Bring payload below maintenance ledge",
+    "Stage payload away from LINK lever",
+    "Return to LINK",
+    "Enable reversible service link",
+    "Partner leaves lift and enters lower relay",
+    "Partner lands at service gallery",
+    "Holder approaches staged cube",
+    "Hold payload beneath maintenance access",
+    "Climber stands below held cube",
+    "Climber jumps onto partner-held cube",
+    "Settle on cube before upper jump",
+    "Jump from held cube toward maintenance ledge",
+    "Land on maintenance ledge",
+    "Approach maintenance terminal",
+    "Commit MAINTENANCE COMPLETE",
+    "Exit still needs payload",
+    "Holder returns cube through upper relay",
+    "Holder brakes in central bay",
+    "Climber descends safely from maintenance ledge",
+    "Climber uses service relay to regroup",
+    "Climber lands in bay",
+    "Checkpoint retry after committed maintenance",
+    "Recovered climber takes the still-powered lower relay",
+    "Recovered climber brakes on gallery",
+    "Recovered climber returns through upper relay",
+    "Recovered climber lands past the lower relay",
+    "Place payload beside final socket",
+    "Drop cube into live PAYLOAD socket",
+    "First physical exit arrival",
+    "One arrival alone cannot finish",
+    "Second physical exit arrival"
+  ],
+  "checkpoints": {
+    "Brake safely after firewall death": {
+      "host": {
+        "player": {
+          "x": 1440,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": false,
+          "firewallActive": true,
+          "liftPower": false,
+          "relayPower": false
+        },
+        "controls": {
+          "draft:link": false,
+          "draft:maintenance": false
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": false,
+        "arrivals": [
+          false,
+          false
+        ],
+        "completed": false,
+        "time": 3.8416666666666557
+      },
+      "partner": {
+        "player": {
+          "x": 1840,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 0
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": false,
+          "firewallActive": true,
+          "liftPower": false,
+          "relayPower": false
+        },
+        "controls": {
+          "draft:link": false,
+          "draft:maintenance": false
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": false,
+        "arrivals": [
+          false,
+          false
+        ],
+        "completed": false,
+        "time": 3.408333333333324
+      }
+    },
+    "Exit still needs payload": {
+      "host": {
+        "player": {
+          "x": 1806.8987331986145,
+          "y": 533,
+          "groundId": "serviceGallery",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": false,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": false,
+        "arrivals": [
+          false,
+          false
+        ],
+        "completed": false,
+        "time": 25.391666666665866
+      },
+      "partner": {
+        "player": {
+          "x": 1969.6999999999998,
+          "y": 343,
+          "groundId": "maintenanceLedge",
+          "deaths": 0
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": false,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": false,
+        "arrivals": [
+          false,
+          false
+        ],
+        "completed": false,
+        "time": 24.958333333332558
+      }
+    },
+    "Checkpoint retry after committed maintenance": {
+      "host": {
+        "player": {
+          "x": 2045.6180555555557,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": false,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": false,
+        "arrivals": [
+          false,
+          false
+        ],
+        "completed": false,
+        "time": 28.10833333333238
+      },
+      "partner": {
+        "player": {
+          "x": 1520,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": false,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": false,
+        "arrivals": [
+          false,
+          false
+        ],
+        "completed": false,
+        "time": 27.67499999999907
+      }
+    },
+    "One arrival alone cannot finish": {
+      "host": {
+        "player": {
+          "x": 2373.02083333333,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": true,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": true,
+        "arrivals": [
+          true,
+          false
+        ],
+        "completed": false,
+        "time": 31.508333333332185
+      },
+      "partner": {
+        "player": {
+          "x": 2035.8472222222222,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": true,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": true,
+        "arrivals": [
+          true,
+          false
+        ],
+        "completed": false,
+        "time": 31.074999999998877
+      }
+    },
+    "Second physical exit arrival": {
+      "host": {
+        "player": {
+          "x": 2402.5583333333293,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": true,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": true,
+        "arrivals": [
+          true,
+          true
+        ],
+        "completed": true,
+        "time": 32.35833333333214
+      },
+      "partner": {
+        "player": {
+          "x": 2330.1736111111095,
+          "y": 933,
+          "groundId": "centralBay",
+          "deaths": 1
+        },
+        "outputs": {
+          "crossingPower": false,
+          "exitReady": true,
+          "firewallActive": false,
+          "liftPower": false,
+          "relayPower": true
+        },
+        "controls": {
+          "draft:link": true,
+          "draft:maintenance": true
+        },
+        "checkpoint": "reunion",
+        "exitUnlocked": true,
+        "arrivals": [
+          true,
+          true
+        ],
+        "completed": true,
+        "time": 31.92499999999883
+      }
+    }
+  }
+}

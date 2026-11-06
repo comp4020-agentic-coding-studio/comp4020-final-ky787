@@ -1,5 +1,8 @@
 # HANDSHAKE — cooperative chamber
 
+Separate prototype: [HANDSHAKE v2 firewall draft](handshake-v2.md). Its revised
+controller does not replace this released chamber or its frozen native evidence.
+
 Released source: [`levels/campaign/handshake.json`](../../levels/campaign/handshake.json).
 Editable draft: [`levels/drafts/handshake.json`](../../levels/drafts/handshake.json).
 This authored/mock chamber joined the campaign on the user's explicit request,
