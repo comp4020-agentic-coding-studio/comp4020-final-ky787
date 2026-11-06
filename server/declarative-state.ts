@@ -5,8 +5,8 @@ import { crumbleView, triggerCrumble } from './crumble-state.ts';
 import type { CrumbleId, DeclarativeLevelId } from '../src/coop/protocol.ts';
 
 /** Replaceable output layer: computes controller output booleans from resolved device values.
- * Custom/workbench sessions keep the authored mock evaluator; released campaign chambers inject
- * a verified native-result lookup so machinery decisions come from the retained OLLVM BCF outputs. */
+ * Custom/workbench sessions and BYPASS keep the authored evaluator; verified campaign chambers inject
+ * a retained native-result lookup so machinery decisions come from the retained OLLVM BCF outputs. */
 export type OutputEvaluator = (draft: DraftDocument, deviceValues: Readonly<Record<string, boolean>>) => Record<string, boolean>;
 const mockOutputs: OutputEvaluator = (draft, deviceValues) => evaluateDraft(draft, deviceValues);
 

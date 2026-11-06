@@ -1,9 +1,10 @@
 /** Public campaign order. The complete mechanics registry remains separate. */
-export const AUTHORED_CAMPAIGN_LEVELS = ['handshake', 'deadlock', 'use-after-free'] as const;
+export const AUTHORED_CAMPAIGN_LEVELS = ['handshake', 'bypass', 'deadlock', 'use-after-free'] as const;
 export type AuthoredCampaignLevel = typeof AUTHORED_CAMPAIGN_LEVELS[number];
 export const isAuthoredCampaignLevel = (value: unknown): value is AuthoredCampaignLevel => AUTHORED_CAMPAIGN_LEVELS.some(id => id === value);
 export const COOP_CAMPAIGN = [
     { id: 'handshake', title: 'HANDSHAKE' },
+    { id: 'bypass', title: 'BYPASS' },
     { id: 'crossfeed-vault', title: 'CROSSFEED VAULT' },
     { id: 'race-condition', title: 'RACE CONDITION' },
     { id: 'deadlock', title: 'DEADLOCK' },

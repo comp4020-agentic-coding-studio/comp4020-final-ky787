@@ -13,13 +13,13 @@ import { emptyInput } from '../src/engine/physics.ts';
 import { newRecord, sharedRoom, readRoomRecord } from '../server/coop-state.ts';
 import { directory, launch, kill, identity, connect } from './helpers/coop-server.ts';
 
-it('only HANDSHAKE and CROSSFEED retain visible campaign breakpoints; releases match their editable sources', async () => {
+it('HANDSHAKE, BYPASS and CROSSFEED retain visible breakpoints; releases match their editable sources', async () => {
     for (const level of AUTHORED_CAMPAIGN_LEVELS) {
         expect(CAMPAIGN_DOCUMENTS[level]).toEqual(JSON.parse(await readFile(`levels/drafts/${level}.json`, 'utf8')));
         const objects = CAMPAIGN_DOCUMENTS[level].geometry.objects;
-        expect(objects.filter(o => o.type === 'breakpoint')).toHaveLength(level === 'handshake' ? 1 : 0);
+        expect(objects.filter(o => o.type === 'breakpoint')).toHaveLength(level === 'handshake' || level === 'bypass' ? 1 : 0);
         expect(objects.filter(o => o.type === 'device' && o.checkpoint)).toHaveLength(0);
-        if (level !== 'handshake') for (const slot of [1, 2] as const) {
+        if (level !== 'handshake' && level !== 'bypass') for (const slot of [1, 2] as const) {
             expect(objects.filter(o => o.type === 'checkpoint')).toHaveLength(0);
             const room = COOP_LABS[level].room(slot);
             expect(room.checkpoint).toEqual(room.spawn);
@@ -29,7 +29,7 @@ it('only HANDSHAKE and CROSSFEED retain visible campaign breakpoints; releases m
     expect(COOP_LABS['race-condition'].room(1).breakpoints ?? []).toHaveLength(0);
 });
 
-it.each(AUTHORED_CAMPAIGN_LEVELS)('%s reads prior checkpoint-only save keys without resetting membership, placements or badges', level => {
+it.each(['handshake', 'deadlock', 'use-after-free'] as const)('%s reads prior checkpoint-only save keys without resetting membership, placements or badges', level => {
     const r = newRecord('ABCD', '11111111-1111-4111-8111-111111111111', level);
     const key = { handshake: 'checkpointControl.value', deadlock: 'lowerCommit.value', 'use-after-free': 'breakpointControl.value' }[level];
     r.levelState.devices[key] = true; r.checkpoint = 'reunion'; r.levelInstance = 4;
@@ -111,15 +111,25 @@ it.each(AUTHORED_CAMPAIGN_LEVELS)('%s persists semantic controls/checkpoint and 
     expect(r.checkpoint).toBe(checkpoint);
     expect((await f.act(2, { type: 'checkpoint', breakpoint: 'draft:missing' })).accepted).toBe(false);
     expect((await f.act(2, { type: 'control', control: 'draft:notInThisChamber' })).accepted).toBe(false);
-    const sensor = document.geometry.objects.find(o => o.type === 'device' && o.kind === 'plate')!;
+    const sensor = document.geometry.objects.find(o => o.type === 'device' && (o.kind === 'plate' || o.kind === 'scanner'))!;
     expect((await f.act(2, { type: 'draft-occupancy', devices: [`draft:${sensor.id}`] })).accepted).toBe(true);
     const socket = document.geometry.objects.find(o => o.type === 'device' && o.kind === 'socket');
     const cubeId = Object.keys(r.cubes)[0] as `draft:${string}` | undefined;
     if (socket && cubeId) expect((await f.act(1, { type: 'draft-cube-occupancy', cubeId, epoch: r.cubes[cubeId].epoch, devices: [`draft:${socket.id}`] })).accepted).toBe(true);
+    if (level === 'bypass') {
+        // Isolated protocol fixture: persistence, not a physical solve.
+        await f.act(1, { type: 'control', control: 'draft:link' });
+        await f.act(2, { type: 'control', control: 'draft:override' });
+        expect((await f.act(1, { type: 'crumble-trigger', platform: 'draft:unstableA', trigger: 'foot' })).room.levelState.platforms['draft:unstableA'].phase).toBe('warning');
+    }
     await kill(f.app.child); const app = await launch(f.dir), guest = await connect<AuthoredCampaignLevel>(app.url, f.guest.cookie);
     guest.send({ type: 'join', code: r.code }); const back = await guest.wait('snapshot');
     expect(back.slot).toBe(2); expect(back.room).toMatchObject({ level, checkpoint, levelInstance: started.levelInstance, party: { phase: 'playing', completedLevels: [] } });
     expect(back.room.levelState.devices[`${sensor.id}.occupied`]).toBe(false);
+    if (level === 'bypass') {
+        expect(back.room.levelState.devices).toMatchObject({ 'link.value': true, 'override.value': true, 'anchorHold.occupied': false, 'bypassHold.occupied': false });
+        expect(back.room.levelState.outputs).toEqual({ anchorPower: true, bridgePower: true, firewallActive: false, exitReady: false });
+    }
     expect(Object.values(back.room.cubes).every(c => !c.holder && !c.transform)).toBe(true);
     expect(Object.values(back.room.levelState.platforms).every(p => p.phase === 'stable')).toBe(true);
     // Resume constructs real slot markers and cube positions from saved semantics, never stored transforms.
@@ -177,4 +187,36 @@ it('campaign plate/cube arbitration, reversible machinery, two arrivals and gene
     r = (await f.act(1, { type: 'select-level', level: 'use-after-free' })).room;
     expect(r.levelState.outputs.routeA).toBe(false); expect(r.levelState.platforms['draft:a1'].phase).toBe('stable');
     expect(r.party?.completedLevels).toEqual(['handshake']);
+});
+
+// Isolated server protocol fixture; the browser scenario supplies actual body contacts.
+it('BYPASS commits survive reset, sequential scans do not count, simultaneous scans latch and both arrivals award a badge', async () => {
+    const f = await party(); let r = (await f.act(1, { type: 'select-level', level: 'bypass' })).room;
+    await f.b.wait('room', m => m.room.levelInstance === r.levelInstance);
+    expect(r.draft).toBeUndefined(); expect(r.cubes).toEqual({});
+    r = (await f.act(1, { type: 'draft-occupancy', devices: ['draft:anchorHold'] })).room;
+    expect(r.levelState.outputs).toMatchObject({ anchorPower: true, bridgePower: false });
+    await f.act(2, { type: 'control', control: 'draft:link' });
+    await f.act(1, { type: 'draft-occupancy', devices: ['draft:bypassHold'] });
+    expect((await f.act(1, { type: 'draft-occupancy', devices: [] })).room.levelState.outputs.firewallActive).toBe(true);
+    await f.act(2, { type: 'control', control: 'draft:override' });
+    r = (await f.act(2, { type: 'local-reset' })).room;
+    expect(r.levelState.devices).toMatchObject({ 'link.value': true, 'override.value': true });
+    expect(r.levelState.outputs.firewallActive).toBe(false);
+    for (const scan of ['leftScan', 'rightScan']) {
+        r = (await f.act(1, { type: 'draft-occupancy', devices: [`draft:${scan}`] })).room;
+        expect(r.exitUnlocked).toBe(false);
+    }
+    r = (await f.act(2, { type: 'draft-occupancy', devices: ['draft:leftScan'] })).room;
+    expect(r.exitUnlocked).toBe(true);
+    await f.act(1, { type: 'draft-occupancy', devices: [] });
+    r = (await f.act(2, { type: 'draft-occupancy', devices: [] })).room;
+    expect(r.exitUnlocked).toBe(true); expect(r.levelState.outputs.exitReady).toBe(false);
+    r = (await f.act(1, { type: 'exit' })).room; expect(r.completed).toBe(false);
+    r = (await f.act(2, { type: 'exit' })).room; expect(r.party?.completedLevels).toEqual(['bypass']);
+    const old = r.levelInstance;
+    r = (await f.act(1, { type: 'select-level', level: 'bypass' })).room;
+    expect(r.levelInstance).toBe(old + 1); expect(r.exitUnlocked).toBe(false);
+    expect(r.levelState.devices).toMatchObject({ 'link.value': false, 'override.value': false });
+    expect(r.party?.completedLevels).toEqual(['bypass']);
 });

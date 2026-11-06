@@ -51,7 +51,7 @@ export const opsScript = String.raw`
   const $ = id => document.getElementById(id);
   const auth = $('ops-auth'), dashboard = $('ops-dashboard'), status = $('ops-status');
   let source = null, snapshot = null, paused = false, checking = false, clock = null, receivedAt = 0;
-  const chamberNames = {handshake:'HANDSHAKE',deadlock:'DEADLOCK','crossfeed-vault':'CROSSFEED VAULT','race-condition':'RACE CONDITION','use-after-free':'USE AFTER FREE',pressure:'PRESSURE',switch:'SWITCH',relay:'RELAY',uplink:'CONTROL SPINE'};
+  const chamberNames = {handshake:'HANDSHAKE',bypass:'BYPASS',deadlock:'DEADLOCK','crossfeed-vault':'CROSSFEED VAULT','race-condition':'RACE CONDITION','use-after-free':'USE AFTER FREE',pressure:'PRESSURE',switch:'SWITCH',relay:'RELAY',uplink:'CONTROL SPINE'};
   const chamberName = id => chamberNames[id] || String(id || 'PARTY LOBBY').replaceAll('-', ' ').toUpperCase();
   const text = (tag, value, className) => { const el=document.createElement(tag); el.textContent=String(value); if(className)el.className=className; return el; };
   const duration = seconds => { seconds=Math.max(0,Math.floor(seconds)); return seconds>=86400?Math.floor(seconds/86400)+'d '+Math.floor(seconds%86400/3600)+'h':seconds>=3600?Math.floor(seconds/3600)+'h '+Math.floor(seconds%3600/60)+'m':Math.floor(seconds/60)+'m '+seconds%60+'s'; };

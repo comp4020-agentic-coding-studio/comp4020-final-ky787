@@ -1,0 +1,36 @@
+{
+  "base": "cc247c88ad86651924f6a49d90b7c756240712f1",
+  "date": "2026-11-06",
+  "campaignChecks": 87,
+  "focusedTests": 78,
+  "typecheck": "pass",
+  "build": "pass",
+  "allSixChambersCompleted": true,
+  "routes": {
+    "handshake": {
+      "pass": true,
+      "scope": "full-room campaign; real controls from authored starts",
+      "hash": "788de3d6e6063687fe9d81b49bed40bb58b961f6d1a6983d1c62cdcb78302a67",
+      "steps": 59
+    },
+    "bypass": {
+      "pass": true,
+      "scope": "full-room campaign; real controls from authored starts",
+      "hash": "22b3c4843a98eecaec7e3b17d0a2f96f59aadf9fe374f0952429f55e88dd7709",
+      "steps": 69
+    },
+    "deadlock": {
+      "pass": true,
+      "scope": "full-room campaign; real controls from authored starts",
+      "hash": "8a14402a80f7862aa9b67213641c476b9410490bbb6c68a579161580e2e56494",
+      "steps": 71
+    },
+    "use-after-free": {
+      "pass": true,
+      "scope": "full-room campaign; real controls from authored starts",
+      "hash": "2a9f11af81b6b289786e23c9226ece5233aeb03ee1e93cdd07cb671ac9961554",
+      "steps": 44
+    }
+  },
+  "reports": ".workbench/reports/bypass-promotion/campaign"
+}

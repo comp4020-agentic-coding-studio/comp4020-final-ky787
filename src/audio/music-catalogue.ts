@@ -8,13 +8,14 @@ export const MUSIC_TRACKS = {
     'race-condition': { file: 'race-condition.ogg', title: 'Race Condition', gain: 1 },
     deadlock: { file: 'deadlock.ogg', title: 'Deadlock', gain: 1 },
     'use-after-free': { file: 'use-after-free.ogg', title: 'Use After Free', gain: 1 },
-    // Explicit draft presentation choice; does not register a campaign chamber.
+    // Shared Kuia recording for BYPASS and explicit draft presentation selection.
     kuia: { file: 'kuia.ogg', title: 'Kuia', gain: 1 },
 } as const;
 
 export type MusicScene = keyof typeof MUSIC_TRACKS;
 
 export function musicSceneForRoom(roomId: string): MusicScene {
+    if (roomId === 'bypass') return 'kuia';
     if (roomId === 'relay' || roomId === 'uplink') return 'tutorial-relay';
     return Object.prototype.hasOwnProperty.call(MUSIC_TRACKS, roomId) ? roomId as MusicScene : 'menu';
 }

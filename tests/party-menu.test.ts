@@ -3,13 +3,13 @@ import { expect, it } from 'vitest';
 import { COOP_CAMPAIGN } from '../src/coop/campaign.ts';
 import { partyMenu } from '../src/coop/party-menu.ts';
 import { newParty, selectChamber, completeParty } from '../server/party-state.ts';
-import { sharedRoom } from '../server/coop-state.ts';
+import { sharedRoom, readRoomRecord } from '../server/coop-state.ts';
 
 const host = '11111111-1111-4111-8111-111111111111';
 it('lobby and pause expose chamber selection only to the host and state replay consequences', () => {
     const r = newParty('ABCD', host), room = sharedRoom(r, [true, true], [null, null]);
     const ui = (slot: 1 | 2) => new JSDOM(partyMenu(room, slot, true, 'lobby')).window.document;
-    expect(ui(1).querySelectorAll('[data-select-level]')).toHaveLength(5);
+    expect(ui(1).querySelectorAll('[data-select-level]')).toHaveLength(6);
     expect(ui(2).querySelectorAll('[data-select-level]')).toHaveLength(0);
     expect(ui(2).body.textContent).toContain('WAITING FOR HOST');
     const active = sharedRoom(selectChamber(r, host, 'race-condition')!, [true, true], [null, null]);
@@ -75,4 +75,19 @@ it('both perspectives retain profile colours, names, host roles and safe compact
     room.profiles[0] = { name: '<img onerror=x>', colour: 'purple' };
     const malformed = new JSDOM(partyMenu(room, 2, true, 'lobby')).window.document;
     expect(malformed.querySelector('img')).toBeNull(); expect(malformed.body.textContent).toContain('Ninja');
+});
+
+it('pre-BYPASS five-badge saves keep their progress and offer the unearned sixth chamber', () => {
+    const r = selectChamber(newParty('ABCD', host), host, 'use-after-free')!;
+    r.visitors[1] = '22222222-2222-4222-8222-222222222222';
+    r.completed = true; r.exitUnlocked = true; r.reachedExit = [true, true];
+    r.party = { phase: 'victory', completedLevels: ['handshake', 'crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free'] };
+    const restored = readRoomRecord(r, r.code)!; expect(restored).toEqual(r);
+    const room = sharedRoom(restored, [true, true], [null, null]);
+    expect(partyMenu(room, 1, true, 'victory')).not.toContain('CAMPAIGN COMPLETE');
+    const doc = new JSDOM(partyMenu(room, 1, true, 'choose')).window.document;
+    const bypass = doc.querySelector('[data-select-level="bypass"]')!.closest('.campaign-chamber')!;
+    expect(bypass.textContent).toContain('02 — BYPASS');
+    expect(bypass.querySelector('small')!.textContent).not.toContain('COMPLETE');
+    expect([...doc.querySelectorAll('.campaign-chamber small')].filter(e => e.textContent?.includes('COMPLETE'))).toHaveLength(5);
 });

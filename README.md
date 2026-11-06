@@ -6,7 +6,7 @@
 
 ![RACE CONDITION chamber overview, including its grapple route and control machinery](docs/playtest/2026-10-12-hero-assets/race-overview-compact.png)
 
-Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The five playable co-op chambers use server-authoritative lookup tables verified against Windows x64 OLLVM-16 BCF binaries; the server does not execute those PEs. The single-player CONTROL SPINE showcase retains its separate validated evidence, and the public Level Builder saves authored drafts in your browser.
+Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The six playable co-op chambers use server-authoritative puzzle state. Five retain lookup tables verified against Windows x64 OLLVM-16 BCF binaries; BYPASS uses its authored Boolean controller. The server does not execute those PEs. The single-player CONTROL SPINE showcase retains its separate validated evidence, and the public Level Builder saves authored drafts in your browser.
 
 ## Play the game
 
@@ -19,7 +19,7 @@ The game has two main modes:
 | Mode | Chambers | Purpose |
 | --- | --- | --- |
 | **Tutorial** (single player) | **PRESSURE**, **SWITCH**, **RELAY**, **CONTROL SPINE** | Learn plates, switches, cubes, grappling and machinery. CONTROL SPINE introduces verified binary-backed behavior. |
-| **Co-op Campaign** (two players) | **HANDSHAKE**, **CROSSFEED VAULT**, **RACE CONDITION**, **DEADLOCK**, **USE AFTER FREE** | Coordinate reversible routes, shared cubes, relays, timed machinery, grapple traversal and a two-person finish. |
+| **Co-op Campaign** (two players) | **HANDSHAKE**, **BYPASS**, **CROSSFEED VAULT**, **RACE CONDITION**, **DEADLOCK**, **USE AFTER FREE** | Coordinate reversible routes, shared cubes, relays, timed machinery, grapple traversal and a two-person finish. |
 
 To play co-op:
 
@@ -28,7 +28,7 @@ To play co-op:
 3. The creator is the party's host and chooses the chamber. Both players can operate the puzzle; neither has a fixed gameplay role.
 4. Solve the machinery together, then **both physically enter the unlocked exit** to finish. The host can choose the next chamber, replay, or select another chamber.
 
-Only HANDSHAKE and CROSSFEED VAULT currently display BREAKPOINT machines. Walk through one to activate it automatically; CROSSFEED’s SYSTEM ONLINE remains a separate E interaction. RACE CONDITION retains its internal cargo recovery milestone. DEADLOCK and USE AFTER FREE respawn at entry.
+HANDSHAKE, BYPASS and CROSSFEED VAULT display BREAKPOINT machines. Walk through one to activate it automatically; CROSSFEED’s SYSTEM ONLINE remains a separate E interaction. RACE CONDITION retains its internal cargo recovery milestone. DEADLOCK and USE AFTER FREE respawn at entry.
 
 Party membership, checkpoints and meaningful puzzle progress survive reconnects and server restarts. The same party code works across campaign chambers. Selecting or replaying a chamber starts that chamber fresh while preserving its completion badge. There is no matchmaking, account system or public spectator mode.
 
@@ -67,7 +67,7 @@ Some controls are contextual. In co-op, resetting or dying affects your own play
 
 ![CROSSFEED VAULT overview](docs/playtest/crossfeed-vault-overview.png)
 
-The co-op chambers remain subject to human playtesting. Their authored mechanics are documented in [HANDSHAKE](docs/chambers/handshake.md), [CROSSFEED VAULT](docs/crossfeed-vault.md), [RACE CONDITION](docs/race-condition.md), [DEADLOCK](docs/chambers/deadlock.md) and [USE AFTER FREE](docs/chambers/use-after-free.md). The three newest chambers have automated two-player traversal evidence; human playtesting is still outstanding.
+The co-op chambers remain subject to human playtesting. Their authored mechanics are documented in [HANDSHAKE](docs/chambers/handshake.md), [BYPASS](docs/chambers/bypass.md), [CROSSFEED VAULT](docs/crossfeed-vault.md), [RACE CONDITION](docs/race-condition.md), [DEADLOCK](docs/chambers/deadlock.md) and [USE AFTER FREE](docs/chambers/use-after-free.md). BYPASS adds a short assisted-grapple crossing, a held firewall bypass and introductory crumble practice. Its automated two-player traversal evidence does not establish a new-player completion time or human playtest acceptance.
 
 ## Real binaries and reverse-engineering evidence
 
@@ -77,9 +77,9 @@ The fourth tutorial chamber, **CONTROL SPINE** (internally `uplink`), uses a val
 
 One optional unstable region is associated with a separately supported bogus-code classification: a cloned block with proven infeasible incoming paths. The block's physical collapse timing remains an **authored gameplay metaphor**, not literal processor behavior. Displayed authored string effects and the other tutorial controllers are likewise not presented as native binary evidence.
 
-All five co-op campaign chambers use server-authoritative decisions from [verified Windows x64 OLLVM-16 BCF results](docs/adr/0011-native-backed-coop-controllers.md). The Linux server reads verified lookup tables; it does not execute the PEs. Compact [environmental assembly](docs/native-world-assembly.md) shows genuine state-linked zero/one stores beside the machinery, with subdued colours and short authored decoding strings. The [four-chamber presentation](docs/coop-environmental-assembly.md) follows RACE’s fixed world-space style; detailed provenance stays in Evidence. Shared platforms reuse the same native region. Server-owned timers, latches and authored instability remain distinct from the binary evidence.
+HANDSHAKE, CROSSFEED VAULT, RACE CONDITION, DEADLOCK and USE AFTER FREE use server-authoritative decisions from [verified Windows x64 OLLVM-16 BCF results](docs/adr/0011-native-backed-coop-controllers.md). The Linux server reads verified lookup tables; it does not execute the PEs. Compact [environmental assembly](docs/native-world-assembly.md) shows genuine state-linked zero/one stores beside the machinery, with subdued colours and short authored decoding strings. The [four-chamber presentation](docs/coop-environmental-assembly.md) follows RACE’s fixed world-space style; detailed provenance stays in Evidence. Shared platforms reuse the same native region. Server-owned timers, latches and authored instability remain distinct from the binary evidence.
 
-**Evidence boundary:** Workbench drafts and public custom levels retain authored/mock controllers. A static listing is not a current execution trace, and unobserved execution alone is never proof that a block is bogus.
+**Evidence boundary:** BYPASS is an **AUTHORED** campaign chamber with no native binary evidence. Its Boolean controller and prototype crumble are authored gameplay. Workbench drafts and public custom levels also retain authored/mock controllers. A static listing is not a current execution trace, and unobserved execution alone is never proof that a block is bogus.
 
 See [CONTROL SPINE's design and evidence notes](docs/c8-vertical-slice.md) and the checked data in `game_data/`.
 

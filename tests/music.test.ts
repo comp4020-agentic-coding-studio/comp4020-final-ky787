@@ -45,11 +45,12 @@ describe('streaming music scenes', () => {
         expect(musicSceneForRoom('relay')).toBe('tutorial-relay');
         expect(musicSceneForRoom('uplink')).toBe('tutorial-relay');
         expect(musicSceneForRoom('handshake')).toBe('handshake');
+        expect(musicSceneForRoom('bypass')).toBe('kuia');
         expect(musicSceneForRoom('crossfeed-vault')).toBe('crossfeed-vault');
         expect(musicSceneForRoom('race-condition')).toBe('race-condition');
         expect(musicSceneForRoom('__proto__')).toBe('menu');
         expect(musicSceneForRoom('workbench')).toBe('menu');
-        expect(musicSceneForRoom('bypass')).toBe('menu'); // A draft title never selects music.
+        expect(musicSceneForRoom('BYPASS')).toBe('menu'); // A display title never selects music.
         expect(MUSIC_TRACKS.kuia.file).toBe('kuia.ogg');
     });
 

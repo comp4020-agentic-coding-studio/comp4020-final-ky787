@@ -12,6 +12,7 @@ const authoredRoom = (id: AuthoredCampaignLevel, slot: Slot): RoomDef => ({ ...d
 /** Hand-authored co-op campaign and internal mechanics fixtures. */
 export const COOP_LABS: Record<Exclude<CoopLevelId, 'workbench'>, { title: string; description: string; room: (slot: Slot) => RoomDef }> = {
     handshake: { title: 'HANDSHAKE', description: 'One payload. Two operators.', room: slot => authoredRoom('handshake', slot) },
+    bypass: { title: 'BYPASS', description: 'Hold the signal. Open the way for your partner.', room: slot => authoredRoom('bypass', slot) },
     deadlock: { title: 'DEADLOCK', description: 'Deliver the weights that power the machine.', room: slot => authoredRoom('deadlock', slot) },
     'use-after-free': { title: 'USE AFTER FREE', description: 'Trade the plates. Swing before the pointer expires.', room: slot => authoredRoom('use-after-free', slot) },
     'race-condition': { title: 'RACE CONDITION', description: 'Deliver the payload. Keep the trace alive.', room: raceCondition },

@@ -6,8 +6,9 @@ VAULT uses **Shadow**, both by James Gargette (cinameng). Shadow is the regular
 and the earlier review edits are not runtime sources. These selections replace
 Kuia and Through the Sewers respectively; no further candidate ranking applies.
 
-**2026-11-06 draft addition:** BYPASS explicitly selects **Kuia**, the previously
-approved James Gargette (cinameng) loop, through `presentation.music: "kuia"`.
+**2026-11-06 BYPASS addition:** The campaign room uses **Kuia**, the previously
+approved James Gargette (cinameng) loop. Its editable draft selects the same
+recording through `presentation.music: "kuia"`.
 Its [source page](https://opengameart.org/content/kuia) was rechecked and lists CC0.
 The complete 47.177143-second runtime master from commit `60c04fc` is reused
 byte-for-byte as `public/audio/music/kuia.ogg`: 2,080,512 samples per channel,
@@ -19,8 +20,9 @@ The retained master includes 28 Hz high-pass / 14 kHz low-pass filtering, +0.51 
 constant gain and 128-sample boundary de-clicks before and after filtering;
 it measures −23.04 LUFS-I and −6.48 dBTP. No listening preview or new remaster is
 used, and no new acoustic audition is claimed. The eight bundled files total
-12,280,654 bytes. All seven released soundtrack files and their entries remain
-unchanged. BYPASS remains a draft; adding the key does not register it in the campaign.
+12,280,654 bytes. The seven earlier soundtrack files and their entries remain
+unchanged. BYPASS was promoted separately on the user’s explicit request; the
+optional draft music key does not itself register campaign content.
 
 Restore the exact retained loop, if needed, with:
 
@@ -68,7 +70,7 @@ recordings by listening; the agent does not claim a subjective audition.
 | `handshake.ogg` | `9fdc98717a1e40393e79d44e177c7ebb13ff07663985ddf67cd157460bf6cd7c` | `659f242908acc04d5ebf37b0fb16d9c8919cd1829d84732883c38ee6e9ccb691` |
 | `crossfeed-vault.ogg` | `e76a74cd3e163d349ce64d7ee4e0567c5711c8234afc9c5dc5a8b4421e9f4004` | `4513cf1301894d113c7a0acb031ab1600f253c1140e801f58b3d0d68f225af76` |
 
-The seven runtime tracks now total **11,725,794 bytes (11.73 MB)**. Menu, RACE,
+At the October 27 release, the seven runtime tracks totalled **11,725,794 bytes (11.73 MB)**. Menu, RACE,
 DEADLOCK's Algate, USE AFTER FREE and `tutorial-relay.ogg` remain byte-for-byte
 unchanged, including their catalogue entries and gains. PRESSURE/SWITCH still
 use the menu theme; RELAY/CONTROL SPINE still use Celestial Harmony at their
@@ -106,7 +108,7 @@ October 26 current-selection document remains in Git history at `8dc02a7`.
 The following initial six-track record and its montage are retained as history.
 Its totals, two replaced scene assignments, runtime hashes and command-line
 options describe the initial export; use the human-approved section above for the
-current seven-track catalogue and targeted generator command.
+current eight-track catalogue (including the BYPASS addition) and targeted generator command.
 
 Six local electronic music loops accompany the title screen and the five co-op
 chambers. The runtime files total **13,158,428 bytes (13.16 MB)**. All shipped

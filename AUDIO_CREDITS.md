@@ -127,7 +127,7 @@ cooldown, voice-limit and loop-mixing design adapts the original project's
 `src/audio/audio-manager.ts`; buffer playback and this chamber's event adapter
 are new. Sounds are authored game feedback, not retained OLLVM execution evidence.
 
-## Music — released selections, 2026-10-27; BYPASS draft addition, 2026-11-06
+## Music — released selections, 2026-10-27; BYPASS addition, 2026-11-06
 
 All eight bundled soundtrack files use **CC0 1.0**, verified on their original
 OpenGameArt pages. They total **12,280,654 bytes** and retain the approximately
@@ -142,12 +142,12 @@ OpenGameArt pages. They total **12,280,654 bytes** and retain the approximately
 | DEADLOCK | Algate — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/algate) |
 | USE AFTER FREE | Neural Malfunction — vitalezzz | [Original submission](https://opengameart.org/content/neural-malfunction) |
 | Solo RELAY and CONTROL SPINE (`uplink`) | Celestial Harmony — vitalezzz | [Original submission](https://opengameart.org/content/celestial-harmony) |
-| BYPASS draft (`presentation.music: "kuia"`) | Kuia — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/kuia), [exact MP3](https://opengameart.org/sites/default/files/kuia.mp3) |
+| BYPASS campaign; drafts selecting `presentation.music: "kuia"` | Kuia — James Gargette (cinameng) | [Original submission](https://opengameart.org/content/kuia), [exact MP3](https://opengameart.org/sites/default/files/kuia.mp3) |
 
 The user explicitly approved Loaben for HANDSHAKE and regular Shadow for
 CROSSFEED after listening. Both source pages identify cinameng / James Gargette
 and CC0, verified 2026-10-27. Shadow dark/light were not selected. Kuia is now
-reused for the BYPASS draft; Through the Sewers remains a historical choice.
+reused for BYPASS and its editable draft; Through the Sewers remains a historical choice.
 
 Kuia's source page was rechecked on 2026-11-06. Its complete approved master is
 restored byte-for-byte from commit `60c04fc`, not from a listening preview:

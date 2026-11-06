@@ -20,9 +20,9 @@ async function party() {
     return { dir, app, host, guest, a, b, first, act };
 }
 it('one public order supplies numbering/next and strict host requests cannot inject identity or state', () => {
-    expect(COOP_CAMPAIGN.map(l => l.id)).toEqual(['handshake', 'crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free']);
+    expect(COOP_CAMPAIGN.map(l => l.id)).toEqual(['handshake', 'bypass', 'crossfeed-vault', 'race-condition', 'deadlock', 'use-after-free']);
     expect(nextChamber('crossfeed-vault')).toBe('race-condition'); expect(nextChamber('race-condition')).toBe('deadlock');
-    expect(nextChamber('handshake')).toBe('crossfeed-vault'); expect(nextChamber('deadlock')).toBe('use-after-free'); expect(nextChamber('use-after-free')).toBeNull();
+    expect(nextChamber('handshake')).toBe('bypass'); expect(nextChamber('bypass')).toBe('crossfeed-vault'); expect(nextChamber('deadlock')).toBe('use-after-free'); expect(nextChamber('use-after-free')).toBeNull();
     const request = { type: 'select-level', seq: 1, level: 'race-condition', levelInstance: 1 };
     expect(parseClientMessage(JSON.stringify(request))).toEqual(request);
     for (const patch of [{ level: 'boost-lab' }, { levelInstance: 0 }, { levelInstance: 1.5 }, { levelInstance: undefined }, { host: 1 }, { slot: 1 }, { revision: 1 }])

@@ -280,7 +280,7 @@ export class SliceGame {
             this.input.releaseAll(); this.accumulated = 0;
             const native = isNativeChamber(room.level);
             this.roomTitle.textContent = `CO-OP / ${COOP_LABS[room.level].title}`;
-            this.sourceBadge.textContent = native ? 'VALIDATED OLLVM BCF' : 'mock-multiplayer';
+            this.sourceBadge.textContent = native ? 'VALIDATED OLLVM BCF' : room.level === 'bypass' ? 'AUTHORED' : 'mock-multiplayer';
             this.evidenceButton.hidden = !native;
             this.overviewPending = sameChamber ? previousOverviewPending : isCampaignLevel(room.level) && room.checkpoint === 'entry';
             this.overviewVisible = this.overviewPending && !restorePause; this.startButton.hidden = !this.overviewVisible;

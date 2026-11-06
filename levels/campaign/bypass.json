@@ -1,0 +1,548 @@
+{
+  "bindings": [
+    {
+      "id": "anchorFeed",
+      "output": "anchorPower",
+      "property": "active",
+      "target": "anchor"
+    },
+    {
+      "id": "bridgeFeed",
+      "output": "bridgePower",
+      "property": "active",
+      "target": "bridge"
+    },
+    {
+      "id": "barrierA",
+      "output": "firewallActive",
+      "property": "active",
+      "target": "firewallA"
+    },
+    {
+      "id": "barrierB",
+      "output": "firewallActive",
+      "property": "active",
+      "target": "firewallB"
+    },
+    {
+      "id": "exitFeed",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit"
+    }
+  ],
+  "controller": {
+    "kind": "declarative",
+    "outputs": {
+      "anchorPower": {
+        "args": [
+          {
+            "id": "anchorHold.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "link.value",
+            "op": "ref"
+          }
+        ],
+        "op": "or"
+      },
+      "bridgePower": {
+        "id": "link.value",
+        "op": "ref"
+      },
+      "exitReady": {
+        "args": [
+          {
+            "id": "link.value",
+            "op": "ref"
+          },
+          {
+            "id": "override.value",
+            "op": "ref"
+          },
+          {
+            "id": "leftScan.occupied",
+            "op": "ref"
+          },
+          {
+            "id": "rightScan.occupied",
+            "op": "ref"
+          }
+        ],
+        "op": "and"
+      },
+      "firewallActive": {
+        "arg": {
+          "args": [
+            {
+              "id": "bypassHold.occupied",
+              "op": "ref"
+            },
+            {
+              "id": "override.value",
+              "op": "ref"
+            }
+          ],
+          "op": "or"
+        },
+        "op": "not"
+      }
+    }
+  },
+  "editor": {
+    "grid": 20,
+    "hidden": [],
+    "locked": [],
+    "snap": true
+  },
+  "geometry": {
+    "height": 880,
+    "objects": [
+      {
+        "id": "player1",
+        "slot": 1,
+        "type": "spawn",
+        "x": 110,
+        "y": 663
+      },
+      {
+        "id": "player2",
+        "slot": 2,
+        "type": "spawn",
+        "x": 430,
+        "y": 663
+      },
+      {
+        "h": 200,
+        "id": "startBank",
+        "kind": "static",
+        "type": "platform",
+        "w": 560,
+        "x": 0,
+        "y": 680
+      },
+      {
+        "h": 200,
+        "id": "middleBank",
+        "kind": "static",
+        "type": "platform",
+        "w": 1120,
+        "x": 980,
+        "y": 680
+      },
+      {
+        "h": 200,
+        "id": "restIsland",
+        "kind": "static",
+        "type": "platform",
+        "w": 180,
+        "x": 2500,
+        "y": 680
+      },
+      {
+        "h": 200,
+        "id": "finishBank",
+        "kind": "static",
+        "type": "platform",
+        "w": 760,
+        "x": 3080,
+        "y": 680
+      },
+      {
+        "h": 170,
+        "id": "firewallRoof",
+        "kind": "static",
+        "type": "platform",
+        "w": 300,
+        "x": 1530,
+        "y": 330
+      },
+      {
+        "activation": "signal",
+        "anchor": true,
+        "h": 24,
+        "hookable": true,
+        "id": "anchor",
+        "kind": "code",
+        "label": "SHARED ANCHOR",
+        "type": "platform",
+        "w": 160,
+        "x": 790,
+        "y": 340
+      },
+      {
+        "activation": "signal",
+        "h": 28,
+        "hookable": false,
+        "id": "bridge",
+        "kind": "code",
+        "label": "LINK BRIDGE",
+        "type": "platform",
+        "w": 420,
+        "x": 560,
+        "y": 680
+      },
+      {
+        "crumbleDelay": 1.4,
+        "h": 28,
+        "hookCrumbleDelay": 1.4,
+        "hookable": true,
+        "id": "unstableA",
+        "kind": "unstable",
+        "label": "UNSTABLE",
+        "respawnDelay": 2.6,
+        "type": "platform",
+        "w": 200,
+        "x": 2200,
+        "y": 680
+      },
+      {
+        "crumbleDelay": 1.4,
+        "h": 28,
+        "hookCrumbleDelay": 1.4,
+        "hookable": true,
+        "id": "unstableB",
+        "kind": "unstable",
+        "label": "UNSTABLE",
+        "respawnDelay": 2.6,
+        "type": "platform",
+        "w": 200,
+        "x": 2780,
+        "y": 680
+      },
+      {
+        "h": 120,
+        "id": "openingField",
+        "type": "hazard",
+        "w": 420,
+        "x": 560,
+        "y": 760
+      },
+      {
+        "h": 90,
+        "id": "crumbleField",
+        "type": "hazard",
+        "w": 980,
+        "x": 2100,
+        "y": 790
+      },
+      {
+        "id": "anchorHold",
+        "kind": "scanner",
+        "label": "HOLD / ANCHOR",
+        "type": "device",
+        "x": 270,
+        "y": 680
+      },
+      {
+        "floating": true,
+        "id": "link",
+        "kind": "terminal",
+        "label": "LINK",
+        "type": "device",
+        "x": 1100,
+        "y": 680
+      },
+      {
+        "checkpoint": "relay",
+        "id": "regroup",
+        "label": "BREAKPOINT",
+        "type": "breakpoint",
+        "x": 1290,
+        "y": 680
+      },
+      {
+        "checkpoint": "relay",
+        "id": "retry1",
+        "slot": 1,
+        "type": "checkpoint",
+        "x": 1220,
+        "y": 663
+      },
+      {
+        "checkpoint": "relay",
+        "id": "retry2",
+        "slot": 2,
+        "type": "checkpoint",
+        "x": 1350,
+        "y": 663
+      },
+      {
+        "id": "bypassHold",
+        "kind": "scanner",
+        "label": "HOLD / BYPASS",
+        "type": "device",
+        "x": 1460,
+        "y": 680
+      },
+      {
+        "id": "firewallA",
+        "label": "FIREWALL",
+        "length": 180,
+        "orientation": "vertical",
+        "thickness": 20,
+        "type": "firewall",
+        "x": 1590,
+        "y": 500
+      },
+      {
+        "id": "firewallB",
+        "label": "FIREWALL",
+        "length": 180,
+        "orientation": "vertical",
+        "thickness": 20,
+        "type": "firewall",
+        "x": 1740,
+        "y": 500
+      },
+      {
+        "floating": true,
+        "id": "override",
+        "kind": "terminal",
+        "label": "OVERRIDE",
+        "type": "device",
+        "x": 1910,
+        "y": 680
+      },
+      {
+        "id": "leftScan",
+        "kind": "scanner",
+        "label": "LEFT",
+        "type": "device",
+        "x": 3250,
+        "y": 680
+      },
+      {
+        "id": "rightScan",
+        "kind": "scanner",
+        "label": "RIGHT",
+        "type": "device",
+        "x": 3430,
+        "y": 680
+      },
+      {
+        "arrivals": 2,
+        "h": 140,
+        "id": "exit",
+        "latch": true,
+        "type": "exit",
+        "w": 80,
+        "x": 3670,
+        "y": 540
+      }
+    ],
+    "width": 3840
+  },
+  "id": "bypass",
+  "instruction": "HOLD THE SIGNAL. OPEN THE WAY FOR YOUR PARTNER.",
+  "presentation": {
+    "cameraReveals": [
+      {
+        "bounds": {
+          "h": 460,
+          "w": 780,
+          "x": 370,
+          "y": 300
+        },
+        "duration": 1.5,
+        "id": "anchorView",
+        "padding": 40,
+        "platformIds": [
+          "anchor",
+          "bridge"
+        ],
+        "source": "anchorHold"
+      }
+    ],
+    "display": {
+      "x": 70,
+      "y": 220
+    },
+    "labels": [
+      {
+        "id": "openingHint",
+        "text": "ONE HOLDS / ONE CROSSES",
+        "x": 360,
+        "y": 440
+      },
+      {
+        "id": "swapHint",
+        "text": "SWAP ROLES / HOLD THE FIREWALL OFF",
+        "x": 1360,
+        "y": 385
+      },
+      {
+        "id": "crumbleHint",
+        "text": "UNSTABLE / KEEP MOVING",
+        "x": 2140,
+        "y": 555
+      },
+      {
+        "id": "finishHint",
+        "text": "SCAN TOGETHER / THEN ENTER",
+        "x": 3220,
+        "y": 525
+      }
+    ],
+    "music": "kuia",
+    "wires": [
+      {
+        "binding": "anchorFeed",
+        "id": "anchorWire",
+        "points": [
+          {
+            "x": 270,
+            "y": 668
+          },
+          {
+            "x": 270,
+            "y": 290
+          },
+          {
+            "x": 870,
+            "y": 290
+          },
+          {
+            "x": 870,
+            "y": 340
+          }
+        ]
+      },
+      {
+        "binding": "bridgeFeed",
+        "id": "bridgeWire",
+        "points": [
+          {
+            "x": 1100,
+            "y": 668
+          },
+          {
+            "x": 1100,
+            "y": 760
+          },
+          {
+            "x": 770,
+            "y": 760
+          },
+          {
+            "x": 770,
+            "y": 708
+          }
+        ]
+      },
+      {
+        "binding": "barrierA",
+        "id": "bypassWire",
+        "points": [
+          {
+            "x": 1460,
+            "y": 668
+          },
+          {
+            "x": 1460,
+            "y": 460
+          },
+          {
+            "x": 1600,
+            "y": 460
+          },
+          {
+            "x": 1600,
+            "y": 500
+          }
+        ]
+      },
+      {
+        "binding": "barrierB",
+        "id": "secondBarrierWire",
+        "points": [
+          {
+            "x": 1600,
+            "y": 460
+          },
+          {
+            "x": 1750,
+            "y": 460
+          },
+          {
+            "x": 1750,
+            "y": 500
+          }
+        ]
+      },
+      {
+        "binding": "barrierB",
+        "id": "overrideWire",
+        "points": [
+          {
+            "x": 1910,
+            "y": 668
+          },
+          {
+            "x": 1910,
+            "y": 460
+          },
+          {
+            "x": 1750,
+            "y": 460
+          }
+        ]
+      },
+      {
+        "binding": "exitFeed",
+        "id": "exitWire",
+        "points": [
+          {
+            "x": 3250,
+            "y": 668
+          },
+          {
+            "x": 3250,
+            "y": 760
+          },
+          {
+            "x": 3710,
+            "y": 760
+          },
+          {
+            "x": 3710,
+            "y": 680
+          }
+        ]
+      },
+      {
+        "binding": "exitFeed",
+        "id": "rightScanWire",
+        "points": [
+          {
+            "x": 3430,
+            "y": 668
+          },
+          {
+            "x": 3430,
+            "y": 760
+          }
+        ]
+      }
+    ]
+  },
+  "previewStates": {
+    "anchor-held": {
+      "anchorHold.occupied": true
+    },
+    "exit-ready": {
+      "leftScan.occupied": true,
+      "link.value": true,
+      "override.value": true,
+      "rightScan.occupied": true
+    },
+    "idle": {},
+    "route-open": {
+      "link.value": true,
+      "override.value": true
+    }
+  },
+  "title": "BYPASS",
+  "version": 1
+}

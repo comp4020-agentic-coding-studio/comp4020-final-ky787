@@ -36,7 +36,7 @@ export function homeMenu(continueLabel?: string): string {
 }
 
 export function coopMenu(labsMarkup = ''): string {
-    return destination('CO-OP', 'Better together.', 'A friend, a grapple, and a little coordination. Find your way through five cooperative chambers.', `
+    return destination('CO-OP', 'Better together.', 'A friend, a grapple, and a little coordination. Find your way through six cooperative chambers.', `
         <div class="destination-choices">
             <button id="create-party" class="destination-choice" type="button"><span class="choice-symbol" aria-hidden="true">＋</span><strong>Start Co-op</strong><span>Open a party, then invite a friend.</span><b aria-hidden="true">Create party →</b></button>
             <button id="show-join" class="destination-choice" type="button"><span class="choice-symbol" aria-hidden="true">↗</span><strong>Join Co-op</strong><span>Have an invitation or party code?</span><b aria-hidden="true">Join a friend →</b></button>

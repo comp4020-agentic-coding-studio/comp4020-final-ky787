@@ -1,7 +1,12 @@
 # BYPASS — authored cooperative draft, 2026-11-06
 
-BYPASS is a complete two-player **DRAFT**, intended for human playtesting between
-HANDSHAKE and CROSSFEED VAULT. It is not in the campaign, badges or NEXT navigation.
+**Promotion note, 2026-11-06:** After this draft delivery, the user explicitly
+requested campaign integration. The unchanged snapshot now lives at
+[`levels/campaign/bypass.json`](../../../levels/campaign/bypass.json), between
+HANDSHAKE and CROSSFEED VAULT. See the [campaign chamber contract](../../chambers/bypass.md).
+That request is not a claim of new human playtesting or native evidence.
+
+The following records the original two-player **DRAFT** validation and custom-session workflow.
 The 3–5-minute first-success target is a design aspiration, not a measured result.
 
 - Draft: [`levels/drafts/bypass.json`](../../../levels/drafts/bypass.json)
@@ -117,9 +122,10 @@ human gameplay acceptance; this JSON and its Boolean contract are not native pro
 The scripts execute much faster than exploratory human play; their elapsed time
 is not a new-player completion-time estimate. Tests establish the specified routes
 and failures, not universal shortcut freedom or human difficulty acceptance. Human
-paired playtesting, including touch/small-screen comfort, remains required before
-campaign integration. Existing campaign replay was not repeated: shared gameplay
-code and movement constants are unchanged.
+paired playtesting, including touch/small-screen comfort, remains outstanding.
+At the draft-delivery stage, existing campaign replay was not repeated because
+shared gameplay code and movement constants were unchanged. Promotion validation
+is recorded separately in the campaign chamber contract.
 
 Reproduce with existing tools:
 
@@ -147,7 +153,8 @@ full solve or an audio audition. Playback is checked separately.
 `presentation.music: "kuia"` explicitly selects the bundled loop for both frozen
 custom clients even though the runtime room ID is `workbench`. Missing selectors
 retain the previous silent draft behavior; only allowlisted bundled keys are
-accepted. No title-derived trust, arbitrary URLs, uploads or campaign registration.
+accepted. The selector itself does not register a campaign chamber or infer trust
+from a title; the later campaign release is explicit and separate.
 
 Kuia by James Gargette (cinameng), [CC0 source](https://opengameart.org/content/kuia),
 uses the complete **47.177143-second** retained runtime master from `60c04fc`,

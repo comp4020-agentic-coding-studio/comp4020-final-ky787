@@ -65,14 +65,14 @@ trigger beat scheduling. A defensive `ended` fallback handles interrupted media.
 
 The focused soundtrack refinement changes asset selection without replacing
 this player or changing its looping, fades, autoplay, focus or streaming behavior.
-The catalogue now has seven runtime files: menu, five co-op chamber selections,
+The catalogue has eight runtime files: menu, six co-op chamber selections,
 and `tutorial-relay.ogg`. The latter preserves the previous Celestial Harmony
 file byte-for-byte at its existing gain for solo RELAY (`relay`) and CONTROL
 SPINE (`uplink`); those tutorials do not inherit the new co-op HANDSHAKE selection.
 PRESSURE and SWITCH continue using the unchanged menu track.
 
-BYPASS adds an eighth bundled file, `kuia.ogg`, without changing those seven
-recordings or their scene assignments. Public custom sessions optionally select
+BYPASS uses `kuia.ogg`, restored for its draft and retained unchanged for the
+campaign release. The seven earlier recordings and scene assignments are unchanged. Public custom sessions optionally select
 a bundled key through `presentation.music`; their existing `GameAudio` saved
 preferences feed the same `MusicPlayer`. Omitted keys preserve silent draft music.
 The frozen document selects the track, not the shared `workbench` room ID or title.

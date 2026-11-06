@@ -3,6 +3,18 @@
 2026-10-16. Campaign integration explicitly requested after the draft delivery.
 Human two-player playtesting has not been claimed or inferred from that request.
 
+## BYPASS extension — 2026-11-06
+
+On explicit user request after its tested draft delivery, BYPASS joins the campaign
+between HANDSHAKE and CROSSFEED VAULT. The public order now has six chambers and
+complete-campaign status requires all six completion badges. Its canonical snapshot
+is `levels/campaign/bypass.json`, identical to the delivered draft. BYPASS uses the
+existing declarative authority and retains its authored evidence status; the other
+five rooms keep their native-backed controllers. See [BYPASS](../chambers/bypass.md)
+for the compact contract, recovery semantics and validation. Human playtesting is
+not inferred from the integration request. The sections below record the original
+2026-10-16 integration and its five-room checks.
+
 ## Campaign and source of truth
 
 The public order in `src/coop/campaign.ts` is HANDSHAKE, CROSSFEED VAULT,

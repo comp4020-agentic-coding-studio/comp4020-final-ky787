@@ -1,9 +1,10 @@
 # Authored cooperative chambers
 
-These three authored/mock chambers are available in the cooperative campaign,
-following the explicit integration request on 2026-10-16. Choose **CO-OP CAMPAIGN**,
-create a party, share its code and select a chamber. The order is HANDSHAKE →
-CROSSFEED VAULT → RACE CONDITION → DEADLOCK → USE AFTER FREE.
+Four chambers use canonical Level Builder JSON snapshots in the cooperative
+campaign: HANDSHAKE, BYPASS, DEADLOCK and USE AFTER FREE. BYPASS was added on
+explicit request on 2026-11-06; the other three were integrated on 2026-10-16.
+Choose **Play Co-op → Start Co-op**, share the party invitation and select a chamber.
+The order is HANDSHAKE → BYPASS → CROSSFEED VAULT → RACE CONDITION → DEADLOCK → USE AFTER FREE.
 
 Released JSON snapshots live in [`levels/campaign/`](../../levels/campaign/).
 The editable drafts below remain independent; future draft edits do not silently
@@ -11,12 +12,14 @@ change the campaign. Single-player tutorials and CONTROL SPINE evidence are unch
 See the [integration contract](../adr/0010-json-coop-campaign.md) for persistence,
 old-party compatibility and full campaign tests. Human playtesting is still outstanding.
 
-As of 2026-10-17 all five campaign chambers are **native-backed**: their
+The five chambers released before BYPASS are **native-backed** as of 2026-10-17: their
 server-authoritative machinery decisions come from verified Windows-native OLLVM
 BCF controller result tables, not mock TypeScript expressions, and the evidence
 inspector shows the real native assembly. The Linux server reads a verified
 lookup table; it does not execute the Windows PE. See
 [native-backed controllers](../adr/0011-native-backed-coop-controllers.md).
+BYPASS remains **AUTHORED**, with a server-evaluated Boolean controller and no
+native evidence. Its prototype crumble is a gameplay mechanic, not bogus-block proof.
 
 The 2026-10-16 campaign check completed all five chambers in one persistent party
 using two independent browser identities and real controls. All 78 campaign checks
@@ -29,6 +32,7 @@ respectively, with zero deaths in those runs. See the
 | Draft | Central discovery | Design and measured evidence |
 |---|---|---|
 | [HANDSHAKE](../../levels/drafts/handshake.json) | Recover one cube, substitute it for a plate operator, use partner-held support, then deliver it to the exit. | [HANDSHAKE](handshake.md) |
+| [BYPASS](../../levels/drafts/bypass.json) | Hold a stable anchor for a partner, latch a bridge and firewall bypass, then cross broad crumble slabs and scan together. | [BYPASS](bypass.md) |
 | [DEADLOCK](../../levels/drafts/deadlock.json) | Delivered weights become unavailable; two people power the last cargo lift, then releasing FEED enables the relay trip to close HATCH. | [DEADLOCK](deadlock.md) |
 | [USE AFTER FREE](../../levels/drafts/use-after-free.json) | Alternate climber and operator roles as occupied pressure-platforms crumble; release each previous circuit before the next route works. | [USE AFTER FREE](use-after-free.md) |
 
@@ -54,7 +58,7 @@ local repository with `pnpm dev`. No accounts or native binaries are required.
 Run from the repository root, after `pnpm install --frozen-lockfile`:
 
 ```sh
-for chamber in handshake deadlock use-after-free; do
+for chamber in handshake bypass deadlock use-after-free; do
   pnpm level:validate "levels/drafts/$chamber.json" --json
   pnpm level:render "levels/drafts/$chamber.json" \
     --out ".workbench/reports/2026-10-16-chambers/$chamber/recheck-overview.png"
@@ -73,7 +77,7 @@ loose-cargo diagnostics declare their narrower scope. Isolated unit fixtures are
 labelled separately.
 
 After `pnpm build`, `node scripts/level-tools/chambers-browser-check.ts` exercises
-all three imports, previews, local physics, exports, IndexedDB reload and
+the original three imports, previews, local physics, exports, IndexedDB reload and
 public-compatible custom-session starts. These integration checks do not replace
 the full physical solves above. Large reports and captures remain ignored under
 `.workbench/reports/2026-10-16-chambers/`; the design documents identify final runs
@@ -83,6 +87,9 @@ and distinguish failed iterations.
 
 - HANDSHAKE: first-use grappling and Space rope jumps, discoverability of the held
   cube boost, optional cube-on-LIFT allocation, role exchange and blind solve time.
+- BYPASS: first-use assisted targeting, release-to-jump timing, role exchange,
+  short lethal retries, crumble warnings and touch/small-screen comfort. No
+  measured first-success time is claimed.
 - DEADLOCK: comfort of the measured catch window, long cargo travel, lower
   entry/checkpoint crowding, loose-cargo allocations and the legitimate grapple
   catch alternative. A mechanically valid solve does not establish its pacing.
