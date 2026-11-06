@@ -99,12 +99,27 @@ export function drawConnections(c: CanvasRenderingContext2D, links: readonly Mac
         c.strokeStyle = on ? colour : '#344955'; c.globalAlpha = on ? .65 : .45;
         c.lineWidth = on ? 2 : 1;
         c.beginPath(); link.points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); c.stroke();
-        if (link.inverted) { c.font = '11px monospace'; c.fillStyle = on ? colour : '#718996'; c.fillText('NOT', link.points[1].x + 8, link.points[1].y - 8); }
         if (!on) continue;
         c.setLineDash([9, 28]); c.lineDashOffset = -w.elapsed * 70; c.globalAlpha = .95; c.stroke();
         c.setLineDash([]); c.lineDashOffset = 0;
         const pulse = connectionPulse(link.points, w.elapsed);
         c.fillStyle = '#d6fff4'; c.beginPath(); c.arc(pulse.x, pulse.y, 3.5, 0, Math.PI * 2); c.fill();
+    }
+    // Inversion describes the authored connection in either state. Draw it after
+    // the wires at full opacity, close enough to the source for the local camera.
+    c.globalAlpha = 1; c.font = 'bold 14px monospace'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    const labelled = new Set<string>(), width = c.measureText('NOT').width;
+    for (const link of links) {
+        if (!link.inverted) continue;
+        const [from, corner] = link.points, distance = Math.hypot(corner.x - from.x, corner.y - from.y);
+        const t = distance ? Math.min(1, 180 / distance) : 0;
+        const x = from.x + (corner.x - from.x) * t - width - 8, y = from.y + (corner.y - from.y) * t - 8;
+        // A single annotation serves wires that share the same inverted trunk.
+        const position = `${x},${y}`;
+        if (labelled.has(position)) continue;
+        labelled.add(position);
+        c.fillStyle = '#111820'; c.fillRect(x - 4, y - 16, width + 8, 20);
+        c.fillStyle = '#ffd76a'; c.fillText('NOT', x, y);
     }
     c.restore();
 }
