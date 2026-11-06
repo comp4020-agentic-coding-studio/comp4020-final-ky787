@@ -1,0 +1,572 @@
+{
+  "schema": "coop-native-integration/v1",
+  "chamber_id": "handshake-v2",
+  "status": "proposal_only_no_live_integration",
+  "contract_sha256": "08ccba38195b3466bfff5fef37e1ede555865de2a1e468cdaa426e5c2f0000e8",
+  "trace_summary_sha256": "cd69926948b9a469f6f1cf54b96b770ac21c59e0d27ba839cfc2b17e6620da8d",
+  "server_owned": [
+    "Accepted body/cube occupancy and cargo ownership",
+    "Reversible LINK toggle and one-use maintenance latch",
+    "Exit latch=true and two distinct physical arrivals",
+    "Automatic breakpoint, respawn and recovery",
+    "Movement, held-cube boost, grapple, lifts, relays and firewall contact handling"
+  ],
+  "outputs": [
+    {
+      "name": "crossingPower",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "crossing.occupied",
+        "op": "ref"
+      },
+      "false_meaning": "Both crossing anchors ghosted",
+      "true_meaning": "Both crossing anchors solid and grappleable",
+      "memory": "uint32_t at the output buffer supplied in RDX + 0 bytes",
+      "bindings": [
+        {
+          "id": "nearPower",
+          "output": "crossingPower",
+          "property": "active",
+          "target": "nearAnchor",
+          "invert": false,
+          "resolved_signal": "draft:nearPower",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        },
+        {
+          "id": "farPower",
+          "output": "crossingPower",
+          "property": "active",
+          "target": "farAnchor",
+          "invert": false,
+          "resolved_signal": "draft:farPower",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "crossingPower",
+          "byte_offset": 0,
+          "instruction_rva": 4337,
+          "instruction_address": 5368713457,
+          "instruction": {
+            "id": "insn_000010F1",
+            "address": 5368713457,
+            "rva": 4337,
+            "size": 6,
+            "bytes": "c7 00 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 1"
+          },
+          "raw_block_id": "bb_000010EA",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            1,
+            3,
+            5,
+            7,
+            9,
+            11,
+            13,
+            15,
+            17,
+            19,
+            21,
+            23,
+            25,
+            27,
+            29,
+            31
+          ]
+        },
+        {
+          "output": "crossingPower",
+          "byte_offset": 0,
+          "instruction_rva": 4444,
+          "instruction_address": 5368713564,
+          "instruction": {
+            "id": "insn_0000115C",
+            "address": 5368713564,
+            "rva": 4444,
+            "size": 6,
+            "bytes": "c7 00 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax], 0"
+          },
+          "raw_block_id": "bb_00001155",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16,
+            18,
+            20,
+            22,
+            24,
+            26,
+            28,
+            30
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "liftPower",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "liftPlate.occupied",
+        "op": "ref"
+      },
+      "false_meaning": "Lift off",
+      "true_meaning": "Lift powered",
+      "memory": "uint32_t at the output buffer supplied in RDX + 4 bytes",
+      "bindings": [
+        {
+          "id": "liftPower",
+          "output": "liftPower",
+          "property": "power",
+          "target": "serviceLift",
+          "invert": false,
+          "resolved_signal": "draft:liftPower",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "liftPower",
+          "byte_offset": 4,
+          "instruction_rva": 4669,
+          "instruction_address": 5368713789,
+          "instruction": {
+            "id": "insn_0000123D",
+            "address": 5368713789,
+            "rva": 4669,
+            "size": 7,
+            "bytes": "c7 40 04 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 1"
+          },
+          "raw_block_id": "bb_00001236",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            2,
+            3,
+            6,
+            7,
+            10,
+            11,
+            14,
+            15,
+            18,
+            19,
+            22,
+            23,
+            26,
+            27,
+            30,
+            31
+          ]
+        },
+        {
+          "output": "liftPower",
+          "byte_offset": 4,
+          "instruction_rva": 4777,
+          "instruction_address": 5368713897,
+          "instruction": {
+            "id": "insn_000012A9",
+            "address": 5368713897,
+            "rva": 4777,
+            "size": 7,
+            "bytes": "c7 40 04 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 4], 0"
+          },
+          "raw_block_id": "bb_000012A2",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            1,
+            4,
+            5,
+            8,
+            9,
+            12,
+            13,
+            16,
+            17,
+            20,
+            21,
+            24,
+            25,
+            28,
+            29
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "relayPower",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "link.value",
+        "op": "ref"
+      },
+      "false_meaning": "Both relay ends off",
+      "true_meaning": "Both relay ends powered",
+      "memory": "uint32_t at the output buffer supplied in RDX + 8 bytes",
+      "bindings": [
+        {
+          "id": "lowerLink",
+          "output": "relayPower",
+          "property": "power",
+          "target": "lowerRelay",
+          "invert": false,
+          "resolved_signal": "draft:lowerLink",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        },
+        {
+          "id": "upperLink",
+          "output": "relayPower",
+          "property": "power",
+          "target": "upperRelay",
+          "invert": false,
+          "resolved_signal": "draft:upperLink",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "relayPower",
+          "byte_offset": 8,
+          "instruction_rva": 5003,
+          "instruction_address": 5368714123,
+          "instruction": {
+            "id": "insn_0000138B",
+            "address": 5368714123,
+            "rva": 5003,
+            "size": 7,
+            "bytes": "c7 40 08 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 1"
+          },
+          "raw_block_id": "bb_00001384",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            4,
+            5,
+            6,
+            7,
+            12,
+            13,
+            14,
+            15,
+            20,
+            21,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "output": "relayPower",
+          "byte_offset": 8,
+          "instruction_rva": 5111,
+          "instruction_address": 5368714231,
+          "instruction": {
+            "id": "insn_000013F7",
+            "address": 5368714231,
+            "rva": 5111,
+            "size": 7,
+            "bytes": "c7 40 08 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 8], 0"
+          },
+          "raw_block_id": "bb_000013F0",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            1,
+            2,
+            3,
+            8,
+            9,
+            10,
+            11,
+            16,
+            17,
+            18,
+            19,
+            24,
+            25,
+            26,
+            27
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "firewallActive",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "arg": {
+          "id": "maintenance.value",
+          "op": "ref"
+        },
+        "op": "not"
+      },
+      "false_meaning": "Payload firewall disabled",
+      "true_meaning": "Payload firewall lethal and active",
+      "memory": "uint32_t at the output buffer supplied in RDX + 12 bytes",
+      "bindings": [
+        {
+          "id": "payloadFirewallPower",
+          "output": "firewallActive",
+          "property": "active",
+          "target": "payloadFirewall",
+          "invert": false,
+          "resolved_signal": "draft:payloadFirewallPower",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "firewallActive",
+          "byte_offset": 12,
+          "instruction_rva": 5337,
+          "instruction_address": 5368714457,
+          "instruction": {
+            "id": "insn_000014D9",
+            "address": 5368714457,
+            "rva": 5337,
+            "size": 7,
+            "bytes": "c7 40 0c 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 0"
+          },
+          "raw_block_id": "bb_000014D2",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "output": "firewallActive",
+          "byte_offset": 12,
+          "instruction_rva": 5445,
+          "instruction_address": 5368714565,
+          "instruction": {
+            "id": "insn_00001545",
+            "address": 5368714565,
+            "rva": 5445,
+            "size": 7,
+            "bytes": "c7 40 0c 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0xc], 1"
+          },
+          "raw_block_id": "bb_0000153E",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "exitReady",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "exitSocket.occupied",
+        "op": "ref"
+      },
+      "false_meaning": "Exit raw unlock false",
+      "true_meaning": "Exit raw unlock true; existing latch retains accepted unlock",
+      "memory": "uint32_t at the output buffer supplied in RDX + 16 bytes",
+      "bindings": [
+        {
+          "id": "exitPower",
+          "output": "exitReady",
+          "property": "unlock",
+          "target": "exit",
+          "invert": false,
+          "resolved_signal": "draft:exitPower",
+          "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+        }
+      ],
+      "verified_bcf_store_sites": [
+        {
+          "output": "exitReady",
+          "byte_offset": 16,
+          "instruction_rva": 5671,
+          "instruction_address": 5368714791,
+          "instruction": {
+            "id": "insn_00001627",
+            "address": 5368714791,
+            "rva": 5671,
+            "size": 7,
+            "bytes": "c7 40 10 01 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 1"
+          },
+          "raw_block_id": "bb_00001620",
+          "observed_values": [
+            1
+          ],
+          "case_ids": [
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "output": "exitReady",
+          "byte_offset": 16,
+          "instruction_rva": 5779,
+          "instruction_address": 5368714899,
+          "instruction": {
+            "id": "insn_00001693",
+            "address": 5368714899,
+            "rva": 5779,
+            "size": 7,
+            "bytes": "c7 40 10 00 00 00 00",
+            "mnemonic": "mov",
+            "op_str": "dword ptr [rax + 0x10], 0"
+          },
+          "raw_block_id": "bb_0000168C",
+          "observed_values": [
+            0
+          ],
+          "case_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        }
+      ],
+      "observed_values": [
+        0,
+        1
+      ]
+    }
+  ]
+}

@@ -1,0 +1,849 @@
+{
+  "schema": "coop-native-contract/v1",
+  "chamber_id": "handshake-v2",
+  "request_revision": "firewall-prototype-2026-11-06",
+  "integration_status": "acquisition_only_no_live_integration",
+  "reference_kind": "actual_declarative_evaluator",
+  "reference_snapshot": "Use the resulting source commit in the matching *-handshake-v2-firewall-linux.md shared handoff. No self-referential result SHA is embedded here.",
+  "released_contract": "Released HANDSHAKE stays on its existing five-input/four-output verified package and maintenance AND payload exit. Do not overwrite or relabel it.",
+  "canonical_document_sha256": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+  "reference_source_sha256": {
+    "levels/drafts/handshake-v2.json": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+    "src/workbench/runtime.ts": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99",
+    "src/workbench/room-adapter.ts": "aeaa365348ac5bee798ea76130f3770276ab7a688f467ed170ce867221a380e7",
+    "server/declarative-state.ts": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 20,
+    "output_size": 20,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "inputs": [
+    {
+      "name": "crossing",
+      "game_port": "crossing.occupied",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "bit": 0,
+      "initial": 0,
+      "false_meaning": "CROSSING empty",
+      "true_meaning": "CROSSING occupied by grounded body or resting cube"
+    },
+    {
+      "name": "liftPlate",
+      "game_port": "liftPlate.occupied",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "bit": 1,
+      "initial": 0,
+      "false_meaning": "LIFT empty",
+      "true_meaning": "LIFT occupied by grounded body or resting cube"
+    },
+    {
+      "name": "link",
+      "game_port": "link.value",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "bit": 2,
+      "initial": 0,
+      "false_meaning": "LINK off",
+      "true_meaning": "Reversible LINK on"
+    },
+    {
+      "name": "maintenance",
+      "game_port": "maintenance.value",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "bit": 3,
+      "initial": 0,
+      "false_meaning": "MAINTENANCE COMPLETE uncommitted",
+      "true_meaning": "One-use MAINTENANCE COMPLETE accepted"
+    },
+    {
+      "name": "exitSocket",
+      "game_port": "exitSocket.occupied",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "bit": 4,
+      "initial": 0,
+      "false_meaning": "PAYLOAD empty",
+      "true_meaning": "Resting cargo accepted in PAYLOAD receiver; bodies do not count"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "crossingPower",
+      "offset": 0,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "crossing.occupied",
+        "op": "ref"
+      },
+      "false_meaning": "Both crossing anchors ghosted",
+      "true_meaning": "Both crossing anchors solid and grappleable"
+    },
+    {
+      "name": "liftPower",
+      "offset": 4,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "liftPlate.occupied",
+        "op": "ref"
+      },
+      "false_meaning": "Lift off",
+      "true_meaning": "Lift powered"
+    },
+    {
+      "name": "relayPower",
+      "offset": 8,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "link.value",
+        "op": "ref"
+      },
+      "false_meaning": "Both relay ends off",
+      "true_meaning": "Both relay ends powered"
+    },
+    {
+      "name": "firewallActive",
+      "offset": 12,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "arg": {
+          "id": "maintenance.value",
+          "op": "ref"
+        },
+        "op": "not"
+      },
+      "false_meaning": "Payload firewall disabled",
+      "true_meaning": "Payload firewall lethal and active"
+    },
+    {
+      "name": "exitReady",
+      "offset": 16,
+      "width_bits": 32,
+      "domain": [
+        0,
+        1
+      ],
+      "expression": {
+        "id": "exitSocket.occupied",
+        "op": "ref"
+      },
+      "false_meaning": "Exit raw unlock false",
+      "true_meaning": "Exit raw unlock true; existing latch retains accepted unlock"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "nearPower",
+      "output": "crossingPower",
+      "property": "active",
+      "target": "nearAnchor",
+      "invert": false,
+      "resolved_signal": "draft:nearPower",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    },
+    {
+      "id": "farPower",
+      "output": "crossingPower",
+      "property": "active",
+      "target": "farAnchor",
+      "invert": false,
+      "resolved_signal": "draft:farPower",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    },
+    {
+      "id": "liftPower",
+      "output": "liftPower",
+      "property": "power",
+      "target": "serviceLift",
+      "invert": false,
+      "resolved_signal": "draft:liftPower",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    },
+    {
+      "id": "lowerLink",
+      "output": "relayPower",
+      "property": "power",
+      "target": "lowerRelay",
+      "invert": false,
+      "resolved_signal": "draft:lowerLink",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    },
+    {
+      "id": "upperLink",
+      "output": "relayPower",
+      "property": "power",
+      "target": "upperRelay",
+      "invert": false,
+      "resolved_signal": "draft:upperLink",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    },
+    {
+      "id": "exitPower",
+      "output": "exitReady",
+      "property": "unlock",
+      "target": "exit",
+      "invert": false,
+      "resolved_signal": "draft:exitPower",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    },
+    {
+      "id": "payloadFirewallPower",
+      "output": "firewallActive",
+      "property": "active",
+      "target": "payloadFirewall",
+      "invert": false,
+      "resolved_signal": "draft:payloadFirewallPower",
+      "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+    }
+  ],
+  "coverage": {
+    "kind": "exhaustive_boolean",
+    "input_count": 5,
+    "row_count": 32,
+    "encoding": "case_id = bit0(crossing) | bit1(liftPlate) | bit2(link) | bit3(maintenance) | bit4(exitSocket)",
+    "domain_note": "Only uint32 0/1. Include all abstract vectors even if physically unreachable before maintenance."
+  },
+  "initial_state": {
+    "inputs": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "outputs": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "harness_output_sentinel": 2779096485,
+    "native_outputs": "Write all five uint32 outputs every invocation; no retained state"
+  },
+  "server_owned": [
+    "Accepted body/cube occupancy and cargo ownership",
+    "Reversible LINK toggle and one-use maintenance latch",
+    "Exit latch=true and two distinct physical arrivals",
+    "Automatic breakpoint, respawn and recovery",
+    "Movement, held-cube boost, grapple, lifts, relays and firewall contact handling"
+  ],
+  "exit_semantics": {
+    "raw_output": "exitReady",
+    "binding": "exitPower",
+    "latch": true,
+    "required_arrivals": 2,
+    "note": "PAYLOAD occupancy alone unlocks. Maintenance only disables the physical firewall; no hidden Boolean maintenance gate."
+  },
+  "manifestation_notes": {
+    "crossingPower": [
+      "nearAnchor.active",
+      "farAnchor.active"
+    ],
+    "relayPower": [
+      "lowerRelay.power",
+      "upperRelay.power"
+    ],
+    "firewallActive": [
+      "payloadFirewall.active"
+    ],
+    "note": "Multiple anchors/relay ends are manifestations, not extra native outputs. The inverted wire label reflects NOT maintenance; the binding itself is not inverted."
+  },
+  "reference_vectors": [
+    {
+      "case_id": 0,
+      "inputs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 1,
+      "inputs": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 2,
+      "inputs": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "outputs": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 3,
+      "inputs": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 4,
+      "inputs": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "outputs": [
+        0,
+        0,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 5,
+      "inputs": [
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 6,
+      "inputs": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "outputs": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 7,
+      "inputs": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "case_id": 8,
+      "inputs": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 9,
+      "inputs": [
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 10,
+      "inputs": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "outputs": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 11,
+      "inputs": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 12,
+      "inputs": [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "outputs": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 13,
+      "inputs": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 14,
+      "inputs": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "outputs": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 15,
+      "inputs": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "outputs": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": 16,
+      "inputs": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 17,
+      "inputs": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 18,
+      "inputs": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "outputs": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 19,
+      "inputs": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 20,
+      "inputs": [
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "outputs": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 21,
+      "inputs": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 22,
+      "inputs": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "outputs": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 23,
+      "inputs": [
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "case_id": 24,
+      "inputs": [
+        0,
+        0,
+        0,
+        1,
+        1
+      ],
+      "outputs": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 25,
+      "inputs": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 26,
+      "inputs": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "outputs": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 27,
+      "inputs": [
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 28,
+      "inputs": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "outputs": [
+        0,
+        0,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 29,
+      "inputs": [
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 30,
+      "inputs": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "outputs": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "case_id": 31,
+      "inputs": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "outputs": [
+        1,
+        1,
+        1,
+        0,
+        1
+      ]
+    }
+  ],
+  "reference_commit": "2532b50e729463f67d2afef700b1830ca6cb7753",
+  "request_sha256": "5faa53318e3f6f4c19431a9be54657fdec139de18119c1b94838af5ac4bc9d36"
+}

@@ -1,0 +1,491 @@
+{
+  "schema": "coop-native-manifest/v1",
+  "chamber_id": "handshake-v2",
+  "reference_commit": "2532b50e729463f67d2afef700b1830ca6cb7753",
+  "request_sha256": "5faa53318e3f6f4c19431a9be54657fdec139de18119c1b94838af5ac4bc9d36",
+  "canonical_document_sha256": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+  "contract_sha256": "08ccba38195b3466bfff5fef37e1ede555865de2a1e468cdaa426e5c2f0000e8",
+  "reference_source_sha256": {
+    "levels/drafts/handshake-v2.json": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+    "src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "src/workbench/model.ts": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+    "src/workbench/runtime.ts": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99",
+    "src/workbench/room-adapter.ts": "aeaa365348ac5bee798ea76130f3770276ab7a688f467ed170ce867221a380e7",
+    "server/declarative-state.ts": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73"
+  },
+  "native_source_sha256": {
+    "controller.c": "171117acd1512dcba2c46fc3ecb0deb9631fd469469984db371e69f8fcacca87",
+    "controller.h": "3d75ad4310b50f4f0c68431055b1f54e3e831aab5687964e906fdc9131bccfa6",
+    "harness.c": "6b3f5c92802d8b88658080c347851083e08c41985e2455e636f118c652c8c491"
+  },
+  "compiler": {
+    "path": "D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\\clang.exe",
+    "sha256": "0d0392508af664396606f4e006922e57573690272a4e5a39f7e60e6543b710be",
+    "version": "clang version 16.0.6 (https://github.com/llvm/llvm-project.git 7cbf1a2591520c2491aa35339f227775f4d3adf6)\nTarget: x86_64-pc-windows-msvc\nThread model: posix\nInstalledDir: D:\\VM_Shared_Folder\\software\\ollvm\\original_ollvm\n"
+  },
+  "linker": {
+    "path": "E:\\Visual Studio\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe",
+    "sha256": "e8c524347b8bc87fba790d254c8a3b902bf1a4b63807093b816d992940af3791"
+  },
+  "seed": "00112233445566778899AABBCCDDEEFF",
+  "builds": [
+    {
+      "variant": "clean",
+      "optimization": "O0",
+      "transformations": [],
+      "frontend_extra_flags": [],
+      "binary_path": "bin/clean_x64.exe",
+      "binary_sha256": "a2edb2a7084c142005dc8273f61736c86be478b8510e7a0cd2234db513ccf33b",
+      "ir_sha256": "8efa426c7e7b531c24f5f933a0ddca515036e108662903a099e812a3f4bc63bf",
+      "compiler_assembly_sha256": "8a2d839119e56d5f1ef302e22aa1abf8926991c829549d920c1f4700a1dfe9eb",
+      "labelled_assembly_sha256": "4fee3bd6aadf6510745ca0a2c533722c487d97034a1296972dc05e8f0b942c31",
+      "link_map_sha256": "6228ac950187e927e8b91de326b06b7c267346b3d4b086eff755cc29d4aa0fd2",
+      "label_manifest_sha256": "0f9b54d80a52dedc14732ee73cb4f4d0dac03fcea4c4886a76ccbf85dd4de1d5"
+    },
+    {
+      "variant": "bcf",
+      "optimization": "O0",
+      "transformations": [
+        "bcf"
+      ],
+      "frontend_extra_flags": [
+        "-mllvm",
+        "-bcf",
+        "-mllvm",
+        "-bcf_prob=100",
+        "-mllvm",
+        "-bcf_loop=1",
+        "-mllvm",
+        "-aesSeed=00112233445566778899AABBCCDDEEFF"
+      ],
+      "binary_path": "bin/obfuscated_x64.exe",
+      "binary_sha256": "57f7951f364594ebc417e5d93b15ef694595c7ad06ff9fe2d148fd0531cbcda1",
+      "ir_sha256": "69d095c2326551a0841ce641b6014d89bd5312978ab969b1406c1877f26e68b5",
+      "compiler_assembly_sha256": "ed39787c8fd33c876bf45dab7dd06e4aa7591803fc3146b4d277ded84ec9016e",
+      "labelled_assembly_sha256": "c9c2398bf60bad38ab6c3ae76e4b51ce1ff984a92ce535946172085f13919818",
+      "link_map_sha256": "91e916578d5ac48d43671e0586b75d64e074502894df44ab815b78a705c6b787",
+      "label_manifest_sha256": "55918aae7d23005b7fef3670abca96af0c00c146e8adf82797cfb28e4aa052d6"
+    }
+  ],
+  "exact_commands": {
+    "path": "build_or_identity/commands.json",
+    "sha256": "22a22a1b0f6300c58596d41038edb4884c6c0cc2c72a7de9bdf50322fdfada99"
+  },
+  "abi": {
+    "target": "bn_evaluate",
+    "architecture": "Windows x64",
+    "calling_convention": "Microsoft x64",
+    "input_register": "RCX",
+    "output_register": "RDX",
+    "return_type": "void",
+    "input_size": 20,
+    "output_size": 20,
+    "endianness": "little",
+    "alignment": 4,
+    "stateful": false
+  },
+  "input_output_mapping": {
+    "inputs": [
+      {
+        "name": "crossing",
+        "game_port": "crossing.occupied",
+        "offset": 0,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "bit": 0,
+        "initial": 0,
+        "false_meaning": "CROSSING empty",
+        "true_meaning": "CROSSING occupied by grounded body or resting cube"
+      },
+      {
+        "name": "liftPlate",
+        "game_port": "liftPlate.occupied",
+        "offset": 4,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "bit": 1,
+        "initial": 0,
+        "false_meaning": "LIFT empty",
+        "true_meaning": "LIFT occupied by grounded body or resting cube"
+      },
+      {
+        "name": "link",
+        "game_port": "link.value",
+        "offset": 8,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "bit": 2,
+        "initial": 0,
+        "false_meaning": "LINK off",
+        "true_meaning": "Reversible LINK on"
+      },
+      {
+        "name": "maintenance",
+        "game_port": "maintenance.value",
+        "offset": 12,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "bit": 3,
+        "initial": 0,
+        "false_meaning": "MAINTENANCE COMPLETE uncommitted",
+        "true_meaning": "One-use MAINTENANCE COMPLETE accepted"
+      },
+      {
+        "name": "exitSocket",
+        "game_port": "exitSocket.occupied",
+        "offset": 16,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "bit": 4,
+        "initial": 0,
+        "false_meaning": "PAYLOAD empty",
+        "true_meaning": "Resting cargo accepted in PAYLOAD receiver; bodies do not count"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "crossingPower",
+        "offset": 0,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "expression": {
+          "id": "crossing.occupied",
+          "op": "ref"
+        },
+        "false_meaning": "Both crossing anchors ghosted",
+        "true_meaning": "Both crossing anchors solid and grappleable"
+      },
+      {
+        "name": "liftPower",
+        "offset": 4,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "expression": {
+          "id": "liftPlate.occupied",
+          "op": "ref"
+        },
+        "false_meaning": "Lift off",
+        "true_meaning": "Lift powered"
+      },
+      {
+        "name": "relayPower",
+        "offset": 8,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "expression": {
+          "id": "link.value",
+          "op": "ref"
+        },
+        "false_meaning": "Both relay ends off",
+        "true_meaning": "Both relay ends powered"
+      },
+      {
+        "name": "firewallActive",
+        "offset": 12,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "expression": {
+          "arg": {
+            "id": "maintenance.value",
+            "op": "ref"
+          },
+          "op": "not"
+        },
+        "false_meaning": "Payload firewall disabled",
+        "true_meaning": "Payload firewall lethal and active"
+      },
+      {
+        "name": "exitReady",
+        "offset": 16,
+        "width_bits": 32,
+        "domain": [
+          0,
+          1
+        ],
+        "expression": {
+          "id": "exitSocket.occupied",
+          "op": "ref"
+        },
+        "false_meaning": "Exit raw unlock false",
+        "true_meaning": "Exit raw unlock true; existing latch retains accepted unlock"
+      }
+    ],
+    "bindings": [
+      {
+        "id": "nearPower",
+        "output": "crossingPower",
+        "property": "active",
+        "target": "nearAnchor",
+        "invert": false,
+        "resolved_signal": "draft:nearPower",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      },
+      {
+        "id": "farPower",
+        "output": "crossingPower",
+        "property": "active",
+        "target": "farAnchor",
+        "invert": false,
+        "resolved_signal": "draft:farPower",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      },
+      {
+        "id": "liftPower",
+        "output": "liftPower",
+        "property": "power",
+        "target": "serviceLift",
+        "invert": false,
+        "resolved_signal": "draft:liftPower",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      },
+      {
+        "id": "lowerLink",
+        "output": "relayPower",
+        "property": "power",
+        "target": "lowerRelay",
+        "invert": false,
+        "resolved_signal": "draft:lowerLink",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      },
+      {
+        "id": "upperLink",
+        "output": "relayPower",
+        "property": "power",
+        "target": "upperRelay",
+        "invert": false,
+        "resolved_signal": "draft:upperLink",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      },
+      {
+        "id": "exitPower",
+        "output": "exitReady",
+        "property": "unlock",
+        "target": "exit",
+        "invert": false,
+        "resolved_signal": "draft:exitPower",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      },
+      {
+        "id": "payloadFirewallPower",
+        "output": "firewallActive",
+        "property": "active",
+        "target": "payloadFirewall",
+        "invert": false,
+        "resolved_signal": "draft:payloadFirewallPower",
+        "resolution": "bool(raw_output) != invert; resolved once in draftFrame"
+      }
+    ]
+  },
+  "coverage": {
+    "exhaustive_vectors": 32,
+    "ordered_snapshots_per_variant": 0,
+    "native_evaluations": 64,
+    "emulator_traces": 32
+  },
+  "native_verification": {
+    "path": "evidence/native-results.json.gz",
+    "sha256": "900d13cd41744e93b5dba94972c29f81ded3231909658f85af0a2e43ab8be70c"
+  },
+  "trace_provenance": {
+    "tools": {
+      "pefile": "2024.8.26",
+      "capstone": "5.0.7",
+      "unicorn": "2.1.4"
+    },
+    "trace_artifact": {
+      "path": "evidence/representative-traces.json.gz",
+      "sha256": "361117f641df64a95267119ae730c383e4b2761395e97a6e618009743a968f08"
+    },
+    "cfg_artifacts": {
+      "clean": {
+        "path": "evidence/disassembly-clean.json.gz",
+        "sha256": "2a3eadf8c67dc3fae6a271ac4825ec64c9f078e3f906ed4121738922acbdad50"
+      },
+      "bcf": {
+        "path": "evidence/disassembly-bcf.json.gz",
+        "sha256": "7390e19e2f165f706b73c86cd85cf1e8c31cf99b239e721dde840bca6ed8a91a"
+      }
+    },
+    "selection": {
+      "method": "Every retained reference/native case",
+      "exhaustive_cases": true,
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "available_case_count": 32,
+      "retained_trace_count": 32,
+      "trace_limit": 32
+    },
+    "cfg_metrics": {
+      "clean": {
+        "blocks": 16,
+        "edges": 20,
+        "instructions": 45,
+        "function_bytes": 195,
+        "clone_origin_blocks": 0
+      },
+      "bcf": {
+        "blocks": 101,
+        "edges": 137,
+        "instructions": 614,
+        "function_bytes": 2102,
+        "clone_origin_blocks": 16
+      }
+    }
+  },
+  "integration_status": "proposal_only_no_live_integration",
+  "external_read_only_files": {
+    "experiments/coop-controller-studies/bypass-v1/scripts/common.py": "f7eb5b0d8578304f6ae00145bae4eb7bca423886f66ddf44ca5eedd3c06cfa64",
+    "experiments/coop-controller-studies/bypass-v1/scripts/pin-reference.py": "4f162c3597a65f98e9cf319da71ec5af932743ba9f33ba17a168aef38d3d24bf",
+    "experiments/coop-controller-studies/bypass-v1/scripts/reference.mjs": "a6a5b100a051af0d1cb5fd8154d88249fd9eadb66c323bad9b7bee3b8ca93023",
+    "experiments/coop-controllers/shared/analyze.py": "de08eaecbdb16fb57e092b0532feb799e0494b63e679eae378585b2982781f5e",
+    "experiments/coop-controllers/shared/build.py": "69bd67623f1bf40cd5f1374d85522ed891500c6305f368adea46f7877325f36e",
+    "experiments/coop-controllers/shared/ollvm_source/BogusControlFlow.cpp": "87b108b3aec92f6684904795206862e626589c6e312cdde8330f3177b00ed72d",
+    "experiments/coop-controllers/shared/ollvm_source/CryptoUtils.cpp": "ad08e77bedc3c66ba365eb36aa214b2e276d4aa333632d10b6a8eb87db672569",
+    "experiments/coop-controllers/shared/ollvm_source/LICENSE-OBFUSCATOR.TXT": "0c9be6145c13ee8fee9a806f9e1dbfbed054b6c0084732694869255535006d1b",
+    "experiments/coop-controllers/shared/ollvm_source/manifest.json": "2ef3827decc2ae1f35af7539d72c16c8923c8c60f9f04166be887a16c4ca5622",
+    "experiments/coop-controllers/shared/ollvm_source/Plugin.cpp": "d4e19793a80b8b3ada6bac320fdf284c68e5a1b3ef48b6b94e4e7b85571e3d79",
+    "experiments/coop-controllers/shared/ollvm_source/Utils.cpp": "874ffe25f1e154d4dd9e8a1f9f6b6c648aa4d637154a1885dbdd1f1a3619a561",
+    "experiments/coop-controllers/shared/prove_bogus.py": "ebe13356627f47872c3c9b53d1f652f074655555da073e8c2847ebc5cffbc3da",
+    "experiments/coop-controllers/shared/validate_native.py": "1bdafadd28438b497c574c40536499dc74673c953a25c412b666a71ad1924eca",
+    "experiments/coop-controllers/shared/verify_portable.py": "669a10294952c3e8ec5a5bece45b66ee483f5ebbd75b9456c00a61bfc8232a8e",
+    "experiments/coop-controllers/shared/verify_proof.py": "da3dc4388018882e73a8b3b38db16cf2fb27cb8cf80d8f8f5d4c017519097731"
+  },
+  "inventory_policy": "Every package file except manifest.json itself, _build/, _scratch/, __pycache__/ and .pyc; exact bytes preserved by package .gitattributes.",
+  "known_limits": [
+    "Stateless decision layer only; the game owns occupancy, latches, commitments, arrivals and movement.",
+    "Portable audit verifies retained observations; it does not rerun Windows PEs or the TypeScript evaluator.",
+    "Only canonical 0/1 inputs and valid distinct buffers are covered; no arbitrary-pointer claim.",
+    "Linux OS execution is a delivery follow-up; acquisition verification ran with isolated standard-library Python on Windows.",
+    "Original HANDSHAKE remains frozen; campaign adoption requires a separate integration task."
+  ],
+  "files": {
+    ".gitattributes": "3e5e82fc72e044ea9af807a2030b73dbb94800d2cd1775302063b2eee761ba1e",
+    ".gitignore": "d3778c09bec22ac798c2a1f47e01b79e19b3bc1f1cfd06bbcb2bc28060fa4b59",
+    "contract.json": "08ccba38195b3466bfff5fef37e1ede555865de2a1e468cdaa426e5c2f0000e8",
+    "fragments.json": "4ec37883d25101219e9920e58cbb4e8622ebda876ada306b5a6eef44cc4e2299",
+    "integration.json": "12ca7b4159b93caed593256688a60041f5e16f4b3e1e059cbbefc2dc725bff4b",
+    "README.md": "7ac9fcb525a149420c01dec211b14bad904c794a61c78e741f3a288257af1330",
+    "bin/clean_x64.exe": "a2edb2a7084c142005dc8273f61736c86be478b8510e7a0cd2234db513ccf33b",
+    "bin/clean_x64.exp": "ab232ee6eec2a6d93568f6bae0340fb3856c728640e86a0a3eed072a61a7e35c",
+    "bin/obfuscated_x64.exe": "57f7951f364594ebc417e5d93b15ef694595c7ad06ff9fe2d148fd0531cbcda1",
+    "bin/obfuscated_x64.exp": "5a48d681191e3084f1e0cb7599b6f307881ff9af09b4f3e098fc634afb71efe8",
+    "build_or_identity/commands.json": "22a22a1b0f6300c58596d41038edb4884c6c0cc2c72a7de9bdf50322fdfada99",
+    "build_or_identity/identity.json": "f69391db2b345de6d28d94aae4d71d9f37cdb386dc2298d21f4fc745832593b2",
+    "build_or_identity/toolchain-probe.json": "9116e55069b52d7d12d913ca6bae1945b53cd97c5ff79c1945329b931faec402",
+    "evidence/acquisition-checks.json": "4a6e4f939dbba3cdd06f9848d5a6f2a5081ab6358bbe021e7a282152a63f2246",
+    "evidence/bogus-proof.json.gz": "08aece086b7ed4c5316ed619e5e862bf3c9f536d19ad85a10554f5251ee290cb",
+    "evidence/decision-mappings.json": "43193943ed2277e8a5d23f9cbeaf9dea5f45f76ae236befb91cab6808f50d6f1",
+    "evidence/disassembly-bcf.json.gz": "7390e19e2f165f706b73c86cd85cf1e8c31cf99b239e721dde840bca6ed8a91a",
+    "evidence/disassembly-clean.json.gz": "2a3eadf8c67dc3fae6a271ac4825ec64c9f078e3f906ed4121738922acbdad50",
+    "evidence/fragment-compositions.json.gz": "e733de83503afd393fdbe8c3e118dda2f404173d72516186e5c2275f3391a728",
+    "evidence/historical-package-verification.json": "ceedb61baa7d955acc601ce1d8243ce8a2d4cfb19dc27ca3e7c4763acbdeefc1",
+    "evidence/native-bcf-windows-host-stdout.jsonl.gz": "3f84dd67744bbe66da67a8f9dbc1988b6e9bccc48c996697e54c0736d4999113",
+    "evidence/native-clean-windows-host-stdout.jsonl.gz": "3f84dd67744bbe66da67a8f9dbc1988b6e9bccc48c996697e54c0736d4999113",
+    "evidence/native-results.json.gz": "900d13cd41744e93b5dba94972c29f81ded3231909658f85af0a2e43ab8be70c",
+    "evidence/native-summary.json": "b75e4778987492b05ec33bba1bcc00bb5cb5b8f846ee3db630f6fd8685ec51b5",
+    "evidence/preservation-baseline.json": "08a9b1975f99d4ce6ae79feb254b882f8d9940bcdcae2b9dcb67986818e15739",
+    "evidence/reference-process.json": "c4664aeea1b8d14e6fc550dcb1273e8bd8708c4b2b6cf14147f44ff7917e0d6f",
+    "evidence/reference-vectors.json": "ba2934ced64db6be8a9a0b4610fdb81fa981cefc6846e8663718f7d52437c359",
+    "evidence/representative-traces.json.gz": "361117f641df64a95267119ae730c383e4b2761395e97a6e618009743a968f08",
+    "evidence/trace-summary.json": "cd69926948b9a469f6f1cf54b96b770ac21c59e0d27ba839cfc2b17e6620da8d",
+    "reference/identity.json": "d39c64f8f04e7a2ed1767b455810ab20969fbd518bd3073ac042b3d6f5bbf484",
+    "reference/request.json": "5faa53318e3f6f4c19431a9be54657fdec139de18119c1b94838af5ac4bc9d36",
+    "scripts/adapt-tools.py": "c82f762288517497b233b296c8f36c80b4d17fb93708327f30d0670b5c0f442a",
+    "scripts/analyze.py": "6820187198632f2b7f71a54f933ab9f7aea42ee95c7a2ee32a02b51e8583b2e6",
+    "scripts/build.py": "31a06916706538214af485769b2d1ac5797096ddbc04c83799cc48a47a32b12e",
+    "scripts/check-historical.py": "44071d5e0ebb83ba9fe6ef7d9dd676575e2ca1769ccefcbe20c4a8f793b9066b",
+    "scripts/check-preservation.py": "cfffb33c4ca0e3caf3dd6a07f47c95ab9d3b5c4306104c3904b2158eb1ca825a",
+    "scripts/common.py": "69a78909e83c25c8b4d15e3ea748c71e6fa6b5c8ce8e347c04e7ccd4982c959b",
+    "scripts/curate.py": "55d61bc2c667aebcf38af6b4560a27c42201ecf7caca3f4a2eb08e36930b68a4",
+    "scripts/freeze.py": "3f24509a5777707fb7f1e98397afe059ec319ae42c701b1e3de1dd9b07397c99",
+    "scripts/pin-reference.py": "41a4ebc47639d93642d639d23554d4f1568d8ad820360fd6040dd550c4bbbd26",
+    "scripts/probe-toolchain.py": "52ea112415d2dae917e29d977c44bd28cc2d38c54d6413f00208708f2c97923d",
+    "scripts/prove_bogus.py": "fc39422177f504813911aa0176d1eac170e1f0b2b5e021a55d46165d03e47414",
+    "scripts/reference.mjs": "e9dbee37a843edb3dd0cd8b938013a296520d287411ea24bc632d30ab5eb8084",
+    "scripts/reuse-map.json": "706b1a7916c69cb3504368dd4635a2910e0910768f85119959554e66b2999aeb",
+    "scripts/validate_native.py": "f519a3b18417501c4fd4dde5ed578253a987631c078a512934ae733390fb64af",
+    "scripts/verify_portable.py": "85f78cbd3986d93043381f4b9c07b2f0443ac2d989168c4aac7e90ea816d427a",
+    "scripts/verify_proof.py": "9251e59e1fd2bf813c7b7c88100452aebfb2f2a3d78d9dbe344f6744dc3fb41c",
+    "src/controller.c": "171117acd1512dcba2c46fc3ecb0deb9631fd469469984db371e69f8fcacca87",
+    "src/controller.h": "3d75ad4310b50f4f0c68431055b1f54e3e831aab5687964e906fdc9131bccfa6",
+    "src/harness.c": "6b3f5c92802d8b88658080c347851083e08c41985e2455e636f118c652c8c491",
+    "build_or_identity/bcf/assembly_labels.json": "55918aae7d23005b7fef3670abca96af0c00c146e8adf82797cfb28e4aa052d6",
+    "build_or_identity/bcf/controller.labelled.s": "c9c2398bf60bad38ab6c3ae76e4b51ce1ff984a92ce535946172085f13919818",
+    "build_or_identity/bcf/controller.ll": "69d095c2326551a0841ce641b6014d89bd5312978ab969b1406c1877f26e68b5",
+    "build_or_identity/bcf/controller.map": "91e916578d5ac48d43671e0586b75d64e074502894df44ab815b78a705c6b787",
+    "build_or_identity/bcf/controller.s": "ed39787c8fd33c876bf45dab7dd06e4aa7591803fc3146b4d277ded84ec9016e",
+    "build_or_identity/clean/assembly_labels.json": "0f9b54d80a52dedc14732ee73cb4f4d0dac03fcea4c4886a76ccbf85dd4de1d5",
+    "build_or_identity/clean/controller.labelled.s": "4fee3bd6aadf6510745ca0a2c533722c487d97034a1296972dc05e8f0b942c31",
+    "build_or_identity/clean/controller.ll": "8efa426c7e7b531c24f5f933a0ddca515036e108662903a099e812a3f4bc63bf",
+    "build_or_identity/clean/controller.map": "6228ac950187e927e8b91de326b06b7c267346b3d4b086eff755cc29d4aa0fd2",
+    "build_or_identity/clean/controller.s": "8a2d839119e56d5f1ef302e22aa1abf8926991c829549d920c1f4700a1dfe9eb",
+    "reference/server/declarative-state.ts": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73",
+    "reference/docs/chambers/handshake-v2.md": "fd8aced4e2703b2a5c542e092569f53b603503aa612c0ddfc242d0a893b870cc",
+    "reference/levels/drafts/handshake-v2.json": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+    "reference/src/engine/constants.ts": "a8e54a7c554b29abf1b586521c870e02488e3aaca94a765af005c3f93010d69a",
+    "reference/src/slice/tuning.ts": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+    "reference/src/workbench/evaluate.ts": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+    "reference/src/workbench/model.ts": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+    "reference/src/workbench/room-adapter.ts": "aeaa365348ac5bee798ea76130f3770276ab7a688f467ed170ce867221a380e7",
+    "reference/src/workbench/runtime.ts": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99"
+  }
+}

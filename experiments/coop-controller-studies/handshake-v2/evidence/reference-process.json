@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "node",
+    "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787\\experiments\\coop-controller-studies\\handshake-v2\\scripts\\reference.mjs"
+  ],
+  "cwd": "E:\\Workspace\\binary_binja_redesign\\comp4020-final-ky787",
+  "exit_code": 0,
+  "stderr": "",
+  "stdout_sha256": "ba2934ced64db6be8a9a0b4610fdb81fa981cefc6846e8663718f7d52437c359",
+  "generator_sha256": "e9dbee37a843edb3dd0cd8b938013a296520d287411ea24bc632d30ab5eb8084",
+  "environment": "Windows host Node.js process",
+  "python": "3.13.9"
+}

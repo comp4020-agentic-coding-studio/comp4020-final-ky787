@@ -1,0 +1,76 @@
+{
+  "schema": "handshake-v2-reference-snapshot/v1",
+  "reference_commit": "2532b50e729463f67d2afef700b1830ca6cb7753",
+  "request_path": "docs/native-requests/handshake-v2.json",
+  "request_sha256": "5faa53318e3f6f4c19431a9be54657fdec139de18119c1b94838af5ac4bc9d36",
+  "canonical_document_path": "levels/drafts/handshake-v2.json",
+  "canonical_document_sha256": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+  "files": {
+    "levels/drafts/handshake-v2.json": {
+      "sha256": "47575e0f0765b177a038c63e8696e0e3ad90da4e7c41b417c6d25f2b1118d341",
+      "git_blob": "30135fa7007bed1b7a6621fa9d8a1548fe240d95"
+    },
+    "src/workbench/evaluate.ts": {
+      "sha256": "43ef10ad4f1cae14e55509c557f8c7c8447d04c814238ba16bf4e46261c5fc65",
+      "git_blob": "03e2e21add7af76f2752731f20c3213ddef06f72"
+    },
+    "src/workbench/model.ts": {
+      "sha256": "4ee9ce974049902d200427461a9fcb46c88207aeede77eaf49fae7f9a29f56fc",
+      "git_blob": "35de947cd19720eadb330b79c95678ec6b086a53"
+    },
+    "src/workbench/runtime.ts": {
+      "sha256": "cff89909be3d60030a181a747ae3d7695f3ce449a023d55e86efb01dc5f21b99",
+      "git_blob": "6e7b166edf112bfb05d6291a48c5937cc829dd4e"
+    },
+    "src/workbench/room-adapter.ts": {
+      "sha256": "aeaa365348ac5bee798ea76130f3770276ab7a688f467ed170ce867221a380e7",
+      "git_blob": "529623460f2cfe0c6cc2a78f6ef7401fa971d532"
+    },
+    "server/declarative-state.ts": {
+      "sha256": "7c9e8fbf33ca4503b29968b427069adfec3ec9cf9df7e2baa36df9b4b92fdf73",
+      "git_blob": "ba7fdeb23b1ca17b4b93afc8516f61a9567db045"
+    },
+    "src/engine/constants.ts": {
+      "sha256": "a8e54a7c554b29abf1b586521c870e02488e3aaca94a765af005c3f93010d69a",
+      "git_blob": "73b6c6ed88a506c84aac9bea63f6dea6772f1b4b"
+    },
+    "src/slice/tuning.ts": {
+      "sha256": "db4f9f33c2aa7d30edf886b71441a30296c4ad406d714354c8e0eb3aacfd367a",
+      "git_blob": "1aece8e415a511fa29e6dfb186ae05254493be29"
+    },
+    "docs/chambers/handshake-v2.md": {
+      "sha256": "fd8aced4e2703b2a5c542e092569f53b603503aa612c0ddfc242d0a893b870cc",
+      "git_blob": "e377c56114677889e45579c4335d30bac08e0ade"
+    }
+  },
+  "method": "git show exact commit:path bytes; isolated source snapshot; never imports moving checkout files",
+  "runtime_import_closure": [
+    "src/workbench/evaluate.ts",
+    "src/workbench/model.ts",
+    "src/engine/constants.ts",
+    "src/slice/tuning.ts"
+  ],
+  "foundation_tool_reuse": {
+    "common.py": {
+      "source_path": "experiments/coop-controller-studies/bypass-v1/scripts/common.py",
+      "source_sha256": "f7eb5b0d8578304f6ae00145bae4eb7bca423886f66ddf44ca5eedd3c06cfa64",
+      "adapted_sha256": "69a78909e83c25c8b4d15e3ea748c71e6fa6b5c8ce8e347c04e7ccd4982c959b"
+    },
+    "pin-reference.py": {
+      "source_path": "experiments/coop-controller-studies/bypass-v1/scripts/pin-reference.py",
+      "source_sha256": "4f162c3597a65f98e9cf319da71ec5af932743ba9f33ba17a168aef38d3d24bf",
+      "adapted_sha256": "41a4ebc47639d93642d639d23554d4f1568d8ad820360fd6040dd550c4bbbd26"
+    },
+    "reference.mjs": {
+      "source_path": "experiments/coop-controller-studies/bypass-v1/scripts/reference.mjs",
+      "source_sha256": "a6a5b100a051af0d1cb5fd8154d88249fd9eadb66c323bad9b7bee3b8ca93023",
+      "adapted_sha256": "e9dbee37a843edb3dd0cd8b938013a296520d287411ea24bc632d30ab5eb8084"
+    }
+  },
+  "foundation_adaptation": "Version/source pins, five-field ABI, direct/NOT controller assertions, finalized draft-only reference, 32 exhaustive vectors and no invented ordered state-machine tests.",
+  "shared_handoff": {
+    "path": "E:\\Workspace\\binary_binja_redesign\\handoffs\\2026-11-06T071647Z-handshake-v2-firewall-linux.md",
+    "sha256": "b82809171ec9b16eab60c44d9cea0e241d12286bed2650749e02a9a4dc3d8c40"
+  },
+  "captured_utc": "2026-11-06T07:29:51.713722+00:00"
+}
