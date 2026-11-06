@@ -127,7 +127,8 @@ it('platform-ID targets include ghost/fake blocks and clamp oversized authored r
 });
 
 it('CROSSFEED authored plate views frame entry or both cargo routes and suppress selector camera churn', () => {
-    const w = { room: crossfeedVault(1), player: createPlayer(1870, 1483), deaths: 0, localControl: null as PuzzleWorld['localControl'] };
+    const room = crossfeedVault(1), entry = room.plates!.find(p => p.id === 'entry')!;
+    const w = { room, player: createPlayer(entry.at.x, entry.at.y - 17), deaths: 0, localControl: null as PuzzleWorld['localControl'] };
     w.player.grounded = true; const view = new ContextualCamera(); view.reset(w);
     expect(view.update(w, .016, false)).toMatchObject({ kind: 'plate', id: 'entry' });
     Object.assign(w.player, { x: 1330, y: 733 }); const frame = view.update(w, .016, false);

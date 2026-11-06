@@ -107,3 +107,21 @@ an independent historical draft; the released factory is authoritative. DEADLOCK
 and USE AFTER FREE drafts and campaign snapshots are byte-identical. Controller
 schemas and input/output contracts are unchanged; only authored coordinates and
 presentation placements change.
+
+## CI camera-fixture correction — 2026-11-06
+
+[Run 42139068990](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/actions/runs/42139068990)
+built the application successfully but failed the unit suite. The CROSSFEED
+fixture in `tests/camera-reveals.test.ts` still placed the player at x=1870,
+while the entry plate now lives at x=2130. The camera correctly stayed in follow
+mode at the old position. The earlier focused selection omitted this test file.
+Deployment was skipped by the normal CI gate.
+
+The fixture now reads the authored entry plate position, matching the existing
+plate-based fixture pattern. All camera assertions remain unchanged; no game,
+geometry, controller or pipeline code changes. The failure reproduced locally
+before the fix (1 failed / 12 passed). Afterwards all 13 camera tests passed.
+Full `pnpm check` then passed: TypeScript, native verification, 92 unit-test files
+(920 passed / 2 skipped locally), and all three HTTP specs against a temporary
+local app. `pnpm check:evidence` also passed. GitHub's runner may skip additional
+local-artifact-dependent tests; the remote run remains the deployment gate.
