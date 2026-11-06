@@ -154,3 +154,14 @@ unchanged. Both normal and recovery scenarios walk to x=1350 for the hold;
 all timing and completion assertions are retained. The pad's right edge
 (x=1398) clears the gateway's left flare (x=1451) by 53 units. See the
 [targeted report](../playtest/2026-11-06-targeted-spacing/README.md).
+
+### Control-scheme regression — 2026-11-06
+
+The full-height tap-jump revision preserves this room's geometry and physics
+limits. Its normal and deliberate-recovery real-input scenarios now walk to
+x=390 before the C-route launch (previously x=350), so ground braking leaves a
+forward enough takeoff to clear B's sensor on the first swing. The precise manual
+C1-to-C2 hop holds the existing jump for 100 ms before firing at C2. All original
+assertions and wait conditions remain, including C2's y ≤ 1240 requirement.
+The full recovery route completes with both players; see the
+[control regression report](../playtest/2026-11-06-assisted-controls/README.md).

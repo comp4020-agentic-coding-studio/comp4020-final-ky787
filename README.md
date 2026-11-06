@@ -10,7 +10,7 @@ Built for **ANU COMP8020 / COMP4020 — Agentic Coding Studio**. The five playab
 
 ## Play the game
 
-On your first visit, enter an operative name, preview the eight colours on the animated ninja, and choose **INITIALIZE NINJA**. Hover or keyboard focus previews a colour; clicking or Enter/Space selects it. Returning visitors load their saved character automatically. **Customize Ninja** on the title screen changes your name and colour without resetting progress. Leave an active party before customizing; you can rejoin it with its code. Your partner sees the same name and colour in every cooperative chamber. See the [character profile contract](docs/character-profiles.md).
+On your first visit, a suggested operative name and default colour let you click **INITIALIZE NINJA** immediately. You can edit the name and preview the eight colours on the animated ninja. Hover or keyboard focus previews a colour; clicking or Enter/Space selects it. Returning visitors load their saved character automatically. **Customize Ninja** on the title screen changes your name and colour without resetting progress. Leave an active party before customizing; you can rejoin it with its code. Your partner sees the same name and colour in every cooperative chamber. See the [character profile contract](docs/character-profiles.md).
 
 **Tutorial** always begins a fresh run at PRESSURE while retaining your previous completion records. Returning visitors can **Continue** their saved room. The title screen also offers **Play Co-op**, **Level Builder**, **Customize Ninja**, **About**, and **Settings**. Escape or clicking outside an ordinary pause card resumes the same room. See the [menu and invitation contract](docs/main-menu-and-invitations.md).
 
@@ -39,16 +39,20 @@ The optional mechanics laboratories used during development are preserved behind
 | Input | Action |
 | --- | --- |
 | **A / D** or **Left / Right arrows** | Move left / right |
-| **Space**, **W**, or **Up arrow** | Jump |
-| **Move mouse** | Aim at a powered anchor or code address bar; the target ring confirms selection |
-| **Space while airborne** | Attempt to hook the highlighted grapple target |
-| **Space while attached** | Jump off / release the grapple |
-| **Hold left mouse button** | Aim and hold a grapple; release to let go |
+| **Tap Space**, **W**, or **Up arrow** | Full-height ordinary jump; holding longer adds no height |
+| **Press and hold Space again while airborne** | Grapple the automatically highlighted valid anchor |
+| **A / D while attached** | Swing while keeping Space held |
+| **Release Space after attachment** | Jump off with bounded momentum, once per anchor until landing |
+| **Hold S while releasing Space** | Detach without a rope jump |
+| **Move mouse** | Override automatic selection with precise aiming at a powered anchor or code address bar |
+| **Hold left mouse button** | Precise grapple; release to detach, or press Space while attached to jump off |
 | **E** | Interact with a switch, terminal or cube; pick up / put down payloads |
 | **S / Down arrow** | Down / drop through supported surfaces |
 | **R** | Reset your own player to the current checkpoint |
 | **Hold Tab** | Show the room overview |
 | **Esc** | Pause or return to the menu |
+
+The touchscreen JUMP button uses the same tap, second press-and-hold, and release sequence. Automatic targeting never selects cubes; aim and click to pull a cube. Holding the first jump does not automatically fire a hook. Releasing before a hook attaches, or after using that anchor’s rope jump, grants no extra jump.
 
 Some controls are contextual. In co-op, resetting or dying affects your own player rather than restarting your partner's progress. The room overview and contextual camera reveals help show what a distant control changes.
 

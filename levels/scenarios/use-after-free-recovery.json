@@ -689,7 +689,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 350
+          "x": 390
         }
       ],
       "wait": {
@@ -841,7 +841,7 @@
         {
           "type": "walk",
           "actor": "host",
-          "x": 350
+          "x": 390
         }
       ],
       "wait": {
@@ -909,7 +909,7 @@
       "waitMs": 800
     },
     {
-      "label": "Host rope-jumps into higher c2 catch",
+      "label": "Hold the deliberate c1 rope jump for the high c2 transfer",
       "actions": [
         {
           "type": "key",
@@ -918,10 +918,17 @@
           "down": true
         },
         {
-          "type": "tap",
+          "type": "key",
           "actor": "host",
-          "code": "Space"
-        },
+          "code": "Space",
+          "down": true
+        }
+      ],
+      "waitMs": 100
+    },
+    {
+      "label": "Host rope-jumps into higher c2 catch",
+      "actions": [
         {
           "type": "grapple",
           "actor": "host",
@@ -953,7 +960,15 @@
           "max": 1240
         },
         "timeoutMs": 4000
-      }
+      },
+      "actions": [
+        {
+          "type": "key",
+          "actor": "host",
+          "code": "Space",
+          "down": false
+        }
+      ]
     },
     {
       "label": "Host catches summit anchor during bounded rope jump",

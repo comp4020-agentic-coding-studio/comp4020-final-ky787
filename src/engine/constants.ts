@@ -30,14 +30,14 @@ export const PLAYER = {
   groundFriction: 2900,
   airDrag: 130,
   gravity: 3400,
-  /** Gravity multiplier while rising with jump held (floaty ascent). */
+  /** Full ordinary-jump ascent; held manual rope jumps retain their original modifier. */
   jumpHoldGravity: 0.72,
   /** Extra gravity while falling, for a snappy arc. */
   fallGravity: 1.25,
   /**
    * Changed from 640: the old game climbed with the grapple, so its jump was a
    * hop (~84 units). With the grapple off, the jump does the climbing; 800
-   * gives ~130 units held and ~94 tapped. Room steps are 105 apart.
+   * gives ~127 units at the fixed step. Ordinary taps now receive that full arc.
    */
   jumpVelocity: 800,
   /** Grace period after leaving a ledge during which a jump still works. */

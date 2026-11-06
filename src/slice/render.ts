@@ -374,22 +374,24 @@ export class PuzzleRenderer {
             if (station) this.text(hint, station.at.x - hint.length * 3.6, station.at.y + 78, 12, C.ink);
             else this.text(hint, p.x - 80, p.y - 72, 15, C.ink);
         }
-        const target = w.target(aim);
+        const target = w.selectedTarget(aim);
         this.switchOnboarding.update(w, target, dt, running, energyMotion);
         if (target) {
             this.ring(target.point.x, target.point.y, 21, C.ink);
             c.setLineDash([3, 8]);
             this.line(p.x, p.y, target.point.x, target.point.y, '#629b99', 1);
             c.setLineDash([]);
-            if (!p.grounded && ['idle', 'retracting'].includes(rope.phase)) this.text('SPACE · GRAPPLE', p.x - 65, p.y - 48, 13, C.cyan);
+            if (!p.grounded && ['idle', 'retracting'].includes(rope.phase)) this.text('HOLD SPACE · GRAPPLE', p.x - 85, p.y - 48, 13, C.cyan);
         }
-        if (rope.phase === 'attached') this.text(canJumpFromRope(p) ? 'SPACE · JUMP OFF' : 'SPACE · RELEASE', p.x - 65, p.y - 48, 13, C.cyan);
-        else if (w.keyboardGrapple) this.text('SPACE · CANCEL HOOK', p.x - 65, p.y - 48, 13, C.cyan);
+        if (rope.phase === 'attached') this.text(w.keyboardGrapple
+            ? canJumpFromRope(p) ? 'RELEASE SPACE · JUMP OFF' : 'RELEASE SPACE · DETACH'
+            : canJumpFromRope(p) ? 'SPACE · JUMP OFF' : 'RELEASE CLICK · DETACH', p.x - 90, p.y - 48, 13, C.cyan);
+        else if (w.keyboardGrapple) this.text('HOLD SPACE · HOOKING', p.x - 85, p.y - 48, 13, C.cyan);
         if (r.id === 'switch') this.drawSwitchOnboarding(w, energyMotion);
         if (r.id === 'relay' || r.id === 'pairing-bay') {
-            this.text('HOLD CLICK + D', 305, 440, 15, C.ink);
-            this.text('OR SPACE IN THE AIR', 285, 461, 13, C.cyan);
-            this.text('Release as you swing right', 310, 483, 12, C.dim);
+            this.text('HOLD SPACE IN THE AIR', 285, 440, 15, C.ink);
+            this.text('HOLD D TO SWING RIGHT', 285, 461, 13, C.cyan);
+            this.text('Release Space to jump off', 300, 483, 12, C.dim);
         }
         if (r.id === 'pairing-bay') {
             this.text('MOCK MULTIPLAYER TEST · NO BINARY EVIDENCE', 80, 170, 12, C.dim);
@@ -443,9 +445,10 @@ export class PuzzleRenderer {
         const c = this.ctx, anchor = world.platforms.find(platform => platform.def.id === 'anchor')!;
         const point = anchor.solid.grapplePoint!;
         const targeted = stage === 'targeted', attached = stage === 'attached';
+        const swinging = attached && world.player.rope.phase === 'attached';
         if (!attached) {
-            // The same address bar and centre used by world.target(); this glow
-            // attracts attention but only its genuine target result confirms aim.
+            // The same address bar and centre used by world.selectedTarget();
+            // only the actual selection receives the stronger target highlight.
             const pulse = this.switchOnboarding.pulse(motion);
             c.save();
             c.globalAlpha = targeted ? .9 : .3 + pulse * .2;
@@ -458,16 +461,30 @@ export class PuzzleRenderer {
         }
         // Authored in-world sign above the approach: clear of both the jump arc
         // and the anchor. It replaces SWITCH's old, easily missed floor text.
+        let heading = targeted ? 'ANCHOR SELECTED' : '02 / JUMP AND GRAPPLE';
+        let first = 'TAP SPACE TO JUMP';
+        let second = 'HOLD SPACE IN THE AIR TO GRAPPLE';
+        let detail = targeted ? 'Press Space again while airborne and keep holding' : 'Move right until the anchor ring is selected';
+        if (attached) {
+            heading = swinging ? 'GRAPPLE CONNECTED' : 'GRAPPLE LEARNED';
+            first = swinging ? 'HOLD A/D TO SWING' : 'KEEP MOVING RIGHT';
+            second = 'LAND ON THE FAR BANK';
+            detail = 'Precise aiming is always available with the mouse';
+            if (swinging) {
+                second = world.keyboardGrapple ? 'RELEASE SPACE TO JUMP OFF' : 'PRESS SPACE TO JUMP OFF';
+                detail = world.keyboardGrapple ? 'S + release Space: detach without jumping' : 'Release click: detach without jumping';
+            }
+        }
         c.save();
         c.fillStyle = '#0c1b25f5';
         c.fillRect(80, 153, 490, 96);
         this.line(80, 153, 80, 249, C.cyan, 3);
-        this.text(attached ? 'GRAPPLE CONNECTED' : targeted ? 'ANCHOR TARGETED' : '02 / AIM YOUR GRAPPLE', 96, 170, 11, C.cyan);
+        this.text(heading, 96, 170, 11, C.cyan);
         c.fillStyle = C.ink;
-        c.font = '600 20px ui-monospace, monospace';
-        c.fillText(attached ? 'NICE CATCH.' : targeted ? 'JUMP, THEN PRESS SPACE AGAIN' : 'MOVE YOUR MOUSE TO AIM', 96, 194);
-        c.fillText(attached ? 'HOLD D TO SWING RIGHT' : targeted ? 'IN MID-AIR TO GRAPPLE' : 'AT THE ANCHOR', 96, 217);
-        this.text(attached ? 'SPACE or release click to let go' : targeted ? 'Alternative: CLICK + HOLD on the anchor' : 'Move closer until the target ring locks on', 96, 238, 12, C.dim);
+        c.font = '600 19px ui-monospace, monospace';
+        c.fillText(first, 96, 194);
+        c.fillText(second, 96, 217);
+        this.text(detail, 96, 238, 12, C.dim);
         c.restore();
     }
     private drawCharacterLabels(entries: { player: PlayerState; profile: PublicCharacterProfile; slot?: Slot; local: boolean; prompt: boolean }[], dpr: number): void {

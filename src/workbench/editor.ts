@@ -261,7 +261,7 @@ export class WorkbenchEditor {
         for (const id of ['rename-draft', 'delete-draft']) $<HTMLButtonElement>(`#${id}`).disabled = this.busy || !this.draftId;
         $('#document-state').textContent = `${this.dirty ? 'UNSAVED · ' : ''}${this.name} · ${this.currentHash.slice(0, 8) || 'hashing'} · ${Math.round(this.camera.zoom * 100)}%`;
         const recorded = this.recording ? ` Measured path ${this.recording.samples.length} samples${this.recording.draftHash !== this.currentHash ? ' · STALE after document edits' : ''}.` : '';
-        $('#mode-banner').innerHTML = this.mode === 'play' ? `<strong>PHYSICS PREVIEW${this.paused ? ' / PAUSED' : ''}</strong> · Local player ${this.testSlot}; not a two-player validation. A/D move · W/Space jump · E use/carry · hold pointer to grapple.${this.testAt ? ' Section-only start.' : ''}` : this.mode === 'preview' ? `<strong>${this.forcedMode ? 'FORCED OUTPUT DIAGNOSTIC' : 'EVALUATED INPUT STATE'}</strong> · ${this.forcedMode ? 'Arbitrary geometry inspection; this is not a reachable state or a solved puzzle.' : 'Saved input values use the actual controller. Physics is stopped.'} WASD pans · wheel zooms.${recorded}` : `<strong>${this.palette ? `PLACE ${PALETTE.find(p => p.kind === this.palette)?.label.toUpperCase()}` : this.connection ? this.connectionSource ? `CONNECT ${html(this.connectionSource)} → select destination` : 'CONNECT / select a source device' : 'EDIT'}</strong> · ${this.runtimeError ? html(this.runtimeError) : !this.playable ? 'Incomplete draft: outline preview. Resolve blocking diagnostics for play. WASD or Space+drag pans · wheel zooms.' : 'Click/drag objects · Shift multi-select · WASD, middle drag or Space+drag pans · wheel zooms · F fits.'}${recorded}`;
+        $('#mode-banner').innerHTML = this.mode === 'play' ? `<strong>PHYSICS PREVIEW${this.paused ? ' / PAUSED' : ''}</strong> · Local player ${this.testSlot}; not a two-player validation. A/D move/swing · tap Space to jump · hold again in air to grapple · release to jump off · E use/carry · hold pointer for precise grappling.${this.testAt ? ' Section-only start.' : ''}` : this.mode === 'preview' ? `<strong>${this.forcedMode ? 'FORCED OUTPUT DIAGNOSTIC' : 'EVALUATED INPUT STATE'}</strong> · ${this.forcedMode ? 'Arbitrary geometry inspection; this is not a reachable state or a solved puzzle.' : 'Saved input values use the actual controller. Physics is stopped.'} WASD pans · wheel zooms.${recorded}` : `<strong>${this.palette ? `PLACE ${PALETTE.find(p => p.kind === this.palette)?.label.toUpperCase()}` : this.connection ? this.connectionSource ? `CONNECT ${html(this.connectionSource)} → select destination` : 'CONNECT / select a source device' : 'EDIT'}</strong> · ${this.runtimeError ? html(this.runtimeError) : !this.playable ? 'Incomplete draft: outline preview. Resolve blocking diagnostics for play. WASD or Space+drag pans · wheel zooms.' : 'Click/drag objects · Shift multi-select · WASD, middle drag or Space+drag pans · wheel zooms · F fits.'}${recorded}`;
         for (const button of document.querySelectorAll<HTMLButtonElement>('[data-palette]')) button.classList.toggle('active', button.dataset.palette === this.palette);
         $('#connect').classList.toggle('active', this.connection); $('#hitboxes').classList.toggle('active', this.hitboxes); $('#range').classList.toggle('active', this.range);
         $<HTMLInputElement>('#snap').checked = this.document.editor.snap; $<HTMLInputElement>('#grid-size').value = String(this.document.editor.grid);
@@ -281,7 +281,7 @@ export class WorkbenchEditor {
         const automaticBreakpoints = this.document.controller.kind === 'declarative' || this.document.controller.id === 'crossfeed-vault';
         const panel = $('#inspector');
         if (this.mode === 'preview') { this.renderPreview(panel); return; }
-        if (this.mode === 'play') { panel.innerHTML = `<h2>Real engine physics test</h2><p class="wb-help">The authored document is frozen. Simulation never writes cube or player positions into the level file.</p><div class="wb-actions"><button id="restart">Restart test</button><button id="pause">${this.paused ? 'Resume' : 'Pause'}</button><button id="step">Frame step</button></div><h3>Live observation</h3><pre id="observation" class="wb-help"></pre><div class="wb-notice">Single local player. ${this.storage.capabilities.coop ? 'TEST WITH FRIEND opens the actual two-player authority session.' : 'Online custom-level multiplayer is reserved for Stage 2.'}</div>`; $('#restart').onclick = () => void this.startTest({ slot: this.testSlot, at: this.testAt }).catch(() => {}); $('#pause').onclick = () => { this.paused = !this.paused; this.input?.releaseAll(); this.renderInspector(); this.updateToolbar(); }; $('#step').onclick = () => { this.paused = true; this.advance(emptyInput()); this.updateToolbar(); }; return; }
+        if (this.mode === 'play') { panel.innerHTML = `<h2>Real engine physics test</h2><p class="wb-help">The authored document is frozen. Simulation never writes cube or player positions into the level file.</p><div class="wb-actions"><button id="restart">Restart test</button><button id="pause">${this.paused ? 'Resume' : 'Pause'}</button><button id="step">Frame step</button></div><h3>Live observation</h3><pre id="observation" class="wb-help"></pre><div class="wb-notice">Single local player. ${this.storage.capabilities.coop ? 'TEST WITH FRIEND opens the actual two-player authority session.' : 'Online custom-level multiplayer is reserved for Stage 2.'}</div>`; $('#restart').onclick = () => void this.startTest({ slot: this.testSlot, at: this.testAt }).catch(() => {}); $('#pause').onclick = () => { this.paused = !this.paused; this.input?.setEnabled(!this.paused); this.runtime?.world.cancelGrapple(); this.renderInspector(); this.updateToolbar(); }; $('#step').onclick = () => { this.paused = true; this.input?.setEnabled(false); this.runtime?.world.cancelGrapple(); this.advance(emptyInput()); this.updateToolbar(); }; return; }
         const setters = new Map<string, (value: string | number | boolean) => void>(); let index = 0;
         const field = (label: string, value: string | number | boolean, setter: (v: string | number | boolean) => void, options?: { values?: string[]; min?: number; step?: number; wide?: boolean }) => {
             const id = `property-${index++}`; setters.set(id, setter);
@@ -615,7 +615,10 @@ export class WorkbenchEditor {
     }
     advance(input: InputState, interact = false) {
         if (!this.runtime || this.mode !== 'play') return;
-        this.runtime.step(input, interact, FIXED_DT); this.recordingElapsed += FIXED_DT;
+        const deaths = this.runtime.world.deaths;
+        this.runtime.step(input, interact, FIXED_DT);
+        if (this.runtime.world.deaths !== deaths) this.input?.releaseAll();
+        this.recordingElapsed += FIXED_DT;
         const state = this.runtime.snapshot(), recording = this.recording;
         if (recording && ++this.recordedFrames % 4 === 1 && recording.samples.length < 18000) recording.samples.push({ time: state.time, player: { x: state.player.x, y: state.player.y, grounded: state.player.grounded, groundId: state.player.groundId, rope: state.player.rope, ropeTarget: state.player.target }, cubes: state.cubes, signals: state.signals, deaths: state.deaths });
         if (recording) recording.events = this.runtime.recording.events.map(e => ({ time: e.time, kind: e.kind, detail: e.details ?? e.at }));
@@ -624,7 +627,7 @@ export class WorkbenchEditor {
         if (this.mode !== 'play' || !this.runtime) throw new Error('Start a physics test first.');
         if (!Number.isInteger(options.frames) || options.frames < 1 || options.frames > 7200) throw new Error('A step is bounded to 1–7200 fixed frames.');
         this.paused = true;
-        for (let i = 0; i < options.frames; i++) this.advance({ ...emptyInput(), ...options.input, ...(i ? { jumpPressed: false, grapplePressed: false, airGrapplePressed: false } : {}) }, i === 0 && options.interact);
+        for (let i = 0; i < options.frames; i++) this.advance({ ...emptyInput(), ...options.input, ...(i ? { jumpPressed: false, grapplePressed: false, airGrapplePressed: false, airGrappleReleased: false, ropeJumpReleased: false } : {}) }, i === 0 && options.interact);
         return this.runtime.snapshot();
     }
     loadDocument(document: DraftDocument, hash?: string) {
@@ -755,11 +758,11 @@ export class WorkbenchEditor {
         }
         if (this.mode === 'play' && this.input && this.runtime && !this.paused) {
             if (this.input.takeAction('reset')) {
-                const world = this.runtime.world, before = world.events.length; world.respawn();
+                const world = this.runtime.world, before = world.events.length; world.respawn(); this.input.releaseAll();
                 for (const event of world.events.slice(before)) if (this.runtime.recording.events.length < 10000) this.runtime.recording.events.push({ time: world.elapsed, kind: event.kind, at: { ...event.at }, details: event });
             }
             this.accumulator += elapsed;
-            while (this.accumulator >= FIXED_DT) { this.input.sync(this.renderer.camera.screenToWorld(this.input.screenAim.x, this.input.screenAim.y)); const edges = this.input.takeEdges(); this.input.state.jumpPressed = edges.jump; this.input.state.airGrapplePressed = edges.airGrapple; this.input.state.grapplePressed = edges.grapple; this.advance(this.input.state, edges.interact); this.accumulator -= FIXED_DT; }
+            while (this.accumulator >= FIXED_DT) { this.input.sync(this.renderer.camera.screenToWorld(this.input.screenAim.x, this.input.screenAim.y)); const edges = this.input.takeEdges(); this.input.state.jumpPressed = edges.jump; this.input.state.airGrapplePressed = edges.airGrapple; this.input.state.airGrappleReleased = edges.airGrappleReleased; this.input.state.grapplePressed = edges.grapple; this.advance(this.input.state, edges.interact); this.accumulator -= FIXED_DT; }
         }
         this.draw(elapsed); requestAnimationFrame(this.animate);
     };

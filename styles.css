@@ -219,6 +219,8 @@ p {
   bottom:15px;
   display:flex;
   gap:12px;
+  touch-action:none;
+  user-select:none;
 }
 .touch-pad button {
   padding:18px;

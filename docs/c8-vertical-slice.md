@@ -21,7 +21,7 @@ workspaces were read but not modified.
 | Room | Hand-authored layout | Physical solution |
 | --- | --- | --- |
 | PRESSURE | 1,250 × 720; continuous floor at y=560; cube at x=310, plate at x=610, exit at x=1,130 | E carries/drops the cube. Either a player or resting cube depresses the plate. Leave the cube there to hold the door open, then hop past the solid cube. |
-| SWITCH | 1,420 × 780; near bank ends x=460, far bank starts x=880; 420-unit pit; lever x=300; anchor ring (770,226) | Lever ON makes the ghost card solid and enables its marked ring. Hold click and move right, or jump and tap Space again at the highlighted target. Release on the rightward swing; the far bank is broad. |
+| SWITCH | 1,420 × 780; near bank ends x=460, far bank starts x=880; 420-unit pit; lever x=300; anchor ring (770,226) | Lever ON makes the ghost card solid and enables its marked ring. Tap Space to jump, press and hold Space again at the automatically highlighted target, swing with D and release Space to jump off. Precise click-and-hold grappling remains available; the far bank is broad. |
 | RELAY | 2,000 × 800; Plate A x=375; banks end/start x=480/920; 440-unit pit; anchor (780,226); bridge lever x=1,080; Plate B (1,270,470) | Cube holds A while the player crosses. The lever permanently locks the bridge and code steps ON and sets the far-bank checkpoint. Retrieve the cube across the bridge and carry it to B to hold the exit open. A lower crumble detour drops onto a safe recovery floor. |
 
 RELAY's steps are y=470 and y=410, then an exit shelf at y=350. The inactive
@@ -38,30 +38,31 @@ return bridge. A cube can then replace a player on Plate B to hold the exit.
 The single-player route requires that return crossing to retrieve the cube. No network
 semantics are implemented or implied.
 
-## SWITCH cursor onboarding — 2026-10-26
+## SWITCH assisted-grapple onboarding — 2026-11-06
 
-SWITCH alone has a staged, authored aiming cue. After its existing switch powers
-`anchor`, a sign above the approach says **MOVE YOUR MOUSE TO AIM AT THE ANCHOR**.
-The glow follows the existing hookable address bar and its attachment centre;
-**ANCHOR TARGETED** appears only when `PuzzleWorld.target(aim)` selects that real
-anchor within the existing range. The next instruction is **JUMP, THEN PRESS
-SPACE AGAIN IN MID-AIR TO GRAPPLE**, with **CLICK + HOLD** as an alternative.
-Moving the cursor or firing a missed hook never records mechanic completion.
+SWITCH alone has a staged, authored cue. After its existing switch powers
+`anchor`, the sign above the approach teaches **TAP SPACE TO JUMP** and **HOLD
+SPACE IN THE AIR TO GRAPPLE**. The second instruction means a second Space press,
+held until the hook attaches. The selected ring appears automatically when a
+valid anchor is in range; moving the mouse can override that choice. The glow
+follows the existing hookable address bar and its attachment centre.
+**ANCHOR SELECTED** appears only when `PuzzleWorld.selectedTarget(aim)` selects
+that real anchor. A selection or fired hook never records mechanic completion.
 
-The real attached rope triggers 2.8 seconds of positive feedback, then retires
-the cue. The existing `grapple` mechanic event remains responsible for progress
-persistence; `PuzzleRenderer.room` receives the saved mechanics so a returning
-player who has learned grappling does not repeat the lesson. Pause freezes the
-feedback timer. Reduced motion keeps a static anchor highlight and the same
-readable sign. The cue does not add listeners, animation loops, controller
-signals, collision geometry or native evidence.
+Only actual attachment teaches grappling. The cue then says **HOLD A/D TO SWING**
+and, for a keyboard-owned rope, **RELEASE SPACE TO JUMP OFF**. It also explains
+S + release for detachment without a jump. A mouse-owned rope instead offers the
+existing Space jump-off and click-release detachment. The cue remains while the
+first rope is attached, then retires after 2.8 seconds. The existing `grapple`
+mechanic event remains responsible for progress persistence; saved knowledge
+prevents a returning player repeating the lesson. Pause freezes the feedback
+timer. Reduced motion keeps a static anchor highlight and the same readable sign.
+The cue adds no controller signals, collision geometry or native evidence.
 
 Focused checks are `tests/switch-onboarding.test.ts` and
 `tests/platform-grapple.test.ts`. After a production build, run
-`node scripts/switch-onboarding-browser-check.ts` for a real keyboard/mouse route
-from PRESSURE, staged screenshots at 1600×900, 1366×768 and 1024×768, reduced
-motion, actual attachment and reload persistence. `BN_SHOTS` selects the output
-directory.
+`pnpm check:switch-onboarding` for the real-input tutorial route. `BN_SHOTS`
+selects the output directory.
 
 ## CONTROL SPINE — showcase redesign, 2026-10-05
 
@@ -93,8 +94,8 @@ and (1280,116). The proven clone is the **last anchor**, at (800,116), swapped
 with the former final real block.
 Each address slab is 200 units wide; the 280-unit gaps are beyond an ordinary
 held run-jump. Swing **under** the slabs and transfer to the next target while
-moving left. Space jumps off an attached rope for an easier transfer; letting go
-of the mouse retains the previous low release arc. The real output also powers
+moving left. Releasing a Space-owned rope jumps off for an easier transfer; a
+mouse-owned rope retains its optional Space jump-off and low mouse-release arc. The real output also powers
 a catch deck at (530,510), 550 units
 wide, below the unstable anchor. The lift ends at y=580, clear of the upper code,
 listings and a normal swing. Upper cargo jumps remain 130 and 110 units wide.
@@ -624,15 +625,34 @@ act as airborne platforms. Grappling the cube under the player's feet is
 rejected so it cannot become a self-lifting elevator. Cube simulation excludes
 its own player-only collider.
 
-Space on the ground jumps. A new Space press while airborne consumes the jump
-only if the same probe used by the visible targeting hint finds an active marked
-anchor. That press latches the rope; another Space press jumps off it. Key release
-alone does not detach a keyboard hook. Clicking takes over with the existing
-hold/release behaviour. Landing, respawning, opening the menu, losing focus or
-losing the anchor signal clears the keyboard latch. W/up remain ordinary jump
-aliases, including the attached-rope hop. Space cancels a hook still in flight
-without adding upward velocity. No automatic hook is fired merely by continuing
-to hold a ground jump.
+### Default jump and assisted grapple controls — 2026-11-06
+
+An ordinary ground or coyote jump always uses the existing maximum held-jump
+ascent, regardless of tap duration. Launch velocity stays 800 units/s, with the
+existing 0.72 ascent-gravity multiplier applied throughout that ordinary jump.
+A transient ground-jump flag keeps this separate from other upward motion;
+manual rope hops retain their existing held/tapped ascent rules.
+Collision, falling gravity, buffering and coyote time retain their existing
+limits. Rope jumps and lift motion do not inherit a new global ascent modifier.
+
+A nearby valid powered anchor is selected automatically, preferring useful
+forward targets and keeping a stable selection. Intentional mouse aiming can
+override it for 1.5 seconds after meaningful pointer movement (and throughout a held mouse hook). Once that intent expires, assistance resumes. The highlighted target is the target the second Space press attempts;
+existing 500-unit range, hookable surfaces and power state still apply. Cubes are
+never automatic swing targets and retain manual mouse pulling.
+
+Tap Space to jump, then press and hold it again while airborne to fire at the
+selected anchor. Hold Space and use A/D to swing. Releasing Space after successful
+attachment invokes the existing deliberate rope jump when airborne and its
+per-anchor budget remains available. S + release, or an exhausted budget, detaches
+without another jump impulse. There is no third required press. Release while
+firing, retracting, grounded or disconnected cannot grant a jump, and pause,
+respawn and reconnect clear queued controls and keyboard ownership.
+
+Clicking takes ownership with the existing precise mouse hold/release behaviour;
+Space/W/Up can still deliberately jump off a mouse rope. W/Up remain ordinary
+jump aliases. Holding the initial ground jump never automatically fires a hook.
+The touch JUMP button uses the same second-press hold/release sequence.
 
 ## Grapple tuning and known limits
 
@@ -676,7 +696,8 @@ units/s versus 607 previously; removing the old release loss retains almost
 all of that speed. With movement released too, the player rises less than 16
 units after detaching and lands safely beyond x=990. These measurements describe
 ordinary mouse release; the intentional rope jump now provides an alternative
-for easier chaining. Ordinary ground jumps are unchanged.
+for easier chaining. The later one-tap control revision retains the old maximum
+ordinary jump height while making it independent of hold duration.
 
 No runaway speed was observed in the stress or browser tests. This is not an
 exhaustive exploit proof: targeting does not currently reject a marked anchor
@@ -893,3 +914,12 @@ All 56 real-control browser assertions pass, with zero UPLINK deaths, no console
 errors, and successful far/upper/Node C reloads. Fresh screenshots and the browser
 log use `docs/playtest/uplink-slabs-*`. Existing saved state and retained evidence
 bytes are unchanged.
+
+### Simplified-control regression — 2026-11-06
+
+The [control regression report](playtest/2026-11-06-assisted-controls/README.md)
+records measured tap/hold heights, the mouse-free SWITCH demonstration, touch
+and release-edge checks, and complete real-input routes. CONTROL SPINE's normal
+return chain now exercises assisted keyboard targeting and Space-release jumps;
+its separate collapse/recovery route retains precise mouse controls and the
+same native five-input/seven-output contract.

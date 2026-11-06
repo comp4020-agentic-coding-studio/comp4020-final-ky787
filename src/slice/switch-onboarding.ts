@@ -1,7 +1,7 @@
 import type { GrappleTarget } from '../engine/physics.ts';
 import type { PuzzleWorld } from './world.ts';
 
-export type SwitchOnboardingStage = 'hidden' | 'aim' | 'targeted' | 'attached' | 'complete';
+export type SwitchOnboardingStage = 'hidden' | 'approach' | 'targeted' | 'attached' | 'complete';
 const CONFIRMATION_SECONDS = 2.8;
 
 /** Presentation only: observes the game's real target and rope; never completes a mechanic. */
@@ -23,6 +23,12 @@ export class SwitchOnboarding {
         if (!running) return;
         if (motion) this.time += Math.max(0, dt);
         if (this.learned) {
+            // Keep the swing/release lesson readable even during a long first
+            // swing. Retire it after leaving the anchor, not while still held.
+            if (world.player.rope.phase === 'attached' && world.player.rope.anchorId === 'anchor' && this.confirmation > 0) {
+                this.stage = 'attached';
+                return;
+            }
             this.confirmation = Math.max(0, this.confirmation - Math.max(0, dt));
             this.stage = this.confirmation > 0 ? 'attached' : 'complete';
             return;
@@ -37,7 +43,7 @@ export class SwitchOnboarding {
         }
         const anchor = world.platforms.find(platform => platform.def.id === 'anchor');
         this.stage = !anchor?.solid.enabled || !anchor.solid.grappleable ? 'hidden'
-            : target?.solid.id === anchor.solid.id ? 'targeted' : 'aim';
+            : target?.solid.id === anchor.solid.id ? 'targeted' : 'approach';
     }
 
     pulse(motion: boolean): number { return motion ? (Math.sin(this.time * 3) + 1) / 2 : .5; }

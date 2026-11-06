@@ -39,13 +39,16 @@ export class InputManager {
   clicks: Vec2[] = [];
 
   private pendingJump = false;
-  private pendingAirGrapple = false;
+  private spaceEdges: ('press' | 'release' | 'release-down')[] = [];
+  private spaceActive = false;
   private pendingInteract = false;
   private pendingGrapple = false;
   private actions = new Set<ActionName>();
   private held = new Set<string>();
   private detach: (() => void)[] = [];
   private touchMove = 0;
+  private touchJump = false;
+  private manualAimUntil = 0;
   private enabled = true;
 
   /** Menus retain native keyboard navigation without buffering gameplay input. */
@@ -59,6 +62,13 @@ export class InputManager {
 
   attach(canvas: HTMLCanvasElement, root: HTMLElement): void {
     const onKey = (e: KeyboardEvent, down: boolean): void => {
+      // Release a gameplay key even if focus moved to a form/button meanwhile.
+      // Unowned keyups (including those after pause/reset) cannot queue a hop.
+      if (!down) {
+        if (this.held.delete(e.code) && e.code === 'Space' && this.enabled)
+          this.spaceEdges.push(this.held.has('KeyS') || this.held.has('ArrowDown') ? 'release-down' : 'release');
+        return;
+      }
       // Form controls (the debug panel's wiring selects) keep their keys.
       const target = e.target as HTMLElement | null;
       if (target && ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName)) return;
@@ -67,13 +77,11 @@ export class InputManager {
       // Menu buttons keep native keyboard navigation and activation.
       if (target?.closest("button") && (code === "Tab" || code === "Space" || code === "Enter")) return;
       if (GAME_KEYS.has(code)) e.preventDefault();
-      if (down && e.repeat) return;
-      if (down) this.held.add(code);
-      else this.held.delete(code);
-      if (!down) return;
+      if (e.repeat || this.held.has(code)) return;
+      this.held.add(code);
 
-      if (code === "Space" || code === "KeyW" || code === "ArrowUp") this.pendingJump = true;
-      if (code === "Space") this.pendingAirGrapple = true;
+      if (code === "KeyW" || code === "ArrowUp") this.pendingJump = true;
+      if (code === "Space") this.spaceEdges.push('press');
       if (code === "KeyE") this.pendingInteract = true;
       if (code === "KeyR") this.actions.add("reset");
       if (code === "KeyF") this.actions.add("fast");
@@ -91,6 +99,8 @@ export class InputManager {
 
     const setAim = (e: PointerEvent): void => {
       const rect = canvas.getBoundingClientRect();
+      if (this.enabled && (e.type === 'pointerdown' || Math.hypot(e.clientX - rect.left - this.screenAim.x, e.clientY - rect.top - this.screenAim.y) >= 3))
+        this.manualAimUntil = performance.now() + 1500;
       this.screenAim.x = e.clientX - rect.left;
       this.screenAim.y = e.clientY - rect.top;
       this.hasPointer = true;
@@ -140,25 +150,30 @@ export class InputManager {
       <button type="button" data-touch="left" aria-label="Move left">◀</button>
       <button type="button" data-touch="right" aria-label="Move right">▶</button>
       <button type="button" data-touch="use" aria-label="Use">E</button>
-      <button type="button" data-touch="jump" aria-label="Jump">JUMP</button>`;
+      <button type="button" data-touch="jump" aria-label="Jump; hold in air to grapple; release to jump off">JUMP / HOOK</button>`;
     root.appendChild(pad);
     for (const button of pad.querySelectorAll<HTMLButtonElement>("[data-touch]")) {
       const kind = button.dataset.touch;
       const press = (e: PointerEvent): void => {
         e.preventDefault();
         if (!this.enabled) return;
+        button.setPointerCapture?.(e.pointerId);
         if (kind === "left") this.touchMove = -1;
         else if (kind === "right") this.touchMove = 1;
         else if (kind === "use") this.pendingInteract = true;
-        else this.pendingJump = true;
+        else { this.touchJump = true; this.spaceEdges.push('press'); }
       };
       const release = (e: PointerEvent): void => {
         e.preventDefault();
         if (kind === "left" || kind === "right") this.touchMove = 0;
+        else if (kind === 'jump' && this.touchJump) {
+          this.touchJump = false;
+          if (e.type === 'pointerup' && this.enabled) this.spaceEdges.push(this.held.has('KeyS') || this.held.has('ArrowDown') ? 'release-down' : 'release');
+          else { this.spaceEdges.length = 0; this.spaceActive = false; }
+        }
       };
       button.addEventListener("pointerdown", press);
       button.addEventListener("pointerup", release);
-      button.addEventListener("pointerleave", release);
       button.addEventListener("pointercancel", release);
     }
     this.detach.push(() => pad.remove());
@@ -180,17 +195,25 @@ export class InputManager {
     s.left = this.held.has("KeyA") || this.held.has("ArrowLeft") || this.touchMove < 0;
     s.right = this.held.has("KeyD") || this.held.has("ArrowRight") || this.touchMove > 0;
     s.down = this.held.has("KeyS") || this.held.has("ArrowDown");
-    s.jumpHeld = this.held.has("Space") || this.held.has("KeyW") || this.held.has("ArrowUp");
+    s.airGrappleHeld = this.spaceActive;
+    s.jumpHeld = s.airGrappleHeld || this.held.has("KeyW") || this.held.has("ArrowUp");
+    s.manualAim = s.grappleHeld || performance.now() < this.manualAimUntil;
     s.reelIn = false;
     s.reelOut = false;
     s.aim = worldAim;
   }
 
   /** Consumed once per physics step; edges fire on the first step only. */
-  takeEdges(): { jump: boolean; interact: boolean; grapple: boolean; airGrapple: boolean } {
-    const out = { jump: this.pendingJump, interact: this.pendingInteract, grapple: this.pendingGrapple, airGrapple: this.pendingAirGrapple };
+  takeEdges(): { jump: boolean; interact: boolean; grapple: boolean; airGrapple: boolean; airGrappleReleased: boolean } {
+    // Preserve event order when a release and a new press both arrive between
+    // fixed steps. One Space edge per step also makes very short taps reliable.
+    const space = this.spaceEdges.shift();
+    if (space) this.spaceActive = space === 'press';
+    this.state.airGrappleHeld = this.spaceActive;
+    this.state.airGrappleReleaseDown = space === 'release-down';
+    this.state.jumpHeld = this.spaceActive || this.held.has('KeyW') || this.held.has('ArrowUp');
+    const out = { jump: this.pendingJump || space === 'press', interact: this.pendingInteract, grapple: this.pendingGrapple, airGrapple: space === 'press', airGrappleReleased: space === 'release' || space === 'release-down' };
     this.pendingJump = false;
-    this.pendingAirGrapple = false;
     this.pendingInteract = false;
     this.pendingGrapple = false;
     return out;
@@ -208,10 +231,13 @@ export class InputManager {
 
   releaseAll(): void {
     this.held.clear();
+    this.spaceEdges.length = 0;
+    this.spaceActive = false;
     this.touchMove = 0;
+    this.touchJump = false;
+    this.manualAimUntil = 0;
     Object.assign(this.state, emptyInput());
     this.pendingJump = false;
-    this.pendingAirGrapple = false;
     this.pendingInteract = false;
     this.pendingGrapple = false;
   }

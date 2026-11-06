@@ -23,7 +23,7 @@ The initial query is validated through `normalizeCode` and retained through prof
 
 Only an accepted matching room snapshot consumes `join` via `history.replaceState`; other parameters remain intact. Failed joins retain their invitation for Retry. Manually correcting an invitation updates the pending query to the validated replacement code, so its successful snapshot consumes the obsolete invitation. The manual input accepts four-character codes or same-origin root URLs containing exactly one `join` parameter and no other parameters, credentials or fragment. Pasted URLs are parsed as data and never used as navigation targets. Full, absent and expired parties show feedback plus Back/Retry.
 
-The SWITCH onboarding contract is documented in [the C8 design](c8-vertical-slice.md). It observes the existing target ring and actual rope attachment; it never changes grapple physics or treats cursor movement as mechanic completion.
+The SWITCH onboarding contract is documented in [the C8 design](c8-vertical-slice.md). It teaches tap jump, an airborne Space hold for the automatically selected anchor, A/D swing and Space release to jump off. It observes the selected target and actual rope attachment; selection or firing never counts as mechanic completion. About also explains precise mouse controls and S + release detachment.
 
 ## Validation
 
@@ -31,6 +31,6 @@ Focused suites cover progress reset boundaries, input suspension, view templates
 
 - `pnpm check:menu`: title sizes 1600×900, 1366×768, 1024×768 and 390×844; customization; navigation; fresh tutorial history; pause, backdrop, Escape, focus, held inputs, Space; settings confirmation.
 - `pnpm check:menu-invitations`: actual isolated visitors, exact clipboard URL, first-time setup, shared gameplay, reconnect, remembered/active conflicts, full/missing/invalid parties, pasted/manual codes and clipboard failure.
-- `pnpm check:switch-onboarding`: physically solve PRESSURE then power SWITCH, aim at the real anchor, jump and attach; inspect all stages and saved retirement at desktop sizes and reduced motion.
+- `pnpm check:switch-onboarding`: physically solve PRESSURE then power SWITCH, jump and attach to the automatically selected anchor without mouse aiming; inspect the staged lesson and saved retirement.
 
 Screenshots and assertion reports are in [the dated review](playtest/2026-10-26-menu/). Existing character, campaign, multiplayer, four-room solo and workbench checks continue to traverse real UI controls through the shared browser navigation helper; their gameplay routes are retained.

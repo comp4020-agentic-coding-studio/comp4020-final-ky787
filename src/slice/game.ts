@@ -410,7 +410,7 @@ export class SliceGame {
         this.coopPaused = true; this.started = false; this.coop.occupy(null);
         this.audio.setActive(false); this.world.cancelGrapple(); this.input.releaseAll();
         this.setView('coop-pause');
-        this.menu.innerHTML = `<div class="menu-card pause-card"><span class="eyebrow">CO-OP / MOCK TEST CHAMBER</span><h2>${this.world.room.title}</h2><p>Room ${this.coop.room?.code ?? 'connecting'} · You are Player ${this.coop.slot ?? '…'}</p><p>Your slot and shared checkpoint stay saved when you leave.</p><button id="continue" class="primary">CONTINUE ${this.world.room.title}</button><button id="leave-coop">LEAVE ROOM / SINGLE PLAYER</button><p class="fine">A / D move · Space jump · E interact<br>Hold click to hook · R resets only you</p></div>`;
+        this.menu.innerHTML = `<div class="menu-card pause-card"><span class="eyebrow">CO-OP / MOCK TEST CHAMBER</span><h2>${this.world.room.title}</h2><p>Room ${this.coop.room?.code ?? 'connecting'} · You are Player ${this.coop.slot ?? '…'}</p><p>Your slot and shared checkpoint stay saved when you leave.</p><button id="continue" class="primary">CONTINUE ${this.world.room.title}</button><button id="leave-coop">LEAVE ROOM / SINGLE PLAYER</button><p class="fine">A / D move / swing · Tap Space to jump · E interact<br>Hold Space again in air to grapple · Release to jump off<br>Hold click for precise grappling · R resets only you</p></div>`;
         this.menu.querySelector('#continue')!.addEventListener('click', () => this.resumeRoom());
         this.menu.querySelector('#leave-coop')!.addEventListener('click', () => this.leaveCoop());
         this.menu.querySelector<HTMLButtonElement>('#continue')!.focus();
@@ -698,8 +698,9 @@ export class SliceGame {
             else if (!this.inspector.element.hidden || this.nativeInspectorOpen) this.closeInspector();
             else if (this.started || this.overviewVisible) this.showMenu();
         }
-        if (this.started && this.input.takeAction('reset'))
-            this.world.respawn();
+        if (this.started && this.input.takeAction('reset')) {
+            this.world.respawn(); this.input.releaseAll();
+        }
         const aim = this.renderer.camera.screenToWorld(this.input.screenAim.x, this.input.screenAim.y);
         this.input.sync(aim);
         if (this.overviewVisible && this.inspector.element.hidden) {
@@ -714,10 +715,12 @@ export class SliceGame {
                 const e = this.input.takeEdges();
                 this.input.state.jumpPressed = e.jump;
                 this.input.state.airGrapplePressed = e.airGrapple;
+                this.input.state.airGrappleReleased = e.airGrappleReleased;
                 this.input.state.grapplePressed = e.grapple;
                 this.world.step(FIXED_DT, this.input.state, e.interact);
                 this.accumulated -= FIXED_DT;
                 const events = this.world.events.splice(0);
+                if (events.some(event => event.kind === 'death')) this.input.releaseAll();
                 this.sound.observe(this.world, events);
                 for (const event of events) {
                     if (event.kind === 'crumble')

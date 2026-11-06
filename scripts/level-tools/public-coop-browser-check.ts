@@ -158,8 +158,10 @@ try {
         const stopped = once(h.app!, 'exit'); h.app!.kill('SIGTERM'); await stopped;
         origin = await h.startServer(Number(new URL(origin).port));
         await guest.send('Page.navigate', { url: `${origin}custom-level.html?code=${code}` });
-        await until(guest, '!!document.querySelector("#status")?.textContent.includes("server restart")');
-        check('server restart terminates temporary sessions with an understandable message', true);
+        await until(guest, '!!document.querySelector("#status")?.textContent.includes("Party not found")');
+        const expired = await observation(guest);
+        check('server restart terminates temporary sessions with an understandable message', !expired.ready && !expired.session.room
+            && await guest.read('document.querySelector("#status").textContent.includes("new invitation link")'));
     }
     for (const p of pages) if (p.errors.length) throw new Error(p.errors.join('\n'));
     await writeFile(join(reports, 'checks.json'), JSON.stringify({ pass: true, origin, checks, savedHash, testHash, measured }, null, 2) + '\n');

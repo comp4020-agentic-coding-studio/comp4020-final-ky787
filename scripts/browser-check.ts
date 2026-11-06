@@ -303,6 +303,7 @@ async function jumpTo(cdp: Cdp, x: number, groundId: string): Promise<void> {
     }
 }
 async function shot(cdp: Cdp, name: string): Promise<void> {
+    if (process.env.BN_SHOT_FILTER && !new RegExp(process.env.BN_SHOT_FILTER).test(name)) return;
     const capture = async (label: string) => {
         const res = await cdp.send('Page.captureScreenshot', { format: 'png' }) as { data?: string };
         if (res.data) writeFileSync(join(SHOTS, `${label}.png`), Buffer.from(res.data, 'base64'));
@@ -345,22 +346,20 @@ async function cross(cdp: Cdp, anchorX: number, keyboard = false, anchorY = 226)
     const before = (await snap(cdp)).deaths;
     await key(cdp, 'keyDown', 'KeyD');
     if (keyboard) {
-        await mouseAt(cdp, anchorX, anchorY, 'mouseMoved');
         await tap(cdp, 'Space'); // Jump from the near bank.
         check('ground Space jumps without firing a hook', (await snap(cdp)).player.rope.phase === 'idle');
-        await mouseAt(cdp, anchorX, anchorY, 'mouseMoved');
-        check('air hook uses visible target preview', await evaluate(cdp, '!!binaryNinja.world.target(binaryNinja.input.state.aim)'));
-        await tap(cdp, 'Space'); // Catch the ring; releasing the key keeps it attached.
+        check('air hook uses visible target preview', await evaluate(cdp, '!!binaryNinja.world.selectedTarget(binaryNinja.input.state.aim)'));
+        await key(cdp, 'keyDown', 'Space'); // Hold the automatically selected hook.
     } else {
         // Deliberate takeoff gives the mouse-hook route a repeatable launch;
         // reeling from a standstill can settle before its release waypoint.
         await tap(cdp, 'Space'); await mouseAt(cdp, anchorX, anchorY);
     }
     await waitFor(cdp, 'hook attachment', s => s.player.rope.phase === 'attached');
-    if (keyboard) check('tapped airborne Space latches the hook', (await snap(cdp)).keyboardGrapple);
+    if (keyboard) check('held airborne Space owns the hook', (await snap(cdp)).keyboardGrapple);
     await waitFor(cdp, 'rightward release point', s => s.player.x > anchorX + 90 && s.player.y < anchorY + 284 && s.player.vx > 0);
     await shot(cdp, `swing-${(await snap(cdp)).room}`);
-    if (keyboard) await tap(cdp, 'Space');
+    if (keyboard) await key(cdp, 'keyUp', 'Space');
     else await mouseAt(cdp, anchorX, anchorY, 'mouseReleased');
     await waitFor(cdp, 'far bank', s => s.player.x > 965 && s.player.grounded);
     await key(cdp, 'keyUp', 'KeyD');
@@ -537,7 +536,8 @@ async function ropeReturn(cdp: Cdp, testRecovery = false) {
         { id: 'proven-clone', x: 800, y: 116 },
     ];
     for (const a of anchors) {
-        await mouseAt(cdp, a.x, a.y);
+        if (testRecovery) await mouseAt(cdp, a.x, a.y);
+        else await key(cdp, 'keyDown', 'Space');
         await waitFor(cdp, `rope to ${a.id}`, s => s.player.rope.anchorId === a.id);
         check(`final rope chain uses ${a.id}`, (await snap(cdp)).player.rope.phase === 'attached');
         if (a.id === 'proven-clone') {
@@ -561,12 +561,13 @@ async function ropeReturn(cdp: Cdp, testRecovery = false) {
         if (a.id === 'return-high') check('upper rope clears the lift volume', (await snap(cdp)).player.y + 17 < 580);
         await shot(cdp, `control-spine-rope-${a.id}`);
         if (!testRecovery) {
-            await tap(cdp, 'Space');
+            await key(cdp, 'keyUp', 'Space'); await sleep(55);
             const jumped = await snap(cdp);
-            check(`Space jumps off ${a.id} with sideways carry`, jumped.player.rope.phase !== 'attached' && jumped.player.ropeJumpAnchors.includes(a.id) && jumped.player.vy < 0 && jumped.player.vx < 0);
+            check(`Space release jumps off ${a.id} with sideways carry`, jumped.player.rope.phase !== 'attached' && jumped.player.ropeJumpAnchors.includes(a.id) && jumped.player.vy < 0 && jumped.player.vx < 0);
             if (a.id === 'return-high') await shot(cdp, 'control-spine-rope-jump');
         }
-        await mouseAt(cdp, a.x, a.y, 'mouseReleased'); await sleep(70);
+        if (testRecovery) await mouseAt(cdp, a.x, a.y, 'mouseReleased');
+        await sleep(70);
     }
     const landing = await waitFor(cdp, 'return exit landing', s => s.player.groundId === 'uplink-deck' || s.ended || (testRecovery && s.player.groundId === 'return-catch'));
     if (landing.player.groundId === 'return-catch') {

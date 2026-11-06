@@ -3,6 +3,7 @@ import { CUBE_SIZE, CODE_SLAB_HEIGHT } from './tuning.ts';
 import { CARRY, GRAPPLE, PLAYER } from '../engine/constants.ts';
 import { boxesOverlap, clamp, raycastBoxes, type Vec2 } from '../engine/geometry.ts';
 import { createPlayer, playerBox, releaseRope, stepBody, stepPlayer, findGrappleTarget, type InputState, type LooseBody, type Solid } from '../engine/physics.ts';
+import { assistedGrappleTarget } from '../engine/grapple-targeting.ts';
 import { type MachineSignal, type ControllerInputs, type ControllerFrame, type RoomController } from './controller.ts';
 import type { RoomMemory } from './progress.ts';
 import type { Platform, RoomDef } from './rooms.ts';
@@ -107,6 +108,8 @@ export class PuzzleWorld {
     get groundedOnPartnerCube() { return this.player.grounded && !!this.player.groundId?.startsWith('partner-cube-support'); }
     get cubeResetting() { return this.authority?.cube?.resetting ?? false; }
     keyboardGrapple = false;
+    private assistedTargetId: string | null = null;
+    private manualAim = false;
     private cubeSolids: CubeMap<Solid> = {};
     doorOpen = 0;
     displayPulse = 0;
@@ -352,29 +355,36 @@ export class PuzzleWorld {
     cancelGrapple(): void {
         for (const [id] of cubeEntries(this.cubes)) this.cubeAuthority(id)?.cancelPull();
         this.keyboardGrapple = false;
+        this.assistedTargetId = null;
+        this.manualAim = false;
         this.pullingCube = false;
         releaseRope(this.player, false);
     }
     private keyboardHook(input: InputState): void {
+        this.manualAim = !!input.manualAim;
+        input.ropeJumpReleased = false;
         if (input.grapplePressed) this.keyboardGrapple = false; // Mouse takes ownership.
+        const p = this.player;
+        if (this.keyboardGrapple && (input.airGrappleReleased || !input.airGrappleHeld)) {
+            // A real release of this rope owns the deliberate hop. Lost input
+            // (blur/pause/reset) only detaches; it must never synthesize keyup.
+            input.ropeJumpReleased = !!input.airGrappleReleased && !input.down && !input.airGrappleReleaseDown && !p.grounded && p.rope.phase === 'attached';
+            this.keyboardGrapple = false;
+            input.grappleHeld = false;
+            input.grapplePressed = false;
+            input.jumpPressed = false;
+            p.jumpBuffer = 0;
+            return;
+        }
         if (input.airGrapplePressed) {
-            const p = this.player;
-            if (p.rope.phase === 'attached') {
-                // Route keyboard and mouse-held ropes through the same jump physics.
-                this.keyboardGrapple = false;
+            if (p.rope.phase === 'attached' && !this.keyboardGrapple) {
+                // A mouse-owned rope retains its optional keyboard jump-off.
                 input.jumpPressed = true;
                 input.grappleHeld = true;
                 return;
             }
-            if (p.rope.phase === 'firing') {
-                this.keyboardGrapple = false;
-                releaseRope(p);
-                input.jumpPressed = false;
-                input.grappleHeld = false;
-                p.jumpBuffer = 0;
-                return;
-            }
-            const target = !p.grounded ? this.target(input.aim) : null;
+            const target = !p.grounded && p.coyote <= 0 && input.airGrappleHeld && !input.airGrappleReleased
+                && (p.rope.phase === 'idle' || p.rope.phase === 'retracting') ? this.selectedTarget(input.aim) : null;
             if (target) {
                 // Exactly the same probe as the pre-click hint, never an arbitrary surface.
                 this.keyboardGrapple = true;
@@ -384,7 +394,7 @@ export class PuzzleWorld {
                 p.jumpBuffer = 0;
             }
         }
-        if (this.keyboardGrapple) input.grappleHeld = true;
+        if (this.keyboardGrapple) { input.grappleHeld = true; input.jumpPressed = false; }
     }
     cubeReachable(id: CubeId): boolean {
         const c = this.cubes[id]; if (!c) return false;
@@ -433,11 +443,13 @@ export class PuzzleWorld {
         this.samplePlate();
         this.evaluate();
         for (const machine of [...this.lifts, ...this.gates]) machine.step(dt);
+        if (input.left !== input.right) this.player.facing = input.right ? 1 : -1;
         this.keyboardHook(input);
         if (this.keyboardGrapple) { for (const [id] of cubeEntries(this.cubes)) this.cubeAuthority(id)?.cancelPull(); this.pullingCube = false; }
         else this.hookCube(input);
         if (this.pullingCube) {
             input.grappleHeld = false;
+            input.ropeJumpReleased = false;
             input.grapplePressed = false;
         }
         for (const [id, c] of cubeEntries(this.cubes)) if (!c.carried && (!this.cubeAuthority(id) || this.cubeAuthority(id)!.simulates)) {
@@ -457,6 +469,7 @@ export class PuzzleWorld {
         this.updateCubeSolid();
         const field = this.lifts.map(l => l.influence(this.player, PLAYER.width, PLAYER.height)).find(Boolean);
         if (field) {
+            input.ropeJumpReleased = false;
             this.keyboardGrapple = false;
             releaseRope(this.player, false);
             input.grapplePressed = false;
@@ -549,6 +562,14 @@ export class PuzzleWorld {
         }
     }
     target(aim: Vec2) { return this.room.id === 'pressure' ? null : findGrappleTarget(this.player, aim, this.solids, this.player.groundId); }
+    /** One selection policy shared by the visible marker and keyboard hook. */
+    selectedTarget(aim: Vec2) {
+        if (this.room.id === 'pressure') return null;
+        if (this.manualAim) return this.target(aim);
+        const target = assistedGrappleTarget(this.player, this.solids, this.assistedTargetId);
+        this.assistedTargetId = target?.solid.id ?? null;
+        return target;
+    }
     /** Apply accepted state even while menus or a reconnect pause local simulation. */
     syncAuthority(): void { if (this.authority) { this.syncCubes(); this.authority.crumble?.sync(this); this.evaluate(); this.alignPayloads(); } }
 }

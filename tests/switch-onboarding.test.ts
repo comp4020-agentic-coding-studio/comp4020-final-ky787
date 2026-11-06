@@ -12,22 +12,22 @@ function fixture(powered = true) {
     Object.assign(w.player, { x: 415, y: 543 });
     w.step(FIXED_DT, emptyInput());
     const cue = new SwitchOnboarding(); cue.reset(w.room.id);
-    const observe = (cursor = aim, dt = FIXED_DT, running = true, motion = true) => cue.update(w, w.target(cursor), dt, running, motion);
+    const observe = (cursor = aim, dt = FIXED_DT, running = true, motion = true) => cue.update(w, w.selectedTarget(cursor), dt, running, motion);
     return { w, cue, observe };
 }
 
 describe('SWITCH grapple onboarding', () => {
-    it('waits for the powered anchor and distinguishes genuine targeting from mouse movement', () => {
+    it('waits for a powered, reachable anchor and teaches without mouse movement', () => {
         const { w, cue, observe } = fixture(false);
         observe(); expect(cue.stage).toBe('hidden');
         w.player.x = 300; w.interact();
-        observe({ x: 300, y: 400 }); expect(cue.stage).toBe('aim');
-        // Cursor on the anchor is insufficient outside the existing grapple range.
-        w.player.x = 130; observe(); expect(cue.stage).toBe('aim');
+        observe({ x: 300, y: 400 }); expect(cue.stage).toBe('approach');
+        // An anchor outside the existing range cannot be selected automatically.
+        w.player.x = 130; observe(); expect(cue.stage).toBe('approach');
         w.player.x = 415;
-        expect(w.target(aim)?.solid.id).toBe('anchor');
+        expect(w.selectedTarget({ x: 0, y: 0 })?.solid.id).toBe('anchor');
         observe(); expect(cue.stage).toBe('targeted');
-        observe({ x: 300, y: 400 }); expect(cue.stage).toBe('aim');
+        observe({ x: 0, y: 0 }); expect(cue.stage).toBe('targeted');
         expect(cue.snapshot().learned).toBe(false);
         w.player.x = 300; w.interact(); observe(); expect(cue.stage).toBe('hidden');
     });
@@ -35,18 +35,24 @@ describe('SWITCH grapple onboarding', () => {
     it('confirms only a real rope attachment after jump then air-grapple, and retires once', () => {
         const { w, cue, observe } = fixture();
         observe(); expect(cue.stage).toBe('targeted');
-        w.step(FIXED_DT, { ...emptyInput(), jumpPressed: true, airGrapplePressed: true, aim });
+        const held = { ...emptyInput(), jumpHeld: true, airGrappleHeld: true };
+        w.step(FIXED_DT, { ...held, jumpPressed: true, airGrapplePressed: true });
         observe(); expect(w.player.grounded).toBe(false); expect(cue.snapshot().learned).toBe(false);
-        w.step(FIXED_DT, { ...emptyInput(), airGrapplePressed: true, aim });
+        w.step(FIXED_DT, { ...emptyInput(), airGrappleReleased: true });
+        w.step(FIXED_DT, { ...held, jumpPressed: true, airGrapplePressed: true });
         observe(); expect(w.player.rope.phase).toBe('firing'); expect(cue.snapshot().learned).toBe(false);
         for (let i = 0; i < 90 && w.player.rope.phase !== 'attached'; i++) {
-            w.step(FIXED_DT, { ...emptyInput(), aim }); observe();
+            w.step(FIXED_DT, held); observe();
         }
         expect(w.player.rope.phase).toBe('attached');
         expect(cue.snapshot()).toMatchObject({ stage: 'attached', learned: true });
         const confirmed = cue.snapshot().confirmation;
         observe(aim, 30, false); expect(cue.snapshot().confirmation).toBe(confirmed);
-        w.cancelGrapple(); observe(aim, 1); expect(cue.stage).toBe('attached');
+        observe(aim, 30); expect(cue.snapshot().confirmation).toBe(confirmed);
+        expect(cue.stage).toBe('attached'); // A long first swing keeps release instructions visible.
+        w.step(FIXED_DT, { ...emptyInput(), airGrappleReleased: true });
+        expect(w.player.rope.phase).toBe('retracting');
+        observe(aim, 1); expect(cue.stage).toBe('attached');
         observe(aim, 2); expect(cue.stage).toBe('complete');
         w.respawn(); observe(); expect(cue.stage).toBe('complete');
     });
@@ -58,17 +64,19 @@ describe('SWITCH grapple onboarding', () => {
         for (const id of ['pressure', 'relay', 'uplink'] as const) {
             cue.reset(id);
             const other = new PuzzleWorld(roomById(id), freshProgress().rooms[id]);
-            cue.update(other, other.target(aim), 1, true, true);
+            cue.update(other, other.selectedTarget(aim), 1, true, true);
             expect(cue.stage).toBe('hidden');
         }
         cue.reset(w.room.id, ['switch']); observe(); expect(cue.stage).toBe('targeted');
     });
 
     it('freezes presentation while paused and gives reduced motion a stable readable highlight', () => {
-        const { cue, observe } = fixture();
-        observe({ x: 0, y: 0 }); expect(cue.stage).toBe('aim');
+        const { w, cue, observe } = fixture();
+        w.player.x = 130;
+        observe(); expect(cue.stage).toBe('approach');
         const pulse = cue.pulse(true);
-        observe(aim, 10, false); expect(cue.stage).toBe('aim'); expect(cue.pulse(true)).toBe(pulse);
+        w.player.x = 415;
+        observe(aim, 10, false); expect(cue.stage).toBe('approach'); expect(cue.pulse(true)).toBe(pulse);
         observe(aim, 10, true, false); expect(cue.stage).toBe('targeted'); expect(cue.pulse(true)).toBe(pulse);
         expect(cue.pulse(false)).toBe(.5);
     });

@@ -94,8 +94,9 @@ can name an executable). No LLM service or subscription is involved.
 3. Switch to **State preview**. Choose a saved input configuration or change device
    inputs. The resolved state drives ghosts, wires and machinery. Forced-output
    diagnostics are labelled separately and are not a gameplay result.
-4. **Play from spawn** runs the actual engine. A/D or arrows move, Space jumps,
-   click holds a grapple, E carries/uses, and R resets. Stop restores the authored
+4. **Play from spawn** runs the actual engine. A/D or arrows move/swing. Tap Space to jump, hold a second airborne press to
+   grapple the highlighted anchor, then release to jump off (S + release detaches).
+   Click-and-hold preserves precise mouse grappling. E carries/uses, and R resets. Stop restores the authored
    document, selection and editor camera. Inspect/export the measured path.
 5. Save directly to `levels/drafts`. To test together, choose **TEST WITH FRIEND**.
    Share its four-character room code with a separate browser profile or private

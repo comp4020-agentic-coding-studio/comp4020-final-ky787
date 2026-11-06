@@ -118,7 +118,7 @@ async function launchDeck(p: Cdp) {
     check('failed swing preserves delivered cargo and trace power', state(afterFall).cubePlacements.cubeA === 'receiver' && state(afterFall).levelState.outputs.phaseA);
     await align(runner, 705);
     const traversalDeaths = (await snapshot(runner)).deaths;
-    await key(runner, 'KeyD', true); await mouse(runner, 1005, 365, true);
+    await key(runner, 'KeyD', true); await tap(runner, 'Space'); await key(runner, 'Space', true);
     await wait(runner, 'hook 1', s => s.player.rope.anchorId === 'span1');
     check('first substantial grapple attached', true);
     const anchors = [{id:'crumbleA', x:1505, y:305}, {id:'span3',x:2005,y:365}, {id:'crumbleB',x:2505,y:305}, {id:'span5',x:3005,y:365}];
@@ -126,8 +126,8 @@ async function launchDeck(p: Cdp) {
         await wait(runner, 'forward swing for transfer', s => s.player.x > s.player.rope.anchor.x + 90 && s.player.vx > 450 && s.player.vy < 0, 3500);
         await tap(operator, 'KeyE');
         await wait(runner, 'accepted next phase', s => state(s).levelState.inputs.phase === (i % 2 === 0));
-        await tap(runner, 'Space'); await mouse(runner, target.x, target.y, false);
-        await mouse(runner, target.x, target.y, true);
+        await key(runner, 'Space', false); await sleep(55);
+        await key(runner, 'Space', true);
         await wait(runner, `catch ${target.id}`, s => s.player.rope.anchorId === target.id, 3000);
         if (target.id === 'crumbleA' || target.id === 'crumbleB') {
             await wait(operator, 'shared unstable fuse', s => state(s).levelState.platforms[target.id as 'crumbleA' | 'crumbleB'].phase === 'warning');
@@ -137,9 +137,9 @@ async function launchDeck(p: Cdp) {
         const operatorView = (await snapshot(operator)).camera;
         check(`phase handover to ${target.id} keeps the operator frame stable`, operatorView.kind === 'plate' && JSON.stringify(operatorView.frame) === spanFrame);
     }
-    check('all four deliberate transfers retain the airborne chain', (await snapshot(runner)).player.ropeJumpAnchors.join(',') === 'span1,crumbleA,span3,crumbleB');
+    check('all four keyboard release transfers retain the airborne chain', (await snapshot(runner)).player.ropeJumpAnchors.join(',') === 'span1,crumbleA,span3,crumbleB');
     await wait(runner, 'last arc', s => s.player.x > s.player.rope.anchor.x + 90 && s.player.vx > 450 && s.player.vy < 0, 3500);
-    await tap(runner, 'Space'); await mouse(runner, 3005,365,false);
+    await key(runner, 'Space', false);
     await wait(runner, 'right deck landing', s => s.player.groundId === 'right-deck', 4000);
     await key(runner,'KeyD',false); await sleep(160); await shot(runner,'right-deck');
     check('runner crossed all five blocks, no floor or death shortcut', (await snapshot(runner)).deaths === traversalDeaths);

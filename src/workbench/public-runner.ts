@@ -76,20 +76,23 @@ function observe() {
 }
 // Observations are detached data. No world, controller, transport or editor mutation API.
 Object.defineProperty(window, 'customLevel', { value: Object.freeze({ observe }) });
+let wasActive = false;
 function frame(now: number) {
     const dt = Math.min(MAX_FRAME_TIME, Math.max(0, (now - (last || now)) / 1000)); last = now;
     const w = session.world, c = session.client;
     if (w) {
         if (w !== lastWorld) { lastWorld = w; renderer.room(w); sound.reset(w); accumulated = 0; input.releaseAll(); canvas.focus(); }
         const active = c.playing && !completed;
+        if (active !== wasActive) { input.setEnabled(active); wasActive = active; }
+        if (!active) w.cancelGrapple();
         audio.setActive(active && !document.hidden && document.hasFocus());
         input.sync(renderer.camera.screenToWorld(input.screenAim.x, input.screenAim.y));
-        if (active && input.takeAction('reset')) w.respawn();
+        if (active && input.takeAction('reset')) { w.respawn(); input.releaseAll(); }
         accumulated = active ? accumulated + dt : 0;
         while (accumulated >= FIXED_DT) {
-            const edges = input.takeEdges(); input.state.jumpPressed = edges.jump; input.state.grapplePressed = edges.grapple; input.state.airGrapplePressed = edges.airGrapple;
+            const edges = input.takeEdges(); input.state.jumpPressed = edges.jump; input.state.grapplePressed = edges.grapple; input.state.airGrapplePressed = edges.airGrapple; input.state.airGrappleReleased = edges.airGrappleReleased;
             session.step(FIXED_DT, input.state, edges.interact); accumulated -= FIXED_DT;
-            const events = w.events.splice(0); sound.observe(w, events);
+            const events = w.events.splice(0); if (events.some(e => e.kind === 'death')) input.releaseAll(); sound.observe(w, events);
             for (const event of events) {
                 if (event.kind === 'crumble') renderer.particles.shatter(event.at.x, event.at.y, 140, 32, '#f9ba68');
                 else renderer.particles.burst(event.at.x, event.at.y, 10, event.cause === 'firewall' ? '#ff943e' : '#64e6d5', 120);

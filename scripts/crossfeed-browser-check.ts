@@ -86,17 +86,17 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     const deaths = (await snapshot(p)).deaths;
     await key(p, move, true);
     await key(p, 'Space', true); await wait(p, 'launch jump clears the lift / gallery', s => s.player.y < (side === 'left' ? 650 : 550)); await key(p, 'Space', false);
-    await mouse(p, anchors[0].x, anchors[0].y, true);
+    await key(p, 'Space', true);
     await wait(p, `${side} first hook with cargo`, s => s.player.rope.anchorId === anchors[0].id);
     for (const target of anchors.slice(1)) {
         await wait(p, `${side} swing release arc`, s => (s.player.x - s.player.rope.anchor.x) * direction > 90 && s.player.vx * direction > 450 && s.player.vy < 0, 4000);
-        await tap(p, 'Space'); await mouse(p, target.x, target.y, false); await mouse(p, target.x, target.y, true);
+        await key(p, 'Space', false); await sleep(55); await key(p, 'Space', true);
         await wait(p, `${side} catch ${target.id}`, s => s.player.rope.anchorId === target.id, 3500);
         check(`${id} stays accepted while swinging from ${target.id}`, (await snapshot(p)).cubes[id]!.carried && state(await snapshot(p)).cubes[id]!.holder === (await snapshot(p)).multiplayer!.slot);
         if (target.id.startsWith('crumble')) await wait(operator, `partner sees ${target.id} warning`, s => state(s).levelState.platforms[target.id as 'crumbleA' | 'crumbleB'].phase === 'warning');
     }
     await wait(p, `${side} final release arc`, s => (s.player.x - s.player.rope.anchor.x) * direction > 90 && s.player.vx * direction > 350 && s.player.vy < 0, 4000);
-    await mouse(p, anchors[2].x, anchors[2].y, false);
+    await key(p, 'KeyS', true); await key(p, 'Space', false); await sleep(20); await key(p, 'KeyS', false);
     // Ordinary air steering brakes the landing, leaving the payload above its holder.
     for (let n = 0; n < 180; n++) {
         const s = await snapshot(p); if (s.player.grounded) break;
@@ -105,7 +105,7 @@ async function swing(p: Cdp, operator: Cdp, side: 'left' | 'right', id: CubeId) 
     }
     await key(p, 'KeyA', false); await key(p, 'KeyD', false);
     await wait(p, `${side} vault cargo landing`, s => s.player.groundId === 'vault-cargo-deck', 2000);
-    check(`${side} three-hook cargo route has no death/reset shortcut`, (await snapshot(p)).deaths === deaths && (await snapshot(p)).cubes[id]!.carried);
+    check(`${side} three-hook keyboard cargo route has no death/reset shortcut`, (await snapshot(p)).deaths === deaths && (await snapshot(p)).cubes[id]!.carried);
 }
     h.scenario = reverse ? '[reversed roles] ' : '[full chamber] '; h.shotPrefix = reverse ? 'reverse-' : 'full-';
     const [a, b] = partyPlayers ?? [await h.page(url, debug), await h.page(url, debug)];

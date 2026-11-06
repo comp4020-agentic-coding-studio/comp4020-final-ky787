@@ -1,0 +1,345 @@
+Base e61466fefca0c7bfb42c5357c732b7af6a85d354; working tree with simplified controls.
+pnpm typecheck: PASS
+pnpm build: PASS (existing chunk-size advisory)
+Integrated unit suite: 947 PASS / 2 skipped; final focused controls: 52 PASS.
+All original UAF scenario assertions and physical wait conditions retained.
+
+pnpm check:switch-onboarding (final build)
+PASS PRESSURE uses real carry input
+PASS unpowered SWITCH has no premature grapple instruction
+PASS tap and hold instructions are visible above the jump path
+PASS 1366×768 instructions stay inside the canvas
+PASS 1024×768 instructions stay inside the canvas
+PASS reduced motion keeps the instructions visible
+PASS automatic highlight alone does not mark grappling learned
+PASS no gameplay pointer movement was needed
+PASS first Space tap jumps without firing the rope
+PASS attached instructions teach swing and release
+PASS actual grapple is persisted by existing mechanic events
+PASS keyup produces the bounded rope jump without a third press
+PASS complete SWITCH gap traversal has no deaths
+PASS retired onboarding does not leave its text behind
+PASS touch jump/hold/swing/release crosses without a death
+PASS paused release neither moves the player nor spends a rope jump
+PASS resume cannot replay the paused release as a jump
+PASS browser reports no errors
+
+pnpm check:browser
+PASS audio waits for the first real gesture
+PASS new visitor starts at pressure
+PASS title screen exposes Tutorial, Play Co-op and Level Builder without a room grid
+PASS Play Co-op is keyboard accessible from Tutorial
+PASS Level Builder is keyboard accessible from the main menu
+PASS builder opens its own destination with both tools
+PASS My Levels is keyboard accessible inside Level Builder
+PASS all audio assets decode without errors
+PASS selecting UPLINK does not complete skipped rooms
+PASS UPLINK direct room selection: validated state 0
+PASS reload continues the selected room
+PASS level select returns to an unfinished tutorial
+PASS cube carried
+PASS cube holds plate after player leaves
+PASS cube and plate interactions play sounds
+PASS inactive anchor has no collision or hook
+PASS switch enables anchor immediately
+PASS switch can be turned off
+PASS pit respawns quickly without losing switch progress
+PASS ground Space jumps without firing a hook
+PASS air hook uses visible target preview
+PASS held airborne Space owns the hook
+PASS switch physical grapple crossing — x=1115
+PASS cube pulls toward player without attaching player
+PASS pulled cube can be carried
+PASS relay physical grapple crossing — x=1139
+PASS bridge locks but exit still requires Plate B
+PASS relay bridge lever cannot switch back off
+PASS return bridge supports player
+PASS checkpoint reset keeps solved machinery
+PASS reload offers CONTINUE — RELAY
+PASS reload restores checkpoint, plate and bridge
+PASS retrieve cube from A across permanent bridge
+PASS removing cube disables anchor but keeps bridge and closed exit
+PASS cube transferred to B opens the exit
+PASS reload restores cube at B with bridge and exit open
+PASS player stands on cube while it holds Plate B
+PASS crumble does not kill player
+PASS debug exposes mock inputs and persistence
+PASS three tutorial rooms complete
+PASS opening overview waits indefinitely without moving the player
+PASS Space starts the chamber without also jumping
+PASS UPLINK entry: validated state 0
+PASS real assembly inspector pauses play and shows PE provenance
+PASS unstable anchor inspector retains proof assumptions and real clone assembly
+PASS UPLINK anchor active: validated state 1
+PASS anchor uses immediate retained output
+PASS Plate A wire powers the crossing machinery
+PASS uplink physical grapple crossing — x=1125
+PASS UPLINK relay power sets far checkpoint
+PASS relay power uses its sci-fi activation cue
+PASS UPLINK relay power can toggle OFF
+PASS UPLINK reload preserves initial cube and powered gate
+PASS UPLINK far reload: validated state 3
+PASS UPLINK player gate B to A
+PASS UPLINK retrieve initial payload
+PASS UPLINK carried payload reaches far gate
+PASS both relay trips play a teleport cue
+PASS UPLINK cube B powers lift and anchor turns off
+PASS powered lift has one audible local hum
+PASS menu pauses machinery audio
+PASS background tab silences lift and reel
+PASS UPLINK upper switch latches lift but needs payload
+PASS lift power and its latch have distinct cues
+PASS UPLINK upper latch cannot be undone
+PASS UPLINK upper checkpoint restores cube holding B
+PASS UPLINK upper reload: validated state 14
+PASS UPLINK retrieve B after latching the lift
+PASS lift wiring shows the latch retaining power after B is freed
+PASS CONTROL SPINE second lift ride carries the payload
+PASS CONTROL SPINE player alone on C cannot unlock the return
+PASS CONTROL SPINE retains its authored temporary return framing
+PASS UPLINK payload activates route without remote completion
+PASS UPLINK payload delivered: validated state 26
+PASS Tab overrides CONTROL SPINE automatic framing
+PASS expired CONTROL SPINE reveal returns to player following
+PASS one retained signal powers four return anchors and the catch deck
+PASS final rope chain uses upper-route
+PASS Space release jumps off upper-route with sideways carry
+PASS final rope chain uses return-mid
+PASS Space release jumps off return-mid with sideways carry
+PASS final rope chain uses return-high
+PASS upper rope clears the lift volume
+PASS Space release jumps off return-high with sideways carry
+PASS final rope chain uses return-near
+PASS Space release jumps off return-near with sideways carry
+PASS final rope chain uses proven-clone
+PASS unstable anchor warns when loaded by the rope
+PASS Space release jumps off proven-clone with sideways carry
+PASS UPLINK full retrieval route has no deaths
+PASS rope jumps and the final transformation play decoded audio
+PASS final door transformation coalesces the simultaneous code activation
+PASS four-room completion saved
+PASS reload restores UPLINK latch, payload and final route
+PASS UPLINK Node C reload: validated state 26
+PASS final rope chain uses upper-route
+PASS final rope chain uses return-mid
+PASS final rope chain uses return-high
+PASS upper rope clears the lift volume
+PASS final rope chain uses return-near
+PASS final rope chain uses proven-clone
+PASS unstable anchor warns when loaded by the rope
+PASS unstable hook failure preserves C and lands safely
+PASS catch deck offers a normal jump onto the exit shelf
+PASS unstable recovery completes the rope route without a death reset
+PASS unstable anchor plays warning and break cues
+PASS selecting a completed room restores its checkpoint and cube
+PASS returning to UPLINK keeps upper latch and final payload
+PASS UPLINK return through level select: validated state 26
+PASS compact menu selects rooms with saved switch state
+PASS reset asks for confirmation and focuses Cancel
+PASS cancel reset preserves all progress without a save write
+PASS Escape cancels reset and keeps the menu paused
+PASS confirmed reset clears every room, checkpoint, mechanic and event
+PASS reload retains reset and anonymous visitor identity
+PASS reset clears CONTROL SPINE latch, cargo and validated output frame
+PASS UPLINK reset CONTROL SPINE: validated state 0
+PASS mute is accessible and stops all sound
+PASS volume slider works with keyboard controls
+PASS reload retains mute and volume separately from game progress
+PASS sound can be enabled again
+PASS no console errors
+
+pnpm check:race (forward)
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four keyboard release transfers retain the airborne chain
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [full] browser has no runtime errors
+PASS [full] browser has no runtime errors
+
+pnpm check:crossfeed (forward)
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] walking into the breakpoint does not operate SYSTEM ONLINE
+PASS [full chamber] shared checkpoint does not teleport the waiting partner
+PASS [full chamber] standing beneath the floating SYSTEM ONLINE button cannot press it
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook keyboard cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook keyboard cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] browser has no runtime errors
+PASS [full chamber] browser has no runtime errors
+
+pnpm check:campaign (one complete integrated run)
+PASS public title screen exposes tutorial and co-op without room grids or internal labs
+PASS creator is host; lobby guest waits with no start controls
+PASS guest selection is refused locally
+PASS forged guest request leaves both in lobby
+PASS handshake: two independent visitors retain one party
+PASS handshake: authored-start physical solve with both arrivals
+PASS fresh two-cube world on the existing socket
+PASS fresh two-cube world on the existing socket
+PASS [full chamber] one large chamber, two named cubes, honest mock source
+PASS [full chamber] reachable A pickup accepted and retained before B
+PASS [full chamber] B bridge lets the entry holder leave A
+PASS [full chamber] Cube A temporarily powers lift
+PASS [full chamber] walking into the breakpoint does not operate SYSTEM ONLINE
+PASS [full chamber] shared checkpoint does not teleport the waiting partner
+PASS [full chamber] standing beneath the floating SYSTEM ONLINE button cannot press it
+PASS [full chamber] C leaves lift on after cargo removal without moving partner
+PASS [full chamber] reverse transfer crossing uses rope jump without death
+PASS [full chamber] B firewall reset preserves A and walking carrier
+PASS [full chamber] relay leaves one B in gallery and A below
+PASS [full chamber] real second jump reaches D with roles changed since A
+PASS [full chamber] cubeA stays accepted while swinging from crumbleA
+PASS [full chamber] cubeA stays accepted while swinging from left3
+PASS [full chamber] left three-hook keyboard cargo route has no death/reset shortcut
+PASS [full chamber] one cube does not enable operator return
+PASS [full chamber] party HUD leaves both upper hook routes visible
+PASS [full chamber] reversible selector keeps held camera stable
+PASS [full chamber] cubeB stays accepted while swinging from crumbleB
+PASS [full chamber] cubeB stays accepted while swinging from right3
+PASS [full chamber] right three-hook keyboard cargo route has no death/reset shortcut
+PASS [full chamber] both sockets enable a safe operator return
+PASS [full chamber] exit stays open after both players leave final plates
+PASS [full chamber] one arrival does not complete room
+PASS [full chamber] CROSSFEED completed through real controls
+PASS [full chamber] victory overlay visible
+PASS [full chamber] victory overlay visible
+PASS [full chamber] host gets NEXT, guest waits
+PASS [full chamber] old chamber traffic cannot alter new machinery/cubes
+PASS [full] named payloads and honest mock controller
+PASS [full] DROP A immediately frames cargo for its local operator
+PASS [full] cargo delivered by timed A release / B press
+PASS [full] DROP B frames cargo, while leaving A restores local follow
+PASS [full] local lever reveal does not hijack the runner
+PASS [full] TRACE stays framed beyond the lever timeout
+PASS [full] span firewall respawns only the runner at launch
+PASS [full] failed swing preserves delivered cargo and trace power
+PASS [full] first substantial grapple attached
+PASS [full] crumbleA fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleA
+PASS [full] phase handover to crumbleA keeps the operator frame stable
+PASS [full] real swing catches span3
+PASS [full] phase handover to span3 keeps the operator frame stable
+PASS [full] crumbleB fuse shared at 1.55 seconds
+PASS [full] real swing catches crumbleB
+PASS [full] phase handover to crumbleB keeps the operator frame stable
+PASS [full] real swing catches span5
+PASS [full] phase handover to span5 keeps the operator frame stable
+PASS [full] all four keyboard release transfers retain the airborne chain
+PASS [full] runner crossed all five blocks, no floor or death shortcut
+PASS [full] cube-held RETURN does not force a camera reveal
+PASS [full] Cube B substitutes for a body on RETURN
+PASS [full] one arrival cannot complete
+PASS [full] RACE complete using real controls
+PASS [full] Race now leads to DEADLOCK
+PASS [full] deadlock: two independent visitors retain one party
+PASS [full] deadlock: authored-start physical solve with both arrivals
+PASS [full] use-after-free: two independent visitors retain one party
+PASS [full] pausing the unstable operator releases route power; resume resamples contact without resetting its fuse
+PASS [full] use-after-free: authored-start physical solve with both arrivals
+PASS [full] last chamber shows campaign complete without a fictitious next level
+PASS [full] all five badges saved on same party
+PASS [full] all five badges saved on same party
+PASS [full] restart restores victory and badges
+PASS [full] restart restores victory and badges
+PASS [full] guest has host-disconnected message and no selection
+PASS [full] completed badges remain in selector
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] playing restart keeps chamber/code/progress
+PASS [full] no browser runtime errors
+PASS [full] no browser runtime errors
+
+pnpm check:public-coop
+PASS breakpoint placement creates both slot markers and inspector frame controls
+PASS one undo removes pedestal and both markers
+PASS new breakpoint needs no activation terminal
+PASS two independent visitor identities load the same frozen hash
+PASS invited friend gets gameplay with no editing API
+PASS test information is explicitly read-only
+PASS editing the browser document cannot replace the running snapshot
+PASS test: host stands on the ordinary pressure plate / signals.draft:traversal
+PASS test: partner waits on launch, still powered by host / player.groundId
+PASS test: partner waits on launch, still powered by host / plates.draft:powerPlate
+PASS test: host leaves plate while resting cube holds the route / signals.draft:traversal
+PASS test: host leaves plate while resting cube holds the route / session.sharedCubes.draft:payload.holder
+PASS test: partner brakes onto the far side / player.deaths
+PASS test: walking activates the shared checkpoint before E while the puzzle terminal stays off
+PASS test: host crosses the return bridge / player.deaths
+PASS test: Player 1 respawns at its accepted marker
+PASS test: Player 2 respawns at its accepted marker
+PASS test: partner makes first physical exit arrival / completed
+PASS test: host makes distinct second physical arrival / completed
+PASS test: host makes distinct second physical arrival / player.deaths
+PASS test: host makes distinct second physical arrival / player.deaths
+PASS test: both players complete with real movement, controls, cube handoff and grapple
+PASS test: guest waits for host replay
+PASS returning to editor preserves unsaved work and undo history
+PASS unsaved test document is still undoable
+PASS MY LEVELS survives closing and reopening the browser with the same saved ID
+PASS saved normal play loads the saved canonical map without opening the editor
+PASS guest reconnect resumes its original slot and snapshot
+PASS play: host stands on the ordinary pressure plate / signals.draft:traversal
+PASS play: partner waits on launch, still powered by host / player.groundId
+PASS play: partner waits on launch, still powered by host / plates.draft:powerPlate
+PASS play: host leaves plate while resting cube holds the route / signals.draft:traversal
+PASS play: host leaves plate while resting cube holds the route / session.sharedCubes.draft:payload.holder
+PASS play: partner brakes onto the far side / player.deaths
+PASS play: walking activates the shared checkpoint before E while the puzzle terminal stays off
+PASS play: host crosses the return bridge / player.deaths
+PASS play: Player 1 respawns at its accepted marker
+PASS play: Player 2 respawns at its accepted marker
+PASS play: partner makes first physical exit arrival / completed
+PASS play: host makes distinct second physical arrival / completed
+PASS play: host makes distinct second physical arrival / player.deaths
+PASS play: host makes distinct second physical arrival / player.deaths
+PASS play: both players complete with real movement, controls, cube handoff and grapple
+PASS play: guest waits for host replay
+PASS host replay resets puzzle, cubes and completion with unchanged snapshot and new generation
+PASS custom play leaves official progress unchanged
+PASS returning to MY LEVELS retains the authored map
+PASS production custom sessions write no room records
+PASS server restart terminates temporary sessions with an understandable message
+
+pnpm level:playtest levels/campaign/use-after-free.json --scenario levels/scenarios/use-after-free-recovery.json: PASS (60 steps, both arrivals)
+
+APP_URL=http://127.0.0.1:18116 pnpm test: PASS (3 HTTP tests)
+pnpm check:evidence: PASS
+git diff --check: PASS

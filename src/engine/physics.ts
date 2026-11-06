@@ -2,7 +2,7 @@
  * Player movement, collision and the controlled puzzle rope.
  *
  * Adapted from the previous Binary Ninja game (crit 5, `src/engine/physics.ts`).
- * Kept as they were: the acceleration/friction model, variable-height jump,
+ * Kept as they were: the acceleration/friction model, maximum ground-jump arc,
  * coyote time, jump buffering, one-way landing and drop-through, the speed
  * caps and grapple/rope structure. C8 bounds reel/swing energy and marks targets.
  * Added: full solid boxes
@@ -65,6 +65,8 @@ export interface PlayerState {
   facing: 1 | -1;
   coyote: number;
   jumpBuffer: number;
+  /** Only a ground/coyote jump receives its full ascent regardless of key duration. */
+  groundJumpAscent: boolean;
   dropThrough: number;
   /** Ground solid ignored while dropping through it. */
   dropIgnore: string | null;
@@ -86,6 +88,15 @@ export interface InputState {
   jumpPressed: boolean;
   /** Space-only edge: the C8 world may consume it for a hinted airborne hook. */
   airGrapplePressed?: boolean;
+  /** Space (or the touch jump button), distinct from the W/Up jump aliases. */
+  airGrappleHeld?: boolean;
+  airGrappleReleased?: boolean;
+  /** Down was held at keyup, even if released before the next fixed step. */
+  airGrappleReleaseDown?: boolean;
+  /** World-validated keyboard ownership; consumed without buffering a ground jump. */
+  ropeJumpReleased?: boolean;
+  /** A recent intentional pointer aim overrides automatic anchor selection. */
+  manualAim?: boolean;
   grappleHeld: boolean;
   grapplePressed: boolean;
   reelIn: boolean;
@@ -101,6 +112,12 @@ export function emptyInput(): InputState {
     down: false,
     jumpHeld: false,
     jumpPressed: false,
+    airGrapplePressed: false,
+    airGrappleHeld: false,
+    airGrappleReleased: false,
+    airGrappleReleaseDown: false,
+    ropeJumpReleased: false,
+    manualAim: false,
     grappleHeld: false,
     grapplePressed: false,
     reelIn: false,
@@ -120,6 +137,7 @@ export function createPlayer(x: number, y: number): PlayerState {
     facing: 1,
     coyote: 0,
     jumpBuffer: 0,
+    groundJumpAscent: false,
     dropThrough: 0,
     dropIgnore: null,
     justLanded: false,
@@ -402,6 +420,7 @@ export function canJumpFromRope(p: PlayerState): boolean {
 
 /** Separate from letting go: retain sideways carry and set a bounded jump speed. */
 export function jumpFromRope(p: PlayerState): void {
+  p.groundJumpAscent = false;
   const anchor = canJumpFromRope(p) ? p.rope.anchorId : null;
   releaseRope(p);
   if (anchor === null) return;
@@ -426,6 +445,7 @@ function fireRope(p: PlayerState, dir: Vec2): void {
 }
 
 function attachRope(p: PlayerState, target: GrappleTarget): void {
+  p.groundJumpAscent = false;
   const rope = p.rope;
   rope.phase = "attached";
   rope.anchorId = target.solid.id;
@@ -561,7 +581,8 @@ export function stepPlayer(
 
   // A jump and mouse release may arrive in the same frame. Validate the anchor
   // before consuming the deliberate jump, rather than detaching it first.
-  const ropeJump = input.jumpPressed && p.rope.phase === 'attached';
+  const releaseJump = !!input.ropeJumpReleased && !input.down && !p.grounded && !field && p.rope.phase === 'attached';
+  const ropeJump = (input.jumpPressed || releaseJump) && p.rope.phase === 'attached';
   stepRope(p, ropeJump ? { ...input, grappleHeld: true, grapplePressed: false } : input, solids, dt);
   let attached = p.rope.phase === "attached";
   if (attached) p.airTime += dt;
@@ -593,6 +614,16 @@ export function stepPlayer(
     p.vx = Math.abs(p.vx) <= drop ? 0 : p.vx - Math.sign(p.vx) * drop;
   }
 
+  // Validate live power/hookability before jumping. A keyup never enters the
+  // landing buffer, and a lost/grounded/flying hook cannot create an impulse.
+  if (releaseJump && attached) {
+    if (canJumpFromRope(p)) jumpFromRope(p);
+    else releaseRope(p);
+    attached = false;
+    p.jumpBuffer = 0;
+    p.coyote = 0;
+  }
+
   // Ground jumps keep their usual height; rope jumps are shorter transfer hops.
   if (p.jumpBuffer > 0 && (p.grounded || p.coyote > 0 || attached)) {
     if (attached && !p.grounded) {
@@ -601,6 +632,7 @@ export function stepPlayer(
     } else {
       if (attached) { releaseRope(p); attached = false; }
       p.vy = -PLAYER.jumpVelocity;
+      p.groundJumpAscent = true;
     }
     p.jumpBuffer = 0;
     p.coyote = 0;
@@ -618,9 +650,10 @@ export function stepPlayer(
     }
   }
 
+  if (field || attached || p.vy >= 0) p.groundJumpAscent = false;
   let gravity = PLAYER.gravity;
   if (attached) gravity *= GRAPPLE.attachedGravity;
-  else if (p.vy < 0 && input.jumpHeld) gravity *= PLAYER.jumpHoldGravity;
+  else if (p.vy < 0 && (p.groundJumpAscent || input.jumpHeld)) gravity *= PLAYER.jumpHoldGravity;
   else if (p.vy > 0) gravity *= PLAYER.fallGravity;
   p.vy += (field ? 0 : gravity) * dt;
   if (field) applyVerticalMotion(p, field, dt, dir !== 0);
@@ -697,4 +730,5 @@ export function stepPlayer(
     p.airTime = 0;
     p.ropeJumpAnchors.length = 0;
   }
+  if (p.grounded || p.vy >= 0) p.groundJumpAscent = false;
 }

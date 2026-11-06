@@ -13,6 +13,7 @@ function step(w: PuzzleWorld, seconds: number, input: Partial<InputState> = {}) 
         w.step(FIXED_DT, i);
         i.jumpPressed = false;
         i.airGrapplePressed = false;
+        i.airGrappleReleased = false;
         i.grapplePressed = false;
     }
 }
@@ -229,7 +230,7 @@ describe('C8 physical vocabulary', () => {
 });
 
 describe('C8 playtest revisions', () => {
-    it('ground Space jumps, airborne Space catches the hinted ring, another press jumps off', () => {
+    it('ground Space jumps, held airborne Space catches the selected ring, release jumps off', () => {
         const w = world(1);
         w.inputs.switchB = true;
         Object.assign(w.player, { x: 430, y: 543 });
@@ -239,26 +240,26 @@ describe('C8 playtest revisions', () => {
         expect(w.player.grounded).toBe(false);
         expect(w.player.rope.phase).toBe('idle');
         expect(w.target(aim)).not.toBeNull();
-        step(w, .25, { jumpPressed: true, airGrapplePressed: true, aim });
+        step(w, .25, { jumpPressed: true, airGrapplePressed: true, airGrappleHeld: true, jumpHeld: true, aim });
         expect(w.player.rope.phase).toBe('attached');
         expect(w.keyboardGrapple).toBe(true);
-        // A tap holds the hook without holding Space or mouse.
-        step(w, .1, { aim });
+        // Keep holding Space through the swing.
+        step(w, .1, { aim, airGrappleHeld: true, jumpHeld: true });
         expect(w.player.rope.phase).toBe('attached');
-        step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, aim });
+        step(w, FIXED_DT, { airGrappleReleased: true, aim });
         expect(w.player.rope.phase).not.toBe('attached');
         expect(w.keyboardGrapple).toBe(false);
         expect(w.player.vy).toBeLessThan(-400);
         expect(w.player.ropeJumpAnchors).toEqual(['anchor']);
         expect(Math.hypot(w.player.vx, w.player.vy)).toBeLessThanOrEqual(GRAPPLE.maxJumpSpeed);
     });
-    it('Space cancels a firing hook without providing an airborne jump', () => {
+    it('releasing Space cancels a firing hook without providing an airborne jump', () => {
         const w = world(1); w.inputs.switchB = true;
         Object.assign(w.player, { x: 430, y: 440, vy: 100 });
         const aim = { x: 770, y: 226 };
-        step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, aim });
+        step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, airGrappleHeld: true, aim });
         expect(w.player.rope.phase).toBe('firing');
-        step(w, FIXED_DT, { jumpPressed: true, airGrapplePressed: true, aim });
+        step(w, FIXED_DT, { airGrappleReleased: true, aim });
         expect(w.player.rope.phase).not.toBe('attached'); expect(w.keyboardGrapple).toBe(false);
         expect(w.player.vy).toBeGreaterThan(0); expect(w.player.ropeJumpAnchors).toEqual([]);
     });
@@ -267,7 +268,7 @@ describe('C8 playtest revisions', () => {
             const w = world(1);
             Object.assign(w.player, { x: 430, y: 440 });
             expect(w.target(aim)).toBeNull();
-            step(w, .15, { jumpPressed: true, airGrapplePressed: true, aim });
+            step(w, .15, { jumpPressed: true, airGrapplePressed: true, airGrappleHeld: true, jumpHeld: true, aim });
             expect(w.keyboardGrapple).toBe(false);
             expect(w.player.rope.phase).toBe('idle');
         }

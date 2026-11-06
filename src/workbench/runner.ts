@@ -116,19 +116,25 @@ window.document.querySelector('#restart')!.addEventListener('click', () => { voi
     const frozen = await response.json(); if (!response.ok) throw new Error(frozen.error);
     session.restart(frozen.hash);
 })().catch(showError); });
+let wasActive = false;
 function frame(now: number) {
     const dt = Math.min(MAX_FRAME_TIME, Math.max(0, (now - (last || now)) / 1000)); last = now;
     try {
         const w = world();
         if (w) {
-            if (w !== lastWorld) { lastWorld = w; renderer.room(w); resetRecording(); }
-            if (running) {
+            if (w !== lastWorld) { input.releaseAll(); lastWorld = w; renderer.room(w); resetRecording(); }
+            const active = running && (!session || session.client.playing);
+            if (active !== wasActive) { input.setEnabled(active); wasActive = active; }
+            if (!active) w.cancelGrapple();
+            if (active) {
                 input.sync(renderer.camera.screenToWorld(input.screenAim.x, input.screenAim.y));
-                if (input.takeAction('reset')) w.respawn();
+                if (input.takeAction('reset')) { w.respawn(); input.releaseAll(); }
                 accumulated += dt;
                 while (accumulated >= FIXED_DT) {
-                    const edges = input.takeEdges(); input.state.jumpPressed = edges.jump; input.state.grapplePressed = edges.grapple; input.state.airGrapplePressed = edges.airGrapple;
+                    const edges = input.takeEdges(); input.state.jumpPressed = edges.jump; input.state.grapplePressed = edges.grapple; input.state.airGrapplePressed = edges.airGrapple; input.state.airGrappleReleased = edges.airGrappleReleased;
+                    const deaths = w.deaths;
                     if (session) session.step(FIXED_DT, input.state, edges.interact); else runtime!.step(input.state, edges.interact, FIXED_DT);
+                    if (w.deaths !== deaths) input.releaseAll();
                     elapsed += FIXED_DT; record(w); accumulated -= FIXED_DT;
                 }
             } else accumulated = 0;
