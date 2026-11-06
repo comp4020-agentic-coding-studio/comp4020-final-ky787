@@ -1,0 +1,19 @@
+PASS bypass: first accepted state already opens exit with no commitments
+PASS bypass: first accepted state already opens exit with no commitments
+PASS bypass: two independent visitors retain one party
+PASS bypass-initial-open-p1: exactly two accepted scanner states use modern pad presentation
+PASS bypass-initial-open-p1: initial portal is physically unlocked
+PASS pausing preserves open portal and inactive scanner state
+PASS bypass-anchor-held-p1: exactly two accepted scanner states use modern pad presentation
+PASS bypass-anchor-held-p1: initial portal is physically unlocked
+PASS bypass: authored-start physical solve with both arrivals
+PASS bypass: both physical arrivals complete the authored room
+PASS bypass: both physical arrivals complete the authored room
+PASS bypass-swapped-roles: first accepted state already opens exit with no commitments
+PASS bypass-swapped-roles: first accepted state already opens exit with no commitments
+PASS bypass: two independent visitors retain one party
+PASS bypass: authored-start physical solve with both arrivals
+PASS bypass-swapped-roles: both physical arrivals complete the authored room
+PASS bypass-swapped-roles: both physical arrivals complete the authored room
+PASS no browser runtime errors
+PASS no browser runtime errors

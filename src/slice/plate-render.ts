@@ -17,6 +17,13 @@ export function drawPressurePad(c: CanvasRenderingContext2D, p: PressurePad, sta
         c.strokeRect(-45, -3, 90, 10); c.setLineDash([]);
         text(c, p.label, 0, p.labelOffset ?? 49, 12, '#8399a5'); c.restore(); return;
     }
+    if (p.scanner) {
+        // Existing biometric rails identify body-only input; the pad still observes
+        // the accepted sensor state and shares the same animation as ordinary pads.
+        const rail = p.active ? '#64e6d5' : '#43636c';
+        for (const side of [-1, 1]) line(c, side * 53, 0, side * 53, -60, rail, 2);
+        line(c, -53, -48, 53, -48, '#43636c', 2);
+    }
     // Keep the base above the code slab's own caption when mounted on a slab.
     panel(c, -48, 2, 96, 7, '#15232d', '#526772', 3);
     panel(c, -41, 1, 82, 6, '#09151f', '#344955', 2);

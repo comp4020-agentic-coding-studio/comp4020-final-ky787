@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
 import { AUTHORED_CAMPAIGN_LEVELS, type AuthoredCampaignLevel } from '../src/coop/campaign.ts';
@@ -55,7 +55,7 @@ it.each(AUTHORED_CAMPAIGN_LEVELS)('%s reuses validated JSON, both spawn/checkpoi
         client.room = sharedRoom(newRecord('ABCD', '11111111-1111-4111-8111-111111111111', level), [true, true], [null, null]);
         const authority = createCoopAuthority(client.room, client);
         const w = new PuzzleWorld(room, { checkpoint: 'entry', switchB: false, cubeOnPlate: false, cubeOnPlateB: false }, undefined, authority);
-        expect(w.frame.outputs.exitDoor).toBe(false);
+        expect(w.frame.outputs.exitDoor).toBe(level === 'bypass');
         expect(Object.keys(w.cubes)).toEqual(document.geometry.objects.filter(o => o.type === 'cube').map(o => `draft:${o.id}`));
         if (level !== 'handshake') {
             w.respawn('reset'); expect(w.player).toMatchObject(room.spawn);
@@ -122,13 +122,24 @@ it.each(AUTHORED_CAMPAIGN_LEVELS)('%s persists semantic controls/checkpoint and 
         await f.act(2, { type: 'control', control: 'draft:override' });
         expect((await f.act(1, { type: 'crumble-trigger', platform: 'draft:unstableA', trigger: 'foot' })).room.levelState.platforms['draft:unstableA'].phase).toBe('warning');
     }
-    await kill(f.app.child); const app = await launch(f.dir), guest = await connect<AuthoredCampaignLevel>(app.url, f.guest.cookie);
+    await kill(f.app.child);
+    if (level === 'bypass') {
+        // A retained pre-revision room can have an unopened portal and obsolete
+        // scanner keys. Reconnect must migrate it without replacing the party.
+        const file = join(f.dir, 'rooms', r.code + '.json'), old = JSON.parse(await readFile(file, 'utf8'));
+        Object.assign(old.levelState.devices, { 'leftScan.occupied': true, 'rightScan.occupied': false });
+        old.exitUnlocked = false; await writeFile(file, JSON.stringify(old));
+    }
+    const app = await launch(f.dir), guest = await connect<AuthoredCampaignLevel>(app.url, f.guest.cookie);
     guest.send({ type: 'join', code: r.code }); const back = await guest.wait('snapshot');
     expect(back.slot).toBe(2); expect(back.room).toMatchObject({ level, checkpoint, levelInstance: started.levelInstance, party: { phase: 'playing', completedLevels: [] } });
     expect(back.room.levelState.devices[`${sensor.id}.occupied`]).toBe(false);
     if (level === 'bypass') {
         expect(back.room.levelState.devices).toMatchObject({ 'link.value': true, 'override.value': true, 'anchorHold.occupied': false, 'bypassHold.occupied': false });
-        expect(back.room.levelState.outputs).toEqual({ anchorPower: true, bridgePower: true, firewallActive: false, exitReady: false });
+        expect(back.room.levelState.outputs).toEqual({ anchorPower: true, bridgePower: true, firewallActive: false, exitReady: true });
+        expect(back.room.exitUnlocked).toBe(true);
+        expect(back.room.levelState.devices).not.toHaveProperty('leftScan.occupied');
+        expect(back.room.levelState.devices).not.toHaveProperty('rightScan.occupied');
     }
     expect(Object.values(back.room.cubes).every(c => !c.holder && !c.transform)).toBe(true);
     expect(Object.values(back.room.levelState.platforms).every(p => p.phase === 'stable')).toBe(true);
@@ -189,34 +200,63 @@ it('campaign plate/cube arbitration, reversible machinery, two arrivals and gene
     expect(r.party?.completedLevels).toEqual(['handshake']);
 });
 
-// Isolated server protocol fixture; the browser scenario supplies actual body contacts.
-it('BYPASS commits survive reset, sequential scans do not count, simultaneous scans latch and both arrivals award a badge', async () => {
+// Isolated server protocol fixture; the browser scenarios supply actual travel.
+it('BYPASS opens immediately without terminal/scanner prerequisites, requires two arrivals and preserves commitments across reset', async () => {
     const f = await party(); let r = (await f.act(1, { type: 'select-level', level: 'bypass' })).room;
     await f.b.wait('room', m => m.room.levelInstance === r.levelInstance);
     expect(r.draft).toBeUndefined(); expect(r.cubes).toEqual({});
+    expect(r.exitUnlocked).toBe(true); expect(r.completed).toBe(false);
+    expect(r.levelState.outputs).toEqual({ anchorPower: false, bridgePower: false, firewallActive: true, exitReady: true });
+    expect(r.levelState.devices).toEqual({ 'anchorHold.occupied': false, 'link.value': false, 'bypassHold.occupied': false, 'override.value': false });
+    for (const scan of ['leftScan', 'rightScan'])
+        expect((await f.act(1, { type: 'draft-occupancy', devices: [`draft:${scan}`] })).accepted).toBe(false);
+    // No invisible LINK/OVERRIDE completion gate: neither terminal has been used.
+    const first = await f.act(1, { type: 'exit' });
+    expect(first.accepted).toBe(true); expect(first.room.completed).toBe(false);
+    expect(first.room.reachedExit).toEqual([true, false]);
+    const second = await f.act(2, { type: 'exit' });
+    expect(second.accepted).toBe(true); r = second.room;
+    expect(r.completed).toBe(true); expect(r.reachedExit).toEqual([true, true]);
+    expect(r.party?.completedLevels).toEqual(['bypass']);
+    expect(r.levelState.devices).toMatchObject({ 'link.value': false, 'override.value': false });
+    const old = r.levelInstance;
+    r = (await f.act(1, { type: 'select-level', level: 'bypass' })).room;
+    await f.b.wait('room', m => m.room.levelInstance === r.levelInstance);
+    expect(r.levelInstance).toBe(old + 1); expect(r.exitUnlocked).toBe(true);
+    expect(r.completed).toBe(false); expect(r.reachedExit).toEqual([false, false]);
+    expect(r.levelState.devices).toMatchObject({ 'link.value': false, 'override.value': false });
+    expect(r.party?.completedLevels).toEqual(['bypass']);
     r = (await f.act(1, { type: 'draft-occupancy', devices: ['draft:anchorHold'] })).room;
     expect(r.levelState.outputs).toMatchObject({ anchorPower: true, bridgePower: false });
     await f.act(2, { type: 'control', control: 'draft:link' });
-    await f.act(1, { type: 'draft-occupancy', devices: ['draft:bypassHold'] });
+    await f.act(1, { type: 'checkpoint', breakpoint: 'draft:regroup' });
+    r = (await f.act(1, { type: 'draft-occupancy', devices: ['draft:bypassHold'] })).room;
+    expect(r.levelState.outputs.firewallActive).toBe(false);
     expect((await f.act(1, { type: 'draft-occupancy', devices: [] })).room.levelState.outputs.firewallActive).toBe(true);
     await f.act(2, { type: 'control', control: 'draft:override' });
     r = (await f.act(2, { type: 'local-reset' })).room;
+    expect(r.checkpoint).toBe('reunion'); expect(r.exitUnlocked).toBe(true);
     expect(r.levelState.devices).toMatchObject({ 'link.value': true, 'override.value': true });
-    expect(r.levelState.outputs.firewallActive).toBe(false);
-    for (const scan of ['leftScan', 'rightScan']) {
-        r = (await f.act(1, { type: 'draft-occupancy', devices: [`draft:${scan}`] })).room;
-        expect(r.exitUnlocked).toBe(false);
-    }
-    r = (await f.act(2, { type: 'draft-occupancy', devices: ['draft:leftScan'] })).room;
-    expect(r.exitUnlocked).toBe(true);
-    await f.act(1, { type: 'draft-occupancy', devices: [] });
-    r = (await f.act(2, { type: 'draft-occupancy', devices: [] })).room;
-    expect(r.exitUnlocked).toBe(true); expect(r.levelState.outputs.exitReady).toBe(false);
-    r = (await f.act(1, { type: 'exit' })).room; expect(r.completed).toBe(false);
-    r = (await f.act(2, { type: 'exit' })).room; expect(r.party?.completedLevels).toEqual(['bypass']);
-    const old = r.levelInstance;
-    r = (await f.act(1, { type: 'select-level', level: 'bypass' })).room;
-    expect(r.levelInstance).toBe(old + 1); expect(r.exitUnlocked).toBe(false);
-    expect(r.levelState.devices).toMatchObject({ 'link.value': false, 'override.value': false });
-    expect(r.party?.completedLevels).toEqual(['bypass']);
+    expect(r.levelState.outputs).toEqual({ anchorPower: true, bridgePower: true, firewallActive: false, exitReady: true });
+    // Both one-use terminals remain committed after repeated use, as before.
+    await f.act(1, { type: 'control', control: 'draft:link' });
+    r = (await f.act(1, { type: 'control', control: 'draft:override' })).room;
+    expect(r.levelState.devices).toMatchObject({ 'link.value': true, 'override.value': true });
+});
+
+it.each([false, true])('BYPASS migrates obsolete scanner save keys without resetting membership, checkpoint or badges (completed=%s)', completed => {
+    const old = newRecord('ABCD', '11111111-1111-4111-8111-111111111111', 'bypass');
+    old.visitors[1] = '22222222-2222-4222-8222-222222222222';
+    old.checkpoint = 'reunion'; old.levelInstance = 7; old.revision = 32;
+    old.levelState.devices = { 'link.value': true, 'override.value': true, 'leftScan.occupied': true, 'rightScan.occupied': false };
+    old.party!.completedLevels = ['handshake', 'bypass'];
+    old.completed = completed; old.reachedExit = [completed, completed]; old.exitUnlocked = completed;
+    old.party!.phase = completed ? 'victory' : 'playing';
+    const before = structuredClone(old), restored = readRoomRecord(old, old.code);
+    expect(restored).toEqual({ ...old, exitUnlocked: true, levelState: { devices: { 'link.value': true, 'override.value': true } } });
+    expect(old).toEqual(before);
+    expect(readRoomRecord({ ...old, levelState: { devices: { ...old.levelState.devices, injected: true } } }, old.code)).toBeNull();
+    expect(readRoomRecord({ ...old, levelState: { devices: { ...old.levelState.devices, 'leftScan.occupied': 'yes' } } }, old.code)).toBeNull();
+    expect(readRoomRecord({ ...old, reachedExit: [true, false], exitUnlocked: false }, old.code)).toBeNull();
+    expect(readRoomRecord({ ...old, levelState: { devices: { 'link.value': true, 'override.value': true } } }, old.code)).toEqual(restored);
 });

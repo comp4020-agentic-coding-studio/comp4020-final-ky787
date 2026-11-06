@@ -1,10 +1,12 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { parseDraft, validateDraft } from '../src/workbench/validation.ts';
 import { evaluateDraft } from '../src/workbench/evaluate.ts';
-import { createRuntime, validateStart } from '../src/workbench/runtime.ts';
+import { createRuntime, validateStart, sampleDevices } from '../src/workbench/runtime.ts';
 import { emptyInput, findGrappleTarget } from '../src/engine/physics.ts';
 import { GRAPPLE } from '../src/engine/constants.ts';
+import { pressurePads } from '../src/slice/machinery-presentation.ts';
 import { parseScenario } from '../scripts/level-tools/scenario.ts';
 
 const draft = parseDraft(JSON.parse(readFileSync('levels/drafts/bypass.json', 'utf8')));
@@ -19,14 +21,64 @@ describe('BYPASS authored draft contract (isolated fixtures, not full-room evide
     expect(draft.presentation.music).toBe('kuia');
   });
 
-  it('holds, commits and requires simultaneous scans for every input combination', () => {
-    for (let bits = 0; bits < 64; bits++) {
-      const [hold, link, bypass, override, left, right] = Array.from({ length: 6 }, (_, i) => !!(bits & (1 << i)));
+  it('preserves three control expressions and always opens the exit for all 16 vectors', () => {
+    for (let bits = 0; bits < 16; bits++) {
+      const [hold, link, bypass, override] = Array.from({ length: 4 }, (_, i) => !!(bits & (1 << i)));
       expect(evaluateDraft(draft, { 'anchorHold.occupied': hold, 'link.value': link, 'bypassHold.occupied': bypass,
-        'override.value': override, 'leftScan.occupied': left, 'rightScan.occupied': right })).toEqual({
-        anchorPower: hold || link, bridgePower: link, firewallActive: !(bypass || override), exitReady: link && override && left && right,
+        'override.value': override })).toEqual({
+        anchorPower: hold || link, bridgePower: link, firewallActive: !(bypass || override), exitReady: true,
       });
     }
+  });
+
+
+  it('starts physically open without commitments and renders the two body-only scanners once as modern pads', () => {
+    const r = createRuntime(draft), w = r.world;
+    expect(w.frame.outputs.exitDoor).toBe(true);
+    expect(r.snapshot().outputs).toEqual({ anchorPower: false, bridgePower: false, firewallActive: true, exitReady: true });
+    expect(Object.keys(r.snapshot().deviceValues)).toEqual(['anchorHold.occupied', 'link.value', 'bypassHold.occupied', 'override.value']);
+    const scanners = draft.geometry.objects.filter(o => o.type === 'device' && o.kind === 'scanner');
+    expect(scanners.map(o => o.id)).toEqual(['anchorHold', 'bypassHold']);
+    for (const scanner of scanners) {
+      // Isolated sampling fixture: a loose cube on each existing scanner must not activate it.
+      const cubes = { cube: { x: scanner.x, y: scanner.y - 22, grounded: true, carried: false } };
+      const cubeOnly = { ...w, cubes, cubeIsResetting: () => false } as unknown as typeof w;
+      expect(sampleDevices(draft, cubeOnly)[scanner.id + '.occupied']).toBe(false);
+      const occupied = createRuntime(draft, 1, { start: { x: scanner.x, y: scanner.y - 17 } }); tick(occupied, 3);
+      expect(occupied.snapshot().deviceValues[scanner.id + '.occupied']).toBe(true);
+      expect(pressurePads(occupied.world).find(p => p.id === 'draft:' + scanner.id)).toMatchObject({ active: true, scanner: true });
+    }
+    const pads = pressurePads(w);
+    expect(pads.map(p => [p.id, p.scanner, p.active])).toEqual([
+      ['draft:anchorHold', true, false], ['draft:bypassHold', true, false],
+    ]);
+    // The renderer's existing at-reference exclusion removes each from the fallback.
+    expect(w.room.plates!.filter(p => !pads.some(pad => pad.at === p.at))).toEqual([]);
+  });
+
+  it('freezes the actual four-input reference snapshot and all ABI vectors for Windows', () => {
+    const request = JSON.parse(readFileSync('docs/native-requests/bypass.json', 'utf8'));
+    expect(request.inputs.map((i: any) => [i.name, i.game_port, i.offset, i.bit, i.initial])).toEqual([
+      ['anchorHold', 'anchorHold.occupied', 0, 0, 0], ['link', 'link.value', 4, 1, 0],
+      ['bypassHold', 'bypassHold.occupied', 8, 2, 0], ['override', 'override.value', 12, 3, 0],
+    ]);
+    expect(request.outputs.map((o: any) => [o.name, o.offset])).toEqual([
+      ['anchorPower', 0], ['bridgePower', 4], ['firewallActive', 8], ['exitReady', 12],
+    ]);
+    expect(request.reference_vectors).toHaveLength(16);
+    for (const vector of request.reference_vectors) {
+      const values = Object.fromEntries(request.inputs.map((input: any, i: number) => [input.game_port, !!(vector.case_id & (1 << i))]));
+      const outputs = evaluateDraft(draft, values);
+      expect(vector.inputs).toEqual(request.inputs.map((_: unknown, i: number) => (vector.case_id >> i) & 1));
+      expect(vector.outputs).toEqual(request.outputs.map((o: any) => Number(outputs[o.name])));
+    }
+    expect(request.reference_vectors[0].outputs).toEqual([0, 0, 1, 1]);
+    expect(request.outputs.map((o: any) => o.expression)).toEqual(request.outputs.map((o: any) =>
+      draft.controller.kind === 'declarative' ? draft.controller.outputs[o.name] : undefined));
+    expect(request.bindings.map(({ invert, resolved_signal, resolution, ...b }: any) => b)).toEqual(draft.bindings);
+    expect(request.bindings.every((b: any) => b.invert === false)).toBe(true);
+    for (const [path, hash] of Object.entries(request.reference_source_sha256))
+      expect(createHash('sha256').update(readFileSync(path)).digest('hex'), path).toBe(hash);
   });
 
   it('keeps every occupied operator position outside manual and assisted anchor range', () => {

@@ -49,9 +49,14 @@ export function definition<L extends SessionLevelId>(level: L): LevelDefinition<
     return LEVEL_DEFINITIONS[level] as LevelDefinition<L>;
 }
 export function newRecord<L extends SessionLevelId>(code: string, visitor: string, level: L, now = new Date().toISOString(), rules = definition(level)): RoomRecord<L> {
-    return { version: 6, party: isCampaignLevel(level) ? { phase: 'playing', completedLevels: [] } : null, levelInstance: 1, code, level, levelState: rules.defaults(), revision: 0, visitors: [visitor, null],
+    const record = { version: 6, party: isCampaignLevel(level) ? { phase: 'playing', completedLevels: [] } : null, levelInstance: 1, code, level, levelState: rules.defaults(), revision: 0, visitors: [visitor, null],
         cubePlacements: Object.fromEntries(rules.cubeIds.map(id => [id, 'spawn'])), checkpoint: 'entry', exitUnlocked: false,
         reachedExit: [false, false], completed: false, createdAt: now, updatedAt: now } as RoomRecord<L>;
+    // Evaluate the accepted initial state before its first snapshot: a constant
+    // unlock must not wait for an unrelated occupancy or control message.
+    record.exitUnlocked = rules.unlock({ record, held: [null, null], draftHeld: [[], []],
+        draftCubeContacts: {}, crumble: freshCrumble(), race: freshRace(), crossfeed: freshCrossfeed(), now: Date.parse(now) });
+    return record;
 }
 export function validRecord(value: unknown, code: string, draftDefinition?: LevelDefinition<'workbench'>): value is RoomRecord {
     if (!validChamber(value, code, 6, false, draftDefinition)) return false;
@@ -104,7 +109,21 @@ const legacyCrossfeedRules = {
         && ['liftCargo', 'finalLeft', 'finalRight'].every(p => Object.values(r.cubePlacements).filter(v => v === p).length <= 1),
 };
 export function readRoomRecord(value: unknown, code: string, draftDefinition?: LevelDefinition<'workbench'>): RoomRecord | null {
-    if (validRecord(value, code, draftDefinition)) return value;
+    if (validRecord(value, code, draftDefinition) && (value.level !== 'bypass' || value.exitUnlocked)) return value;
+    if (value && typeof value === 'object' && 'level' in value && value.level === 'bypass'
+        && 'version' in value && value.version === 6) {
+        const old = value as RoomRecord<'bypass'>, devices = old.levelState?.devices;
+        if (!devices || typeof devices !== 'object' || Array.isArray(devices)) return null;
+        const obsolete = ['leftScan.occupied', 'rightScan.occupied'];
+        if (obsolete.some(key => Object.hasOwn(devices, key) && typeof devices[key] !== 'boolean')) return null;
+        // Do not turn a malformed old arrival record into a valid one while
+        // opening the newly unconditional portal. All other fields are validated below.
+        if (typeof old.exitUnlocked !== 'boolean' || !old.exitUnlocked
+            && Array.isArray(old.reachedExit) && old.reachedExit.some(Boolean)) return null;
+        const kept = { ...devices }; for (const key of obsolete) delete kept[key];
+        const migrated = { ...old, exitUnlocked: true, levelState: { ...old.levelState, devices: kept } };
+        return validRecord(migrated, code, draftDefinition) ? migrated : null;
+    }
     if (value && typeof value === 'object' && 'level' in value && value.level === 'crossfeed-vault'
         && 'version' in value && (value.version === 5 || value.version === 6) && validChamber(value, code, value.version, true)) {
         const old = value as RoomRecord<'crossfeed-vault'>;

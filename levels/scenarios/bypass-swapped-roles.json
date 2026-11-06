@@ -16,6 +16,89 @@
   ],
   "steps": [
     {
+      "label": "Portal is accepted open before any input or commitment",
+      "wait": {
+        "actor": "p1",
+        "condition": {
+          "path": "exitUnlocked",
+          "equals": true
+        },
+        "timeoutMs": 5000
+      },
+      "assert": [
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "signals.draft:exitReady",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "controls.draft:link",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "controls.draft:override",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "exitUnlocked",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "signals.draft:exitReady",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "controls.draft:link",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "controls.draft:override",
+            "equals": false
+          }
+        },
+        {
+          "actor": "p2",
+          "condition": {
+            "path": "completed",
+            "equals": false
+          }
+        }
+      ]
+    },
+    {
       "label": "P1 holds the anchor scanner",
       "actions": [
         {
@@ -893,62 +976,7 @@
       }
     },
     {
-      "label": "P1 touches LEFT alone",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "p1",
-          "x": 3250
-        }
-      ],
-      "waitMs": 220,
-      "assert": [
-        {
-          "actor": "p1",
-          "condition": {
-            "path": "exitUnlocked",
-            "equals": false
-          }
-        }
-      ]
-    },
-    {
-      "label": "P1 touches RIGHT alone after LEFT",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "p1",
-          "x": 3430
-        }
-      ],
-      "waitMs": 220,
-      "assert": [
-        {
-          "actor": "p1",
-          "condition": {
-            "path": "plates.draft:leftScan",
-            "equals": false
-          }
-        },
-        {
-          "actor": "p1",
-          "condition": {
-            "path": "plates.draft:rightScan",
-            "equals": true
-          }
-        },
-        {
-          "actor": "p1",
-          "condition": {
-            "path": "exitUnlocked",
-            "equals": false
-          }
-        }
-      ]
-    },
-    {
       "label": "P2 waits for both slabs to recover",
-      "waitMs": 3000,
       "assert": [
         {
           "actor": "p2",
@@ -964,7 +992,15 @@
             "equals": "stable"
           }
         }
-      ]
+      ],
+      "wait": {
+        "actor": "p2",
+        "condition": {
+          "path": "session.room.levelState.platforms.draft:unstableB.phase",
+          "equals": "stable"
+        },
+        "timeoutMs": 5000
+      }
     },
     {
       "label": "p2 crosses first gap / takeoff",
@@ -1183,44 +1219,6 @@
       }
     },
     {
-      "label": "P2 occupies LEFT while P1 holds RIGHT",
-      "actions": [
-        {
-          "type": "walk",
-          "actor": "p2",
-          "x": 3250
-        }
-      ],
-      "waitMs": 220
-    },
-    {
-      "label": "Simultaneous current occupancy latches exit",
-      "wait": {
-        "actor": "p1",
-        "condition": {
-          "path": "exitUnlocked",
-          "equals": true
-        },
-        "timeoutMs": 5000
-      },
-      "assert": [
-        {
-          "actor": "p1",
-          "condition": {
-            "path": "plates.draft:leftScan",
-            "equals": true
-          }
-        },
-        {
-          "actor": "p1",
-          "condition": {
-            "path": "plates.draft:rightScan",
-            "equals": true
-          }
-        }
-      ]
-    },
-    {
       "label": "P1 physically enters the exit",
       "actions": [
         {
@@ -1237,36 +1235,23 @@
             "path": "completed",
             "equals": false
           }
-        }
-      ]
-    },
-    {
-      "label": "Exit stays unlocked after scanners clear",
-      "actions": [
+        },
         {
-          "type": "walk",
-          "actor": "p2",
-          "x": 3550
-        }
-      ],
-      "waitMs": 200,
-      "assert": [
-        {
-          "actor": "p2",
+          "actor": "p1",
           "condition": {
-            "path": "plates.draft:leftScan",
+            "path": "session.reachedExit.1",
+            "equals": true
+          }
+        },
+        {
+          "actor": "p1",
+          "condition": {
+            "path": "session.reachedExit.0",
             "equals": false
           }
         },
         {
-          "actor": "p2",
-          "condition": {
-            "path": "plates.draft:rightScan",
-            "equals": false
-          }
-        },
-        {
-          "actor": "p2",
+          "actor": "p1",
           "condition": {
             "path": "exitUnlocked",
             "equals": true

@@ -1,0 +1,52 @@
+{
+  "base": "e377ff8f3fc5e6f632491eb333a81ceba3224a2c",
+  "request": "docs/native-requests/bypass.json",
+  "request_sha256": "af24de094de2926bf47e4ea8d01536ff999f69b58030ff88993acb06792fb469",
+  "document_sha256": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+  "unitTests": 102,
+  "typecheck": "pass",
+  "build": "pass",
+  "browserChecks": 19,
+  "routes": {
+    "bypass": {
+      "pass": true,
+      "steps": 65,
+      "scope": "full-room campaign; real controls from authored starts",
+      "hash": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+      "arrivals": {
+        "p1": [
+          true,
+          true
+        ],
+        "p2": [
+          true,
+          true
+        ]
+      },
+      "deaths": {
+        "p1": 4,
+        "p2": 4
+      }
+    },
+    "bypass-swapped-roles": {
+      "pass": true,
+      "steps": 59,
+      "scope": "full-room campaign; real controls from authored starts",
+      "hash": "38fc3c7e1393caa034eb840f96bca9d1a79bae466d46db01b3a45b04144ec9cb",
+      "arrivals": {
+        "p1": [
+          true,
+          true
+        ],
+        "p2": [
+          true,
+          true
+        ]
+      },
+      "deaths": {
+        "p1": 4,
+        "p2": 2
+      }
+    }
+  }
+}

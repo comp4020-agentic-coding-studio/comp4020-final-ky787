@@ -52,25 +52,8 @@
         "op": "ref"
       },
       "exitReady": {
-        "args": [
-          {
-            "id": "link.value",
-            "op": "ref"
-          },
-          {
-            "id": "override.value",
-            "op": "ref"
-          },
-          {
-            "id": "leftScan.occupied",
-            "op": "ref"
-          },
-          {
-            "id": "rightScan.occupied",
-            "op": "ref"
-          }
-        ],
-        "op": "and"
+        "op": "const",
+        "value": true
       },
       "firewallActive": {
         "arg": {
@@ -306,22 +289,6 @@
         "y": 680
       },
       {
-        "id": "leftScan",
-        "kind": "scanner",
-        "label": "LEFT",
-        "type": "device",
-        "x": 3250,
-        "y": 680
-      },
-      {
-        "id": "rightScan",
-        "kind": "scanner",
-        "label": "RIGHT",
-        "type": "device",
-        "x": 3430,
-        "y": 680
-      },
-      {
         "arrivals": 2,
         "h": 140,
         "id": "exit",
@@ -335,7 +302,7 @@
     "width": 3840
   },
   "id": "bypass",
-  "instruction": "HOLD THE SIGNAL. OPEN THE WAY FOR YOUR PARTNER.",
+  "instruction": "REACH THE EXIT TOGETHER.",
   "presentation": {
     "cameraReveals": [
       {
@@ -361,28 +328,10 @@
     },
     "labels": [
       {
-        "id": "openingHint",
-        "text": "ONE HOLDS / ONE CROSSES",
-        "x": 360,
-        "y": 440
-      },
-      {
-        "id": "swapHint",
-        "text": "SWAP ROLES / HOLD THE FIREWALL OFF",
-        "x": 1360,
-        "y": 385
-      },
-      {
         "id": "crumbleHint",
         "text": "UNSTABLE / KEEP MOVING",
         "x": 2140,
         "y": 555
-      },
-      {
-        "id": "finishHint",
-        "text": "SCAN TOGETHER / THEN ENTER",
-        "x": 3220,
-        "y": 525
       }
     ],
     "music": "kuia",
@@ -488,54 +437,12 @@
             "y": 460
           }
         ]
-      },
-      {
-        "binding": "exitFeed",
-        "id": "exitWire",
-        "points": [
-          {
-            "x": 3250,
-            "y": 668
-          },
-          {
-            "x": 3250,
-            "y": 760
-          },
-          {
-            "x": 3710,
-            "y": 760
-          },
-          {
-            "x": 3710,
-            "y": 680
-          }
-        ]
-      },
-      {
-        "binding": "exitFeed",
-        "id": "rightScanWire",
-        "points": [
-          {
-            "x": 3430,
-            "y": 668
-          },
-          {
-            "x": 3430,
-            "y": 760
-          }
-        ]
       }
     ]
   },
   "previewStates": {
     "anchor-held": {
       "anchorHold.occupied": true
-    },
-    "exit-ready": {
-      "leftScan.occupied": true,
-      "link.value": true,
-      "override.value": true,
-      "rightScan.occupied": true
     },
     "idle": {},
     "route-open": {

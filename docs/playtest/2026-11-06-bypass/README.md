@@ -1,5 +1,9 @@
 # BYPASS — authored cooperative draft, 2026-11-06
 
+> Historical draft record. The final two-scanner puzzle and six-input contract below
+> are superseded by the [four-input, always-open exit request](../../native-requests/bypass.md).
+> Use the current campaign/draft snapshot and its new source commit for Windows acquisition.
+
 **Promotion note, 2026-11-06:** After this draft delivery, the user explicitly
 requested campaign integration. The unchanged snapshot now lives at
 [`levels/campaign/bypass.json`](../../../levels/campaign/bypass.json), between

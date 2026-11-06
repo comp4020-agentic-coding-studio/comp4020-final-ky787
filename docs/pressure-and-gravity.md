@@ -23,10 +23,11 @@ immediately restores amber and fades the blue accent while the top rises.
 
 | Device | Presentation |
 | --- | --- |
-| Declarative `kind: "plate"`, including all five campaign chambers | Pressure pad, accepted `frame.plates[id]` |
+| Declarative `kind: "plate"` in campaign and builder rooms | Pressure pad, accepted `frame.plates[id]` |
 | Legacy A/B pads in the solo rooms and mechanics laboratories | Pressure pad, existing accepted room input |
 | Legacy PAIRING BAY final personnel pads | Same pad art; their existing personnel contract is unchanged |
-| CROSSFEED's body-only scanners | Existing scanner art, unchanged |
+| Body-only `kind: "scanner"`, including BYPASS | Animated pressure pad plus biometric rails; accepted `frame.plates[id]`, no cube activation |
+| CROSSFEED's legacy body-only scanners | Same shared pad/rails path, existing accepted room inputs |
 | Declarative sockets and existing cube-only payload pads | Existing compact green PAYLOAD RECEIVER, unchanged |
 | RACE CONDITION's ordinary pad named `receiver` | Pressure pad; the name does not make it a cube-only sensor |
 

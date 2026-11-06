@@ -7,8 +7,8 @@ import { draftHash, objectBounds } from '../src/workbench/model.ts';
 import { conditionMatches, parseScenario, type ScenarioCondition } from './level-tools/scenario.ts';
 import type { Cdp, coopBrowser } from './coop-browser.ts';
 
-export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowser>>, level: AuthoredCampaignLevel, pages: [Cdp, Cdp]) {
-    const scenario = parseScenario(JSON.parse(await readFile(`levels/scenarios/${level}.json`, 'utf8')));
+export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowser>>, level: AuthoredCampaignLevel, pages: [Cdp, Cdp], scenarioName: string = level) {
+    const scenario = parseScenario(JSON.parse(await readFile(`levels/scenarios/${scenarioName}.json`, 'utf8')));
     const document = CAMPAIGN_DOCUMENTS[level], hash = await draftHash(document);
     const actors = new Map(scenario.actors.map(a => [a.id, pages[a.slot - 1]]));
     const results: unknown[] = []; let failedStep: string | null = null, pass = false, error: string | null = null;
@@ -86,6 +86,6 @@ export async function campaignDraftRoute(h: Awaited<ReturnType<typeof coopBrowse
     } catch (caught) { error = String(caught); throw caught; }
     finally {
         const final = Object.fromEntries(await Promise.all([...actors].map(async ([id, p]) => [id, await observe(p).catch(() => null)])));
-        await writeFile(join(h.shots, `${level}-report.json`), JSON.stringify({ pass, scope: 'full-room campaign; real controls from authored starts', hash, failedStep, error, results, final }, null, 2) + '\n');
+        await writeFile(join(h.shots, `${scenarioName}-report.json`), JSON.stringify({ pass, scope: 'full-room campaign; real controls from authored starts', hash, failedStep, error, results, final }, null, 2) + '\n');
     }
 }
