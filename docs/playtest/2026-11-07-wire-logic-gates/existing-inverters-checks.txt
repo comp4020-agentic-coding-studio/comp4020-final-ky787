@@ -1,0 +1,27 @@
+PASS handshake existing inverted wires: every displayed circuit has known accepted ports and a matching final result
+PASS handshake existing inverted wires: every NOT reverses its incoming signal
+PASS handshake existing inverted wires: distinct module housings do not overlap
+PASS handshake existing inverted wires: modules clear terrain and code-platform footprints
+PASS handshake existing inverted wires: amber 14-unit NOT is opaque
+PASS handshake existing inverted wires: NOT module fits the normal camera
+PASS handshake existing inverted wires: modules clear captions and interaction feedback
+PASS handshake existing inverted wires: normal gameplay camera
+PASS deadlock existing inverted wires: every displayed circuit has known accepted ports and a matching final result
+PASS deadlock existing inverted wires: every NOT reverses its incoming signal
+PASS deadlock existing inverted wires: distinct module housings do not overlap
+PASS deadlock existing inverted wires: modules clear terrain and code-platform footprints
+PASS deadlock existing inverted wires: amber 14-unit NOT is opaque
+PASS deadlock existing inverted wires: NOT module fits the normal camera
+PASS deadlock existing inverted wires: modules clear captions and interaction feedback
+PASS deadlock existing inverted wires: normal gameplay camera
+PASS use-after-free existing inverted wires: every displayed circuit has known accepted ports and a matching final result
+PASS use-after-free existing inverted wires: every NOT reverses its incoming signal
+PASS use-after-free existing inverted wires: distinct module housings do not overlap
+PASS use-after-free existing inverted wires: modules clear terrain and code-platform footprints
+PASS use-after-free existing inverted wires: amber 14-unit NOT is opaque
+PASS use-after-free existing inverted wires: NOT module fits the normal camera
+PASS use-after-free existing inverted wires: modules clear captions and interaction feedback
+PASS use-after-free existing inverted wires: normal gameplay camera
+PASS disconnected: backbones remain and no moving marks are drawn
+PASS no browser runtime errors
+PASS no browser runtime errors

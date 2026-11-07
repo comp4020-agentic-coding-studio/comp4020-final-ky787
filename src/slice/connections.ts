@@ -1,3 +1,5 @@
+import { drawGateConnections } from './connection-gates.ts';
+import { withWireLogic, type WireLogic } from './wire-logic.ts';
 import type { Vec2 } from '../engine/geometry.ts';
 import type { ControllerInputs, MachineSignal } from './controller.ts';
 import type { RoomDef } from './rooms.ts';
@@ -10,11 +12,12 @@ export interface MachineConnection {
     /** Resolved output by default; false preserves legacy source-wire presentation. */
     resolved?: boolean;
     inverted?: boolean;
+    logic?: WireLogic;
     output: MachineSignal;
     points: Vec2[];
 }
 export function roomConnections(r: RoomDef): MachineConnection[] {
-    if (r.wires) return r.wires;
+    if (r.wires) return withWireLogic(r.wires, r.id);
     const wires: MachineConnection[] = [];
     const add = (id: string, input: MachineConnection['input'], output: MachineConnection['output'], points: Vec2[]) => wires.push({ id, input, output, points, resolved: r.id === 'crossfeed-vault' });
     const above = (p: Vec2) => ({ x: p.x, y: p.y - 12 });
@@ -92,47 +95,29 @@ export function connectionPulse(points: readonly Vec2[], seconds: number): Vec2 
     }
     return points[0];
 }
-export function drawConnections(c: CanvasRenderingContext2D, links: readonly MachineConnection[], w: PuzzleWorld, energyMotion = true): void {
+export function drawConnections(c: CanvasRenderingContext2D, links: readonly MachineConnection[], w: PuzzleWorld, energyMotion = true) {
     c.save();
-    for (const link of links) {
-        const on = connectionPowered(link, w), colour = link.output === 'relayGates' ? '#b59bff' : '#64e6d5';
-        c.beginPath(); link.points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y));
-        if (!on) {
-            // A continuous quiet backbone remains readable without implying power.
-            // The dark edge separates it from nearby structure and background grid.
+    const paint = (points: readonly Vec2[], on: boolean | null, colour: string) => {
+        c.beginPath(); points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y));
+        if (on !== true) {
             c.strokeStyle = '#0b121a'; c.globalAlpha = .9; c.lineWidth = 3.8; c.stroke();
-            c.strokeStyle = '#71849c'; c.globalAlpha = .85; c.lineWidth = 1.8; c.stroke();
-            if (energyMotion) {
-                // Dash phase follows the complete path through every corner. This
-                // is decoration using the existing world clock, not signal timing.
+            c.strokeStyle = on === null ? '#605e60' : '#71849c'; c.globalAlpha = .85; c.lineWidth = 1.8; c.stroke();
+            if (energyMotion && on !== null) {
                 c.strokeStyle = '#a0b3cd'; c.globalAlpha = .55; c.lineWidth = 1.3;
                 c.setLineDash([12, 228]); c.lineDashOffset = -w.elapsed * 75; c.stroke();
                 c.setLineDash([]); c.lineDashOffset = 0;
             }
-            continue;
+            return;
         }
         c.strokeStyle = colour; c.globalAlpha = .65; c.lineWidth = 2; c.stroke();
-        if (!energyMotion) continue;
+        if (!energyMotion) return;
         c.setLineDash([9, 28]); c.lineDashOffset = -w.elapsed * 70; c.globalAlpha = .95; c.stroke();
         c.setLineDash([]); c.lineDashOffset = 0;
-        const pulse = connectionPulse(link.points, w.elapsed);
+        const pulse = connectionPulse(points, w.elapsed);
         c.fillStyle = '#d6fff4'; c.beginPath(); c.arc(pulse.x, pulse.y, 3.5, 0, Math.PI * 2); c.fill();
-    }
-    // Inversion describes the authored connection in either state. Draw it after
-    // the wires at full opacity, close enough to the source for the local camera.
-    c.globalAlpha = 1; c.font = 'bold 14px monospace'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    const labelled = new Set<string>(), width = c.measureText('NOT').width;
-    for (const link of links) {
-        if (!link.inverted) continue;
-        const [from, corner] = link.points, distance = Math.hypot(corner.x - from.x, corner.y - from.y);
-        const t = distance ? Math.min(1, 180 / distance) : 0;
-        const x = from.x + (corner.x - from.x) * t - width - 8, y = from.y + (corner.y - from.y) * t - 8;
-        // A single annotation serves wires that share the same inverted trunk.
-        const position = `${x},${y}`;
-        if (labelled.has(position)) continue;
-        labelled.add(position);
-        c.fillStyle = '#111820'; c.fillRect(x - 4, y - 16, width + 8, 20);
-        c.fillStyle = '#ffd76a'; c.fillText('NOT', x, y);
-    }
-    c.restore();
+    };
+    for (const link of links) if (!link.logic && !link.inverted)
+        paint(link.points, connectionPowered(link, w), link.output === 'relayGates' ? '#b59bff' : '#64e6d5');
+    const diagnostic = drawGateConnections(c, links, w.frame, paint);
+    c.restore(); return diagnostic;
 }

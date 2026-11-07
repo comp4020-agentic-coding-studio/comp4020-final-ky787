@@ -20,7 +20,7 @@ export class CrossfeedAuthority implements WorldAuthority {
     get frame(): ControllerFrame {
         const o = this.room.levelState.outputs, i = this.room.levelState.inputs, mode = this.selected('switchB'), route = this.selected('routeMode');
         const remaining = Math.max(0, this.room.levelState.handoverMs - (performance.now() - this.client.roomReceivedAt)) / CROSSFEED_HANDOVER_MS;
-        return { source: 'mock-multiplayer', outputs: { exitDoor: o.exitDoor, grappleAnchor: o.grappleAnchor, bridge: o.bridge,
+        return { circuit: { inputs: { ...i }, outputs: { ...o } }, source: 'mock-multiplayer', outputs: { exitDoor: o.exitDoor, grappleAnchor: o.grappleAnchor, bridge: o.bridge,
             liftField: o.liftField, relayGates: o.relayGates, codePlatformA: o.galleryAccess, codePlatformB: o.vaultPower },
             signals: { ...o, bridge: mode, grappleAnchor: i.plateAOccupied && !mode, relayGates: i.switchC && !mode,
                 leftRoute: i.switchC && i.routePowerOccupied && !route, rightRoute: i.switchC && i.routePowerOccupied && route },

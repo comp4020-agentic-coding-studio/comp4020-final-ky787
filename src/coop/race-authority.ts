@@ -21,7 +21,7 @@ export class RaceAuthority implements WorldAuthority {
     get phase() { return this.client.pendingPhase?.value ?? this.room.levelState.inputs.phase; }
     get frame(): ControllerFrame {
         const o = this.room.levelState.outputs;
-        return { source: 'mock-multiplayer', timer: this.bufferDisplay, outputs: { exitDoor: this.room.exitUnlocked, grappleAnchor: false,
+        return { circuit: { inputs: { ...this.room.levelState.inputs }, outputs: { ...o }, bufferPhase: this.room.levelState.buffer.phase }, source: 'mock-multiplayer', timer: this.bufferDisplay, outputs: { exitDoor: this.room.exitUnlocked, grappleAnchor: false,
             bridge: o.returnBridge, codePlatformA: false, codePlatformB: false, relayGates: false, liftField: false },
             signals: { ...o, phaseA: o.spanMaster && !this.phase, phaseB: o.spanMaster && this.phase } };
     }

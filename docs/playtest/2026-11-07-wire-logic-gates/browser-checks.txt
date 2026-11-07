@@ -1,0 +1,114 @@
+PASS TRANSFER / SYSTEM off: every displayed circuit has known accepted ports and a matching final result
+PASS TRANSFER / SYSTEM off: every NOT reverses its incoming signal
+PASS TRANSFER / SYSTEM off: distinct module housings do not overlap
+PASS TRANSFER / SYSTEM off: modules clear terrain and code-platform footprints
+PASS TRANSFER / SYSTEM off: amber 14-unit NOT is opaque
+PASS TRANSFER / SYSTEM off: NOT module fits the normal camera
+PASS TRANSFER / SYSTEM off: modules clear captions and interaction feedback
+PASS TRANSFER / SYSTEM off: normal gameplay camera
+PASS SYSTEM off: inverter output true does not power the relay past AND
+PASS TRANSFER true / SYSTEM off: every displayed circuit has known accepted ports and a matching final result
+PASS TRANSFER true / SYSTEM off: every NOT reverses its incoming signal
+PASS TRANSFER true / SYSTEM off: distinct module housings do not overlap
+PASS TRANSFER true / SYSTEM off: modules clear terrain and code-platform footprints
+PASS TRANSFER true / SYSTEM off: amber 14-unit NOT is opaque
+PASS TRANSFER true / SYSTEM off: NOT module fits the normal camera
+PASS TRANSFER true / SYSTEM off: modules clear captions and interaction feedback
+PASS TRANSFER true / SYSTEM off: normal gameplay camera
+PASS TRANSFER false / SYSTEM on: every displayed circuit has known accepted ports and a matching final result
+PASS TRANSFER false / SYSTEM on: every NOT reverses its incoming signal
+PASS TRANSFER false / SYSTEM on: distinct module housings do not overlap
+PASS TRANSFER false / SYSTEM on: modules clear terrain and code-platform footprints
+PASS TRANSFER false / SYSTEM on: amber 14-unit NOT is opaque
+PASS TRANSFER false / SYSTEM on: NOT module fits the normal camera
+PASS TRANSFER false / SYSTEM on: modules clear captions and interaction feedback
+PASS TRANSFER false / SYSTEM on: normal gameplay camera
+PASS TRANSFER true / SYSTEM on: every displayed circuit has known accepted ports and a matching final result
+PASS TRANSFER true / SYSTEM on: every NOT reverses its incoming signal
+PASS TRANSFER true / SYSTEM on: distinct module housings do not overlap
+PASS TRANSFER true / SYSTEM on: modules clear terrain and code-platform footprints
+PASS TRANSFER true / SYSTEM on: amber 14-unit NOT is opaque
+PASS TRANSFER true / SYSTEM on: NOT module fits the normal camera
+PASS TRANSFER true / SYSTEM on: modules clear captions and interaction feedback
+PASS TRANSFER true / SYSTEM on: normal gameplay camera
+PASS actual gameplay advances idle and powered segments independently
+PASS ROUTE / POWER absent: every displayed circuit has known accepted ports and a matching final result
+PASS ROUTE / POWER absent: every NOT reverses its incoming signal
+PASS ROUTE / POWER absent: distinct module housings do not overlap
+PASS ROUTE / POWER absent: modules clear terrain and code-platform footprints
+PASS ROUTE / POWER absent: amber 14-unit NOT is opaque
+PASS ROUTE / POWER absent: NOT module fits the normal camera
+PASS ROUTE / POWER absent: modules clear captions and interaction feedback
+PASS ROUTE / POWER absent: normal gameplay camera
+PASS SYSTEM alone does not power either route
+PASS ROUTE false / prerequisites on: every displayed circuit has known accepted ports and a matching final result
+PASS ROUTE false / prerequisites on: every NOT reverses its incoming signal
+PASS ROUTE false / prerequisites on: distinct module housings do not overlap
+PASS ROUTE false / prerequisites on: modules clear terrain and code-platform footprints
+PASS ROUTE false / prerequisites on: amber 14-unit NOT is opaque
+PASS ROUTE false / prerequisites on: NOT module fits the normal camera
+PASS ROUTE false / prerequisites on: modules clear captions and interaction feedback
+PASS ROUTE false / prerequisites on: normal gameplay camera
+PASS ROUTE true / prerequisites on: every displayed circuit has known accepted ports and a matching final result
+PASS ROUTE true / prerequisites on: every NOT reverses its incoming signal
+PASS ROUTE true / prerequisites on: distinct module housings do not overlap
+PASS ROUTE true / prerequisites on: modules clear terrain and code-platform footprints
+PASS ROUTE true / prerequisites on: amber 14-unit NOT is opaque
+PASS ROUTE true / prerequisites on: NOT module fits the normal camera
+PASS ROUTE true / prerequisites on: modules clear captions and interaction feedback
+PASS ROUTE true / prerequisites on: normal gameplay camera
+PASS ROUTE at 1024: every displayed circuit has known accepted ports and a matching final result
+PASS ROUTE at 1024: every NOT reverses its incoming signal
+PASS ROUTE at 1024: distinct module housings do not overlap
+PASS ROUTE at 1024: modules clear terrain and code-platform footprints
+PASS ROUTE at 1024: amber 14-unit NOT is opaque
+PASS ROUTE at 1024: NOT module fits the normal camera
+PASS ROUTE at 1024: modules clear captions and interaction feedback
+PASS ROUTE at 1024: normal gameplay camera
+PASS reduced motion: backbones remain and no moving marks are drawn
+PASS paused: backbones remain and no moving marks are drawn
+PASS DROP A false: every displayed circuit has known accepted ports and a matching final result
+PASS DROP A false: every NOT reverses its incoming signal
+PASS DROP A false: distinct module housings do not overlap
+PASS DROP A false: modules clear terrain and code-platform footprints
+PASS DROP A false: amber 14-unit NOT is opaque
+PASS DROP A false: NOT module fits the normal camera
+PASS DROP A false: modules clear captions and interaction feedback
+PASS DROP A false: normal gameplay camera
+PASS DROP A true: every displayed circuit has known accepted ports and a matching final result
+PASS DROP A true: every NOT reverses its incoming signal
+PASS DROP A true: distinct module housings do not overlap
+PASS DROP A true: modules clear terrain and code-platform footprints
+PASS DROP A true: amber 14-unit NOT is opaque
+PASS DROP A true: NOT module fits the normal camera
+PASS DROP A true: modules clear captions and interaction feedback
+PASS DROP A true: normal gameplay camera
+PASS DROP B true: every displayed circuit has known accepted ports and a matching final result
+PASS DROP B true: every NOT reverses its incoming signal
+PASS DROP B true: distinct module housings do not overlap
+PASS DROP B true: modules clear terrain and code-platform footprints
+PASS DROP B true: amber 14-unit NOT is opaque
+PASS DROP B true: NOT module fits the normal camera
+PASS DROP B true: modules clear captions and interaction feedback
+PASS DROP B true: normal gameplay camera
+PASS DROP B shares exactly one inverter before distinct AND/OR modules
+PASS DROP B false: every displayed circuit has known accepted ports and a matching final result
+PASS DROP B false: every NOT reverses its incoming signal
+PASS DROP B false: distinct module housings do not overlap
+PASS DROP B false: modules clear terrain and code-platform footprints
+PASS DROP B false: amber 14-unit NOT is opaque
+PASS DROP B false: NOT module fits the normal camera
+PASS DROP B false: modules clear captions and interaction feedback
+PASS DROP B false: normal gameplay camera
+PASS DROP B true / EXPIRED: every displayed circuit has known accepted ports and a matching final result
+PASS DROP B true / EXPIRED: every NOT reverses its incoming signal
+PASS DROP B true / EXPIRED: distinct module housings do not overlap
+PASS DROP B true / EXPIRED: modules clear terrain and code-platform footprints
+PASS DROP B true / EXPIRED: amber 14-unit NOT is opaque
+PASS DROP B true / EXPIRED: NOT module fits the normal camera
+PASS DROP B true / EXPIRED: modules clear captions and interaction feedback
+PASS DROP B true / EXPIRED: normal gameplay camera
+PASS expired OR keeps safety on despite inverted DROP B false
+PASS disconnected: backbones remain and no moving marks are drawn
+PASS no browser runtime errors
+PASS no browser runtime errors

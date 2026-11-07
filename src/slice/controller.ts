@@ -25,6 +25,8 @@ export interface ControllerOutputs {
 }
 export type MachineSignal = keyof ControllerOutputs | keyof RaceOutputs | keyof CrossfeedOutputs | `draft:${string}`;
 export interface ControllerFrame {
+    /** Read-only accepted ports for authored wire logic; never local predictions. */
+    circuit?: { inputs: Readonly<Record<string, boolean>>; outputs: Readonly<Record<string, boolean>>; bufferPhase?: string };
     /** Optional authored device presentation, separate from validated C8 inputs. */
     controls?: Partial<Record<string, boolean>>;
     plates?: Partial<Record<string, boolean>>;

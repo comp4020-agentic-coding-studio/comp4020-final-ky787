@@ -17,7 +17,7 @@ type Paint = { kind: 'stroke' | 'fill' | 'text' | 'rect'; colour: string; alpha:
     dash: number[]; offset: number; path: PathCommand[]; text?: string; font?: string };
 /** Small local Canvas recorder, matching the terrain renderer tests. Records
  * actual path/state at paint time rather than a snapshot of every setter. */
-function render(links: MachineConnection[], powered: boolean, seconds: number, motion = true) {
+function record(links: MachineConnection[], powered: boolean, seconds: number, motion = true, circuit?: ControllerFrame['circuit']) {
     const paints: Paint[] = [];
     let path: PathCommand[] = [], dash: number[] = [];
     const c = {
@@ -25,6 +25,7 @@ function render(links: MachineConnection[], powered: boolean, seconds: number, m
         save() {}, restore() {}, beginPath() { path = []; },
         moveTo(x: number, y: number) { path.push(['moveTo', x, y]); },
         lineTo(x: number, y: number) { path.push(['lineTo', x, y]); },
+        closePath() { path.push(['closePath']); },
         arc(x: number, y: number, radius: number, start: number, end: number) { path.push(['arc', x, y, radius, start, end]); },
         setLineDash(value: number[]) { dash = [...value]; },
         measureText() { return { width: 25 }; },
@@ -39,12 +40,26 @@ function render(links: MachineConnection[], powered: boolean, seconds: number, m
     }
     const inputs = { ...emptyInputs(), plateA: !powered }, frame = emptyFrame();
     frame.signals = Object.fromEntries(links.map(link => [link.output, powered]));
+    if (circuit) frame.circuit = circuit;
     const world = { inputs, frame, elapsed: seconds } as PuzzleWorld;
     const before = structuredClone(world);
-    drawConnections(c as unknown as CanvasRenderingContext2D, links, world, motion);
+    const diagnostic = drawConnections(c as unknown as CanvasRenderingContext2D, links, world, motion);
     expect(world).toEqual(before);
-    return paints;
+    return { paints, diagnostic };
 }
+const render = (links: MachineConnection[], powered: boolean, seconds: number, motion = true) => record(links, powered, seconds, motion).paints;
+const inverter = (source = 'feed'): MachineConnection => ({ ...elbow, inverted: true, logic: {
+    source: { op: 'ref', id: `input:${source}` }, final: { op: 'ref', id: 'output:grappleAnchor' }, stages: [{ op: 'NOT', distance: 100 }],
+} });
+const chain = (op: 'AND' | 'OR'): MachineConnection => {
+    const link = inverter();
+    return { ...link, logic: { ...link.logic!, stages: [...link.logic!.stages,
+        { op, distance: 300, side: [{ label: 'ENABLE', expr: { op: 'ref', id: 'input:enable' } }] }] } };
+};
+const circuitFrame = (feed: boolean, final: boolean, enable = false): NonNullable<ControllerFrame['circuit']> => ({
+    inputs: { feed, enable }, outputs: { grappleAnchor: final },
+});
+const wireStrokes = (paints: Paint[]) => paints.filter(p => p.kind === 'stroke' && p.path.every(command => ['moveTo', 'lineTo'].includes(command[0])));
 
 it('every physical wire has endpoints inside its chamber and a distinct identity', () => {
     for (const room of ROOMS) {
@@ -138,17 +153,100 @@ it.each([false, true])('animated %s wires reset their dash before the next compl
     expect(nextBackbone.dash).toEqual([]); expect(nextBackbone.offset).toBe(0);
     expect(nextBackbone.path).toEqual(strokes[0].path);
 });
-it.each([false, true])('NOT stays opaque and deduplicated for %s shared inverted trunks', powered => {
-    const links = [{ ...elbow, inverted: true }, { ...elbow, id: 'branch', inverted: true,
-        points: [...elbow.points.slice(0, 2), { x: 800, y: 180 }] }, { ...elbow, id: 'ordinary' }];
+it.each([false, true])('NOT modules have opaque housings and truthful ports when their input is %s', source => {
+    const link = inverter(), links = [link, { ...link, id: 'branch', points: [...elbow.points.slice(0, 2), { x: 800, y: 180 }] }];
     for (const motion of [false, true]) {
-        const paints = render(links, powered, 7, motion), labels = paints.filter(p => p.kind === 'text'), backing = paints.filter(p => p.kind === 'rect');
-        expect(labels).toHaveLength(1); expect(backing).toHaveLength(1);
-        expect(labels[0]).toMatchObject({ text: 'NOT', colour: '#ffd76a', font: 'bold 14px monospace', alpha: 1 });
-        expect(backing[0]).toMatchObject({ colour: '#111820', alpha: 1 });
-        expect(paints.at(-1)).toBe(labels[0]);
-        expect(render([{ ...elbow, inverted: false }], powered, 7, motion).some(p => p.kind === 'text' || p.kind === 'rect')).toBe(false);
+        const { paints, diagnostic } = record(links, false, 7, motion, circuitFrame(source, !source));
+        expect(diagnostic.gates).toHaveLength(1); expect(diagnostic.unavailable).toEqual([]);
+        const node = diagnostic.gates[0]; expect(node).toMatchObject({ op: 'NOT', input: source, output: !source });
+        const labels = paints.filter(p => p.kind === 'text'), housings = paints.filter(p => p.kind === 'fill' && p.path.some(c => c[0] === 'closePath'));
+        expect(labels).toHaveLength(1); expect(housings).toHaveLength(1);
+        expect(labels[0]).toMatchObject({ text: 'NOT', colour: '#ffd76a', font: 'bold 14px monospace', alpha: 1,
+            path: [['text', node.at.x, node.at.y]] });
+        expect(housings[0]).toMatchObject({ colour: '#111820', alpha: 1 });
+        expect(paints.find(p => p.kind === 'rect' && p.path[0][1] === node.inputAt.x - 2.5)).toMatchObject({
+            colour: source ? '#64e6d5' : '#71849c', alpha: 1,
+            path: [['rect', node.inputAt.x - 2.5, node.inputAt.y - 2.5, 5, 5]],
+        });
+        expect(paints.find(p => p.kind === 'stroke' && p.path[0][0] === 'arc' && p.path[0][3] === 3)).toMatchObject({
+            colour: source ? '#71849c' : '#64e6d5', alpha: 1,
+        });
     }
+});
+it('module deduplication follows the source and operation, never mere coordinate proximity', () => {
+    const first = inverter(), unrelated = { ...inverter('other'), id: 'unrelated' }, frame = circuitFrame(false, true);
+    const result = record([first, { ...first, id: 'same-source' }, unrelated], false, 2, true,
+        { ...frame, inputs: { ...frame.inputs, other: false } });
+    expect(result.diagnostic.gates).toHaveLength(2);
+    expect(result.diagnostic.gates[0].at).toEqual(result.diagnostic.gates[1].at);
+    expect(result.diagnostic.gates[0].id).not.toBe(result.diagnostic.gates[1].id);
+    expect(result.paints.filter(p => p.kind === 'text' && p.text === 'NOT')).toHaveLength(2);
+    const and = chain('AND'), or = { ...chain('OR'), id: 'different-operation' };
+    const split = record([and, or], false, 2, true, circuitFrame(false, true, true));
+    expect(split.diagnostic.gates.map(g => g.op)).toEqual(['NOT', 'AND', 'OR']);
+});
+it.each([
+    ['AND', false, false, false], ['AND', true, true, false], ['AND', false, true, true], ['OR', true, true, true],
+] as const)('%s draws source=%s, enable=%s and final=%s as separate animated segments', (op, source, enable, final) => {
+    const { paints, diagnostic } = record([chain(op)], false, .73, true, circuitFrame(source, final, enable));
+    expect(diagnostic.unavailable).toEqual([]);
+    const [not, junction] = diagnostic.gates;
+    expect(not).toMatchObject({ op: 'NOT', input: source, output: !source });
+    expect(junction).toMatchObject({ op, input: !source, output: final });
+    const strokes = wireStrokes(paints);
+    const atStart = (point: { x: number; y: number }) => strokes.filter(p => p.path[0][1] === point.x && p.path[0][2] === point.y);
+    for (const [start, end, active] of [[elbow.points[0], not.inputAt, source], [not.outputAt, junction.inputAt, !source],
+        [junction.outputAt, elbow.points.at(-1)!, final]] as const) {
+        const segment = atStart(start);
+        expect(segment).toHaveLength(active ? 2 : 3);
+        expect(segment.every(p => p.path.at(-1)![1] === end.x && p.path.at(-1)![2] === end.y)).toBe(true);
+        expect(segment[0]).toMatchObject(active ? { colour: '#64e6d5', alpha: .65 } : { colour: '#0b121a', alpha: .9 });
+        const scan = segment.find(p => p.dash.length)!;
+        expect(scan).toMatchObject(active ? { dash: [9, 28], offset: -.73 * 70 } : { dash: [12, 228], offset: -.73 * 75 });
+    }
+    // Each hot segment owns its pulse; it cannot jump across a module or an
+    // unpowered intermediate/final leg just because the destination is active.
+    const pulses = paints.filter(p => p.kind === 'fill' && p.colour === '#d6fff4');
+    const hot = strokes.filter(p => p.dash.length && p.colour === '#64e6d5');
+    expect(pulses).toHaveLength(hot.length);
+    expect(pulses.map(p => p.path[0].slice(1, 3))).toEqual(hot.map(p => {
+        const point = connectionPulse(p.path.map(command => ({ x: command[1], y: command[2] })), .73);
+        return [point.x, point.y];
+    }));
+    for (const pulse of pulses) for (const node of diagnostic.gates) {
+        const [, x, y] = pulse.path[0], b = node.bounds;
+        expect(x < b.x || x > b.x + b.w || y < b.y || y > b.y + b.h).toBe(true);
+    }
+    const firstHousing = paints.findIndex(p => p.kind === 'fill' && p.path.some(c => c[0] === 'closePath'));
+    expect(paints.slice(firstHousing).some(p => p.dash.length > 0 || p.kind === 'fill' && p.colour === '#d6fff4')).toBe(false);
+});
+it('motion-disabled inverter and compound modules remain identical as world time changes', () => {
+    for (const source of [false, true]) for (const enable of [false, true]) for (const op of ['AND', 'OR'] as const) {
+        const final = op === 'AND' ? !source && enable : !source || enable, frame = circuitFrame(source, final, enable);
+        const first = record([chain(op)], false, 0, false, frame), later = record([chain(op)], false, 100, false, frame);
+        expect(later).toEqual(first);
+        expect(first.paints.some(p => p.dash.length || p.kind === 'fill' && p.colour === '#d6fff4')).toBe(false);
+        expect(first.diagnostic.gates.map(g => g.op)).toEqual(['NOT', op]);
+    }
+});
+it('unmapped inversion stays neutral and never fabricates a NOT rule from the destination', () => {
+    const legacy = { ...elbow, inverted: true };
+    for (const destination of [false, true]) {
+        const result = record([legacy], destination, 7);
+        expect(result.diagnostic.unavailable).toEqual([legacy.id]);
+        expect(result.diagnostic.gates).toMatchObject([{ op: '?', input: null, output: null }]);
+        expect(result.paints.filter(p => p.kind === 'text').map(p => p.text)).toEqual(['?']);
+        expect(wireStrokes(result.paints).map(p => p.colour)).toEqual(['#0b121a', '#605e60']);
+        expect(result.paints.some(p => p.dash.length || p.kind === 'fill' && p.colour === '#d6fff4')).toBe(false);
+        expect(record([legacy], destination, 0)).toEqual(record([legacy], destination, 100));
+    }
+    const missingPorts = record([inverter()], true, 7);
+    expect(missingPorts.diagnostic.gates).toMatchObject([{ op: 'NOT', input: null, output: null }]);
+    expect(wireStrokes(missingPorts.paints).every(p => ['#0b121a', '#605e60'].includes(p.colour))).toBe(true);
+    expect(missingPorts.paints.some(p => p.dash.length || p.kind === 'fill' && p.colour === '#d6fff4')).toBe(false);
+    const ordinary = record([{ ...elbow, inverted: false }], false, 7);
+    expect(ordinary.diagnostic.gates).toEqual([]);
+    expect(ordinary.paints.some(p => p.kind === 'text' || p.kind === 'rect')).toBe(false);
 });
 it('powered pulses travel around a corner and loop without adding gameplay delay', () => {
     const path = [{ x: 0, y: 0 }, { x: 220, y: 0 }, { x: 220, y: 220 }];

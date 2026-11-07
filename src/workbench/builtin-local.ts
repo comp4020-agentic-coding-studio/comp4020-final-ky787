@@ -83,7 +83,7 @@ class BuiltinAuthority implements LocalDraftAuthority {
         if (this.forced) Object.assign(this.outputs, this.forced);
         const signals: Partial<Record<MachineSignal, boolean>> = {};
         for (const b of this.document.bindings) { const value = !!this.outputs[b.output] !== !!b.invert; if (b.invert) signals[draftSignal(b.id)] = value; }
-        this.frame = { source: 'mock-greybox', outputs: base, signals: { ...CONSTANT_POWER, ...this.outputs, ...signals }, controls, plates, ...(timer ? { timer } : {}), ...(fading ? { fading } : {}) };
+        this.frame = { ...((p.level === 'race-condition' || p.level === 'crossfeed-vault') ? { circuit: { inputs: { ...p.state.inputs }, outputs: { ...this.outputs }, ...(p.level === 'race-condition' ? { bufferPhase: p.state.buffer.phase } : {}) } } : {}), source: 'mock-greybox', outputs: base, signals: { ...CONSTANT_POWER, ...this.outputs, ...signals }, controls, plates, ...(timer ? { timer } : {}), ...(fading ? { fading } : {}) };
         if (this.forced?.exitDoor !== undefined) this.frame.outputs.exitDoor = this.forced.exitDoor;
         for (const d of this.document.geometry.objects) if (d.type === 'device') { let v = d.kind === 'toggle' || d.kind === 'terminal' ? controls[d.id] : plates[d.id]; if (d.legacy) { const map = { plate: 'plateA', plateB: 'plateB', plateC: 'plateC', cargoPlate: 'cubeOnPlate', lever: 'switchB', upperLever: 'switchC' } as const; if (d.legacy !== 'cubePad') v = this.inputs[map[d.legacy]]; } this.values[objectPort(d)] = !!v; }
     }

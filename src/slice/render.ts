@@ -67,6 +67,7 @@ export class PuzzleRenderer {
     particles = new Particles();
     heroes = new HeroPresentation();
     switchOnboarding = new SwitchOnboarding();
+    connectionLogic: ReturnType<typeof drawConnections> = { gates: [], wires: [], unavailable: [] };
     private readonly energyMotionPreference = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
     private ctx: CanvasRenderingContext2D;
     constructor(readonly canvas: HTMLCanvasElement, private presentation: MachinePresentation = authoredPresentation) { this.ctx = canvas.getContext('2d')!; }
@@ -154,7 +155,7 @@ export class PuzzleRenderer {
         for (const lift of w.lifts) drawGravityLift(c, lift, this.heroes.machinery.lifts.get(lift.def.id)!, this.heroes.time, visible, cam.zoom, energyMotion, r.id !== 'uplink');
         this.text(r.id === 'workbench' ? `DRAFT / ${r.title}` : isCoopLevel(r.id) ? `CO-OP / ${r.title}` : `0${ROOM_IDS.indexOf(r.id) + 1} / ${r.title}`, 80, r.id === 'uplink' ? 935 : 90, 18, C.cyan);
         this.text(r.instruction, 80, r.id === 'uplink' ? 1045 : 132, 27, C.ink);
-        drawConnections(c, this.connections, w, energyMotion);
+        this.connectionLogic = drawConnections(c, this.connections, w, energyMotion);
         for (const h of r.hazards) drawDeathZone(c, h, visible, this.heroes.time, energyMotion);
         this.raceCargoDisplay.draw(c, this.raceCargo, r.id, visible, dt, energyMotion, running, performance.now());
         this.raceMachineryDisplay.draw(c, this.raceMachinery, r.id, visible, dt, energyMotion);
