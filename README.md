@@ -28,7 +28,7 @@ The game automatically highlights nearby grapple points, although mouse aiming i
 
 ## What good means for this game
 
-A good Binary Ninja level should make two players say, "Hold that while I try this," rather than ask what a button does or why a jump failed. Overall the level design philosophy was inspired from Portal (by Valve). My goal is a cooperative platformer where the challenge comes from understanding a shared world and coordinating movement. Players should not need assembly knowledge, precise mouse or keyboard interactions or an explanation from the developer before they can start enjoying the game. Overall the game should be fun and intuitive regardless of background.
+A good Binary Ninja level should make two players say, "Hold that while I try this," rather than ask what a button does or why a jump failed. Overall the level design philosophy was inspired from Portal. My goal is a cooperative platformer where the challenge comes from understanding a shared world and coordinating movement. Players should not need assembly knowledge, precise mouse or keyboard interactions or an explanation from the developer before they can start enjoying the game. Overall the game should be fun and intuitive regardless of background.
 
 ### Cooperation
 
@@ -38,14 +38,6 @@ Cooperation should arise from the level itself. One player might hold a pressure
 
 The machinery also needs to communicate its state. In Binary Ninja, wires connect controls to machinery, powered and unpowered platforms look different, and payload receivers show whether they have accepted a cube. Visual logic gates show how a signal changes rather than leaving players to interpret a small NOT label. The intended result is a puzzle players can investigate by observing cause and effect, without reading a technical manual.
 
-### Learning through play
-
-Learning should happen through gameplay with interactive tutorials and teaching mechanics as players progress. The four solo tutorial rooms introduce the controls before the cooperative campaign combines them. Playtesting revealed that variable jump height and cursor-dependent grappling were obstacles to understanding the puzzles. Ordinary jumps therefore reach a consistent height, nearby grapple targets are highlighted automatically, and short environmental prompts explain unfamiliar interactions. Precise mouse control remains available. These changes aim to remove unnecessary input difficulty, not remove the challenge of timing and teamwork.
-
-### Recovery and retries
-
-Mistakes should lead to another attempt rather than erase shared progress. Respawning, checkpoints where provided, and retained puzzle commitments let players experiment with routes and hazards. BYPASS provides an intermediate chamber before the more demanding stages. Later puzzles still require communication and practice; the aim is understandable difficulty, not a game in which every action succeeds immediately.
-
 ### Authentic reverse engineering
 
-Finally, the reverse-engineering theme should be authentic without becoming homework. The campaign’s controller results are verified against real Windows x64 binaries built with O-LLVM (an obfuscator for the clang toolchain), while compact assembly excerpts add atmosphere beside the machinery. The server uses verified lookup tables rather than running those binaries. Level geometry, animations, crumble timing and other physical rules remain authored gameplay, not claims about how a processor behaves. Detailed evidence is optional. Automated checks establish specific properties and successful routes, but they do not prove that a level is enjoyable or obvious. Human playtesting remains the basis for judging whether the experience meets these goals.
+Finally, the reverse-engineering theme should be authentic without becoming academic work for the player. The campaign’s controller results are verified against real Windows x64 binaries built with O-LLVM (an obfuscator for the clang toolchain), while assembly excerpts add atmosphere beside the machinery. The server uses lookup tables to retrieve the relevant assembly. Level geometry, animations, crumble timing and other physical rules remain authored gameplay, not claims about how a processor behaves. 
