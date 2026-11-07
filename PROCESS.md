@@ -42,3 +42,14 @@ Originally I got claude to pick some audio for various things such as sound effe
 - [60c04fc — Human-approved audio replacements](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/60c04fcddf519b452d9eb9d56ae754ecc6fb6dce): Installed the selected HANDSHAKE and CROSSFEED VAULT music and landing sound, while unifying lever feedback. Retained source credits and checks for the replacement assets.
 - [c5e623b — Selected victory sound](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/c5e623b196bb03b63c680a74a7c0aa32c277cf0a): Replaced the completion cue with the human-selected SRG774 Victory recording and made the background music stay quieter for the recording's duration.
 - [5977e97 — Final soundtrack choices](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/5977e97eb2fe1ba58fe235606ffba4896b4043df): Installed the final listening choices, Loaben for HANDSHAKE and regular Shadow for CROSSFEED VAULT, both CC0 recordings by James Gargette. Preserved the full tracks and recorded source hashes, loop checks and playback validation in the [soundtrack report](docs/playtest/2026-10-27-approved-soundtracks/README.md).
+
+### Multiple small changes and polished
+
+Towards the end of the project I attended crits and had various friends test the game and gather feedback. This occurred on multiple occaisions where feedback gradually made the game more intuitive and fun. Examples were: 
+- Quickly making a ninja character intead of being forced to create a name and make customisation optional
+- Changing jump height to be static regardless of the space key being held
+- Change grapple mechanics to stop the enforcement of the mouse and replaced tripple tapping space with a tap and hold design
+- Making inactive machinery and connections more visible
+Some testers played the game before and after some of these and found it easier and more enoyable to play. Some changes such as jumping keyboard mechanics would not have been optimised if not for the repeated testing with actual humans which shows the importance of attending the crits. 
+
+> git commits pls
