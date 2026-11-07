@@ -1,0 +1,9 @@
+PASS original deployed README invariants pass
+PASS 1280: semantic tables and screenshots, no client JavaScript
+PASS 1280: document fits viewport
+PASS 390: semantic tables and screenshots, no client JavaScript
+PASS 390: document fits viewport
+PASS mobile tables scroll inside their own container
+PASS repository screenshot 1 loads in actual Chromium
+PASS repository screenshot 2 loads in actual Chromium
+PASS no browser runtime errors

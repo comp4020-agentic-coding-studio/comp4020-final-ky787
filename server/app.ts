@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { freshProgress, validProgress, readProgress, type Progress } from '../src/slice/progress.ts';
 import { atomicJson } from './atomic-json.ts';
 import { streamAudio } from './audio-stream.ts';
+import { renderReadme } from './readme-page.ts';
 import { ensureVisitor, sameOrigin } from './identity.ts';
 import { attachMultiplayer } from './multiplayer.ts';
 import { PublicDraftRegistry, PublicDraftError, PUBLIC_DRAFT_LIMITS } from './public-drafts.ts';
@@ -197,9 +198,8 @@ export async function createApp(dataDir: string, siteDir = resolve('dist'), opti
             }
             if (url.pathname === '/readme/' || url.pathname === '/readme') {
                 const md = await readFile(resolve('README.md'), 'utf8');
-                const escaped = md.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                res.end(req.method === 'HEAD' ? undefined : `<!doctype html><meta charset="utf-8"><title>Binary Ninja — README</title><pre style="white-space:pre-wrap;max-width:85ch;margin:3rem auto">${escaped}</pre>`);
+                res.end(req.method === 'HEAD' ? undefined : renderReadme(md));
                 return;
             }
             const name = decodeURIComponent(url.pathname);
