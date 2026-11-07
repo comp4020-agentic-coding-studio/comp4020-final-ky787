@@ -8,7 +8,7 @@ I created a binary ninja platformer game where 2 players control a character tha
 
 ### Separating backend and frontend. 
 
-I used separate agents with different harnesses for backend and frontend. I used a codex agent to do the backend which create datasets from level designs by generating matching binaries and wrote outputs to a shared folder which a separate agent on the front end which read them from. Then this agent which as a separate harness which is catered towards gameplay visuals is used to generate the actual game and infrastructure. 
+I used separate agents with different harnesses for backend and frontend. I used a windows codex agent to do the backend which create datasets from level designs by generating matching binaries and wrote outputs to a shared folder which a separate agent on the front end which read them from. Then this agent which as a separate harness which is catered towards gameplay visuals is used to generate the actual game and infrastructure. 
 
 
 - [e8b0e25](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/e8b0e25c458df420972f469f2d7ee852d5d3189e) — Agent instructions
@@ -50,3 +50,7 @@ Some testers played the game before and after some of these and found it easier 
 - [e61466f](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/e61466fefca0c7bfb42c5357c732b7af6a85d354) — One-click character setup
 - [7bf93b2](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/7bf93b2071e233e49271eee9db33455ad7059f42) — Simpler jump/grapple controls
 - [f24f06f](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/f24f06f07b5ce0554d6ad706caf8ad402957a41d) — Visible inactive connections
+
+
+
+
