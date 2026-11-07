@@ -45,11 +45,16 @@ Originally I got claude to pick some audio for various things such as sound effe
 
 ### Multiple small changes and polished
 
-Towards the end of the project I attended crits and had various friends test the game and gather feedback. This occurred on multiple occaisions where feedback gradually made the game more intuitive and fun. Examples were: 
+Towards the end of the project I attended crits and had various friends test the game and gather feedback. This occurred on multiple occaisions where feedback gradually made the game more intuitive and fun. Examples were:
+
 - Quickly making a ninja character intead of being forced to create a name and make customisation optional
 - Changing jump height to be static regardless of the space key being held
 - Change grapple mechanics to stop the enforcement of the mouse and replaced tripple tapping space with a tap and hold design
 - Making inactive machinery and connections more visible
-Some testers played the game before and after some of these and found it easier and more enoyable to play. Some changes such as jumping keyboard mechanics would not have been optimised if not for the repeated testing with actual humans which shows the importance of attending the crits. 
 
-> git commits pls
+Some testers played the game before and after some of these and found it easier and more enoyable to play. Some changes such as jumping keyboard mechanics would not have been optimised if not for the repeated testing with actual humans which shows the importance of attending the crits.
+
+- [e61466f — One-click character setup](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/e61466fefca0c7bfb42c5357c732b7af6a85d354): Prefilled a valid random operative name so new players could immediately initialise a ninja with the default colour. Kept the suggested name editable and preserved existing saved names.
+- [7bf93b2 — Simpler jump and grapple controls](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/7bf93b2071e233e49271eee9db33455ad7059f42): Made ordinary jumps reach the existing maximum height regardless of tap duration. Added automatic anchor targeting and a second Space press-and-hold to grapple, with release to jump off, while retaining precise mouse controls.
+- [f24f06f — Readable inactive connections](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/f24f06f07b5ce0554d6ad706caf8ad402957a41d): Replaced faint inactive wires with clearer blue-grey lines and restrained scanning animation. Preserved the brighter powered-wire appearance and respected pause and reduced-motion settings.
+- [7c6d4f5 — Visible signal logic](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/7c6d4f51f25e710f7a21ac07c01a50c324e6201b) and [572fc53 — Preserve frozen references](https://github.com/comp4020-agentic-coding-studio/comp4020-final-ky787/commit/572fc53fb4270be920b87ecd919115bcf6e2d752): Replaced floating NOT labels with visible gate modules showing incoming, inverted and final output states. Kept this presentation separate from the verified native reference code and preserved the controller logic.
