@@ -1,0 +1,479 @@
+[
+  {
+    "raster": [
+      {
+        "name": "continuous inactive contrast at zoom 0.45 on #0c131a",
+        "pass": true,
+        "detail": {
+          "current": 28649,
+          "old": 3500,
+          "ratio": 8.185428571428572
+        }
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.45 #0c131a 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.45 #0c131a 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.45 #0c131a 1.8",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.45 #0c131a 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.45 #0c131a 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.45 #0c131a 1.8",
+        "pass": true
+      },
+      {
+        "name": "continuous inactive contrast at zoom 0.45 on #1b2934",
+        "pass": true,
+        "detail": {
+          "current": 15759,
+          "old": 1754,
+          "ratio": 8.984606613454961
+        }
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.45 #1b2934 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.45 #1b2934 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.45 #1b2934 1.8",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.45 #1b2934 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.45 #1b2934 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.45 #1b2934 1.8",
+        "pass": true
+      },
+      {
+        "name": "continuous inactive contrast at zoom 0.75 on #0c131a",
+        "pass": true,
+        "detail": {
+          "current": 87954,
+          "old": 9899,
+          "ratio": 8.885139913122538
+        }
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.75 #0c131a 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.75 #0c131a 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.75 #0c131a 1.8",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.75 #0c131a 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.75 #0c131a 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.75 #0c131a 1.8",
+        "pass": true
+      },
+      {
+        "name": "continuous inactive contrast at zoom 0.75 on #1b2934",
+        "pass": true,
+        "detail": {
+          "current": 73960,
+          "old": 6119,
+          "ratio": 12.086942310835104
+        }
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.75 #1b2934 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.75 #1b2934 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 0.75 #1b2934 1.8",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.75 #1b2934 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.75 #1b2934 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 0.75 #1b2934 1.8",
+        "pass": true
+      },
+      {
+        "name": "continuous inactive contrast at zoom 1 on #0c131a",
+        "pass": true,
+        "detail": {
+          "current": 157032,
+          "old": 18153,
+          "ratio": 8.6504709965295
+        }
+      },
+      {
+        "name": "powered pixels unchanged relayGates 1 #0c131a 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 1 #0c131a 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 1 #0c131a 1.8",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 1 #0c131a 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 1 #0c131a 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 1 #0c131a 1.8",
+        "pass": true
+      },
+      {
+        "name": "continuous inactive contrast at zoom 1 on #1b2934",
+        "pass": true,
+        "detail": {
+          "current": 152701,
+          "old": 9793,
+          "ratio": 15.59287245992035
+        }
+      },
+      {
+        "name": "powered pixels unchanged relayGates 1 #1b2934 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 1 #1b2934 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged relayGates 1 #1b2934 1.8",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 1 #1b2934 0",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 1 #1b2934 0.25",
+        "pass": true
+      },
+      {
+        "name": "powered pixels unchanged grappleAnchor 1 #1b2934 1.8",
+        "pass": true
+      },
+      {
+        "name": "motion disabled ignores time, powered=false",
+        "pass": true
+      },
+      {
+        "name": "motion disabled ignores time, powered=true",
+        "pass": true
+      },
+      {
+        "name": "idle scan visibly advances",
+        "pass": true
+      },
+      {
+        "name": "scan follows the elbow continuously onto the vertical segment",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "name": "handshake-inactive",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1318.4174391700908,
+      "y": 722.999989695385,
+      "zoom": 1.0513495478201162
+    },
+    "signals": {
+      "draft:activation:on": true,
+      "draft:activation:off": false,
+      "draft:crossingPower": false,
+      "draft:liftPower": false,
+      "draft:relayPower": false,
+      "draft:firewallActive": true,
+      "draft:exitReady": false,
+      "draft:nearPower": false,
+      "draft:farPower": false,
+      "draft:lowerLink": false,
+      "draft:upperLink": false,
+      "draft:exitPower": false,
+      "draft:payloadFirewallPower": true
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "mode": "running",
+    "ink1": {
+      "scan": [
+        -199.375,
+        -199.375,
+        -199.375,
+        -199.375,
+        -199.375,
+        -199.375,
+        -200.625,
+        -200.625,
+        -200.625,
+        -200.625,
+        -200.625,
+        -200.625
+      ],
+      "flow": [
+        -186.0833282470703,
+        -187.25
+      ],
+      "backbone": 12
+    },
+    "ink2": {
+      "scan": [
+        -231.875,
+        -231.875,
+        -231.875,
+        -231.875,
+        -231.875,
+        -231.875,
+        -233.125,
+        -233.125,
+        -233.125,
+        -233.125,
+        -233.125,
+        -233.125
+      ],
+      "flow": [
+        -216.4166717529297,
+        -217.5833282470703
+      ],
+      "backbone": 12
+    }
+  },
+  {
+    "mode": "reduced motion",
+    "a": {
+      "scan": [],
+      "flow": [],
+      "backbone": 12
+    },
+    "b": {
+      "scan": [],
+      "flow": [],
+      "backbone": 12
+    }
+  },
+  {
+    "mode": "paused",
+    "a": {
+      "scan": [],
+      "flow": [],
+      "backbone": 12
+    },
+    "b": {
+      "scan": [],
+      "flow": [],
+      "backbone": 12
+    }
+  },
+  {
+    "name": "handshake-powered-1024",
+    "camera": {
+      "kind": "plate",
+      "id": "draft:crossing",
+      "frame": {
+        "x": 100,
+        "y": 580,
+        "w": 1140,
+        "h": 620,
+        "padding": 50
+      },
+      "x": 670.6437758680158,
+      "y": 889.9895065719214,
+      "zoom": 0.8208436783129119
+    },
+    "signals": {
+      "draft:activation:on": true,
+      "draft:activation:off": false,
+      "draft:crossingPower": true,
+      "draft:liftPower": true,
+      "draft:relayPower": false,
+      "draft:firewallActive": true,
+      "draft:exitReady": false,
+      "draft:nearPower": true,
+      "draft:farPower": true,
+      "draft:lowerLink": false,
+      "draft:upperLink": false,
+      "draft:exitPower": false,
+      "draft:payloadFirewallPower": true
+    },
+    "outputs": {
+      "exitDoor": false,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "bypass-initial",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 761.1345732135347,
+      "y": 453.00066584422046,
+      "zoom": 1.0510624903325232
+    },
+    "signals": {
+      "draft:activation:on": true,
+      "draft:activation:off": false,
+      "draft:anchorPower": false,
+      "draft:bridgePower": false,
+      "draft:firewallActive": true,
+      "draft:exitReady": true,
+      "draft:anchorFeed": false,
+      "draft:bridgeFeed": false,
+      "draft:barrierA": true,
+      "draft:barrierB": true,
+      "draft:exitFeed": true
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "bypass-firewall-active",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1550,
+      "y": 453.00528332982077,
+      "zoom": 1.0513513513513513
+    },
+    "signals": {
+      "draft:activation:on": true,
+      "draft:activation:off": false,
+      "draft:anchorPower": true,
+      "draft:bridgePower": true,
+      "draft:firewallActive": true,
+      "draft:exitReady": true,
+      "draft:anchorFeed": true,
+      "draft:bridgeFeed": true,
+      "draft:barrierA": true,
+      "draft:barrierB": true,
+      "draft:exitFeed": true
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "name": "bypass-override",
+    "camera": {
+      "kind": "follow",
+      "id": null,
+      "frame": null,
+      "x": 1910,
+      "y": 453.00308315692223,
+      "zoom": 1.0513513513513513
+    },
+    "signals": {
+      "draft:activation:on": true,
+      "draft:activation:off": false,
+      "draft:anchorPower": true,
+      "draft:bridgePower": true,
+      "draft:firewallActive": false,
+      "draft:exitReady": true,
+      "draft:anchorFeed": true,
+      "draft:bridgeFeed": true,
+      "draft:barrierA": false,
+      "draft:barrierB": false,
+      "draft:exitFeed": true
+    },
+    "outputs": {
+      "exitDoor": true,
+      "grappleAnchor": false,
+      "bridge": false,
+      "codePlatformA": false,
+      "codePlatformB": false,
+      "relayGates": false,
+      "liftField": false
+    }
+  },
+  {
+    "mode": "disconnected",
+    "a": {
+      "scan": [],
+      "flow": [],
+      "backbone": 6
+    },
+    "b": {
+      "scan": [],
+      "flow": [],
+      "backbone": 6
+    }
+  }
+]

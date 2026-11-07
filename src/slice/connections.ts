@@ -92,14 +92,27 @@ export function connectionPulse(points: readonly Vec2[], seconds: number): Vec2 
     }
     return points[0];
 }
-export function drawConnections(c: CanvasRenderingContext2D, links: readonly MachineConnection[], w: PuzzleWorld): void {
+export function drawConnections(c: CanvasRenderingContext2D, links: readonly MachineConnection[], w: PuzzleWorld, energyMotion = true): void {
     c.save();
     for (const link of links) {
         const on = connectionPowered(link, w), colour = link.output === 'relayGates' ? '#b59bff' : '#64e6d5';
-        c.strokeStyle = on ? colour : '#344955'; c.globalAlpha = on ? .65 : .45;
-        c.lineWidth = on ? 2 : 1;
-        c.beginPath(); link.points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); c.stroke();
-        if (!on) continue;
+        c.beginPath(); link.points.forEach((p, i) => i ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y));
+        if (!on) {
+            // A continuous quiet backbone remains readable without implying power.
+            // The dark edge separates it from nearby structure and background grid.
+            c.strokeStyle = '#0b121a'; c.globalAlpha = .9; c.lineWidth = 3.8; c.stroke();
+            c.strokeStyle = '#71849c'; c.globalAlpha = .85; c.lineWidth = 1.8; c.stroke();
+            if (energyMotion) {
+                // Dash phase follows the complete path through every corner. This
+                // is decoration using the existing world clock, not signal timing.
+                c.strokeStyle = '#a0b3cd'; c.globalAlpha = .55; c.lineWidth = 1.3;
+                c.setLineDash([12, 228]); c.lineDashOffset = -w.elapsed * 75; c.stroke();
+                c.setLineDash([]); c.lineDashOffset = 0;
+            }
+            continue;
+        }
+        c.strokeStyle = colour; c.globalAlpha = .65; c.lineWidth = 2; c.stroke();
+        if (!energyMotion) continue;
         c.setLineDash([9, 28]); c.lineDashOffset = -w.elapsed * 70; c.globalAlpha = .95; c.stroke();
         c.setLineDash([]); c.lineDashOffset = 0;
         const pulse = connectionPulse(link.points, w.elapsed);

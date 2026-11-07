@@ -1,0 +1,58 @@
+PASS continuous inactive contrast at zoom 0.45 on #0c131a — {"current":28649,"old":3500,"ratio":8.185428571428572}
+PASS powered pixels unchanged relayGates 0.45 #0c131a 0 — ""
+PASS powered pixels unchanged relayGates 0.45 #0c131a 0.25 — ""
+PASS powered pixels unchanged relayGates 0.45 #0c131a 1.8 — ""
+PASS powered pixels unchanged grappleAnchor 0.45 #0c131a 0 — ""
+PASS powered pixels unchanged grappleAnchor 0.45 #0c131a 0.25 — ""
+PASS powered pixels unchanged grappleAnchor 0.45 #0c131a 1.8 — ""
+PASS continuous inactive contrast at zoom 0.45 on #1b2934 — {"current":15759,"old":1754,"ratio":8.984606613454961}
+PASS powered pixels unchanged relayGates 0.45 #1b2934 0 — ""
+PASS powered pixels unchanged relayGates 0.45 #1b2934 0.25 — ""
+PASS powered pixels unchanged relayGates 0.45 #1b2934 1.8 — ""
+PASS powered pixels unchanged grappleAnchor 0.45 #1b2934 0 — ""
+PASS powered pixels unchanged grappleAnchor 0.45 #1b2934 0.25 — ""
+PASS powered pixels unchanged grappleAnchor 0.45 #1b2934 1.8 — ""
+PASS continuous inactive contrast at zoom 0.75 on #0c131a — {"current":87954,"old":9899,"ratio":8.885139913122538}
+PASS powered pixels unchanged relayGates 0.75 #0c131a 0 — ""
+PASS powered pixels unchanged relayGates 0.75 #0c131a 0.25 — ""
+PASS powered pixels unchanged relayGates 0.75 #0c131a 1.8 — ""
+PASS powered pixels unchanged grappleAnchor 0.75 #0c131a 0 — ""
+PASS powered pixels unchanged grappleAnchor 0.75 #0c131a 0.25 — ""
+PASS powered pixels unchanged grappleAnchor 0.75 #0c131a 1.8 — ""
+PASS continuous inactive contrast at zoom 0.75 on #1b2934 — {"current":73960,"old":6119,"ratio":12.086942310835104}
+PASS powered pixels unchanged relayGates 0.75 #1b2934 0 — ""
+PASS powered pixels unchanged relayGates 0.75 #1b2934 0.25 — ""
+PASS powered pixels unchanged relayGates 0.75 #1b2934 1.8 — ""
+PASS powered pixels unchanged grappleAnchor 0.75 #1b2934 0 — ""
+PASS powered pixels unchanged grappleAnchor 0.75 #1b2934 0.25 — ""
+PASS powered pixels unchanged grappleAnchor 0.75 #1b2934 1.8 — ""
+PASS continuous inactive contrast at zoom 1 on #0c131a — {"current":157032,"old":18153,"ratio":8.6504709965295}
+PASS powered pixels unchanged relayGates 1 #0c131a 0 — ""
+PASS powered pixels unchanged relayGates 1 #0c131a 0.25 — ""
+PASS powered pixels unchanged relayGates 1 #0c131a 1.8 — ""
+PASS powered pixels unchanged grappleAnchor 1 #0c131a 0 — ""
+PASS powered pixels unchanged grappleAnchor 1 #0c131a 0.25 — ""
+PASS powered pixels unchanged grappleAnchor 1 #0c131a 1.8 — ""
+PASS continuous inactive contrast at zoom 1 on #1b2934 — {"current":152701,"old":9793,"ratio":15.59287245992035}
+PASS powered pixels unchanged relayGates 1 #1b2934 0 — ""
+PASS powered pixels unchanged relayGates 1 #1b2934 0.25 — ""
+PASS powered pixels unchanged relayGates 1 #1b2934 1.8 — ""
+PASS powered pixels unchanged grappleAnchor 1 #1b2934 0 — ""
+PASS powered pixels unchanged grappleAnchor 1 #1b2934 0.25 — ""
+PASS powered pixels unchanged grappleAnchor 1 #1b2934 1.8 — ""
+PASS motion disabled ignores time, powered=false — ""
+PASS motion disabled ignores time, powered=true — ""
+PASS idle scan visibly advances — ""
+PASS scan follows the elbow continuously onto the vertical segment — ""
+PASS handshake-inactive uses the normal gameplay camera
+PASS actual gameplay advances faint idle and unchanged powered flow
+PASS continuous inactive lines remain drawn in chamber overview
+PASS reduced motion: inactive backbone remains and both kinds of animated marks stop
+PASS paused: inactive backbone remains and both kinds of animated marks stop
+PASS handshake-powered-1024 uses the normal gameplay camera
+PASS bypass-initial uses the normal gameplay camera
+PASS bypass-firewall-active uses the normal gameplay camera
+PASS bypass-override uses the normal gameplay camera
+PASS disconnected: inactive backbone remains and both kinds of animated marks stop
+PASS no browser runtime errors
+PASS no browser runtime errors

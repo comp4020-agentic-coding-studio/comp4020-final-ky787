@@ -1,0 +1,36 @@
+PASS TRANSFER initially powers inverted relay output
+PASS TRANSFER MODE relay on: amber 14-unit NOT is fully opaque
+PASS TRANSFER MODE relay on: NOT backing fits the normal camera
+PASS TRANSFER MODE relay on: NOT backing clears captions, E prompt, player names and evidence text
+PASS TRANSFER MODE relay on: normal gameplay camera
+PASS TRANSFER switches relay off and bridge on
+PASS TRANSFER MODE relay off: amber 14-unit NOT is fully opaque
+PASS TRANSFER MODE relay off: NOT backing fits the normal camera
+PASS TRANSFER MODE relay off: NOT backing clears captions, E prompt, player names and evidence text
+PASS TRANSFER MODE relay off: normal gameplay camera
+PASS TRANSFER reverses back to powered relay
+PASS ROUTE initially selects inverted left route
+PASS ROUTE SELECT left on: amber 14-unit NOT is fully opaque
+PASS ROUTE SELECT left on: NOT backing fits the normal camera
+PASS ROUTE SELECT left on: NOT backing clears captions, E prompt, player names and evidence text
+PASS ROUTE SELECT left on: normal gameplay camera
+PASS ROUTE switches left off and right on
+PASS ROUTE SELECT left off: amber 14-unit NOT is fully opaque
+PASS ROUTE SELECT left off: NOT backing fits the normal camera
+PASS ROUTE SELECT left off: NOT backing clears captions, E prompt, player names and evidence text
+PASS ROUTE SELECT left off: normal gameplay camera
+PASS ROUTE reverses back to powered left route
+PASS ROUTE SELECT 1024×768: amber 14-unit NOT is fully opaque
+PASS ROUTE SELECT 1024×768: NOT backing fits the normal camera
+PASS ROUTE SELECT 1024×768: NOT backing clears captions, E prompt, player names and evidence text
+PASS ROUTE SELECT 1024×768: normal gameplay camera
+PASS ROUTE SELECT reduced motion: amber 14-unit NOT is fully opaque
+PASS ROUTE SELECT reduced motion: NOT backing fits the normal camera
+PASS ROUTE SELECT reduced motion: NOT backing clears captions, E prompt, player names and evidence text
+PASS ROUTE SELECT reduced motion: normal gameplay camera
+PASS ROUTE SELECT paused: amber 14-unit NOT is fully opaque
+PASS ROUTE SELECT paused: NOT backing fits the normal camera
+PASS ROUTE SELECT paused: NOT backing clears captions, E prompt, player names and evidence text
+PASS ROUTE SELECT paused: normal gameplay camera
+PASS no browser runtime errors
+PASS no browser runtime errors
