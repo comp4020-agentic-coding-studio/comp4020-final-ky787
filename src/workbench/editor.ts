@@ -250,7 +250,7 @@ export class WorkbenchEditor {
     rebuildRuntime() {
         this.runtimeError = ''; this.runtime = null;
         if (!this.playable) return;
-        try { this.runtime = createRuntime(cloneDraft(this.document), this.testSlot); this.renderer.room(this.runtime.world); if (this.mode === 'preview') this.runtime.preview(this.previewValues, this.forcedMode ? this.forced : undefined); }
+        try { this.runtime = createRuntime(cloneDraft(this.document), this.testSlot); this.renderer.room(this.runtime.world, false, [], this.runtime.document); if (this.mode === 'preview') this.runtime.preview(this.previewValues, this.forcedMode ? this.forced : undefined); }
         catch (error) { this.runtimeError = error instanceof Error ? error.message : String(error); this.status(`Renderer/runtime: ${this.runtimeError}`); }
     }
     updateToolbar() {
@@ -596,7 +596,7 @@ export class WorkbenchEditor {
             const hash = await draftHash(snapshot);
             if (request !== this.testRequest || serializeDraft(snapshot) !== serializeDraft(this.document)) throw new Error('Draft changed while starting the test; start again from the current document.');
             this.clearEditorMovement(); this.testSlot = slot; this.testAt = options.at; this.runtime = runtime; this.mode = 'play'; this.paused = false; this.accumulator = 0;
-            this.palette = null; this.connection = false; this.renderer.room(runtime.world);
+            this.palette = null; this.connection = false; this.renderer.room(runtime.world, false, [], runtime.document);
             this.recording = { version: 1, draftHash: hash, engineRevision: this.engineRevision, scenario: options.scenario ?? (options.at ? 'editor-test-from-here' : 'editor-play-from-spawn'), sectionOnly: !!options.at, samples: [], events: [] }; this.recordedFrames = 0; this.recordingElapsed = 0;
             this.input = new InputManager(true); this.input.attach(this.canvas, $('.wb-stage')); this.canvas.focus(); this.renderInspector(); this.renderLogic(); this.updateToolbar(); this.status('Physics test running in an isolated runtime. Escape or Stop returns to authored geometry.');
         } catch (error) { const message = error instanceof Error ? error.message : String(error); this.status(`Cannot start test: ${message}`); throw error; }

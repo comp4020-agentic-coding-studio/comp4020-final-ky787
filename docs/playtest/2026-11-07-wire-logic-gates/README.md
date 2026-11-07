@@ -13,7 +13,11 @@ identifiers. RACE and CROSSFEED expose a read-only `ControllerFrame.circuit` vie
 of accepted inputs/outputs and the accepted buffer phase. Pending lever prediction,
 extrapolated countdowns and physical handover grace do not change these diagrams.
 Declarative diagrams factor the actual AST and binding inversion; evaluator files
-and frozen source hashes remain untouched.
+and frozen source hashes remain untouched. Metadata is attached at the renderer
+boundary; local previews and custom sessions pass their frozen draft document.
+`room-adapter.ts` stays byte-identical to the Windows request. The first CI run
+caught its additional source pin; the follow-up moved presentation work out of
+that file without changing the request, hashes or hash assertions.
 
 | Connection | Incoming source | Intermediate / junction | Final outgoing value |
 |---|---|---|---|
@@ -59,8 +63,8 @@ room for the modules; canonical import/export does not insert a second jog.
 
 ## Validation and captures
 
-- 66 focused tests passed: `connections`, `wire-logic`, `workbench-runtime`,
-  `camera-reveals`. This includes 656 controller vectors against actual TS
+- 86 focused tests passed: `connections`, `wire-logic`, `workbench-runtime`,
+  `camera-reveals`, `handshake-v2`. This includes 656 controller vectors against actual TS
   evaluators, accepted-versus-pending state, buffer phases, raw versus grace,
   unknown inputs, shared gates, segment/pulse boundaries and motion-disabled output.
 - `pnpm typecheck`, `pnpm build`, `pnpm check:native` passed. Build retains the
@@ -90,7 +94,7 @@ playtesting decision, not established by pixel or geometry assertions.
 Reproduce after building:
 
 ```sh
-pnpm exec vitest run --config vitest.unit.config.ts tests/connections.test.ts tests/wire-logic.test.ts tests/workbench-runtime.test.ts tests/camera-reveals.test.ts
+pnpm exec vitest run --config vitest.unit.config.ts tests/connections.test.ts tests/wire-logic.test.ts tests/workbench-runtime.test.ts tests/camera-reveals.test.ts tests/handshake-v2.test.ts
 BN_SHOTS=.workbench/reports/logic-gates node scripts/inverted-signals-browser-check.ts
 BN_GATES_DECLARATIVE_ONLY=1 BN_SHOTS=.workbench/reports/logic-gates-existing node scripts/inverted-signals-browser-check.ts
 ```

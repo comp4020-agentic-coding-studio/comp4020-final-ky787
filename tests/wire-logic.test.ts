@@ -11,7 +11,7 @@ import { RaceAuthority } from '../src/coop/race-authority.ts';
 import { raceCondition } from '../src/coop/race-condition.ts';
 import type { RaceInputs, RaceOutputs, CrossfeedOutputs, Plate } from '../src/coop/protocol.ts';
 import type { ControllerFrame } from '../src/slice/controller.ts';
-import type { MachineConnection } from '../src/slice/connections.ts';
+import { roomConnections, type MachineConnection } from '../src/slice/connections.ts';
 import { declarativeWireLogic, logicState, withWireLogic } from '../src/slice/wire-logic.ts';
 import { draftFrame, emptyOutputs, evaluateDraft, initialDeviceValues } from '../src/workbench/evaluate.ts';
 import { draftRoom } from '../src/workbench/room-adapter.ts';
@@ -153,7 +153,10 @@ it('server grace can retain a physical route without changing its accepted raw c
 
 const campaign = (id: string) => parseDraft(JSON.parse(readFileSync(`levels/campaign/${id}.json`, 'utf8')));
 it.each(['handshake', 'deadlock', 'use-after-free'])('%s diagram agrees with its actual declarative bindings for every device vector', id => {
-    const document = campaign(id), before = structuredClone(document), links = draftRoom(document).wires!.filter(w => w.logic);
+    const document = campaign(id), before = structuredClone(document), room = draftRoom(document), rawRoom = structuredClone(room);
+    const links = roomConnections(room, document).filter(w => w.logic);
+    expect(room).toEqual(rawRoom); expect(room.wires!.every(w => !w.logic)).toBe(true);
+    expect(roomConnections({ ...room, id } as typeof room).filter(w => w.logic)).toEqual(links);
     expect(document).toEqual(before); expect(links.length).toBeGreaterThan(0);
     const ports = Object.keys(initialDeviceValues(document));
     for (let bits = 0; bits < 2 ** ports.length; bits++) {

@@ -71,7 +71,7 @@ async function load(value: DraftDocument, options: { state?: string; start?: Vec
     draftDoc = structuredClone(value); hash = await draftHash(draftDoc); scenario = options.scenario ?? 'manual';
     runtime = createRuntime(draftDoc, options.slot ?? 1, options.start ? { start: options.start } : undefined);
     if (options.state) { const state = draftDoc.previewStates[options.state]; if (!state) throw new Error(`Unknown preview state '${options.state}'`); runtime.preview(state); }
-    resetRecording(); lastWorld = runtime.world; renderer.room(runtime.world); ready = true;
+    resetRecording(); lastWorld = runtime.world; renderer.room(runtime.world, false, [], runtime.document); ready = true;
     status.textContent = 'PHYSICS PREVIEW · single player · no campaign progress';
 }
 function connect(hashToStart?: string, code?: string) {
@@ -99,7 +99,7 @@ function start(options: { marker?: string; at?: Vec2; scenario?: string } = {}) 
     const marker = options.marker ? draftDoc.geometry.objects.find(o => o.id === options.marker) : undefined;
     if (options.marker && (!marker || !['spawn', 'checkpoint'].includes(marker.type))) throw new Error('Test start must reference a spawn/checkpoint marker');
     runtime.restart(options.at ?? (marker ? { x: marker.x, y: marker.y } : undefined));
-    scenario = options.scenario ?? scenario; renderer.editorCamera = undefined; renderer.room(runtime.world); resetRecording(); running = true; input.releaseAll(); canvas.focus();
+    scenario = options.scenario ?? scenario; renderer.editorCamera = undefined; renderer.room(runtime.world, false, [], runtime.document); resetRecording(); running = true; input.releaseAll(); canvas.focus();
 }
 const api = { load, observe, render, start, stop: () => { running = false; input.releaseAll(); return recording(); }, recording,
     aimPoint: (id: string) => { const o = draftDoc?.geometry.objects.find(o => o.id === id); if (!o) throw new Error(`Unknown aim target '${id}'`); const b = objectBounds(o); const x = b.x + b.w / 2, y = b.y + Math.min(12, b.h / 2), rect = canvas.getBoundingClientRect(); return { x: (x - renderer.camera.originX()) * renderer.camera.zoom + rect.left, y: (y - renderer.camera.originY()) * renderer.camera.zoom + rect.top }; },
@@ -132,7 +132,7 @@ function frame(now: number) {
         music.setActive(!!w && running && (!session || session.client.playing));
         music.setDucked(running ? 'none' : 'pause');
         if (w) {
-            if (w !== lastWorld) { input.releaseAll(); lastWorld = w; renderer.room(w); resetRecording(); }
+            if (w !== lastWorld) { input.releaseAll(); lastWorld = w; renderer.room(w, false, [], session?.document ?? runtime?.document ?? undefined); resetRecording(); }
             const active = running && (!session || session.client.playing);
             if (active !== wasActive) { input.setEnabled(active); wasActive = active; }
             if (!active) w.cancelGrapple();

@@ -1,3 +1,4 @@
+import type { DraftDocument } from '../workbench/model.ts';
 import { colourHex, DEFAULT_CHARACTER_PROFILE, type PublicCharacterProfile } from '../character/profile.ts';
 import { characterForSlot, characterLabel } from '../character/presentation.ts';
 import type { CharacterProfiles, Slot } from '../coop/protocol.ts';
@@ -80,9 +81,9 @@ export class PuzzleRenderer {
         this.camera.viewW = rect.width;
         this.camera.viewH = rect.height;
     }
-    room(world: PuzzleWorld, completed = false, mechanics: readonly string[] = []): void {
+    room(world: PuzzleWorld, completed = false, mechanics: readonly string[] = [], document?: DraftDocument): void {
         this.switchOnboarding.reset(world.room.id, mechanics);
-        this.connections = roomConnections(world.room);
+        this.connections = roomConnections(world.room, document);
         this.resize();
         this.camera.setWorld(world.room.width, world.room.height, 740);
         this.camera.snapTo(world.player.x, world.player.y - 100);

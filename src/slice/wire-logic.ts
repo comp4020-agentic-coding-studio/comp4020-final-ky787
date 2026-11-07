@@ -157,3 +157,14 @@ export function declarativeWireLogic(draft: DraftDocument, wire: DraftWire, bind
         return { points, logic: { source: convert({ op: 'ref', id: source }), stages, final: ref(`signal:draft:${binding?.id ?? output}`) } };
     } catch { return {}; }
 }
+
+/** Attach presentation metadata after the frozen geometry adapter has run. */
+export function draftWireLogic(links: readonly MachineConnection[], draft: DraftDocument): MachineConnection[] {
+    if (draft.controller.kind === 'builtin') return withWireLogic(links, draft.controller.id);
+    return links.map((link, index) => {
+        const wire = draft.presentation.wires[index];
+        if (!wire || link.logic) return link;
+        const binding = draft.bindings.find(b => b.id === wire.binding), visual = declarativeWireLogic(draft, wire, binding);
+        return { ...link, ...(visual.logic ? { logic: visual.logic } : {}), ...(visual.points ? { points: visual.points } : {}) };
+    });
+}

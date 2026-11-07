@@ -90,7 +90,7 @@ function frame(now: number) {
     music.setActive(!!w && c.playing);
     music.setDucked(performance.now() < completionMusicUntil ? 'complete' : c.playing ? 'none' : 'pause');
     if (w) {
-        if (w !== lastWorld) { lastWorld = w; renderer.room(w); sound.reset(w); accumulated = 0; input.releaseAll(); canvas.focus(); }
+        if (w !== lastWorld) { lastWorld = w; renderer.room(w, false, [], session.document ?? undefined); sound.reset(w); accumulated = 0; input.releaseAll(); canvas.focus(); }
         const active = c.playing && !completed;
         if (active !== wasActive) { input.setEnabled(active); wasActive = active; }
         if (!active) w.cancelGrapple();

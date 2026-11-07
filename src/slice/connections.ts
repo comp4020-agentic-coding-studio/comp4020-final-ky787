@@ -1,5 +1,7 @@
+import { CAMPAIGN_DOCUMENTS } from '../coop/authored-campaign.ts';
+import type { DraftDocument } from '../workbench/model.ts';
 import { drawGateConnections } from './connection-gates.ts';
-import { withWireLogic, type WireLogic } from './wire-logic.ts';
+import { draftWireLogic, withWireLogic, type WireLogic } from './wire-logic.ts';
 import type { Vec2 } from '../engine/geometry.ts';
 import type { ControllerInputs, MachineSignal } from './controller.ts';
 import type { RoomDef } from './rooms.ts';
@@ -16,8 +18,9 @@ export interface MachineConnection {
     output: MachineSignal;
     points: Vec2[];
 }
-export function roomConnections(r: RoomDef): MachineConnection[] {
-    if (r.wires) return withWireLogic(r.wires, r.id);
+export function roomConnections(r: RoomDef, document?: DraftDocument): MachineConnection[] {
+    const draft = document ?? (Object.hasOwn(CAMPAIGN_DOCUMENTS, r.id) ? CAMPAIGN_DOCUMENTS[r.id as keyof typeof CAMPAIGN_DOCUMENTS] : undefined);
+    if (r.wires) return draft ? draftWireLogic(r.wires, draft) : withWireLogic(r.wires, r.id);
     const wires: MachineConnection[] = [];
     const add = (id: string, input: MachineConnection['input'], output: MachineConnection['output'], points: Vec2[]) => wires.push({ id, input, output, points, resolved: r.id === 'crossfeed-vault' });
     const above = (p: Vec2) => ({ x: p.x, y: p.y - 12 });

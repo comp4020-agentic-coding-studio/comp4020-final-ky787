@@ -1,4 +1,3 @@
-import { declarativeWireLogic, withWireLogic } from '../slice/wire-logic.ts';
 import type { CubeId, CubePlacement, PressurePlateId, Slot } from '../coop/protocol.ts';
 import { PRESSURE_PLATES, CROSSFEED_PLATES } from '../coop/protocol.ts';
 import type { MachineSignal } from '../slice/controller.ts';
@@ -45,10 +44,5 @@ export function draftRoom(document: DraftDocument, slot: Slot = 1): RoomDef {
     const pairIds = [...new Set(objects.filter(o => o.type === 'relay').map(o => o.pair))];
     for (const pair of pairIds) { const gates = objects.filter(o => o.type === 'relay' && o.pair === pair); if (gates[0]?.type !== 'relay' || gates[1]?.type !== 'relay') throw new Error(`Missing relay pair ${pair}`); const one = gates[0], two = gates[1]; (room.gates ??= []).push({ id: pair, signal: feed(one.id, 'power')!, gates: [{ id: one.nativeId ?? one.id, ...at(one), w: one.w, h: one.h, exitSide: one.exitSide }, { id: two.nativeId ?? two.id, ...at(two), w: two.w, h: two.h, exitSide: two.exitSide }] }); }
     room.wires = draft.presentation.wires.flatMap(w => { const b = w.binding ? draft.bindings.find(b => b.id === w.binding) : undefined; const output = b ? bindingSignal(b) : w.output ? builtin ? nativeSignal(w.output) : draftSignal(w.output) : draftSignal(`decorative:${w.id}`); return [{ id: w.id.replace(/^wire-/, ''), input: nativeInput(w.legacyInput), output, points: structuredClone(w.points), resolved: !w.sourcePowered, ...(w.invertedLabel || b?.invert ? { inverted: true } : {}) }]; });
-    room.wires = builtin && draft.controller.kind === 'builtin' ? withWireLogic(room.wires, draft.controller.id) : room.wires.map((link, index) => {
-        const wire = draft.presentation.wires[index], binding = draft.bindings.find(b => b.id === wire.binding);
-        const visual = declarativeWireLogic(draft, wire, binding);
-        return { ...link, ...(visual.logic ? { logic: visual.logic } : {}), ...(visual.points ? { points: visual.points } : {}) };
-    });
     return room;
 }

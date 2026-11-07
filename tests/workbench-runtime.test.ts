@@ -63,7 +63,7 @@ describe('trusted draft import compatibility', () => {
             expect(room.controls).toEqual(source.controls); expect(room.plates).toEqual(source.plates); expect(room.cubePads).toEqual(source.cubePads); expect(room.breakpoints).toEqual(source.breakpoints);
             expect(room.regions).toEqual(source.regions ?? []);
             const normalizedWires = (wires: NonNullable<typeof room.wires>) => wires.map(w => ({ ...w, resolved: w.resolved !== false, inverted: !!w.inverted }));
-            expect(normalizedWires(room.wires!)).toEqual(normalizedWires(roomConnections(source)));
+            expect(normalizedWires(roomConnections(room, draft))).toEqual(normalizedWires(roomConnections(source)));
         }
     });
 });
