@@ -48,4 +48,6 @@ Sources:
 
 Junod, P., Rinaldini, J., Wehrli, J., & Michielin, J. (2015). [Obfuscator-LLVM - Software Protection for the Masses](https://crypto.junod.info/spro15.pdf). IEEE/ACM Workshop on Software Protection.
 
+### Level Development Pipeline:
+
 ![Binary Ninja level design pipeline](level-design-pipeline.svg)
