@@ -50,4 +50,4 @@ Junod, P., Rinaldini, J., Wehrli, J., & Michielin, J. (2015). [Obfuscator-LLVM -
 
 ### Level Development Pipeline:
 
-![Binary Ninja level design pipeline](level-design-pipeline.svg)
+[![Binary Ninja level design pipeline](level-design-pipeline.svg)](level-design-pipeline.svg)
