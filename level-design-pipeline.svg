@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" height="3970px" version="1.1" viewBox="0 0 1500 3970" width="1500px">
+  <title>Binary Ninja: Level Design to Verified Native Assembly</title>
+  <desc>Detailed process flowchart. Human and AI co-design an authored room and validate gameplay before freezing controller logic. A Windows agent compiles matching clean and OLLVM-BCF binaries and compares the outputs exhaustively with the game oracle. Linux verifies the evidence and builds runtime truth tables and authentic assembly displays. Gameplay feedback loops back to level design; logic changes require new native evidence.</desc>
+  <defs>
+    <marker id="arrow" markerHeight="10" markerUnits="userSpaceOnUse" markerWidth="12" orient="auto" refX="10" refY="5">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8eabb9"/>
+    </marker>
+    <marker id="feedback-arrow" markerHeight="10" markerUnits="userSpaceOnUse" markerWidth="12" orient="auto" refX="10" refY="5">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f3c47a"/>
+    </marker>
+  </defs>
+  <g id="background">
+    <rect fill="#0b131b" height="3970" width="1500" x="0" y="0"/>
+    <rect fill="#10202a" height="1064" rx="24" ry="24" stroke="#294452" stroke-width="1.7" width="1428" x="36" y="211"/>
+    <line stroke="#294452" stroke-width="2" x1="68" x2="1432" y1="284" y2="284"/>
+    <rect fill="#10202a" height="1242" rx="24" ry="24" stroke="#294452" stroke-width="1.7" width="1428" x="36" y="1293"/>
+    <line stroke="#294452" stroke-width="2" x1="68" x2="1432" y1="1366" y2="1366"/>
+    <rect fill="#10202a" height="1083" rx="24" ry="24" stroke="#294452" stroke-width="1.7" width="1428" x="36" y="2552"/>
+    <line stroke="#294452" stroke-width="2" x1="68" x2="1432" y1="2625" y2="2625"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="62" x2="62" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="188" x2="188" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="314" x2="314" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="440" x2="440" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="566" x2="566" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="692" x2="692" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="818" x2="818" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="944" x2="944" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="1070" x2="1070" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="1196" x2="1196" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="1322" x2="1322" y1="125" y2="175"/>
+    <line opacity=".4" stroke="#223744" stroke-width="2" x1="1448" x2="1448" y1="125" y2="175"/>
+  </g>
+  <g id="headings">
+    <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="750" letter-spacing="3.4" x="65" y="79">BINARY NINJA</text>
+    <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="39" font-weight="760" x="65" y="132">FROM LEVEL DESIGN TO VERIFIED x64 ASSEMBLY</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="65" y="174">One human-led, AI-assisted workflow  •  gameplay first, binary evidence second</text>
+    <rect fill="#78d7cb" height="45" rx="10" width="50" x="65" y="235"/>
+    <text fill="#0b131b" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="21" font-weight="780" text-anchor="middle" x="90" y="267">01</text>
+    <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="29" font-weight="760" x="137" y="267">CO-DESIGN &amp; PLAYTEST</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="137" y="297">Human judgement and AI iteration converge on one room definition.</text>
+    <rect fill="#f3c47a" height="45" rx="10" width="50" x="65" y="1317"/>
+    <text fill="#0b131b" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="21" font-weight="780" text-anchor="middle" x="90" y="1349">02</text>
+    <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="29" font-weight="760" x="137" y="1349">WINDOWS BINARY ACQUISITION</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="137" y="1379">Compile the accepted Boolean controller, not the physical layout.</text>
+    <rect fill="#84d8ac" height="45" rx="10" width="50" x="65" y="2577"/>
+    <text fill="#0b131b" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="21" font-weight="780" text-anchor="middle" x="90" y="2609">03</text>
+    <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="29" font-weight="760" x="137" y="2609">LINUX INTEGRATION &amp; RELEASE</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="137" y="2639">Turn independently verified native results into gameplay and evidence.</text>
+  </g>
+  <g fill="none" id="connectors" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 695,382 L 803,382" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 385,465 L 385,511 L 250,511 L 250,559" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,465 L 1115,511 L 1250,511 L 1250,559" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 425,658 L 478,658" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1075,658 L 1022,658" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,750 L 750,802 L 385,802 L 385,854" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,750 L 750,802 L 1115,802 L 1115,854" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 385,1010 L 385,1048 L 600,1048 L 600,1089" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,1010 L 1115,1048 L 900,1048 L 900,1089" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 75,928 L 49,928 L 49,661 L 73,661" fill="none" marker-end="url(#feedback-arrow)" opacity="0.82" stroke="#f3c47a" stroke-dasharray="10 10" stroke-width="3.4"/>
+    <path d="M 1425,928 L 1451,928 L 1451,661 L 1427,661" fill="none" marker-end="url(#feedback-arrow)" opacity="0.82" stroke="#f3c47a" stroke-dasharray="10 10" stroke-width="3.4"/>
+    <path d="M 750,1241 L 750,1320 L 385,1320 L 385,1414" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 695,1487 L 803,1487" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,1565 L 1115,1612 L 750,1612 L 750,1644" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,1770 L 750,1812 L 385,1812 L 385,1859" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,1770 L 750,1812 L 1115,1812 L 1115,1859" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 385,2005 L 385,2044 L 600,2044 L 600,2094" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,2005 L 1115,2044 L 900,2044 L 900,2094" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,2255 L 750,2349" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,2515 L 750,2648 L 385,2648 L 385,2680" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 695,2764 L 803,2764" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,2840 L 1115,2880 L 385,2880 L 385,2919" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,2840 L 1115,2919" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 385,3070 L 385,3121 L 595,3121 L 595,3159" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 1115,3070 L 1115,3121 L 905,3121 L 905,3159" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+    <path d="M 750,3330 L 750,3419" fill="none" marker-end="url(#arrow)" opacity="1" stroke="#83a5b4" stroke-dasharray="none" stroke-width="3.2"/>
+  </g>
+  <g id="steps">
+    <g id="step-1">
+      <rect fill="#14232e" height="165" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="75" y="300"/>
+      <rect fill="#78d7cb" height="165" rx="3" width="6" x="75" y="300"/>
+      <circle cx="109" cy="336" fill="#203744" r="16" stroke="#78d7cb" stroke-width="2"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="342">1</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="136" y="344">Idea &amp; game goals</text>
+      <rect fill="#2b4350" height="25" rx="12" width="100" x="577" y="316"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="627.0" y="334">HUMAN</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="382">Human chooses the co-op puzzle, mechanics and</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="411">player experience. Tests whether it will be fun,</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="440">not just solvable.</text>
+    </g>
+    <g id="step-2">
+      <rect fill="#14232e" height="165" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="805" y="300"/>
+      <rect fill="#adbdff" height="165" rx="3" width="6" x="805" y="300"/>
+      <circle cx="839" cy="336" fill="#203744" r="16" stroke="#adbdff" stroke-width="2"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="839" y="342">2</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="866" y="344">Agent-assisted prototype</text>
+      <rect fill="#2b4350" height="25" rx="12" width="154" x="1253" y="316"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1330.0" y="334">AI / LINUX</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="382">AI implements room geometry, switches, physics</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="411">interactions and optional first-play guidance.</text>
+    </g>
+    <g id="step-3">
+      <rect fill="#14232e" height="185" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="350" x="75" y="560"/>
+      <rect fill="#78d7cb" height="185" rx="3" width="6" x="75" y="560"/>
+      <circle cx="109" cy="596" fill="#203744" r="16" stroke="#78d7cb" stroke-width="2"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="602">3</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="23" font-weight="730" x="136" y="604">Human edits</text>
+      <rect fill="#2b4350" height="25" rx="12" width="100" x="307" y="576"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="357.0" y="594">GUI</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="101" y="642">Drag, place and resize</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="101" y="671">objects in the Level</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="101" y="700">Builder; adjust layout</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="101" y="729">after playtesting.</text>
+    </g>
+    <g id="step-4">
+      <rect fill="#14232e" height="220" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="540" x="480" y="530"/>
+      <rect fill="#f3c47a" height="220" rx="3" width="6" x="480" y="530"/>
+      <circle cx="514" cy="566" fill="#203744" r="16" stroke="#f3c47a" stroke-width="2"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="514" y="572">4</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="22" font-weight="730" x="541" y="574">Canonical level definition</text>
+      <rect fill="#2b4350" height="25" rx="12" width="100" x="902" y="546"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="952.0" y="564">JSON</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="506" y="612">Versioned JSON draft: geometry, devices,</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="506" y="641">Boolean outputs, machinery bindings and wire</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="506" y="670">positions. One shared representation.</text>
+    </g>
+    <g id="step-5">
+      <rect fill="#14232e" height="185" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="350" x="1075" y="560"/>
+      <rect fill="#adbdff" height="185" rx="3" width="6" x="1075" y="560"/>
+      <circle cx="1109" cy="596" fill="#203744" r="16" stroke="#adbdff" stroke-width="2"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="1109" y="602">5</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="23" font-weight="730" x="1136" y="604">Agent edits</text>
+      <rect fill="#2b4350" height="25" rx="12" width="154" x="1253" y="576"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1330.0" y="594">JSON / CLI</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="1101" y="642">Codex changes the same JSON</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="1101" y="671">directly, without inventing</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="1101" y="700">a separate TS level file.</text>
+    </g>
+    <g id="step-6">
+      <rect fill="#14232e" height="155" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="75" y="855"/>
+      <rect fill="#9bb3c7" height="155" rx="3" width="6" x="75" y="855"/>
+      <circle cx="109" cy="891" fill="#203744" r="16" stroke="#9bb3c7" stroke-width="2"/>
+      <text fill="#9bb3c7" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="897">6</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="136" y="899">Validate the model</text>
+      <rect fill="#2b4350" height="25" rx="12" width="141" x="536" y="871"/>
+      <text fill="#9bb3c7" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="606.5" y="889">AUTOMATED</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="937">Schema + references + signal binding checks.</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="966">Reject invalid objects, cycles and inconsistent</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="995">ports.</text>
+    </g>
+    <g id="step-7">
+      <rect fill="#14232e" height="155" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="805" y="855"/>
+      <rect fill="#78d7cb" height="155" rx="3" width="6" x="805" y="855"/>
+      <circle cx="839" cy="891" fill="#203744" r="16" stroke="#78d7cb" stroke-width="2"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="839" y="897">7</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="866" y="899">Playtest real physics</text>
+      <rect fill="#2b4350" height="25" rx="12" width="193" x="1214" y="871"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1310.5" y="889">HUMAN + TESTS</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="937">Two browser identities, actual jumps, grapples and</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="966">cube transfers; screenshots + human feedback.</text>
+    </g>
+    <g id="step-8">
+      <rect fill="#14232e" height="152" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="750" x="375" y="1090"/>
+      <rect fill="#f3c47a" height="152" rx="3" width="6" x="375" y="1090"/>
+      <circle cx="409" cy="1126" fill="#203744" r="16" stroke="#f3c47a" stroke-width="2"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="409" y="1132">8</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="436" y="1134">Approve &amp; freeze gameplay</text>
+      <rect fill="#2b4350" height="25" rx="12" width="154" x="953" y="1106"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1030.0" y="1124">CHECKPOINT</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="401" y="1172">Accepted level + exact controller input/output contract,</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="401" y="1201">canonical hashes and expected states.</text>
+    </g>
+    <g id="step-9">
+      <rect fill="#14232e" height="150" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="75" y="1415"/>
+      <rect fill="#f3c47a" height="150" rx="3" width="6" x="75" y="1415"/>
+      <circle cx="109" cy="1451" fill="#203744" r="16" stroke="#f3c47a" stroke-width="2"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="1457">9</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="136" y="1459">Cross-machine handoff</text>
+      <rect fill="#2b4350" height="25" rx="12" width="219" x="458" y="1431"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="567.5" y="1449">LINUX → WINDOWS</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="1497">Versioned request and shared-workspace handoff.</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="1526">Specify ports, controller logic and evidence</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="1555">boundaries.</text>
+    </g>
+    <g id="step-10">
+      <rect fill="#14232e" height="150" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="805" y="1415"/>
+      <rect fill="#adbdff" height="150" rx="3" width="6" x="805" y="1415"/>
+      <circle cx="839" cy="1451" fill="#203744" r="16" stroke="#adbdff" stroke-width="2"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="839" y="1457">10</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="866" y="1459">Windows Codex acquisition</text>
+      <rect fill="#2b4350" height="25" rx="12" width="115" x="1292" y="1431"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1349.5" y="1449">WINDOWS</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="1497">Read the frozen request; do not regenerate the</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="1526">room or invent a different game oracle.</text>
+    </g>
+    <g id="step-11">
+      <rect fill="#14232e" height="125" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="720" x="390" y="1645"/>
+      <rect fill="#9bb3c7" height="125" rx="3" width="6" x="390" y="1645"/>
+      <circle cx="424" cy="1681" fill="#203744" r="16" stroke="#9bb3c7" stroke-width="2"/>
+      <text fill="#9bb3c7" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="424" y="1687">11</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="451" y="1689">Native C controller</text>
+      <rect fill="#2b4350" height="25" rx="12" width="100" x="992" y="1661"/>
+      <text fill="#9bb3c7" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1042.0" y="1679">CODE</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="416" y="1727">Translate only accepted stateless Boolean decisions into C</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="416" y="1756">with ordered ABI fields.</text>
+    </g>
+    <g id="step-12">
+      <rect fill="#14232e" height="145" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="75" y="1860"/>
+      <rect fill="#9bb3c7" height="145" rx="3" width="6" x="75" y="1860"/>
+      <circle cx="109" cy="1896" fill="#203744" r="16" stroke="#9bb3c7" stroke-width="2"/>
+      <text fill="#9bb3c7" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="1902">12</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="136" y="1904">Build clean x64 PE</text>
+      <rect fill="#2b4350" height="25" rx="12" width="141" x="536" y="1876"/>
+      <text fill="#9bb3c7" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="606.5" y="1894">REFERENCE</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="1942">Clang/LLVM Windows target, no bogus-control-flow</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="1971">pass; establish a comparison baseline.</text>
+    </g>
+    <g id="step-13">
+      <rect fill="#14232e" height="145" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="805" y="1860"/>
+      <rect fill="#f3c47a" height="145" rx="3" width="6" x="805" y="1860"/>
+      <circle cx="839" cy="1896" fill="#203744" r="16" stroke="#f3c47a" stroke-width="2"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="839" y="1902">13</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="866" y="1904">Build obfuscated x64 PE</text>
+      <rect fill="#2b4350" height="25" rx="12" width="154" x="1253" y="1876"/>
+      <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1330.0" y="1894">OBFUSCATED</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="1942">OLLVM-16 with Bogus Control Flow (BCF), retaining</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="1971">actual linked executable bytes.</text>
+    </g>
+    <g id="step-14">
+      <rect fill="#14232e" height="160" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="870" x="315" y="2095"/>
+      <rect fill="#84d8ac" height="160" rx="3" width="6" x="315" y="2095"/>
+      <circle cx="349" cy="2131" fill="#203744" r="16" stroke="#84d8ac" stroke-width="2"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="349" y="2137">14</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="376" y="2139">Exhaustive native validation</text>
+      <rect fill="#2b4350" height="25" rx="12" width="141" x="1026" y="2111"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1096.5" y="2129">HARD GATE</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="341" y="2177">Compare clean PE, BCF PE and original gameplay oracle over the complete</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="341" y="2206">declared input domain. Fail on a mismatch.</text>
+    </g>
+    <g id="step-15">
+      <rect fill="#14232e" height="165" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="980" x="260" y="2350"/>
+      <rect fill="#84d8ac" height="165" rx="3" width="6" x="260" y="2350"/>
+      <circle cx="294" cy="2386" fill="#203744" r="16" stroke="#84d8ac" stroke-width="2"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="294" y="2392">15</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="321" y="2394">Retain verifiable native evidence</text>
+      <rect fill="#2b4350" height="25" rx="12" width="128" x="1094" y="2366"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1158.0" y="2384">ACQUIRED</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="286" y="2432">Real disassembly + CFG; output-store RVAs, representative Unicorn PE-byte traces,</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="286" y="2461">conditional bogus-clone proofs and SHA-256 manifests.</text>
+    </g>
+    <g id="step-16">
+      <rect fill="#14232e" height="160" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="75" y="2680"/>
+      <rect fill="#84d8ac" height="160" rx="3" width="6" x="75" y="2680"/>
+      <circle cx="109" cy="2716" fill="#203744" r="16" stroke="#84d8ac" stroke-width="2"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="2722">16</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="136" y="2724">Portable Linux verification</text>
+      <rect fill="#2b4350" height="25" rx="12" width="141" x="536" y="2696"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="606.5" y="2714">READ ONLY</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="2762">Read acquired manifest and evidence, confirm</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="2791">hashes, contract identities and all retained</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="2820">native results.</text>
+    </g>
+    <g id="step-17">
+      <rect fill="#14232e" height="160" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="805" y="2680"/>
+      <rect fill="#adbdff" height="160" rx="3" width="6" x="805" y="2680"/>
+      <circle cx="839" cy="2716" fill="#203744" r="16" stroke="#adbdff" stroke-width="2"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="839" y="2722">17</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="866" y="2724">Generate runtime artifacts</text>
+      <rect fill="#2b4350" height="25" rx="12" width="100" x="1307" y="2696"/>
+      <text fill="#adbdff" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1357.0" y="2714">LINUX</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="2762">Deterministic code builds compact truth tables and</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="2791">separate display assets; mismatches stop the</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="2820">build.</text>
+    </g>
+    <g id="step-18">
+      <rect fill="#14232e" height="150" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="75" y="2920"/>
+      <rect fill="#84d8ac" height="150" rx="3" width="6" x="75" y="2920"/>
+      <circle cx="109" cy="2956" fill="#203744" r="16" stroke="#84d8ac" stroke-width="2"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="109" y="2962">18</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="136" y="2964">Server controller outputs</text>
+      <rect fill="#2b4350" height="25" rx="12" width="102" x="575" y="2936"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="626.0" y="2954">SERVER</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="3002">Bit-packed verified native results select power</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="3031">states. Node/WebSocket server owns latches, timers</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="101" y="3060">and arrivals.</text>
+    </g>
+    <g id="step-19">
+      <rect fill="#14232e" height="150" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="620" x="805" y="2920"/>
+      <rect fill="#d4b5fa" height="150" rx="3" width="6" x="805" y="2920"/>
+      <circle cx="839" cy="2956" fill="#203744" r="16" stroke="#d4b5fa" stroke-width="2"/>
+      <text fill="#d4b5fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="839" y="2962">19</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="866" y="2964">Environmental assembly</text>
+      <rect fill="#2b4350" height="25" rx="12" width="102" x="1305" y="2936"/>
+      <text fill="#d4b5fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1356.0" y="2954">CLIENT</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="3002">Display authentic x64 instructions, output-store</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="831" y="3031">associations and optional trace/inspector data.</text>
+    </g>
+    <g id="step-20">
+      <rect fill="#14232e" height="170" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="900" x="300" y="3160"/>
+      <rect fill="#78d7cb" height="170" rx="3" width="6" x="300" y="3160"/>
+      <circle cx="334" cy="3196" fill="#203744" r="16" stroke="#78d7cb" stroke-width="2"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="334" y="3202">20</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="361" y="3204">Integrate into the authored chamber</text>
+      <rect fill="#2b4350" height="25" rx="12" width="128" x="1054" y="3176"/>
+      <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1118.0" y="3194">PLAYABLE</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="326" y="3242">Human-designed terrain + native-backed signals + server-authoritative</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="326" y="3271">shared puzzle. Windows PE never runs on Linux.</text>
+    </g>
+    <g id="step-21">
+      <rect fill="#14232e" height="160" rx="16" ry="16" stroke="#456070" stroke-width="1.8" width="900" x="300" y="3420"/>
+      <rect fill="#84d8ac" height="160" rx="3" width="6" x="300" y="3420"/>
+      <circle cx="334" cy="3456" fill="#203744" r="16" stroke="#84d8ac" stroke-width="2"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="16" font-weight="750" text-anchor="middle" x="334" y="3462">21</text>
+      <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="24" font-weight="730" x="361" y="3464">Two-player checks → CI → Fly.io</text>
+      <rect fill="#2b4350" height="25" rx="12" width="115" x="1067" y="3436"/>
+      <text fill="#84d8ac" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="14" font-weight="760" text-anchor="middle" x="1124.5" y="3454">RELEASE</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="326" y="3502">Run focused solves, reconnect/persistence, native checks, visual</text>
+      <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="20" font-weight="400" x="326" y="3531">inspection; push only after review.</text>
+    </g>
+  </g>
+  <g id="change-policy">
+    <text fill="#edf6fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="25" font-weight="760" x="68" y="3650">WHEN PLAYTESTING REVEALS A PROBLEM</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="400" x="68" y="3685">Return to the design loop; decide whether it is a gameplay, visual or controller change.</text>
+    <rect fill="#122430" height="148" rx="16" ry="16" stroke="#355366" stroke-width="2" width="425" x="68" y="3715"/>
+    <rect fill="#78d7cb" height="5" rx="2" width="425" x="68" y="3715"/>
+    <text fill="#78d7cb" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="760" x="86" y="3758">LAYOUT / VISUALS</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="86" y="3795">Revise JSON, positions or art. Existing</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="86" y="3822">native result tables remain valid.</text>
+    <rect fill="#122430" height="148" rx="16" ry="16" stroke="#355366" stroke-width="2" width="425" x="537" y="3715"/>
+    <rect fill="#f3c47a" height="5" rx="2" width="425" x="537" y="3715"/>
+    <text fill="#f3c47a" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="760" x="555" y="3758">BOOLEAN LOGIC CHANGES</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="555" y="3795">Freeze a new contract, acquire and verify</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="555" y="3822">a new Windows specimen.</text>
+    <rect fill="#122430" height="148" rx="16" ry="16" stroke="#355366" stroke-width="2" width="425" x="1006" y="3715"/>
+    <rect fill="#d4b5fa" height="5" rx="2" width="425" x="1006" y="3715"/>
+    <text fill="#d4b5fa" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="19" font-weight="760" x="1024" y="3758">PROVENANCE RULE</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="1024" y="3795">A static listing is not a live execution</text>
+    <text fill="#a8bcc9" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="18" font-weight="400" x="1024" y="3822">trace. Crumble remains authored.</text>
+    <text fill="#9bb2c1" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="17" font-weight="400" text-anchor="middle" x="750" y="3905">Authoring note: HANDSHAKE, BYPASS, DEADLOCK and USE AFTER FREE use JSON; CROSSFEED and RACE retain TS room factories.</text>
+    <text fill="#8da6b5" font-family="Inter, Segoe UI, DejaVu Sans, sans-serif" font-size="17" font-weight="400" text-anchor="middle" x="750" y="3944">Binary Ninja / COMP8020  •  Human decisions  +  AI-assisted production  +  verified evidence</text>
+  </g>
+</svg>

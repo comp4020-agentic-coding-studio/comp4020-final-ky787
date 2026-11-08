@@ -47,3 +47,5 @@ Sources:
 [Portal 2 - Official Steam page](https://store.steampowered.com/app/620/Portal_2/)
 
 Junod, P., Rinaldini, J., Wehrli, J., & Michielin, J. (2015). [Obfuscator-LLVM - Software Protection for the Masses](https://crypto.junod.info/spro15.pdf). IEEE/ACM Workshop on Software Protection.
+
+![Binary Ninja level design pipeline](level-design-pipeline.svg)
