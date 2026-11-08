@@ -40,10 +40,10 @@ The machinery also needs to communicate its state. In Binary Ninja, wires connec
 
 ### Authentic reverse engineering
 
-Finally, the reverse-engineering theme should be authentic without becoming academic work for the player. The campaign’s controller results are verified against real Windows x64 binaries built with O-LLVM (an obfuscator for the clang toolchain), while assembly excerpts add atmosphere beside the machinery. The server uses lookup tables to to evaluate the binary backed controllers. Level geometry, animations, crumble timing and other physical rules remain authored gameplay, not claims about how a processor behaves. 
+Finally, the reverse-engineering theme should be authentic without becoming academic work for the player. The campaign’s controller results are verified against real Windows x64 binaries built with O-LLVM (an obfuscator for the clang toolchain), while assembly excerpts add atmosphere beside the machinery. The server uses lookup tables to evaluate the binary backed controllers. Level geometry, animations, crumble timing and other physical rules remain authored gameplay, not claims about how a processor behaves.
 
 Sources: 
 
-Portal 2 - Official Steam page: https://store.steampowered.com/app/620/Portal_2/
+[Portal 2 - Official Steam page](https://store.steampowered.com/app/620/Portal_2/)
 
-Junod, P., Rinaldini, J., Wehrli, J., & Michielin, J. (2015). Obfuscator-LLVM - Software Protection for the Masses. IEEE/ACM Workshop on Software Protection.
+Junod, P., Rinaldini, J., Wehrli, J., & Michielin, J. (2015). [Obfuscator-LLVM - Software Protection for the Masses](https://crypto.junod.info/spro15.pdf). IEEE/ACM Workshop on Software Protection.
