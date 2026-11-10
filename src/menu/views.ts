@@ -12,9 +12,8 @@ export function homeMenu(continueLabel?: string): string {
     return `<section class="home-shell" aria-labelledby="home-title">
         <div class="home-topline"><span class="home-wordmark"><b aria-hidden="true">BN<span>_</span></b> COOPERATIVE PLATFORM PUZZLES</span><span class="home-signal"><i></i> SYSTEM READY</span></div>
         <div class="home-layout"><div class="home-copy">
-            <div class="home-heading"><span class="eyebrow">FIND YOUR WAY THROUGH THE CODE</span>
-            <h1 id="home-title">BINARY<br><span>NINJA</span><i aria-hidden="true">_</i></h1>
-            <p>Read the room. Make the connection.</p></div>
+            <div class="home-heading">
+            <h1 id="home-title">BINARY<br><span>NINJA</span><i aria-hidden="true">_</i></h1></div>
             <nav class="home-nav" aria-label="Main menu">
                 <button id="tutorial" class="home-action home-primary" type="button"><span class="home-action-number" aria-hidden="true">01</span><span>Tutorial<small>Learn the moves · solo</small></span><b aria-hidden="true">↗</b></button>
                 <button id="play-coop" class="home-action" type="button"><span class="home-action-number" aria-hidden="true">02</span><span>Play Co-op<small>Two ninjas. One way out.</small></span><b aria-hidden="true">→</b></button>
